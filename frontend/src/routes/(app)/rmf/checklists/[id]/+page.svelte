@@ -125,7 +125,7 @@
       ]);
 
       if (checklistRes.success) checklist = checklistRes.data;
-      if (findingsRes.success) findings = findingsRes.results || [];
+      if (findingsRes.success) findings = findingsRes.data?.results || [];
       if (scoreRes.success) score = scoreRes.data;
 
       // Check for upgrade

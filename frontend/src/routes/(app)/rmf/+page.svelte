@@ -43,7 +43,7 @@
         metrics = metricsRes.data;
       }
       if (systemsRes.success) {
-        systemGroups = systemsRes.results || [];
+        systemGroups = systemsRes.data?.results || [];
         if (systemGroups.length > 0 && !selectedSystemId) {
           selectedSystemId = systemGroups[0].id;
           await loadSystemSpecificData(selectedSystemId);

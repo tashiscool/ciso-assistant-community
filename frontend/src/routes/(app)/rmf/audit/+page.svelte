@@ -44,8 +44,8 @@
 
       const res = await auditApi.list(params);
       if (res.success) {
-        auditEntries = res.results || [];
-        totalCount = res.count || 0;
+        auditEntries = res.data?.results || [];
+        totalCount = res.data?.count || 0;
 
         // Extract unique programs and actions for filters
         const uniquePrograms = new Set(auditEntries.map((e) => e.program));

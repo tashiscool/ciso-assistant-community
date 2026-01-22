@@ -91,7 +91,7 @@
       ]);
 
       if (systemRes.success) system = systemRes.data;
-      if (checklistsRes.success) checklists = checklistsRes.results || [];
+      if (checklistsRes.success) checklists = checklistsRes.data?.results || [];
       if (scoreRes.success) systemScore = scoreRes.data;
     } catch (error) {
       console.error('Error loading system:', error);

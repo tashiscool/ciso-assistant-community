@@ -43,7 +43,7 @@
     try {
       const res = await systemGroupApi.list();
       if (res.success) {
-        systemGroups = res.results || [];
+        systemGroups = res.data?.results || [];
       }
     } catch (error) {
       console.error('Error loading systems:', error);

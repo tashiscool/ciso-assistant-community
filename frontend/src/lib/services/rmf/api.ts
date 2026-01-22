@@ -35,7 +35,7 @@ export interface StigChecklist {
   hostName: string;
   stigType: string;
   stigRelease: string;
-  stigVersion: string;
+  version: string; // STIG version (e.g., "1.0")
   lifecycle_state: 'draft' | 'active' | 'archived';
   assetInfo: Record<string, any>;
   rawCklData?: Record<string, any>;
@@ -47,7 +47,6 @@ export interface StigChecklist {
   tags: string[];
   created_at: string;
   updated_at: string;
-  aggregateVersion: number;
   // Computed fields
   assetHostname?: string;
   assetIpAddresses?: string[];

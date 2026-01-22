@@ -46,8 +46,8 @@
         systemGroupApi.list({ lifecycle_state: 'active' })
       ]);
 
-      if (templatesRes.success) templates = templatesRes.results || [];
-      if (systemsRes.success) systemGroups = systemsRes.results || [];
+      if (templatesRes.success) templates = templatesRes.data?.results || [];
+      if (systemsRes.success) systemGroups = systemsRes.data?.results || [];
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {

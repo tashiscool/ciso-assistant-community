@@ -29,7 +29,7 @@
     try {
       const res = await systemGroupApi.list({ lifecycle_state: 'active' });
       if (res.success) {
-        systemGroups = res.results || [];
+        systemGroups = res.data?.results || [];
 
         // Check URL params for pre-selected system
         const urlParams = new URLSearchParams(window.location.search);

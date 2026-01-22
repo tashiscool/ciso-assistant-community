@@ -46,7 +46,7 @@
     try {
       const res = await systemGroupApi.list({ lifecycle_state: 'active' });
       if (res.success) {
-        systemGroups = res.results || [];
+        systemGroups = res.data?.results || [];
       }
     } catch (error) {
       console.error('Error loading systems:', error);
