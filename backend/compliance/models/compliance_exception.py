@@ -500,8 +500,8 @@ class ComplianceException(AggregateRoot):
         framework: str,
         requested_by_user_id: Optional[uuid.UUID] = None,
         requested_by_username: Optional[str] = None,
-        start_date: Optional[timezone.date] = None,
-        end_date: Optional[timezone.date] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
         tags: Optional[List[str]] = None
     ):
         """Create a new compliance exception"""
@@ -592,7 +592,7 @@ class ComplianceException(AggregateRoot):
 
     def extend_exception(
         self,
-        new_end_date: timezone.date,
+        new_end_date: date,
         extension_reason: str,
         approved_by_user_id: uuid.UUID,
         approved_by_username: str
@@ -624,7 +624,7 @@ class ComplianceException(AggregateRoot):
             approved_by_user_id=str(approved_by_user_id)
         ))
 
-    def conduct_review(self, review_notes: Optional[str] = None, next_review_date: Optional[timezone.date] = None):
+    def conduct_review(self, review_notes: Optional[str] = None, next_review_date: Optional[date] = None):
         """Conduct an exception review"""
         self.last_review_date = timezone.now().date()
         self.next_review_date = next_review_date or self._calculate_next_review_date()
@@ -687,7 +687,7 @@ class ComplianceException(AggregateRoot):
             self.renewal_period_months and
             (self.max_renewals is None or self.renewal_count < self.max_renewals)):
 
-            from datetime import timedelta
+            from datetime import timedelta, date, datetime
             new_end_date = self.end_date + timedelta(days=self.renewal_period_months * 30)
 
             self.extend_exception(
@@ -697,7 +697,7 @@ class ComplianceException(AggregateRoot):
                 approved_by_username=self.approved_by_username
             )
 
-    def _calculate_next_review_date(self) -> timezone.date:
+    def _calculate_next_review_date(self) -> date:
         """Calculate next review date based on monitoring frequency"""
         base_date = self.last_review_date or self.approval_date or timezone.now().date()
 

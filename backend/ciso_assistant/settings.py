@@ -203,10 +203,6 @@ INSTALLED_APPS = [
     "core.bounded_contexts.third_party_management",  # ThirdPartyManagement bounded context
     "core.bounded_contexts.business_continuity",  # BusinessContinuity bounded context
     "core.bounded_contexts.rmf_operations",  # RMF Operations bounded context
-    "privacy",  # Privacy bounded context
-    "security_operations",  # Security Operations bounded context
-    "third_party_management",  # Third Party Management bounded context
-    "business_continuity",  # Business Continuity bounded context
     "cal",
     "django_filters",
     "library",

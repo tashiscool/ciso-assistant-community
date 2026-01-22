@@ -3,20 +3,20 @@ Django app configuration for Compliance bounded context
 """
 
 from django.apps import AppConfig
-from core.domain.events import get_event_bus
 
 
 class ComplianceConfig(AppConfig):
     """Configuration for Compliance bounded context"""
-    
+
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'core.bounded_contexts.compliance'
     verbose_name = 'Compliance Bounded Context'
-    
+
     def ready(self):
         """Called when Django starts - register event handlers"""
+        from core.domain.events import get_event_bus
         from .projections.compliance_projections import ComplianceProjectionHandler
-        
+
         event_bus = get_event_bus()
         
         # Register projection handlers for all compliance events

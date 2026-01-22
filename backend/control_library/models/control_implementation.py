@@ -10,6 +10,7 @@ from typing import Optional, List, Dict, Any
 from django.db import models
 from django.utils import timezone
 from core.domain.aggregate import AggregateRoot
+from datetime import date, datetime
 
 
 class ControlImplementation(AggregateRoot):
@@ -422,7 +423,7 @@ class ControlImplementation(AggregateRoot):
         if evidence_id in self.evidence_ids:
             self.primary_evidence_id = uuid.UUID(evidence_id)
 
-    def request_exception(self, justification: str, expiry_date: Optional[timezone.date] = None):
+    def request_exception(self, justification: str, expiry_date: Optional[date] = None):
         """Request an exception/deviation"""
         self.has_exception = True
         self.exception_justification = justification
@@ -461,7 +462,7 @@ class ControlImplementation(AggregateRoot):
                 reason=reason
             ))
 
-    def schedule_review(self, review_date: timezone.date):
+    def schedule_review(self, review_date: date):
         """Schedule next review"""
         self.next_review_date = review_date
 
@@ -472,7 +473,7 @@ class ControlImplementation(AggregateRoot):
             review_date=str(review_date)
         ))
 
-    def conduct_review(self, review_date: Optional[timezone.date] = None, notes: Optional[str] = None):
+    def conduct_review(self, review_date: Optional[date] = None, notes: Optional[str] = None):
         """Conduct implementation review"""
         self.last_review_date = review_date or timezone.now().date()
         self.next_review_date = None  # Clear scheduled review

@@ -10,6 +10,7 @@ from typing import Optional, List, Dict, Any
 from django.db import models
 from django.utils import timezone
 from core.domain.aggregate import AggregateRoot
+from datetime import date, datetime
 
 
 class Asset(AggregateRoot):
@@ -444,7 +445,7 @@ class Asset(AggregateRoot):
             owner_user_id=str(owner_user_id) if owner_user_id else None
         ))
 
-    def deploy_asset(self, location: Optional[str] = None, deployment_date: Optional[timezone.date] = None):
+    def deploy_asset(self, location: Optional[str] = None, deployment_date: Optional[date] = None):
         """Deploy the asset"""
         if self.status in ['planned', 'procured']:
             old_status = self.status
@@ -484,7 +485,7 @@ class Asset(AggregateRoot):
                 reason=reason
             ))
 
-    def dispose_asset(self, disposal_date: Optional[timezone.date] = None):
+    def dispose_asset(self, disposal_date: Optional[date] = None):
         """Dispose of the asset"""
         if self.status == 'decommissioned':
             self.status = 'disposed'
@@ -551,7 +552,7 @@ class Asset(AggregateRoot):
             relationship_type=relationship_type
         ))
 
-    def schedule_maintenance(self, maintenance_date: timezone.date, description: str):
+    def schedule_maintenance(self, maintenance_date: date, description: str):
         """Schedule maintenance for the asset"""
         self.next_maintenance_date = maintenance_date
 
@@ -563,7 +564,7 @@ class Asset(AggregateRoot):
             description=description
         ))
 
-    def record_maintenance(self, maintenance_date: Optional[timezone.date] = None, notes: Optional[str] = None):
+    def record_maintenance(self, maintenance_date: Optional[date] = None, notes: Optional[str] = None):
         """Record completed maintenance"""
         self.last_maintenance_date = maintenance_date or timezone.now().date()
 
@@ -584,7 +585,7 @@ class Asset(AggregateRoot):
             maintenance_date=str(self.last_maintenance_date)
         ))
 
-    def update_risk_score(self, risk_score: int, assessment_date: Optional[timezone.date] = None):
+    def update_risk_score(self, risk_score: int, assessment_date: Optional[date] = None):
         """Update the asset's risk score"""
         old_score = self.risk_score
         self.risk_score = risk_score

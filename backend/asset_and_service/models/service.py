@@ -10,6 +10,7 @@ from typing import Optional, List, Dict, Any
 from django.db import models
 from django.utils import timezone
 from core.domain.aggregate import AggregateRoot
+from datetime import date, datetime
 
 
 class Service(AggregateRoot):
@@ -451,7 +452,7 @@ class Service(AggregateRoot):
             owner_user_id=str(owner_user_id) if owner_user_id else None
         ))
 
-    def activate_service(self, go_live_date: Optional[timezone.date] = None):
+    def activate_service(self, go_live_date: Optional[date] = None):
         """Activate the service"""
         if self.status in ['planned', 'design', 'development', 'testing', 'deployment']:
             self.status = 'active'
@@ -572,7 +573,7 @@ class Service(AggregateRoot):
             incident_id=incident_id
         ))
 
-    def schedule_change(self, change_id: str, change_type: str, scheduled_date: timezone.date, description: str):
+    def schedule_change(self, change_id: str, change_type: str, scheduled_date: date, description: str):
         """Schedule a change for this service"""
         change_record = {
             'id': change_id,
@@ -651,7 +652,7 @@ class Service(AggregateRoot):
             new_owner_username=new_owner_username
         ))
 
-    def schedule_review(self, review_date: timezone.date):
+    def schedule_review(self, review_date: date):
         """Schedule next service review"""
         self.next_review_date = review_date
 
@@ -662,7 +663,7 @@ class Service(AggregateRoot):
             review_date=str(review_date)
         ))
 
-    def conduct_review(self, review_date: Optional[timezone.date] = None, notes: Optional[str] = None):
+    def conduct_review(self, review_date: Optional[date] = None, notes: Optional[str] = None):
         """Conduct service review"""
         self.last_review_date = review_date or timezone.now().date()
 

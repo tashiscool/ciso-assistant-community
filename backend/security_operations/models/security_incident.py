@@ -10,6 +10,7 @@ from typing import Optional, List, Dict, Any
 from django.db import models
 from django.utils import timezone
 from core.domain.aggregate import AggregateRoot
+from datetime import date, datetime
 
 
 class SecurityIncident(AggregateRoot):
@@ -494,7 +495,7 @@ class SecurityIncident(AggregateRoot):
         category: str,
         severity: str,
         detection_method: str,
-        detection_date: timezone.datetime,
+        detection_date: datetime,
         reported_by_user_id: Optional[uuid.UUID] = None,
         reported_by_username: Optional[str] = None,
         tags: Optional[List[str]] = None
@@ -614,7 +615,7 @@ class SecurityIncident(AggregateRoot):
 
     def complete_incident(
         self,
-        resolution_date: Optional[timezone.datetime] = None,
+        resolution_date: Optional[datetime] = None,
         lessons_learned: Optional[str] = None,
         preventive_measures: Optional[List[str]] = None
     ):
@@ -638,7 +639,7 @@ class SecurityIncident(AggregateRoot):
             resolution_date=str(self.resolution_date)
         ))
 
-    def close_incident(self, closure_date: Optional[timezone.datetime] = None):
+    def close_incident(self, closure_date: Optional[datetime] = None):
         """Close the incident"""
         self.status = 'closed'
         self.closure_date = closure_date or timezone.now()

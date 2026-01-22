@@ -6,6 +6,7 @@ aggregate risks across all domains (asset, third party, business).
 """
 
 import uuid
+from datetime import date, datetime
 from typing import Optional, List, Dict, Any
 from django.db import models
 from django.utils import timezone
@@ -397,7 +398,7 @@ class RiskRegister(AggregateRoot):
             critical_risks=self.critical_risks
         ))
 
-    def generate_report(self, report_date: Optional[timezone.date] = None):
+    def generate_report(self, report_date: Optional[date] = None):
         """Generate a risk register report"""
         self.last_report_date = report_date or timezone.now().date()
         self._calculate_next_report_date()
@@ -409,7 +410,7 @@ class RiskRegister(AggregateRoot):
             report_date=str(self.last_report_date)
         ))
 
-    def conduct_review(self, review_date: Optional[timezone.date] = None, notes: Optional[str] = None):
+    def conduct_review(self, review_date: Optional[date] = None, notes: Optional[str] = None):
         """Conduct a register review"""
         self.last_review_date = review_date or timezone.now().date()
         self._calculate_next_review_date()
@@ -508,7 +509,7 @@ class RiskRegister(AggregateRoot):
         else:
             days = 30  # default monthly
 
-        from datetime import timedelta
+        from datetime import timedelta, date, datetime
         self.next_report_date = self.last_report_date + timedelta(days=days)
 
     def _calculate_next_review_date(self):
@@ -516,7 +517,7 @@ class RiskRegister(AggregateRoot):
         if not self.last_review_date:
             return
 
-        from datetime import timedelta
+        from datetime import timedelta, date, datetime
         self.next_review_date = self.last_review_date + timedelta(days=365)
 
     @property

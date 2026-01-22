@@ -12,6 +12,7 @@ from django.utils import timezone
 from ..models.questionnaire import Questionnaire
 from ..models.question import Question
 from ..models.questionnaire_run import QuestionnaireRun
+from datetime import date, datetime
 
 
 class QuestionnaireService:
@@ -392,7 +393,7 @@ class QuestionnaireService:
 
         return True
 
-    def _calculate_expiry(self, questionnaire: Questionnaire) -> Optional[timezone.datetime]:
+    def _calculate_expiry(self, questionnaire: Questionnaire) -> Optional[datetime]:
         """Calculate when a questionnaire run should expire"""
         if questionnaire.estimated_duration_minutes:
             return timezone.now() + timezone.timedelta(minutes=questionnaire.estimated_duration_minutes * 2)  # 2x buffer

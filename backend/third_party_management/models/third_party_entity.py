@@ -10,6 +10,7 @@ from typing import Optional, List, Dict, Any
 from django.db import models
 from django.utils import timezone
 from core.domain.aggregate import AggregateRoot
+from datetime import date, datetime
 
 
 class ThirdPartyEntity(AggregateRoot):
@@ -399,7 +400,7 @@ class ThirdPartyEntity(AggregateRoot):
             risk_score=risk_score
         ))
 
-    def update_compliance_status(self, status: str, assessment_date: Optional[timezone.date] = None):
+    def update_compliance_status(self, status: str, assessment_date: Optional[date] = None):
         """Update compliance status"""
         old_status = self.compliance_status
         self.compliance_status = status

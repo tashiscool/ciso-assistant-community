@@ -10,6 +10,7 @@ from typing import Optional, List, Dict, Any
 from django.db import models
 from django.utils import timezone
 from core.domain.aggregate import AggregateRoot
+from datetime import date, datetime
 
 
 class QuestionnaireRun(AggregateRoot):
@@ -200,7 +201,7 @@ class QuestionnaireRun(AggregateRoot):
         user_id: Optional[uuid.UUID] = None,
         session_token: Optional[str] = None,
         enable_scoring: bool = False,
-        expires_at: Optional[timezone.datetime] = None
+        expires_at: Optional[datetime] = None
     ):
         """Start a new questionnaire run"""
         self.questionnaire_id = questionnaire_id

@@ -10,6 +10,7 @@ from typing import Optional, List, Dict, Any
 from django.db import models
 from django.utils import timezone
 from core.domain.aggregate import AggregateRoot
+from datetime import date, datetime
 
 
 class RequirementAssessment(AggregateRoot):
@@ -394,7 +395,7 @@ class RequirementAssessment(AggregateRoot):
             framework=framework
         ))
 
-    def start_assessment(self, start_date: Optional[timezone.date] = None):
+    def start_assessment(self, start_date: Optional[date] = None):
         """Start the requirement assessment"""
         if self.status == 'not_started':
             self.status = 'in_progress'
@@ -530,7 +531,7 @@ class RequirementAssessment(AggregateRoot):
                 new_status='under_review'
             ))
 
-    def complete_assessment(self, completion_date: Optional[timezone.date] = None):
+    def complete_assessment(self, completion_date: Optional[date] = None):
         """Mark assessment as completed"""
         self.assessment_completion_date = completion_date or timezone.now().date()
 
@@ -550,7 +551,7 @@ class RequirementAssessment(AggregateRoot):
         remediation_plan: str,
         remediation_owner_user_id: uuid.UUID,
         remediation_owner_username: str,
-        deadline: Optional[timezone.date] = None
+        deadline: Optional[date] = None
     ):
         """Plan remediation for non-compliant requirement"""
         self.remediation_required = True

@@ -12,6 +12,7 @@ from django.utils import timezone
 
 from core.domain.repository import Repository
 from ..models.risk_register import RiskRegister
+from datetime import date, datetime
 
 
 class RiskRegisterRepository(Repository[RiskRegister]):
@@ -213,7 +214,7 @@ class RiskRegisterRepository(Repository[RiskRegister]):
 
         return consolidated_count
 
-    def generate_enterprise_report(self, report_date: Optional[timezone.date] = None) -> Dict[str, Any]:
+    def generate_enterprise_report(self, report_date: Optional[date] = None) -> Dict[str, Any]:
         """Generate comprehensive enterprise risk report"""
         report_date = report_date or timezone.now().date()
 
