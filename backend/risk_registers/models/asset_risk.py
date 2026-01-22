@@ -8,6 +8,7 @@ including threat assessments, vulnerability analysis, and risk scoring.
 import uuid
 from typing import Optional, List, Dict, Any
 from django.db import models
+from datetime import date, datetime
 from django.utils import timezone
 from core.domain.aggregate import AggregateRoot
 
@@ -519,7 +520,7 @@ class AssetRisk(AggregateRoot):
             treatment_strategy=treatment_strategy
         ))
 
-    def implement_treatment(self, implementation_date: Optional[timezone.date] = None):
+    def implement_treatment(self, implementation_date: Optional[date] = None):
         """Mark treatment as implemented"""
         if self.treatment_status == 'planned' or self.treatment_status == 'in_progress':
             self.treatment_status = 'implemented'
@@ -536,7 +537,7 @@ class AssetRisk(AggregateRoot):
         self,
         residual_likelihood: int,
         residual_impact: int,
-        effective_date: Optional[timezone.date] = None
+        effective_date: Optional[date] = None
     ):
         """Update residual risk after treatment implementation"""
         old_score = self.residual_risk_score
@@ -557,7 +558,7 @@ class AssetRisk(AggregateRoot):
             new_residual_score=self.residual_risk_score
         ))
 
-    def add_milestone(self, milestone_description: str, target_date: timezone.date, status: str = 'pending'):
+    def add_milestone(self, milestone_description: str, target_date: date, status: str = 'pending'):
         """Add a treatment milestone"""
         milestone = {
             'id': str(uuid.uuid4()),
@@ -579,7 +580,7 @@ class AssetRisk(AggregateRoot):
             description=milestone_description
         ))
 
-    def update_milestone_status(self, milestone_id: str, status: str, actual_date: Optional[timezone.date] = None):
+    def update_milestone_status(self, milestone_id: str, status: str, actual_date: Optional[date] = None):
         """Update milestone status"""
         for milestone in self.treatment_milestones:
             if milestone['id'] == milestone_id:
@@ -600,7 +601,7 @@ class AssetRisk(AggregateRoot):
                 ))
                 break
 
-    def conduct_review(self, review_notes: Optional[str] = None, next_review_date: Optional[timezone.date] = None):
+    def conduct_review(self, review_notes: Optional[str] = None, next_review_date: Optional[date] = None):
         """Conduct a risk review"""
         self.last_review_date = timezone.now().date()
         self.next_review_date = next_review_date

@@ -5,7 +5,7 @@ First-class association representing a compliance audit.
 """
 
 import uuid
-from typing import Optional
+from typing import Optional, List
 from datetime import date
 from django.db import models
 

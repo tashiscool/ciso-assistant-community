@@ -3,7 +3,6 @@ Django app configuration for RMF Operations bounded context
 """
 
 from django.apps import AppConfig
-from core.domain.events import get_event_bus
 
 
 class RmfOperationsConfig(AppConfig):

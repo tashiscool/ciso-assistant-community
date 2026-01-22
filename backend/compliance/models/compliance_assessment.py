@@ -9,6 +9,7 @@ evidence collection and validation.
 import uuid
 from typing import Optional, List, Dict, Any
 from django.db import models
+from datetime import date, datetime
 from django.utils import timezone
 from core.domain.aggregate import AggregateRoot
 
@@ -488,8 +489,8 @@ class ComplianceAssessment(AggregateRoot):
         scope: str = 'System',
         assessment_lead_user_id: Optional[uuid.UUID] = None,
         assessment_lead_username: Optional[str] = None,
-        planned_start_date: Optional[timezone.date] = None,
-        planned_completion_date: Optional[timezone.date] = None,
+        planned_start_date: Optional[date] = None,
+        planned_completion_date: Optional[date] = None,
         description: Optional[str] = None,
         tags: Optional[List[str]] = None
     ):
@@ -522,7 +523,7 @@ class ComplianceAssessment(AggregateRoot):
             target_type=target_type
         ))
 
-    def start_assessment(self, start_date: Optional[timezone.date] = None):
+    def start_assessment(self, start_date: Optional[date] = None):
         """Start the compliance assessment"""
         if self.status == 'planned':
             self.status = 'in_progress'
@@ -662,7 +663,7 @@ class ComplianceAssessment(AggregateRoot):
                 approval_date=str(self.approval_date)
             ))
 
-    def complete_assessment(self, completion_date: Optional[timezone.date] = None):
+    def complete_assessment(self, completion_date: Optional[date] = None):
         """Mark assessment as completed"""
         if self.status in ['approved', 'in_progress']:
             self.status = 'completed'
@@ -676,7 +677,7 @@ class ComplianceAssessment(AggregateRoot):
                 final_score=self.overall_compliance_score
             ))
 
-    def conduct_review(self, review_notes: Optional[str] = None, next_review_date: Optional[timezone.date] = None):
+    def conduct_review(self, review_notes: Optional[str] = None, next_review_date: Optional[date] = None):
         """Conduct an assessment review"""
         self.last_review_date = timezone.now().date()
         self.next_review_date = next_review_date or self._calculate_next_review_date()
@@ -693,8 +694,8 @@ class ComplianceAssessment(AggregateRoot):
             review_date=str(self.last_review_date)
         ))
 
-    def update_certification_status(self, new_status: str, certification_date: Optional[timezone.date] = None,
-                                  expiry_date: Optional[timezone.date] = None):
+    def update_certification_status(self, new_status: str, certification_date: Optional[date] = None,
+                                  expiry_date: Optional[date] = None):
         """Update certification status"""
         old_status = self.certification_status
         self.certification_status = new_status
@@ -726,7 +727,7 @@ class ComplianceAssessment(AggregateRoot):
         else:
             return 'non_compliant'
 
-    def _calculate_next_review_date(self) -> timezone.date:
+    def _calculate_next_review_date(self) -> date:
         """Calculate next review date based on frequency"""
         base_date = self.planned_completion_date or self.actual_completion_date or timezone.now().date()
 

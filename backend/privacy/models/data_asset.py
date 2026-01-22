@@ -6,6 +6,7 @@ processing purposes, data subject rights, and privacy impact assessments.
 """
 
 import uuid
+from datetime import date, datetime
 from typing import Optional, List, Dict, Any
 from django.db import models
 from django.utils import timezone
@@ -628,7 +629,7 @@ class DataAsset(AggregateRoot):
     def conduct_privacy_audit(
         self,
         findings: str,
-        next_audit_date: Optional[timezone.date] = None
+        next_audit_date: Optional[date] = None
     ):
         """Conduct privacy audit"""
         self.last_audit_date = timezone.now().date()

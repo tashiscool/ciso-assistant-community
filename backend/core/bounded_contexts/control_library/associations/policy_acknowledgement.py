@@ -6,6 +6,7 @@ First-class association representing a user's acknowledgement of a policy.
 
 import uuid
 from datetime import datetime
+from typing import Optional
 from django.db import models
 from django.utils import timezone
 

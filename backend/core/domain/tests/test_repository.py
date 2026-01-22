@@ -10,7 +10,7 @@ from core.domain.aggregate import AggregateRoot
 from core.domain.repository import Repository
 
 
-class TestAggregate(AggregateRoot):
+class RepositoryTestAggregate(AggregateRoot):
     """Test aggregate root"""
     
     name = models.CharField(max_length=255)
@@ -23,11 +23,11 @@ class RepositoryTests(TestCase):
     """Tests for Repository"""
     
     def setUp(self):
-        self.repository = Repository(TestAggregate)
+        self.repository = Repository(RepositoryTestAggregate)
     
     def test_get_by_id(self):
         """Test getting aggregate by ID"""
-        aggregate = TestAggregate(name="Test")
+        aggregate = RepositoryTestAggregate(name="Test")
         aggregate.save()
         
         retrieved = self.repository.get_by_id(aggregate.id)
@@ -45,8 +45,8 @@ class RepositoryTests(TestCase):
     
     def test_get_all(self):
         """Test getting all aggregates"""
-        TestAggregate(name="Test1").save()
-        TestAggregate(name="Test2").save()
+        RepositoryTestAggregate(name="Test1").save()
+        RepositoryTestAggregate(name="Test2").save()
         
         all_aggregates = self.repository.get_all()
         
@@ -57,7 +57,7 @@ class RepositoryTests(TestCase):
     
     def test_save_aggregate(self):
         """Test saving aggregate"""
-        aggregate = TestAggregate(name="Test")
+        aggregate = RepositoryTestAggregate(name="Test")
         
         saved = self.repository.save(aggregate)
         
@@ -66,7 +66,7 @@ class RepositoryTests(TestCase):
     
     def test_delete_aggregate(self):
         """Test deleting aggregate"""
-        aggregate = TestAggregate(name="Test")
+        aggregate = RepositoryTestAggregate(name="Test")
         aggregate.save()
         
         self.repository.delete(aggregate)
@@ -75,7 +75,7 @@ class RepositoryTests(TestCase):
     
     def test_exists(self):
         """Test checking if aggregate exists"""
-        aggregate = TestAggregate(name="Test")
+        aggregate = RepositoryTestAggregate(name="Test")
         aggregate.save()
         
         self.assertTrue(self.repository.exists(aggregate.id))
@@ -87,8 +87,8 @@ class RepositoryTests(TestCase):
         """Test counting aggregates"""
         initial_count = self.repository.count()
         
-        TestAggregate(name="Test1").save()
-        TestAggregate(name="Test2").save()
+        RepositoryTestAggregate(name="Test1").save()
+        RepositoryTestAggregate(name="Test2").save()
         
         self.assertEqual(self.repository.count(), initial_count + 2)
 

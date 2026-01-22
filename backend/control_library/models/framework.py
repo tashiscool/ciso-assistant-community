@@ -8,6 +8,7 @@ COBIT, and other compliance frameworks with their control structures.
 import uuid
 from typing import Optional, List, Dict, Any
 from django.db import models
+from datetime import date, datetime
 from django.utils import timezone
 from core.domain.aggregate import AggregateRoot
 
@@ -409,7 +410,7 @@ class Framework(AggregateRoot):
         """Update adoption statistics"""
         self.active_assessments = active_assessments
 
-    def schedule_review(self, review_date: timezone.date):
+    def schedule_review(self, review_date: date):
         """Schedule framework review"""
         self.review_date = review_date
 
@@ -420,7 +421,7 @@ class Framework(AggregateRoot):
             review_date=str(review_date)
         ))
 
-    def conduct_review(self, review_date: Optional[timezone.date] = None, notes: Optional[str] = None):
+    def conduct_review(self, review_date: Optional[date] = None, notes: Optional[str] = None):
         """Conduct framework review"""
         self.last_updated = review_date or timezone.now().date()
         self.review_date = None  # Clear scheduled review

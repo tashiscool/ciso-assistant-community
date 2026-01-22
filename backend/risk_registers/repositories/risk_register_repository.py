@@ -8,6 +8,7 @@ consolidated risk reporting and cross-domain risk analysis.
 import uuid
 from typing import List, Optional, Dict, Any
 from django.db import models
+from datetime import date, datetime
 from django.utils import timezone
 
 from core.domain.repository import Repository
@@ -213,7 +214,7 @@ class RiskRegisterRepository(Repository[RiskRegister]):
 
         return consolidated_count
 
-    def generate_enterprise_report(self, report_date: Optional[timezone.date] = None) -> Dict[str, Any]:
+    def generate_enterprise_report(self, report_date: Optional[date] = None) -> Dict[str, Any]:
         """Generate comprehensive enterprise risk report"""
         report_date = report_date or timezone.now().date()
 

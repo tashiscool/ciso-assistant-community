@@ -8,6 +8,7 @@ identified during compliance assessments with remediation tracking.
 import uuid
 from typing import Optional, List, Dict, Any
 from django.db import models
+from datetime import date, datetime
 from django.utils import timezone
 from core.domain.aggregate import AggregateRoot
 
@@ -540,7 +541,7 @@ class ComplianceFinding(AggregateRoot):
         self,
         remediation_plan: str,
         remediation_steps: List[Dict[str, Any]],
-        deadline: Optional[timezone.date] = None,
+        deadline: Optional[date] = None,
         estimated_cost: Optional[float] = None,
         estimated_effort_days: Optional[int] = None
     ):
@@ -562,7 +563,7 @@ class ComplianceFinding(AggregateRoot):
             updated_fields=['remediation_plan']
         ))
 
-    def start_remediation(self, start_date: Optional[timezone.date] = None):
+    def start_remediation(self, start_date: Optional[date] = None):
         """Start remediation efforts"""
         if self.remediation_status == 'planned':
             self.remediation_status = 'in_progress'
@@ -592,7 +593,7 @@ class ComplianceFinding(AggregateRoot):
         elif progress_percentage > 0 and self.remediation_status == 'not_started':
             self.start_remediation()
 
-    def complete_remediation(self, completion_date: Optional[timezone.date] = None, actual_cost: Optional[float] = None, actual_effort: Optional[int] = None):
+    def complete_remediation(self, completion_date: Optional[date] = None, actual_cost: Optional[float] = None, actual_effort: Optional[int] = None):
         """Mark remediation as completed"""
         self.remediation_status = 'completed'
         self.remediation_completion_date = completion_date or timezone.now().date()
@@ -614,7 +615,7 @@ class ComplianceFinding(AggregateRoot):
         self,
         verification_method: str,
         verification_result: str,
-        verification_date: Optional[timezone.date] = None
+        verification_date: Optional[date] = None
     ):
         """Verify remediation effectiveness"""
         self.verification_method = verification_method
@@ -663,7 +664,7 @@ class ComplianceFinding(AggregateRoot):
                 reason=escalation_reason
             ))
 
-    def add_follow_up(self, follow_up_notes: str, next_follow_up_date: Optional[timezone.date] = None):
+    def add_follow_up(self, follow_up_notes: str, next_follow_up_date: Optional[date] = None):
         """Add follow-up monitoring"""
         self.follow_up_required = True
         self.follow_up_frequency = 'quarterly'  # Default

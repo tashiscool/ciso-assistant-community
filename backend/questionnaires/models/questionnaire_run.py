@@ -8,6 +8,7 @@ answers, scoring, and progress through dynamic question flows.
 import uuid
 from typing import Optional, List, Dict, Any
 from django.db import models
+from datetime import date, datetime
 from django.utils import timezone
 from core.domain.aggregate import AggregateRoot
 
@@ -200,7 +201,7 @@ class QuestionnaireRun(AggregateRoot):
         user_id: Optional[uuid.UUID] = None,
         session_token: Optional[str] = None,
         enable_scoring: bool = False,
-        expires_at: Optional[timezone.datetime] = None
+        expires_at: Optional[datetime] = None
     ):
         """Start a new questionnaire run"""
         self.questionnaire_id = questionnaire_id

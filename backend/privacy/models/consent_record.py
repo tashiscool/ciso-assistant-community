@@ -8,6 +8,7 @@ purposes, validity periods, and consent withdrawal tracking.
 import uuid
 from typing import Optional, List, Dict, Any
 from django.db import models
+from datetime import date, datetime
 from django.utils import timezone
 from core.domain.aggregate import AggregateRoot
 
@@ -375,7 +376,7 @@ class ConsentRecord(AggregateRoot):
         processing_purposes: List[str],
         consent_method: str,
         consent_language: str = 'en',
-        valid_until: Optional[timezone.datetime] = None,
+        valid_until: Optional[datetime] = None,
         source_system: Optional[str] = None,
         country_code: Optional[str] = None
     ):
@@ -467,7 +468,7 @@ class ConsentRecord(AggregateRoot):
             new_consents=self.granular_consents
         ))
 
-    def extend_validity(self, new_valid_until: timezone.datetime, reason: str):
+    def extend_validity(self, new_valid_until: datetime, reason: str):
         """Extend consent validity period"""
         old_valid_until = self.valid_until
         self.valid_until = new_valid_until

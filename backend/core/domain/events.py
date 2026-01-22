@@ -11,17 +11,25 @@ They are used for:
 
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 from dataclasses import dataclass, field
-from django.db import models
 from django.utils import timezone
+
+if TYPE_CHECKING:
+    from .event_models import EventStore
+
+
+def get_event_store():
+    """Lazy import of EventStore to avoid app registry issues"""
+    from .event_models import EventStore
+    return EventStore
 
 
 @dataclass
 class DomainEvent:
     """
     Base class for all domain events.
-    
+
     Domain events are immutable value objects that represent
     something important that happened in the domain.
     """
@@ -31,12 +39,12 @@ class DomainEvent:
     occurred_at: datetime = field(default_factory=lambda: timezone.now())
     event_type: str = None
     payload: Dict[str, Any] = field(default_factory=dict)
-    
+
     def __post_init__(self):
         """Set event_type from class name if not provided"""
         if self.event_type is None:
             self.event_type = self.__class__.__name__
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert event to dictionary for storage"""
         return {
@@ -47,7 +55,7 @@ class DomainEvent:
             "event_type": self.event_type,
             "payload": self.payload,
         }
-    
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "DomainEvent":
         """Reconstruct event from dictionary"""
@@ -59,32 +67,6 @@ class DomainEvent:
             event_type=data["event_type"],
             payload=data.get("payload", {}),
         )
-
-
-class EventStore(models.Model):
-    """
-    Event store for domain events.
-    
-    Uses PostgreSQL JSONB for efficient storage and querying.
-    """
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    event_id = models.UUIDField(unique=True, db_index=True)
-    aggregate_id = models.UUIDField(db_index=True, null=True, blank=True)
-    aggregate_version = models.IntegerField(default=0)
-    occurred_at = models.DateTimeField(db_index=True)
-    event_type = models.CharField(max_length=255, db_index=True)
-    payload = models.JSONField()
-    
-    class Meta:
-        db_table = "domain_events"
-        ordering = ["occurred_at"]
-        indexes = [
-            models.Index(fields=["aggregate_id", "aggregate_version"]),
-            models.Index(fields=["event_type", "occurred_at"]),
-        ]
-    
-    def __str__(self):
-        return f"{self.event_type} ({self.event_id})"
 
 
 class EventBus:
@@ -122,6 +104,7 @@ class EventBus:
         """
         # Store event if enabled
         if store and self._store_events:
+            EventStore = get_event_store()
             EventStore.objects.create(
                 event_id=event.event_id,
                 aggregate_id=event.aggregate_id,
@@ -153,6 +136,7 @@ class EventBus:
             event_type: Filter by event type
             since: Filter events since this datetime
         """
+        EventStore = get_event_store()
         queryset = EventStore.objects.all()
         
         if aggregate_id:

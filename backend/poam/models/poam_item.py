@@ -411,7 +411,7 @@ class POAMItem(AggregateRoot):
                 weakness_id=self.weakness_id
             ))
 
-    def add_milestone(self, description: str, target_date: timezone.date, status: str = 'pending'):
+    def add_milestone(self, description: str, target_date: date, status: str = 'pending'):
         """Add a remediation milestone"""
         milestone = {
             'id': str(uuid.uuid4()),
@@ -432,7 +432,7 @@ class POAMItem(AggregateRoot):
             description=description
         ))
 
-    def update_milestone(self, milestone_id: str, status: str, actual_date: Optional[timezone.date] = None):
+    def update_milestone(self, milestone_id: str, status: str, actual_date: Optional[date] = None):
         """Update milestone status"""
         for milestone in self.milestones:
             if milestone['id'] == milestone_id:
@@ -506,7 +506,7 @@ class POAMItem(AggregateRoot):
             evidence_id=evidence_entry['id']
         ))
 
-    def schedule_review(self, review_date: timezone.date):
+    def schedule_review(self, review_date: date):
         """Schedule next review date"""
         self.next_review_date = review_date
 

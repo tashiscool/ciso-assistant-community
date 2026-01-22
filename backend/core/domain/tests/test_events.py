@@ -9,11 +9,11 @@ from django.utils import timezone
 
 from core.domain.events import (
     DomainEvent,
-    EventStore,
     EventBus,
     EventHandler,
     get_event_bus,
 )
+from core.domain.event_models import EventStore
 
 
 class TestDomainEvent(DomainEvent):
