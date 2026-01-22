@@ -365,6 +365,10 @@ export interface StigTemplate {
   created_from_checklist_id?: string;
   tags: string[];
   compatible_systems: string[];
+  // Computed fields
+  full_stig_identifier?: string;
+  is_outdated?: boolean;
+  usage_percentage?: number;
   created_at: string;
   updated_at: string;
 }
@@ -415,14 +419,29 @@ export const templateApi = {
 export interface NessusScan {
   id: string;
   systemGroupId: string;
-  fileName: string;
-  scanDate: string;
-  criticalCount: number;
-  highCount: number;
-  mediumCount: number;
-  lowCount: number;
-  infoCount: number;
+  filename: string;
+  scan_date: string;
+  scanner_version?: string;
+  policy_name?: string;
+  total_hosts: number;
+  total_vulnerabilities: number;
+  scan_duration_seconds?: number;
+  critical_count: number;
+  high_count: number;
+  medium_count: number;
+  low_count: number;
+  info_count: number;
+  correlated_checklist_ids: string[];
+  tags: string[];
+  processing_status: 'uploaded' | 'processing' | 'completed' | 'failed';
+  processing_error?: string;
+  // Computed fields
+  severity_breakdown?: Record<string, number>;
+  total_severe_vulnerabilities?: number;
+  processing_percentage?: number;
   created_at: string;
+  updated_at: string;
+  version: number;
 }
 
 export interface NessusVulnerability {
