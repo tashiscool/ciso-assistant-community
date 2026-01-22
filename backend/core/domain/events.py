@@ -179,3 +179,21 @@ _event_bus = EventBus()
 def get_event_bus() -> EventBus:
     """Get the global event bus instance"""
     return _event_bus
+
+
+# Lazy imports for backwards compatibility
+def __getattr__(name):
+    """Lazy import EventStore to avoid circular imports"""
+    if name == "EventStore":
+        from .event_store import EventStore
+        return EventStore
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
+__all__ = [
+    "DomainEvent",
+    "EventBus",
+    "EventHandler",
+    "EventStore",
+    "get_event_bus",
+]
