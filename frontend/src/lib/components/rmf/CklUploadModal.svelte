@@ -3,7 +3,7 @@
   import { X, Upload, CheckCircle, AlertCircle, Loader } from 'lucide-svelte';
   import { rmfApi, type StigChecklist } from '$lib/services/rmf/api';
   import FileUpload from './FileUpload.svelte';
-  import Modal from '$lib/components/Modal/Modal.svelte';
+  import Modal from '$lib/components/Modals/Modal.svelte';
 
   export let show = false;
   export let systemGroupId: string | null = null;

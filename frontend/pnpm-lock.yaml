@@ -58,6 +58,9 @@ importers:
       globals:
         specifier: ^15.15.0
         version: 15.15.0
+      lucide-svelte:
+        specifier: ^0.562.0
+        version: 0.562.0(svelte@5.34.8)
       marked:
         specifier: ^16.1.2
         version: 16.1.2
@@ -124,7 +127,7 @@ importers:
         version: 6.6.3
       '@testing-library/svelte':
         specifier: ^5.2.8
-        version: 5.2.8(svelte@5.34.8)(vite@5.4.21(@types/node@20.19.1)(lightningcss@1.30.1))(vitest@3.2.4(@types/node@20.19.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1))
+        version: 5.2.8(svelte@5.34.8)(vite@5.4.21(@types/node@20.19.1)(lightningcss@1.30.1))(vitest@3.2.4)
       '@types/node':
         specifier: ^20.19.1
         version: 20.19.1
@@ -133,7 +136,7 @@ importers:
         version: 1.14.10(svelte@5.34.8)
       '@vitest/coverage-v8':
         specifier: ^3.2.4
-        version: 3.2.4(vitest@3.2.4(@types/node@20.19.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1))
+        version: 3.2.4(vitest@3.2.4)
       '@vitest/ui':
         specifier: ^3.2.4
         version: 3.2.4(vitest@3.2.4)
@@ -2667,6 +2670,11 @@ packages:
   lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
 
+  lucide-svelte@0.562.0:
+    resolution: {integrity: sha512-kSJDH/55lf0mun/o4nqWBXOcq0fWYzPeIjbTD97ywoeumAB9kWxtM06gC7oynqjtK3XhAljWSz5RafIzPEYIQA==}
+    peerDependencies:
+      svelte: ^3 || ^4 || ^5.0.0-next.42
+
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
     hasBin: true
@@ -4432,7 +4440,7 @@ snapshots:
       lodash: 4.17.21
       redent: 3.0.0
 
-  '@testing-library/svelte@5.2.8(svelte@5.34.8)(vite@5.4.21(@types/node@20.19.1)(lightningcss@1.30.1))(vitest@3.2.4(@types/node@20.19.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1))':
+  '@testing-library/svelte@5.2.8(svelte@5.34.8)(vite@5.4.21(@types/node@20.19.1)(lightningcss@1.30.1))(vitest@3.2.4)':
     dependencies:
       '@testing-library/dom': 10.4.0
       svelte: 5.34.8
@@ -4830,7 +4838,7 @@ snapshots:
       validator: 13.15.23
     optional: true
 
-  '@vitest/coverage-v8@3.2.4(vitest@3.2.4(@types/node@20.19.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1))':
+  '@vitest/coverage-v8@3.2.4(vitest@3.2.4)':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -6155,6 +6163,10 @@ snapshots:
   loupe@3.1.4: {}
 
   lru-cache@10.4.3: {}
+
+  lucide-svelte@0.562.0(svelte@5.34.8):
+    dependencies:
+      svelte: 5.34.8
 
   lz-string@1.5.0: {}
 

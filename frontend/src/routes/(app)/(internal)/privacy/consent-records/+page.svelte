@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
 	import { safeTranslate } from '$lib/utils/i18n';
-	import { urlModel } from '$lib/stores';
+	import type { urlModel } from '$lib/utils/types';
 	import type { PageData } from './$types';
 	import ModelTable from '$lib/components/ModelTable/ModelTable.svelte';
 	import Breadcrumbs from '$lib/components/Breadcrumbs/Breadcrumbs.svelte';

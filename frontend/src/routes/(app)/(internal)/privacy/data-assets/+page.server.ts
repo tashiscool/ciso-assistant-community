@@ -3,15 +3,12 @@ import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { getModelInfo } from '$lib/utils/crud';
 import { safeTranslate } from '$lib/utils/i18n';
-import { urlModel } from '$lib/stores';
-import { get } from 'svelte/store';
 
 const MODEL = 'data-assets';
 
 export const load: PageServerLoad = async ({ url, fetch, depends }) => {
 	depends('app:data-assets');
 
-	const urlModelStore = get(urlModel);
 	const model = getModelInfo(MODEL);
 
 	if (!model) {
