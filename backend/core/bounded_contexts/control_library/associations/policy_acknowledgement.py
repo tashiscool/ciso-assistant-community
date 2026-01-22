@@ -9,9 +9,10 @@ from datetime import datetime
 from django.db import models
 from django.utils import timezone
 
+from typing import Optional
+
 from core.domain.aggregate import AggregateRoot
 from ..domain_events import (
-from typing import Optional
     PolicyAcknowledged,
 )
 
