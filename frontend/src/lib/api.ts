@@ -3,9 +3,10 @@
  *
  * Provides a simple fetch-based API client for making HTTP requests.
  * Used by the service modules for DDD bounded context API calls.
+ * Aligns with the original CISO Assistant patterns using BASE_API_URL.
  */
 
-import { base } from '$app/paths';
+import { BASE_API_URL } from '$lib/utils/constants';
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -55,17 +56,24 @@ async function handleResponse<T>(response: Response): Promise<ApiResponse<T>> {
 }
 
 function buildUrl(path: string, params?: Record<string, any>): string {
-  const url = new URL(`${base}/api${path}`, window.location.origin);
+  // BASE_API_URL already includes '/api', so path should start with '/' for the endpoint
+  // e.g., path='/rmf/system-groups/' becomes 'http://localhost:8000/api/rmf/system-groups/'
+  let url = `${BASE_API_URL}${path}`;
 
   if (params) {
+    const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        url.searchParams.append(key, String(value));
+        searchParams.append(key, String(value));
       }
     });
+    const queryString = searchParams.toString();
+    if (queryString) {
+      url += (url.includes('?') ? '&' : '?') + queryString;
+    }
   }
 
-  return url.toString();
+  return url;
 }
 
 function getDefaultHeaders(): Record<string, string> {
