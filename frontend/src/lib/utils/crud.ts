@@ -2369,6 +2369,156 @@ export const URL_MODEL_MAP: ModelMap = {
 			{ field: 'time_range', valueType: 'string', detail: false },
 			{ field: 'aggregation', valueType: 'string', detail: false }
 		]
+	},
+	// Continuous Monitoring
+	'conmon-profiles': {
+		name: 'conmonprofile',
+		localName: 'conmonProfile',
+		localNamePlural: 'conmonProfiles',
+		verboseName: 'ConMon profile',
+		verboseNamePlural: 'ConMon profiles',
+		endpointUrl: 'conmon/profiles',
+		foreignKeyFields: [
+			{ field: 'folder', urlModel: 'folders', urlParams: 'content_type=DO' },
+			{ field: 'base_framework', urlModel: 'frameworks' },
+			{ field: 'compliance_assessment', urlModel: 'compliance-assessments' },
+			{ field: 'assigned_actors', urlModel: 'actors' }
+		],
+		reverseForeignKeyFields: [
+			{
+				field: 'profile',
+				urlModel: 'conmon-activities',
+				disableCreate: false,
+				disableDelete: false
+			}
+		],
+		selectFields: [
+			{ field: 'profile_type' },
+			{ field: 'status' }
+		],
+		detailViewFields: [
+			{ field: 'name' },
+			{ field: 'description' },
+			{ field: 'folder' },
+			{ field: 'profile_type' },
+			{ field: 'status' },
+			{ field: 'base_framework' },
+			{ field: 'compliance_assessment' },
+			{ field: 'implementation_groups' },
+			{ field: 'notification_lead_days' },
+			{ field: 'notification_enabled' },
+			{ field: 'assigned_actors' },
+			{ field: 'created_at', type: 'datetime' },
+			{ field: 'updated_at', type: 'datetime' }
+		],
+		filters: [{ field: 'folder' }, { field: 'profile_type' }, { field: 'status' }]
+	},
+	'conmon-activities': {
+		name: 'conmonactivityconfig',
+		localName: 'conmonActivity',
+		localNamePlural: 'conmonActivities',
+		verboseName: 'ConMon activity',
+		verboseNamePlural: 'ConMon activities',
+		endpointUrl: 'conmon/activities',
+		foreignKeyFields: [
+			{ field: 'folder', urlModel: 'folders', urlParams: 'content_type=DO' },
+			{ field: 'profile', urlModel: 'conmon-profiles' },
+			{ field: 'assigned_actors', urlModel: 'actors' },
+			{ field: 'applied_controls', urlModel: 'applied-controls' },
+			{ field: 'task_template', urlModel: 'task-templates' }
+		],
+		reverseForeignKeyFields: [
+			{
+				field: 'activity_config',
+				urlModel: 'conmon-executions',
+				disableCreate: true,
+				disableDelete: true
+			}
+		],
+		selectFields: [{ field: 'frequency_override' }],
+		detailViewFields: [
+			{ field: 'ref_id' },
+			{ field: 'name' },
+			{ field: 'profile' },
+			{ field: 'requirement_urn' },
+			{ field: 'enabled' },
+			{ field: 'frequency_override' },
+			{ field: 'custom_schedule' },
+			{ field: 'assigned_actors' },
+			{ field: 'applied_controls' },
+			{ field: 'task_template' },
+			{ field: 'notes' },
+			{ field: 'created_at', type: 'datetime' },
+			{ field: 'updated_at', type: 'datetime' }
+		],
+		filters: [{ field: 'folder' }, { field: 'profile' }, { field: 'enabled' }]
+	},
+	'conmon-executions': {
+		name: 'conmonexecution',
+		localName: 'conmonExecution',
+		localNamePlural: 'conmonExecutions',
+		verboseName: 'ConMon execution',
+		verboseNamePlural: 'ConMon executions',
+		endpointUrl: 'conmon/executions',
+		foreignKeyFields: [
+			{ field: 'folder', urlModel: 'folders', urlParams: 'content_type=DO' },
+			{ field: 'activity_config', urlModel: 'conmon-activities' },
+			{ field: 'completed_by', urlModel: 'users' },
+			{ field: 'task_node', urlModel: 'task-nodes' },
+			{ field: 'evidences', urlModel: 'evidences' }
+		],
+		selectFields: [
+			{ field: 'status' },
+			{ field: 'result' }
+		],
+		detailViewFields: [
+			{ field: 'activity_config' },
+			{ field: 'period_start', type: 'date' },
+			{ field: 'period_end', type: 'date' },
+			{ field: 'due_date', type: 'date' },
+			{ field: 'status' },
+			{ field: 'result' },
+			{ field: 'completed_date', type: 'date' },
+			{ field: 'completed_by' },
+			{ field: 'task_node' },
+			{ field: 'evidences' },
+			{ field: 'findings' },
+			{ field: 'observations' },
+			{ field: 'created_at', type: 'datetime' },
+			{ field: 'updated_at', type: 'datetime' }
+		],
+		filters: [{ field: 'folder' }, { field: 'activity_config' }, { field: 'status' }, { field: 'result' }]
+	},
+	'conmon-metrics': {
+		name: 'conmonmetric',
+		localName: 'conmonMetric',
+		localNamePlural: 'conmonMetrics',
+		verboseName: 'ConMon metric',
+		verboseNamePlural: 'ConMon metrics',
+		endpointUrl: 'conmon/metrics',
+		foreignKeyFields: [
+			{ field: 'folder', urlModel: 'folders', urlParams: 'content_type=DO' },
+			{ field: 'profile', urlModel: 'conmon-profiles' }
+		],
+		selectFields: [
+			{ field: 'metric_type' },
+			{ field: 'trend' }
+		],
+		detailViewFields: [
+			{ field: 'profile' },
+			{ field: 'metric_type' },
+			{ field: 'period_start', type: 'date' },
+			{ field: 'period_end', type: 'date' },
+			{ field: 'value' },
+			{ field: 'target' },
+			{ field: 'unit' },
+			{ field: 'trend' },
+			{ field: 'trend_value' },
+			{ field: 'breakdown' },
+			{ field: 'created_at', type: 'datetime' },
+			{ field: 'updated_at', type: 'datetime' }
+		],
+		filters: [{ field: 'folder' }, { field: 'profile' }, { field: 'metric_type' }]
 	}
 };
 

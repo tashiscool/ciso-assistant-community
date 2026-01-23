@@ -199,6 +199,7 @@ INSTALLED_APPS = [
     "business_continuity",  # Business Continuity bounded context (standalone)
     "ai_assistant",  # AI-powered suggestions for GRC
     "evidence_automation",  # Automated evidence collection
+    "continuous_monitoring",  # Continuous monitoring operations and tracking
     # Bounded contexts within core
     "core.bounded_contexts.asset_and_service",
     "core.bounded_contexts.organization",

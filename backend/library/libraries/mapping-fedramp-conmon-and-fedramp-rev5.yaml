@@ -1,0 +1,122 @@
+urn: urn:intuitem:risk:library:mapping-fedramp-conmon-and-fedramp-rev5
+locale: en
+ref_id: MAPPING-FEDRAMP-CONMON-REV5
+name: FedRAMP ConMon Checklist <-> FedRAMP Rev5 Mapping
+description: >
+  Mapping between FedRAMP Continuous Monitoring Checklist and FedRAMP Rev5
+  controls. Links FedRAMP-specific ConMon activities to their corresponding
+  NIST SP 800-53 Rev 5 control requirements.
+copyright: intuitem
+version: 2
+publication_date: 2025-01-23
+provider: intuitem
+packager: intuitem
+dependencies:
+- urn:intuitem:risk:library:fedramp-conmon-checklist
+- urn:intuitem:risk:library:fedramp-rev5
+objects:
+  requirement_mapping_sets:
+  - urn: urn:intuitem:risk:req_mapping_set:mapping-fedramp-conmon-and-fedramp-rev5
+    ref_id: MAPPING-FEDRAMP-CONMON-REV5
+    name: FedRAMP ConMon Checklist <-> FedRAMP Rev5
+    description: >
+      Maps FedRAMP-specific ConMon checklist items to FedRAMP Rev5 controls,
+      enabling traceability between operational activities and control requirements.
+    source_framework_urn: urn:intuitem:risk:framework:fedramp-conmon-checklist
+    target_framework_urn: urn:intuitem:risk:framework:fedramp-rev5
+    requirement_mappings:
+    # Monthly Package
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-poam
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ca-5
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-inventory
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cm-8
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-scan-reports
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ra-5
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-security-status
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ca-7
+      relationship: subset
+
+    # Vulnerability Timelines
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-critical-30
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ra-5
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-critical-30
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:si-2
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-moderate-90
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ra-5
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-moderate-90
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:si-2
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-low-180
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ra-5
+      relationship: subset
+
+    # Annual Assessment
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-schedule
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ca-2
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-ssp-update
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:pl-2
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-scope
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ca-2
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-sap
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ca-2
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-execute
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ca-2
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-poam-update
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ca-5
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-package-upload
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ca-6
+      relationship: subset
+
+    # Significant Change
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:sc-categorize
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cm-4
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:sc-impact-analysis
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cm-4
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:sc-scr-submission
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cm-3
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:sc-post-change
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ca-2
+      relationship: subset
+
+    # Incident Reporting
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:ir-1hour
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ir-6
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:ir-cisa
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ir-6
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:ir-daily
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ir-6
+      relationship: subset
+
+    # FedRAMP Periodic
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:contingency-10day
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cp-3
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:authenticator-60day
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ia-5
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:inactive-90day
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ac-2-(3)
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:inactive-90day
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ia-4
+      relationship: subset
+    - source_requirement_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:reauth-3year
+      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ca-6
+      relationship: subset

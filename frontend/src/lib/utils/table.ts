@@ -2800,6 +2800,152 @@ export const listViewFields = {
 		body: ['title', 'module_id', 'version', 'framework'],
 		meta: ['module_id']
 	},
+	// ============================================================================
+	// Continuous Monitoring Tables
+	// ============================================================================
+	'conmon-profiles': {
+		head: ['name', 'profileType', 'status', 'baseFramework', 'activities', 'domain'],
+		body: ['name', 'profile_type', 'status', 'base_framework', 'enabled_activities', 'folder'],
+		meta: ['id'],
+		filters: {
+			folder: DOMAIN_FILTER,
+			profile_type: {
+				component: AutocompleteSelect,
+				props: {
+					options: [
+						{ label: 'FedRAMP Low', value: 'fedramp_low' },
+						{ label: 'FedRAMP Moderate', value: 'fedramp_moderate' },
+						{ label: 'FedRAMP High', value: 'fedramp_high' },
+						{ label: 'ISO 27001', value: 'iso_27001' },
+						{ label: 'SOC 2', value: 'soc_2' },
+						{ label: 'NIST CSF', value: 'nist_csf' },
+						{ label: 'CMMC Level 1', value: 'cmmc_l1' },
+						{ label: 'CMMC Level 2', value: 'cmmc_l2' },
+						{ label: 'CMMC Level 3', value: 'cmmc_l3' },
+						{ label: 'Custom', value: 'custom' }
+					],
+					label: 'profileType',
+					multiple: true
+				}
+			},
+			status: {
+				component: AutocompleteSelect,
+				props: {
+					options: [
+						{ label: 'Draft', value: 'draft' },
+						{ label: 'Active', value: 'active' },
+						{ label: 'Archived', value: 'archived' }
+					],
+					label: 'status',
+					multiple: true
+				}
+			}
+		}
+	},
+	'conmon-activities': {
+		head: ['refId', 'name', 'profile', 'enabled', 'frequencyOverride', 'status'],
+		body: ['ref_id', 'name', 'profile', 'enabled', 'frequency_override', 'status'],
+		meta: ['id'],
+		filters: {
+			folder: DOMAIN_FILTER,
+			profile: {
+				component: AutocompleteSelect,
+				props: {
+					optionsEndpoint: 'conmon/profiles',
+					label: 'profile',
+					multiple: true
+				}
+			},
+			enabled: {
+				component: AutocompleteSelect,
+				props: {
+					options: [
+						{ label: 'Enabled', value: 'true' },
+						{ label: 'Disabled', value: 'false' }
+					],
+					label: 'enabled',
+					multiple: false
+				}
+			}
+		}
+	},
+	'conmon-executions': {
+		head: ['activityRefId', 'activityName', 'dueDate', 'status', 'result', 'completedDate'],
+		body: ['activity_ref_id', 'activity_name', 'due_date', 'status', 'result', 'completed_date'],
+		meta: ['id', 'is_overdue'],
+		filters: {
+			folder: DOMAIN_FILTER,
+			activity_config: {
+				component: AutocompleteSelect,
+				props: {
+					optionsEndpoint: 'conmon/activities',
+					label: 'activity',
+					multiple: true
+				}
+			},
+			status: {
+				component: AutocompleteSelect,
+				props: {
+					options: [
+						{ label: 'Pending', value: 'pending' },
+						{ label: 'In Progress', value: 'in_progress' },
+						{ label: 'Completed', value: 'completed' },
+						{ label: 'Completed Late', value: 'completed_late' },
+						{ label: 'Missed', value: 'missed' },
+						{ label: 'Not Applicable', value: 'not_applicable' }
+					],
+					label: 'status',
+					multiple: true
+				}
+			},
+			result: {
+				component: AutocompleteSelect,
+				props: {
+					options: [
+						{ label: 'Pass', value: 'pass' },
+						{ label: 'Fail', value: 'fail' },
+						{ label: 'Partial', value: 'partial' },
+						{ label: 'Not Assessed', value: 'not_assessed' }
+					],
+					label: 'result',
+					multiple: true
+				}
+			}
+		}
+	},
+	'conmon-metrics': {
+		head: ['profile', 'metricType', 'periodEnd', 'value', 'target', 'trend'],
+		body: ['profile', 'metric_type', 'period_end', 'value', 'target', 'trend'],
+		meta: ['id'],
+		filters: {
+			folder: DOMAIN_FILTER,
+			profile: {
+				component: AutocompleteSelect,
+				props: {
+					optionsEndpoint: 'conmon/profiles',
+					label: 'profile',
+					multiple: true
+				}
+			},
+			metric_type: {
+				component: AutocompleteSelect,
+				props: {
+					options: [
+						{ label: 'Activity Completion Rate', value: 'completion_rate' },
+						{ label: 'On-Time Completion Rate', value: 'on_time_rate' },
+						{ label: 'Evidence Freshness', value: 'evidence_freshness' },
+						{ label: 'Vulnerability Remediation Time', value: 'vuln_remediation_time' },
+						{ label: 'POA&M Aging', value: 'poam_aging' },
+						{ label: 'Scan Compliance', value: 'scan_compliance' },
+						{ label: 'Control Effectiveness', value: 'control_effectiveness' },
+						{ label: 'Incident Response Time', value: 'incident_response_time' }
+					],
+					label: 'metricType',
+					multiple: true
+				}
+			}
+		}
+	},
 	extra: {
 		filters: {
 			risk: undefined,

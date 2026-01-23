@@ -280,6 +280,35 @@ export const navData = {
 			]
 		},
 		{
+			name: 'continuousMonitoring',
+			items: [
+				{
+					name: 'conmonDashboard',
+					fa_icon: 'fa-solid fa-gauge-high',
+					href: '/continuous-monitoring',
+					permissions: ['view_conmonprofile']
+				},
+				{
+					name: 'conmonProfiles',
+					fa_icon: 'fa-solid fa-sliders',
+					href: '/conmon-profiles',
+					permissions: ['view_conmonprofile']
+				},
+				{
+					name: 'conmonActivities',
+					fa_icon: 'fa-solid fa-list-check',
+					href: '/conmon-activities',
+					permissions: ['view_conmonactivityconfig']
+				},
+				{
+					name: 'conmonExecutions',
+					fa_icon: 'fa-solid fa-clock-rotate-left',
+					href: '/conmon-executions',
+					permissions: ['view_conmonexecution']
+				}
+			]
+		},
+		{
 			name: 'metrology',
 			items: [
 				{
@@ -403,6 +432,30 @@ export const navData = {
 					name: 'rmfDashboard',
 					fa_icon: 'fa-solid fa-gauge',
 					href: '/rmf',
+					permissions: ['view_systemgroup']
+				},
+				{
+					name: 'fedramp20x',
+					fa_icon: 'fa-solid fa-flag-usa',
+					href: '/rmf/fedramp-20x',
+					permissions: ['view_systemgroup']
+				},
+				{
+					name: 'changeControl',
+					fa_icon: 'fa-solid fa-code-branch',
+					href: '/rmf/change-control',
+					permissions: ['view_systemgroup']
+				},
+				{
+					name: 'incidentResponse',
+					fa_icon: 'fa-solid fa-fire-extinguisher',
+					href: '/rmf/incident-response',
+					permissions: ['view_systemgroup']
+				},
+				{
+					name: 'ksiDashboard',
+					fa_icon: 'fa-solid fa-key',
+					href: '/rmf/ksi-dashboard',
 					permissions: ['view_systemgroup']
 				},
 				{

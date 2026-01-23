@@ -135,6 +135,7 @@ urlpatterns = [
     path("iam/", include("iam.urls")),
     path("ai/", include("ai_assistant.urls")),  # AI Assistant API
     path("evidence-automation/", include("evidence_automation.urls")),  # Evidence Automation API
+    path("conmon/", include("continuous_monitoring.api.urls")),  # Continuous Monitoring API
     path("organization/", include("core.bounded_contexts.organization.urls")),  # Organization bounded context API
     path("asset-service/", include("core.bounded_contexts.asset_and_service.urls")),  # Asset and Service bounded context API
     path("control-library/", include("core.bounded_contexts.control_library.urls")),  # Control Library bounded context API

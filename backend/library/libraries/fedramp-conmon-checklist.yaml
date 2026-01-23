@@ -1,0 +1,555 @@
+urn: urn:intuitem:risk:library:fedramp-conmon-checklist
+locale: en
+ref_id: FEDRAMP-CONMON-CHECKLIST
+name: FedRAMP Continuous Monitoring & Annual Activities Checklist
+description: >
+  FedRAMP-specific Continuous Monitoring (ConMon) checklist extending the generic
+  ConMon Schedule with FedRAMP-specific requirements, timelines, and deliverables.
+  Aligned with NIST SP 800-53 Rev 5 and current FedRAMP requirements. Includes
+  the Annual Assessment mini-checklist and Significant Change governance.
+copyright: US General Services Administration (GSA) FedRAMP PMO
+version: 2
+publication_date: 2025-01-23
+provider: FedRAMP PMO / GSA
+packager: intuitem
+dependencies:
+- urn:intuitem:risk:library:conmon-schedule
+objects:
+  framework:
+    urn: urn:intuitem:risk:framework:fedramp-conmon-checklist
+    ref_id: FEDRAMP-CONMON-CHECKLIST
+    name: FedRAMP Continuous Monitoring & Annual Activities Checklist
+    description: >
+      FedRAMP-specific Continuous Monitoring (ConMon) checklist with FedRAMP-specific
+      requirements, deliverables, and timelines. Use with FedRAMP Low, Moderate, or
+      High impact level baselines.
+    implementation_groups_definition:
+    - ref_id: L
+      name: Low
+      description: FedRAMP Low Impact baseline requirements
+    - ref_id: M
+      name: Moderate
+      description: FedRAMP Moderate Impact baseline requirements
+    - ref_id: H
+      name: High
+      description: FedRAMP High Impact baseline requirements
+    requirement_nodes:
+    # ============================================================
+    # FEDRAMP MONTHLY CONMON PACKAGE
+    # ============================================================
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-package
+      assessable: false
+      depth: 1
+      ref_id: FEDRAMP-MONTHLY
+      name: FedRAMP Monthly ConMon Package
+      description: >
+        FedRAMP-specific monthly continuous monitoring deliverables. Package
+        must be posted to secure repository and AO/agency ConMon POCs notified.
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-poam
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-package
+      ref_id: FEDRAMP-M-01
+      name: POA&M Submitted to ISSO/AO
+      description: >
+        Plan of Action and Milestones (POA&M) updated and submitted to ISSO/AO
+        monthly. Must include new findings, milestone updates, and closure of
+        remediated items. Use current FedRAMP POA&M template.
+      annotation: |
+        FedRAMP Requirement: Monthly POA&M submission
+        Template: FedRAMP POA&M Template
+        Control: CA-5
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-inventory
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-package
+      ref_id: FEDRAMP-M-02
+      name: System Inventory Updated
+      description: >
+        System inventory updated monthly or when changes occur. Include all
+        hardware, software, and firmware within the authorization boundary.
+        Use FedRAMP inventory workbook format.
+      annotation: |
+        FedRAMP Requirement: Monthly inventory update
+        Control: CM-8
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-scan-reports
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-package
+      ref_id: FEDRAMP-M-03
+      name: Vulnerability Scan Reports Submitted
+      description: >
+        Submit vulnerability scan reports (OS, web, database) as part of
+        monthly ConMon package. Include raw scan files if required by agency
+        agreement. Document scan coverage and any exclusions.
+      annotation: |
+        FedRAMP Requirement: Monthly scan submission
+        Control: RA-5
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-security-status
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-package
+      ref_id: FEDRAMP-M-04
+      name: Security Status Reported to AO
+      description: >
+        Report current security state to organization/agency ConMon lead.
+        Include vulnerability status, POA&M updates, and any significant
+        security events. Use FedRAMP ConMon report template.
+      annotation: |
+        FedRAMP Requirement: Monthly status reporting
+        Control: CA-7
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    # ============================================================
+    # FEDRAMP VULNERABILITY REMEDIATION TIMELINES
+    # ============================================================
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-timelines
+      assessable: false
+      depth: 1
+      ref_id: FEDRAMP-VULN
+      name: FedRAMP Vulnerability Remediation Requirements
+      description: >
+        FedRAMP-specific vulnerability remediation timelines. These are
+        hard requirements for maintaining FedRAMP authorization.
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-critical-30
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-timelines
+      ref_id: FEDRAMP-V-01
+      name: Critical/High Vulnerabilities Remediated Within 30 Days
+      description: >
+        Critical and High severity vulnerabilities must be remediated within
+        30 days of discovery. If remediation is not possible, document
+        deviation request with compensating controls and submit to AO.
+      annotation: |
+        FedRAMP Requirement: 30-day Critical/High remediation
+        Control: RA-5(d), SI-2
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-moderate-90
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-timelines
+      ref_id: FEDRAMP-V-02
+      name: Moderate Vulnerabilities Remediated Within 90 Days
+      description: >
+        Moderate severity vulnerabilities must be remediated within 90 days
+        of discovery. Track in POA&M and provide monthly status updates.
+      annotation: |
+        FedRAMP Requirement: 90-day Moderate remediation
+        Control: RA-5(d), SI-2
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-low-180
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-timelines
+      ref_id: FEDRAMP-V-03
+      name: Low Vulnerabilities Remediated Within 180 Days
+      description: >
+        Low severity vulnerabilities should be remediated within 180 days.
+        Track in POA&M for visibility and closure tracking.
+      annotation: |
+        FedRAMP Guidance: 180-day Low remediation
+        Control: RA-5(d), SI-2
+      implementation_groups:
+      - M
+      - H
+
+    # ============================================================
+    # FEDRAMP ANNUAL ASSESSMENT (AA)
+    # ============================================================
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:annual-assessment
+      assessable: false
+      depth: 1
+      ref_id: FEDRAMP-AA
+      name: FedRAMP Annual Assessment (AA) Activities
+      description: >
+        FedRAMP Annual Assessment mini-checklist. All activities must be
+        completed by the ATO anniversary date to avoid CAP trigger.
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-schedule
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:annual-assessment
+      ref_id: FEDRAMP-AA-01
+      name: Build AA Schedule
+      description: >
+        Build Annual Assessment schedule working backwards from ATO anniversary.
+        Include documentation updates, IR/CP tests early so AA is not blocked
+        by incomplete prerequisites.
+      annotation: |
+        FedRAMP Requirement: Annual Assessment planning
+        Timeline: Begin 4-6 months before ATO anniversary
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-ssp-update
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:annual-assessment
+      ref_id: FEDRAMP-AA-02
+      name: SSP and Appendices Updated
+      description: >
+        Review and update System Security Plan (SSP) and all appendices.
+        Ensure using current FedRAMP SSP template version. Document all
+        changes since last assessment.
+      annotation: |
+        FedRAMP Requirement: Current SSP for AA
+        Template: FedRAMP SSP Template (current version)
+        Control: PL-2
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-scope
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:annual-assessment
+      ref_id: FEDRAMP-AA-03
+      name: Assessment Scope Defined
+      description: >
+        Define assessment scope using FedRAMP control selection worksheet.
+        Include core controls (required annually), change-driven controls,
+        and ensure 3-year coverage for all controls.
+      annotation: |
+        FedRAMP Requirement: Control selection per FedRAMP guidance
+        Tool: FedRAMP Control Selection Worksheet
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-sap
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:annual-assessment
+      ref_id: FEDRAMP-AA-04
+      name: 3PAO Produces SAP
+      description: >
+        Third Party Assessment Organization (3PAO) produces Security Assessment
+        Plan (SAP). Brief agency customers using collaborative ConMon meeting
+        if system has multiple agency authorizations.
+      annotation: |
+        FedRAMP Requirement: SAP from accredited 3PAO
+        Template: FedRAMP SAP Template
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-execute
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:annual-assessment
+      ref_id: FEDRAMP-AA-05
+      name: Assessment Executed and SAR Produced
+      description: >
+        Execute assessment per SAP. 3PAO produces Security Assessment Report
+        (SAR) with Risk Exposure Table (RET) and Security Requirements
+        Traceability Matrix (SRTM) as required.
+      annotation: |
+        FedRAMP Requirement: SAR from 3PAO
+        Templates: FedRAMP SAR, RET, SRTM Templates
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-poam-update
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:annual-assessment
+      ref_id: FEDRAMP-AA-06
+      name: POA&M Updated with SAR Findings
+      description: >
+        Update POA&M with residual risks identified in SAR. Include
+        remediation plans with milestones. Track all findings through
+        closure.
+      annotation: |
+        FedRAMP Requirement: POA&M update post-assessment
+        Control: CA-5
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-package-upload
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:annual-assessment
+      ref_id: FEDRAMP-AA-07
+      name: AA Package Uploaded by Anniversary
+      description: >
+        Ensure complete Annual Assessment package is uploaded to FedRAMP
+        repository by ATO anniversary date to avoid Corrective Action Plan
+        (CAP) trigger. Package includes updated SSP, SAP, SAR, and POA&M.
+      annotation: |
+        FedRAMP Requirement: Package upload deadline
+        Consequence: CAP initiation if missed
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    # ============================================================
+    # FEDRAMP SIGNIFICANT CHANGE
+    # ============================================================
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:significant-change
+      assessable: false
+      depth: 1
+      ref_id: FEDRAMP-SC
+      name: FedRAMP Significant Change Governance
+      description: >
+        FedRAMP Significant Change Request (SCR) process for changes that
+        may affect the security posture of the authorized system.
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:sc-categorize
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:significant-change
+      ref_id: FEDRAMP-SC-01
+      name: Change Categorization
+      description: >
+        Categorize change per FedRAMP guidance: Routine Recurring (no SCR),
+        Adaptive Maintenance (SCR may be required), or Transformative
+        (SCR and assessment required). Document categorization rationale.
+      annotation: |
+        FedRAMP Guidance: Significant Change Request Process
+        Control: CM-4
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:sc-impact-analysis
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:significant-change
+      ref_id: FEDRAMP-SC-02
+      name: Security Impact Analysis
+      description: >
+        Perform security impact analysis before implementing significant
+        changes. Identify affected controls, boundary changes, and
+        potential security implications.
+      annotation: |
+        FedRAMP Requirement: Impact analysis for significant changes
+        Control: CM-4
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:sc-scr-submission
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:significant-change
+      ref_id: FEDRAMP-SC-03
+      name: SCR and AO Approval
+      description: >
+        For Adaptive/Transformative changes: prepare Significant Change
+        Request (SCR) with all required fields. Submit to AO for approval
+        before implementation. Assessor prepares SAP if assessment required.
+      annotation: |
+        FedRAMP Requirement: SCR approval before implementation
+        Template: FedRAMP SCR Template
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:sc-post-change
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:significant-change
+      ref_id: FEDRAMP-SC-04
+      name: Post-Change Testing and Documentation
+      description: >
+        Conduct post-change security testing as agreed in SCR. Produce
+        SAR/attestation as required. Update POA&M with any findings.
+        Update SSP and other documentation by next Annual Assessment.
+      annotation: |
+        FedRAMP Requirement: Post-change verification
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    # ============================================================
+    # FEDRAMP INCIDENT REPORTING
+    # ============================================================
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:incident-reporting
+      assessable: false
+      depth: 1
+      ref_id: FEDRAMP-IR
+      name: FedRAMP Incident Reporting Requirements
+      description: >
+        FedRAMP incident communication requirements with strict timelines.
+        These are mandatory for all FedRAMP authorized systems.
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:ir-1hour
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:incident-reporting
+      ref_id: FEDRAMP-IR-01
+      name: 1-Hour Notification
+      description: >
+        For suspected or confirmed incidents: notify impacted agency customers,
+        FedRAMP PMO, and agency POCs within 1 hour of SOC/CSIRT identification.
+        Use FedRAMP incident notification template.
+      annotation: |
+        FedRAMP Requirement: 1-hour notification
+        Control: IR-6
+        Contact: fedramp.conmon@fedramp.gov
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:ir-cisa
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:incident-reporting
+      ref_id: FEDRAMP-IR-02
+      name: CISA Reporting
+      description: >
+        Report to CISA (Cybersecurity and Infrastructure Security Agency)
+        if incident meets US-CERT reporting criteria. Distribute tracking
+        number to all stakeholders when available.
+      annotation: |
+        FedRAMP/Federal Requirement: CISA incident reporting
+        Control: IR-6
+        Portal: us-cert.cisa.gov
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:ir-daily
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:incident-reporting
+      ref_id: FEDRAMP-IR-03
+      name: Daily Status Updates
+      description: >
+        Provide daily status updates to all stakeholders until incident
+        recovery is complete. Then provide final incident report after
+        post-incident activity is concluded.
+      annotation: |
+        FedRAMP Requirement: Daily updates during active incidents
+        Control: IR-6
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    # ============================================================
+    # FEDRAMP-SPECIFIC PERIODIC ACTIVITIES
+    # ============================================================
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:fedramp-periodic
+      assessable: false
+      depth: 1
+      ref_id: FEDRAMP-PERIODIC
+      name: FedRAMP-Specific Periodic Activities
+      description: >
+        Additional periodic activities specific to FedRAMP requirements.
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:contingency-10day
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:fedramp-periodic
+      ref_id: FEDRAMP-P-01
+      name: Contingency Evidence Check (Every 10 Days)
+      description: >
+        Capture contingency evidence and post per organizational process
+        every 10 days. Ensure contingency planning documentation is
+        current and accessible.
+      annotation: |
+        FedRAMP Requirement: 10-day contingency evidence
+        Control: CP-3(a)
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:authenticator-60day
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:fedramp-periodic
+      ref_id: FEDRAMP-P-02
+      name: Authenticator Refresh (Every 60 Days)
+      description: >
+        Change/refresh authenticators at least every 60 days per FedRAMP
+        requirements. Include service accounts in scope. Document rotation
+        and verification.
+      annotation: |
+        FedRAMP Requirement: 60-day authenticator refresh
+        Control: IA-5(g)
+      implementation_groups:
+      - L
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:inactive-90day
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:fedramp-periodic
+      ref_id: FEDRAMP-P-03
+      name: Inactive Account Disable (90 Days)
+      description: >
+        Disable user IDs after 90 days of inactivity per FedRAMP requirements.
+        Review inactive accounts and disable or remove as appropriate.
+        Document all actions.
+      annotation: |
+        FedRAMP Requirement: 90-day inactive account disable
+        Control: AC-2(3), IA-4(e)
+      implementation_groups:
+      - M
+      - H
+
+    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:reauth-3year
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:fedramp-periodic
+      ref_id: FEDRAMP-P-04
+      name: Reauthorization (Every 3 Years)
+      description: >
+        Complete reauthorization process every 3 years or when significant
+        changes occur that require reassessment of the authorization.
+        Document reauthorization date in SSP.
+      annotation: |
+        FedRAMP Requirement: 3-year reauthorization cycle
+        Control: CA-6(c)
+      implementation_groups:
+      - L
+      - M
+      - H

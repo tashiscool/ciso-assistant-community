@@ -155,7 +155,12 @@ export const URL_MODEL = [
 	'poam-items',
 	'poam-milestones',
 	// questionnaires enhanced
-	'questionnaire-modules'
+	'questionnaire-modules',
+	// continuous monitoring
+	'conmon-profiles',
+	'conmon-activities',
+	'conmon-executions',
+	'conmon-metrics'
 ] as const;
 
 export const THIRD_PARTY_URL_MODEL = [

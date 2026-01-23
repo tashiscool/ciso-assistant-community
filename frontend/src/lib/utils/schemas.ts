@@ -1874,6 +1874,77 @@ export const QuestionnaireModuleSchema = z.object({
 	control_mappings: z.record(z.array(z.string())).default({})
 });
 
+/** Continuous Monitoring schemas */
+export const ConMonProfileSchema = z.object({
+	...NameDescriptionMixin,
+	folder: z.string(),
+	profile_type: z.enum([
+		'fedramp_low', 'fedramp_moderate', 'fedramp_high',
+		'iso_27001', 'soc_2', 'nist_csf',
+		'cmmc_l1', 'cmmc_l2', 'cmmc_l3', 'custom'
+	]).default('custom'),
+	status: z.enum(['draft', 'active', 'archived']).default('draft'),
+	base_framework: z.string().uuid().optional(),
+	compliance_assessment: z.string().uuid().optional(),
+	implementation_groups: z.array(z.string()).optional(),
+	notification_lead_days: z.number().int().min(0).default(7),
+	notification_enabled: z.boolean().default(true),
+	assigned_actors: z.preprocess(toArrayPreprocessor, z.array(z.string().optional())).optional()
+});
+
+export const ConMonActivityConfigSchema = z.object({
+	folder: z.string(),
+	profile: z.string().uuid(),
+	requirement_urn: z.string().optional(),
+	ref_id: z.string().optional(),
+	name: z.string().optional(),
+	enabled: z.boolean().default(true),
+	frequency_override: z.enum([
+		'inherit', 'continuous', 'daily', 'weekly', 'biweekly',
+		'monthly', 'quarterly', 'semi_annual', 'annual',
+		'biennial', 'triennial', 'event_driven'
+	]).default('inherit'),
+	custom_schedule: jsonSchema.optional(),
+	assigned_actors: z.preprocess(toArrayPreprocessor, z.array(z.string().optional())).optional(),
+	applied_controls: z.preprocess(toArrayPreprocessor, z.array(z.string().optional())).optional(),
+	task_template: z.string().uuid().optional(),
+	notes: z.string().optional()
+});
+
+export const ConMonExecutionSchema = z.object({
+	folder: z.string(),
+	activity_config: z.string().uuid(),
+	period_start: z.string(),
+	period_end: z.string(),
+	due_date: z.string(),
+	status: z.enum(['pending', 'in_progress', 'completed', 'completed_late', 'missed', 'not_applicable']).default('pending'),
+	result: z.enum(['pass', 'fail', 'partial', 'not_assessed']).default('not_assessed'),
+	completed_date: z.string().optional(),
+	completed_by: z.string().uuid().optional(),
+	task_node: z.string().uuid().optional(),
+	evidences: z.preprocess(toArrayPreprocessor, z.array(z.string().optional())).optional(),
+	findings: z.string().optional(),
+	observations: z.string().optional()
+});
+
+export const ConMonMetricSchema = z.object({
+	folder: z.string(),
+	profile: z.string().uuid(),
+	metric_type: z.enum([
+		'completion_rate', 'on_time_rate', 'evidence_freshness',
+		'vuln_remediation_time', 'poam_aging', 'scan_compliance',
+		'control_effectiveness', 'incident_response_time'
+	]),
+	period_start: z.string(),
+	period_end: z.string(),
+	value: z.number(),
+	target: z.number().optional(),
+	unit: z.string().default('%'),
+	trend: z.enum(['up', 'down', 'stable']).default('stable'),
+	trend_value: z.number().default(0),
+	breakdown: jsonSchema.optional()
+});
+
 const SCHEMA_MAP: Record<string, AnyZodObject> = {
 	folders: FolderSchema,
 	'folders-import': FolderImportSchema,
@@ -1967,7 +2038,12 @@ const SCHEMA_MAP: Record<string, AnyZodObject> = {
 	'poam-items': POAMItemSchema,
 	'poam-milestones': POAMMilestoneSchema,
 	// Questionnaires Enhanced
-	'questionnaire-modules': QuestionnaireModuleSchema
+	'questionnaire-modules': QuestionnaireModuleSchema,
+	// Continuous Monitoring
+	'conmon-profiles': ConMonProfileSchema,
+	'conmon-activities': ConMonActivityConfigSchema,
+	'conmon-executions': ConMonExecutionSchema,
+	'conmon-metrics': ConMonMetricSchema
 };
 
 export const modelSchema = (model: string) => {
