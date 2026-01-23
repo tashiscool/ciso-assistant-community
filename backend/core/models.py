@@ -7976,3 +7976,6 @@ auditlog.register(
     exclude_fields=common_exclude,
 )
 # actions - 0: create, 1: update, 2: delete
+
+# Import EventStore for Django model discovery
+from core.domain.event_store import EventStore

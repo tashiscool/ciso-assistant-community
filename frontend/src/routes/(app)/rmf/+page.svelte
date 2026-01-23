@@ -11,7 +11,8 @@
     BarChart3,
     RefreshCw,
     ChevronRight,
-    Activity
+    Activity,
+    FileOutput
   } from 'lucide-svelte';
   import DonutChart from '$lib/components/Chart/DonutChart.svelte';
   import BarChart from '$lib/components/Chart/BarChart.svelte';
@@ -388,7 +389,15 @@
       </div>
 
       <!-- Quick Links -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+        <button
+          onclick={() => goto('/rmf/ksi-dashboard')}
+          class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow-sm border border-blue-500 p-4 hover:shadow-md transition-all text-left text-white"
+        >
+          <BarChart3 size={20} class="mb-2" />
+          <p class="font-medium">FedRAMP KSI</p>
+          <p class="text-xs text-blue-100">Key Security Indicators</p>
+        </button>
         <button
           onclick={() => goto('/rmf/compliance')}
           class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md hover:border-indigo-300 transition-all text-left"
@@ -412,6 +421,14 @@
           <Upload size={20} class="text-purple-600 mb-2" />
           <p class="font-medium text-gray-900">Upload</p>
           <p class="text-xs text-gray-500">Import CKL/SCAP</p>
+        </button>
+        <button
+          onclick={() => goto('/rmf/ssp-generator')}
+          class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md hover:border-indigo-300 transition-all text-left"
+        >
+          <FileOutput size={20} class="text-blue-600 mb-2" />
+          <p class="font-medium text-gray-900">SSP Generator</p>
+          <p class="text-xs text-gray-500">Generate FedRAMP SSP</p>
         </button>
         <button
           onclick={() => goto('/rmf/audit')}

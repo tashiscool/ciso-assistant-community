@@ -13,7 +13,7 @@ from core.domain.events import (
     EventHandler,
     get_event_bus,
 )
-from core.domain.event_models import EventStore
+from core.domain.event_store import EventStore
 
 
 class TestDomainEvent(DomainEvent):

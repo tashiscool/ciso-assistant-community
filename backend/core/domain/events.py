@@ -16,12 +16,12 @@ from dataclasses import dataclass, field
 from django.utils import timezone
 
 if TYPE_CHECKING:
-    from .event_models import EventStore
+    from .event_store import EventStore
 
 
 def get_event_store():
     """Lazy import of EventStore to avoid app registry issues"""
-    from .event_models import EventStore
+    from .event_store import EventStore
     return EventStore
 
 

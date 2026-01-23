@@ -24,6 +24,7 @@ class EventStore(models.Model):
     payload = models.JSONField()
 
     class Meta:
+        app_label = "core"
         db_table = "domain_events"
         ordering = ["occurred_at"]
         indexes = [

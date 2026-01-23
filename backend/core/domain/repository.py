@@ -57,6 +57,10 @@ class Repository(Generic[T]):
         """Get count of aggregates"""
         return self.model_class.objects.count()
 
+    def filter(self, **kwargs) -> List[T]:
+        """Filter aggregates by given criteria"""
+        return list(self.model_class.objects.filter(**kwargs))
+
 
 class BaseRepository(Repository[T]):
     """
