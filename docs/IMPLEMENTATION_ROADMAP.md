@@ -1,7 +1,7 @@
 # CISO Assistant Implementation Roadmap
 ## Feature Parity with RegScale + FedRAMP 20x Future-Proofing
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** January 2026
 **Status:** Draft
 
@@ -10,7 +10,7 @@
 ## Executive Summary
 
 This roadmap outlines a strategic implementation plan to:
-1. **Achieve feature parity with RegScale** - Address 16 identified gaps
+1. **Achieve feature parity with RegScale** - Address identified gaps in core GRC capabilities
 2. **Support FedRAMP 20x** - Future-proof for the new authorization paradigm
 3. **Maintain competitive advantage** - Leverage existing strengths (90+ frameworks, OSCAL, multi-language)
 
@@ -21,11 +21,46 @@ This roadmap outlines a strategic implementation plan to:
 | Phase 1 | FedRAMP 20x Foundation | 6-8 weeks | Critical |
 | Phase 2 | Core Platform Enhancements | 8-10 weeks | High |
 | Phase 3 | Scanner Integrations | 10-12 weeks | High |
-| Phase 4 | Advanced Workflows | 8-10 weeks | Medium |
+| Phase 4 | Advanced AI & Risk Analytics | 8-10 weeks | High |
+| Phase 5 | Advanced Workflows & Automation | 6-8 weeks | Medium |
 
-**Future Consideration (Post-Product Maturity):**
+### Deferred Items (Post-Product Maturity)
+
+The following items are explicitly **out of scope** for this roadmap and will be considered only after core product features are complete and validated:
 - CLI Tool
 - GraphQL API
+
+These developer-focused features add complexity without directly improving core GRC capabilities for end users.
+
+---
+
+## Feature Parity Comparison: CISO Assistant vs RegScale
+
+| Feature | RegScale | CISO Assistant | Gap Status |
+|---------|----------|----------------|------------|
+| **Compliance Frameworks** | 60+ | 90+ | ✅ Ahead |
+| **OSCAL Support** | Full (SSP, SAP, SAR, POA&M) | Full bi-directional | ✅ Parity |
+| **FedRAMP Support** | Rev5 + 20x | Rev5, 20x in progress | 🔄 Phase 1 |
+| **Continuous Controls Monitoring** | Yes | Yes (ConMon module) | ✅ Parity |
+| **Risk Management** | Asset, TPRM, Enterprise | Asset, TPRM, Business | 🔄 Phase 4.5 |
+| **Quantitative Risk (Monte Carlo)** | Yes | No | 🔄 Phase 4.2 |
+| **Third-Party Risk Management** | Yes | Yes | ✅ Parity |
+| **Evidence Repository** | Centralized, automated | Centralized, automated | ✅ Parity |
+| **Scanner Integrations** | 1300+ APIs (via OCSF) | 20+ connectors | 🔄 Phase 3 |
+| **OCSF Support** | Yes (OCSF-to-OSCAL) | No | 🔄 Phase 4.3 |
+| **AI - Control Authoring** | RegML Author | Basic AI Assistant | 🔄 Phase 4.1 |
+| **AI - Policy Extraction** | RegML Extractor | No | 🔄 Phase 4.1 |
+| **AI - Control Auditing** | RegML Auditor | No | 🔄 Phase 4.1 |
+| **AI - Control Explanation** | RegML Explainer | No | 🔄 Phase 4.1 |
+| **Time Travel / Version History** | Patented system | Basic audit logs | 🔄 Phase 2.4 |
+| **Security Graph** | Yes (360° asset view) | No | 🔄 Phase 4.4 |
+| **Low-Code Workflows** | Yes | Basic workflow engine | 🔄 Phase 5.2 |
+| **Kanban/Visual Tracking** | Yes | No | 🔄 Phase 2.1 |
+| **Guided Workflows (Wayfinder)** | Yes | No | 🔄 Phase 2.2 |
+| **Multi-Language Support** | Limited | 22 languages | ✅ Ahead |
+| **Open Source** | No (Proprietary) | Yes | ✅ Differentiator |
+
+**Legend:** ✅ Complete | 🔄 In Roadmap | ❌ Not Planned
 
 ---
 
@@ -852,9 +887,378 @@ class WizConnector(IntegrationConnector):
 
 ---
 
-## Phase 4: Advanced Workflows & Automation (Medium Priority)
+## Phase 4: Advanced AI & Risk Analytics (High Priority)
 
-### 4.1 Master Assessment Feature
+**Gap:** RegScale has RegML AI platform with Author, Extractor, Auditor, and Explainer capabilities, plus quantitative risk analysis with Monte Carlo simulations.
+
+### 4.1 Enhanced AI Assistant (RegML Parity)
+
+**Deliverable:** Expand AI Assistant to match RegScale's RegML capabilities
+
+**Location:** `backend/ai_assistant/services/`
+
+**Features:**
+
+```python
+class AIAssistantService:
+    """
+    Enhanced AI capabilities matching RegML feature set.
+    """
+
+    # AI Author - Draft control implementation statements
+    async def author_control(
+        self,
+        requirement_id: UUID,
+        context: ControlContext,
+        existing_policies: List[PolicyDocument]
+    ) -> ControlDraft:
+        """
+        Draft precise control implementation statements that satisfy
+        regulatory requirements. Reduces errors and improves documentation.
+        """
+        pass
+
+    # AI Extractor - Extract controls from policy documents
+    async def extract_controls_from_policy(
+        self,
+        policy_document: bytes,
+        target_framework_id: Optional[UUID] = None
+    ) -> List[ExtractedControl]:
+        """
+        Automatically derive compliance documentation from existing policies.
+        Analyzes policies and builds effective controls statements.
+        """
+        pass
+
+    # AI Auditor - Evaluate controls on demand
+    async def audit_control(
+        self,
+        control_id: UUID,
+        evaluation_criteria: Optional[List[str]] = None
+    ) -> ControlAuditResult:
+        """
+        Evaluate controls on-demand, identify gaps, and recommend
+        improvements with context-aware suggestions.
+        """
+        pass
+
+    # AI Explainer - Demystify complex control statements
+    async def explain_control(
+        self,
+        control_id: UUID,
+        target_audience: str = "technical"  # technical, executive, auditor
+    ) -> ControlExplanation:
+        """
+        Provide role-specific explanations that bridge knowledge gaps
+        and ensure clear understanding of regulatory requirements.
+        """
+        pass
+
+    # AI Mapper - Map controls across frameworks
+    async def suggest_control_mapping(
+        self,
+        source_control_id: UUID,
+        target_framework_id: UUID
+    ) -> List[MappingSuggestion]:
+        """
+        Intelligently suggest control mappings between frameworks.
+        """
+        pass
+```
+
+**Tasks:**
+- [ ] Implement AI Author with policy context awareness
+- [ ] Build AI Extractor with PDF/Word document parsing
+- [ ] Create AI Auditor with gap analysis and recommendations
+- [ ] Add AI Explainer with role-based output formatting
+- [ ] Integrate with existing AI Assistant UI
+
+**Estimated Effort:** 4 weeks
+
+---
+
+### 4.2 Quantitative Risk Analysis (Monte Carlo)
+
+**Gap:** RegScale has financial modeling that translates risks to dollars using Monte Carlo simulations
+
+**Deliverable:** Quantitative risk analysis with financial impact modeling
+
+**Location:** `backend/core/bounded_contexts/risk_registers/services/quantitative_analysis.py`
+
+```python
+class QuantitativeRiskAnalysisService:
+    """
+    Financial risk modeling with Monte Carlo simulations.
+    """
+
+    def run_monte_carlo_simulation(
+        self,
+        risk_id: UUID,
+        iterations: int = 10000,
+        confidence_levels: List[float] = [0.90, 0.95, 0.99]
+    ) -> MonteCarloResult:
+        """
+        Run Monte Carlo simulation for risk financial impact.
+
+        Returns:
+        - Expected annual loss
+        - Loss distribution
+        - Value at Risk (VaR) at confidence levels
+        - Conditional VaR (CVaR)
+        """
+        pass
+
+    def calculate_risk_reduction_roi(
+        self,
+        risk_id: UUID,
+        mitigation_cost: Decimal,
+        mitigation_effectiveness: float  # 0-1 reduction factor
+    ) -> ROIAnalysis:
+        """
+        Calculate ROI of risk mitigation investment.
+        Translates risk reduction to bottom-line impact.
+        """
+        pass
+
+    def aggregate_portfolio_risk(
+        self,
+        risk_ids: List[UUID],
+        correlation_matrix: Optional[List[List[float]]] = None
+    ) -> PortfolioRiskResult:
+        """
+        Aggregate risks with correlation analysis.
+        """
+        pass
+
+
+@dataclass
+class MonteCarloResult:
+    iterations: int
+    expected_annual_loss: Decimal
+    standard_deviation: Decimal
+    minimum_loss: Decimal
+    maximum_loss: Decimal
+    percentiles: Dict[int, Decimal]  # {90: $X, 95: $Y, 99: $Z}
+    var_90: Decimal  # Value at Risk
+    var_95: Decimal
+    var_99: Decimal
+    cvar_95: Decimal  # Conditional VaR (Expected Shortfall)
+    loss_distribution: List[Decimal]  # For visualization
+
+
+@dataclass
+class ROIAnalysis:
+    mitigation_cost: Decimal
+    expected_loss_before: Decimal
+    expected_loss_after: Decimal
+    annual_risk_reduction: Decimal
+    roi_percentage: float
+    payback_period_years: float
+    npv_5_year: Decimal
+```
+
+**UI Components:**
+- Risk financial impact input form (ALE factors)
+- Monte Carlo simulation runner with progress indicator
+- Loss distribution histogram/chart
+- ROI calculator with visualization
+- Portfolio risk dashboard
+
+**Estimated Effort:** 3 weeks
+
+---
+
+### 4.3 OCSF Integration (Telemetry Normalization)
+
+**Gap:** RegScale has OCSF-to-OSCAL translator for seamless telemetry conversion
+
+**Deliverable:** Open Cybersecurity Schema Framework (OCSF) support
+
+**Location:** `backend/integrations/ocsf/`
+
+```python
+class OCSFTranslatorService:
+    """
+    OCSF-to-OSCAL translation for telemetry normalization.
+    Enables single integration point for security tool data.
+    """
+
+    def parse_ocsf_event(
+        self,
+        event: Dict[str, Any],
+        event_class: str  # security_finding, vulnerability, etc.
+    ) -> OCSFEvent:
+        """
+        Parse and validate OCSF event data.
+        """
+        pass
+
+    def translate_to_oscal(
+        self,
+        ocsf_event: OCSFEvent,
+        target_type: str  # finding, observation, risk
+    ) -> OSCALObject:
+        """
+        Convert OCSF event to OSCAL-compliant object.
+        """
+        pass
+
+    def map_to_controls(
+        self,
+        ocsf_event: OCSFEvent,
+        framework_id: UUID
+    ) -> List[ControlMapping]:
+        """
+        Map OCSF security finding to relevant controls.
+        """
+        pass
+
+    def bulk_import_ocsf(
+        self,
+        events: List[Dict[str, Any]],
+        source: str
+    ) -> ImportResult:
+        """
+        Bulk import OCSF events from security tools.
+        """
+        pass
+```
+
+**Supported OCSF Event Classes:**
+- Security Finding (1001)
+- Vulnerability Finding (2001)
+- Compliance Finding (2002)
+- Detection Finding (2004)
+- Configuration State (5001)
+- Account Change (3001)
+- Authentication (3002)
+
+**Benefits:**
+- Single integration point for multiple security tools
+- Automatic normalization of diverse telemetry
+- Native OSCAL output for compliance documentation
+- Reduced connector maintenance burden
+
+**Estimated Effort:** 3 weeks
+
+---
+
+### 4.4 Security Graph & Asset Relationships
+
+**Gap:** RegScale has Security Graph for 360-degree asset view
+
+**Deliverable:** Graph-based asset relationship visualization and querying
+
+**Location:** `backend/core/bounded_contexts/asset_service/services/security_graph.py`
+
+```python
+class SecurityGraphService:
+    """
+    Graph-based representation of assets, controls, risks, and relationships.
+    """
+
+    def build_asset_graph(
+        self,
+        scope: Optional[AssetScope] = None
+    ) -> AssetGraph:
+        """
+        Build graph of assets with all relationships:
+        - Asset → Asset (dependencies, data flows)
+        - Asset → Control (implemented by)
+        - Asset → Risk (threatens)
+        - Asset → Vulnerability (affects)
+        - Asset → Evidence (supports)
+        """
+        pass
+
+    def query_graph(
+        self,
+        query: GraphQuery
+    ) -> GraphQueryResult:
+        """
+        Query the security graph:
+        - Find all assets affected by a vulnerability
+        - Trace data flows from sensitive systems
+        - Identify blast radius of a compromised asset
+        - Find control coverage gaps
+        """
+        pass
+
+    def calculate_blast_radius(
+        self,
+        asset_id: UUID,
+        attack_type: str = "compromise"
+    ) -> BlastRadiusResult:
+        """
+        Calculate potential impact if asset is compromised.
+        """
+        pass
+
+    def get_asset_risk_context(
+        self,
+        asset_id: UUID
+    ) -> AssetRiskContext:
+        """
+        360-degree view of asset with:
+        - Direct and inherited risks
+        - Control coverage
+        - Vulnerability exposure
+        - Compliance status
+        - Data sensitivity
+        """
+        pass
+```
+
+**UI Components:**
+- Interactive graph visualization (D3.js or similar)
+- Blast radius visualizer
+- Asset context panel
+- Graph query builder
+
+**Estimated Effort:** 4 weeks
+
+---
+
+### 4.5 Enterprise Risk Expansion
+
+**Gap:** RegScale has enterprise risk beyond IT/cyber (HR, legal, safety)
+
+**Deliverable:** Extended risk register categories
+
+**Location:** Extend `backend/core/bounded_contexts/risk_registers/`
+
+**New Risk Categories:**
+```python
+class RiskCategory(str, Enum):
+    # Existing
+    ASSET = "asset"
+    THIRD_PARTY = "third_party"
+    BUSINESS = "business"
+
+    # New categories
+    OPERATIONAL = "operational"      # Business process risks
+    FINANCIAL = "financial"          # Financial/budget risks
+    LEGAL = "legal"                  # Legal/regulatory risks
+    HR = "hr"                        # Human resources risks
+    SAFETY = "safety"                # Physical safety risks
+    REPUTATIONAL = "reputational"    # Brand/reputation risks
+    STRATEGIC = "strategic"          # Strategic/market risks
+    ENVIRONMENTAL = "environmental"  # Environmental/ESG risks
+```
+
+**Features:**
+- Category-specific risk templates
+- Cross-category risk correlation
+- Enterprise risk dashboard
+- Board-level reporting views
+
+**Estimated Effort:** 2 weeks
+
+---
+
+## Phase 5: Advanced Workflows & Automation (Medium Priority)
+
+### 5.1 Master Assessment Feature
 
 **Gap:** RegScale has grouped control testing workflows
 
@@ -903,56 +1307,24 @@ class MasterAssessment(AggregateRoot):
 
 ---
 
-### 4.2 Low-Code Workflow Builder
+### 5.2 Enhanced Workflow Builder
 
-**Gap:** RegScale has 450+ tool integrations with no-code automation
+**Current State:** Basic workflow engine exists
 
-**Deliverable:** Visual workflow builder for automation
+**Enhancement:** Advanced visual workflow builder with more capabilities
 
 **Location:** `frontend/src/lib/components/WorkflowBuilder/`
 
-**Features:**
-- Drag-drop workflow designer
-- Trigger types: schedule, event, manual, webhook
-- Action types: API calls, notifications, data transforms, approvals
-- Conditional logic and branching
-- Pre-built templates
-- Testing/simulation mode
-
-```typescript
-interface WorkflowDefinition {
-  id: string;
-  name: string;
-  description: string;
-  trigger: WorkflowTrigger;
-  steps: WorkflowStep[];
-  variables: WorkflowVariable[];
-}
-
-interface WorkflowTrigger {
-  type: 'schedule' | 'event' | 'manual' | 'webhook';
-  config: {
-    // Schedule: cron expression
-    // Event: entity type, event type (created, updated, etc.)
-    // Webhook: endpoint path
-  };
-}
-
-interface WorkflowStep {
-  id: string;
-  type: 'action' | 'condition' | 'loop' | 'parallel';
-  action?: {
-    type: 'api_call' | 'notification' | 'create_entity' | 'update_entity' | 'integration';
-    config: Record<string, any>;
-  };
-  condition?: {
-    expression: string;
-    trueBranch: string[];  // step IDs
-    falseBranch: string[];
-  };
-  nextSteps: string[];
-}
-```
+**Additional Features:**
+- Drag-drop workflow designer improvements
+- Advanced trigger types: schedule, event, manual, webhook, API
+- Enhanced action types: API calls, notifications, data transforms, approvals, integrations
+- Conditional logic with complex expressions
+- Loop and parallel execution
+- Error handling and retry logic
+- Workflow versioning and rollback
+- Testing/simulation mode with dry-run
+- Workflow analytics and performance metrics
 
 **Pre-built Workflow Templates:**
 1. Vulnerability → POA&M creation
@@ -960,8 +1332,11 @@ interface WorkflowStep {
 3. Scanner data → vulnerability import
 4. Assessment completion → report generation
 5. Control change → re-assessment trigger
+6. Incident detection → response playbook execution
+7. Vendor risk score change → escalation workflow
+8. Compliance deadline → reminder cascade
 
-**Estimated Effort:** 4 weeks
+**Estimated Effort:** 3 weeks
 
 ---
 
@@ -972,8 +1347,11 @@ interface WorkflowStep {
                     High │ Phase 1: FedRAMP 20x    Phase 3: Scanners
                          │ (Critical for future)   (Customer demand)
                          │
-                         │ Phase 2: Core UX        Phase 4: Workflows
-                    Low  │ (Kanban, Wayfinder)     (Automation)
+                         │ Phase 4: AI & Risk      Phase 2: Core UX
+                         │ (RegScale parity)       (Kanban, Wayfinder)
+                         │
+                    Low  │                         Phase 5: Workflows
+                         │                         (Automation)
                          └─────────────────────────────────────────
                               Low                High
                                     EFFORT
@@ -990,7 +1368,7 @@ interface WorkflowStep {
 - Frontend: Dashboard, KSI management UI
 - Integration: Machine-readable formats
 
-**Stream 2: Platform Enhancements (3 developers)**
+**Stream 2: Platform Enhancements (2 developers)**
 - Kanban system
 - Wayfinder workflows
 - Lightning Assessment
@@ -999,7 +1377,12 @@ interface WorkflowStep {
 **Stream 3: Integrations (2 developers)**
 - Scanner connectors (parallelizable)
 - Integration framework
-- Low-code workflow builder
+- OCSF translator
+
+**Stream 4: AI & Risk Analytics (1 developer + AI/ML specialist)**
+- Enhanced AI Assistant features
+- Quantitative risk analysis
+- Security Graph
 
 ---
 
@@ -1011,17 +1394,22 @@ interface WorkflowStep {
 - [ ] Pass FedRAMP validation for machine-readable format
 - [ ] Generate compliant OARs
 
-### Feature Parity
-- [ ] 14 new scanner integrations operational
+### Feature Parity with RegScale
+- [ ] 14+ new scanner integrations operational
+- [ ] AI Author, Extractor, Auditor, Explainer features live
+- [ ] Quantitative risk analysis with Monte Carlo simulations
+- [ ] OCSF-to-OSCAL translation working
+- [ ] Security Graph with blast radius analysis
+- [ ] Enterprise risk categories beyond IT/cyber
 - [ ] Kanban used in 3+ modules
 - [ ] 5+ Wayfinder workflows published
-- [ ] Low-code workflow builder operational
 - [ ] Master Assessment feature deployed
 
 ### User Adoption
 - [ ] 50% reduction in assessment setup time (Lightning Assessment)
 - [ ] 30% increase in automation coverage (workflows)
 - [ ] 90% user satisfaction with new UI features
+- [ ] 60% reduction in control authoring time (AI Author)
 
 ---
 
@@ -1033,6 +1421,8 @@ interface WorkflowStep {
 | Integration API changes | Medium | Version connectors, add fallback logic |
 | Scope creep | Medium | Strict MVP definitions per phase |
 | Resource constraints | Medium | Prioritize ruthlessly, consider community contributions |
+| AI model quality | Medium | Iterative testing, human review workflows |
+| OCSF schema evolution | Low | Abstract translation layer, version support |
 
 ---
 
@@ -1048,10 +1438,16 @@ interface WorkflowStep {
    - Prototype Kanban component
    - Begin Wayfinder workflow engine design
 
-3. **Ongoing:**
+3. **Medium-term (Week 5-8):**
+   - Start Phase 4 AI enhancement work (AI Author, Extractor)
+   - Implement quantitative risk analysis foundation
+   - Begin OCSF schema integration
+
+4. **Ongoing:**
    - Weekly sync on FedRAMP 20x RFC updates
    - Bi-weekly integration prioritization review
    - Monthly roadmap adjustment based on feedback
+   - Track RegScale feature releases for parity updates
 
 ---
 
