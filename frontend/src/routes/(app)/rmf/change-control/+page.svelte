@@ -6,6 +6,7 @@
 	import WayfinderWorkflow from '$lib/components/Wayfinder/WayfinderWorkflow.svelte';
 	import type { WorkflowConfig } from '$lib/components/Wayfinder';
 	import DonutChart from '$lib/components/Chart/DonutChart.svelte';
+	import type { PageData } from './$types';
 
 	// Types
 	interface ChangeRequest {
@@ -38,13 +39,16 @@
 		pending_approval: number;
 	}
 
-	// State
-	let dashboardData: DashboardData | null = $state(null);
-	let changeRequests: ChangeRequest[] = $state([]);
-	let loading = $state(true);
-	let error = $state<string | null>(null);
+	// Server data
+	export let data: PageData;
+
+	// State - initialize from server data
+	let dashboardData: DashboardData | null = $state(data.dashboard);
+	let changeRequests: ChangeRequest[] = $state(data.changeRequests || []);
+	let loading = $state(false);
+	let error = $state<string | null>(data.error || null);
 	let activeTab = $state<'overview' | 'list' | 'kanban' | 'workflow'>('overview');
-	let csoId = $state<string | null>(null);
+	let csoId = $state<string | null>(data.csoId);
 
 	// Status mapping for Kanban
 	const CHANGE_STATUS_MAPPING = {
@@ -251,11 +255,13 @@
 		alert('Create change request modal - TODO');
 	}
 
-	// Lifecycle
+	// Lifecycle - data is loaded server-side, onMount only needed for URL params
 	onMount(() => {
 		const urlParams = new URLSearchParams(window.location.search);
-		csoId = urlParams.get('cso_id');
-		loadDashboard();
+		if (urlParams.get('cso_id') !== csoId) {
+			csoId = urlParams.get('cso_id');
+			loadDashboard();
+		}
 	});
 
 	// Tab configuration

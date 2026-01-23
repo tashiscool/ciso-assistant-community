@@ -146,6 +146,8 @@ urlpatterns = [
     path("third-party-management/", include("core.bounded_contexts.third_party_management.urls")),  # ThirdPartyManagement bounded context API
     path("business-continuity/", include("core.bounded_contexts.business_continuity.urls")),  # BusinessContinuity bounded context API
     path("rmf/", include("core.bounded_contexts.rmf_operations.urls")),  # RMF Operations bounded context API
+    path("workflows/", include("core.bounded_contexts.workflow_engine.urls")),  # Workflow Engine bounded context API
+    path("connectors/", include("connectors.urls")),  # Connectors API
     path("privacy/", include("privacy.api.urls")),  # Privacy bounded context API
     path("security/", include("security_operations.api.urls")),  # Security Operations bounded context API
     path("third-party/", include("third_party_management.api.urls")),  # Third Party Management bounded context API

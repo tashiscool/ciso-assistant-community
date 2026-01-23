@@ -6,6 +6,7 @@
 	import WayfinderWorkflow from '$lib/components/Wayfinder/WayfinderWorkflow.svelte';
 	import type { WorkflowConfig } from '$lib/components/Wayfinder';
 	import DonutChart from '$lib/components/Chart/DonutChart.svelte';
+	import type { PageData } from './$types';
 
 	// Types
 	interface Incident {
@@ -42,14 +43,17 @@
 		avg_time_to_resolve_hours: number | null;
 	}
 
-	// State
-	let dashboardData: DashboardData | null = $state(null);
-	let incidents: Incident[] = $state([]);
-	let loading = $state(true);
-	let error = $state<string | null>(null);
+	// Server data
+	export let data: PageData;
+
+	// State - initialize from server data
+	let dashboardData: DashboardData | null = $state(data.dashboard);
+	let incidents: Incident[] = $state(data.incidents || []);
+	let loading = $state(false);
+	let error = $state<string | null>(data.error || null);
 	let activeTab = $state<'overview' | 'list' | 'kanban' | 'workflow' | 'overdue'>('overview');
-	let csoId = $state<string | null>(null);
-	let showOpenOnly = $state(true);
+	let csoId = $state<string | null>(data.csoId);
+	let showOpenOnly = $state(data.openOnly !== false);
 
 	// Status mapping
 	const INCIDENT_STATUS_MAPPING = {
@@ -302,11 +306,13 @@
 		return formatDuration(diffHours) + ' ago';
 	}
 
-	// Lifecycle
+	// Lifecycle - data is loaded server-side, onMount only needed for URL param changes
 	onMount(() => {
 		const urlParams = new URLSearchParams(window.location.search);
-		csoId = urlParams.get('cso_id');
-		loadDashboard();
+		if (urlParams.get('cso_id') !== csoId) {
+			csoId = urlParams.get('cso_id');
+			loadDashboard();
+		}
 	});
 
 	// Tab configuration

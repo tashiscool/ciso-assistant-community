@@ -515,6 +515,23 @@ export const navData = {
 			]
 		},
 		{
+			name: 'automation',
+			items: [
+				{
+					name: 'connectors',
+					fa_icon: 'fa-solid fa-plug',
+					href: '/connectors',
+					permissions: ['view_appliedcontrol']
+				},
+				{
+					name: 'workflows',
+					fa_icon: 'fa-solid fa-diagram-project',
+					href: '/workflows',
+					permissions: ['view_appliedcontrol']
+				}
+			]
+		},
+		{
 			name: 'extra',
 			items: [
 				{
