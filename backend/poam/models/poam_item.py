@@ -7,7 +7,7 @@ including weaknesses, milestones, and remediation tracking.
 
 import uuid
 from typing import Optional, List, Dict, Any
-from datetime import datetime
+from datetime import datetime, date
 from django.db import models
 from django.utils import timezone
 from core.domain.aggregate import AggregateRoot

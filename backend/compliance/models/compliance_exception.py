@@ -688,7 +688,7 @@ class ComplianceException(AggregateRoot):
             self.renewal_period_months and
             (self.max_renewals is None or self.renewal_count < self.max_renewals)):
 
-            from datetime import timedelta
+            from datetime import timedelta, date, datetime
             new_end_date = self.end_date + timedelta(days=self.renewal_period_months * 30)
 
             self.extend_exception(

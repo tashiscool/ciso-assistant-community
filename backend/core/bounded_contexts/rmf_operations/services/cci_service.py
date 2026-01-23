@@ -7,7 +7,7 @@ to RMF controls and technical implementations.
 
 import json
 import logging
-from typing import Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set
 from pathlib import Path
 
 from .cci import CCI

@@ -12,6 +12,7 @@ from django.utils import timezone
 
 from core.domain.aggregate import AggregateRoot
 from ..domain_events import (
+from typing import Optional
     PolicyAcknowledged,
 )
 

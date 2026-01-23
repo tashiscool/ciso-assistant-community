@@ -10,6 +10,7 @@ class PrivacyConfig(AppConfig):
 
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'core.bounded_contexts.privacy'
+    label = 'bc_privacy'  # Unique label to avoid conflict with legacy privacy app
     verbose_name = 'Privacy Bounded Context'
 
     def ready(self):

@@ -7,11 +7,11 @@ from django.apps import AppConfig
 
 class RmfOperationsConfig(AppConfig):
     """Configuration for RMF Operations bounded context"""
-    
+
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'core.bounded_contexts.rmf_operations'
     verbose_name = 'RMF Operations Bounded Context'
-    
+
     def ready(self):
         """Called when Django starts - register event handlers"""
         # Projection handlers will be registered here in later phases

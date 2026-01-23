@@ -13,6 +13,7 @@ from django.utils import timezone
 from ..models.questionnaire import Questionnaire
 from ..models.question import Question
 from ..models.questionnaire_run import QuestionnaireRun
+from datetime import date, datetime
 
 
 class QuestionnaireService:

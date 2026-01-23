@@ -13,6 +13,7 @@ from django.utils import timezone
 
 from core.domain.repository import Repository
 from ..models.risk_register import RiskRegister
+from datetime import date, datetime
 
 
 class RiskRegisterRepository(Repository[RiskRegister]):
