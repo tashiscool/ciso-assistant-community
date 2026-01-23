@@ -23,7 +23,12 @@ class Repository(Generic[T]):
     
     def __init__(self, model_class: Type[T]):
         self.model_class = model_class
-    
+
+    @property
+    def model(self) -> Type[T]:
+        """Alias for model_class for backward compatibility"""
+        return self.model_class
+
     def get_by_id(self, id: UUID) -> Optional[T]:
         """Get aggregate by ID"""
         try:

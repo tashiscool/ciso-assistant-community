@@ -51,7 +51,7 @@ class AuditLog(AggregateRoot):
     )
 
     entity_type = models.CharField(
-        max_length=20,
+        max_length=21,
         choices=ENTITY_TYPES,
         help_text="Type of entity affected"
     )

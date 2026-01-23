@@ -12,11 +12,12 @@ from core.domain.repository import Repository
 
 class RepositoryTestAggregate(AggregateRoot):
     """Test aggregate root"""
-    
+
     name = models.CharField(max_length=255)
-    
+
     class Meta:
         app_label = "core"
+        managed = False  # Don't create database table
 
 
 class RepositoryTests(TestCase):

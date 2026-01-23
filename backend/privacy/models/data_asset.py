@@ -434,7 +434,7 @@ class DataAsset(AggregateRoot):
     )
 
     class Meta:
-        db_table = "privacy_data_assets"
+        db_table = "privacy_module_data_assets"
         indexes = [
             models.Index(fields=['primary_data_category'], name='data_asset_category_idx'),
             models.Index(fields=['sensitivity_level'], name='data_asset_sensitivity_idx'),

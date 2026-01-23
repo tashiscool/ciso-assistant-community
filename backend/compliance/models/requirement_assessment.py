@@ -153,7 +153,7 @@ class RequirementAssessment(AggregateRoot):
     )
 
     control_effectiveness = models.CharField(
-        max_length=20,
+        max_length=21,
         choices=[
             ('not_implemented', 'Not Implemented'),
             ('partially_implemented', 'Partially Implemented'),

@@ -10,17 +10,18 @@ from django.core.exceptions import ValidationError
 from core.domain.fields import EmbeddedIdArrayField
 
 
-class TestModel(models.Model):
+class FieldTestModel(models.Model):
     """Test model with embedded ID array"""
-    
+
     controlIds = EmbeddedIdArrayField(
         models.UUIDField(),
         default=list,
         blank=True
     )
-    
+
     class Meta:
         app_label = "core"
+        managed = False  # Don't create database table
 
 
 class EmbeddedIdArrayFieldTests(TestCase):
@@ -33,18 +34,18 @@ class EmbeddedIdArrayFieldTests(TestCase):
     
     def test_save_uuid_array(self):
         """Test saving array of UUIDs"""
-        model = TestModel()
+        model = FieldTestModel()
         model.controlIds = [uuid.uuid4(), uuid.uuid4()]
         model.save()
         
-        retrieved = TestModel.objects.get(id=model.id)
+        retrieved = FieldTestModel.objects.get(id=model.id)
         self.assertEqual(len(retrieved.controlIds), 2)
         self.assertIsInstance(retrieved.controlIds[0], uuid.UUID)
     
     def test_validate_uuid_array(self):
         """Test validation of UUID array"""
         field = EmbeddedIdArrayField(models.UUIDField())
-        model = TestModel()
+        model = FieldTestModel()
         
         # Valid UUIDs
         model.controlIds = [uuid.uuid4(), uuid.uuid4()]
@@ -57,10 +58,10 @@ class EmbeddedIdArrayFieldTests(TestCase):
     
     def test_empty_array(self):
         """Test empty array handling"""
-        model = TestModel()
+        model = FieldTestModel()
         model.controlIds = []
         model.save()
         
-        retrieved = TestModel.objects.get(id=model.id)
+        retrieved = FieldTestModel.objects.get(id=model.id)
         self.assertEqual(retrieved.controlIds, [])
 

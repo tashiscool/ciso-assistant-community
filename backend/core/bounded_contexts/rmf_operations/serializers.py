@@ -5,15 +5,15 @@ DRF Serializers for RMF Operations bounded context
 from rest_framework import serializers
 from django.core.exceptions import ValidationError
 
-from ..aggregates.system_group import SystemGroup
-from ..aggregates.stig_checklist import StigChecklist
-from ..aggregates.vulnerability_finding import VulnerabilityFinding
-from ..aggregates.checklist_score import ChecklistScore
-from ..aggregates.nessus_scan import NessusScan
-from ..aggregates.stig_template import StigTemplate
-from ..aggregates.artifact import Artifact
-from ..value_objects.vulnerability_status import VulnerabilityStatus
-from ..value_objects.severity_category import SeverityCategory
+from .aggregates.system_group import SystemGroup
+from .aggregates.stig_checklist import StigChecklist
+from .aggregates.vulnerability_finding import VulnerabilityFinding
+from .aggregates.checklist_score import ChecklistScore
+from .aggregates.nessus_scan import NessusScan
+from .aggregates.stig_template import StigTemplate
+from .aggregates.artifact import Artifact
+from .value_objects.vulnerability_status import VulnerabilityStatus
+from .value_objects.severity_category import SeverityCategory
 
 
 class SystemGroupSerializer(serializers.ModelSerializer):

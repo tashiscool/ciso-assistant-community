@@ -53,7 +53,7 @@ class ComplianceException(AggregateRoot):
     ]
 
     exception_type = models.CharField(
-        max_length=25,
+        max_length=26,
         choices=EXCEPTION_TYPES,
         default='temporary_waiver',
         help_text="Type of compliance exception"
@@ -341,7 +341,7 @@ class ComplianceException(AggregateRoot):
     )
 
     risk_acceptance_level = models.CharField(
-        max_length=20,
+        max_length=22,
         choices=[
             ('not_assessed', 'Not Assessed'),
             ('accepted', 'Accepted'),

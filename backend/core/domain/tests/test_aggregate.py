@@ -15,11 +15,15 @@ class TestEvent(DomainEvent):
     pass
 
 
-class TestAggregate(AggregateRoot):
+class SampleSampleTestAggregate(AggregateRoot):
     """Test aggregate root"""
-    
+
     name = models.CharField(max_length=255)
-    
+
+    class Meta:
+        app_label = 'core'
+        managed = False  # Don't create database table
+
     def create(self):
         """Create the aggregate and raise event"""
         self._raise_event(TestEvent(
@@ -32,7 +36,7 @@ class AggregateRootTests(TestCase):
     
     def test_aggregate_has_id(self):
         """Test that aggregate has UUID ID"""
-        aggregate = TestAggregate(name="Test")
+        aggregate = SampleTestAggregate(name="Test")
         aggregate.save()
         
         self.assertIsNotNone(aggregate.id)
@@ -40,7 +44,7 @@ class AggregateRootTests(TestCase):
     
     def test_aggregate_versioning(self):
         """Test optimistic locking version"""
-        aggregate = TestAggregate(name="Test")
+        aggregate = SampleTestAggregate(name="Test")
         aggregate.save()
         
         initial_version = aggregate.version
@@ -52,7 +56,7 @@ class AggregateRootTests(TestCase):
     
     def test_raise_event(self):
         """Test raising domain events"""
-        aggregate = TestAggregate(name="Test")
+        aggregate = SampleTestAggregate(name="Test")
         aggregate.create()
         
         events = aggregate.get_uncommitted_events()
@@ -71,7 +75,7 @@ class AggregateRootTests(TestCase):
         event_bus = get_event_bus()
         event_bus.subscribe("TestEvent", handler)
         
-        aggregate = TestAggregate(name="Test")
+        aggregate = SampleTestAggregate(name="Test")
         aggregate.create()
         aggregate.save()
         

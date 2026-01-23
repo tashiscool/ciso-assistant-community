@@ -399,7 +399,7 @@ class AssetRisk(AggregateRoot):
             models.Index(fields=['risk_category'], name='asset_risk_category_idx'),
             models.Index(fields=['treatment_status'], name='asset_risk_treatment_idx'),
             models.Index(fields=['next_review_date'], name='asset_risk_review_idx'),
-            models.Index(fields=['requires_treatment'], name='asset_risk_treatment_needed_idx'),
+            models.Index(fields=['requires_treatment'], name='asset_risk_treat_req_idx'),
             models.Index(fields=['residual_risk_score'], name='asset_risk_score_idx'),
             models.Index(fields=['created_at'], name='asset_risk_created_idx'),
         ]

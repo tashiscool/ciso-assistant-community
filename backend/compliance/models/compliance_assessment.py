@@ -466,15 +466,15 @@ class ComplianceAssessment(AggregateRoot):
     class Meta:
         db_table = "compliance_assessments"
         indexes = [
-            models.Index(fields=['status'], name='compliance_assessment_status_idx'),
-            models.Index(fields=['target_type', 'target_id'], name='compliance_assessment_target_idx'),
-            models.Index(fields=['primary_framework'], name='compliance_assessment_framework_idx'),
-            models.Index(fields=['assessment_lead_user_id'], name='compliance_assessment_lead_idx'),
-            models.Index(fields=['planned_completion_date'], name='compliance_assessment_due_idx'),
-            models.Index(fields=['overall_compliance_score'], name='compliance_assessment_score_idx'),
-            models.Index(fields=['certification_status'], name='compliance_assessment_cert_idx'),
-            models.Index(fields=['next_review_date'], name='compliance_assessment_review_idx'),
-            models.Index(fields=['created_at'], name='compliance_assessment_created_idx'),
+            models.Index(fields=['status'], name='comp_assess_status_idx'),
+            models.Index(fields=['target_type', 'target_id'], name='comp_assess_target_idx'),
+            models.Index(fields=['primary_framework'], name='comp_assess_framework_idx'),
+            models.Index(fields=['assessment_lead_user_id'], name='comp_assess_lead_idx'),
+            models.Index(fields=['planned_completion_date'], name='comp_assess_due_idx'),
+            models.Index(fields=['overall_compliance_score'], name='comp_assess_score_idx'),
+            models.Index(fields=['certification_status'], name='comp_assess_cert_idx'),
+            models.Index(fields=['next_review_date'], name='comp_assess_review_idx'),
+            models.Index(fields=['created_at'], name='comp_assess_created_idx'),
         ]
         ordering = ['-created_at']
 

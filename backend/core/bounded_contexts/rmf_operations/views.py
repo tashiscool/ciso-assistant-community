@@ -11,20 +11,20 @@ from django.core.exceptions import ValidationError
 import uuid
 
 from core.permissions import RBACPermissions
-from ..aggregates.system_group import SystemGroup
-from ..aggregates.stig_checklist import StigChecklist
-from ..aggregates.vulnerability_finding import VulnerabilityFinding
-from ..aggregates.checklist_score import ChecklistScore
-from ..aggregates.nessus_scan import NessusScan
-from ..aggregates.stig_template import StigTemplate
-from ..aggregates.artifact import Artifact
-from ..repositories.system_group_repository import SystemGroupRepository
-from ..repositories.stig_checklist_repository import StigChecklistRepository
-from ..repositories.vulnerability_finding_repository import VulnerabilityFindingRepository
-from ..repositories.checklist_score_repository import ChecklistScoreRepository
-from ..repositories.nessus_scan_repository import NessusScanRepository
-from ..repositories.stig_template_repository import StigTemplateRepository
-from ..repositories.artifact_repository import ArtifactRepository
+from .aggregates.system_group import SystemGroup
+from .aggregates.stig_checklist import StigChecklist
+from .aggregates.vulnerability_finding import VulnerabilityFinding
+from .aggregates.checklist_score import ChecklistScore
+from .aggregates.nessus_scan import NessusScan
+from .aggregates.stig_template import StigTemplate
+from .aggregates.artifact import Artifact
+from .repositories.system_group_repository import SystemGroupRepository
+from .repositories.stig_checklist_repository import StigChecklistRepository
+from .repositories.vulnerability_finding_repository import VulnerabilityFindingRepository
+from .repositories.checklist_score_repository import ChecklistScoreRepository
+from .repositories.nessus_scan_repository import NessusScanRepository
+from .repositories.stig_template_repository import StigTemplateRepository
+from .repositories.artifact_repository import ArtifactRepository
 from .serializers import (
     SystemGroupSerializer, StigChecklistSerializer,
     VulnerabilityFindingSerializer, ChecklistScoreSerializer,

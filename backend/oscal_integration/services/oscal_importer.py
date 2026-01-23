@@ -14,8 +14,8 @@ from pathlib import Path
 from datetime import datetime
 
 from django.utils import timezone
-from compliance_trestle import oscal
-from compliance_trestle.oscal import ssp, catalog, profile, assessment_plan, assessment_results, poam
+from trestle import oscal
+from trestle.oscal import ssp, catalog, profile, assessment_plan, assessment_results, poam
 
 logger = logging.getLogger(__name__)
 

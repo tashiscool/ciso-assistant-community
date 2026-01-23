@@ -28,21 +28,21 @@ class EmbeddedIdArrayField(ArrayField):
             )
     """
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, base_field=None, **kwargs):
         # Default to UUID field if not specified
-        if not args:
-            args = (models.UUIDField(),)
-        
+        if base_field is None:
+            base_field = models.UUIDField()
+
         # Set defaults
         kwargs.setdefault('default', list)
         kwargs.setdefault('blank', True)
-        
-        super().__init__(*args, **kwargs)
-    
+
+        super().__init__(base_field, **kwargs)
+
     def validate(self, value, model_instance):
         """Validate that all values are UUIDs"""
         super().validate(value, model_instance)
-        
+
         if value is not None:
             for item in value:
                 if not isinstance(item, uuid.UUID):
@@ -52,11 +52,11 @@ class EmbeddedIdArrayField(ArrayField):
                         raise ValidationError(
                             f"All items in {self.name} must be valid UUIDs"
                         )
-    
+
     def deconstruct(self):
         """Deconstruct for migrations"""
         name, path, args, kwargs = super().deconstruct()
-        # Remove default from kwargs if it's list (will be added back)
+        # Remove default from kwargs if it's list (will be added back in __init__)
         if kwargs.get('default') == list:
             kwargs.pop('default', None)
         return name, path, args, kwargs

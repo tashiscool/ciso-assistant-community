@@ -1583,7 +1583,6 @@ class AssetFilter(GenericFilterSet):
             "security_exceptions",
             "applied_controls",
             "filtering_labels",
-            "personal_data",
             "is_business_function",
             "dora_licenced_activity",
             "dora_criticality_assessment",
@@ -1617,7 +1616,6 @@ class AssetViewSet(ExportMixin, BaseModelViewSet):
                 "owner",
                 "security_exceptions",
                 "filtering_labels",
-                "personal_data",
                 "overridden_children_capabilities",
             )
         )
@@ -3949,7 +3947,6 @@ class AppliedControlFilterSet(GenericFilterSet):
             "findings": ["exact"],
             "eta": ["exact", "lte", "gte", "lt", "gt", "month", "year"],
             "ref_id": ["exact"],
-            "processings": ["exact"],
             "genericcollection": ["exact"],
         }
 
@@ -7747,7 +7744,6 @@ class EvidenceViewSet(BaseModelViewSet):
         "status",
         "expiry_date",
         "contracts",
-        "processings",
     ]
 
     @action(detail=False, name="Get all evidences owners")

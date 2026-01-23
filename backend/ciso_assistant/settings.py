@@ -197,6 +197,11 @@ INSTALLED_APPS = [
     "security_operations",  # Security Operations bounded context (standalone)
     "third_party_management",  # Third Party Management bounded context (standalone)
     "business_continuity",  # Business Continuity bounded context (standalone)
+    # Bounded contexts within core
+    "core.bounded_contexts.asset_and_service",
+    "core.bounded_contexts.organization",
+    "core.bounded_contexts.control_library",
+    "core.bounded_contexts.rmf_operations",
     "cal",
     "django_filters",
     "library",
