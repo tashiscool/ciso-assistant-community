@@ -107,6 +107,33 @@ Dynamic assessment capabilities inspired by GovReady-Q:
 - **Multi-user Collaboration**: Review workflows with role-based assignments
 - **Assessment Templates**: Reusable templates with scheduling support
 
+### AI Assistant
+
+Intelligent assistance for GRC workflows:
+
+- **Context-Aware Suggestions**: AI-powered recommendations based on your organization's data
+- **Control Mapping**: Automatic suggestions for control implementations
+- **Risk Analysis**: Intelligent risk scoring and mitigation recommendations
+- **Compliance Guidance**: Framework-specific guidance and gap analysis
+
+### Evidence Automation
+
+Automated evidence collection and management:
+
+- **Connector Framework**: Extensible connectors for cloud providers, security tools, and IT systems
+- **Scheduled Collection**: Automated evidence gathering on configurable schedules
+- **Evidence Validation**: Automatic validation and freshness tracking
+- **Audit Trail**: Complete history of evidence collection activities
+
+### FedRAMP Key Security Indicators (KSI)
+
+Real-time monitoring of FedRAMP compliance metrics:
+
+- **KSI Dashboard**: Visual dashboard for all 12 FedRAMP KSIs
+- **Trend Analysis**: Historical tracking of security indicator changes
+- **Threshold Alerts**: Configurable alerts when metrics exceed thresholds
+- **SSP Generator**: OSCAL-compliant System Security Plan generation
+
 ---
 
 [![CodeFactor](https://www.codefactor.io/repository/github/intuitem/ciso-assistant-community/badge)](https://www.codefactor.io/repository/github/intuitem/ciso-assistant-community)
