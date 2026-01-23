@@ -182,3 +182,164 @@ class ChecklistCreatedFromTemplate(DomainEvent):
     """Raised when a checklist is created from a template"""
     pass
 
+
+# FedRAMP 20x Cloud Service Offering Events
+class CloudServiceOfferingCreated(DomainEvent):
+    """Raised when a Cloud Service Offering is created"""
+    pass
+
+
+class CSOSubmittedForAuthorization(DomainEvent):
+    """Raised when a CSO is submitted for FedRAMP authorization"""
+    pass
+
+
+class CSOAuthorizationGranted(DomainEvent):
+    """Raised when a CSO receives FedRAMP authorization"""
+    pass
+
+
+class CSOAuthorizationRevoked(DomainEvent):
+    """Raised when a CSO authorization is revoked"""
+    pass
+
+
+class CSOKSIMetricsUpdated(DomainEvent):
+    """Raised when CSO KSI compliance metrics are updated"""
+    pass
+
+
+# FedRAMP 20x KSI Implementation Events
+class KSIImplementationCreated(DomainEvent):
+    """Raised when a KSI implementation record is created"""
+    pass
+
+
+class KSIMarkedImplemented(DomainEvent):
+    """Raised when a KSI is marked as implemented"""
+    pass
+
+
+class KSIValidationRecorded(DomainEvent):
+    """Raised when a KSI validation result is recorded"""
+    pass
+
+
+class KSIPersistentValidationEnabled(DomainEvent):
+    """Raised when persistent validation is enabled for a KSI"""
+    pass
+
+
+# FedRAMP 20x Ongoing Authorization Report Events
+class OARCreated(DomainEvent):
+    """Raised when an Ongoing Authorization Report is created"""
+    pass
+
+
+class OARSubmitted(DomainEvent):
+    """Raised when an OAR is submitted"""
+    pass
+
+
+class OARAccepted(DomainEvent):
+    """Raised when an OAR is accepted"""
+    pass
+
+
+# FedRAMP 20x Persistent Validation Events
+class ValidationRuleCreated(DomainEvent):
+    """Raised when a persistent validation rule is created"""
+    pass
+
+
+class ValidationRuleActivated(DomainEvent):
+    """Raised when a validation rule is activated"""
+    pass
+
+
+class ValidationExecutionRecorded(DomainEvent):
+    """Raised when a validation execution result is recorded"""
+    pass
+
+
+# Significant Change Request Events
+class SignificantChangeRequestCreated(DomainEvent):
+    """Raised when a significant change request is created"""
+    pass
+
+
+class SignificantChangeSubmitted(DomainEvent):
+    """Raised when a change request is submitted for review"""
+    pass
+
+
+class SignificantChangeImpactAssessed(DomainEvent):
+    """Raised when impact analysis is completed for a change"""
+    pass
+
+
+class SignificantChangeSCNDetermined(DomainEvent):
+    """Raised when SCN requirement is determined"""
+    pass
+
+
+class SignificantChangeSCNSubmitted(DomainEvent):
+    """Raised when SCN is submitted to FedRAMP"""
+    pass
+
+
+class SignificantChangeApproved(DomainEvent):
+    """Raised when a change request is approved"""
+    pass
+
+
+class SignificantChangeRejected(DomainEvent):
+    """Raised when a change request is rejected"""
+    pass
+
+
+class SignificantChangeImplemented(DomainEvent):
+    """Raised when a change is implemented"""
+    pass
+
+
+# Security Incident Events
+class SecurityIncidentCreated(DomainEvent):
+    """Raised when a security incident is created"""
+    pass
+
+
+class SecurityIncidentAnalysisStarted(DomainEvent):
+    """Raised when incident analysis begins"""
+    pass
+
+
+class SecurityIncidentSeverityChanged(DomainEvent):
+    """Raised when incident severity is changed"""
+    pass
+
+
+class SecurityIncidentContained(DomainEvent):
+    """Raised when an incident is contained"""
+    pass
+
+
+class SecurityIncidentEradicated(DomainEvent):
+    """Raised when the threat is eradicated"""
+    pass
+
+
+class SecurityIncidentRecovered(DomainEvent):
+    """Raised when systems are recovered"""
+    pass
+
+
+class SecurityIncidentClosed(DomainEvent):
+    """Raised when an incident is closed"""
+    pass
+
+
+class SecurityIncidentUSCERTReported(DomainEvent):
+    """Raised when incident is reported to US-CERT/CISA"""
+    pass
+

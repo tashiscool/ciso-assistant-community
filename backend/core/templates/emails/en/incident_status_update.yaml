@@ -1,0 +1,26 @@
+subject: "Incident ${incident_number} Status Update: ${new_status}"
+body: |
+  Security Incident Status Update
+
+  Incident: ${incident_number}
+  Title: ${incident_title}
+
+  Previous Status: ${old_status}
+  New Status: ${new_status}
+  Updated: ${updated_at}
+  Updated By: ${updated_by}
+
+  ${status_notes}
+
+  Incident Summary:
+  - Severity: ${severity}
+  - Category: ${category}
+  - Detected: ${detected_at}
+  - Time Open: ${hours_open} hours
+
+  US-CERT Status: ${uscert_status}
+
+  Access the incident for full details:
+  ${ciso_assistant_url}/rmf/incident-response
+
+  This is an automated status notification.

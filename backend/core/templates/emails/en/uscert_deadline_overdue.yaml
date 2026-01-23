@@ -1,0 +1,28 @@
+subject: "CRITICAL: US-CERT Reporting OVERDUE for ${incident_number}"
+body: |
+  CRITICAL ALERT: US-CERT/CISA Reporting is OVERDUE
+
+  Incident: ${incident_number}
+  Title: ${incident_title}
+  Severity: ${severity}
+  Category: ${category}
+
+  REPORTING DEADLINE: ${deadline}
+  OVERDUE BY: ${hours_overdue} hours
+
+  This incident REQUIRED mandatory reporting to US-CERT/CISA that is now OVERDUE.
+
+  IMMEDIATE ACTION REQUIRED:
+  1. Submit incident report to US-CERT/CISA immediately
+  2. Document the delay and reason
+  3. Notify FedRAMP PMO of the delayed reporting
+
+  Failure to report incidents within the required timeframe may impact your FedRAMP authorization status.
+
+  Access the incident management system:
+  ${ciso_assistant_url}/rmf/incident-response
+
+  For US-CERT reporting portal:
+  https://www.cisa.gov/report
+
+  This is an automated compliance alert.

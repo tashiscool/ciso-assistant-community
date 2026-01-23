@@ -1,0 +1,32 @@
+subject: "Change Request ${change_number} Approved"
+body: |
+  Change Request Approved
+
+  Change Request: ${change_number}
+  Title: ${change_title}
+
+  Status: APPROVED
+  Approved By: ${approver}
+  Approval Date: ${approval_date}
+
+  ${approval_notes}
+
+  Next Steps:
+  1. Review the implementation plan
+  2. Coordinate with affected teams
+  3. Implement the change per the planned date
+  4. Perform post-implementation verification
+  5. Update the change request with implementation notes
+
+  Planned Implementation Date: ${planned_date}
+
+  Change Details:
+  - Type: ${change_type}
+  - Impact Level: ${impact_level}
+  - SCN Required: ${scn_required}
+  - SCN Reference: ${scn_reference}
+
+  Access the change control system:
+  ${ciso_assistant_url}/rmf/change-control
+
+  Thank you.

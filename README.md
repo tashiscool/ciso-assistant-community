@@ -134,6 +134,50 @@ Real-time monitoring of FedRAMP compliance metrics:
 - **Threshold Alerts**: Configurable alerts when metrics exceed thresholds
 - **SSP Generator**: OSCAL-compliant System Security Plan generation
 
+### Continuous Monitoring (ConMon)
+
+Enterprise continuous monitoring aligned with FedRAMP, NIST, and other frameworks:
+
+- **ConMon Profiles**: Pre-built profiles for FedRAMP (Low/Moderate/High), ISO 27001, SOC 2, NIST CSF, and CMMC
+- **Activity Scheduling**: Automated task generation based on monitoring frequencies
+- **Framework Integration**: Links to compliance assessments and control implementations
+- **Calendar Dashboard**: Visual timeline of upcoming and overdue activities
+- **Notification System**: Configurable reminders and escalations
+
+### FedRAMP 20x Continuous Authorization
+
+Complete support for FedRAMP 20x operational requirements:
+
+- **Change Control Board**: Significant Change Notification (SCN) workflow with approval tracking
+- **Incident Response**: Security incident management with US-CERT reporting timelines
+- **Ongoing Authorization**: Automated authorization status reports and POA&M tracking
+- **Persistent Validation**: Continuous security validation and automated evidence collection
+
+### Connector Framework
+
+Extensible integration framework with 20+ pre-built connectors:
+
+| Category | Integrations |
+|----------|--------------|
+| **Cloud Security** | Wiz, Prisma Cloud, Aqua |
+| **SAST/DAST** | Snyk, Veracode, SonarCloud, Burp Suite, IBM AppScan |
+| **Container Security** | Trivy |
+| **Vulnerability Scanners** | Rapid7/InsightVM, Nessus, Qualys |
+| **CI/CD Security** | GitLab Security, JFrog Xray, GitHub Advanced Security |
+| **Identity & Access** | Active Directory, Microsoft Intune, Okta |
+| **Endpoint Security** | Microsoft Defender |
+
+Features include OAuth2/API key authentication, scheduled syncs, and automatic evidence mapping.
+
+### Workflow Engine
+
+Visual workflow builder for custom GRC processes:
+
+- **Drag-and-Drop Builder**: Create workflows without code
+- **Conditional Logic**: Branch workflows based on data conditions
+- **Approval Chains**: Multi-level approval routing
+- **Integration Actions**: Trigger connectors, send notifications, update records
+
 ---
 
 [![CodeFactor](https://www.codefactor.io/repository/github/intuitem/ciso-assistant-community/badge)](https://www.codefactor.io/repository/github/intuitem/ciso-assistant-community)

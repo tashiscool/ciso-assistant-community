@@ -1,0 +1,29 @@
+subject: "URGENT: US-CERT Reporting Deadline Approaching for ${incident_number}"
+body: |
+  ATTENTION: US-CERT/CISA Reporting Deadline Alert
+
+  Incident: ${incident_number}
+  Title: ${incident_title}
+  Severity: ${severity}
+  Category: ${category}
+
+  REPORTING DEADLINE: ${deadline}
+  TIME REMAINING: ${hours_remaining} hours
+
+  This incident requires mandatory reporting to US-CERT/CISA per Federal incident notification guidelines.
+
+  Severity-based reporting requirements:
+  - Critical: Within 1 hour
+  - High: Within 24 hours
+  - Moderate: Within 72 hours
+  - Low: Within 7 days
+
+  Please ensure the initial report is submitted before the deadline to maintain FedRAMP compliance.
+
+  Access the incident management system to submit your report:
+  ${ciso_assistant_url}/rmf/incident-response
+
+  For US-CERT reporting portal:
+  https://www.cisa.gov/report
+
+  Thank you.

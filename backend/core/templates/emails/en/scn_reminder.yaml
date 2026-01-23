@@ -1,0 +1,28 @@
+subject: "Reminder: FedRAMP SCN Required for Change Request ${change_number}"
+body: |
+  FedRAMP Significant Change Notification Reminder
+
+  Change Request: ${change_number}
+  Title: ${change_title}
+  Change Type: ${change_type}
+  SCN Category: ${scn_category}
+
+  This change request has been assessed and requires a Significant Change Notification (SCN) to be submitted to FedRAMP.
+
+  Impact Assessment Summary:
+  - Impact Level: ${impact_level}
+  - Affected KSIs: ${affected_ksi_count}
+  - Affected Controls: ${affected_control_count}
+  - Risk Delta: ${risk_delta}
+
+  Please submit the SCN to FedRAMP as soon as possible to proceed with the change implementation.
+
+  Planned Implementation Date: ${planned_date}
+
+  Access the change control system:
+  ${ciso_assistant_url}/rmf/change-control
+
+  For FedRAMP SCN submission guidance:
+  https://www.fedramp.gov/significant-change-notification
+
+  Thank you.

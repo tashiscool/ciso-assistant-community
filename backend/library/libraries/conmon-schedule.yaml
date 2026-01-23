@@ -1,0 +1,1158 @@
+urn: urn:intuitem:risk:library:conmon-schedule
+locale: en
+ref_id: CONMON-SCHEDULE
+name: Continuous Monitoring Operations Schedule
+description: >
+  Framework-agnostic Continuous Monitoring (ConMon) operational schedule defining
+  security activities by frequency. This schedule can be used standalone or mapped
+  to any compliance framework (FedRAMP, ISO 27001, SOC 2, CMMC, NIST CSF, etc.).
+  Activities are organized by frequency from continuous/daily through multi-year cycles.
+copyright: intuitem
+version: 1
+publication_date: 2025-01-23
+provider: intuitem
+packager: intuitem
+objects:
+  framework:
+    urn: urn:intuitem:risk:framework:conmon-schedule
+    ref_id: CONMON-SCHEDULE
+    name: Continuous Monitoring Operations Schedule
+    description: >
+      Framework-agnostic Continuous Monitoring (ConMon) operational schedule defining
+      security activities by frequency. This schedule can be used standalone or mapped
+      to any compliance framework. Activities are tagged for applicability filtering.
+    implementation_groups_definition:
+    - ref_id: BASIC
+      name: Basic
+      description: Essential monitoring activities applicable to all organizations
+    - ref_id: STANDARD
+      name: Standard
+      description: Standard monitoring activities for most compliance frameworks
+    - ref_id: ENHANCED
+      name: Enhanced
+      description: Enhanced monitoring for high-security or regulated environments
+    requirement_nodes:
+    # ============================================================
+    # CONTINUOUS (DAILY/ONGOING)
+    # ============================================================
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      assessable: false
+      depth: 1
+      ref_id: CONT
+      name: Continuous (Daily/Ongoing) Activities
+      description: >
+        Always-on continuous monitoring activities that must be operational daily
+        or on an ongoing basis. These form the foundation of any security monitoring program.
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:cont-siem-monitoring
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      ref_id: CONT-01
+      name: Security Information and Event Monitoring (SIEM)
+      description: >
+        Ensure system monitoring is operational (SIEM/alerts/log forwarding).
+        Monitor information system events to detect attack indicators and
+        potential security violations. Verify alerts are being generated
+        and reviewed.
+      annotation: |
+        Related controls: NIST SI-4, ISO 27001 A.12.4, SOC 2 CC7.2
+        Evidence: SIEM dashboard screenshots, alert configurations, monitoring status
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:cont-audit-collection
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      ref_id: CONT-02
+      name: Audit Event Collection
+      description: >
+        Ensure required auditable events are continuously collected and logged.
+        Verify audit logging is operational across all system components and
+        logs are being forwarded to centralized storage.
+      annotation: |
+        Related controls: NIST AU-2, AU-3, ISO 27001 A.12.4.1, SOC 2 CC7.2
+        Evidence: Log aggregation status, audit configuration, sample logs
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:cont-asset-discovery
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      ref_id: CONT-03
+      name: Automated Asset Discovery
+      description: >
+        Automated discovery of new assets and system components is running.
+        Detect unauthorized hardware, software, and firmware components within
+        the information system boundary.
+      annotation: |
+        Related controls: NIST CM-8(3), ISO 27001 A.8.1, SOC 2 CC6.1
+        Evidence: Asset discovery tool reports, new asset alerts
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:cont-incident-tracking
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      ref_id: CONT-04
+      name: Incident Reporting and Tracking
+      description: >
+        Incident reporting and tracking system is operational. Security
+        incidents can be reported and tracked through resolution.
+        Escalation paths are defined and functional.
+      annotation: |
+        Related controls: NIST IR-6, ISO 27001 A.16.1, SOC 2 CC7.3
+        Evidence: Incident tracking system status, open incident list
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:cont-environmental-monitoring
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      ref_id: CONT-05
+      name: Environmental Monitoring
+      description: >
+        Temperature, humidity, and environmental monitoring is operational
+        for data center/server room facilities. Environmental controls are
+        actively monitored for deviations.
+      annotation: |
+        Related controls: NIST PE-14, ISO 27001 A.11.1.4, SOC 2 A1.2
+        Evidence: Environmental monitoring dashboard, alert history
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:cont-vuln-signatures
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      ref_id: CONT-06
+      name: Vulnerability Scanner Signature Updates
+      description: >
+        Update vulnerability scanning tool plugin/signature list to ensure
+        detection of latest vulnerabilities. Verify signature/plugin updates
+        are current before each scan cycle.
+      annotation: |
+        Related controls: NIST RA-5(2), ISO 27001 A.12.6.1
+        Evidence: Scanner update status, signature version
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:cont-ids-monitoring
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      ref_id: CONT-07
+      name: Intrusion Detection/Prevention Monitoring
+      description: >
+        Network and/or host-based intrusion detection/prevention systems
+        are operational. Wireless intrusion detection is running where
+        applicable. Alerts are being generated and reviewed.
+      annotation: |
+        Related controls: NIST SI-4(4), SI-4(14), ISO 27001 A.13.1.1
+        Evidence: IDS/IPS status, alert summary, signature currency
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:cont-container-security
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      ref_id: CONT-08
+      name: Container/Image Security Scanning
+      description: >
+        Container registry monitoring prevents deployment of images not
+        scanned within the required window. Only approved and scanned
+        container images can be deployed to production.
+      annotation: |
+        Related controls: NIST CM-7, SA-10, ISO 27001 A.14.2.2
+        Evidence: Registry scan policy, blocked deployments, scan results
+      implementation_groups:
+      - ENHANCED
+
+    # ============================================================
+    # WEEKLY
+    # ============================================================
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:weekly
+      assessable: false
+      depth: 1
+      ref_id: WEEKLY
+      name: Weekly Activities
+      description: Activities that must be completed on a weekly basis.
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:weekly-audit-review
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:weekly
+      ref_id: WEEKLY-01
+      name: Audit Record Review and Analysis
+      description: >
+        Review and analyze audit records weekly. Document anomalies and
+        actions taken. Investigate suspicious activity and report findings
+        to appropriate personnel.
+      annotation: |
+        Related controls: NIST AU-6, ISO 27001 A.12.4.1, SOC 2 CC7.2
+        Evidence: Audit review report, anomaly documentation, action items
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:weekly-backup-verification
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:weekly
+      ref_id: WEEKLY-02
+      name: Backup Status Verification
+      description: >
+        Verify backup jobs completed successfully. Review backup logs for
+        failures or warnings. Confirm backup data is accessible and intact.
+      annotation: |
+        Related controls: NIST CP-9, ISO 27001 A.12.3.1, SOC 2 A1.2
+        Evidence: Backup job reports, success/failure logs
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    # ============================================================
+    # MONTHLY
+    # ============================================================
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly
+      assessable: false
+      depth: 1
+      ref_id: MONTHLY
+      name: Monthly Activities
+      description: >
+        Monthly continuous monitoring activities including vulnerability
+        scanning, reporting, and remediation tracking.
+
+    # -- Reporting --
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-reporting
+      assessable: false
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly
+      ref_id: MONTHLY-RPT
+      name: Monthly Reporting
+      description: Monthly reporting and status activities.
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-poam-update
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-reporting
+      ref_id: MONTHLY-RPT-01
+      name: Plan of Action and Milestones (POA&M) Update
+      description: >
+        Update POA&M/remediation tracking with new findings, milestone
+        updates, and closure of remediated items. Submit to stakeholders
+        as required.
+      annotation: |
+        Related controls: NIST CA-5, ISO 27001 A.18.2.2
+        Evidence: POA&M document, change log, stakeholder acknowledgment
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-inventory-update
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-reporting
+      ref_id: MONTHLY-RPT-02
+      name: Asset Inventory Update
+      description: >
+        System inventory updated monthly or when changes occur. Maintain
+        accurate inventory of all system components including hardware,
+        software, and firmware within the system boundary.
+      annotation: |
+        Related controls: NIST CM-8, ISO 27001 A.8.1.1, SOC 2 CC6.1
+        Evidence: Updated inventory, change documentation
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-security-status
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-reporting
+      ref_id: MONTHLY-RPT-03
+      name: Security Status Report
+      description: >
+        Report current security state to management/stakeholders. Include
+        vulnerability status, POA&M updates, metrics, and any significant
+        security events from the reporting period.
+      annotation: |
+        Related controls: NIST CA-7, ISO 27001 A.18.2.2
+        Evidence: Security status report, management briefing
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    # -- Vulnerability Scanning --
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-scanning
+      assessable: false
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly
+      ref_id: MONTHLY-SCAN
+      name: Vulnerability Scanning and Remediation
+      description: Monthly vulnerability scanning and remediation activities.
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-os-scans
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-scanning
+      ref_id: MONTHLY-SCAN-01
+      name: OS/Infrastructure Vulnerability Scans
+      description: >
+        Complete OS/infrastructure vulnerability scans (authenticated where
+        possible). Include all servers, workstations, and network devices
+        in scope. Document scan coverage and any exclusions.
+      annotation: |
+        Related controls: NIST RA-5, ISO 27001 A.12.6.1, SOC 2 CC7.1
+        Evidence: Scan reports, coverage metrics, exclusion justifications
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-webapp-scans
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-scanning
+      ref_id: MONTHLY-SCAN-02
+      name: Web Application Vulnerability Scans
+      description: >
+        Complete web application vulnerability scans. Include all public-facing
+        and internal web applications in the authorization boundary.
+        Document findings by severity.
+      annotation: |
+        Related controls: NIST RA-5, ISO 27001 A.14.2.5, SOC 2 CC7.1
+        Evidence: Web app scan reports, application inventory
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-db-scans
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-scanning
+      ref_id: MONTHLY-SCAN-03
+      name: Database Vulnerability Scans
+      description: >
+        Complete database vulnerability scans. Include all database instances
+        within the system boundary. Check for misconfigurations, missing
+        patches, and access control issues.
+      annotation: |
+        Related controls: NIST RA-5, ISO 27001 A.12.6.1
+        Evidence: Database scan reports, instance inventory
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-remediation
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-scanning
+      ref_id: MONTHLY-SCAN-04
+      name: Vulnerability Remediation Tracking
+      description: >
+        Track and document vulnerability remediation progress. Ensure
+        critical/high vulnerabilities are remediated within defined SLAs
+        (typically 30 days for critical, 90 days for high). Document
+        exceptions and risk acceptances.
+      annotation: |
+        Related controls: NIST RA-5(d), SI-2, ISO 27001 A.12.6.1
+        Evidence: Remediation metrics, exception documentation
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-patch-management
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-scanning
+      ref_id: MONTHLY-SCAN-05
+      name: Security Patch Application
+      description: >
+        Apply security-relevant patches and firmware updates within defined
+        timeframes (typically 30 days of release). Document patching
+        activities, test results, and exceptions.
+      annotation: |
+        Related controls: NIST SI-2, ISO 27001 A.12.6.1, SOC 2 CC7.1
+        Evidence: Patch deployment reports, testing documentation
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-integrity-scans
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-scanning
+      ref_id: MONTHLY-SCAN-06
+      name: File Integrity Monitoring Review
+      description: >
+        Review file integrity monitoring alerts and scans. Investigate any
+        unauthorized changes to software, firmware, and critical system files.
+        Document findings and resolutions.
+      annotation: |
+        Related controls: NIST SI-7, ISO 27001 A.12.4.3, SOC 2 CC7.2
+        Evidence: FIM reports, change investigation documentation
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    # -- Access and Configuration --
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-access-config
+      assessable: false
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly
+      ref_id: MONTHLY-ACC
+      name: Access and Configuration Management
+      description: Monthly access control and configuration management activities.
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-temp-accounts
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-access-config
+      ref_id: MONTHLY-ACC-01
+      name: Temporary/Emergency Account Review
+      description: >
+        Review and terminate temporary and emergency accounts that have
+        exceeded their authorized duration. Verify no temporary accounts
+        exist beyond their expiration.
+      annotation: |
+        Related controls: NIST AC-2(2), ISO 27001 A.9.2.6
+        Evidence: Temporary account list, termination records
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-least-functionality
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-access-config
+      ref_id: MONTHLY-ACC-02
+      name: Least Functionality Review
+      description: >
+        Review system configurations for least functionality (ports/protocols/
+        services). Disable unnecessary functions and document the
+        configuration baseline. Record any changes.
+      annotation: |
+        Related controls: NIST CM-7(1), ISO 27001 A.12.5.1
+        Evidence: Configuration review report, baseline comparison
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-physical-logs
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-access-config
+      ref_id: MONTHLY-ACC-03
+      name: Physical Access Log Review
+      description: >
+        Review physical access logs and visitor records. Investigate any
+        unauthorized access attempts or anomalies. Verify visitor escort
+        procedures are being followed.
+      annotation: |
+        Related controls: NIST PE-6, PE-8, ISO 27001 A.11.1.2
+        Evidence: Access log review report, visitor logs
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    # ============================================================
+    # QUARTERLY (90 DAYS)
+    # ============================================================
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly
+      assessable: false
+      depth: 1
+      ref_id: QUARTERLY
+      name: Quarterly (90 Days) Activities
+      description: Activities that must be completed on a quarterly basis.
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly-inactive-accounts
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly
+      ref_id: QUARTERLY-01
+      name: Inactive Account Review and Disable
+      description: >
+        Review and disable user accounts inactive for 90 days or more.
+        Document disabled accounts and notify account owners where
+        appropriate.
+      annotation: |
+        Related controls: NIST AC-2(3), IA-4, ISO 27001 A.9.2.6
+        Evidence: Inactive account report, disablement records
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly-public-content
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly
+      ref_id: QUARTERLY-02
+      name: Publicly Accessible Content Review
+      description: >
+        Review publicly accessible content for sensitive information
+        disclosure. Ensure confidential data is not inadvertently exposed
+        on public-facing systems or websites.
+      annotation: |
+        Related controls: NIST AC-22, ISO 27001 A.8.2.3
+        Evidence: Content review report, findings documentation
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly-privileged-access
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly
+      ref_id: QUARTERLY-03
+      name: Privileged Access Review
+      description: >
+        Review and validate privileged access rights. Verify access is
+        still required and appropriately scoped. Remove unnecessary
+        privileges following least privilege principle.
+      annotation: |
+        Related controls: NIST AC-6, CM-5(5), ISO 27001 A.9.2.5
+        Evidence: Privileged access review, removal documentation
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly-authenticator-refresh
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly
+      ref_id: QUARTERLY-04
+      name: Authenticator/Password Rotation
+      description: >
+        Rotate authenticators (passwords, keys, tokens) per organizational
+        policy. Include service accounts and system accounts in scope.
+        Document rotation and verification.
+      annotation: |
+        Related controls: NIST IA-5, ISO 27001 A.9.4.3
+        Evidence: Rotation records, compliance report
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    # ============================================================
+    # ANNUAL
+    # ============================================================
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual
+      assessable: false
+      depth: 1
+      ref_id: ANNUAL
+      name: Annual Activities
+      description: >
+        Annual activities including policy/procedure reviews, training,
+        testing, and comprehensive assessments.
+
+    # -- Policy Reviews --
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-policy
+      assessable: false
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual
+      ref_id: ANNUAL-POL
+      name: Policy and Procedure Reviews
+      description: Annual review and update of security policies and procedures.
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-policy-review
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-policy
+      ref_id: ANNUAL-POL-01
+      name: Security Policy Review and Update
+      description: >
+        Review and update all security policies. Ensure policies reflect
+        current organizational requirements, regulatory guidance, and
+        industry best practices. Obtain management approval for changes.
+      annotation: |
+        Related controls: NIST *-1 controls, ISO 27001 A.5.1, SOC 2 CC1.1
+        Evidence: Updated policies, approval records, change log
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-procedure-review
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-policy
+      ref_id: ANNUAL-POL-02
+      name: Security Procedure Review and Update
+      description: >
+        Review and update security procedures and standard operating
+        procedures (SOPs). Ensure procedures are current, accurate, and
+        aligned with policies.
+      annotation: |
+        Related controls: NIST *-1 controls, ISO 27001 A.5.1
+        Evidence: Updated procedures, review records
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-architecture-review
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-policy
+      ref_id: ANNUAL-POL-03
+      name: Security Architecture Review
+      description: >
+        Review and update information security architecture to reflect
+        changes in the enterprise architecture. Ensure security architecture
+        aligns with organizational goals and technology changes.
+      annotation: |
+        Related controls: NIST PL-8, ISO 27001 A.6.1.1
+        Evidence: Updated architecture documentation, review records
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-isa-review
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-policy
+      ref_id: ANNUAL-POL-04
+      name: Interconnection Agreements Review
+      description: >
+        Review and update interconnection security agreements (ISAs) and
+        memoranda of understanding (MOUs). Ensure all system interconnections
+        are properly authorized and documented.
+      annotation: |
+        Related controls: NIST CA-3, ISO 27001 A.13.1.2
+        Evidence: Updated ISAs/MOUs, review records
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    # -- Training --
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-training
+      assessable: false
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual
+      ref_id: ANNUAL-TRN
+      name: Security Training
+      description: Annual security awareness and role-based training activities.
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-awareness-training
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-training
+      ref_id: ANNUAL-TRN-01
+      name: Security Awareness Training
+      description: >
+        Provide security awareness training to all information system users
+        (including managers, executives, and contractors). Track completion
+        and maintain training records.
+      annotation: |
+        Related controls: NIST AT-2, ISO 27001 A.7.2.2, SOC 2 CC1.4
+        Evidence: Training materials, completion records, attendance
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-role-training
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-training
+      ref_id: ANNUAL-TRN-02
+      name: Role-Based Security Training
+      description: >
+        Provide role-based security training to personnel with specific
+        security responsibilities (administrators, developers, incident
+        responders, etc.). Ensure training is relevant to job functions.
+      annotation: |
+        Related controls: NIST AT-3, ISO 27001 A.7.2.2
+        Evidence: Role-specific training records, competency verification
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-incident-training
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-training
+      ref_id: ANNUAL-TRN-03
+      name: Incident Response Training
+      description: >
+        Provide incident response training to personnel with incident
+        handling responsibilities. Include recognition, reporting, and
+        response procedures.
+      annotation: |
+        Related controls: NIST IR-2, ISO 27001 A.16.1.1
+        Evidence: IR training materials, attendance records
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-contingency-training
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-training
+      ref_id: ANNUAL-TRN-04
+      name: Contingency/Disaster Recovery Training
+      description: >
+        Provide contingency training to personnel with disaster recovery
+        and business continuity responsibilities. Ensure personnel
+        understand their roles during contingency operations.
+      annotation: |
+        Related controls: NIST CP-3, ISO 27001 A.17.1
+        Evidence: DR training records, role assignments
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    # -- Plans and Testing --
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-plans
+      assessable: false
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual
+      ref_id: ANNUAL-PLN
+      name: Plans Review and Testing
+      description: Annual review of security plans and execution of tests.
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-ssp-review
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-plans
+      ref_id: ANNUAL-PLN-01
+      name: System Security Plan Review
+      description: >
+        Review and update the System Security Plan (SSP) or equivalent
+        security documentation. Ensure it accurately reflects current
+        system configuration and security posture.
+      annotation: |
+        Related controls: NIST PL-2, ISO 27001 A.5.1
+        Evidence: Updated SSP, change log, approval records
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-cp-review
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-plans
+      ref_id: ANNUAL-PLN-02
+      name: Contingency Plan Review and Test
+      description: >
+        Review and update the Contingency Plan/Disaster Recovery Plan.
+        Conduct annual test/exercise and document results. Update plan
+        based on lessons learned.
+      annotation: |
+        Related controls: NIST CP-2, CP-4, ISO 27001 A.17.1
+        Evidence: Updated CP, test results, lessons learned
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-ir-review
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-plans
+      ref_id: ANNUAL-PLN-03
+      name: Incident Response Plan Review and Test
+      description: >
+        Review and update the Incident Response Plan. Conduct annual
+        tabletop or functional exercise. Document results and participants.
+        Update plan based on lessons learned.
+      annotation: |
+        Related controls: NIST IR-3, IR-8, ISO 27001 A.16.1
+        Evidence: Updated IR plan, exercise results, participants
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-backup-test
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-plans
+      ref_id: ANNUAL-PLN-04
+      name: Backup Restoration Test
+      description: >
+        Test backup restoration to verify media reliability and data
+        integrity. Document test procedures, results, and any issues
+        discovered.
+      annotation: |
+        Related controls: NIST CP-9(1), ISO 27001 A.12.3.1
+        Evidence: Restoration test results, test documentation
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-baseline-review
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-plans
+      ref_id: ANNUAL-PLN-05
+      name: Configuration Baseline Review
+      description: >
+        Review and update the baseline configuration of information
+        systems. Ensure configuration standards reflect current security
+        requirements and best practices.
+      annotation: |
+        Related controls: NIST CM-2(1), ISO 27001 A.12.5.1
+        Evidence: Updated baselines, review documentation
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    # -- Access Governance --
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-access
+      assessable: false
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual
+      ref_id: ANNUAL-ACC
+      name: Access Governance
+      description: Annual access governance and recertification activities.
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-account-recert
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-access
+      ref_id: ANNUAL-ACC-01
+      name: User Account Recertification
+      description: >
+        Complete annual user account recertification. Verify all accounts
+        are still required and appropriately provisioned. Remove or
+        modify accounts as needed.
+      annotation: |
+        Related controls: NIST AC-2, ISO 27001 A.9.2.5
+        Evidence: Recertification records, modification/removal logs
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-physical-access
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-access
+      ref_id: ANNUAL-ACC-02
+      name: Physical Access Recertification
+      description: >
+        Review and recertify physical access authorizations and credentials.
+        Verify all physical access remains appropriate. Update badge/key
+        inventories.
+      annotation: |
+        Related controls: NIST PE-2, PE-3, ISO 27001 A.11.1.2
+        Evidence: Physical access review, badge/key inventory
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    # -- Asset Lifecycle --
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-assets
+      assessable: false
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual
+      ref_id: ANNUAL-AST
+      name: Asset and Software Lifecycle
+      description: Annual software and asset lifecycle management activities.
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-software-review
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-assets
+      ref_id: ANNUAL-AST-01
+      name: Authorized Software Review
+      description: >
+        Review and update the list of authorized software. Ensure only
+        approved software is permitted on systems. Remove unauthorized
+        software discovered during the review.
+      annotation: |
+        Related controls: NIST CM-7(5), ISO 27001 A.12.5.1
+        Evidence: Authorized software list, removal records
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-eol-review
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-assets
+      ref_id: ANNUAL-AST-02
+      name: End-of-Life Software Review
+      description: >
+        Perform software inventory review with EOL/EOS status for each
+        item. Identify unsupported software and plan for remediation
+        (upgrade, replacement, or risk acceptance).
+      annotation: |
+        Related controls: NIST CM-8, SA-22, ISO 27001 A.8.1.1
+        Evidence: EOL inventory, remediation plans
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    # -- Assessments --
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-assessment
+      assessable: false
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual
+      ref_id: ANNUAL-ASM
+      name: Security Assessments
+      description: Annual security assessment activities.
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-control-assessment
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-assessment
+      ref_id: ANNUAL-ASM-01
+      name: Security Control Assessment
+      description: >
+        Conduct annual security control assessment (internal or independent).
+        Assess control implementation and effectiveness. Document findings
+        and remediation plans.
+      annotation: |
+        Related controls: NIST CA-2, ISO 27001 A.18.2, SOC 2 CC4.1
+        Evidence: Assessment report, findings, remediation plans
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-pentest
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-assessment
+      ref_id: ANNUAL-ASM-02
+      name: Penetration Testing
+      description: >
+        Conduct annual penetration testing by qualified assessors.
+        Include network, application, and social engineering tests
+        as appropriate. Document and remediate findings.
+      annotation: |
+        Related controls: NIST CA-8, ISO 27001 A.18.2.3
+        Evidence: Pentest report, remediation tracking
+      implementation_groups:
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-privacy-assessment
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-assessment
+      ref_id: ANNUAL-ASM-03
+      name: Privacy Impact Assessment
+      description: >
+        Perform/update Privacy Threshold Analysis or Privacy Impact
+        Assessment. Determine if the system processes PII and document
+        privacy requirements and controls.
+      annotation: |
+        Related controls: NIST PT-5, AR-2, ISO 27701
+        Evidence: PTA/PIA documentation
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    # ============================================================
+    # MULTI-YEAR
+    # ============================================================
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:multi-year
+      assessable: false
+      depth: 1
+      ref_id: MULTI-YEAR
+      name: Multi-Year Activities
+      description: Activities with cycles longer than one year.
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:biennial-identifier-reuse
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:multi-year
+      ref_id: MULTI-YEAR-01
+      name: Identifier Reuse Prevention (2 Years)
+      description: >
+        Prevent reuse of user and device identifiers for at least 2 years.
+        Ensure identifier management prevents premature reuse of
+        deprovisioned accounts.
+      annotation: |
+        Related controls: NIST IA-4
+        Evidence: Identifier management policy, system configuration
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:triennial-risk-assessment
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:multi-year
+      ref_id: MULTI-YEAR-02
+      name: Comprehensive Risk Assessment (3 Years)
+      description: >
+        Conduct comprehensive risk assessment every 3 years or when
+        significant changes occur. Update risk register and treatment
+        plans. Obtain management approval.
+      annotation: |
+        Related controls: NIST RA-3, ISO 27001 A.8.2
+        Evidence: Risk assessment report, risk register
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:triennial-position-review
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:multi-year
+      ref_id: MULTI-YEAR-03
+      name: Position Categorization Review (3 Years)
+      description: >
+        Review and update position categorizations/risk designations
+        every 3 years. Ensure positions with access to sensitive data
+        or critical systems are appropriately categorized.
+      annotation: |
+        Related controls: NIST PS-2
+        Evidence: Position categorization documentation
+      implementation_groups:
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:quinquennial-screening
+      assessable: true
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:multi-year
+      ref_id: MULTI-YEAR-04
+      name: Personnel Rescreening (5 Years)
+      description: >
+        Conduct personnel rescreening every 5 years for positions
+        requiring background investigations. Ensure screening remains
+        current per organizational requirements.
+      annotation: |
+        Related controls: NIST PS-3
+        Evidence: Screening records, reinvestigation dates
+      implementation_groups:
+      - ENHANCED
+
+    # ============================================================
+    # EVENT-DRIVEN
+    # ============================================================
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:event-driven
+      assessable: false
+      depth: 1
+      ref_id: EVENT
+      name: Event-Driven Activities
+      description: Activities triggered by specific events or changes.
+
+    # -- Significant Change --
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:event-change
+      assessable: false
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:event-driven
+      ref_id: EVENT-CHG
+      name: Significant Change Management
+      description: Activities triggered by significant changes to the system.
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:event-impact-analysis
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:event-change
+      ref_id: EVENT-CHG-01
+      name: Security Impact Analysis
+      description: >
+        Perform security impact analysis before implementing significant
+        changes. Determine potential security implications and required
+        mitigations. Obtain approval before implementation.
+      annotation: |
+        Related controls: NIST CM-4, ISO 27001 A.14.2.3
+        Evidence: Impact analysis documentation, approval records
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:event-change-testing
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:event-change
+      ref_id: EVENT-CHG-02
+      name: Post-Change Security Testing
+      description: >
+        Conduct security testing after significant changes are implemented.
+        Verify security controls remain effective. Document results and
+        any new findings.
+      annotation: |
+        Related controls: NIST CM-4, CA-2, ISO 27001 A.14.2.9
+        Evidence: Test results, verification documentation
+      implementation_groups:
+      - STANDARD
+      - ENHANCED
+
+    # -- Incident Response --
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:event-incident
+      assessable: false
+      depth: 2
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:event-driven
+      ref_id: EVENT-IR
+      name: Incident Response Activities
+      description: Activities triggered by security incidents.
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:event-incident-notification
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:event-incident
+      ref_id: EVENT-IR-01
+      name: Incident Notification
+      description: >
+        Report suspected or confirmed incidents to appropriate stakeholders
+        within required timeframes. Follow organizational escalation
+        procedures.
+      annotation: |
+        Related controls: NIST IR-6, ISO 27001 A.16.1.2
+        Evidence: Incident reports, notification records
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:event-incident-tracking
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:event-incident
+      ref_id: EVENT-IR-02
+      name: Incident Status Updates
+      description: >
+        Provide regular status updates during incident response.
+        Document containment, eradication, and recovery activities.
+        Prepare final incident report after resolution.
+      annotation: |
+        Related controls: NIST IR-5, IR-6, ISO 27001 A.16.1.5
+        Evidence: Status reports, incident documentation
+      implementation_groups:
+      - BASIC
+      - STANDARD
+      - ENHANCED
+
+    - urn: urn:intuitem:risk:req_node:conmon-schedule:event-lessons-learned
+      assessable: true
+      depth: 3
+      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:event-incident
+      ref_id: EVENT-IR-03
+      name: Incident Lessons Learned
+      description: >
+        Conduct post-incident review and document lessons learned.
+        Update incident response procedures based on findings.
+        Share relevant information with stakeholders.
+      annotation: |
+        Related controls: NIST IR-4, ISO 27001 A.16.1.6
+        Evidence: Lessons learned report, procedure updates
+      implementation_groups:
+      - STANDARD
+      - ENHANCED

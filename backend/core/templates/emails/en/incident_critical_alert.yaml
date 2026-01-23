@@ -1,0 +1,29 @@
+subject: "CRITICAL SECURITY INCIDENT: ${incident_number} - ${incident_title}"
+body: |
+  CRITICAL SECURITY INCIDENT DETECTED
+
+  A critical severity security incident has been detected and requires immediate attention.
+
+  Incident Details:
+  - Number: ${incident_number}
+  - Title: ${incident_title}
+  - Severity: CRITICAL
+  - Category: ${category}
+  - Detected: ${detected_at}
+  - Detection Method: ${detection_method}
+
+  Cloud Service Offering: ${cso_name}
+
+  IMMEDIATE ACTIONS REQUIRED:
+  1. Activate incident response team
+  2. Begin containment procedures
+  3. Submit US-CERT report within 1 HOUR
+  4. Notify FedRAMP PMO
+  5. Notify affected agency customers
+
+  US-CERT Reporting Deadline: ${uscert_deadline}
+
+  Access the incident response system:
+  ${ciso_assistant_url}/rmf/incident-response
+
+  This is an automated security alert. Do not reply to this email.

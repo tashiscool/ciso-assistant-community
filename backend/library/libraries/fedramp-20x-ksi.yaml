@@ -1,0 +1,1075 @@
+urn: urn:intuitem:risk:library:fedramp-20x-ksi
+locale: en
+ref_id: FEDRAMP-20X-KSI
+name: FedRAMP 20x Key Security Indicators
+description: |
+  FedRAMP 20x is a modernized cloud authorization approach that replaces traditional
+  control-by-control narratives with Key Security Indicators (KSIs). This framework
+  defines 61 KSIs across 11 thematic categories that cloud service providers must
+  address to obtain and maintain FedRAMP 20x authorization.
+
+  Key differences from FedRAMP Rev5:
+  - KSI-based approach instead of individual control narratives
+  - Machine-readable authorization packages required
+  - 70%+ automated validation coverage expected
+  - Quarterly Ongoing Authorization Reports (OARs)
+  - Persistent validation and continuous monitoring
+copyright: FedRAMP / GSA
+version: 1
+publication_date: 2025-12-29
+provider: US General Services Administration / FedRAMP
+packager: intuitem
+objects:
+  framework:
+    urn: urn:intuitem:risk:framework:fedramp-20x-ksi
+    ref_id: FEDRAMP-20X-KSI
+    name: FedRAMP 20x Key Security Indicators
+    description: |
+      FedRAMP 20x Key Security Indicators (KSIs) framework for modern cloud authorization.
+      Supports Low Impact (56 KSIs) and Moderate Impact (61 KSIs) baselines.
+    implementation_groups_definition:
+      - ref_id: LOW
+        name: Low Impact
+        description: FedRAMP 20x Low Impact baseline - 56 Key Security Indicators applicable
+          to cloud services where loss of confidentiality, integrity, and availability
+          would result in limited adverse effect.
+      - ref_id: MOD
+        name: Moderate Impact
+        description: FedRAMP 20x Moderate Impact baseline - 61 Key Security Indicators
+          applicable to cloud services where loss of confidentiality, integrity, and
+          availability would result in serious adverse effect.
+    requirement_nodes:
+      # ===========================================================================
+      # KSI-AFR: Authorization by FedRAMP (11 indicators)
+      # ===========================================================================
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        assessable: false
+        depth: 1
+        ref_id: KSI-AFR
+        name: Authorization by FedRAMP
+        description: |
+          A secure cloud service provider seeking FedRAMP authorization will address
+          all FedRAMP 20x requirements and recommendations, including government-specific
+          requirements for maintaining a secure system and reporting on activities to
+          government customers.
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-01
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        ref_id: KSI-AFR-01
+        name: Minimum Assessment Scope
+        description: |
+          Apply the FedRAMP Minimum Assessment Scope (MAS) to identify and document
+          the scope of the cloud service offering to be assessed for FedRAMP authorization
+          and persistently address all related requirements and recommendations.
+        annotation: |
+          Related controls: AC-1, AC-21, AT-1, AU-1, CA-1, CM-1, CP-1, CP-2.1, CP-2.8,
+          CP-4.1, IA-1, IR-1, MA-1, MP-1, PE-1, PL-1, PL-2, PL-4, PL-4.1, PS-1, RA-1,
+          RA-9, SA-1, SC-1, SI-1, SR-1, SR-2, SR-3, SR-11
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-02
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        ref_id: KSI-AFR-02
+        name: Key Security Indicators
+        description: |
+          Set security goals for the cloud service offering based on FedRAMP 20x
+          Key Security Indicators (KSIs), develop automated validation of status
+          and progress to the greatest extent possible, and persistently address
+          all related requirements and recommendations.
+        annotation: |
+          This KSI is addressed by otherwise addressing all the KSIs. Providers and
+          assessors may use this KSI to summarize the approach, coverage, status, etc.
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-03
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        ref_id: KSI-AFR-03
+        name: Authorization Data Sharing
+        description: |
+          Determine how authorization data will be shared with all necessary parties
+          in alignment with the FedRAMP Authorization Data Sharing (ADS) process and
+          persistently address all related requirements and recommendations.
+        annotation: |
+          Related controls: AC-3, AC-4, AU-2, AU-3, AU-6, CA-2, IR-4, RA-5, SC-8
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-04
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        ref_id: KSI-AFR-04
+        name: Vulnerability Detection and Response
+        description: |
+          Document the vulnerability detection and vulnerability response methodology
+          used within the cloud service offering in alignment with the FedRAMP
+          Vulnerability Detection and Response (VDR) process and persistently address
+          all related requirements and recommendations.
+        annotation: |
+          Related controls: CA-2, CA-7, CA-7.6, IR-1, IR-4, IR-4.1, IR-5, IR-5.1, IR-6,
+          IR-6.1, IR-6.2, PM-3, PM-5, PM-31, RA-2, RA-2.1, RA-3, RA-3.3, RA-5, RA-5.2,
+          RA-5.3, RA-5.4, RA-5.5, RA-5.6, RA-5.7, RA-5.11, RA-9, RA-10
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-05
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        ref_id: KSI-AFR-05
+        name: Significant Change Notifications
+        description: |
+          Determine how significant changes will be tracked and how all necessary
+          parties will be notified in alignment with the FedRAMP Significant Change
+          Notification (SCN) process and persistently address all related requirements
+          and recommendations.
+        annotation: |
+          Related controls: CA-7.4, CM-3.4, CM-4, CM-7.1, AU-5
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-06
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        ref_id: KSI-AFR-06
+        name: Collaborative Continuous Monitoring
+        description: |
+          Establish collaborative continuous monitoring practices with agencies and
+          FedRAMP in alignment with the FedRAMP Collaborative Continuous Monitoring
+          (CCM) process and persistently address all related requirements and
+          recommendations, including quarterly Ongoing Authorization Reports (OARs).
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-07
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        ref_id: KSI-AFR-07
+        name: Recommended Secure Configuration
+        description: |
+          Follow the FedRAMP Recommended Secure Configuration (RSC) guidance and
+          persistently address all related requirements and recommendations.
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-08
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        ref_id: KSI-AFR-08
+        name: FedRAMP Security Inbox
+        description: |
+          Maintain a FedRAMP Security Inbox for security communications in alignment
+          with the FedRAMP Security Inbox (FSI) process and persistently address all
+          related requirements and recommendations.
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-09
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        ref_id: KSI-AFR-09
+        name: Persistent Validation and Assessment
+        description: |
+          Implement persistent validation programs in alignment with the FedRAMP
+          Persistent Validation and Assessment (PVA) process and persistently address
+          all related requirements and recommendations.
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-10
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        ref_id: KSI-AFR-10
+        name: Incident Communications Procedures
+        description: |
+          Follow the FedRAMP Incident Communications Procedures (ICP) and persistently
+          address all related requirements and recommendations.
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-11
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        ref_id: KSI-AFR-11
+        name: Using Cryptographic Modules
+        description: |
+          Use cryptographic modules in alignment with the FedRAMP Using Cryptographic
+          Modules (UCM) guidance and persistently address all related requirements
+          and recommendations.
+        implementation_groups:
+          - LOW
+          - MOD
+
+      # ===========================================================================
+      # KSI-CED: Cybersecurity Education (4 indicators)
+      # ===========================================================================
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced
+        assessable: false
+        depth: 1
+        ref_id: KSI-CED
+        name: Cybersecurity Education
+        description: |
+          A secure cloud service provider will educate their employees on cybersecurity
+          measures, testing them persistently to ensure their knowledge is satisfactory.
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced-01
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced
+        ref_id: KSI-CED-01
+        name: General Training
+        description: |
+          Persistently review the effectiveness of training given to all employees on
+          policies, procedures, and security-related topics.
+        annotation: |
+          Related controls: AT-2, AT-2.2, AT-2.3, AT-3.5, AT-4
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced-02
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced
+        ref_id: KSI-CED-02
+        name: Role-Specific Training
+        description: |
+          Persistently review the effectiveness of role-specific training given to
+          employees in high risk roles, including at least roles with privileged access.
+        annotation: |
+          Related controls: AT-2, AT-2.3, AT-3, SR-11.1
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced-03
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced
+        ref_id: KSI-CED-03
+        name: Development and Engineering Training
+        description: |
+          Persistently review the effectiveness of role-specific training given to
+          development and engineering staff that covers best practices for delivering
+          secure software and infrastructure.
+        annotation: |
+          Related controls: CP-3, IR-2, PS-6
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced-04
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced
+        ref_id: KSI-CED-04
+        name: Incident Response and Disaster Recovery Training
+        description: |
+          Persistently review the effectiveness of role-specific training given to
+          staff involved with incident response or disaster recovery.
+        implementation_groups:
+          - LOW
+          - MOD
+
+      # ===========================================================================
+      # KSI-CMT: Change Management (4 indicators)
+      # ===========================================================================
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt
+        assessable: false
+        depth: 1
+        ref_id: KSI-CMT
+        name: Change Management
+        description: |
+          A secure cloud service provider will ensure that all changes are properly
+          documented and configuration baselines are updated accordingly.
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt-01
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt
+        ref_id: KSI-CMT-01
+        name: Log and Monitor Changes
+        description: |
+          Log and monitor modifications to the cloud service offering.
+        annotation: |
+          Related controls: AU-2, CM-3, CM-3.2, CM-4.2, CM-6
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt-02
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt
+        ref_id: KSI-CMT-02
+        name: Redeployment
+        description: |
+          Execute changes to machine-based information resources through redeployment
+          of version controlled immutable resources rather than direct modification.
+        annotation: |
+          Related controls: CM-2, CM-3, CM-5, CM-6, CM-7
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt-03
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt
+        ref_id: KSI-CMT-03
+        name: Automated Testing and Validation
+        description: |
+          Automate persistent testing and validation of changes throughout deployment.
+        annotation: |
+          Related controls: CM-3, CM-3.2, CM-4.2, SI-2
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt-04
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt
+        ref_id: KSI-CMT-04
+        name: Change Management Procedures
+        description: |
+          Persistently review the effectiveness of documented change management procedures.
+        annotation: |
+          Related controls: CM-3, CM-3.2, CM-3.4, CM-5, CM-7.1
+        implementation_groups:
+          - LOW
+          - MOD
+
+      # ===========================================================================
+      # KSI-CNA: Cloud Native Architecture (8 indicators)
+      # ===========================================================================
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        assessable: false
+        depth: 1
+        ref_id: KSI-CNA
+        name: Cloud Native Architecture
+        description: |
+          A secure cloud service offering will use cloud native architecture and design
+          principles to enforce and enhance the confidentiality, integrity and availability
+          of the system.
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna-01
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        ref_id: KSI-CNA-01
+        name: Restrict Network Traffic
+        description: |
+          Persistently ensure all machine-based information resources are configured
+          to limit inbound and outbound network traffic.
+        annotation: |
+          Related controls: AC-17.3, CA-9, CM-7.1, SC-7.5, SI-8
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna-02
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        ref_id: KSI-CNA-02
+        name: Attack Surface
+        description: |
+          Persistently ensure machine-based information resources have a minimal attack
+          surface and that lateral movement is minimized if compromised.
+        annotation: |
+          Related controls: AC-17.3, AC-18.1, AC-18.3, AC-20.1, CA-9
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna-03
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        ref_id: KSI-CNA-03
+        name: Enforce Traffic Flow
+        description: |
+          Use logical networking and related capabilities to enforce traffic flow controls.
+        annotation: |
+          Related controls: AC-12, AC-17.3, CA-9, SC-4, SC-7
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna-04
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        ref_id: KSI-CNA-04
+        name: Immutable Infrastructure
+        description: |
+          Use immutable infrastructure with strictly defined functionality and privileges
+          by default.
+        annotation: |
+          Related controls: CM-2, SI-3
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna-05
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        ref_id: KSI-CNA-05
+        name: Unwanted Activity
+        description: |
+          Persistently review the effectiveness of protection against denial of service
+          attacks and other unwanted activity.
+        annotation: |
+          Related controls: SC-5, SI-8, SI-8.2
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna-06
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        ref_id: KSI-CNA-06
+        name: High Availability
+        description: |
+          Design and implement high availability architecture to ensure service continuity.
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna-07
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        ref_id: KSI-CNA-07
+        name: Best Practices
+        description: |
+          Follow cloud native architecture best practices and industry standards.
+        annotation: |
+          Related controls: AC-17.3, CM-2, PL-10
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna-08
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        ref_id: KSI-CNA-08
+        name: Automated Enforcement
+        description: |
+          Use automated services to persistently assess security posture and enforce
+          operational state.
+        annotation: |
+          Related controls: CA-2.1, CA-7.1
+          NOTE: This KSI applies only to Moderate Impact level.
+        implementation_groups:
+          - MOD
+
+      # ===========================================================================
+      # KSI-IAM: Identity and Access Management (7 indicators)
+      # ===========================================================================
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam
+        assessable: false
+        depth: 1
+        ref_id: KSI-IAM
+        name: Identity and Access Management
+        description: |
+          A secure cloud service offering will protect user data, control access,
+          and apply zero trust principles.
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam-01
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam
+        ref_id: KSI-IAM-01
+        name: Phishing-Resistant MFA
+        description: |
+          Enforce multi-factor authentication (MFA) using methods that are difficult
+          to intercept or impersonate (phishing-resistant MFA) for all user authentication
+          and authorization to the cloud service offering.
+        annotation: |
+          Related controls: AC-2, IA-2, IA-2.1, IA-2.2, IA-2.8, IA-5, IA-8, SC-23
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam-02
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam
+        ref_id: KSI-IAM-02
+        name: Passwordless Authentication
+        description: |
+          Use secure passwordless methods for user authentication and authorization
+          when feasible, otherwise enforce strong passwords with MFA.
+        annotation: |
+          Related controls: AC-2, AC-3, IA-2.1, IA-2.2, IA-2.8, IA-5, IA-5.1
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam-03
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam
+        ref_id: KSI-IAM-03
+        name: Non-User Accounts
+        description: |
+          Enforce appropriately secure authentication methods for non-user accounts
+          and services.
+        annotation: |
+          Related controls: AC-2, AC-2.2, AC-4, AC-6.5, IA-3
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam-04
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam
+        ref_id: KSI-IAM-04
+        name: Just-in-Time Authorization
+        description: |
+          Use a least-privileged, role and attribute-based, and just-in-time security
+          authorization model for all user and non-user accounts and services.
+        annotation: |
+          Related controls: AC-2, AC-2.1, AC-2.2, AC-2.3, AC-2.4
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam-05
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam
+        ref_id: KSI-IAM-05
+        name: Least Privilege
+        description: |
+          Persistently ensure that identity and access management employs measures to
+          ensure each user or device can only access the resources they need.
+        annotation: |
+          Related controls: AC-2.5, AC-2.6, AC-3, AC-4, AC-6
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam-06
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam
+        ref_id: KSI-IAM-06
+        name: Suspicious Activity
+        description: |
+          Monitor and respond to suspicious authentication and authorization activity.
+        annotation: |
+          Related controls: AC-2, AC-2.1, AC-2.3, AC-2.13, AC-7
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam-07
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam
+        ref_id: KSI-IAM-07
+        name: Automated Account Management
+        description: |
+          Automate account management processes including provisioning, deprovisioning,
+          and access reviews.
+        annotation: |
+          Related controls: AC-2.2, AC-2.3, AC-2.13, AC-6.7, IA-4.4
+        implementation_groups:
+          - LOW
+          - MOD
+
+      # ===========================================================================
+      # KSI-INR: Incident Response (3 indicators)
+      # ===========================================================================
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-inr
+        assessable: false
+        depth: 1
+        ref_id: KSI-INR
+        name: Incident Response
+        description: |
+          A secure cloud service offering will document, report, and analyze security
+          incidents to ensure regulatory compliance and continuous security improvement.
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-inr-01
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-inr
+        ref_id: KSI-INR-01
+        name: Incident Response Procedures
+        description: |
+          Persistently review the effectiveness of documented incident response procedures.
+        annotation: |
+          Related controls: IR-4, IR-4.1, IR-6, IR-6.1, IR-6.3
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-inr-02
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-inr
+        ref_id: KSI-INR-02
+        name: Incident Review
+        description: |
+          Persistently review past incidents for patterns or vulnerabilities.
+        annotation: |
+          Related controls: IR-3, IR-4, IR-4.1, IR-5, IR-8
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-inr-03
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-inr
+        ref_id: KSI-INR-03
+        name: Incident After Action Reports
+        description: |
+          Generate incident after action reports and persistently incorporate lessons learned.
+        annotation: |
+          Related controls: IR-3, IR-4, IR-4.1, IR-8
+        implementation_groups:
+          - LOW
+          - MOD
+
+      # ===========================================================================
+      # KSI-MLA: Monitoring, Logging, and Auditing (5 indicators)
+      # ===========================================================================
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla
+        assessable: false
+        depth: 1
+        ref_id: KSI-MLA
+        name: Monitoring, Logging, and Auditing
+        description: |
+          A secure cloud service offering will monitor, log, and audit all important
+          events, activity, and changes.
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla-01
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla
+        ref_id: KSI-MLA-01
+        name: Security Information and Event Management (SIEM)
+        description: |
+          Operate a Security Information and Event Management (SIEM) or similar system(s)
+          for centralized, tamper-resistant logging of events, activities, and changes.
+        annotation: |
+          Related controls: AC-17.1, AC-20.1, AU-2, AU-3, AU-3.1
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla-02
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla
+        ref_id: KSI-MLA-02
+        name: Audit Logging
+        description: |
+          Persistently review and audit logs.
+        annotation: |
+          Related controls: AC-2.4, AC-6.9, AU-2, AU-6, AU-6.1
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla-05
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla
+        ref_id: KSI-MLA-05
+        name: Evaluate Configuration
+        description: |
+          Persistently evaluate and test the configuration of machine-based information
+          resources, especially infrastructure as code.
+        annotation: |
+          Related controls: CA-7, CM-2, CM-6, SI-7.7
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla-07
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla
+        ref_id: KSI-MLA-07
+        name: Event Types
+        description: |
+          Log all security-relevant event types including authentication, authorization,
+          configuration changes, and administrative actions.
+        annotation: |
+          Related controls: AC-2.4, AC-6.9, AC-17.1, AC-20.1, AU-2
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla-08
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla
+        ref_id: KSI-MLA-08
+        name: Log Data Access
+        description: |
+          Control and audit access to log data.
+        annotation: |
+          Related controls: SI-11
+          NOTE: This KSI applies only to Moderate Impact level.
+        implementation_groups:
+          - MOD
+
+      # ===========================================================================
+      # KSI-PIY: Policy and Inventory (5 indicators)
+      # ===========================================================================
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy
+        assessable: false
+        depth: 1
+        ref_id: KSI-PIY
+        name: Policy and Inventory
+        description: |
+          A secure cloud service offering will have intentional, organized, universal
+          guidance for how every information resource, including personnel, is secured.
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy-01
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy
+        ref_id: KSI-PIY-01
+        name: Automated Inventory
+        description: |
+          Use authoritative sources to automatically generate real-time inventories
+          of all information resources when needed.
+        annotation: |
+          Related controls: CM-2.2, CM-7.5, CM-8, CM-8.1, CM-12
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy-03
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy
+        ref_id: KSI-PIY-03
+        name: Vulnerability Disclosure Program
+        description: |
+          Persistently review the effectiveness of the provider's vulnerability
+          disclosure program.
+        annotation: |
+          Related controls: RA-5.11
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy-04
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy
+        ref_id: KSI-PIY-04
+        name: CISA Secure By Design
+        description: |
+          Persistently review the effectiveness of building security and privacy
+          considerations into the Software Development Lifecycle and aligning with
+          CISA Secure by Design principles.
+        annotation: |
+          Related controls: AC-5, AU-3.3, CM-3.4, PL-8, PM-7
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy-06
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy
+        ref_id: KSI-PIY-06
+        name: Security Investment Effectiveness
+        description: |
+          Persistently review the effectiveness of security investments and controls.
+        annotation: |
+          Related controls: AC-5, CA-2, CP-2.1, CP-4.1, IR-3.2
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy-08
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy
+        ref_id: KSI-PIY-08
+        name: Executive Support
+        description: |
+          Ensure executive leadership support for security programs and initiatives.
+        implementation_groups:
+          - LOW
+          - MOD
+
+      # ===========================================================================
+      # KSI-RPL: Recovery Planning (4 indicators)
+      # ===========================================================================
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl
+        assessable: false
+        depth: 1
+        ref_id: KSI-RPL
+        name: Recovery Planning
+        description: |
+          A secure cloud service offering will define, maintain, and test incident
+          response plan(s) and recovery capabilities to ensure minimal service disruption
+          and data loss during incidents and contingencies.
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl-01
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl
+        ref_id: KSI-RPL-01
+        name: Recovery Objectives
+        description: |
+          Persistently review desired Recovery Time Objectives (RTO) and Recovery
+          Point Objectives (RPO).
+        annotation: |
+          Related controls: CP-2.3, CP-10
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl-02
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl
+        ref_id: KSI-RPL-02
+        name: Recovery Plan
+        description: |
+          Persistently review the alignment of recovery plans with defined recovery objectives.
+        annotation: |
+          Related controls: CP-2, CP-2.1, CP-2.3, CP-4.1, CP-6
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl-03
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl
+        ref_id: KSI-RPL-03
+        name: System Backups
+        description: |
+          Persistently review the alignment of machine-based information resource
+          backups with defined recovery objectives.
+        annotation: |
+          Related controls: CM-2.3, CP-6, CP-9, CP-10, CP-10.2
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl-04
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl
+        ref_id: KSI-RPL-04
+        name: Recovery Testing
+        description: |
+          Persistently test the capability to recover from incidents and contingencies,
+          including alignment with defined recovery objectives.
+        annotation: |
+          Related controls: CP-2.1, CP-2.3, CP-4, CP-4.1, CP-6
+        implementation_groups:
+          - LOW
+          - MOD
+
+      # ===========================================================================
+      # KSI-SVC: Service Configuration (8 indicators)
+      # ===========================================================================
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        assessable: false
+        depth: 1
+        ref_id: KSI-SVC
+        name: Service Configuration
+        description: |
+          A secure cloud service offering will follow FedRAMP encryption policies,
+          continuously verify information resource integrity, and restrict access
+          to third-party information resources.
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc-01
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        ref_id: KSI-SVC-01
+        name: Continuous Improvement
+        description: |
+          Implement improvements based on persistent evaluation of information resources
+          for opportunities to improve security.
+        annotation: |
+          Related controls: CM-7.1, CM-12.1, MA-2, PL-8, SC-7
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc-02
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        ref_id: KSI-SVC-02
+        name: Network Encryption
+        description: |
+          Encrypt or otherwise secure network traffic.
+        annotation: |
+          Related controls: AC-1, AC-17.2, CP-9.8, SC-8, SC-8.1
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc-04
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        ref_id: KSI-SVC-04
+        name: Configuration Automation
+        description: |
+          Manage configuration of machine-based information resources using automation.
+        annotation: |
+          Related controls: AC-2.4, CM-2, CM-2.2, CM-2.3, CM-6
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc-05
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        ref_id: KSI-SVC-05
+        name: Resource Integrity
+        description: |
+          Use cryptographic methods to validate the integrity of machine-based
+          information resources.
+        annotation: |
+          Related controls: CM-2.2, CM-8.3, SC-13, SC-23, SI-7
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc-06
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        ref_id: KSI-SVC-06
+        name: Secret Management
+        description: |
+          Implement secure secret management practices for credentials, keys, and
+          other sensitive configuration data.
+        annotation: |
+          Related controls: AC-17.2, IA-5.2, IA-5.6, SC-12, SC-17
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc-08
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        ref_id: KSI-SVC-08
+        name: Prevent Residual Risk
+        description: |
+          Prevent residual data from being accessible after resource deallocation.
+        annotation: |
+          Related controls: SC-4
+          NOTE: This KSI applies only to Moderate Impact level.
+        implementation_groups:
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc-09
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        ref_id: KSI-SVC-09
+        name: Communication Integrity
+        description: |
+          Protect the integrity of communications and session state.
+        annotation: |
+          Related controls: SC-23, SI-7.1
+          NOTE: This KSI applies only to Moderate Impact level.
+        implementation_groups:
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc-10
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        ref_id: KSI-SVC-10
+        name: Unwanted Data Removal
+        description: |
+          Remove unwanted data in accordance with retention policies.
+        annotation: |
+          Related controls: SI-12.3, SI-18.4
+          NOTE: This KSI applies only to Moderate Impact level.
+        implementation_groups:
+          - MOD
+
+      # ===========================================================================
+      # KSI-TPR: Third-Party Information Resources (2 indicators)
+      # ===========================================================================
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-tpr
+        assessable: false
+        depth: 1
+        ref_id: KSI-TPR
+        name: Third-Party Information Resources
+        description: |
+          A secure cloud service offering will understand, monitor, and manage supply
+          chain risks from third-party information resources.
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-tpr-03
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-tpr
+        ref_id: KSI-TPR-03
+        name: Supply Chain Risk Management
+        description: |
+          Persistently identify, review, and mitigate potential supply chain risks.
+        annotation: |
+          Related controls: AC-20, RA-3.1, SA-9, SA-10, SA-11
+        implementation_groups:
+          - LOW
+          - MOD
+
+      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-tpr-04
+        assessable: true
+        depth: 2
+        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-tpr
+        ref_id: KSI-TPR-04
+        name: Supply Chain Risk Monitoring
+        description: |
+          Automatically monitor third party software information resources for upstream
+          vulnerabilities using mechanisms that may include contractual notifications,
+          software composition analysis, and vulnerability scanning.
+        annotation: |
+          Related controls: AC-20, CA-3, IR-6.3, PS-7, RA-5
+        implementation_groups:
+          - LOW
+          - MOD
