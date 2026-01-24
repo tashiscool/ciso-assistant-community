@@ -122,6 +122,167 @@ class FedRAMP20xPackage:
         """Convert to dictionary"""
         return asdict(self)
 
+    def to_oscal(self) -> Dict[str, Any]:
+        """
+        Convert FedRAMP 20x KSI package to OSCAL Assessment Results format.
+
+        Returns:
+            OSCAL Assessment Results structure as dict
+        """
+        # Generate UUIDs for OSCAL elements
+        results_uuid = str(uuid.uuid4())
+        result_uuid = str(uuid.uuid4())
+
+        # Build observations from KSI entries
+        observations = []
+        findings = []
+
+        for entry in self.ksi_entries:
+            obs_uuid = str(uuid.uuid4())
+
+            # Create observation
+            observation = {
+                'uuid': obs_uuid,
+                'title': f"KSI Assessment: {entry.get('ksi_ref_id', 'Unknown')}",
+                'description': entry.get('ksi_name', ''),
+                'methods': ['EXAMINE', 'TEST'] if entry.get('automation_percentage', 0) > 0 else ['EXAMINE'],
+                'collected': entry.get('last_validation_date') or self.generation_timestamp,
+                'props': [
+                    {'name': 'ksi-ref-id', 'value': entry.get('ksi_ref_id', '')},
+                    {'name': 'ksi-category', 'value': entry.get('category', '')},
+                    {'name': 'implementation-status', 'value': entry.get('implementation_status', '')},
+                    {'name': 'compliance-status', 'value': entry.get('compliance_status', '')},
+                    {'name': 'automation-percentage', 'value': str(entry.get('automation_percentage', 0))},
+                    {'name': 'evidence-count', 'value': str(entry.get('evidence_count', 0))},
+                ],
+            }
+
+            # Add NIST control mappings as relevant evidence
+            nist_mappings = entry.get('nist_control_mappings', [])
+            if nist_mappings:
+                observation['relevant-evidence'] = [
+                    {
+                        'description': f"NIST SP 800-53 control mapping: {ctrl}",
+                        'props': [{'name': 'control-id', 'value': ctrl}]
+                    }
+                    for ctrl in nist_mappings
+                ]
+
+            observations.append(observation)
+
+            # Create finding for each KSI
+            finding_uuid = str(uuid.uuid4())
+            compliance_status = entry.get('compliance_status', 'unknown')
+
+            # Map compliance status to OSCAL state
+            state_map = {
+                'compliant': 'satisfied',
+                'non_compliant': 'not-satisfied',
+                'partially_compliant': 'partially-satisfied',
+                'not_assessed': 'not-satisfied',
+            }
+            oscal_state = state_map.get(compliance_status, 'not-satisfied')
+
+            finding = {
+                'uuid': finding_uuid,
+                'title': f"KSI Finding: {entry.get('ksi_ref_id', 'Unknown')}",
+                'description': entry.get('ksi_name', ''),
+                'target': {
+                    'type': 'objective-id',
+                    'target-id': entry.get('ksi_ref_id', ''),
+                    'status': {'state': oscal_state},
+                },
+                'related-observations': [{'observation-uuid': obs_uuid}],
+                'props': [
+                    {'name': 'validation-result', 'value': str(entry.get('last_validation_result', 'unknown'))},
+                ],
+            }
+
+            # Add POA&M reference if exists
+            if entry.get('poam_id'):
+                finding['props'].append({
+                    'name': 'poam-item-uuid',
+                    'value': entry.get('poam_id'),
+                })
+
+            findings.append(finding)
+
+        # Build OSCAL Assessment Results structure
+        oscal_ar = {
+            'assessment-results': {
+                'uuid': results_uuid,
+                'metadata': {
+                    'title': f"FedRAMP 20x KSI Compliance Assessment - {self.cso_name or 'Unknown CSO'}",
+                    'last-modified': self.generation_timestamp,
+                    'version': self.package_version,
+                    'oscal-version': '1.1.2',
+                    'props': [
+                        {'name': 'fedramp-package-id', 'value': self.fedramp_package_id or ''},
+                        {'name': 'impact-level', 'value': self.impact_level or ''},
+                        {'name': 'authorization-status', 'value': self.authorization_status or ''},
+                    ],
+                },
+                'import-ap': {
+                    'href': f'#assessment-plan-{self.cso_id or "default"}',
+                },
+                'results': [
+                    {
+                        'uuid': result_uuid,
+                        'title': 'KSI Compliance Results',
+                        'description': f"FedRAMP 20x Key Security Indicator compliance assessment for {self.cso_name}",
+                        'start': self.generation_timestamp,
+                        'reviewed-controls': {
+                            'control-selections': [
+                                {
+                                    'description': 'FedRAMP 20x Key Security Indicators',
+                                    'include-all': {},
+                                }
+                            ],
+                        },
+                        'attestations': [
+                            {
+                                'responsible-parties': [],
+                                'parts': [
+                                    {
+                                        'name': 'compliance-summary',
+                                        'prose': f"KSI Compliance: {self.ksi_compliance_percentage:.1f}% ({self.ksi_compliant}/{self.ksi_total} compliant). "
+                                                f"Persistent validation coverage: {self.persistent_validation_coverage:.1f}%.",
+                                    }
+                                ],
+                            }
+                        ],
+                        'observations': observations,
+                        'findings': findings,
+                        'props': [
+                            {'name': 'ksi-total', 'value': str(self.ksi_total)},
+                            {'name': 'ksi-compliant', 'value': str(self.ksi_compliant)},
+                            {'name': 'ksi-non-compliant', 'value': str(self.ksi_non_compliant)},
+                            {'name': 'ksi-compliance-percentage', 'value': f"{self.ksi_compliance_percentage:.2f}"},
+                            {'name': 'persistent-validation-coverage', 'value': f"{self.persistent_validation_coverage:.2f}"},
+                        ],
+                    }
+                ],
+            }
+        }
+
+        # Add vulnerability summary if available
+        if self.vulnerability_summary:
+            vuln_props = [
+                {'name': f'vulnerability-{k}', 'value': str(v)}
+                for k, v in self.vulnerability_summary.items()
+            ]
+            oscal_ar['assessment-results']['results'][0]['props'].extend(vuln_props)
+
+        # Add POA&M summary if available
+        if self.poam_summary:
+            poam_props = [
+                {'name': f'poam-{k}', 'value': str(v)}
+                for k, v in self.poam_summary.items()
+            ]
+            oscal_ar['assessment-results']['results'][0]['props'].extend(poam_props)
+
+        return oscal_ar
+
 
 class FedRAMP20xExportService:
     """

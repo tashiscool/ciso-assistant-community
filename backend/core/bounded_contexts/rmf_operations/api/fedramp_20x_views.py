@@ -61,11 +61,13 @@ class FedRAMP20xKSIExportView(APIView):
             package = service.generate_ksi_package()
 
             if output_format == 'oscal':
-                # TODO: Convert to OSCAL format
+                oscal_data = package.to_oscal()
                 return Response({
-                    'success': False,
-                    'error': 'OSCAL format not yet implemented',
-                }, status=status.HTTP_501_NOT_IMPLEMENTED)
+                    'success': True,
+                    'data': oscal_data,
+                    'format': 'oscal-ar',
+                    'oscal_version': '1.1.2',
+                })
 
             return Response({
                 'success': True,

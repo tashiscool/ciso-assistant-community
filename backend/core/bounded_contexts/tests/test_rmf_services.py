@@ -603,6 +603,185 @@ class TestRMFBulkOperations:
 
 
 # =============================================================================
+# FedRAMP 20x OSCAL Export Tests
+# =============================================================================
+
+@pytest.mark.django_db
+class TestFedRAMP20xOSCALExport:
+    """Tests for FedRAMP 20x OSCAL export functionality."""
+
+    def test_oscal_export_package_structure(self):
+        """Test that OSCAL export creates valid structure."""
+        from core.bounded_contexts.rmf_operations.services.fedramp_20x_export import (
+            FedRAMP20xPackage,
+        )
+
+        # Create a test package with sample data
+        package = FedRAMP20xPackage(
+            package_id='test-package-001',
+            cso_name='Test Cloud Service',
+            cso_id='12345678-1234-1234-1234-123456789012',
+            impact_level='Moderate',
+            authorization_status='Authorized',
+            ksi_total=10,
+            ksi_compliant=8,
+            ksi_non_compliant=2,
+            ksi_compliance_percentage=80.0,
+            persistent_validation_coverage=60.0,
+            ksi_entries=[
+                {
+                    'ksi_ref_id': 'KSI-IAM-01',
+                    'ksi_name': 'Identity Management',
+                    'category': 'IAM',
+                    'implementation_status': 'implemented',
+                    'compliance_status': 'compliant',
+                    'automation_percentage': 80.0,
+                    'last_validation_date': '2024-01-15T10:00:00Z',
+                    'last_validation_result': True,
+                    'nist_control_mappings': ['AC-2', 'IA-2'],
+                    'evidence_count': 3,
+                    'poam_id': None,
+                },
+                {
+                    'ksi_ref_id': 'KSI-CMT-01',
+                    'ksi_name': 'Configuration Management',
+                    'category': 'CMT',
+                    'implementation_status': 'partial',
+                    'compliance_status': 'non_compliant',
+                    'automation_percentage': 20.0,
+                    'last_validation_date': '2024-01-10T10:00:00Z',
+                    'last_validation_result': False,
+                    'nist_control_mappings': ['CM-6', 'CM-8'],
+                    'evidence_count': 1,
+                    'poam_id': '87654321-4321-4321-4321-210987654321',
+                },
+            ],
+        )
+
+        # Generate OSCAL output
+        oscal = package.to_oscal()
+
+        # Verify structure
+        assert 'assessment-results' in oscal
+        ar = oscal['assessment-results']
+
+        # Check metadata
+        assert ar['metadata']['oscal-version'] == '1.1.2'
+        assert 'Test Cloud Service' in ar['metadata']['title']
+
+        # Check results
+        assert len(ar['results']) == 1
+        result = ar['results'][0]
+
+        # Check observations and findings match KSI entries
+        assert len(result['observations']) == 2
+        assert len(result['findings']) == 2
+
+        # Check first observation
+        obs1 = result['observations'][0]
+        assert obs1['title'] == 'KSI Assessment: KSI-IAM-01'
+        assert 'EXAMINE' in obs1['methods']
+        assert 'TEST' in obs1['methods']  # Because automation > 0
+
+        # Check first finding
+        finding1 = result['findings'][0]
+        assert finding1['target']['status']['state'] == 'satisfied'  # compliant
+
+        # Check second finding (non-compliant)
+        finding2 = result['findings'][1]
+        assert finding2['target']['status']['state'] == 'not-satisfied'
+
+        # Check POA&M reference in second finding
+        poam_prop = next(
+            (p for p in finding2['props'] if p['name'] == 'poam-item-uuid'),
+            None
+        )
+        assert poam_prop is not None
+        assert poam_prop['value'] == '87654321-4321-4321-4321-210987654321'
+
+        # Check summary props
+        props = {p['name']: p['value'] for p in result['props']}
+        assert props['ksi-total'] == '10'
+        assert props['ksi-compliant'] == '8'
+        assert props['ksi-compliance-percentage'] == '80.00'
+
+    def test_oscal_export_with_vulnerability_summary(self):
+        """Test OSCAL export includes vulnerability summary."""
+        from core.bounded_contexts.rmf_operations.services.fedramp_20x_export import (
+            FedRAMP20xPackage,
+        )
+
+        package = FedRAMP20xPackage(
+            package_id='test-vuln-package',
+            ksi_total=5,
+            ksi_compliant=5,
+            ksi_compliance_percentage=100.0,
+            vulnerability_summary={
+                'total_open': 15,
+                'critical': 2,
+                'high': 5,
+                'medium': 8,
+            },
+        )
+
+        oscal = package.to_oscal()
+        result_props = oscal['assessment-results']['results'][0]['props']
+        props_dict = {p['name']: p['value'] for p in result_props}
+
+        assert 'vulnerability-total_open' in props_dict
+        assert props_dict['vulnerability-total_open'] == '15'
+        assert props_dict['vulnerability-critical'] == '2'
+
+    def test_oscal_export_with_poam_summary(self):
+        """Test OSCAL export includes POA&M summary."""
+        from core.bounded_contexts.rmf_operations.services.fedramp_20x_export import (
+            FedRAMP20xPackage,
+        )
+
+        package = FedRAMP20xPackage(
+            package_id='test-poam-package',
+            ksi_total=5,
+            ksi_compliant=3,
+            ksi_non_compliant=2,
+            ksi_compliance_percentage=60.0,
+            poam_summary={
+                'total': 5,
+                'open': 3,
+                'overdue': 1,
+            },
+        )
+
+        oscal = package.to_oscal()
+        result_props = oscal['assessment-results']['results'][0]['props']
+        props_dict = {p['name']: p['value'] for p in result_props}
+
+        assert 'poam-total' in props_dict
+        assert props_dict['poam-total'] == '5'
+        assert props_dict['poam-overdue'] == '1'
+
+    def test_oscal_export_empty_package(self):
+        """Test OSCAL export handles empty package."""
+        from core.bounded_contexts.rmf_operations.services.fedramp_20x_export import (
+            FedRAMP20xPackage,
+        )
+
+        package = FedRAMP20xPackage(
+            package_id='empty-package',
+            ksi_total=0,
+            ksi_compliant=0,
+            ksi_non_compliant=0,
+            ksi_compliance_percentage=0.0,
+        )
+
+        oscal = package.to_oscal()
+
+        assert 'assessment-results' in oscal
+        result = oscal['assessment-results']['results'][0]
+        assert len(result['observations']) == 0
+        assert len(result['findings']) == 0
+
+
+# =============================================================================
 # CCI Service Tests
 # =============================================================================
 
