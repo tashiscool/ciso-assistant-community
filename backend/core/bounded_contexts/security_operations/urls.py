@@ -12,7 +12,7 @@ from .views import (
 )
 
 router = routers.DefaultRouter()
-router.register(r'security-incidents', SecurityIncidentViewSet, basename='security-incidents')
+router.register(r'incidents', SecurityIncidentViewSet, basename='incidents')  # Frontend expects /security/incidents/
 router.register(r'awareness-programs', AwarenessProgramViewSet, basename='awareness-programs')
 router.register(r'awareness-campaigns', AwarenessCampaignViewSet, basename='awareness-campaigns')
 router.register(r'awareness-completions', AwarenessCompletionViewSet, basename='awareness-completions')

@@ -14,7 +14,7 @@ from .views import (
 # Create router and register viewsets
 router = routers.DefaultRouter()
 router.register(r'asset-risks', AssetRiskViewSet, basename='asset-risks')
-router.register(r'registers', RiskRegisterViewSet, basename='registers')
+router.register(r'risk-registers', RiskRegisterViewSet, basename='risk-registers')  # Frontend expects /risks/risk-registers/
 router.register(r'reporting', RiskReportingViewSet, basename='reporting')
 
 urlpatterns = [

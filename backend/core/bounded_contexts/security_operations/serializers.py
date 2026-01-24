@@ -11,7 +11,14 @@ from .associations.awareness_completion import AwarenessCompletion
 
 class SecurityIncidentSerializer(serializers.ModelSerializer):
     """Serializer for SecurityIncident aggregate"""
-    
+
+    # Alias fields to match frontend expectations
+    status = serializers.CharField(source='lifecycle_state', read_only=True)
+    incident_title = serializers.CharField(source='title', read_only=True)
+    incident_type = serializers.SerializerMethodField()
+    detected_at = serializers.DateTimeField(source='reported_at', read_only=True)
+    resolved_at = serializers.DateTimeField(source='closed_at', read_only=True)
+
     class Meta:
         model = SecurityIncident
         fields = [
@@ -25,8 +32,21 @@ class SecurityIncidentSerializer(serializers.ModelSerializer):
             'reported_at', 'triaged_at', 'contained_at',
             'eradicated_at', 'recovered_at', 'closed_at',
             'tags',
+            # Frontend-expected alias fields
+            'status', 'incident_title', 'incident_type',
+            'detected_at', 'resolved_at',
         ]
         read_only_fields = ['id', 'version', 'created_at', 'updated_at']
+
+    def get_incident_type(self, obj):
+        """Derive incident type from classification or detection source"""
+        # Map detection source to incident type categories
+        source_mapping = {
+            'siem': 'security_event',
+            'user_report': 'user_reported',
+            'automated': 'automated_detection',
+        }
+        return source_mapping.get(obj.detection_source, 'other')
 
 
 class AwarenessProgramSerializer(serializers.ModelSerializer):

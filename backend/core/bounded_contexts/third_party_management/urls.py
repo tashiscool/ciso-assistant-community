@@ -7,7 +7,7 @@ from rest_framework import routers
 from .views import ThirdPartyViewSet
 
 router = routers.DefaultRouter()
-router.register(r'third-parties', ThirdPartyViewSet, basename='third-parties')
+router.register(r'entities', ThirdPartyViewSet, basename='entities')  # Frontend expects /third-party/entities/
 
 urlpatterns = [
     path('', include(router.urls)),

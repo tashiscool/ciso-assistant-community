@@ -11,7 +11,7 @@ from .views import (
 )
 
 router = routers.DefaultRouter()
-router.register(r'business-continuity-plans', BusinessContinuityPlanViewSet, basename='business-continuity-plans')
+router.register(r'bcp-plans', BusinessContinuityPlanViewSet, basename='bcp-plans')  # Frontend expects /business-continuity/bcp-plans/
 router.register(r'bcp-tasks', BcpTaskViewSet, basename='bcp-tasks')
 router.register(r'bcp-audits', BcpAuditViewSet, basename='bcp-audits')
 

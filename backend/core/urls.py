@@ -142,8 +142,8 @@ urlpatterns = [
     path("risks/", include("risk_registers.api.urls")),  # Risk Registers bounded context API
     path("compliance/", include("core.bounded_contexts.compliance.urls")),  # Compliance bounded context API
     path("privacy/", include("core.bounded_contexts.privacy.urls")),  # Privacy bounded context API
-    path("security-operations/", include("core.bounded_contexts.security_operations.urls")),  # SecurityOperations bounded context API
-    path("third-party-management/", include("core.bounded_contexts.third_party_management.urls")),  # ThirdPartyManagement bounded context API
+    path("security/", include("core.bounded_contexts.security_operations.urls")),  # Frontend expects /security/
+    path("third-party/", include("core.bounded_contexts.third_party_management.urls")),  # Frontend expects /third-party/
     path("business-continuity/", include("core.bounded_contexts.business_continuity.urls")),  # BusinessContinuity bounded context API
     path("rmf/", include("core.bounded_contexts.rmf_operations.urls")),  # RMF Operations bounded context API
     path("workflows/", include("core.bounded_contexts.workflow_engine.urls")),  # Workflow Engine bounded context API

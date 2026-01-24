@@ -10,7 +10,14 @@ from .supporting_entities.bcp_audit import BcpAudit
 
 class BusinessContinuityPlanSerializer(serializers.ModelSerializer):
     """Serializer for BusinessContinuityPlan aggregate"""
-    
+
+    # Alias fields to match frontend expectations
+    status = serializers.CharField(source='lifecycle_state', read_only=True)
+    plan_name = serializers.CharField(source='name', read_only=True)
+    last_test_date = serializers.SerializerMethodField()
+    last_test_result = serializers.SerializerMethodField()
+    business_impact = serializers.SerializerMethodField()
+
     class Meta:
         model = BusinessContinuityPlan
         fields = [
@@ -20,8 +27,26 @@ class BusinessContinuityPlanSerializer(serializers.ModelSerializer):
             'orgUnitIds', 'processIds', 'assetIds', 'serviceIds',
             'taskIds', 'auditIds',
             'tags',
+            # Frontend-expected alias fields
+            'status', 'plan_name', 'last_test_date',
+            'last_test_result', 'business_impact',
         ]
         read_only_fields = ['id', 'version', 'created_at', 'updated_at']
+
+    def get_last_test_date(self, obj):
+        """Get the most recent audit date as last test date"""
+        # TODO: Query audits by bcpId and get latest performed_at
+        return None
+
+    def get_last_test_result(self, obj):
+        """Get the most recent audit outcome as last test result"""
+        # TODO: Query audits by bcpId and get latest outcome
+        return None
+
+    def get_business_impact(self, obj):
+        """Derive business impact from service/asset criticality"""
+        # TODO: Calculate from linked assets/services
+        return 'medium'
 
 
 class BcpTaskSerializer(serializers.ModelSerializer):

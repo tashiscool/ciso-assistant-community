@@ -12,7 +12,13 @@ from .supporting_entities.risk_exception import RiskException
 
 class AssetRiskSerializer(serializers.ModelSerializer):
     """Serializer for AssetRisk aggregate"""
-    
+
+    # Alias fields to match frontend expectations
+    status = serializers.CharField(source='lifecycle_state', read_only=True)
+    risk_title = serializers.CharField(source='title', read_only=True)
+    risk_level = serializers.SerializerMethodField()
+    calculated_risk_score = serializers.SerializerMethodField()
+
     class Meta:
         model = AssetRisk
         fields = [
@@ -22,8 +28,27 @@ class AssetRiskSerializer(serializers.ModelSerializer):
             'assetIds', 'controlImplementationIds', 'exceptionIds', 'relatedRiskIds',
             'scoring', 'treatmentPlanId',
             'tags',
+            # Frontend-expected alias fields
+            'status', 'risk_title', 'risk_level', 'calculated_risk_score',
         ]
         read_only_fields = ['id', 'version', 'created_at', 'updated_at']
+
+    def get_risk_level(self, obj):
+        """Derive risk level from scoring"""
+        scoring = obj.scoring or {}
+        score = scoring.get('inherent_score', 0)
+        if score >= 8:
+            return 'critical'
+        elif score >= 6:
+            return 'high'
+        elif score >= 4:
+            return 'medium'
+        return 'low'
+
+    def get_calculated_risk_score(self, obj):
+        """Extract numeric score from scoring object"""
+        scoring = obj.scoring or {}
+        return scoring.get('inherent_score', 0)
 
 
 class ThirdPartyRiskSerializer(serializers.ModelSerializer):

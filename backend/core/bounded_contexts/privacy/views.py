@@ -17,6 +17,33 @@ from .serializers import (
 )
 
 
+# Stub ViewSets for endpoints the frontend expects but models aren't implemented yet
+class ConsentRecordViewSet(viewsets.ViewSet):
+    """Stub ViewSet for ConsentRecord - returns empty results until model is implemented"""
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        """Return empty list - model not yet implemented"""
+        return Response({'results': [], 'count': 0})
+
+    def retrieve(self, request, pk=None):
+        """Return 404 - model not yet implemented"""
+        return Response({'error': 'Not implemented'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class DataSubjectRightViewSet(viewsets.ViewSet):
+    """Stub ViewSet for DataSubjectRight - returns empty results until model is implemented"""
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        """Return empty list - model not yet implemented"""
+        return Response({'results': [], 'count': 0})
+
+    def retrieve(self, request, pk=None):
+        """Return 404 - model not yet implemented"""
+        return Response({'error': 'Not implemented'}, status=status.HTTP_404_NOT_FOUND)
+
+
 class DataAssetViewSet(viewsets.ModelViewSet):
     """ViewSet for DataAsset aggregates"""
 
