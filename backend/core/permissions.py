@@ -33,7 +33,10 @@ class RBACPermissions(permissions.DjangoObjectPermissions):
         perms = self.get_required_permissions(request.method, type(obj))
         if not perms:
             return False
-        _codename = perms[0].split(".")[1]
+        # perms[0] is like "app_label.codename"
+        perm_parts = perms[0].split(".")
+        _app_label = perm_parts[0]
+        _codename = perm_parts[1]
 
         # Check for view action permission overrides
         current_action = getattr(view, "action", None)
@@ -42,7 +45,17 @@ class RBACPermissions(permissions.DjangoObjectPermissions):
             permission_overrides = getattr(view, "permission_overrides", {})
             _codename = permission_overrides.get(current_action, _codename)
 
-        perm = Permission.objects.get(codename=_codename)
+        # Filter by both app_label and codename to avoid MultipleObjectsReturned
+        perm = Permission.objects.filter(
+            content_type__app_label=_app_label,
+            codename=_codename
+        ).first()
+
+        if perm is None:
+            # Fallback: try to get by codename only (for backwards compatibility)
+            perm = Permission.objects.filter(codename=_codename).first()
+            if perm is None:
+                return False
 
         # any user is allowed to view itself
         if obj == request.user and perm.codename == "view_user":
