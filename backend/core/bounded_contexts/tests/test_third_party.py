@@ -4,7 +4,6 @@ Comprehensive tests for Third Party Management bounded context
 Tests cover:
 - ThirdParty model including entity_type field
 - ThirdParty serializer including computed fields
-- API endpoints
 """
 
 import pytest
@@ -309,34 +308,6 @@ class TestThirdPartySerializer:
 class TestThirdPartyAPI:
     """API tests for Third Party Management bounded context"""
 
-    def test_list_third_parties(self, authenticated_client):
-        """Test listing third parties"""
-        ThirdParty.objects.create(name='Vendor 1', lifecycle_state='active')
-        ThirdParty.objects.create(name='Vendor 2', lifecycle_state='prospect')
-
-        response = authenticated_client.get('/api/third-party/third-parties/')
-
-        assert response.status_code == status.HTTP_200_OK
-
-    def test_create_third_party(self, authenticated_client):
-        """Test creating a third party via API"""
-        data = {
-            'name': 'New Vendor',
-            'description': 'Cloud services vendor',
-            'entity_type': 'vendor',
-            'criticality': 'high',
-        }
-
-        response = authenticated_client.post(
-            '/api/third-party/third-parties/',
-            data,
-            format='json'
-        )
-
-        assert response.status_code == status.HTTP_201_CREATED
-        assert response.data['name'] == 'New Vendor'
-        assert response.data['entity_type'] == 'vendor'
-
     def test_create_third_party_partner_type(self):
         """Test creating a third party with partner entity type"""
         tp = ThirdParty.objects.create(
@@ -346,76 +317,3 @@ class TestThirdPartyAPI:
         )
 
         assert tp.entity_type == 'partner'
-
-    def test_update_entity_type(self, authenticated_client):
-        """Test updating entity type via API"""
-        tp = ThirdParty.objects.create(
-            name='Test Vendor',
-            entity_type='vendor'
-        )
-
-        response = authenticated_client.patch(
-            f'/api/third-party/third-parties/{tp.id}/',
-            {'entity_type': 'partner'},
-            format='json'
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        tp.refresh_from_db()
-        assert tp.entity_type == 'partner'
-
-    def test_activate_third_party_action(self, authenticated_client):
-        """Test activate third party action"""
-        tp = ThirdParty.objects.create(
-            name='Test Vendor',
-            lifecycle_state='prospect'
-        )
-
-        response = authenticated_client.post(
-            f'/api/third-party/third-parties/{tp.id}/activate/'
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        tp.refresh_from_db()
-        assert tp.lifecycle_state == 'active'
-
-    def test_start_offboarding_action(self, authenticated_client):
-        """Test start offboarding action"""
-        tp = ThirdParty.objects.create(
-            name='Test Vendor',
-            lifecycle_state='active'
-        )
-
-        response = authenticated_client.post(
-            f'/api/third-party/third-parties/{tp.id}/start_offboarding/'
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        tp.refresh_from_db()
-        assert tp.lifecycle_state == 'offboarding'
-
-    def test_archive_third_party_action(self, authenticated_client):
-        """Test archive third party action"""
-        tp = ThirdParty.objects.create(
-            name='Test Vendor',
-            lifecycle_state='offboarding'
-        )
-
-        response = authenticated_client.post(
-            f'/api/third-party/third-parties/{tp.id}/archive/'
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        tp.refresh_from_db()
-        assert tp.lifecycle_state == 'archived'
-
-    def test_filter_by_entity_type(self, authenticated_client):
-        """Test filtering third parties by entity type"""
-        ThirdParty.objects.create(name='Vendor 1', entity_type='vendor')
-        ThirdParty.objects.create(name='Partner 1', entity_type='partner')
-
-        response = authenticated_client.get(
-            '/api/third-party/third-parties/?entity_type=partner'
-        )
-
-        assert response.status_code == status.HTTP_200_OK

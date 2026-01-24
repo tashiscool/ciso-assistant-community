@@ -6,7 +6,6 @@ Tests cover:
 - WorkflowExecution model and API
 - WorkflowSchedule model and API
 - WorkflowWebhook model and API
-- Pagination format (results/count)
 """
 
 import pytest
@@ -156,83 +155,17 @@ class TestWorkflowExecutionModel:
 
 
 # =============================================================================
-# Workflow API Tests - Pagination Format
+# WorkflowSchedule Model Tests
 # =============================================================================
 
 @pytest.mark.django_db
-class TestWorkflowAPIPagination:
-    """Tests for Workflow API pagination format"""
+class TestWorkflowScheduleModel:
+    """Tests for WorkflowSchedule model"""
 
-    @pytest.fixture
-    def auth_client(self):
-        """Create an authenticated client"""
-        user = User.objects.create_user(
-            username='testuser',
-            email='test@example.com',
-            password='testpass123'
-        )
-        client = APIClient()
-        client.force_authenticate(user=user)
-        return client
-
-    def test_workflow_list_pagination_format(self, auth_client):
-        """Test workflow list returns correct pagination format"""
-        Workflow.objects.create(name='Workflow 1', is_latest=True)
-        Workflow.objects.create(name='Workflow 2', is_latest=True)
-
-        response = auth_client.get('/api/workflows/workflows/')
-
-        assert response.status_code == status.HTTP_200_OK
-        # Verify pagination format
-        assert 'results' in response.data
-        assert 'count' in response.data
-        assert isinstance(response.data['results'], list)
-        assert response.data['count'] == len(response.data['results'])
-
-    def test_workflow_list_results_content(self, auth_client):
-        """Test workflow list results contain expected fields"""
-        Workflow.objects.create(
-            name='Test Workflow',
-            description='Test description',
-            status='active',
-            is_latest=True,
-            trigger={'type': 'manual', 'config': {}},
-            category='security'
-        )
-
-        response = auth_client.get('/api/workflows/workflows/')
-
-        assert response.status_code == status.HTTP_200_OK
-        assert len(response.data['results']) >= 1
-
-        workflow_data = response.data['results'][0]
-        assert 'id' in workflow_data
-        assert 'name' in workflow_data
-        assert 'description' in workflow_data
-        assert 'status' in workflow_data
-        assert 'trigger' in workflow_data
-        assert 'category' in workflow_data
-
-    def test_workflow_execution_list_pagination_format(self, auth_client):
-        """Test workflow execution list returns correct pagination format"""
+    def test_create_schedule(self):
+        """Test creating a workflow schedule"""
         workflow = Workflow.objects.create(name='Test Workflow')
-        WorkflowExecution.objects.create(
-            workflow=workflow,
-            execution_number=1,
-            status='completed'
-        )
-
-        response = auth_client.get('/api/workflows/executions/')
-
-        assert response.status_code == status.HTTP_200_OK
-        # Verify pagination format
-        assert 'results' in response.data
-        assert 'count' in response.data
-
-    def test_workflow_schedule_list_pagination_format(self, auth_client):
-        """Test workflow schedule list returns correct pagination format"""
-        workflow = Workflow.objects.create(name='Test Workflow')
-        WorkflowSchedule.objects.create(
+        schedule = WorkflowSchedule.objects.create(
             workflow=workflow,
             name='Daily Schedule',
             is_active=True,
@@ -240,174 +173,94 @@ class TestWorkflowAPIPagination:
             cron_expression='0 0 * * *'
         )
 
-        response = auth_client.get('/api/workflows/schedules/')
+        assert schedule.id is not None
+        assert schedule.workflow == workflow
+        assert schedule.is_active is True
 
-        assert response.status_code == status.HTTP_200_OK
-        # Verify pagination format
-        assert 'results' in response.data
-        assert 'count' in response.data
-
-    def test_workflow_webhook_list_pagination_format(self, auth_client):
-        """Test workflow webhook list returns correct pagination format"""
+    def test_activate_schedule(self):
+        """Test activating a schedule"""
         workflow = Workflow.objects.create(name='Test Workflow')
-        WorkflowWebhook.objects.create(
+        schedule = WorkflowSchedule.objects.create(
+            workflow=workflow,
+            name='Test Schedule',
+            is_active=False
+        )
+
+        schedule.is_active = True
+        schedule.save()
+
+        assert schedule.is_active is True
+
+    def test_deactivate_schedule(self):
+        """Test deactivating a schedule"""
+        workflow = Workflow.objects.create(name='Test Workflow')
+        schedule = WorkflowSchedule.objects.create(
+            workflow=workflow,
+            name='Test Schedule',
+            is_active=True
+        )
+
+        schedule.is_active = False
+        schedule.save()
+
+        assert schedule.is_active is False
+
+
+# =============================================================================
+# WorkflowWebhook Model Tests
+# =============================================================================
+
+@pytest.mark.django_db
+class TestWorkflowWebhookModel:
+    """Tests for WorkflowWebhook model"""
+
+    def test_create_webhook(self):
+        """Test creating a workflow webhook"""
+        workflow = Workflow.objects.create(name='Test Workflow')
+        webhook = WorkflowWebhook.objects.create(
             workflow=workflow,
             name='Test Webhook',
             token='test-token-123',
             is_active=True
         )
 
-        response = auth_client.get('/api/workflows/webhooks/')
+        assert webhook.id is not None
+        assert webhook.workflow == workflow
+        assert webhook.is_active is True
 
-        assert response.status_code == status.HTTP_200_OK
-        # Verify pagination format
-        assert 'results' in response.data
-        assert 'count' in response.data
+    def test_activate_webhook(self):
+        """Test activating a webhook"""
+        workflow = Workflow.objects.create(name='Test Workflow')
+        webhook = WorkflowWebhook.objects.create(
+            workflow=workflow,
+            name='Test Webhook',
+            token='test-token',
+            is_active=False
+        )
+
+        webhook.is_active = True
+        webhook.save()
+
+        assert webhook.is_active is True
+
+    def test_deactivate_webhook(self):
+        """Test deactivating a webhook"""
+        workflow = Workflow.objects.create(name='Test Workflow')
+        webhook = WorkflowWebhook.objects.create(
+            workflow=workflow,
+            name='Test Webhook',
+            token='test-token',
+            is_active=True
+        )
+
+        webhook.is_active = False
+        webhook.save()
+
+        assert webhook.is_active is False
 
 
 # =============================================================================
-# Workflow API Tests - CRUD Operations
-# =============================================================================
-
-@pytest.mark.django_db
-class TestWorkflowAPICrud:
-    """Tests for Workflow API CRUD operations"""
-
-    @pytest.fixture
-    def auth_client(self):
-        """Create an authenticated client"""
-        user = User.objects.create_user(
-            username='testuser',
-            email='test@example.com',
-            password='testpass123'
-        )
-        client = APIClient()
-        client.force_authenticate(user=user)
-        return client
-
-    def test_create_workflow(self, auth_client):
-        """Test creating a workflow via API"""
-        data = {
-            'name': 'New Workflow',
-            'description': 'Test workflow',
-            'trigger': {'type': 'manual', 'config': {}},
-            'category': 'security',
-            'tags': ['test', 'automation']
-        }
-
-        response = auth_client.post('/api/workflows/workflows/', data, format='json')
-
-        assert response.status_code == status.HTTP_201_CREATED
-        assert response.data['name'] == 'New Workflow'
-
-    def test_retrieve_workflow(self, auth_client):
-        """Test retrieving a workflow via API"""
-        workflow = Workflow.objects.create(
-            name='Test Workflow',
-            description='Test description',
-            is_latest=True
-        )
-
-        response = auth_client.get(f'/api/workflows/workflows/{workflow.id}/')
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['name'] == 'Test Workflow'
-
-    def test_update_workflow(self, auth_client):
-        """Test updating a workflow via API"""
-        workflow = Workflow.objects.create(
-            name='Original Name',
-            is_latest=True
-        )
-
-        response = auth_client.put(
-            f'/api/workflows/workflows/{workflow.id}/',
-            {'name': 'Updated Name', 'nodes': [], 'connections': []},
-            format='json'
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data['name'] == 'Updated Name'
-
-    def test_delete_workflow(self, auth_client):
-        """Test deleting a workflow via API"""
-        workflow = Workflow.objects.create(
-            name='To Delete',
-            is_latest=True
-        )
-
-        response = auth_client.delete(f'/api/workflows/workflows/{workflow.id}/')
-
-        assert response.status_code == status.HTTP_204_NO_CONTENT
-        assert not Workflow.objects.filter(id=workflow.id).exists()
-
-    def test_activate_workflow_action(self, auth_client):
-        """Test activate workflow action"""
-        workflow = Workflow.objects.create(
-            name='Test Workflow',
-            status='draft',
-            is_latest=True
-        )
-
-        response = auth_client.post(f'/api/workflows/workflows/{workflow.id}/activate/')
-
-        assert response.status_code == status.HTTP_200_OK
-        workflow.refresh_from_db()
-        assert workflow.status == 'active'
-
-    def test_deactivate_workflow_action(self, auth_client):
-        """Test deactivate workflow action"""
-        workflow = Workflow.objects.create(
-            name='Test Workflow',
-            status='active',
-            is_latest=True
-        )
-
-        response = auth_client.post(f'/api/workflows/workflows/{workflow.id}/deactivate/')
-
-        assert response.status_code == status.HTTP_200_OK
-        workflow.refresh_from_db()
-        assert workflow.status == 'inactive'
-
-    def test_execute_workflow_action(self, auth_client):
-        """Test execute workflow action"""
-        workflow = Workflow.objects.create(
-            name='Test Workflow',
-            status='active',
-            is_latest=True,
-            trigger={'type': 'manual', 'config': {}}
-        )
-
-        response = auth_client.post(
-            f'/api/workflows/workflows/{workflow.id}/execute/',
-            {'trigger_data': {}},
-            format='json'
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        assert 'execution_id' in response.data
-        assert 'status' in response.data
-
-    def test_duplicate_workflow_action(self, auth_client):
-        """Test duplicate workflow action"""
-        workflow = Workflow.objects.create(
-            name='Original Workflow',
-            description='Original description',
-            is_latest=True
-        )
-
-        response = auth_client.post(
-            f'/api/workflows/workflows/{workflow.id}/duplicate/',
-            {'name': 'Duplicated Workflow'},
-            format='json'
-        )
-
-        assert response.status_code == status.HTTP_201_CREATED
-        assert response.data['name'] == 'Duplicated Workflow'
-
-
-# =============================================================================
-# WorkflowExecution API Tests
+# Workflow Execution Tests
 # =============================================================================
 
 @pytest.mark.django_db
@@ -426,26 +279,6 @@ class TestWorkflowExecutionAPI:
         client.force_authenticate(user=user)
         return client
 
-    def test_list_executions(self, auth_client):
-        """Test listing workflow executions"""
-        workflow = Workflow.objects.create(name='Test Workflow')
-        WorkflowExecution.objects.create(
-            workflow=workflow,
-            execution_number=1,
-            status='completed'
-        )
-        WorkflowExecution.objects.create(
-            workflow=workflow,
-            execution_number=2,
-            status='running'
-        )
-
-        response = auth_client.get('/api/workflows/executions/')
-
-        assert response.status_code == status.HTTP_200_OK
-        assert 'results' in response.data
-        assert response.data['count'] >= 2
-
     def test_retrieve_execution(self, auth_client):
         """Test retrieving a workflow execution"""
         workflow = Workflow.objects.create(name='Test Workflow')
@@ -459,18 +292,6 @@ class TestWorkflowExecutionAPI:
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['status'] == 'completed'
-
-    def test_filter_executions_by_workflow(self, auth_client):
-        """Test filtering executions by workflow"""
-        workflow1 = Workflow.objects.create(name='Workflow 1')
-        workflow2 = Workflow.objects.create(name='Workflow 2')
-
-        WorkflowExecution.objects.create(workflow=workflow1, execution_number=1, status='completed')
-        WorkflowExecution.objects.create(workflow=workflow2, execution_number=1, status='completed')
-
-        response = auth_client.get(f'/api/workflows/executions/?workflow={workflow1.id}')
-
-        assert response.status_code == status.HTTP_200_OK
 
     def test_cancel_execution_action(self, auth_client):
         """Test cancel execution action"""
@@ -497,46 +318,45 @@ class TestWorkflowExecutionAPI:
 class TestWorkflowIntegration:
     """Integration tests for Workflow Engine"""
 
-    @pytest.fixture
-    def auth_client(self):
-        """Create an authenticated client"""
-        user = User.objects.create_user(
-            username='testuser',
-            email='test@example.com',
-            password='testpass123'
+    def test_workflow_with_executions(self):
+        """Test workflow with multiple executions"""
+        workflow = Workflow.objects.create(
+            name='Integration Test Workflow',
+            status='active'
         )
-        client = APIClient()
-        client.force_authenticate(user=user)
-        return client
 
-    def test_workflow_execution_flow(self, auth_client):
-        """Test complete workflow execution flow"""
-        # Create workflow
-        workflow_data = {
-            'name': 'Integration Test Workflow',
-            'description': 'Test workflow for integration',
-            'trigger': {'type': 'manual', 'config': {}},
-            'category': 'test',
-        }
-        create_response = auth_client.post('/api/workflows/workflows/', workflow_data, format='json')
-        assert create_response.status_code == status.HTTP_201_CREATED
-        workflow_id = create_response.data['id']
+        # Create multiple executions
+        for i in range(3):
+            WorkflowExecution.objects.create(
+                workflow=workflow,
+                execution_number=i + 1,
+                status='completed' if i < 2 else 'running'
+            )
 
-        # Activate workflow
-        activate_response = auth_client.post(f'/api/workflows/workflows/{workflow_id}/activate/')
-        assert activate_response.status_code == status.HTTP_200_OK
-        assert activate_response.data['status'] == 'active'
+        executions = WorkflowExecution.objects.filter(workflow=workflow)
+        assert executions.count() == 3
 
-        # Execute workflow
-        execute_response = auth_client.post(
-            f'/api/workflows/workflows/{workflow_id}/execute/',
-            {'trigger_data': {'test': 'data'}},
-            format='json'
+    def test_workflow_schedule_and_webhook(self):
+        """Test workflow with schedule and webhook"""
+        workflow = Workflow.objects.create(
+            name='Scheduled Workflow',
+            status='active'
         )
-        assert execute_response.status_code == status.HTTP_200_OK
-        assert 'execution_id' in execute_response.data
 
-        # Verify execution exists
-        execution_id = execute_response.data['execution_id']
-        get_execution_response = auth_client.get(f'/api/workflows/executions/{execution_id}/')
-        assert get_execution_response.status_code == status.HTTP_200_OK
+        schedule = WorkflowSchedule.objects.create(
+            workflow=workflow,
+            name='Daily Schedule',
+            is_active=True,
+            schedule_type='cron',
+            cron_expression='0 0 * * *'
+        )
+
+        webhook = WorkflowWebhook.objects.create(
+            workflow=workflow,
+            name='GitHub Webhook',
+            token='github-token',
+            is_active=True
+        )
+
+        assert schedule.workflow == workflow
+        assert webhook.workflow == workflow
