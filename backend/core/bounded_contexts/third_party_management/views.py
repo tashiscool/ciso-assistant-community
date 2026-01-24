@@ -20,7 +20,7 @@ class ThirdPartyViewSet(viewsets.ModelViewSet):
     serializer_class = ThirdPartySerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['lifecycle_state', 'criticality']
+    filterset_fields = ['lifecycle_state', 'criticality', 'entity_type']
     search_fields = ['name', 'description']
     ordering_fields = ['name', 'created_at']
     ordering = ['name']
@@ -48,4 +48,40 @@ class ThirdPartyViewSet(viewsets.ModelViewSet):
         third_party.archive()
         third_party.save()
         return Response({'status': 'archived'})
+
+    @action(detail=True, methods=['post'])
+    def add_service(self, request, pk=None):
+        """Add a service to a third party"""
+        third_party = self.get_object()
+        service_id = request.data.get('service_id')
+        if service_id:
+            import uuid
+            third_party.add_service(uuid.UUID(service_id))
+            third_party.save()
+            return Response({'status': 'service added'})
+        return Response({'error': 'service_id required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'])
+    def add_contract(self, request, pk=None):
+        """Add a contract to a third party"""
+        third_party = self.get_object()
+        contract_id = request.data.get('contract_id')
+        if contract_id:
+            import uuid
+            third_party.add_contract(uuid.UUID(contract_id))
+            third_party.save()
+            return Response({'status': 'contract added'})
+        return Response({'error': 'contract_id required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'])
+    def add_risk(self, request, pk=None):
+        """Add a risk to a third party"""
+        third_party = self.get_object()
+        risk_id = request.data.get('risk_id')
+        if risk_id:
+            import uuid
+            third_party.add_risk(uuid.UUID(risk_id))
+            third_party.save()
+            return Response({'status': 'risk added'})
+        return Response({'error': 'risk_id required'}, status=status.HTTP_400_BAD_REQUEST)
 

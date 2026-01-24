@@ -22,13 +22,15 @@ from .api import (
 )
 
 router = routers.DefaultRouter()
-router.register(r'', WorkflowViewSet, basename='workflows')
+# Register specific routes first to avoid them being matched by the catch-all pattern
 router.register(r'executions', WorkflowExecutionViewSet, basename='workflow-executions')
 router.register(r'schedules', WorkflowScheduleViewSet, basename='workflow-schedules')
 router.register(r'webhooks', WorkflowWebhookViewSet, basename='workflow-webhooks')
 router.register(r'templates', WorkflowTemplateViewSet, basename='workflow-templates')
 router.register(r'assessments', MasterAssessmentViewSet, basename='assessments')
 router.register(r'assessment-tasks', AssessmentTaskViewSet, basename='assessment-tasks')
+# Register workflows last with empty prefix
+router.register(r'', WorkflowViewSet, basename='workflows')
 
 urlpatterns = [
     path('', include(router.urls)),

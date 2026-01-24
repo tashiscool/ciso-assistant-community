@@ -65,10 +65,10 @@ class TestThirdPartyViewSetCRUD:
 
     def test_list_third_parties(self, authenticated_client, test_folder):
         """Test listing all third parties."""
-        ThirdParty.objects.create(name='Vendor A', folder=test_folder)
-        ThirdParty.objects.create(name='Vendor B', folder=test_folder)
+        ThirdParty.objects.create(name='Vendor A')
+        ThirdParty.objects.create(name='Vendor B')
 
-        response = authenticated_client.get('/api/third-party/third-parties/')
+        response = authenticated_client.get('/api/third-party/entities/')
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -81,11 +81,11 @@ class TestThirdPartyViewSetCRUD:
             'description': 'Primary cloud infrastructure provider',
             'entity_type': 'vendor',
             'criticality': 'high',
-            'folder': str(test_folder.id),
+            
         }
 
         response = authenticated_client.post(
-            '/api/third-party/third-parties/',
+            '/api/third-party/entities/',
             data=payload,
             format='json'
         )
@@ -99,11 +99,10 @@ class TestThirdPartyViewSetCRUD:
         """Test retrieving a single third party."""
         tp = ThirdParty.objects.create(
             name='Test Vendor',
-            description='Test description',
-            folder=test_folder
+            description='Test description'
         )
 
-        response = authenticated_client.get(f'/api/third-party/third-parties/{tp.id}/')
+        response = authenticated_client.get(f'/api/third-party/entities/{tp.id}/')
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -113,18 +112,17 @@ class TestThirdPartyViewSetCRUD:
         """Test updating a third party via API."""
         tp = ThirdParty.objects.create(
             name='Original Name',
-            criticality='low',
-            folder=test_folder
+            criticality='low'
         )
 
         payload = {
             'name': 'Updated Name',
             'criticality': 'high',
-            'folder': str(test_folder.id),
+            
         }
 
         response = authenticated_client.put(
-            f'/api/third-party/third-parties/{tp.id}/',
+            f'/api/third-party/entities/{tp.id}/',
             data=payload,
             format='json'
         )
@@ -138,12 +136,11 @@ class TestThirdPartyViewSetCRUD:
         """Test partial update (PATCH) of a third party."""
         tp = ThirdParty.objects.create(
             name='Test Vendor',
-            criticality='low',
-            folder=test_folder
+            criticality='low'
         )
 
         response = authenticated_client.patch(
-            f'/api/third-party/third-parties/{tp.id}/',
+            f'/api/third-party/entities/{tp.id}/',
             data={'criticality': 'critical'},
             format='json'
         )
@@ -154,9 +151,9 @@ class TestThirdPartyViewSetCRUD:
 
     def test_delete_third_party(self, authenticated_client, test_folder):
         """Test deleting a third party."""
-        tp = ThirdParty.objects.create(name='To Delete', folder=test_folder)
+        tp = ThirdParty.objects.create(name='To Delete')
 
-        response = authenticated_client.delete(f'/api/third-party/third-parties/{tp.id}/')
+        response = authenticated_client.delete(f'/api/third-party/entities/{tp.id}/')
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not ThirdParty.objects.filter(id=tp.id).exists()
@@ -175,11 +172,11 @@ class TestThirdPartyEntityTypes:
         payload = {
             'name': 'Vendor Inc',
             'entity_type': 'vendor',
-            'folder': str(test_folder.id),
+            
         }
 
         response = authenticated_client.post(
-            '/api/third-party/third-parties/',
+            '/api/third-party/entities/',
             data=payload,
             format='json'
         )
@@ -192,11 +189,11 @@ class TestThirdPartyEntityTypes:
         payload = {
             'name': 'Partner Corp',
             'entity_type': 'partner',
-            'folder': str(test_folder.id),
+            
         }
 
         response = authenticated_client.post(
-            '/api/third-party/third-parties/',
+            '/api/third-party/entities/',
             data=payload,
             format='json'
         )
@@ -209,11 +206,11 @@ class TestThirdPartyEntityTypes:
         payload = {
             'name': 'Services LLC',
             'entity_type': 'service_provider',
-            'folder': str(test_folder.id),
+            
         }
 
         response = authenticated_client.post(
-            '/api/third-party/third-parties/',
+            '/api/third-party/entities/',
             data=payload,
             format='json'
         )
@@ -234,12 +231,11 @@ class TestThirdPartyLifecycle:
         """Test activating a third party via API action."""
         tp = ThirdParty.objects.create(
             name='Prospect Vendor',
-            lifecycle_state='prospect',
-            folder=test_folder
+            lifecycle_state='prospect'
         )
 
         response = authenticated_client.post(
-            f'/api/third-party/third-parties/{tp.id}/activate/',
+            f'/api/third-party/entities/{tp.id}/activate/',
             format='json'
         )
 
@@ -251,12 +247,11 @@ class TestThirdPartyLifecycle:
         """Test starting offboarding via API action."""
         tp = ThirdParty.objects.create(
             name='Active Vendor',
-            lifecycle_state='active',
-            folder=test_folder
+            lifecycle_state='active'
         )
 
         response = authenticated_client.post(
-            f'/api/third-party/third-parties/{tp.id}/start_offboarding/',
+            f'/api/third-party/entities/{tp.id}/start_offboarding/',
             format='json'
         )
 
@@ -268,12 +263,11 @@ class TestThirdPartyLifecycle:
         """Test archiving a third party via API action."""
         tp = ThirdParty.objects.create(
             name='Offboarding Vendor',
-            lifecycle_state='offboarding',
-            folder=test_folder
+            lifecycle_state='offboarding'
         )
 
         response = authenticated_client.post(
-            f'/api/third-party/third-parties/{tp.id}/archive/',
+            f'/api/third-party/entities/{tp.id}/archive/',
             format='json'
         )
 
@@ -292,44 +286,44 @@ class TestThirdPartyFiltering:
 
     def test_filter_by_entity_type(self, authenticated_client, test_folder):
         """Test filtering by entity type."""
-        ThirdParty.objects.create(name='Vendor 1', entity_type='vendor', folder=test_folder)
-        ThirdParty.objects.create(name='Partner 1', entity_type='partner', folder=test_folder)
+        ThirdParty.objects.create(name='Vendor 1', entity_type='vendor')
+        ThirdParty.objects.create(name='Partner 1', entity_type='partner')
 
         response = authenticated_client.get(
-            '/api/third-party/third-parties/?entity_type=vendor'
+            '/api/third-party/entities/?entity_type=vendor'
         )
 
         assert response.status_code == status.HTTP_200_OK
 
     def test_filter_by_criticality(self, authenticated_client, test_folder):
         """Test filtering by criticality."""
-        ThirdParty.objects.create(name='High Risk', criticality='high', folder=test_folder)
-        ThirdParty.objects.create(name='Low Risk', criticality='low', folder=test_folder)
+        ThirdParty.objects.create(name='High Risk', criticality='high')
+        ThirdParty.objects.create(name='Low Risk', criticality='low')
 
         response = authenticated_client.get(
-            '/api/third-party/third-parties/?criticality=high'
+            '/api/third-party/entities/?criticality=high'
         )
 
         assert response.status_code == status.HTTP_200_OK
 
     def test_filter_by_lifecycle_state(self, authenticated_client, test_folder):
         """Test filtering by lifecycle state."""
-        ThirdParty.objects.create(name='Active Vendor', lifecycle_state='active', folder=test_folder)
-        ThirdParty.objects.create(name='Prospect', lifecycle_state='prospect', folder=test_folder)
+        ThirdParty.objects.create(name='Active Vendor', lifecycle_state='active')
+        ThirdParty.objects.create(name='Prospect', lifecycle_state='prospect')
 
         response = authenticated_client.get(
-            '/api/third-party/third-parties/?lifecycle_state=active'
+            '/api/third-party/entities/?lifecycle_state=active'
         )
 
         assert response.status_code == status.HTTP_200_OK
 
     def test_search_by_name(self, authenticated_client, test_folder):
         """Test searching by name."""
-        ThirdParty.objects.create(name='Cloud Provider Inc', folder=test_folder)
-        ThirdParty.objects.create(name='Security Vendor', folder=test_folder)
+        ThirdParty.objects.create(name='Cloud Provider Inc')
+        ThirdParty.objects.create(name='Security Vendor')
 
         response = authenticated_client.get(
-            '/api/third-party/third-parties/?search=Cloud'
+            '/api/third-party/entities/?search=Cloud'
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -345,11 +339,11 @@ class TestThirdPartyAssociations:
 
     def test_add_service_association(self, authenticated_client, test_folder):
         """Test adding a service to a third party."""
-        tp = ThirdParty.objects.create(name='Test Vendor', folder=test_folder)
+        tp = ThirdParty.objects.create(name='Test Vendor')
         service_id = str(uuid.uuid4())
 
         response = authenticated_client.post(
-            f'/api/third-party/third-parties/{tp.id}/add_service/',
+            f'/api/third-party/entities/{tp.id}/add_service/',
             data={'service_id': service_id},
             format='json'
         )
@@ -358,11 +352,11 @@ class TestThirdPartyAssociations:
 
     def test_add_contract_association(self, authenticated_client, test_folder):
         """Test adding a contract to a third party."""
-        tp = ThirdParty.objects.create(name='Test Vendor', folder=test_folder)
+        tp = ThirdParty.objects.create(name='Test Vendor')
         contract_id = str(uuid.uuid4())
 
         response = authenticated_client.post(
-            f'/api/third-party/third-parties/{tp.id}/add_contract/',
+            f'/api/third-party/entities/{tp.id}/add_contract/',
             data={'contract_id': contract_id},
             format='json'
         )
@@ -371,11 +365,11 @@ class TestThirdPartyAssociations:
 
     def test_add_risk_association(self, authenticated_client, test_folder):
         """Test adding a risk to a third party."""
-        tp = ThirdParty.objects.create(name='Test Vendor', folder=test_folder)
+        tp = ThirdParty.objects.create(name='Test Vendor')
         risk_id = str(uuid.uuid4())
 
         response = authenticated_client.post(
-            f'/api/third-party/third-parties/{tp.id}/add_risk/',
+            f'/api/third-party/entities/{tp.id}/add_risk/',
             data={'risk_id': risk_id},
             format='json'
         )
@@ -395,11 +389,10 @@ class TestThirdPartyRiskCompliance:
         """Test that risk_level is included in API response."""
         tp = ThirdParty.objects.create(
             name='Critical Vendor',
-            criticality='critical',
-            folder=test_folder
+            criticality='critical'
         )
 
-        response = authenticated_client.get(f'/api/third-party/third-parties/{tp.id}/')
+        response = authenticated_client.get(f'/api/third-party/entities/{tp.id}/')
 
         assert response.status_code == status.HTTP_200_OK
         assert 'risk_level' in response.json()
@@ -410,11 +403,10 @@ class TestThirdPartyRiskCompliance:
         tp = ThirdParty.objects.create(
             name='Compliant Vendor',
             lifecycle_state='active',
-            assessmentRunIds=[uuid.uuid4()],
-            folder=test_folder
+            assessmentRunIds=[uuid.uuid4()]
         )
 
-        response = authenticated_client.get(f'/api/third-party/third-parties/{tp.id}/')
+        response = authenticated_client.get(f'/api/third-party/entities/{tp.id}/')
 
         assert response.status_code == status.HTTP_200_OK
         assert 'compliance_status' in response.json()
@@ -423,11 +415,10 @@ class TestThirdPartyRiskCompliance:
         """Test that contract_status is included in API response."""
         tp = ThirdParty.objects.create(
             name='Active Vendor',
-            lifecycle_state='active',
-            folder=test_folder
+            lifecycle_state='active'
         )
 
-        response = authenticated_client.get(f'/api/third-party/third-parties/{tp.id}/')
+        response = authenticated_client.get(f'/api/third-party/entities/{tp.id}/')
 
         assert response.status_code == status.HTTP_200_OK
         assert 'contract_status' in response.json()
@@ -445,19 +436,19 @@ class TestThirdPartyBulkOperations:
         """Test pagination of third party list."""
         # Create multiple third parties
         for i in range(25):
-            ThirdParty.objects.create(name=f'Vendor {i}', folder=test_folder)
+            ThirdParty.objects.create(name=f'Vendor {i}')
 
-        response = authenticated_client.get('/api/third-party/third-parties/')
+        response = authenticated_client.get('/api/third-party/entities/')
 
         assert response.status_code == status.HTTP_200_OK
 
     def test_bulk_activate(self, authenticated_client, test_folder):
         """Test bulk activation of third parties."""
-        tp1 = ThirdParty.objects.create(name='V1', lifecycle_state='prospect', folder=test_folder)
-        tp2 = ThirdParty.objects.create(name='V2', lifecycle_state='prospect', folder=test_folder)
+        tp1 = ThirdParty.objects.create(name='V1', lifecycle_state='prospect')
+        tp2 = ThirdParty.objects.create(name='V2', lifecycle_state='prospect')
 
         response = authenticated_client.post(
-            '/api/third-party/third-parties/bulk_activate/',
+            '/api/third-party/entities/bulk_activate/',
             data={'ids': [str(tp1.id), str(tp2.id)]},
             format='json'
         )
@@ -478,12 +469,12 @@ class TestThirdPartyIntegration:
         """Test full third party lifecycle via API."""
         # Create as prospect
         create_response = authenticated_client.post(
-            '/api/third-party/third-parties/',
+            '/api/third-party/entities/',
             data={
                 'name': 'Lifecycle Test Vendor',
                 'entity_type': 'vendor',
                 'criticality': 'medium',
-                'folder': str(test_folder.id),
+                
             },
             format='json'
         )
@@ -492,21 +483,21 @@ class TestThirdPartyIntegration:
 
         # Activate
         activate_response = authenticated_client.post(
-            f'/api/third-party/third-parties/{tp_id}/activate/',
+            f'/api/third-party/entities/{tp_id}/activate/',
             format='json'
         )
         assert activate_response.status_code == 200
 
         # Start offboarding
         offboard_response = authenticated_client.post(
-            f'/api/third-party/third-parties/{tp_id}/start_offboarding/',
+            f'/api/third-party/entities/{tp_id}/start_offboarding/',
             format='json'
         )
         assert offboard_response.status_code == 200
 
         # Archive
         archive_response = authenticated_client.post(
-            f'/api/third-party/third-parties/{tp_id}/archive/',
+            f'/api/third-party/entities/{tp_id}/archive/',
             format='json'
         )
         assert archive_response.status_code == 200
@@ -519,11 +510,11 @@ class TestThirdPartyIntegration:
         """Test creating a vendor with all associations."""
         # Create vendor
         response = authenticated_client.post(
-            '/api/third-party/third-parties/',
+            '/api/third-party/entities/',
             data={
                 'name': 'Full Association Vendor',
                 'entity_type': 'vendor',
-                'folder': str(test_folder.id),
+                
             },
             format='json'
         )
@@ -532,17 +523,17 @@ class TestThirdPartyIntegration:
 
         # Add associations
         authenticated_client.post(
-            f'/api/third-party/third-parties/{tp_id}/add_service/',
+            f'/api/third-party/entities/{tp_id}/add_service/',
             data={'service_id': str(uuid.uuid4())},
             format='json'
         )
         authenticated_client.post(
-            f'/api/third-party/third-parties/{tp_id}/add_contract/',
+            f'/api/third-party/entities/{tp_id}/add_contract/',
             data={'contract_id': str(uuid.uuid4())},
             format='json'
         )
         authenticated_client.post(
-            f'/api/third-party/third-parties/{tp_id}/add_risk/',
+            f'/api/third-party/entities/{tp_id}/add_risk/',
             data={'risk_id': str(uuid.uuid4())},
             format='json'
         )
