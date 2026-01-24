@@ -16,28 +16,28 @@ This module provides services for OSCAL document manipulation:
 def __getattr__(name):
     """Lazy import to avoid circular dependencies and optional dependency issues"""
     if name == 'OSCALImporter':
-        from backend.oscal_integration.services.oscal_importer import OSCALImporter
+        from oscal_integration.services.oscal_importer import OSCALImporter
         return OSCALImporter
     elif name == 'OSCALExporter':
-        from backend.oscal_integration.services.oscal_exporter import OSCALExporter
+        from oscal_integration.services.oscal_exporter import OSCALExporter
         return OSCALExporter
     elif name == 'SSPGenerator':
-        from backend.oscal_integration.services.ssp_generator import SSPGenerator
+        from oscal_integration.services.ssp_generator import SSPGenerator
         return SSPGenerator
     elif name == 'SSPImporter':
-        from backend.oscal_integration.services.ssp_importer import SSPImporter
+        from oscal_integration.services.ssp_importer import SSPImporter
         return SSPImporter
     elif name == 'FedRAMPValidator':
-        from backend.oscal_integration.services.fedramp_validator import FedRAMPValidator
+        from oscal_integration.services.fedramp_validator import FedRAMPValidator
         return FedRAMPValidator
     elif name == 'TrestleService':
-        from backend.oscal_integration.services.trestle_service import TrestleService
+        from oscal_integration.services.trestle_service import TrestleService
         return TrestleService
     elif name == 'FedRAMPEnhancedService':
-        from backend.oscal_integration.services.fedramp_enhanced import FedRAMPEnhancedService
+        from oscal_integration.services.fedramp_enhanced import FedRAMPEnhancedService
         return FedRAMPEnhancedService
     elif name == 'OpenControlConverter':
-        from backend.oscal_integration.services.opencontrol_converter import OpenControlConverter
+        from oscal_integration.services.opencontrol_converter import OpenControlConverter
         return OpenControlConverter
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
