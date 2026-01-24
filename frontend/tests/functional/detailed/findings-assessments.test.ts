@@ -94,7 +94,7 @@ test('user can create findings inside a follow up', async ({
 				name: vars.evidenceName + ' from followup',
 				description: vars.description,
 				attachment: vars.file,
-				link: 'https://intuitem.com/'
+				link: 'https://ciso-assistant.com/'
 			},
 			undefined,
 			page,

@@ -1,7 +1,7 @@
 services:
   backend:
     container_name: backend
-    image: ghcr.io/intuitem/ciso-assistant-enterprise/backend:latest
+    image: ghcr.io/tashiscool/ciso-assistant-enterprise/backend:latest
     restart: always
     environment:
       - ALLOWED_HOSTS=backend,cool-vm
@@ -13,7 +13,7 @@ services:
 
   # huey:
   #   container_name: huey
-  #   image: ghcr.io/intuitem/ciso-assistant-community/backend:latest
+  #   image: ghcr.io/tashiscool/ciso-assistant-community/backend:latest
   #   restart: always
   #   environment:
   #     - ALLOWED_HOSTS=backend,localhost
@@ -34,7 +34,7 @@ services:
       - PROTOCOL_HEADER=x-forwarded-proto
       - HOST_HEADER=x-forwarded-host
 
-    image: ghcr.io/intuitem/ciso-assistant-enterprise/frontend:latest
+    image: ghcr.io/tashiscool/ciso-assistant-enterprise/frontend:latest
     depends_on:
       - backend
 

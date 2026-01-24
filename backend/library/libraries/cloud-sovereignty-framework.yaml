@@ -1,6 +1,6 @@
 convert_library_version: 'v2 ; Compat Mode: [0] {[v2.1] (DEFAULT) Don''t use any Compatibility
   Mode}'
-urn: urn:intuitem:risk:library:cloud-sovereignty-framework
+urn: urn:ciso:risk:library:cloud-sovereignty-framework
 locale: en
 ref_id: cloud-sovereignty-framework
 name: Cloud Sovereignty Framework
@@ -9,10 +9,10 @@ copyright: EUROPEAN COMMISSION
 version: 2
 publication_date: 2025-10-30
 provider: EUROPEAN COMMISSION
-packager: intuitem
+packager: ciso-assistant
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:cloud-sovereignty-framework
+    urn: urn:ciso:risk:framework:cloud-sovereignty-framework
     ref_id: cloud-sovereignty-framework
     name: Cloud Sovereignty Framework
     description: Cloud Sovereignty Framework - version 1.2.1 - Oct 2025
@@ -51,7 +51,7 @@ objects:
         Technology and operations under complete EU control, subject only to EU law,
         with no critical non-EU dependencies.'
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:cloud-sovereignty-framework:sov-1
+    - urn: urn:ciso:risk:req_node:cloud-sovereignty-framework:sov-1
       assessable: true
       depth: 1
       ref_id: SOV-1
@@ -75,7 +75,7 @@ objects:
         - Ability to sustain secure operations against requests to cease or suspend
         the service, or if vendor support is withdrawn or disrupted.'
       weight: 15
-    - urn: urn:intuitem:risk:req_node:cloud-sovereignty-framework:sov-2
+    - urn: urn:ciso:risk:req_node:cloud-sovereignty-framework:sov-2
       assessable: true
       depth: 1
       ref_id: SOV-2
@@ -98,7 +98,7 @@ objects:
         \ creation, registration, and development (EU vs. third countries), legal\
         \ jurisdiction where IP is created and developed."
       weight: 10
-    - urn: urn:intuitem:risk:req_node:cloud-sovereignty-framework:sov-3
+    - urn: urn:ciso:risk:req_node:cloud-sovereignty-framework:sov-3
       assessable: true
       depth: 1
       ref_id: SOV-3
@@ -123,7 +123,7 @@ objects:
         and governed under EU control, minimizing dependency on non-EU technology
         stacks.'
       weight: 10
-    - urn: urn:intuitem:risk:req_node:cloud-sovereignty-framework:sov-4
+    - urn: urn:ciso:risk:req_node:cloud-sovereignty-framework:sov-4
       assessable: true
       depth: 1
       ref_id: SOV-4
@@ -154,7 +154,7 @@ objects:
         - Location and legal control of critical suppliers or subcontractors involved
         in service delivery.'
       weight: 15
-    - urn: urn:intuitem:risk:req_node:cloud-sovereignty-framework:sov-5
+    - urn: urn:ciso:risk:req_node:cloud-sovereignty-framework:sov-5
       assessable: true
       depth: 1
       ref_id: SOV-5
@@ -179,7 +179,7 @@ objects:
         - Visibility into the entire supplier and sub-supplier chain, including audit
         rights.'
       weight: 20
-    - urn: urn:intuitem:risk:req_node:cloud-sovereignty-framework:sov-6
+    - urn: urn:ciso:risk:req_node:cloud-sovereignty-framework:sov-6
       assessable: true
       depth: 1
       ref_id: SOV-6
@@ -205,7 +205,7 @@ objects:
         - Degree of EU independence in high-performance computing capabilities, including
         processors, accelerators, and software ecosystems.'
       weight: 15
-    - urn: urn:intuitem:risk:req_node:cloud-sovereignty-framework:sov-7
+    - urn: urn:ciso:risk:req_node:cloud-sovereignty-framework:sov-7
       assessable: true
       depth: 1
       ref_id: SOV-7
@@ -235,7 +235,7 @@ objects:
         - Capacity for EU entities to perform independent security and compliance
         audits with full access.'
       weight: 10
-    - urn: urn:intuitem:risk:req_node:cloud-sovereignty-framework:sov-8
+    - urn: urn:ciso:risk:req_node:cloud-sovereignty-framework:sov-8
       assessable: true
       depth: 1
       ref_id: SOV-8

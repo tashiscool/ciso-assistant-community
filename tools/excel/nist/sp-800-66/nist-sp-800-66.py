@@ -18,7 +18,7 @@ input_file_name = args.filename
 output_file_name = "nist-sp-800-66-rev2.xlsx"
 
 library_copyright = """With the exception of material marked as copyrighted, information presented on NIST sites are considered public information and may be distributed or copied."""
-packager = "intuitem"
+packager = "ciso"
 
 library_description = """Implementing the Health Insurance Portability and Accountability Act (HIPAA) Security Rule: A Cybersecurity Resource Guide, 2.0.0
 Source: https://csrc.nist.gov/Projects/cprt/catalog#/cprt/framework/version/SP800_66_2_0_0/home

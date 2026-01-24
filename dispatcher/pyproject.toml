@@ -3,7 +3,7 @@ name = "ciso-assistant-dispatcher"
 version = "0.1.0"
 description = "Kafka-compatible message dispatcher for CISO Assistant"
 readme = "README.md"
-authors = [{ name = "intuitem", email = "contact@intuitem.com" }]
+authors = [{ name = "ciso", email = "contact@ciso.com" }]
 requires-python = "<4.0,>=3.11"
 dependencies = [
   "kafka-python[snappy]<3.0.0,>=2.0.6",

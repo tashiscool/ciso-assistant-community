@@ -1,4 +1,4 @@
-urn: urn:intuitem:risk:library:risk-matrix-4x4-ebios-rm
+urn: urn:ciso:risk:library:risk-matrix-4x4-ebios-rm
 locale: en
 ref_id: risk-matrix-4x4-ebios-rm
 name: 4x4 risk matrix from EBIOS-RM
@@ -6,15 +6,15 @@ description: based on the official guide of the EBIOS RM approach
 copyright: public domain
 version: 4
 publication_date: 2025-05-02
-provider: intuitem
-packager: intuitem
+provider: ciso
+packager: ciso-assistant
 translations:
   fr:
     name: Matrice 4x4 EBIOS-RM
     description: "Bas\xE9e sur le guide officiel de la m\xE9thode EBIOS RM"
 objects:
   risk_matrix:
-  - urn: urn:intuitem:risk:matrix:risk-matrix-4x4-ebios-rm
+  - urn: urn:ciso:risk:matrix:risk-matrix-4x4-ebios-rm
     ref_id: risk-matrix-4x4-ebios-rm
     name: 4x4 risk matrix from EBIOS-RM
     description: based on the official guide of the EBIOS RM approach

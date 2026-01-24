@@ -324,7 +324,7 @@ async def create_risk_scenario(
         current_impact: Impact 0-4 (0=very low, 4=very high)
         assets: List of asset IDs/names
         threats: List of threat IDs/names
-        threat_library: Library URN to filter threats (e.g. "urn:intuitem:risk:library:intuitem-common-catalog")
+        threat_library: Library URN to filter threats (e.g. "urn:ciso:risk:library:ciso-common-catalog")
         applied_controls: List of planned control IDs/names
         existing_applied_controls: List of existing control IDs/names
     """
@@ -672,7 +672,7 @@ async def create_quantitative_risk_scenario(
         folder_id: Folder ID/name
         assets: List of asset IDs/names
         threats: List of threat IDs/names
-        threat_library: Library URN to filter threats (e.g. "urn:intuitem:risk:library:intuitem-common-catalog")
+        threat_library: Library URN to filter threats (e.g. "urn:ciso:risk:library:ciso-common-catalog")
     """
     try:
         from ..resolvers import resolve_id_or_name, resolve_asset_id

@@ -96,7 +96,7 @@ fw_urn = "anssi-points-de-controle-active-directory"
 fw_id = fw_urn
 copyright = "ANSSI"
 provider = copyright
-packager = "intuitem"
+packager = "ciso"
 
 # -------------------------------------------------------------------
 # Utility functions for text / Markdown processing

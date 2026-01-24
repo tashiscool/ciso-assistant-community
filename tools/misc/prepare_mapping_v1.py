@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument("source_yaml")
 parser.add_argument("target_yaml")
 args = parser.parse_args()
-packager = "intuitem"
+packager = "ciso"
 
 print("parsing", args.source_yaml, args.target_yaml)
 with open(args.source_yaml, "r", encoding="utf-8") as file:

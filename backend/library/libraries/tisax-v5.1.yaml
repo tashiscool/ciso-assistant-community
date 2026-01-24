@@ -1,4 +1,4 @@
-urn: urn:intuitem:risk:library:tisax-v5.1
+urn: urn:ciso:risk:library:tisax-v5.1
 locale: en
 ref_id: TISAX v5.1
 name: 'Trusted Information Security Assessment Exchange    '
@@ -24,10 +24,10 @@ copyright: "Publisher: VERBAND DER AUTOMOBILINDUSTRIE e.\_V. (VDA, German Associ
 version: 1
 publication_date: 2024-06-18
 provider: VDA
-packager: intuitem
+packager: ciso-assistant
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:tisax-v5.1
+    urn: urn:ciso:risk:framework:tisax-v5.1
     ref_id: TISAX v5.1
     name: Trusted Information Security Assessment Exchange
     description: 'VDA ISA provides the basis for
@@ -109,27 +109,27 @@ objects:
         high or very high protection, the minimum requirements for prototype protection
         must be applied.
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1
       assessable: false
       depth: 1
       ref_id: '1'
       name: IS Policies and Organization
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1
       ref_id: '1.1'
       description: Information Security Policies
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.1.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.1.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.1
       ref_id: 1.1.1
       description: To what extent are information security policies available?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node5
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node5
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.1.1
       name: (must)
       description: "+ The requirements for information security have been determined\
         \ and documented:\n  - The requirements are adapted to the organization\u2019\
@@ -138,10 +138,10 @@ objects:
         \ within the organization."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node6
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node6
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.1.1
       name: (should)
       description: "+ The information security requirements based on the strategy\
         \ of the organization, legislation and contracts are taken into account in\
@@ -154,22 +154,22 @@ objects:
         \ are informed of any changes relevant to them."
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1
       ref_id: '1.2'
       description: Organization of Information Security
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.2.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.2
       ref_id: 1.2.1
       description: To what extent is information security managed within the organization?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node9
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node9
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.2.1
       name: (must)
       description: "+ The scope of the ISMS (the organization managed by the ISMS)\
         \ is defined.\n+ The organization's requirements for the ISMS are determined.\n\
@@ -181,16 +181,16 @@ objects:
         \ the management."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.2.2
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.2
       ref_id: 1.2.2
       description: To what extent are information security responsibilities organized?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node11
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node11
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.2.2
       name: (must)
       description: '+ Responsibilities for information security within the organization
         are defined, documented and assigned.
@@ -203,45 +203,45 @@ objects:
         partners.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node12
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node12
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.2.2
       name: (should)
       description: + There is a definition and documentation of an adequate information
         security structure within the organization.
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node13
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node13
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.2.2
       name: (for high protection needs)
       description: + An appropriate organizational separation of responsibilities
         should be established in order to avoid conflict of interests (separation
         of duties). (C, I, A)
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2.3
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.2.3
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.2
       ref_id: 1.2.3
       description: To what extent are information security requirements taken into
         account in projects?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node15
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node15
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.2.3
       name: (must)
       description: + Projects are classified while taking into account the information
         security requirements.
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node16
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node16
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.2.3
       name: (should)
       description: '+ The procedure and criteria for the classification of projects
         are documented.
@@ -253,26 +253,26 @@ objects:
         into account in the project.'
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node17
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node17
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.2.3
       name: (for high protection needs)
       description: + The measures thus derived are reviewed regularly during the project
         and reassessed in case of changes to the assessment criteria. (C, I, A)
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2.4
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.2.4
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.2
       ref_id: 1.2.4
       description: To what extent are the responsibilities between external IT service
         providers and the own organization defined?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node19
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node19
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.2.4
       name: (must)
       description: '+ The concerned services and IT services used are identified.
 
@@ -286,10 +286,10 @@ objects:
         + The responsible organization fulfils its respective responsibilities.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node20
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node20
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.2.4
       name: (should)
       description: '+ In case of IT services, configuration has been conceived, implemented
         and documented based on the necessary security requirements.
@@ -297,10 +297,10 @@ objects:
         + The responsible staff is adequately trained.'
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node21
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node21
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.2.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.2.4
       name: (for high protection needs)
       description: '+ A list exists indicating the concerned IT services and the respective
         responsible IT service providers. (C, I, A)
@@ -318,22 +318,22 @@ objects:
         mechanisms) is established and documented. (C, I, A)'
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.3
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.3
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1
       ref_id: '1.3'
       description: Asset Management
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.3.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.3.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.3
       ref_id: 1.3.1
       description: 'To what extent are information assets identified and recorded? '
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node24
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node24
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.3.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.3.1
       name: (must)
       description: "+ The information assets being of relevance to the organization\
         \ are identified and recorded.\n  - A person responsible for these information\
@@ -342,27 +342,27 @@ objects:
         \ supporting assets is assigned."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node25
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node25
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.3.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.3.1
       name: (should)
       description: "+ A catalog of the relevant information assets exists:\n  - The\
         \ corresponding supporting assets are assigned to each relevant information\
         \ asset,\n  - The catalog is subject to regular review."
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.3.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.3.2
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.3
       ref_id: 1.3.2
       description: To what extent are information assets classified and managed in
         terms of their protection needs?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node27
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node27
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.3.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.3.2
       name: (must)
       description: "+ A consistent scheme for the classification of information assets\
         \ with regard to the protection goal of confidentiality is available.\n+ Evaluation\
@@ -373,27 +373,27 @@ objects:
         \ of information assets are in place and implemented."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node28
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node28
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.3.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.3.2
       name: (should)
       description: + The protection goals of integrity and availability are taken
         into consideration.
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.3.3
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.3.3
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.3
       ref_id: 1.3.3
       description: "To what extent is it ensured that only evaluated and approved\
         \ external IT services are used for processing the organization\u2019s information\
         \ assets?"
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node30
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node30
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.3.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.3.3
       name: (must)
       description: "+ External IT services are not used without explicit assessment\
         \ and implementation of the information security requirements:\n  - A risk\
@@ -403,10 +403,10 @@ objects:
         \ assets."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node31
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node31
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.3.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.3.3
       name: (should)
       description: '+ Requirements regarding the procurement, commissioning and release
         associated with the use of external IT services are determined and fulfilled.
@@ -421,22 +421,22 @@ objects:
         '
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.4
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.4
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1
       ref_id: '1.4'
       description: IS Risk Management
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.4.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.4.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.4
       ref_id: 1.4.1
       description: To what extent are information security risks managed?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node34
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node34
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.4.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.4.1
       name: (must)
       description: '+ Risk assessments are carried out both at regular intervals and
         in response to events.
@@ -451,10 +451,10 @@ objects:
         security risks.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node35
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node35
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.4.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.4.1
       name: (should)
       description: "+ A procedure is in place defining how to identify, assess and\
         \ address information security risks within the organization.\n+ Criteria\
@@ -466,23 +466,23 @@ objects:
         \ is carried out in a timely manner."
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.5
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.5
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1
       ref_id: '1.5'
       description: Assessments
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.5.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.5.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.5
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.5
       ref_id: 1.5.1
       description: To what extent is compliance with information security ensured
         in procedures and processes?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node38
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node38
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.5.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.5.1
       name: (must)
       description: '+ Observation of policies is verified throughout the organization.
 
@@ -497,25 +497,25 @@ objects:
         + The results of the conducted reviews are recorded and retained.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node39
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node39
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.5.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.5.1
       name: (should)
       description: + A plan for content and framework conditions (time schedule, scope,
         controls) of the reviews to be conducted is provided.
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.5.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.5.2
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.5
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.5
       ref_id: 1.5.2
       description: To what extent is the ISMS reviewed by an independent authority?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node41
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node41
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.5.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.5.2
       name: (must)
       description: '+ Information security reviews are carried out by an independent
         and competent body at regular intervals and in case of significant changes.
@@ -523,31 +523,31 @@ objects:
         + Measures for correcting potential deviations are initiated and pursued.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node42
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node42
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.5.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.5.2
       name: (should)
       description: + The results of conducted reviews are documented and reported
         to the management of the organization.
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.6
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.6
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1
       ref_id: '1.6'
       description: Incident Management
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:1.6.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:1.6.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.6
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.6
       ref_id: 1.6.1
       description: To what extent are information security events processed?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node45
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node45
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.6.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.6.1
       name: (must)
       description: "+ A definition of information security events/vulnerabilities\
         \ exists.\n+ A procedure for reporting and recording information security\
@@ -565,10 +565,10 @@ objects:
         \ as a procedure for deciding whether a cybercriminal attack will be prosecuted. "
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node46
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node46
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.6.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.6.1
       name: (should)
       description: '+ Information security events/vulnerabilities (problem management)
         are analyzed.
@@ -577,31 +577,31 @@ objects:
         are defined and implemented.'
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node47
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node47
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:1.6.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:1.6.1
       name: (for high protection needs)
       description: + Requirements resulting from business relations (e.g. obligations
         of reporting to customers) are determined and implemented. (C, I, A)
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:2
       assessable: false
       depth: 1
       ref_id: '2'
       name: Human Resources
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:2.1.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:2.1.1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:2
       ref_id: 2.1.1
       description: To what extent is the qualification of employees for sensitive
         work fields ensured?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node50
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node50
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:2.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:2.1.1
       name: (must)
       description: '+ Sensitive work fields and jobs are determined.
 
@@ -612,10 +612,10 @@ objects:
         documents).'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node51
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node51
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:2.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:2.1.1
       name: (should)
       description: '+ The personal suitability of potential employees is verified
         by means of simple methods (e.g. job interview).
@@ -626,27 +626,27 @@ objects:
         checking of professional and private background).'
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:2.1.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:2.1.2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:2
       ref_id: 2.1.2
       description: To what extent is all staff contractually bound to comply with
         information security policies?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node53
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node53
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:2.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:2.1.2
       name: (must)
       description: '+ A non-disclosure obligation is in effect.
 
         + An obligation to comply with the information security policies is in effect.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node54
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node54
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:2.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:2.1.2
       name: (should)
       description: '+ A non-disclosure obligation beyond the employment contract or
         order is in effect.
@@ -657,25 +657,25 @@ objects:
         + A procedure for handling violations of said obligations is described.'
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:2.1.3
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:2.1.3
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:2
       ref_id: 2.1.3
       description: To what extent is staff made aware of and trained with respect
         to the risks arising from the handling of information?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node56
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node56
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:2.1.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:2.1.3
       name: (must)
       description: + Employees are trained and made aware.
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node57
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node57
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:2.1.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:2.1.3
       name: (should)
       description: "+ A concept for awareness and training of employees is prepared.\
         \ As a minimum, the following aspects are taken into account:\n  - Information\
@@ -693,16 +693,16 @@ objects:
         \ persons for information security are known to employees."
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:2.1.4
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:2.1.4
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:2
       ref_id: 2.1.4
       description: To what extent is teleworking regulated?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node59
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node59
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:2.1.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:2.1.4
       name: (must)
       description: "+ The requirements for teleworking are determined and fulfilled.\
         \ The following aspects are considered:\n  - Secure handling of and access\
@@ -714,47 +714,47 @@ objects:
         s network is accessed via a secured connection (e.g. VPN) and strong authentication."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node60
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node60
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:2.1.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:2.1.4
       name: (should)
       description: "+ The following aspects are considered:\n  - Measures for travelling\
         \ (e.g. viewing by authorities),\n  - Measures for travelling to security-critical\
         \ countries.\n+ Employee awareness."
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node61
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node61
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:2.1.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:2.1.4
       name: (for high protection needs)
       description: + Protective measures against overhearing and viewing are implemented.
         (C)
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node62
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node62
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:2.1.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:2.1.4
       name: Further information
       description: Contractual requirements include, for example, customer requirements
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:3
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:3
       assessable: false
       depth: 1
       ref_id: '3'
       name: Physical Security and Business Continuity
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:3.1.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:3.1.1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:3
       ref_id: 3.1.1
       description: To what extent are security zones managed to protect information
         assets?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node65
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node65
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:3.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:3.1.1
       name: (must)
       description: "+ A security zone concept including the associated protective\
         \ measures based on the requirements for the handling of information assets\
@@ -765,10 +765,10 @@ objects:
         \ persons involved."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node66
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node66
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:3.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:3.1.1
       name: (should)
       description: '+ Procedures for allocation and revocation of access rights are
         established.
@@ -788,19 +788,19 @@ objects:
         workshops, test tracks, data processing centers).'
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node67
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node67
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:3.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:3.1.1
       name: (for high protection needs)
       description: + Protective measures against simple overhearing and viewing are
         implemented. (C)
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node68
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node68
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:3.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:3.1.1
       name: Further information
       description: "Focus point: Constructional and organizational measures\n+ Security\
         \ zone 1 (green): Area with constructional, technical or organizational or\
@@ -818,16 +818,16 @@ objects:
         \ know-how)\n\nArea 3 (red): Area with principally very high security requirements,\
         \ protection of information assets with very high protection needs, usually\
         \ also strictly confidential scopes (e.g. design)"
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:3.1.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:3.1.2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:3
       ref_id: 3.1.2
       description: To what extent is information security ensured in exceptional situations?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node70
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node70
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:3.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:3.1.2
       name: (must)
       description: "+ Possible exceptional situations are identified and recorded.\n\
         + Potentially endangered infrastructure components (e.g. access points, IT\
@@ -837,10 +837,10 @@ objects:
         \ and procedures."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node71
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node71
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:3.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:3.1.2
       name: (should)
       description: "+ Emergency plans are defined and reviewed regularly.\n+ Physical\
         \ security is generally maintained also in exceptional situations.\n+ IT services\
@@ -854,42 +854,42 @@ objects:
         \ measures for events of crisis are tested regularly."
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:3.1.3
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:3.1.3
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:3
       ref_id: 3.1.3
       description: To what extent is the handling of supporting assets managed?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node73
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node73
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:3.1.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:3.1.3
       name: (must)
       description: '+ The requirements for the handling of supporting assets (e.g.
         transport, storage, repair, loss, return, disposal) are determined and fulfilled. '
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node74
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node74
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:3.1.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:3.1.3
       name: (for high protection needs)
       description: "+ Supporting assets are protected. Disposal of supporting assets\
         \ is conducted in accordance with one of the relevant standards (e.g. ISO\_\
         21964, at least Security Level 4). (C)"
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:3.1.4
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:3.1.4
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:3
       ref_id: 3.1.4
       description: To what extent is the handling of mobile IT devices and mobile
         data storage devices managed?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node76
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node76
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:3.1.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:3.1.4
       name: (must)
       description: "+ The requirements for mobile IT devices and mobile data storage\
         \ devices are determined and fulfilled. The following aspects are considered:\
@@ -897,47 +897,47 @@ objects:
         \ (also considering requirements for use in the presence of customers)."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node77
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node77
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:3.1.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:3.1.4
       name: (should)
       description: '+ Registration of the IT devices.
 
         + Users are informed of missing data protection on mobile devices.'
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node78
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node78
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:3.1.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:3.1.4
       name: (for high protection needs)
       description: "+ General encryption of mobile data storage devices or the information\
         \ assets stored thereon: (C, I)\n  - Where this is technically not feasible,\
         \ information is protected by similarly effective measures."
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:4
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:4
       assessable: false
       depth: 1
       ref_id: '4'
       name: Identity and Access Management
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:4.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:4.1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4
       ref_id: '4.1'
       description: Identity Management
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:4.1.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:4.1.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.1
       ref_id: 4.1.1
       description: To what extent is the use of identification means managed?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node82
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node82
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.1.1
       name: (must)
       description: "+ The requirements for the handling of identification means over\
         \ the entire lifecycle are determined and fulfilled. The following aspects\
@@ -945,19 +945,19 @@ objects:
         \ periods,\n  - Traceability,\n  - Handling of loss."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node83
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node83
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.1.1
       name: (should)
       description: + Identification means can be produced under controlled conditions
         only.
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node84
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node84
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.1.1
       name: (for high protection needs)
       description: '+ The validity of identification means is limited to an appropriate
         period. (C, I, A)
@@ -966,17 +966,17 @@ objects:
         loss is prepared and implemented as far as possible. (C, I, A)'
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:4.1.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:4.1.2
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.1
       ref_id: 4.1.2
       description: To what extent is the user access to network services, IT systems
         and IT applications secured?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node86
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node86
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.1.2
       name: (must)
       description: '+ The procedures for user authentication have been selected based
         on a risk assessment. Possible attack scenarios have been considered (e.g.
@@ -986,10 +986,10 @@ objects:
         of the art.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node87
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node87
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.1.2
       name: (should)
       description: "+ The user authentication procedures are defined and implemented\
         \ based on the business-related and security-relevant requirements:\n  - Users\
@@ -999,10 +999,10 @@ objects:
         \ authentication)."
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node88
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node88
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.1.2
       name: (for high protection needs)
       description: + Depending on the risk assessment, authentication procedure and
         access control have been enhanced by supplementary measures (e.g. permanent
@@ -1010,27 +1010,27 @@ objects:
         automatic logout or disabling in case of inactivity). (C, I, A)
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node89
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node89
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.1.2
       name: (for very high protection needs)
       description: + Before gaining access to data of very high protection needs,
         users are authenticated by means of strong authentication (e.g. two-factor
         authentication) according to the state of the art. (C, I)
       implementation_groups:
       - very_high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:4.1.3
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:4.1.3
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.1
       ref_id: 4.1.3
       description: 'To what extent are user accounts and login information securely
         managed and applied? '
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node91
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node91
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.1.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.1.3
       name: (must)
       description: "+ The creating, changing and deleting of user accounts is conducted.\n\
         + Unique and personalized user accounts are used.\n+ The use of \u201Ccollective\
@@ -1052,10 +1052,10 @@ objects:
         \ be known to the assigned user only. "
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node92
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node92
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.1.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.1.3
       name: (should)
       description: '+ A basic user account with minimum access rights and functionalities
         is existent and used.
@@ -1081,22 +1081,22 @@ objects:
         accounts in customers'' IT systems.'
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:4.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:4.2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4
       ref_id: '4.2'
       description: Access Management
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:4.2.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:4.2.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.2
       ref_id: 4.2.1
       description: To what extent are access rights assigned and managed?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node95
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node95
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.2.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.2.1
       name: (must)
       description: "+ The requirements for the management of access rights (authorization)\
         \ are determined and fulfilled. The following aspects are considered:\n  -\
@@ -1106,10 +1106,10 @@ objects:
         \ at regular intervals also within IT systems of customers."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node96
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node96
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.2.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.2.1
       name: (should)
       description: "+ Strategies for authorizing access to information are prepared.\n\
         + Authorization roles are used.\n+ Rights are allocated on a need-to-use basis\
@@ -1119,19 +1119,19 @@ objects:
         \ field of responsibility)."
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node97
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node97
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.2.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.2.1
       name: (for high protection needs)
       description: + The access rights are approved by the responsible internal Information
         Officer. (C, I, A)
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node98
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node98
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.2.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.2.1
       name: (for very high protection needs)
       description: "+ Prevention of unauthorized persons gaining access and information\
         \ (privileged users): (C)\n  - Information is stored in encrypted form at\
@@ -1141,35 +1141,35 @@ objects:
         \ (C)"
       implementation_groups:
       - very_high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node99
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node99
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:4.2.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:4.2.1
       name: Further information
       description: + In case of externally operated IT infrastructure (e.g. server)
         and/or cloud solutions, compliance with the encryption requirements according
         to control question 5.1.1 is ensured.
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5
       assessable: false
       depth: 1
       ref_id: '5'
       name: "IT Security\_/ Cyber Security"
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5.1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5
       ref_id: '5.1'
       description: Cryptography
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5.1.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5.1.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.1
       ref_id: 5.1.1
       description: To what extent is the use of cryptographic procedures managed?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node103
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node103
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.1.1
       name: (must)
       description: '+ All cryptographic procedures used (e.g. encryption, signature,
         and hash algorithms, protocols, applications) provide the security required
@@ -1178,10 +1178,10 @@ objects:
         + The legal parameters for the use of cryptography are taken into account.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node104
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node104
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.1.1
       name: (should)
       description: "+ Preparation of technical rules containing requirements for encryption\
         \ in order to protect information according to its classification.\n+ A concept\
@@ -1192,25 +1192,25 @@ objects:
         \ and deletion.\n+ An emergency process for restoring key material is established."
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node105
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node105
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.1.1
       name: (for high protection needs)
       description: + Key sovereignty requirements (particularly in case of external
         processing) are determined and fulfilled. (C, I)
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5.1.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5.1.2
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.1
       ref_id: 5.1.2
       description: To what extent is information protected during transfer?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node107
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node107
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.1.2
       name: (must)
       description: "+ The network services used to transfer information are identified\
         \ and documented. \n+ Policies and procedures in accordance with the classification\
@@ -1219,10 +1219,10 @@ objects:
         \ access are implemented."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node108
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node108
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.1.2
       name: (should)
       description: '+ Measures for ensuring correct addressing and correct transfer
         of information are implemented.
@@ -1231,50 +1231,50 @@ objects:
         according to the respective classification. '
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node109
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node109
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.1.2
       name: (for high protection needs)
       description: "+ Information is transported or transferred in encrypted form:\
         \ (C)\n  - Where encryption is not feasible, information must be protected\
         \ by similarly effective measures."
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node110
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node110
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.1.2
       name: (for very high protection needs)
       description: + Information is transported or transferred in content-encrypted
         form. (C)
       implementation_groups:
       - very_high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5.2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5
       ref_id: '5.2'
       description: Operations Security
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2
       ref_id: 5.2.1
       description: 'To what extent are changes managed? '
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node113
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node113
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.1
       name: (must)
       description: + Information security requirements for changes to the organization,
         business processes, IT systems are determined and applied.
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node114
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node114
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.1
       name: (should)
       description: '+ A formal approval procedure is established.
 
@@ -1287,26 +1287,26 @@ objects:
         + Procedures for fall-back in fault cases are taken into account.'
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node115
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node115
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.1
       name: (for high protection needs)
       description: + Compliance with the information security requirements is verified
         during and after the changes are applied. (C, I, A)
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.2
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2
       ref_id: 5.2.2
       description: To what extent are development and testing environments separated
         from operational environments?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node117
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node117
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.2
       name: (must)
       description: '+ The IT systems have been subjected to risk assessment in order
         to determine the necessity of their separation into development, testing and
@@ -1315,10 +1315,10 @@ objects:
         + A segmentation is implemented based on the results of risk analysis.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node118
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node118
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.2
       name: (should)
       description: "+ The requirements for development and testing environments are\
         \ determined and implemented. The following aspects are considered:\n  - Separation\
@@ -1328,16 +1328,16 @@ objects:
         \ systems."
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.3
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.3
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2
       ref_id: 5.2.3
       description: To what extent are IT systems protected against malware?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node120
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node120
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.3
       name: (must)
       description: '+ Requirements for protection against malware are determined.
 
@@ -1345,10 +1345,10 @@ objects:
         defined and implemented.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node121
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node121
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.3
       name: (should)
       description: "+ Unnecessary network services are disabled.\n+ Access to network\
         \ services is restricted to necessary access by means of suitable protective\
@@ -1366,16 +1366,16 @@ objects:
         \ no active users, network isolation) are implemented. "
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.4
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.4
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2
       ref_id: 5.2.4
       description: To what extent are event logs recorded and analyzed?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node123
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node123
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.4
       name: (must)
       description: '+ Information security requirements regarding the handling of
         event logs are determined and fulfilled.
@@ -1392,10 +1392,10 @@ objects:
         in compliance with the permissible legal and organizational provisions.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node124
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node124
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.4
       name: (should)
       description: '+ A procedure for the escalation of relevant events to the responsible
         body (e.g. security incident report, data protection, corporate security,
@@ -1408,10 +1408,10 @@ objects:
         relevant to information security are established.'
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node125
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node125
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.4
       name: (for high protection needs)
       description: '+ Information security requirements relevant to the security during
         the handling of event logs, e.g. contractual requirements, are determined
@@ -1421,26 +1421,26 @@ objects:
         (e.g. remote maintenance) are logged. (C, I, A)'
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node126
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node126
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.4
       name: (for very high protection needs)
       description: + Logging of any access to data of very high protection needs as
         far as technically feasible and as permissible according to legal and organizational
         provisions. (C, I)
       implementation_groups:
       - very_high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.5
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.5
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2
       ref_id: 5.2.5
       description: 'To what extent are vulnerabilities identified and addressed? '
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node128
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node128
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.5
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.5
       name: (must)
       description: '+ Information on technical vulnerabilities for the IT systems
         in use is gathered (e.g. information from the manufacturer, system audits,
@@ -1450,10 +1450,10 @@ objects:
         any vulnerabilities are addressed.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node129
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node129
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.5
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.5
       name: (should)
       description: '+ An adequate patch management is defined and implemented (e.g.
         patch testing and installation).
@@ -1463,16 +1463,16 @@ objects:
         + Successful installation of patches is verified in an appropriate manner.'
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.6
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.6
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2
       ref_id: 5.2.6
       description: To what extent are IT systems technically checked (system audit)?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node131
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node131
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.6
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.6
       name: (must)
       description: '+ Requirements for auditing IT systems are determined.
 
@@ -1486,10 +1486,10 @@ objects:
         + Measures are derived from the results.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node132
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node132
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.6
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.6
       name: (should)
       description: '+ System audits are planned taking into account any security risks
         they might cause (e.g. disturbances).
@@ -1502,19 +1502,19 @@ objects:
         prepared.'
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.7
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.7
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2
       ref_id: 5.2.7
       description: 'To what extent is the network of the organization managed?
 
 
         '
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node134
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node134
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.7
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.7
       name: (must)
       description: '+ Requirements for the management and control of networks are
         determined and fulfilled.
@@ -1522,10 +1522,10 @@ objects:
         + Requirements regarding network segmentation are determined and fulfilled.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node135
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node135
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.7
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.7
       name: (should)
       description: "+ Procedures for the management and control of networks are defined.\n\
         + For network segmentation, the following aspects are considered:\n  - Limitations\
@@ -1536,10 +1536,10 @@ objects:
         \ considering customer requirements."
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node136
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node136
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.2.7
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.2.7
       name: (for high protection needs)
       description: "+ Extended requirements for the management and control of networks\
         \ are determined and implemented. The following aspects are considered: (C,\
@@ -1547,23 +1547,23 @@ objects:
         \ management interfaces of IT systems is restricted."
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5.3
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5
       ref_id: '5.3'
       description: System acquisitions, requirement management and development
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5.3.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.3
       ref_id: 5.3.1
       description: To what extent is information security considered in new or further
         developed IT systems?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node139
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node139
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.3.1
       name: (must)
       description: '+ The information security requirements associated with the design
         and development of IT systems are determined and taken into account.
@@ -1578,10 +1578,10 @@ objects:
         security requirements.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node140
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node140
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.3.1
       name: (should)
       description: "+ Requirement specifications are prepared under consideration\
         \ of the information security requirements.\n+ Requirement specifications\
@@ -1596,25 +1596,25 @@ objects:
         \ the generation of test data are defined."
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5.3.2
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.3
       ref_id: 5.3.2
       description: To what extent are requirements for network services defined?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node142
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node142
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.3.2
       name: (must)
       description: + Requirements regarding the information security of network services
         are determined and fulfilled.
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node143
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node143
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.3.2
       name: (should)
       description: '+ A procedure for securing and using network services is defined
         and implemented.
@@ -1624,60 +1624,60 @@ objects:
         + Adequate redundancy solutions are implemented.'
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node144
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node144
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.3.2
       name: (for high protection needs)
       description: + Procedures for monitoring the quality of network traffic (e.g.
         traffic flow analyses, availability measurements) are defined and carried
         out. (A)
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3.3
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5.3.3
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.3
       ref_id: 5.3.3
       description: 'To what extent is the return and secure removal of information
         assets from external IT services regulated? '
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node146
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node146
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.3.3
       name: (must)
       description: + A procedure for the return and secure removal of information
         assets from each external IT service is defined and implemented.
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node147
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node147
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.3.3
       name: (should)
       description: + A description of the termination process is given, adapted to
         any changes and contractually regulated.
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3.4
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:5.3.4
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.3
       ref_id: 5.3.4
       description: To what extent is information protected in shared external IT services?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node149
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node149
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.3.4
       name: (must)
       description: + Effective segregation (e.g. segregation of clients) prevents
         access to own information by unauthorized users of other organizations.
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node150
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node150
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:5.3.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:5.3.4
       name: (should)
       description: "+ The provider\u2019s segregation concept is documented and adapted\
         \ to any changes. The following aspects are considered:\n  - Separation of\
@@ -1686,25 +1686,25 @@ objects:
         \ environment."
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:6
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:6
       assessable: false
       depth: 1
       ref_id: '6'
       name: Supplier Relationships
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:6.1.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:6.1.1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:6
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:6
       ref_id: 6.1.1
       description: 'To what extent is information security ensured among contractors
         and cooperation partners?
 
 
         '
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node153
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node153
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:6.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:6.1.1
       name: (must)
       description: '+ Contractors and cooperation partners are subjected to a risk
         assessment with regard to information security.
@@ -1718,10 +1718,10 @@ objects:
         + Compliance with contractual agreements is verified.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node154
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node154
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:6.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:6.1.1
       name: (should)
       description: '+ Contractors and cooperation partners are contractually obliged
         to also pass on any requirements regarding an appropriate level of information
@@ -1731,20 +1731,20 @@ objects:
         reviewed.'
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node155
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node155
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:6.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:6.1.1
       name: (for high protection needs)
       description: + Proof is provided that the information security level of the
         supplier is adequate for the protection needs of the information (e.g. certificate,
         attestation, internal audit). (C, I, A)
       implementation_groups:
       - high
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node156
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node156
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:6.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:6.1.1
       name: Further information
       description: "Within the context of VDA ISA, the term contractor includes both\
         \ classic suppliers and subcontractors but also classic service providers,\
@@ -1780,17 +1780,17 @@ objects:
         \ quality management system.\nContractually specified deliverables (e.g. availability\
         \ requirements) should be verified at regular intervals. This can be done\
         \ by e.g. regular analysis of service reports and SLAs.  "
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:6.1.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:6.1.2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:6
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:6
       ref_id: 6.1.2
       description: To what extent is non-disclosure regarding the exchange of information
         contractually agreed?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node158
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node158
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:6.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:6.1.2
       name: (must)
       description: '+ The non-disclosure requirements are determined and fulfilled.
 
@@ -1805,10 +1805,10 @@ objects:
         intervals.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node159
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node159
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:6.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:6.1.2
       name: (should)
       description: "+ Non-disclosure agreement templates are available and checked\
         \ for legal applicability.\n+ Non-disclosure agreements include the following\
@@ -1823,22 +1823,22 @@ objects:
         \ due time is defined and implemented."
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:7
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:7
       assessable: false
       depth: 1
       ref_id: '7'
       name: Compliance
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:7.1.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:7.1.1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:7
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:7
       ref_id: 7.1.1
       description: To what extent is compliance with regulatory and contractual provisions
         ensured?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node162
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node162
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:7.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:7.1.1
       name: (must)
       description: '+ Legal, regulatory and contractual provisions of relevance to
         information security (see examples) are determined at regular intervals.
@@ -1847,26 +1847,26 @@ objects:
         and communicated to the responsible persons.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node163
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node163
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:7.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:7.1.1
       name: (should)
       description: + The integrity of records in accordance with the legal, regulatory
         or contractual provisions and business requirements is considered.
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:7.1.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:7.1.2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:7
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:7
       ref_id: 7.1.2
       description: 'To what extent is the protection of personally identifiable data
         taken into account when implementing information security? '
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node165
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node165
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:7.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:7.1.2
       name: (must)
       description: '+ Legal and contractual information security requirements regarding
         the procedures and processes in the processing of personally identifiable
@@ -1880,29 +1880,29 @@ objects:
         are taken into account in the information security management system.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8
       assessable: false
       depth: 1
       ref_id: '8'
       name: Prototype Protection
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8
       ref_id: '8.1'
       description: Physical and Environmental Security
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1
       ref_id: 8.1.1
       description: To what extent is a security concept available describing minimum
         requirements regarding the physical and environmental security for prototype
         protection?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node169
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node169
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.1
       name: (must)
       description: "+ A security concept under consideration of the following aspects\
         \ is established: \n - stability of outer skin,\n - view and sight protection,\n\
@@ -1910,59 +1910,59 @@ objects:
         \ monitoring,\n - documented visitor management,\n - client segregation."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node170
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node170
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.1
       name: (should)
       description: + Perimeter security.
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.2
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1
       ref_id: 8.1.2
       description: To what extent is perimeter security existent preventing unauthorized
         access to protected property objects?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node172
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node172
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.2
       name: (must)
       description: + Unauthorized access to properties is not possible.
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node173
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node173
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.2
       name: (should)
       description: "+ Suitable barriers are in place such as:\n  - artificial barriers\
         \ (fence systems, walls),\n  - technical barriers (detection),\n  - natural\
         \ barriers (growth, vegetation)."
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.3
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.3
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1
       ref_id: 8.1.3
       description: To what extent is the outer skin of the protected buildings constructed
         such as to prevent removal or opening of outer-skin components using standard
         tools?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node175
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node175
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.3
       name: (must)
       description: + Unauthorized access to buildings/security areas is not possible.
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node176
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node176
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.3
       name: (should)
       description: '+ Solid construction (masonry, concrete, reinforced concrete or
         prestressed concrete).
@@ -1971,52 +1971,52 @@ objects:
         or better.'
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.4
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.4
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1
       ref_id: 8.1.4
       description: To what extent is view and sight protection ensured in defined
         security areas?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node178
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node178
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.4
       name: (must)
       description: + Unauthorized viewing of new developments needing high or very
         high protection is not possible.
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node179
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node179
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.4
       name: (should)
       description: '+ Sight protection through relevant glass surfaces is ensured.
 
         + View into defined security areas through open doors/gates/windows is prevented. '
       implementation_groups:
       - should
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node180
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node180
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.4
       name: (for vehicles classified as requiring protection)
       description: + The spatial situation is also suitable for protecting vehicles
         classified as requiring protection against unauthorized view.
       implementation_groups:
       - vehicle
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.5
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.5
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1
       ref_id: 8.1.5
       description: To what extent is the protection against unauthorized entry regulated
         in the form of access control?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node182
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node182
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.5
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.5
       name: (must)
       description: "+ At least one of the following three requirements must be implemented:\n\
         \  - mechanical locks with documented key assignment,\n  - electronic access\
@@ -2024,25 +2024,25 @@ objects:
         \ including documentation."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node183
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node183
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.5
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.5
       name: (for vehicles classified as requiring protection)
       description: + The spatial situation is also suitable for protecting vehicles
         classified as requiring protection against unauthorized access.
       implementation_groups:
       - vehicle
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.6
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.6
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1
       ref_id: 8.1.6
       description: To what extent are the premises to be secured monitored for intrusion?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node185
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node185
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.6
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.6
       name: (must)
       description: "+ Intrusion monitoring of the premises to be secured is ensured:\n\
         \  - An intrusion detection system exists which complies with DIN\_EN\_50131\
@@ -2052,16 +2052,16 @@ objects:
         \ available.\n+ Timely alarm processing is ensured."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.7
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.7
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1
       ref_id: 8.1.7
       description: To what extent is a documented visitor management in place?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node187
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node187
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.7
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.7
       name: (must)
       description: '+ Registration obligation for all visitors.
 
@@ -2072,16 +2072,16 @@ objects:
         + Country-specific legal provisions regarding data protection are to be observed.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.8
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.8
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1
       ref_id: 8.1.8
       description: To what extent is on-site client segregation existent?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node189
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node189
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.8
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.8
       name: (must)
       description: "+ Spatial separation by staff-related or technical measures is\
         \ in effect according to the following aspects:\n  - customers, and/or\n \
@@ -2089,49 +2089,49 @@ objects:
         \ the customer is required."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node190
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node190
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.1.8
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.1.8
       name: (for vehicles classified as requiring protection)
       description: + The spatial situation is also suitable for implementing client
         segregation for vehicles classified as requiring protection.
       implementation_groups:
       - vehicle
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8
       ref_id: '8.2'
       description: Organizational Requirements
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.2.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.2
       ref_id: 8.2.1
       description: To what extent are non-disclosure agreements/obligations existent
         according to the valid contractual law?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node193
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node193
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.2.1
       name: (must)
       description: "+ A non-disclosure agreement: \n  - between contractor and customer\
         \ (company level),\n  - with all employees and project members (personal obligation).\n\
         + Country-specific legal provisions regarding data protection are to be observed."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.2.2
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.2
       ref_id: 8.2.2
       description: To what extent are requirements for commissioning subcontractors
         known and fulfilled?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node195
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node195
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.2.2
       name: (must)
       description: "+ Approval by the original customer.\n+ contractually valid non-disclosure\
         \ agreement exists:\n  - between contractor and subcontractor (company level),\n\
@@ -2142,17 +2142,17 @@ objects:
         \ attestation) is provided."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2.3
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.2.3
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.2
       ref_id: 8.2.3
       description: To what extent do employees and project members evidently participate
         in training and awareness measures regarding the handling of prototypes?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node197
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node197
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.2.3
       name: (must)
       description: "+ Ensuring execution of trainings\_/ awareness programs by the\
         \ management.\n+ Training of employees and project members when joining the\
@@ -2166,17 +2166,17 @@ objects:
         \ (see also control question 2.1.3 Information Security)."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2.4
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.2.4
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.2
       ref_id: 8.2.4
       description: To what extent are security classifications of the project and
         the resulting security measures known?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node199
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node199
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.2.4
       name: (must)
       description: '+ Ensuring that the security classification and requirements in
         relation to the project progress are made known to each project member.
@@ -2188,17 +2188,17 @@ objects:
         security of the project (see Controls 1.2.3 and 7.1.1 Information Security).'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2.5
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.2.5
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.2
       ref_id: 8.2.5
       description: To what extent is a process defined for granting access to security
         areas?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node201
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node201
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2.5
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.2.5
       name: (must)
       description: '+ Responsibilities for access authorization are clearly specified
         and documented.
@@ -2209,17 +2209,17 @@ objects:
         + Code of conduct in case of the loss/theft of access control means.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2.6
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.2.6
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.2
       ref_id: 8.2.6
       description: To what extent are regulations for image recording and handling
         of created image material existent?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node203
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node203
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2.6
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.2.6
       name: (must)
       description: '+ Approval procedures for image recording.
 
@@ -2233,40 +2233,40 @@ objects:
         only.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2.7
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.2.7
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.2
       ref_id: 8.2.7
       description: To what extent is a process for carrying along and using mobile
         video and photography devices in(to) defined security areas established?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node205
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node205
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.2.7
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.2.7
       name: (must)
       description: '+ Specification for carrying along (e.g. sealed/unsealed, etc.).
 
         + Specification for use (e.g. phone calls, photography, etc.).'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.3
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.3
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8
       ref_id: '8.3'
       description: Handling of vehicles, components and parts
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.3.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.3.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.3
       ref_id: 8.3.1
       description: To what extent are transports of vehicles, components or parts
         classified as requiring protection arranged according to the customer requirements?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node208
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node208
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.3.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.3.1
       name: (must)
       description: "+ A process for obtaining customer-specific requirements for the\
         \ transport of vehicles, components and parts classified as requiring protection\
@@ -2276,40 +2276,40 @@ objects:
         \ security-relevant events to the customer is described and implemented."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.3.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.3.2
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.3
       ref_id: 8.3.2
       description: To what extent is it ensured that vehicles, components and parts
         classified as requiring protection are parked/stored in accordance with customer
         requirements?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node210
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node210
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.3.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.3.2
       name: (must)
       description: + The customer-specific requirements for parking/storage are verifiably
         known and observed.
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.4
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.4
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8
       ref_id: '8.4'
       description: Requirements for trial vehicles
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.4.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.4.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.4
       ref_id: 8.4.1
       description: To what extent are the predefined camouflage regulations implemented
         by the project members?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node213
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node213
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.4.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.4.1
       name: (must)
       description: '+ The requirements for using the respective camouflage are known
         to the project members.
@@ -2321,17 +2321,17 @@ objects:
         described and implemented.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.4.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.4.2
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.4
       ref_id: 8.4.2
       description: To what extent are measures for protecting approved test and trial
         grounds observed/implemented?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node215
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node215
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.4.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.4.2
       name: (must)
       description: "+ A process for obtaining customer-specific requirements for the\
         \ use of trial vehicles classified as requiring protection on test and trial\
@@ -2341,17 +2341,17 @@ objects:
         \ operation \n  - customer-defined protective measures These are implemented."
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.4.3
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.4.3
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.4
       ref_id: 8.4.3
       description: To what extent are protective measures for approved test and trial
         drives in public observed/implemented?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node217
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node217
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.4.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.4.3
       name: (must)
       description: '+ A process for obtaining customer-specific requirements for the
         operation of trial vehicles classified as requiring protection on public roads
@@ -2363,24 +2363,24 @@ objects:
         theft...) is known and observed.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.5
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.5
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8
       ref_id: '8.5'
       description: Requirements for events and shootings
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.5.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.5.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.5
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.5
       ref_id: 8.5.1
       description: To what extent are security requirements for presentations and
         events involving vehicles, components or parts classified as requiring protection
         known?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node220
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node220
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.5.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.5.1
       name: (must)
       description: '+ A process for obtaining customer-specific requirements for presentations
         and events involving vehicles, components or parts classified as requiring
@@ -2393,18 +2393,18 @@ objects:
         + Code of conduct in case of special incidents.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:8.5.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:8.5.2
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.5
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.5
       ref_id: 8.5.2
       description: To what extent are the protective measures for film and photo shootings
         involving vehicles, components or parts classified as requiring protection
         known?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node222
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node222
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:8.5.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:8.5.2
       name: (must)
       description: '+ A process for obtaining customer-specific requirements for film
         and photo shootings involving vehicles, components or parts classified as
@@ -2419,21 +2419,21 @@ objects:
         + Code of conduct in case of special incidents. '
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:9
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:9
       assessable: false
       depth: 1
       ref_id: '9'
       name: Data Protection
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:9.1
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:9.1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:9
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:9
       ref_id: '9.1'
       description: To what extent is the implementation of data protection organized?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node225
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node225
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:9.1
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:9.1
       name: (must)
       description: "+ Appointment of a data protection officer where legally required,\
         \ otherwise appointment of a person responsible for data protection\n+ Organizational\
@@ -2448,17 +2448,17 @@ objects:
         \ Human Resources, Logistics, Development, etc.)"
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:9.2
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:9.2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:9
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:9
       ref_id: '9.2'
       description: To what extent are organizational measures taken in order to ensure
         that personally identifiable data is processed in conformance with legislation?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node227
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node227
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:9.2
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:9.2
       name: (must)
       description: "+ Specification of data protection principles (processing of personally\
         \ identifiable data) in a documented company-internal data protection policy\
@@ -2491,18 +2491,18 @@ objects:
         \ assessment and evaluation of TOM. "
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:9.3
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:9.3
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:9
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:9
       ref_id: '9.3'
       description: To what extent is it ensured that the internal processes or workflows
         are carried out according to the currently valid data protection regulations
         and that these are regularly subjected to a quality check?
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node229
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node229
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:9.3
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:9.3
       name: (must)
       description: '+ Proof of regular review and optimization of the data protection
         management system (e.g. certification).
@@ -2519,19 +2519,19 @@ objects:
         + Ensuring implementation of contracts and customer instructions.'
       implementation_groups:
       - must
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:9.4
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:9.4
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:9
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:9
       ref_id: '9.4'
       description: 'To what extent are the relevant processing procedures documented
         with regard to their admissibility according to data protection law?
 
         '
-    - urn: urn:intuitem:risk:req_node:tisax-v5.1:node231
+    - urn: urn:ciso:risk:req_node:tisax-v5.1:node231
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:tisax-v5.1:9.4
+      parent_urn: urn:ciso:risk:req_node:tisax-v5.1:9.4
       name: (must)
       description: '+ Documentation of essential activities associated with the processing
         of personally identifiable data in accordance with legal requirements.

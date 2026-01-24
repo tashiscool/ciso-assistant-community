@@ -23,7 +23,7 @@ library_copyright = """© Boost Aerospace
 This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. Any commercial use of this work must be contracted with BoostAeroSpace.
 Permission given to include AirCyber in CISO Assistant.
 """
-packager = "intuitem"
+packager = "ciso"
 
 library_description = """AirCyber is the AeroSpace and Defense official standard for Cybersecurity maturity evaluation and increase built by Airbus, Dassault Aviation, Safran and Thales to help the AeroSpace SupplyChain to be more resilient.
 Their joint venture BoostAeroSpace is offering this extract of the AirCyber maturity level matrix to provide further details on this standard, the questions and the AirCyber maturity levels they are associated to.

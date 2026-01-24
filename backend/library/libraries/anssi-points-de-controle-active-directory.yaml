@@ -1,6 +1,6 @@
 convert_library_version: 'v2 ; Compat Mode: [0] {[v2.1] (DEFAULT) Don''t use any Compatibility
   Mode}'
-urn: urn:intuitem:risk:library:anssi-points-de-controle-active-directory
+urn: urn:ciso:risk:library:anssi-points-de-controle-active-directory
 locale: fr
 ref_id: anssi-points-de-controle-active-directory
 name: "Points de contr\xF4le Active Directory (AD)"
@@ -31,7 +31,7 @@ copyright: ANSSI
 version: 1
 publication_date: 2025-11-21
 provider: ANSSI
-packager: intuitem
+packager: ciso-assistant
 translations:
   en:
     name: ANSSI Active Directory (AD) Security Assessment Checklist
@@ -61,7 +61,7 @@ translations:
     copyright: ANSSI
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:anssi-points-de-controle-active-directory
+    urn: urn:ciso:risk:framework:anssi-points-de-controle-active-directory
     ref_id: anssi-points-de-controle-active-directory
     name: "Points de contr\xF4le Active Directory (AD)"
     description: "L'annuaire Active Directory, centre n\xE9vralgique de la s\xE9curit\xE9\
@@ -159,17 +159,17 @@ objects:
           description: The Active Directory infrastructure exhibits an enhanced level
             of security and management;
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:intro
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:intro
       assessable: false
       depth: 1
       name: Introduction
       translations:
         en:
           name: Introduction
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:intro_text
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:intro_text
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:intro
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:intro
       description: "L'annuaire Active Directory, centre n\xE9vralgique de la s\xE9\
         curit\xE9 des syst\xE8mes d'information Microsoft, est un \xE9l\xE9ment critique\
         \ permettant la gestion centralis\xE9e de comptes, de ressources et de permissions.\
@@ -323,17 +323,17 @@ objects:
             and agency support are intended to help improve security and track changes
             in the long run. The agency''s ADS assessment service implements every
             item listed herein.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:about_assessment_item_list
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:about_assessment_item_list
       assessable: false
       depth: 1
       name: "A propos de la Liste des points de contr\xF4le"
       translations:
         en:
           name: About Assessment Item List
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:about_assessment_item_list_text
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:about_assessment_item_list_text
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:about_assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:about_assessment_item_list
       description: "Un point de contr\xF4le peut appara\xEEtre pour plusieurs niveaux\
         \ de s\xE9curit\xE9 d'un Active directory. Plus le niveau vis\xE9 est \xE9\
         lev\xE9, plus ses crit\xE8res deviennent stricts. \xC0 ce jour, seuls les\
@@ -355,17 +355,17 @@ objects:
 
 
             Modification history is [available here](https://www.cert.ssi.gouv.fr/uploads/ad_checklist.html#/ad/changelog).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       assessable: false
       depth: 1
       name: "Liste des points de contr\xF4le"
       translations:
         en:
           name: Assessment Item List
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_adcs_control-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_adcs_control-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_adcs_control-l1
       name: "Permissions dangereuses sur les conteneurs de certificats (chemins de\
         \ contr\xF4le) (Niveau 1)"
@@ -583,10 +583,10 @@ objects:
 
 
             The installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_adcs_template_control-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_adcs_template_control-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_adcs_template_control-l1
       name: "Permissions dangereuses sur les objets de mod\xE8les de certificats (chemins\
         \ de contr\xF4le) (Niveau 1)"
@@ -824,10 +824,10 @@ objects:
 
 
             The installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_adcs_template_control-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_adcs_template_control-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_adcs_template_control-l2
       name: "Permissions dangereuses sur les objets de mod\xE8les de certificats (chemins\
         \ de contr\xF4le) (Niveau 2)"
@@ -1065,10 +1065,10 @@ objects:
 
 
             The installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_adcs_template_auth_enroll_with_name-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_adcs_template_auth_enroll_with_name-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_adcs_template_auth_enroll_with_name-l1
       name: "Permissions d'enr\xF4lement dangereuses sur des mod\xE8les de certificats\
         \ permettant l'authentification (Niveau 1)"
@@ -1251,10 +1251,10 @@ objects:
 
 
             The installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_certificates_vuln-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_certificates_vuln-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_certificates_vuln-l1
       name: "Certificats faibles ou vuln\xE9rables (Niveau 1)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nCertains certificats\
@@ -1392,10 +1392,10 @@ objects:
             If the certificate is expired, it should be purged from the trusted authorities
             list of the Active Directory. For binary code signature usage, the certificate
             authority can be redeployed locally through GPO management.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_certificates_vuln-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_certificates_vuln-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_certificates_vuln-l2
       name: "Certificats faibles ou vuln\xE9rables (Niveau 2)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nCertains certificats\
@@ -1533,10 +1533,10 @@ objects:
             If the certificate is expired, it should be purged from the trusted authorities
             list of the Active Directory. For binary code signature usage, the certificate
             authority can be redeployed locally through GPO management.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_certificates_vuln-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_certificates_vuln-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_certificates_vuln-l3
       name: "Certificats faibles ou vuln\xE9rables (Niveau 3)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nCertains certificats\
@@ -1674,10 +1674,10 @@ objects:
             If the certificate is expired, it should be purged from the trusted authorities
             list of the Active Directory. For binary code signature usage, the certificate
             authority can be redeployed locally through GPO management.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_critical_objects-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_critical_objects-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_critical_objects-l1
       name: Objets critiques non disponibles (Niveau 1)
       description: "# Description de la vuln\xE9rabilit\xE9\n\nCertaines informations\
@@ -1729,10 +1729,10 @@ objects:
             It is advised to restart the collection tool from the beginning using
             a more privileged account. It may be necessary to perform the dump using
             Domain Admin privilege.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_dc_inconsistent_uac-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_dc_inconsistent_uac-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_dc_inconsistent_uac-l1
       name: "Contr\xF4leurs de domaine incoh\xE9rents (Niveau 1)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nCertains contr\xF4\
@@ -1811,10 +1811,10 @@ objects:
 
             Note: some publishers may introduce such deviations when installing their
             products. Riverbed is such a known case.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_delegation_a2d2-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_delegation_a2d2-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_delegation_a2d2-l1
       name: "D\xE9l\xE9gation d'authentification contrainte vers un service d'un contr\xF4\
         leur de domaine (Niveau 1)"
@@ -1865,10 +1865,10 @@ objects:
             referencing domain controllers must be removed from their `msDS-AllowedToDelegateTo`
             attribute. This can be performed through the "Delegation" tab of the Active
             directory Users and Computers management console.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_delegation_sourcedeleg-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_delegation_sourcedeleg-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_delegation_sourcedeleg-l1
       name: "D\xE9l\xE9gation contrainte bas\xE9e sur les ressources, sur des contr\xF4\
         leurs de domaine (Niveau 1)"
@@ -1918,10 +1918,10 @@ objects:
             This can be fixed with PowerShell. The following command can be used to
             remove such a delegation on a target computer named `COMPUTER`: `Set-ADComputer
             COMPUTER -PrincipalsAllowedToDelegateToAccount $Null`.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_delegation_t2a4d-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_delegation_t2a4d-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_delegation_t2a4d-l1
       name: "D\xE9l\xE9gation d'authentification contrainte avec transition de protocole\
         \ vers un service privil\xE9gi\xE9 (Niveau 1)"
@@ -1978,10 +1978,10 @@ objects:
             referencing domain controllers must be removed from their `msDS-AllowedToDelegateTo`
             attribute. This can be performed through the "Delegation" tab of the Active
             directory Users and Computers management console.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_delegation_t4d-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_delegation_t4d-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_delegation_t4d-l1
       name: "D\xE9l\xE9gation d'authentification non contrainte (Niveau 1)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nDes comptes de la for\xEA\
@@ -2028,10 +2028,10 @@ objects:
             "Delegation" tab of the Active directory Users and Computers management
             console. If a Kerberos delegation really is required, use a constrained
             one.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_display_specifier-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_display_specifier-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_display_specifier-l1
       name: "Pr\xE9sence de Display Specifiers dangereux (Niveau 1)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nLes objets `Display\
@@ -2058,10 +2058,10 @@ objects:
 
             Scripts references in `Display Specifiers` objects should be deleted or
             moved to a sysvol share of a domain controller.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_dnsadmins-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_dnsadmins-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_dnsadmins-l1
       name: Permissions dangereuses sur le groupe DnsAdmins (Niveau 1)
       description: "# Description de la vuln\xE9rabilit\xE9\n\nPlusieurs comptes non\
@@ -2432,10 +2432,10 @@ objects:
             \ may be extracted from the Azure AD Connect installer with `msiexec`:\
             \ `msiexec /a \"AzureADConnect.msi\" /qb TARGETDIR=c:\\temp\\`\n\nThe\
             \ installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_dnszone_bad_prop-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_dnszone_bad_prop-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_dnszone_bad_prop-l1
       name: "Zones DNS mal configur\xE9es (Niveau 1)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nDes zones DNS pr\xE9\
@@ -2502,10 +2502,10 @@ objects:
 
 
             dnscmd <servername> /Config <zone> /AllowUpdate 2'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_dnszone_bad_prop-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_dnszone_bad_prop-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_dnszone_bad_prop-l3
       name: "Zones DNS mal configur\xE9es (Niveau 3)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nDes zones DNS pr\xE9\
@@ -2572,10 +2572,10 @@ objects:
 
 
             dnscmd <servername> /Config <zone> /AllowUpdate 2'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_dont_expire_priv-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_dont_expire_priv-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_dont_expire_priv-l1
       name: "Comptes privil\xE9gi\xE9s dont le mot de passe n'expire jamais (Niveau\
         \ 1)"
@@ -2744,10 +2744,10 @@ objects:
             \ can load arbitrary printer drivers on domain controllers, which grants\
             \ them the ability to recover privileged user secrets directly from the\
             \ authentication database (by loading a malicious driver)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_dsheuristics_bad-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_dsheuristics_bad-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_dsheuristics_bad-l1
       name: "Param\xE8tres dSHeuristics dangereux (Niveau 1)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nDes param\xE8tres dangereux\
@@ -2899,10 +2899,10 @@ objects:
             The fix is usually applied through the `adsiedit.msc` or `ldp` utilities.
             The `dSHeuristics` attribute uses a specific format that is described
             in the [documentation](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/e5899be4-862e-496f-9a38-33950617d2c5).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_dsheuristics_bad-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_dsheuristics_bad-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_dsheuristics_bad-l2
       name: "Param\xE8tres dSHeuristics dangereux (Niveau 2)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nDes param\xE8tres dangereux\
@@ -3054,10 +3054,10 @@ objects:
             The fix is usually applied through the `adsiedit.msc` or `ldp` utilities.
             The `dSHeuristics` attribute uses a specific format that is described
             in the [documentation](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/e5899be4-862e-496f-9a38-33950617d2c5).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_dsheuristics_bad-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_dsheuristics_bad-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_dsheuristics_bad-l3
       name: "Param\xE8tres dSHeuristics dangereux (Niveau 3)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nDes param\xE8tres dangereux\
@@ -3209,10 +3209,10 @@ objects:
             The fix is usually applied through the `adsiedit.msc` or `ldp` utilities.
             The `dSHeuristics` attribute uses a specific format that is described
             in the [documentation](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/e5899be4-862e-496f-9a38-33950617d2c5).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_functional_level-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_functional_level-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_functional_level-l1
       name: "Niveaux fonctionnels de la for\xEAt et des domaines insuffisants (Niveau\
         \ 1)"
@@ -3357,10 +3357,10 @@ objects:
             Note: compatibility with the target functional level must be checked for
             all third-party software. Refer to the Microsoft Exchange Server supportability
             matrix for such an instance where incompatibility could arise: [https://docs.microsoft.com/en-us/exchange/plan-and-deploy/supportability-matrix?view=exchserver-2019](https://docs.microsoft.com/en-us/exchange/plan-and-deploy/supportability-matrix?view=exchserver-2019).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_functional_level-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_functional_level-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_functional_level-l3
       name: "Niveaux fonctionnels de la for\xEAt et des domaines insuffisants (Niveau\
         \ 3)"
@@ -3505,10 +3505,10 @@ objects:
             Note: compatibility with the target functional level must be checked for
             all third-party software. Refer to the Microsoft Exchange Server supportability
             matrix for such an instance where incompatibility could arise: [https://docs.microsoft.com/en-us/exchange/plan-and-deploy/supportability-matrix?view=exchserver-2019](https://docs.microsoft.com/en-us/exchange/plan-and-deploy/supportability-matrix?view=exchserver-2019).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_functional_level-l4
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_functional_level-l4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_functional_level-l4
       name: "Niveaux fonctionnels de la for\xEAt et des domaines insuffisants (Niveau\
         \ 4)"
@@ -3653,10 +3653,10 @@ objects:
             Note: compatibility with the target functional level must be checked for
             all third-party software. Refer to the Microsoft Exchange Server supportability
             matrix for such an instance where incompatibility could arise: [https://docs.microsoft.com/en-us/exchange/plan-and-deploy/supportability-matrix?view=exchserver-2019](https://docs.microsoft.com/en-us/exchange/plan-and-deploy/supportability-matrix?view=exchserver-2019).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_kerberos_properties_preauth_priv-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_kerberos_properties_preauth_priv-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_kerberos_properties_preauth_priv-l1
       name: "Comptes privil\xE9gi\xE9s sans pr\xE9authentification Kerberos (Niveau\
         \ 1)"
@@ -3740,10 +3740,10 @@ objects:
             flag is not set. That property was designed for backward compatibility
             with older Kerberos implementations. It must never be set for privileged
             domain accounts. Any incompatible software must be upgraded.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_password_change_dc_no_change-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_password_change_dc_no_change-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_password_change_dc_no_change-l1
       name: "Contr\xF4leurs de domaine dont le mot de passe de compte d'ordinateur\
         \ est inchang\xE9 depuis plus de 45 jours (Niveau 1)"
@@ -3811,10 +3811,10 @@ objects:
             Running `nltest /SC_VERIFY:<DomainName>` (with `DomainName` being the
             domain NetBIOS name) can check the synchronization status, and should
             display `0 0x0 NERR_Success` for both verifications.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_password_change_inactive_dc-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_password_change_inactive_dc-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_password_change_inactive_dc-l1
       name: "Contr\xF4leurs de domaines inactifs (Niveau 1)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nDes contr\xF4leurs\
@@ -3853,10 +3853,10 @@ objects:
             255)">OWNER</span> control path exposing its computer account. To avoid
             doing so, use of the [Djoin](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/ff793312(v%3Dws.11))
             utility is advised.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_password_change_priv-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_password_change_priv-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_password_change_priv-l1
       name: "Comptes privil\xE9gi\xE9s dont le mot de passe est inchang\xE9 depuis\
         \ plus de 3 ans (Niveau 1)"
@@ -4003,10 +4003,10 @@ objects:
             \ \xBB: these operators can load arbitrary printer drivers on domain controllers,\
             \ which grants them the ability to recover privileged user secrets directly\
             \ from the authentication database (by loading a malicious driver)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_adminsdholder-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_adminsdholder-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_adminsdholder-l1
       name: Permissions dangereuses sur l'objet adminSDHolder (Niveau 1)
       description: "# Description de la vuln\xE9rabilit\xE9\n\nDes permissions dangereuses\
@@ -4290,10 +4290,10 @@ objects:
             \nAny other control path shall be manually investigated to properly address\
             \ the issue.\n\nA list of published Exchange Server security updates is\
             \ [available here](https://learn.microsoft.com/en-us/exchange/new-features/build-numbers-and-release-dates)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_adminsdholder-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_adminsdholder-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_adminsdholder-l2
       name: Permissions dangereuses sur l'objet adminSDHolder (Niveau 2)
       description: "# Description de la vuln\xE9rabilit\xE9\n\nDes permissions dangereuses\
@@ -4577,10 +4577,10 @@ objects:
             \nAny other control path shall be manually investigated to properly address\
             \ the issue.\n\nA list of published Exchange Server security updates is\
             \ [available here](https://learn.microsoft.com/en-us/exchange/new-features/build-numbers-and-release-dates)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_dc-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_dc-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_dc-l1
       name: "Permissions dangereuses sur les objets contr\xF4leurs de domaine (chemins\
         \ de contr\xF4le) (Niveau 1)"
@@ -4889,10 +4889,10 @@ objects:
             \ may be extracted from the Azure AD Connect installer with `msiexec`:\
             \ `msiexec /a \"AzureADConnect.msi\" /qb TARGETDIR=c:\\temp\\`\n\nThe\
             \ installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_dc-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_dc-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_dc-l2
       name: "Permissions dangereuses sur les objets contr\xF4leurs de domaine (chemins\
         \ de contr\xF4le) (Niveau 2)"
@@ -5201,10 +5201,10 @@ objects:
             \ may be extracted from the Azure AD Connect installer with `msiexec`:\
             \ `msiexec /a \"AzureADConnect.msi\" /qb TARGETDIR=c:\\temp\\`\n\nThe\
             \ installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_dfsr_sysvol-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_dfsr_sysvol-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_dfsr_sysvol-l1
       name: "Permissions dangereuses sur les objets des param\xE8tres DFSR du SYSVOL\
         \ (chemins de contr\xF4le) (Niveau 1)"
@@ -5448,10 +5448,10 @@ objects:
 
 
             The installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_dfsr_sysvol-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_dfsr_sysvol-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_dfsr_sysvol-l2
       name: "Permissions dangereuses sur les objets des param\xE8tres DFSR du SYSVOL\
         \ (chemins de contr\xF4le) (Niveau 2)"
@@ -5695,10 +5695,10 @@ objects:
 
 
             The installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_dpapi-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_dpapi-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_dpapi-l1
       name: "Permissions dangereuses sur les objets de cl\xE9s DPAPI (chemins de contr\xF4\
         le) (Niveau 1)"
@@ -5952,10 +5952,10 @@ objects:
 
 
             The installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_dpapi-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_dpapi-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_dpapi-l2
       name: "Permissions dangereuses sur les objets de cl\xE9s DPAPI (chemins de contr\xF4\
         le) (Niveau 2)"
@@ -6209,10 +6209,10 @@ objects:
 
 
             The installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_gmsa_keys-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_gmsa_keys-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_gmsa_keys-l1
       name: "Permissions dangereuses vers les objets de cl\xE9s gMSA (chemins de contr\xF4\
         le) (Niveau 1)"
@@ -6464,10 +6464,10 @@ objects:
 
 
             The installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_gmsa_keys-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_gmsa_keys-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_gmsa_keys-l2
       name: "Permissions dangereuses vers les objets de cl\xE9s gMSA (chemins de contr\xF4\
         le) (Niveau 2)"
@@ -6719,10 +6719,10 @@ objects:
 
 
             The installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_naming_context-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_naming_context-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_naming_context-l1
       name: "Permissions dangereuses sur la racine des naming contexts (chemins de\
         \ contr\xF4le) (Niveau 1)"
@@ -7023,10 +7023,10 @@ objects:
             \ may be extracted from the Azure AD Connect installer with `msiexec`:\
             \ `msiexec /a \"AzureADConnect.msi\" /qb TARGETDIR=c:\\temp\\`\n\nThe\
             \ installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_naming_context-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_naming_context-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_naming_context-l2
       name: "Permissions dangereuses sur la racine des naming contexts (chemins de\
         \ contr\xF4le) (Niveau 2)"
@@ -7327,10 +7327,10 @@ objects:
             \ may be extracted from the Azure AD Connect installer with `msiexec`:\
             \ `msiexec /a \"AzureADConnect.msi\" /qb TARGETDIR=c:\\temp\\`\n\nThe\
             \ installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_schema-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_schema-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_schema-l1
       name: "Permissions dangereuses sur les objets du sch\xE9ma (chemins de contr\xF4\
         le) (Niveau 1)"
@@ -7591,10 +7591,10 @@ objects:
 
 
             The installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_schema-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_schema-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_schema-l2
       name: "Permissions dangereuses sur les objets du sch\xE9ma (chemins de contr\xF4\
         le) (Niveau 2)"
@@ -7855,10 +7855,10 @@ objects:
 
 
             The installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_msdns-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_msdns-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_msdns-l1
       name: "Permissions dangereuses sur les objets serveurs MicrosoftDNS (chemins\
         \ de contr\xF4le) (Niveau 1)"
@@ -8175,10 +8175,10 @@ objects:
 
 
             The installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_gpo_priv-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_gpo_priv-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_gpo_priv-l1
       name: "Permissions dangereuses sur les objets de GPO s'appliquant aux membres\
         \ des groupes privil\xE9gi\xE9s (chemins de contr\xF4le) (Niveau 1)"
@@ -8409,10 +8409,10 @@ objects:
 
 
             The installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_primary_group_id_1000-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_primary_group_id_1000-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_primary_group_id_1000-l1
       name: "Comptes avec un PrimaryGroupID inf\xE9rieur \xE0 1000 (Niveau 1)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nCertains utilisateurs\
@@ -8455,10 +8455,10 @@ objects:
             \ (Contr\xF4leurs de domaine));\n* read-only domain controller (RODC)\
             \ accounts : 521 (*Read-only Domain Controllers* (Contr\xF4leurs de domaine\
             \ en lecture seule))."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_privileged_members-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_privileged_members-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_privileged_members-l1
       name: "Nombre important de membres des groupes privil\xE9gi\xE9s (Niveau 1)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nLa for\xEAt contient\
@@ -8619,10 +8619,10 @@ objects:
             \ can load arbitrary printer drivers on domain controllers, which grants\
             \ them the ability to recover privileged user secrets directly from the\
             \ authentication database (by loading a malicious driver)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_privileged_members-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_privileged_members-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_privileged_members-l2
       name: "Nombre important de membres des groupes privil\xE9gi\xE9s (Niveau 2)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nLa for\xEAt contient\
@@ -8783,10 +8783,10 @@ objects:
             \ can load arbitrary printer drivers on domain controllers, which grants\
             \ them the ability to recover privileged user secrets directly from the\
             \ authentication database (by loading a malicious driver)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_privileged_members_perm-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_privileged_members_perm-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_privileged_members_perm-l1
       name: "Permissions dangereuses sur des membres de groupes privil\xE9gi\xE9s\
         \ (chemins de contr\xF4le) (Niveau 1)"
@@ -9126,10 +9126,10 @@ objects:
             \ may be extracted from the Azure AD Connect installer with `msiexec`:\
             \ `msiexec /a \"AzureADConnect.msi\" /qb TARGETDIR=c:\\temp\\`\n\nThe\
             \ installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_privileged_members_perm-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_privileged_members_perm-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_privileged_members_perm-l2
       name: "Permissions dangereuses sur des membres de groupes privil\xE9gi\xE9s\
         \ (chemins de contr\xF4le) (Niveau 2)"
@@ -9469,10 +9469,10 @@ objects:
             \ may be extracted from the Azure AD Connect installer with `msiexec`:\
             \ `msiexec /a \"AzureADConnect.msi\" /qb TARGETDIR=c:\\temp\\`\n\nThe\
             \ installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_spn_priv-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_spn_priv-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_spn_priv-l1
       name: "Comptes privil\xE9gi\xE9s avec SPN (Niveau 1)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nL'attribut `servicePrincipalName`\
@@ -9609,10 +9609,10 @@ objects:
             \ \xBB: these operators can load arbitrary printer drivers on domain controllers,\
             \ which grants them the ability to recover privileged user secrets directly\
             \ from the authentication database (by loading a malicious driver)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_trusts_domain_notfiltered-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_trusts_domain_notfiltered-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_trusts_domain_notfiltered-l1
       name: "Relations d'approbation sortante de type domaine non filtr\xE9 (Niveau\
         \ 1)"
@@ -9689,10 +9689,10 @@ objects:
             / old forests, internal trust relationships may not bear the <code style="background-color:rgb(0,
             123, 255);color:rgb(255, 255, 255)">WITHIN_FOREST</code> flag. Should
             this occur the various flags must be manually set on all relevant relationships.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_trusts_forest_sidhistory-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_trusts_forest_sidhistory-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_trusts_forest_sidhistory-l1
       name: "Relations d'approbation sortantes de type for\xEAt avec sID History activ\xE9\
         \ (Niveau 1)"
@@ -9753,10 +9753,10 @@ objects:
             the `sIDHistory` mechanism. Otherwise, filtering should be restored to
             its defaults through the command: `netdom trust <forest> /domain:<other
             trusted forest> /EnableSIDHistory:no`.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_user_accounts_dormant-l1
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_user_accounts_dormant-l1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_user_accounts_dormant-l1
       name: "Nombre important de comptes actifs inutilis\xE9s (Niveau 1)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nLa for\xEAt contient\
@@ -9888,10 +9888,10 @@ objects:
 
             * optionally, update the account description field to mention the context
             for disabling (date, reason, etc.).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_adupdate_bad-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_adupdate_bad-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_adupdate_bad-l2
       name: Mauvaises versions de l'Active Directory (Niveau 2)
       description: "# Description de la vuln\xE9rabilit\xE9\n\nLa pr\xE9paration du\
@@ -9946,10 +9946,10 @@ objects:
             \ operating systems or functional levels (domain and forest). It is not\
             \ required to update domain controllers operating systems or raise functional\
             \ levels."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_compatible_2000_anonymous-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_compatible_2000_anonymous-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_compatible_2000_anonymous-l2
       name: Le groupe "Pre-Windows 2000 Compatible Access" contient "Anonymous" (Niveau
         2)
@@ -9983,10 +9983,10 @@ objects:
             \ to serve backward compatibility purposes for systems prior to Windows\
             \ 2000 (Windows NT 4.0). This group must only include *Authenticated Users*\
             \ (Utilisateurs authentifi\xE9s) (`S-1-5-11`)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_dc_crypto-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_dc_crypto-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_dc_crypto-l2
       name: "Algorithmes de chiffrement support\xE9s par les DC/RODC (Niveau 2)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nLes DC/RODC mettent\
@@ -10111,10 +10111,10 @@ objects:
             \ r\xE9seau : Configurer les types de chiffrement autoris\xE9s pour Kerberos\
             \ : RC4-HMAC, AES128-CTS-HMAC-SHA1-96, AES256-CTS-HMAC-SHA1-96 and \"\
             Future encryption types\""
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_dc_crypto-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_dc_crypto-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_dc_crypto-l3
       name: "Algorithmes de chiffrement support\xE9s par les DC/RODC (Niveau 3)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nLes DC/RODC mettent\
@@ -10239,10 +10239,10 @@ objects:
             \ r\xE9seau : Configurer les types de chiffrement autoris\xE9s pour Kerberos\
             \ : RC4-HMAC, AES128-CTS-HMAC-SHA1-96, AES256-CTS-HMAC-SHA1-96 and \"\
             Future encryption types\""
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_dc_crypto-l4
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_dc_crypto-l4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_dc_crypto-l4
       name: "Algorithmes de chiffrement support\xE9s par les DC/RODC (Niveau 4)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nLes DC/RODC mettent\
@@ -10367,10 +10367,10 @@ objects:
             \ r\xE9seau : Configurer les types de chiffrement autoris\xE9s pour Kerberos\
             \ : RC4-HMAC, AES128-CTS-HMAC-SHA1-96, AES256-CTS-HMAC-SHA1-96 and \"\
             Future encryption types\""
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_dont_expire-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_dont_expire-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_dont_expire-l2
       name: Comptes dont le mot de passe n'expire jamais (Niveau 2)
       description: "# Description de la vuln\xE9rabilit\xE9\n\nPlus de 10% des comptes\
@@ -10488,10 +10488,10 @@ objects:
             * a procedure to change its password;
 
             * a person or a team responsible for its lifecycle.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_guest-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_guest-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_guest-l2
       name: "Compte Invit\xE9 actif (Niveau 2)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nLe compte *Invit\xE9\
@@ -10522,10 +10522,10 @@ objects:
             \ (Tout le monde) group are accessible over the network, which could lead\
             \ to the exposure or corruption of data."
           annotation: "# Recommended measure\n\nDisable the *Guest* (Invit\xE9) account."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_kerberos_properties_deskey-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_kerberos_properties_deskey-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_kerberos_properties_deskey-l2
       name: Comptes utilisateurs avec un chiffrement Kerberos faible (Niveau 2)
       description: "# Description de la vuln\xE9rabilit\xE9\n\nLa propri\xE9t\xE9\
@@ -10587,10 +10587,10 @@ objects:
 
 
             Any incompatible software must be upgraded.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_kerberos_properties_preauth-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_kerberos_properties_preauth-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_kerberos_properties_preauth-l2
       name: "Comptes sans pr\xE9authentification Kerberos (Niveau 2)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nDes comptes n'imposent\
@@ -10666,10 +10666,10 @@ objects:
             * changing the affected user passwords after modifying the PSO settings;
 
             * enforcing AES usage for the affected account.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_krbtgt-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_krbtgt-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_krbtgt-l2
       name: "Mot de passe du compte krbtgt inchang\xE9 depuis plus d'un an (Niveau\
         \ 2)"
@@ -10766,10 +10766,10 @@ objects:
             controllers. An alternative strategy could be rolling this password only
             once every 6 months, thus ensuring proper revocation of all previous passwords
             every year.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_password_change_server_no_change_90-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_password_change_server_no_change_90-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_password_change_server_no_change_90-l2
       name: "Serveurs dont le mot de passe de compte d'ordinateur est inchang\xE9\
         \ depuis plus de 90 jours (Niveau 2)"
@@ -10835,10 +10835,10 @@ objects:
             Running `nltest /SC_VERIFY:<DomainName>` (with `DomainName` being the
             domain NetBIOS name) can check the synchronization status, and should
             display `0 0x0 NERR_Success` for both verifications.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_password_change_cluster_no_change_3years-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_password_change_cluster_no_change_3years-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_password_change_cluster_no_change_3years-l2
       name: "Comptes utilis\xE9s dans un cluster de basculement Windows Server dont\
         \ le mot de passe est inchang\xE9 depuis plus de 3 ans (Niveau 2)"
@@ -10871,10 +10871,10 @@ objects:
             The password renewal must follow a Ce changement fait l''objet d''un [specific
             process](https://learn.microsoft.com/fr-fr/windows-server/failover-clustering/configure-ad-accounts#planning-ahead-for-password-resets-and-other-account-maintenance9)
             depending on the cluster members.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_password_change_msa_no_change_90-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_password_change_msa_no_change_90-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_password_change_msa_no_change_90-l2
       name: "Comptes de service manag\xE9s dont le mot de passe de compte est inchang\xE9\
         \ depuis plus de 90 jours (Niveau 2)"
@@ -10925,10 +10925,10 @@ objects:
 
             Incorrect values should be reset to their default setting, and GPOs must
             be checked to ensure they do not override those.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_gpo_container_priv-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_permissions_gpo_container_priv-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_permissions_gpo_container_priv-l2
       name: "Permissions dangereuses sur des conteneurs d'objets privil\xE9gi\xE9\
         s (chemins de contr\xF4le) (Niveau 2)"
@@ -11141,10 +11141,10 @@ objects:
 
 
             The installation package may be downloaded from [https://go.microsoft.com/fwlink/?LinkId=615771](https://go.microsoft.com/fwlink/?LinkId=615771).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_privileged_members_password-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_privileged_members_password-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_privileged_members_password-l2
       name: "Comptes membres de groupes privil\xE9gi\xE9s avec une mauvaise politique\
         \ de mot de passe (Niveau 2)"
@@ -11211,10 +11211,10 @@ objects:
             Important note: passwords should not be renewed too often. Enforcing short
             password lifespans compels users to choose statistically weaker passwords,
             which negates the intended benefits.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_privileged_members_no_admincount-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_privileged_members_no_admincount-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_privileged_members_no_admincount-l2
       name: "Comptes membres de groupes privil\xE9gi\xE9s ayant un attribut adminCount\
         \ vide ou valant 0 (Niveau 2)"
@@ -11317,10 +11317,10 @@ objects:
             \ \xBB: these operators can load arbitrary printer drivers on domain controllers,\
             \ which grants them the ability to recover privileged user secrets directly\
             \ from the authentication database (by loading a malicious driver)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_rodc_priv_revealed-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_rodc_priv_revealed-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_rodc_priv_revealed-l2
       name: "Comptes ou groupes privil\xE9gi\xE9s r\xE9v\xE9l\xE9s par des RODC (Niveau\
         \ 2)"
@@ -11431,10 +11431,10 @@ objects:
             \ can load arbitrary printer drivers on domain controllers, which grants\
             \ them the ability to recover privileged user secrets directly from the\
             \ authentication database (by loading a malicious driver)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_sidhistory_dangerous-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_sidhistory_dangerous-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_sidhistory_dangerous-l2
       name: Comptes ou groupes ayant un historique de SID d'apparence non conforme
         (Niveau 2)
@@ -11476,10 +11476,10 @@ objects:
             An investigation into the reasons for these unexpected SIDs being granted
             to users should be carried out. The `sIDHistory` attribute must then be
             erased for all the aforementioned users and computers.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_sysvol_ntfrs-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_sysvol_ntfrs-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_sysvol_ntfrs-l2
       name: "Utilisation de NTFRS pour la r\xE9plication du SYSVOL (Niveau 2)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nDes contr\xF4leurs\
@@ -11517,10 +11517,10 @@ objects:
 
             Note: support for NTFRS has been dropped in latest Windows Server versions.
             Migration to DSFR is documented at the URL below: [https://docs.microsoft.com/en-us/windows-server/storage/dfs-replication/migrate-sysvol-to-dfsr](https://docs.microsoft.com/en-us/windows-server/storage/dfs-replication/migrate-sysvol-to-dfsr).'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_trusts_accounts-l2
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_trusts_accounts-l2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_trusts_accounts-l2
       name: "Comptes de trust dont le mot de passe est inchang\xE9 depuis plus d'un\
         \ an (Niveau 2)"
@@ -11563,10 +11563,10 @@ objects:
             Trust passwords should be changed at least once a year. That change must
             be automatic for trust relationships between Microsoft environments. The
             cause for the lack of an automatic renewal should be investigated.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_compatible_2000_not_default-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_compatible_2000_not_default-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_compatible_2000_not_default-l3
       name: Comptes ou groupes membres de "Pre-Windows 2000 Compatible Access" (Niveau
         3)
@@ -11608,10 +11608,10 @@ objects:
             \ automatically added to this group upon installation. They can be removed\
             \ in most instances as it is likely not useful. This operation is easily\
             \ reversible."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_kerberos_properties_encryption-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_kerberos_properties_encryption-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_kerberos_properties_encryption-l3
       name: "Algorithmes de chiffrement support\xE9s par les comptes de service (Niveau\
         \ 3)"
@@ -11673,10 +11673,10 @@ objects:
             \ options:\n  * \"This account supports Kerberos AES 128-bits encryption.\"\
             \n  * \"This account supports Kerberos AES 256-bits encryption.\"\n\n\
             Any incompatible software must be upgraded."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_owner-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_owner-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_owner-l3
       name: "Objets ayant un propri\xE9taire inadapt\xE9 (Niveau 3)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nDes objets, cr\xE9\xE9\
@@ -11705,10 +11705,10 @@ objects:
             \ Admins* (Administrateurs de l'entreprise) \xBB ;\n* \xAB *Administrators*\
             \ (Administrateurs) \xBB ;\n* \xAB *Local System* (Syst\xE8me local) \xBB\
             ."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_password_change_inactive_servers-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_password_change_inactive_servers-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_password_change_inactive_servers-l3
       name: Serveurs inactifs (Niveau 3)
       description: "# Description de la vuln\xE9rabilit\xE9\n\nDes serveurs ne se\
@@ -11745,10 +11745,10 @@ objects:
             53, 69);color:rgb(255, 255, 255)">OWNER</span> control path exposing its
             computer account. To avoid doing so, use of the [Djoin](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/ff793312(v%3Dws.11))
             utility is advised.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_password_change_server_no_change_45-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_password_change_server_no_change_45-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_password_change_server_no_change_45-l3
       name: "Serveurs dont le mot de passe de compte d'ordinateur est inchang\xE9\
         \ depuis plus de 45 jours (Niveau 3)"
@@ -11814,10 +11814,10 @@ objects:
             Running `nltest /SC_VERIFY:<DomainName>` (with `DomainName` being the
             domain NetBIOS name) can check the synchronization status, and should
             display `0 0x0 NERR_Success` for both verifications.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_primary_group_id_nochange-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_primary_group_id_nochange-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_primary_group_id_nochange-l3
       name: "Comptes avec un PrimaryGroupID modifi\xE9 (Niveau 3)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nCertains utilisateurs\
@@ -11857,10 +11857,10 @@ objects:
             \ (Contr\xF4leurs de domaine));\n* read-only domain controller (RODC)\
             \ accounts : 521 (*Read-only Domain Controllers* (Contr\xF4leurs de domaine\
             \ en lecture seule))."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_protected_users-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_protected_users-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_protected_users-l3
       name: "Comptes privil\xE9gi\xE9s non membres du groupe Protected Users (Niveau\
         \ 3)"
@@ -11953,10 +11953,10 @@ objects:
             \ can load arbitrary printer drivers on domain controllers, which grants\
             \ them the ability to recover privileged user secrets directly from the\
             \ authentication database (by loading a malicious driver)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_reversible_password-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_reversible_password-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_reversible_password-l3
       name: "Comptes ayant leur mot de passe stock\xE9 de mani\xE8re r\xE9versible\
         \ (Niveau 3)"
@@ -12003,10 +12003,10 @@ objects:
 
             If these settings have a legitimate use, it should be documented, for
             instance in the account description attribute.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_rodc_never_reveal-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_rodc_never_reveal-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_rodc_never_reveal-l3
       name: "Configuration dangereuse des contr\xF4leurs de domaine en lecture seule\
         \ (RODC) (neverReveal) (Niveau 3)"
@@ -12044,10 +12044,10 @@ objects:
             rateurs de compte);\n* *Backup Operators* (Op\xE9rateurs de sauvegarde);\n\
             * *Denied RODC Password Replication Group* (Groupe de r\xE9plication de\
             \ mot de passe RODC refus\xE9e)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_rodc_reveal-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_rodc_reveal-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_rodc_reveal-l3
       name: "Comptes ou groupes privil\xE9gi\xE9s pr\xE9sents dans les attributs de\
         \ r\xE9v\xE9lation des RODC (Niveau 3)"
@@ -12135,10 +12135,10 @@ objects:
             \ \xBB: these operators can load arbitrary printer drivers on domain controllers,\
             \ which grants them the ability to recover privileged user secrets directly\
             \ from the authentication database (by loading a malicious driver)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_rodc_allowed_group-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_rodc_allowed_group-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_rodc_allowed_group-l3
       name: "Configuration dangereuse des groupes de r\xE9plication pour les contr\xF4\
         leurs de domaine en lecture seule (RODC) (allow) (Niveau 3)"
@@ -12164,10 +12164,10 @@ objects:
             \ passe RODC autoris\xE9e) have their password hashes revealed on all\
             \ RODCs.\n\nThis group should be emptied, and dedicated groups should\
             \ only be added to the Password Replication Policy of each relevant RODC."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_rodc_denied_group-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_rodc_denied_group-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_rodc_denied_group-l3
       name: "Configuration dangereuse des groupes de r\xE9plication pour les contr\xF4\
         leurs de domaine en lecture seule (RODC) (denied) (Niveau 3)"
@@ -12201,10 +12201,10 @@ objects:
             \ (Administrateurs du domaine);\n* *Cert Publishers* (\xC9diteurs de certificats);\n\
             * *Enterprise Admins* (Administrateurs de l'entreprise);\n* *Schema Admins*\
             \ (Administrateurs du sch\xE9ma);\n* *KRBTGT* (KRBTGT)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_rodc_orphan_krbtgt-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_rodc_orphan_krbtgt-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_rodc_orphan_krbtgt-l3
       name: Comptes krbtgt de RODC orphelins (Niveau 3)
       description: "# Description de la vuln\xE9rabilit\xE9\n\nDes comptes `krbtgt`\
@@ -12224,10 +12224,10 @@ objects:
 
 
             Unused `krbtgt` accounts can be deleted.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_sidhistory_present-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_sidhistory_present-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_sidhistory_present-l3
       name: Comptes ou groupes ayant un historique de SID (Niveau 3)
       description: "# Description de la vuln\xE9rabilit\xE9\n\nDes comptes ou groupes\
@@ -12277,10 +12277,10 @@ objects:
 
             The `sIDHistory` attribute must be erased for all accounts and groups
             aforementioned, as soon as domain migrations are completed.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_trusts_tgt_deleg-l3
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_trusts_tgt_deleg-l3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_trusts_tgt_deleg-l3
       name: "Relations d'approbation entrante avec d\xE9l\xE9gation (Niveau 3)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nDes relations d'approbation\
@@ -12324,10 +12324,10 @@ objects:
             It is possible to disable TGT delegation with <span style="background-color:rgb(255,
             165, 0);color:rgb(0, 0, 0)">Windows 2012</span> and later, through the
             command: `netdom trust <domain> /domain:<trusted domain> /EnableTGTDelegation:no`'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_group_loop-l4
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_group_loop-l4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_group_loop-l4
       name: "Pr\xE9sences de boucles d'imbrication de groupes (Niveau 4)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nLa pr\xE9sence de boucles\
@@ -12350,10 +12350,10 @@ objects:
 
 
             For hygiene purpose it is recommended to remove the loops in group memberships.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_silo_priv-l4
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_silo_priv-l4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_silo_priv-l4
       name: "Membres des groupes privil\xE9gi\xE9s hors silo d'authentification (Niveau\
         \ 4)"
@@ -12437,10 +12437,10 @@ objects:
             \ \xBB: these operators can load arbitrary printer drivers on domain controllers,\
             \ which grants them the ability to recover privileged user secrets directly\
             \ from the authentication database (by loading a malicious driver)."
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_smartcard_expire_passwords-l4
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_smartcard_expire_passwords-l4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_smartcard_expire_passwords-l4
       name: "Comptes utilisateurs de carte \xE0 puce sans expiration de mot de passe\
         \ (Niveau 4)"
@@ -12484,10 +12484,10 @@ objects:
             The `msDS-ExpirePasswordsOnSmartCardOnlyAccounts` attribute should be
             set at the root of each domain, even if smart cards are not currently
             used.'
-    - urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:vuln_user_accounts_machineaccountquota-l4
+    - urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:vuln_user_accounts_machineaccountquota-l4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
+      parent_urn: urn:ciso:risk:req_node:anssi-points-de-controle-active-directory:assessment_item_list
       ref_id: vuln_user_accounts_machineaccountquota-l4
       name: "Ajout de machines au domaine non limit\xE9 (Niveau 4)"
       description: "# Description de la vuln\xE9rabilit\xE9\n\nPar d\xE9faut les utilisateurs\

@@ -1,4 +1,4 @@
-urn: urn:intuitem:risk:library:bsi-c5-2020
+urn: urn:ciso:risk:library:bsi-c5-2020
 locale: en
 ref_id: BSI-C5-2020
 name: BSI C5 Library
@@ -7,24 +7,24 @@ copyright: BSI
 version: 1
 publication_date: 2024-09-29
 provider: BSI
-packager: intuitem
+packager: ciso-assistant
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:bsi-c5-2020
+    urn: urn:ciso:risk:framework:bsi-c5-2020
     ref_id: BSI-C5-2020
     name: BSI C5 Library
     description: Cloud Computing Compliance Criteria Catalogue (C5)
     min_score: 0
     max_score: 100
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node2
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node2
       assessable: false
       depth: 1
       name: Organisation of Information Security (OIS)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ois-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ois-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node2
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node2
       ref_id: OIS-01
       name: Information Security Management System (ISMS)
       description: "The Cloud Service Provider operates an information security management\
@@ -41,10 +41,10 @@ objects:
         The basic criterion can also be fulfilled without valid certification of the
         ISMS according to ISO/IEC 27001 or ISO 27001 based on IT-Grundschutz, if the
         submitted documentation meets the requirements of ISO/IEC 27001.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ois-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ois-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node2
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node2
       ref_id: OIS-02
       name: Information Security Policy
       description: "The top management of the Cloud Service Provider has adopted an\
@@ -58,10 +58,10 @@ objects:
         \ structure for information security in the ISMS application area."
       annotation: The top management is a natural person or group of persons who make
         the final decision for the institution and is responsible for that decision.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ois-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ois-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node2
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node2
       ref_id: OIS-03
       name: Interfaces and Dependencies
       description: "Interfaces and dependencies between cloud service delivery activities\
@@ -85,10 +85,10 @@ objects:
 
         Third parties in the sense of this basic criterion are, e.g. cloud customers
         and sub-service providers.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ois-04
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ois-04
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node2
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node2
       ref_id: OIS-04
       name: Segregation of Duties
       description: "Conflicting tasks and responsibilities are separated based on\
@@ -106,10 +106,10 @@ objects:
       annotation: Identified events that may constitute unauthorised or unintentional
         changes to or misuse of cloud customer data may, for example, be treated as
         a security incident, cf. SIM-01.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ois-05
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ois-05
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node2
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node2
       ref_id: OIS-05
       name: Contact with Relevant Government Agencies and Interest Groups
       description: The Cloud Service Provider leverages relevant authorities and interest
@@ -123,10 +123,10 @@ objects:
         \n\u2022 OWASP Foundation; and\n\n\u2022 CERT networks DFN-CERT, TF-CSIRT\
         \ etc.\n\nPublic sector organisations in Germany are e.g. authorities and\
         \ ministries."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ois-06
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ois-06
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node2
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node2
       ref_id: OIS-06
       name: Risk Management Policy
       description: "Policies and instructions for risk management procedures are documented,\
@@ -142,10 +142,10 @@ objects:
         \ enable consistent, valid and comparable results."
       annotation: The risk level can be determined by qualitative, semi-quantitative
         and quantitative methods (cf. ISO 31010) based on the likelihood and impacts.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ois-07
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ois-07
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node2
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node2
       ref_id: OIS-07
       name: Application of the Risk Management Policy
       description: "The Cloud Service Provider executes the process for handling risks\
@@ -171,14 +171,14 @@ objects:
         \ found in the criteria area \u201CControl and Monitoring of Service Providers\
         \ and Suppliers (SSO)\u201D.\n\nShared resources are e.g. networks, RAM or\
         \ storage."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node10
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node10
       assessable: false
       depth: 1
       name: Security Policies and Instructions (SP)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:sp-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:sp-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node10
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node10
       ref_id: SP-01
       name: Documentation, communication and provision of policies and instructions
       description: "Policies and instructions (incl. concepts and guidelines) are\
@@ -217,10 +217,10 @@ objects:
         \n\u2022 Policy for security incident management (SIM-01)\n\n\u2022 Business\
         \ impact analysis policies and procedures (BCM-02)\n\n\u2022 Policy for planning\
         \ and conducting audits (COM-02)"
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:sp-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:sp-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node10
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node10
       ref_id: SP-02
       name: Review and Approval of Policies and Instructions
       description: "Information security policies and instructions are reviewed at\
@@ -230,10 +230,10 @@ objects:
         \ the cloud service; and\n\n\u2022 Legal and regulatory changes in the Cloud\
         \ Service Provider's environment.\n\nRevised policies and instructions are\
         \ approved before they become effective."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:sp-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:sp-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node10
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node10
       ref_id: SP-03
       name: Exceptions from Existing Policies and Instructions
       description: Exceptions to the policies and instructions for information security
@@ -250,14 +250,14 @@ objects:
         \ information from the Cloud Service Provider about deviations from information\
         \ security policies and instructions in order to assess and appropriately\
         \ manage the associated risks to their own information security."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node14
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node14
       assessable: false
       depth: 1
       name: Personnel (HR)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:hr-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:hr-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node14
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node14
       ref_id: HR-01
       name: Verification of qualification and trustworthiness
       description: "The competency and integrity of all internal and external employees\
@@ -283,10 +283,10 @@ objects:
         equivalents of the German certificate of good conduct may also be permitted.
         The assessment of the extent to which a potential employee can be blackmailed
         can be carried out, for example, by checking his creditworthiness.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:hr-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:hr-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node14
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node14
       ref_id: HR-02
       name: Employment terms and conditions
       description: 'The Cloud Service Provider''s internal and external employees
@@ -301,10 +301,10 @@ objects:
         cloud service in the production environment.'
       annotation: The Cloud Service Provider ensures that the policies and instructions
         reflect applicable legal and regulatory requirements in accordance with SP-01.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:hr-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:hr-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node14
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node14
       ref_id: HR-03
       name: Security training and awareness programme
       description: "The Cloud Service Provider operates a target group-oriented security\
@@ -322,10 +322,10 @@ objects:
         programme are measured and evaluated in a target group-oriented manner. The
         measurements cover quantitative and qualitative aspects. The results are used
         to improve the awareness and training programme.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:hr-04
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:hr-04
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node14
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node14
       ref_id: HR-04
       name: Disciplinary measures
       description: "In the event of violations of policies and instructions or applicable\
@@ -337,10 +337,10 @@ objects:
         \ measures.\n\nThe use of disciplinary measures is appropriately documented."
       annotation: The Cloud Service Provider ensures that the policies and instructions
         reflect applicable legal and regulatory requirements in accordance with SP-01.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:hr-05
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:hr-05
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node14
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node14
       ref_id: HR-05
       name: Responsibilities in the event of termination or change of employment
       description: Internal and external employees have been informed about which
@@ -349,10 +349,10 @@ objects:
         or changed and for how long.
       annotation: The Cloud Service Provider ensures that the policies and instructions
         reflect applicable legal and regulatory requirements in accordance with SP-01.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:hr-06
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:hr-06
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node14
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node14
       ref_id: HR-06
       name: Confidentiality agreements
       description: "The non-disclosure or confidentiality agreements to be agreed\
@@ -378,14 +378,14 @@ objects:
         \ if necessary; and\n\n\u2022 The consequences of a breach of the agreement.\n\
         \nConfidentiality or non-disclosure agreements can be signed by means of an\
         \ electronic signature, insofar as this is legally binding."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node21
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node21
       assessable: false
       depth: 1
       name: Asset Management (AM)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:am-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:am-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node21
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node21
       ref_id: AM-01
       name: Asset Inventory
       description: 'The Cloud Service Provider has established procedures for inventorying
@@ -420,10 +420,10 @@ objects:
         \ programming interfaces (APIs).\n\nThe lifecycle of an asset includes:\n\n\
         \u2022 Acquisition;\n\n\u2022 Commissioning;\n\n\u2022 Maintenance;\n\n\u2022\
         \ Decommissioning; and\n\n\u2022 Disposal."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:am-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:am-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node21
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node21
       ref_id: AM-02
       name: Acceptable Use and Safe Handling of Assets Policy
       description: "Policies and instructions for acceptable use and safe handling\
@@ -442,10 +442,10 @@ objects:
         \ deactivation, deletion or blocking;\n\n\u2022 Physical delivery and transport;\n\
         \n\u2022 dealing with incidents and vulnerabilities; and\n\n\u2022 Complete\
         \ and irrevocable deletion of the data upon decommissioning."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:am-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:am-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node21
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node21
       ref_id: AM-03
       name: Commissioning of Hardware
       description: The Cloud Service Provider has an approval process for the use
@@ -465,10 +465,10 @@ objects:
 
         The approval process typically considers both the basic approval to use the
         hardware and the final approval of the configured assets.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:am-04
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:am-04
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node21
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node21
       ref_id: AM-04
       name: Decommissioning of Hardware
       description: 'The decommissioning of hardware used to operate system components
@@ -481,10 +481,10 @@ objects:
       annotation: The deletion of data or physical destruction of data mediums can
         take place, for example, according to DIN 66399 or BSI IT-Grundschutz module
         CON.6.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:am-05
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:am-05
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node21
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node21
       ref_id: AM-05
       name: Commitment to Permissible Use, Safe Handling and Return of Assets
       description: 'The Cloud Service Provider''s internal and external employees
@@ -506,10 +506,10 @@ objects:
         smartphones, etc.), where confidential information is stored on them which
         can be used in the event of unauthorised access to obtain privileged access
         to the cloud service (e.g. if these are used as security tokens for authentication).'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:am-06
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:am-06
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node21
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node21
       ref_id: AM-06
       name: Asset Classification and Labelling
       description: 'Assets are classified and, if possible, labelled. Classification
@@ -531,14 +531,14 @@ objects:
         If the Cloud Service Provider does not make a differentiated classification
         of the assets, all assets are to be assigned to the highest defined protection
         requirement.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node28
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node28
       assessable: false
       depth: 1
       name: Physical Security (PS)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ps-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ps-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node28
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node28
       ref_id: PS-01
       name: Physical Security and Environmental Control Requirements
       description: "Security requirements for premises and buildings related to the\
@@ -617,10 +617,10 @@ objects:
         Time specifications for self-sustaining operation as well as maximum tolerable
         downtimes of utility facilities are typically collected during the business
         impact analysis (cf. BCM-02, BCM-03).'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ps-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ps-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node28
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node28
       ref_id: PS-02
       name: Redundancy model
       description: 'The cloud service is provided from two locations that are redundant
@@ -659,10 +659,10 @@ objects:
         \ an architecture can represent an alternative fulfilment (cf. Chapter 4.4.7)\
         \ of the criterion. The tests and exercises on functionality required in the\
         \ criterion also apply analogously to resilient architectures."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ps-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ps-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node28
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node28
       ref_id: PS-03
       name: Perimeter Protection
       description: "The structural shell of premises and buildings related to the\
@@ -686,10 +686,10 @@ objects:
         and other components must withstand a break-in attempt for at least 10 minutes.
         The US standard SD-STD-01.01 Rev.G. is an international equivalent to this
         standard.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ps-04
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ps-04
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node28
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node28
       ref_id: PS-04
       name: Physical site access control
       description: "At access points to premises and buildings related to the cloud\
@@ -713,10 +713,10 @@ objects:
         \ of access logging that enables the Cloud Service Provider, in the sense\
         \ of an effectiveness audit, to check whether only defined personnel have\
         \ entered the premises and buildings related to the cloud service provided."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ps-05
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ps-05
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node28
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node28
       ref_id: PS-05
       name: Protection from fire and smoke
       description: "Premises and buildings related to the cloud service provided are\
@@ -740,10 +740,10 @@ objects:
         \ allowed control range, alarm messages are generated and forwarded to the\
         \ responsible Cloud Service Provider.\nStructural parts are walls, ceilings,\
         \ floors, doors, ventilation flaps, etc."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ps-06
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ps-06
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node28
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node28
       ref_id: PS-06
       name: Protection against interruptions caused by power failures and other such
         risks
@@ -798,10 +798,10 @@ objects:
         Power supply and telecommunications lines can be protected against interruption,
         interference, damage and eavesdropping by e.g. underground supply via different
         supply routes.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ps-07
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ps-07
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node28
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node28
       ref_id: PS-07
       name: Surveillance of operational and environmental parameters
       description: The operating parameters of the technical utilities (cf. PS-06)
@@ -813,14 +813,14 @@ objects:
         the necessary measures for return to the control range.
       annotation: Operating parameters and environmental parameters of the premises
         and buildings are, e.g. air temperature and humidity, leakage.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       assessable: false
       depth: 1
       name: Operations (OPS)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-01
       name: Capacity Management - Planning
       description: "The planning of capacities and resources (personnel and IT resources)\
@@ -851,10 +851,10 @@ objects:
         planned and reflected in the SLA with the Cloud Service Provider. The requirements
         can also be reviewed regularly through appropriate controls and the SLA can
         be adjusted accordingly.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-02
       name: Capacity Management - Monitoring
       description: Technical and organisational safeguards for the monitoring and
@@ -869,10 +869,10 @@ objects:
         \u2022 Process for correlating events and interface to incident management;\n\
         \n\u2022 Continuous monitoring of the systems by qualified personnel; and\n\
         \n\u2022 Redundancies in the IT systems."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-03
       name: Capacity Management - Controlling of Resources
       description: Depending on the capabilities of the respective service model,
@@ -883,10 +883,10 @@ objects:
         \ for example\n\n\u2022 Computing capacity;\n\n\u2022 Storage capacity;\n\n\
         \u2022 Configuration of network properties;\n\n\u2022 Application Programming\
         \ Interfaces (APIs); and\n\n\u2022 Databases."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-04
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-04
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-04
       name: Protection Against Malware - Concept
       description: "Policies and instructions with specifications for protection against\
@@ -907,10 +907,10 @@ objects:
         Protection programs for employee devices can be, for example, server-based
         protection programs that scan files in attachments on the server or filter
         network traffic.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-05
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-05
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-05
       name: Protection Against Malware - Implementation
       description: System components under the Cloud Service Provider's responsibility
@@ -926,10 +926,10 @@ objects:
         Protection against malicious programs can be implemented by operating system-specific
         protection mechanisms or explicit protection programs (e.g. for signature-
         and behaviour-based detection and removal of malicious programs).'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-06
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-06
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-06
       name: Data Protection and Recovery - Concept
       description: "Policies and instructions for data backup and recovery are documented,\
@@ -958,10 +958,10 @@ objects:
         data of the Cloud Service Provider, only the adequacy and implementation of
         the controls must be proven, but not their effectiveness. For procedures to
         secure the data of cloud customers, proof of effectiveness must also be provided.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-07
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-07
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-07
       name: Data Backup and Recovery - Monitoring
       description: The execution of data backups is monitored by technical and organisational
@@ -976,10 +976,10 @@ objects:
         Service Provider and the cloud customer, this criterion is not applicable.
         The Cloud Service Provider must present this situation transparently in the
         system description.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-08
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-08
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-08
       name: Data Backup and Recovery - Regular Testing
       description: 'Restore procedures are tested regularly, at least annually. The
@@ -1000,10 +1000,10 @@ objects:
         Service Provider and the cloud customer, this criterion is not applicable.
         The Cloud Service Provider must present this situation transparently in the
         system description.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-09
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-09
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-09
       name: Data Backup and Recovery - Storage
       description: The Cloud Service Provider transfers data to be backed up to a
@@ -1021,10 +1021,10 @@ objects:
 
 
         A remote location can be e.g. another data centre of the Cloud Service Provider.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-10
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-10
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-10
       name: Logging and Monitoring - Concept
       description: "The Cloud Service Provider has established policies and instructions\
@@ -1039,10 +1039,10 @@ objects:
         \ system components; and\n\n\u2022 Compliance with legal and regulatory frameworks."
       annotation: Legal and regulatory frameworks can define e.g. legal requirements
         for retention and deletion of data.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-11
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-11
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-11
       name: Logging and Monitoring - Metadata Management Concept
       description: "Policies and instructions for the secure handling of metadata\
@@ -1073,10 +1073,10 @@ objects:
         clear definition of the collection and use of metadata. In addition, metadata
         refers to data that is generated when the Cloud Service Provider accesses
         customer data (e.g. for indexing).'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-12
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-12
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-12
       name: Logging and Monitoring - Access, Storage and Deletion
       description: "The requirements for the logging and monitoring of events and\
@@ -1085,10 +1085,10 @@ objects:
         \ for authorised users and systems;\n\n\u2022 Retention for the specified\
         \ period; and\n\n\u2022 Deletion when further retention is no longer necessary\
         \ for the purpose of collection."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-13
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-13
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-13
       name: Logging and Monitoring - Identification of Events
       description: "The logging data is automatically monitored for events that may\
@@ -1096,10 +1096,10 @@ objects:
         \ requirements. This also includes the detection of relationships between\
         \ events (event correlation). \n\nIdentified events are automatically reported\
         \ to the appropriate departments for prompt evaluation and action."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-14
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-14
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-14
       name: Logging and Monitoring - Storage of the Logging Data
       description: "The Cloud Service Provider retains the generated log data and\
@@ -1116,10 +1116,10 @@ objects:
         Customer. Depending on the protection requirements of the Cloud Service Provider
         and the technical feasibility, a logical or physical separation of log and
         customer data is carried out.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-15
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-15
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-15
       name: Logging and Monitoring - Accountability
       description: "The log data generated allows an unambiguous identification of\
@@ -1134,10 +1134,10 @@ objects:
 
         Infrastructure components in the sense of this criterion are e.g. fabric controllers,
         network components and virtualisation servers.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-16
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-16
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-16
       name: Logging and Monitoring - Configuration
       description: "Access to system components for logging and monitoring in the\
@@ -1146,10 +1146,10 @@ objects:
         \ policies (cf. DEV-03)."
       annotation: Access to system components for logging and monitoring in the Cloud
         Service Provider's area of responsibility requires two-factor authentication.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-17
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-17
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-17
       name: Logging and Monitoring - Availability of the Monitoring Software
       description: "The Cloud Service Provider monitors the system components for\
@@ -1159,10 +1159,10 @@ objects:
       annotation: The system components for logging and monitoring are designed in
         such a way that the overall functionality is not restricted if individual
         components fail.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-18
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-18
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-18
       name: Managing Vulnerabilities, Malfunctions and Errors - Concept
       description: "Guidelines and instructions with technical and organisational\
@@ -1180,10 +1180,10 @@ objects:
         metrics such as CVSS or OWASP. The decision not to remediate or mitigate identified
         vulnerabilities must be made by the Cloud Service Provider based on a risk
         assessment. If necessary, risk-compensating measures must be taken.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-19
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-19
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-19
       name: Managing Vulnerabilities, Malfunctions and Errors - Penetration Tests
       description: "The Cloud Service Provider has penetration tests carried out by\
@@ -1206,10 +1206,10 @@ objects:
         \ can serve as an orientation:\n\n\u2022 High: Immediate reaction;\n\n\u2022\
         \ Medium: Short-term response;\n\n\u2022 Low: Medium-term response; and\n\n\
         \u2022 Information: Long-term response."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-20
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-20
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-20
       name: Managing Vulnerabilities, Malfunctions and Errors - Measurements, Analyses
         and Assessments of Procedures
@@ -1223,10 +1223,10 @@ objects:
         their effectiveness.'
       annotation: Common Vulnerabilities and Exposures (CVE) or similar methods are
         a suitable way of documenting vulnerabilities and incidents.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-21
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-21
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-21
       name: Involvement of Cloud customers in the event of incidents
       description: 'The Cloud Service Provider periodically informs the cloud customer
@@ -1238,10 +1238,10 @@ objects:
         As soon as an incident has been resolved from the Cloud Service Provider''s
         perspective, the cloud customer is informed according to the contractual agreements,
         about the actions taken.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-22
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-22
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-22
       name: Testing and Documentation of known Vulnerabilities
       description: System components in the area of responsibility of the Cloud Service
@@ -1258,10 +1258,10 @@ objects:
         In contrast to penetration tests (Cf. OPS-20), which are carried out manually\
         \ and according to an individual scheme, the check for open vulnerabilities\
         \ is performed automatically, using so-called vulnerability scanners."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-23
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-23
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-23
       name: Managing Vulnerabilities, Malfunctions and Errors - System Hardening
       description: 'System components in the production environment used to provide
@@ -1295,10 +1295,10 @@ objects:
         \ Internet Security\u201D (CIS) or the corresponding modules in the BSI IT-Grundschutz-Kompendium.\n\
         \nCompliance with hardening specifications can be monitored with e.g. file\
         \ integrity monitoring"
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:ops-24
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:ops-24
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node36
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node36
       ref_id: OPS-24
       name: Separation of Datasets in the Cloud Infrastructure
       description: Cloud customer data stored and processed on shared virtual and
@@ -1317,14 +1317,14 @@ objects:
         also be provided through expert third party review results (e.g. penetration
         tests to validate the concept). The segregation of transmitted data is subject
         to control COS-06.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node61
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node61
       assessable: false
       depth: 1
       name: Identity and Access Management (IDM)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:idm-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:idm-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node61
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node61
       ref_id: IDM-01
       name: Policy for user accounts and access rights
       description: "A role and rights concept based on the business and security requirements\
@@ -1353,10 +1353,10 @@ objects:
         concern procedures for automated software provisioning (continuous delivery)
         as well as for automated provisioning and deprovisioning of user accounts
         and access rights based on approved requests.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:idm-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:idm-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node61
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node61
       ref_id: IDM-02
       name: Granting and change of user accounts and access rights
       description: Specified procedures for granting and modifying user accounts and
@@ -1367,10 +1367,10 @@ objects:
       annotation: The Cloud Service Provider offers cloud customers a self-service
         with which they can independently assign and change user accounts and access
         rights.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:idm-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:idm-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node61
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node61
       ref_id: IDM-03
       name: Locking and withdrawal of user accounts in the event of inactivity or
         multiple failed logins
@@ -1386,10 +1386,10 @@ objects:
         be repeated.'
       annotation: Locking can result from a longer absence of the employee, for example,
         due to illness, parental leave, or sabbatical.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:idm-04
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:idm-04
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node61
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node61
       ref_id: IDM-04
       name: Withdraw or adjust access rights as the task area changes
       description: Access rights are promptly revoked if the job responsibilities
@@ -1403,10 +1403,10 @@ objects:
         be triggered by changes in the employment relationship (e.g. termination,
         transfer) or in contracts and agreements. For privileged access rights the
         definition in IDM-06 applies.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:idm-05
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:idm-05
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node61
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node61
       ref_id: IDM-05
       name: Regular review of access rights
       description: Access rights of internal and external employees of the Cloud Service
@@ -1420,10 +1420,10 @@ objects:
         after their detection, by appropriate modification or withdrawal of the access
         rights.
       annotation: 'Privileged access rights are reviewed at least every six months. '
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:idm-06
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:idm-06
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node61
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node61
       ref_id: IDM-06
       name: Privileged access rights
       description: 'Privileged access rights for internal and external employees as
@@ -1457,10 +1457,10 @@ objects:
         \ of the data of the cloud customers (also indirectly, e.g. by deactivating\
         \ the logging and monitoring of security-relevant events). Misused privileged\
         \ access rights can be treated e.g. as a security incident, cf. SIM-01."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:idm-07
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:idm-07
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node61
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node61
       ref_id: IDM-07
       name: Access to cloud customer data
       description: The cloud customer is informed by the Cloud Service Provider whenever
@@ -1485,10 +1485,10 @@ objects:
 
         Subject matter experts in the sense of this basic criterion is personnel from
         e.g. IT, Compliance or Internal Audit. '
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:idm-08
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:idm-08
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node61
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node61
       ref_id: IDM-08
       name: Confidentiality of authentication information
       description: "The allocation of authentication information to access system\
@@ -1516,10 +1516,10 @@ objects:
 
         Insofar as this is legally binding, declarations can be signed using an electronic
         signature.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:idm-09
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:idm-09
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node61
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node61
       ref_id: IDM-09
       name: Authentication mechanisms
       description: System components in the Cloud Service Provider's area of responsibility
@@ -1539,14 +1539,14 @@ objects:
         multi-factor authentication. Within the non-production environment, users
         are authenticated using passwords, digitally signed certificates, or procedures
         that provide at least an equivalent level of security.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node71
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node71
       assessable: false
       depth: 1
       name: Cryptography and Key Management (CRY)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:cry-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:cry-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node71
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node71
       ref_id: CRY-01
       name: Policy for the use of encryption procedures and key management
       description: "Policies and instructions with technical and organisational safeguards\
@@ -1568,10 +1568,10 @@ objects:
         \ Cryptographic Mechanisms: Use of Internet Protocol Security (IPSec) and\
         \ Internet Key Exchange (IKEv2); and\n\n\u2022 BSI TR-02102-4 Cryptographic\
         \ Mechanisms: Use of Secure Shell (SSH)."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:cry-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:cry-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node71
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node71
       ref_id: CRY-02
       name: Encryption of data for transmission (transport encryption)
       description: The Cloud Service Provider has established procedures and technical
@@ -1592,10 +1592,10 @@ objects:
         \ wildcard certificates is not considered a secure procedure.\n\nThe basic\
         \ criterion for the transmission cloud customers' data, relates to e.g. the\
         \ sending of electronic messages via public networks."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:cry-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:cry-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node71
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node71
       ref_id: CRY-03
       name: Encryption of sensitive data for storage
       description: The Cloud Service Provider has established procedures and technical
@@ -1615,10 +1615,10 @@ objects:
         of the procedure, on a regular basis. This criterion does not apply to data
         that cannot be encrypted for the provision of the cloud service for functional
         reasons.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:cry-04
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:cry-04
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node71
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node71
       ref_id: CRY-04
       name: Secure key management
       description: "Procedures and technical safeguards for secure key management\
@@ -1637,14 +1637,14 @@ objects:
         or employee changes. The Cloud Service Provider protects the keys which are
         created and inserted into the cloud service by the cloud customers according
         to the same criteria as the keys created by the Cloud Service Provider.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node76
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node76
       assessable: false
       depth: 1
       name: Communication Security (COS)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:cos-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:cos-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node76
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node76
       ref_id: COS-01
       name: Technical safeguards
       description: Based on the results of a risk analysis carried out according to
@@ -1662,10 +1662,10 @@ objects:
         \ be conducted e.g. with MAC spoofing and ARP poisoning attacks. Technical\
         \ measures to prevent unknown physical or virtual devices from joining a physical\
         \ or virtual network can be based on e.g. MACSec according to IEEE 802.1X:2010. "
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:cos-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:cos-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node76
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node76
       ref_id: COS-02
       name: Security requirements for connections in the Cloud Service Provider's
         network
@@ -1681,10 +1681,10 @@ objects:
         \u2022 which cross-network communication is allowed"
       annotation: 'Cross-location communication can be realised for e.g. individual
         regions or data centres via e.g. WAN, LAN, VPN, RAS. '
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:cos-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:cos-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node76
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node76
       ref_id: COS-03
       name: Monitoring of connections in the Cloud Service Provider's network
       description: 'A distinction is made between trusted and untrusted networks.
@@ -1712,10 +1712,10 @@ objects:
         implemented to design the networks. For example, monitoring and reviewing
         firewall rules or log files for abnormalities, as well as visual inspections
         of physical network components for changes.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:cos-04
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:cos-04
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node76
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node76
       ref_id: COS-04
       name: Cross-network access
       description: Each network perimeter is controlled by security gateways. The
@@ -1726,10 +1726,10 @@ objects:
 
         Cross-network access is access from one network to another network via a defined
         network perimeter.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:cos-05
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:cos-05
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node76
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node76
       ref_id: COS-05
       name: Networks for administration
       description: There are separate networks for the administrative management of
@@ -1738,10 +1738,10 @@ objects:
         protected from unauthorised access by multi-factor authentication (cf. IDM-09).
         Networks used by the Cloud Service Provider to migrate or create virtual machines
         are also physically or logically separated from other networks
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:cos-06
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:cos-06
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node76
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node76
       ref_id: COS-06
       name: Segregation of data traffic in jointly used network environments
       description: Data traffic of cloud customers in jointly used network environments
@@ -1763,10 +1763,10 @@ objects:
         \ the Cloud Service Provider does not use shared network environments for\
         \ cloud customers and instead uses a physical segregation, the basic criterion\
         \ is not applicable."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:cos-07
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:cos-07
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node76
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node76
       ref_id: COS-07
       name: Documentation of the network topology
       description: The documentation of the logical structure of the network used
@@ -1778,10 +1778,10 @@ objects:
         cloud customers' data is stored are indicated.
       annotation: Zoning is a segmentation of the subnets with a firewall implemented
         at the network perimeters.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:cos-08
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:cos-08
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node76
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node76
       ref_id: COS-08
       name: Policies for data transmission
       description: Policies and instructions with technical and organisational safeguards
@@ -1792,14 +1792,14 @@ objects:
       annotation: A safeguard against unauthorised interception, manipulation, copying,
         modification, redirection or destruction of data during transmission is e.g.
         the use of transport encryption according to CRY-02.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node85
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node85
       assessable: false
       depth: 1
       name: Portability and Interoperability (PI)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:pi-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:pi-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node85
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node85
       ref_id: PI-01
       name: Documentation and safety of input and output interfaces
       description: 'The cloud service can be accessed by other cloud services or IT
@@ -1819,10 +1819,10 @@ objects:
         use of these interfaces. The information is maintained in such a way that
         it is applicable for the cloud service''s version which is intended for productive
         use.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:pi-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:pi-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node85
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node85
       ref_id: PI-02
       name: Contractual agreements for the provision of data
       description: "In contractual agreements, the following aspects are defined with\
@@ -1859,10 +1859,10 @@ objects:
         \ for retention can be found, for example, in the German Tax Code (\xA7147\
         \ AO) and the German Commercial Code (\xA7257 HGB). These provide for a retention\
         \ obligation of six or ten years."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:pi-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:pi-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node85
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node85
       ref_id: PI-03
       name: Secure deletion of data
       description: 'The Cloud Service Provider''s procedures for deleting the cloud
@@ -1877,14 +1877,14 @@ objects:
         The deletion procedures prevent recovery by forensic means.'
       annotation: Suitable methods for data deletion are e.g. multiple overwriting
         or deletion of the encryption key.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node89
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node89
       assessable: false
       depth: 1
       name: Procurement, Development and Modification of Information Systems (DEV)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:dev-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:dev-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node89
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node89
       ref_id: DEV-01
       name: Policies for the development/procurement of information systems
       description: "Policies and instructions with technical and organisational measures\
@@ -1904,10 +1904,10 @@ objects:
         \ provision can be carried out e.g. with Continuous Delivery methods.\n\n\
         Accepted standards and methods are, for example:\n\n\u2022 ISO/IEC 27034;\
         \ and\n\n\u2022 OWASP Secure Software Development Lifecycle (S-SDLC)."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:dev-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:dev-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node89
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node89
       ref_id: DEV-02
       name: Outsourcing of the development
       description: "In the case of outsourced development of the cloud service (or\
@@ -1928,10 +1928,10 @@ objects:
         The purchase of software available on the market as well as the integration
         of external employees into the processes of the Cloud Service Provider do
         not constitute outsourcing in the sense of this basic criterion.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:dev-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:dev-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node89
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node89
       ref_id: DEV-03
       name: Policies for changes to information systems
       description: "Policies and instructions with technical and organisational safeguards\
@@ -1974,10 +1974,10 @@ objects:
 
         The cloud customer''s obligations to cooperate can define that, e.g. the cloud
         customer must carry out certain tests.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:dev-04
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:dev-04
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node89
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node89
       ref_id: DEV-04
       name: Safety training and awareness programme regarding continuous software
         delivery and associated systems, components or tools.
@@ -1987,10 +1987,10 @@ objects:
         as well as on how to use the tools used for this purpose. The program is regularly
         reviewed and updated with regard to the applicable policies and instructions,
         the assigned roles and responsibilities and the tools used.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:dev-05
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:dev-05
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node89
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node89
       ref_id: DEV-05
       name: Risk assessment, categorisation and prioritisation of changes
       description: In accordance with the applicable policies (cf. DEV-03), changes
@@ -2002,10 +2002,10 @@ objects:
         own risk assessment before the change is made available in the production
         environment. Regardless of the contractual agreements, this is done for changes
         that have the highest risk category based on their risk assessment.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:dev-06
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:dev-06
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node89
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node89
       ref_id: DEV-06
       name: Testing changes
       description: 'Changes to the cloud service are subject to appropriate testing
@@ -2024,10 +2024,10 @@ objects:
         criteria and actions for timely remediation or mitigation are initiated.'
       annotation: The errors and vulnerabilities identified in tests can be assessed,
         for example, according to the Common Vulnerability Scoring System (CVSS).
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:dev-07
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:dev-07
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node89
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node89
       ref_id: DEV-07
       name: Logging of changes
       description: System components and tools for source code management and software
@@ -2036,10 +2036,10 @@ objects:
         according to IDM-01 and authorisation mechanisms. They must be configured
         in such a way that all changes are logged and can therefore be traced back
         to the individuals or system components executing them.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:dev-08
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:dev-08
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node89
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node89
       ref_id: DEV-08
       name: Version Control
       description: Version control procedures are set up to track dependencies of
@@ -2048,10 +2048,10 @@ objects:
       annotation: Version control procedures provide appropriate safeguards to ensure
         that the integrity and availability of cloud customer data is not compromised
         when system components are restored back to their previous state.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:dev-09
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:dev-09
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node89
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node89
       ref_id: DEV-09
       name: Approvals for provision in the production environment
       description: 'Authorised personnel or system components of the Cloud Service
@@ -2062,10 +2062,10 @@ objects:
 
         Cloud customers are involved in the release according to contractual requirements.'
       annotation: The definitions for criterion DEV-03 apply.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:dev-10
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:dev-10
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node89
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node89
       ref_id: DEV-10
       name: Separation of environments
       description: Production environments are physically or logically separated from
@@ -2073,14 +2073,14 @@ objects:
         data, the spread of malware, or changes to system components. Data contained
         in the production environments is not used in test or development environments
         in order not to compromise their confidentiality.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node100
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node100
       assessable: false
       depth: 1
       name: Control and Monitoring of Service Providers and Suppliers (SSO)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:sso-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:sso-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node100
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node100
       ref_id: SSO-01
       name: Policies and instructions for controlling and monitoring third parties
       description: "Policies and instructions for controlling and monitoring third\
@@ -2126,10 +2126,10 @@ objects:
         \nIf legal or regulatory requirements provide for a regulation deviating from\
         \ these criteria for the control of subcontractors, these regulations remain\
         \ unaffected by the C5 criteria."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:sso-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:sso-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node100
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node100
       ref_id: SSO-02
       name: Risk assessment of service providers and suppliers
       description: "Service providers and suppliers of the Cloud Service Provider\
@@ -2146,10 +2146,10 @@ objects:
         \ Cloud Service Provider's dependence on the service provider or supplier\
         \ for the scope, complexity and uniqueness of the service purchased, including\
         \ the consideration of possible alternatives."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:sso-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:sso-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node100
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node100
       ref_id: SSO-03
       name: Directory of service providers and suppliers
       description: "The Cloud Service Provider maintains a directory for controlling\
@@ -2165,10 +2165,10 @@ objects:
         \ accuracy and validity."
       annotation: It is not necessary to maintain a single central register in order
         to fulfil the basic criterion.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:sso-04
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:sso-04
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node100
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node100
       ref_id: SSO-04
       name: Monitoring of compliance with requirements
       description: "The Cloud Service Provider monitors compliance with information\
@@ -2207,10 +2207,10 @@ objects:
         \ and corresponding controls to be implemented and executed by the Cloud Service\
         \ Provider;\n\n\u2022 Disclosed subcontractors incl. any changes among those\
         \ (e.g. additional subcontractor); and\n\n\u2022 Stated security incidents."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:sso-05
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:sso-05
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node100
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node100
       ref_id: SSO-05
       name: Exit strategy for the receipt of benefits
       description: "The Cloud Service Provider has defined and documented exit strategies\
@@ -2239,14 +2239,14 @@ objects:
         \ by any other provider in the required quality of service; and\n\n    - It\
         \ requires specific knowledge that is only/mainly available to the current\
         \ service provider or supplier and not to the Cloud Service Provider."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node106
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node106
       assessable: false
       depth: 1
       name: Security Incident Management (SIM)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:sim-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:sim-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node106
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node106
       ref_id: SIM-01
       name: Policy for security incident management
       description: 'Policies and instructions with technical and organisational safeguards
@@ -2271,10 +2271,10 @@ objects:
         In addition, there are analysis plans for typical security incidents and an
         evaluation methodology so that the collected information does not lose its
         evidential value in any subsequent legal assessment.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:sim-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:sim-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node106
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node106
       ref_id: SIM-02
       name: Processing of security incidents
       description: Subject matter experts of the Cloud Service Provider, together
@@ -2283,10 +2283,10 @@ objects:
       annotation: The Cloud Service Provider simulates the identification, analysis
         and defence of security incidents and attacks at least once a year through
         appropriate tests and exercises (e.g. Red Team training).
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:sim-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:sim-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node106
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node106
       ref_id: SIM-03
       name: Documentation and reporting of security incidents
       description: After a security incident has been processed, the solution is documented
@@ -2303,10 +2303,10 @@ objects:
         The contract between the Cloud Service Provider and the cloud customer regulates
         which data is made available to the cloud customer for his own analysis in
         the event of security incidents.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:sim-04
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:sim-04
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node106
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node106
       ref_id: SIM-04
       name: Duty of the users to report security incidents to a central body
       description: 'The Cloud Service Provider informs employees and external business
@@ -2319,10 +2319,10 @@ objects:
         In addition, the Cloud Service Provider communicates that "false reports"
         of events that do not subsequently turn out to be incidents do not have any
         negative consequences.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:sim-05
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:sim-05
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node106
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node106
       ref_id: SIM-05
       name: Evaluation and learning process
       description: Mechanisms are in place to measure and monitor the type and scope
@@ -2331,14 +2331,14 @@ objects:
         incidents and to identify the need for further protection.
       annotation: Supporting bodies may be external service providers or government
         agencies such as the BSI.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node112
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node112
       assessable: false
       depth: 1
       name: Business Continuity Management (BCM)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:bcm-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:bcm-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node112
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node112
       ref_id: BCM-01
       name: Top management responsibility
       description: 'The top management (or a member of the top management) of the
@@ -2351,10 +2351,10 @@ objects:
         People in management and other relevant leadership positions demonstrate leadership
         and commitment to this issue by encouraging employees to actively contribute
         to the effectiveness of continuity and emergency management.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:bcm-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:bcm-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node112
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node112
       ref_id: BCM-02
       name: Business impact analysis policies and instructions
       description: "Policies and instructions to determine the impact of any malfunction\
@@ -2375,10 +2375,10 @@ objects:
       annotation: Scenarios to be considered according to the basic criterion are,
         for example, the loss of personnel, buildings, infrastructure and service
         providers.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:bcm-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:bcm-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node112
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node112
       ref_id: BCM-03
       name: Planning business continuity
       description: "Based on the business impact analysis, a single framework for\
@@ -2399,10 +2399,10 @@ objects:
         \ Incident Management."
       annotation: The consistency of plans according to the basic criterion must also
         be maintained when different locations are used.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:bcm-04
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:bcm-04
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node112
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node112
       ref_id: BCM-04
       name: Verification, updating and testing of the business continuity
       description: The business impact analysis, business continuity plans and contingency
@@ -2424,14 +2424,14 @@ objects:
         \ are in particular service providers and suppliers of the Cloud Service Provider\
         \ who contribute to the provision of the cloud service (cf. basic criteria\
         \ SSO-02 and SSO-05)."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node117
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node117
       assessable: false
       depth: 1
       name: Compliance (COM)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:com-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:com-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node117
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node117
       ref_id: COM-01
       name: Identification of applicable legal, regulatory, self-imposed or contractual
         requirements
@@ -2447,10 +2447,10 @@ objects:
         \ principles (e.g. in accordance with HGB or IFRS);\n\n\u2022 Requirements\
         \ regarding access to data and auditability of digital documents (e.g. according\
         \ to GDPdU); and\n\n\u2022 Other laws (e.g. according to BSIG or AktG)."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:com-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:com-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node117
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node117
       ref_id: COM-02
       name: Policy for planning and conducting audits
       description: "Policies and instructions for planning and conducting audits are\
@@ -2463,10 +2463,10 @@ objects:
         \ Logging and monitoring of activities."
       annotation: The Cloud Service Provider grants its cloud customers contractually
         guaranteed information and audit rights.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:com-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:com-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node117
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node117
       ref_id: COM-03
       name: Internal audits of the information security management system
       description: "Subject matter experts check the compliance of the information\
@@ -2493,10 +2493,10 @@ objects:
         \ by the Cloud Service Provider, such as auditing companies, and may hold\
         \ relevant certifications such as \"Certified Internal Auditor (CIA)\". \n\
         \nWith regard to ISMS compliance, see Section 9.2 of ISO/IEC 27001."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:com-04
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:com-04
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node117
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node117
       ref_id: COM-04
       name: Information on information security performance and management assessment
         of the ISMS
@@ -2511,24 +2511,24 @@ objects:
 
         The aspects to be dealt with in the management review of the ISMS are listed
         in Section 9.3 of ISO / IEC 27001.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node122
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node122
       assessable: false
       depth: 1
       name: Dealing with investigation requests from government agencies (INQ)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:inq-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:inq-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node122
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node122
       ref_id: INQ-01
       name: Legal Assessment of Investigative Inquiries
       description: Investigation requests from government agencies are subjected to
         a legal assessment by subject matter experts of the Cloud Service Provider.
         The assessment determines whether the government agency has an applicable
         and legally valid legal basis and what further steps need to be taken.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:inq-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:inq-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node122
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node122
       ref_id: INQ-02
       name: Informing Cloud Customers about Investigation Requests
       description: The Cloud Service Provider informs the affected Cloud Customer(s)
@@ -2537,10 +2537,10 @@ objects:
         in connection with the use of the Cloud Service.
       annotation: This does not affect other legal or regulatory requirements that
         requires earlier information for cloud customers.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:inq-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:inq-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node122
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node122
       ref_id: INQ-03
       name: Conditions for Access to or Disclosure of Data in Investigation Requests
       description: Access to or disclosure of cloud customer data in connection with
@@ -2548,10 +2548,10 @@ objects:
         Service Provider's legal assessment has shown that an applicable and valid
         legal basis exists and that the investigation request must be granted on that
         basis.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:inq-04
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:inq-04
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node122
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node122
       ref_id: INQ-04
       name: Limiting Access to or Disclosure of Data in Investigation Requests
       description: 'The Cloud Service Provider''s procedures establishing access to
@@ -2563,14 +2563,14 @@ objects:
         If no clear limitation of the data is possible, the Cloud Service Provider
         anonymises or pseudonymises the data so that government agencies can only
         assign it to those cloud customers who are subject of the investigation request.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:node127
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:node127
       assessable: false
       depth: 1
       name: Product Safety and Security (PSS)
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:pss-01
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:pss-01
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node127
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node127
       ref_id: PSS-01
       name: Guidelines and Recommendations for Cloud Customers
       description: "The Cloud Service Provider provides cloud customers with guidelines\
@@ -2591,10 +2591,10 @@ objects:
         \ of the cloud service by privileged users. \n\nThe information is maintained\
         \ so that it is applicable to the cloud service provided in the version intended\
         \ for productive use."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:pss-02
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:pss-02
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node127
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node127
       ref_id: PSS-02
       name: Identification of Vulnerabilities of the Cloud Service
       description: "The Cloud Service Provider applies appropriate measures to check\
@@ -2618,10 +2618,10 @@ objects:
         going through the Cloud Service Provider''s software development process are
         the subject of criteria OPS-23 (Management of vulnerabilities, malfunctions
         and errors - open vulnerability assessment).'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:pss-03
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:pss-03
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node127
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node127
       ref_id: PSS-03
       name: Online Register of Known Vulnerabilities
       description: "The Cloud Service Provider operates or refers to a daily updated\
@@ -2651,10 +2651,10 @@ objects:
         If the cloud service relies on other cloud services, this registry has to
         incorporate or refer to the vulnerabilities of those other cloud services
         in order for this criterion to be met.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:pss-04
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:pss-04
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node127
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node127
       ref_id: PSS-04
       name: Error handling and Logging Mechanisms
       description: "The cloud service provided is equipped with error handling and\
@@ -2679,10 +2679,10 @@ objects:
         In the case of a SaaS service for secure data exchange, the terms data, services
         or functions would mean, for example, the logging of all read or write accesses
         to the stored files and their metadata.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:pss-05
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:pss-05
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node127
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node127
       ref_id: PSS-05
       name: Authentication Mechanisms
       description: "The Cloud Service Provider provides authentication mechanisms\
@@ -2707,10 +2707,10 @@ objects:
 
         Multi-factor authentication can be performed with cryptographic certificates,
         smart cards or tokens, for example.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:pss-06
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:pss-06
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node127
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node127
       ref_id: PSS-06
       name: Session Management
       description: To protect confidentiality, availability, integrity and authenticity
@@ -2722,10 +2722,10 @@ objects:
         Cloud Service Provider or - if technically possible - by the cloud customer.
       annotation: Known attacks include manipulation, forgery, session takeover, denial
         of service attacks, enveloping, replay and null cipher attacks.
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:pss-07
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:pss-07
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node127
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node127
       ref_id: PSS-07
       name: Confidentiality of Authentication Information
       description: "If passwords are used as authentication information for the cloud\
@@ -2744,10 +2744,10 @@ objects:
         \ \"Cryptographic mechanisms: Recommendations and key lengths\". In version\
         \ 2019-01 of this guideline these were:\n\n\u2022 SHA-256, SHA-512/256, SHA-384,\
         \ SHA-512; and\n\n\u2022 SHA3-256, SHA3-384, SHA3-512."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:pss-08
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:pss-08
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node127
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node127
       ref_id: PSS-08
       name: Roles and Rights Concept
       description: 'The Cloud Service Provider provides cloud users with a roles and
@@ -2767,10 +2767,10 @@ objects:
         \ of available images that can be used to create virtual machines; and\n\n\
         \u2022 Management of virtual networks (e.g. configuration of virtual routers\
         \ and switches)."
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:pss-09
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:pss-09
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node127
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node127
       ref_id: PSS-09
       name: Authorisation Mechanisms
       description: 'Access to the functions provided by the cloud service is restricted
@@ -2789,10 +2789,10 @@ objects:
       annotation: Access controls are attribute-based to enable granular and contextual
         checks against multiple attributes of a user, IT component, or application
         (e.g., role, location, authentication method).
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:pss-10
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:pss-10
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node127
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node127
       ref_id: PSS-10
       name: Software Defined Networking
       description: 'If the Cloud Service offers functions for software-defined networking
@@ -2810,10 +2810,10 @@ objects:
 
         Suitable SDN methods for increasing confidentiality are, for example, L2 overlay
         networking (tagging) or tunnelling/encapsulation.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:pss-11
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:pss-11
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node127
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node127
       ref_id: PSS-11
       name: Images for Virtual Machines and Containers
       description: "If cloud customers operate virtual machines or containers with\
@@ -2837,10 +2837,10 @@ objects:
         Generally accepted industry standards are, for example, the Security Configuration
         Benchmark of the Centre for Internet Security (CIS) or the corresponding modules
         in the BSI IT-Grundschutz-Kompendium.'
-    - urn: urn:intuitem:risk:req_node:bsi-c5-2020:pss-12
+    - urn: urn:ciso:risk:req_node:bsi-c5-2020:pss-12
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:bsi-c5-2020:node127
+      parent_urn: urn:ciso:risk:req_node:bsi-c5-2020:node127
       ref_id: PSS-12
       name: Locations of Data Processing and Storage
       description: 'The cloud customer is able to specify the locations (location/country)

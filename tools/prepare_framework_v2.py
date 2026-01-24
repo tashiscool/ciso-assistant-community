@@ -581,7 +581,7 @@ def create_excel(data, output_excel=None):
     ws1 = wb.active
     ws1.title = "library_meta"
     ws1.append(["type", "library"])
-    ws1.append(["urn", f"urn:intuitem:risk:library:{urn_root}"])
+    ws1.append(["urn", f"urn:ciso:risk:library:{urn_root}"])
     ws1.append(["version", "1"])
     ws1.append(["locale", locale])
     ws1.append(["ref_id", ref_id])
@@ -609,8 +609,8 @@ def create_excel(data, output_excel=None):
     # Main sheet: framework_meta
     framework_meta_sheet = wb.create_sheet(f"{framework_sheet_base}_meta")
     framework_meta_sheet.append(["type", "framework"])
-    framework_meta_sheet.append(["base_urn", f"urn:intuitem:risk:req_node:{urn_root}"])
-    framework_meta_sheet.append(["urn", f"urn:intuitem:risk:framework:{urn_root}"])
+    framework_meta_sheet.append(["base_urn", f"urn:ciso:risk:req_node:{urn_root}"])
+    framework_meta_sheet.append(["urn", f"urn:ciso:risk:framework:{urn_root}"])
     framework_meta_sheet.append(["ref_id", ref_id])
     framework_meta_sheet.append(["name", name])
     framework_meta_sheet.append(["description", description])

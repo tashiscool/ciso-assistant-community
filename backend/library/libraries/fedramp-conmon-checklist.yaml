@@ -1,4 +1,4 @@
-urn: urn:intuitem:risk:library:fedramp-conmon-checklist
+urn: urn:ciso:risk:library:fedramp-conmon-checklist
 locale: en
 ref_id: FEDRAMP-CONMON-CHECKLIST
 name: FedRAMP Continuous Monitoring & Annual Activities Checklist
@@ -11,12 +11,12 @@ copyright: US General Services Administration (GSA) FedRAMP PMO
 version: 2
 publication_date: 2025-01-23
 provider: FedRAMP PMO / GSA
-packager: intuitem
+packager: ciso-assistant
 dependencies:
-- urn:intuitem:risk:library:conmon-schedule
+- urn:ciso:risk:library:conmon-schedule
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:fedramp-conmon-checklist
+    urn: urn:ciso:risk:framework:fedramp-conmon-checklist
     ref_id: FEDRAMP-CONMON-CHECKLIST
     name: FedRAMP Continuous Monitoring & Annual Activities Checklist
     description: >
@@ -37,7 +37,7 @@ objects:
     # ============================================================
     # FEDRAMP MONTHLY CONMON PACKAGE
     # ============================================================
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-package
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:monthly-package
       assessable: false
       depth: 1
       ref_id: FEDRAMP-MONTHLY
@@ -46,10 +46,10 @@ objects:
         FedRAMP-specific monthly continuous monitoring deliverables. Package
         must be posted to secure repository and AO/agency ConMon POCs notified.
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-poam
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:monthly-poam
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-package
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:monthly-package
       ref_id: FEDRAMP-M-01
       name: POA&M Submitted to ISSO/AO
       description: >
@@ -65,10 +65,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-inventory
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:monthly-inventory
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-package
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:monthly-package
       ref_id: FEDRAMP-M-02
       name: System Inventory Updated
       description: >
@@ -83,10 +83,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-scan-reports
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:monthly-scan-reports
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-package
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:monthly-package
       ref_id: FEDRAMP-M-03
       name: Vulnerability Scan Reports Submitted
       description: >
@@ -101,10 +101,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-security-status
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:monthly-security-status
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:monthly-package
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:monthly-package
       ref_id: FEDRAMP-M-04
       name: Security Status Reported to AO
       description: >
@@ -122,7 +122,7 @@ objects:
     # ============================================================
     # FEDRAMP VULNERABILITY REMEDIATION TIMELINES
     # ============================================================
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-timelines
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:vuln-timelines
       assessable: false
       depth: 1
       ref_id: FEDRAMP-VULN
@@ -131,10 +131,10 @@ objects:
         FedRAMP-specific vulnerability remediation timelines. These are
         hard requirements for maintaining FedRAMP authorization.
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-critical-30
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:vuln-critical-30
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-timelines
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:vuln-timelines
       ref_id: FEDRAMP-V-01
       name: Critical/High Vulnerabilities Remediated Within 30 Days
       description: >
@@ -149,10 +149,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-moderate-90
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:vuln-moderate-90
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-timelines
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:vuln-timelines
       ref_id: FEDRAMP-V-02
       name: Moderate Vulnerabilities Remediated Within 90 Days
       description: >
@@ -166,10 +166,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-low-180
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:vuln-low-180
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:vuln-timelines
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:vuln-timelines
       ref_id: FEDRAMP-V-03
       name: Low Vulnerabilities Remediated Within 180 Days
       description: >
@@ -185,7 +185,7 @@ objects:
     # ============================================================
     # FEDRAMP ANNUAL ASSESSMENT (AA)
     # ============================================================
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:annual-assessment
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:annual-assessment
       assessable: false
       depth: 1
       ref_id: FEDRAMP-AA
@@ -194,10 +194,10 @@ objects:
         FedRAMP Annual Assessment mini-checklist. All activities must be
         completed by the ATO anniversary date to avoid CAP trigger.
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-schedule
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:aa-schedule
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:annual-assessment
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:annual-assessment
       ref_id: FEDRAMP-AA-01
       name: Build AA Schedule
       description: >
@@ -212,10 +212,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-ssp-update
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:aa-ssp-update
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:annual-assessment
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:annual-assessment
       ref_id: FEDRAMP-AA-02
       name: SSP and Appendices Updated
       description: >
@@ -231,10 +231,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-scope
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:aa-scope
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:annual-assessment
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:annual-assessment
       ref_id: FEDRAMP-AA-03
       name: Assessment Scope Defined
       description: >
@@ -249,10 +249,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-sap
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:aa-sap
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:annual-assessment
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:annual-assessment
       ref_id: FEDRAMP-AA-04
       name: 3PAO Produces SAP
       description: >
@@ -267,10 +267,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-execute
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:aa-execute
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:annual-assessment
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:annual-assessment
       ref_id: FEDRAMP-AA-05
       name: Assessment Executed and SAR Produced
       description: >
@@ -285,10 +285,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-poam-update
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:aa-poam-update
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:annual-assessment
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:annual-assessment
       ref_id: FEDRAMP-AA-06
       name: POA&M Updated with SAR Findings
       description: >
@@ -303,10 +303,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:aa-package-upload
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:aa-package-upload
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:annual-assessment
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:annual-assessment
       ref_id: FEDRAMP-AA-07
       name: AA Package Uploaded by Anniversary
       description: >
@@ -324,7 +324,7 @@ objects:
     # ============================================================
     # FEDRAMP SIGNIFICANT CHANGE
     # ============================================================
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:significant-change
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:significant-change
       assessable: false
       depth: 1
       ref_id: FEDRAMP-SC
@@ -333,10 +333,10 @@ objects:
         FedRAMP Significant Change Request (SCR) process for changes that
         may affect the security posture of the authorized system.
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:sc-categorize
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:sc-categorize
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:significant-change
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:significant-change
       ref_id: FEDRAMP-SC-01
       name: Change Categorization
       description: >
@@ -351,10 +351,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:sc-impact-analysis
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:sc-impact-analysis
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:significant-change
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:significant-change
       ref_id: FEDRAMP-SC-02
       name: Security Impact Analysis
       description: >
@@ -369,10 +369,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:sc-scr-submission
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:sc-scr-submission
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:significant-change
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:significant-change
       ref_id: FEDRAMP-SC-03
       name: SCR and AO Approval
       description: >
@@ -387,10 +387,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:sc-post-change
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:sc-post-change
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:significant-change
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:significant-change
       ref_id: FEDRAMP-SC-04
       name: Post-Change Testing and Documentation
       description: >
@@ -407,7 +407,7 @@ objects:
     # ============================================================
     # FEDRAMP INCIDENT REPORTING
     # ============================================================
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:incident-reporting
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:incident-reporting
       assessable: false
       depth: 1
       ref_id: FEDRAMP-IR
@@ -416,10 +416,10 @@ objects:
         FedRAMP incident communication requirements with strict timelines.
         These are mandatory for all FedRAMP authorized systems.
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:ir-1hour
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:ir-1hour
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:incident-reporting
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:incident-reporting
       ref_id: FEDRAMP-IR-01
       name: 1-Hour Notification
       description: >
@@ -435,10 +435,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:ir-cisa
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:ir-cisa
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:incident-reporting
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:incident-reporting
       ref_id: FEDRAMP-IR-02
       name: CISA Reporting
       description: >
@@ -454,10 +454,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:ir-daily
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:ir-daily
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:incident-reporting
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:incident-reporting
       ref_id: FEDRAMP-IR-03
       name: Daily Status Updates
       description: >
@@ -475,7 +475,7 @@ objects:
     # ============================================================
     # FEDRAMP-SPECIFIC PERIODIC ACTIVITIES
     # ============================================================
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:fedramp-periodic
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:fedramp-periodic
       assessable: false
       depth: 1
       ref_id: FEDRAMP-PERIODIC
@@ -483,10 +483,10 @@ objects:
       description: >
         Additional periodic activities specific to FedRAMP requirements.
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:contingency-10day
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:contingency-10day
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:fedramp-periodic
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:fedramp-periodic
       ref_id: FEDRAMP-P-01
       name: Contingency Evidence Check (Every 10 Days)
       description: >
@@ -501,10 +501,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:authenticator-60day
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:authenticator-60day
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:fedramp-periodic
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:fedramp-periodic
       ref_id: FEDRAMP-P-02
       name: Authenticator Refresh (Every 60 Days)
       description: >
@@ -519,10 +519,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:inactive-90day
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:inactive-90day
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:fedramp-periodic
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:fedramp-periodic
       ref_id: FEDRAMP-P-03
       name: Inactive Account Disable (90 Days)
       description: >
@@ -536,10 +536,10 @@ objects:
       - M
       - H
 
-    - urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:reauth-3year
+    - urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:reauth-3year
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:fedramp-conmon-checklist:fedramp-periodic
+      parent_urn: urn:ciso:risk:req_node:fedramp-conmon-checklist:fedramp-periodic
       ref_id: FEDRAMP-P-04
       name: Reauthorization (Every 3 Years)
       description: >

@@ -36,16 +36,16 @@ create_risk_scenario(
   folder_id="ACME",  # <- Scopes asset/threat lookups
   assets=["Customer Data"],
   threats=["Ransomware"],
-  threat_library="urn:intuitem:risk:library:intuitem-common-catalog"
+  threat_library="urn:ciso:risk:library:ciso-common-catalog"
 )
 ```
 
 ### Always Use threat_library for Threat Lookups
 
-Threats exist in multiple libraries (intuitem catalog, MITRE ATT&CK, etc.). Always specify the library:
+Threats exist in multiple libraries (ciso catalog, MITRE ATT&CK, etc.). Always specify the library:
 
 ```python
-threat_library="urn:intuitem:risk:library:intuitem-common-catalog"
+threat_library="urn:ciso:risk:library:ciso-common-catalog"
 ```
 
 ### Include Relevance in Scenario Descriptions
@@ -111,11 +111,11 @@ create_asset(name="Production Database", description="Primary data storage",
 ### Step 5: Import Threat Catalog
 
 ```python
-# Import the intuitem common catalog (23 threats)
-import_stored_library("urn:intuitem:risk:library:intuitem-common-catalog")
+# Import the ciso common catalog (23 threats)
+import_stored_library("urn:ciso:risk:library:ciso-common-catalog")
 
 # Verify threats are available
-get_threats(library="urn:intuitem:risk:library:intuitem-common-catalog")
+get_threats(library="urn:ciso:risk:library:ciso-common-catalog")
 ```
 
 ### Step 6: Generate Scenario Suggestions
@@ -166,7 +166,7 @@ create_risk_scenario(
   folder_id="ACME",  # CRITICAL: scope lookups
   assets=["Customer Data"],
   threats=["Ransomware"],
-  threat_library="urn:intuitem:risk:library:intuitem-common-catalog"
+  threat_library="urn:ciso:risk:library:ciso-common-catalog"
 )
 ```
 
@@ -179,7 +179,7 @@ create_quantitative_risk_scenario(
   folder_id="ACME",
   assets=["Customer Data"],
   threats=["Ransomware"],
-  threat_library="urn:intuitem:risk:library:intuitem-common-catalog"
+  threat_library="urn:ciso:risk:library:ciso-common-catalog"
 )
 ```
 
@@ -222,7 +222,7 @@ After creating scenarios, summarize and guide on next steps:
 ### Common Threat Library URN
 
 ```
-urn:intuitem:risk:library:intuitem-common-catalog
+urn:ciso:risk:library:ciso-common-catalog
 ```
 
 ### Threat Catalog Quick Reference

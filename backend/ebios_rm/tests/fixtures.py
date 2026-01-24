@@ -7,12 +7,12 @@ from ebios_rm.models import RoTo, EbiosRMStudy, FearedEvent
 @pytest.fixture
 def ebios_rm_matrix_fixture():
     library = StoredLibrary.objects.filter(
-        urn="urn:intuitem:risk:library:risk-matrix-4x4-ebios-rm"
+        urn="urn:ciso:risk:library:risk-matrix-4x4-ebios-rm"
     ).last()
     assert library is not None
     library.load()
     return RiskMatrix.objects.get(
-        urn="urn:intuitem:risk:matrix:risk-matrix-4x4-ebios-rm"
+        urn="urn:ciso:risk:matrix:risk-matrix-4x4-ebios-rm"
     )
 
 

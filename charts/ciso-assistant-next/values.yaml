@@ -147,7 +147,7 @@ backend:
     # @default -- `""` (defaults to global.image.registry)
     registry: ""
     # -- Repository to use for the backend
-    repository: intuitem/ciso-assistant-community/backend
+    repository: tashiscool/ciso-assistant-community/backend
     # -- Tag to use for the backend
     # @default -- `""` (defaults to global.image.tag)
     tag: ""
@@ -222,7 +222,7 @@ frontend:
     # @default -- `""` (defaults to global.image.registry)
     registry: ""
     # -- Repository to use for the frontend
-    repository: intuitem/ciso-assistant-community/frontend
+    repository: tashiscool/ciso-assistant-community/frontend
     # -- Tag to use for the frontend
     # @default -- `""` (defaults to global.image.tag)
     tag: ""

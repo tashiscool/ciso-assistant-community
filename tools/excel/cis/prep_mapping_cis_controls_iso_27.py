@@ -62,7 +62,7 @@ def build_library_meta(packager_name: str) -> pd.DataFrame:
         ("packager", packager_name),
         (
             "dependencies",
-            f"urn:{packager_name}:risk:library:cis-controls-v8, urn:intuitem:risk:library:iso27001-2022",
+            f"urn:{packager_name}:risk:library:cis-controls-v8, urn:ciso:risk:library:iso27001-2022",
         ),
     ]
     return pd.DataFrame(rows)
@@ -76,9 +76,9 @@ def build_mappings_meta(packager_name: str) -> pd.DataFrame:
         ("name", "CIS-Controls-v8 <-> ISO/IEC 27001:2022"),
         ("description", "Mapping between CIS Controls v8 and International standard ISO/IEC 27001:2022"),
         ("source_framework_urn", f"urn:{packager_name}:risk:framework:cis-controls-v8"),
-        ("target_framework_urn", "urn:intuitem:risk:framework:iso27001-2022"),
+        ("target_framework_urn", "urn:ciso:risk:framework:iso27001-2022"),
         ("source_node_base_urn", f"urn:{packager_name}:risk:req_node:cis-controls-v8"),
-        ("target_node_base_urn", "urn:intuitem:risk:req_node:iso27001-2022"),
+        ("target_node_base_urn", "urn:ciso:risk:req_node:iso27001-2022"),
     ]
     return pd.DataFrame(rows)
 

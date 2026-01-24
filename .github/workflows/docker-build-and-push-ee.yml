@@ -61,7 +61,7 @@ jobs:
           context: .
           file: ./enterprise/frontend/Dockerfile
           push: true
-          tags: ghcr.io/intuitem/ciso-assistant-enterprise-frontend:${{ needs.prepare.outputs.version }}-${{ matrix.arch }}
+          tags: ghcr.io/ciso/ciso-assistant-enterprise-frontend:${{ needs.prepare.outputs.version }}-${{ matrix.arch }}
           platforms: linux/${{ matrix.arch }}
 
   build-backend:
@@ -97,7 +97,7 @@ jobs:
           context: .
           file: ./enterprise/backend/Dockerfile
           push: true
-          tags: ghcr.io/intuitem/ciso-assistant-enterprise-backend:${{ needs.prepare.outputs.version }}-${{ matrix.arch }}
+          tags: ghcr.io/ciso/ciso-assistant-enterprise-backend:${{ needs.prepare.outputs.version }}-${{ matrix.arch }}
           platforms: linux/${{ matrix.arch }}
 
   merge-manifests:
@@ -113,13 +113,13 @@ jobs:
       - name: Create multi-arch manifests
         run: |
           # Frontend
-          docker buildx imagetools create -t ghcr.io/intuitem/ciso-assistant-enterprise-frontend:${{ needs.prepare.outputs.version }} \
-            -t ghcr.io/intuitem/ciso-assistant-enterprise-frontend:latest \
-            ghcr.io/intuitem/ciso-assistant-enterprise-frontend:${{ needs.prepare.outputs.version }}-amd64 \
-            ghcr.io/intuitem/ciso-assistant-enterprise-frontend:${{ needs.prepare.outputs.version }}-arm64
+          docker buildx imagetools create -t ghcr.io/ciso/ciso-assistant-enterprise-frontend:${{ needs.prepare.outputs.version }} \
+            -t ghcr.io/ciso/ciso-assistant-enterprise-frontend:latest \
+            ghcr.io/ciso/ciso-assistant-enterprise-frontend:${{ needs.prepare.outputs.version }}-amd64 \
+            ghcr.io/ciso/ciso-assistant-enterprise-frontend:${{ needs.prepare.outputs.version }}-arm64
 
           # Backend
-          docker buildx imagetools create -t ghcr.io/intuitem/ciso-assistant-enterprise-backend:${{ needs.prepare.outputs.version }} \
-            -t ghcr.io/intuitem/ciso-assistant-enterprise-backend:latest \
-            ghcr.io/intuitem/ciso-assistant-enterprise-backend:${{ needs.prepare.outputs.version }}-amd64 \
-            ghcr.io/intuitem/ciso-assistant-enterprise-backend:${{ needs.prepare.outputs.version }}-arm64
+          docker buildx imagetools create -t ghcr.io/ciso/ciso-assistant-enterprise-backend:${{ needs.prepare.outputs.version }} \
+            -t ghcr.io/ciso/ciso-assistant-enterprise-backend:latest \
+            ghcr.io/ciso/ciso-assistant-enterprise-backend:${{ needs.prepare.outputs.version }}-amd64 \
+            ghcr.io/ciso/ciso-assistant-enterprise-backend:${{ needs.prepare.outputs.version }}-arm64

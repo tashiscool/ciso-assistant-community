@@ -1,6 +1,6 @@
 convert_library_version: 'v2 ; Compat Mode: [0] {[v2.1] (DEFAULT) Don''t use any Compatibility
   Mode}'
-urn: urn:intuitem:risk:library:nist-csf-2.0
+urn: urn:ciso:risk:library:nist-csf-2.0
 locale: en
 ref_id: NIST-CSF-2.0
 name: NIST CSF version 2.0
@@ -11,7 +11,7 @@ copyright: With the exception of material marked as copyrighted, information pre
 version: 5
 publication_date: 2025-07-09
 provider: NIST
-packager: intuitem
+packager: ciso-assistant
 translations:
   fr:
     name: NIST CSF version 2.0
@@ -23,7 +23,7 @@ translations:
       (CSF 2.0)
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:nist-csf-2.0
+    urn: urn:ciso:risk:framework:nist-csf-2.0
     ref_id: NIST-CSF-2.0
     name: NIST CSF v2.0
     description: NIST Cybersecurity Framework
@@ -127,7 +127,7 @@ objects:
             n de las actividades de ciberseguridad anteriores y actuales, incluidas\
             \ las lecciones aprendidas y los indicadores predictivos."
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv
       assessable: false
       depth: 1
       ref_id: GV
@@ -145,10 +145,10 @@ objects:
           description: "Se establecen, comunican y supervisan la estrategia, las expectativas\
             \ y la pol\xEDtica de gesti\xF3n de riesgos de seguridad cibern\xE9tica\
             \ de la organizaci\xF3n."
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.oc
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.oc
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv
       ref_id: GV.OC
       name: Organizational Context
       description: The circumstances - mission, stakeholder expectations, dependencies,
@@ -167,10 +167,10 @@ objects:
             \ de las partes interesadas, dependencias y requisitos legales, normativos\
             \ y contractuales - que afectan a las decisiones de gesti\xF3n de riesgos\
             \ de seguridad cibern\xE9tica de la organizaci\xF3n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.oc-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.oc-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.oc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.oc
       ref_id: GV.OC-01
       description: The organizational mission is understood and informs cybersecurity
         risk management
@@ -196,10 +196,10 @@ objects:
             n y misi\xF3n, marketing y estrategias de servicio) para proporcionar\
             \ una base para identificar los riesgos que pueden obstaculizar esa misi\xF3\
             n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.oc-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.oc-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.oc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.oc
       ref_id: GV.OC-02
       description: Internal and external stakeholders are understood, and their needs
         and expectations regarding cybersecurity risk management are understood and
@@ -244,10 +244,10 @@ objects:
             \ ejemplo, expectativas de privacidad de los clientes, expectativas comerciales\
             \ de las asociaciones, expectativas de cumplimiento de los reguladores,\
             \ expectativas \xE9ticas de la sociedad)"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.oc-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.oc-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.oc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.oc
       ref_id: GV.OC-03
       description: Legal, regulatory, and contractual requirements regarding cybersecurity
         - including privacy and civil liberties obligations - are understood and managed
@@ -295,10 +295,10 @@ objects:
             \ la gesti\xF3n de la ciberseguridad de la informaci\xF3n de proveedores,\
             \ clientes y socios\nEx3: Alinear la estrategia de ciberseguridad de la\
             \ organizaci\xF3n con los requisitos legales, regulatorios y contractuales"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.oc-04
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.oc-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.oc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.oc
       ref_id: GV.OC-04
       description: Critical objectives, capabilities, and services that stakeholders
         depend on or expect from the organization are understood and communicated
@@ -348,10 +348,10 @@ objects:
             \ de tiempo de recuperaci\xF3n) para la entrega de capacidades y servicios\
             \ cr\xEDticos en varios estados operativos (p. ej., bajo ataque, durante\
             \ la recuperaci\xF3n, operaci\xF3n normal)"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.oc-05
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.oc-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.oc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.oc
       ref_id: GV.OC-05
       description: Outcomes, capabilities, and services that the organization depends
         on are understood and communicated
@@ -386,10 +386,10 @@ objects:
             \ externas que son puntos potenciales de falla para las capacidades y\
             \ servicios cr\xEDticos de la organizaci\xF3n, y compartir esa informaci\xF3\
             n con el personal adecuado\n3\xBA: Riesgo de 3\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rm
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rm
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv
       ref_id: GV.RM
       name: Risk Management Strategy
       description: The organization's priorities, constraints, risk tolerance and
@@ -408,10 +408,10 @@ objects:
             \ las declaraciones de tolerancia y apetito por el riesgo y los supuestos\
             \ de la organizaci\xF3n para respaldar las decisiones sobre el riesgo\
             \ operativo"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rm-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rm-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rm
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rm
       ref_id: GV.RM-01
       description: Risk management objectives are established and agreed to by organizational
         stakeholders
@@ -452,10 +452,10 @@ objects:
             \ contra los riesgos de los sistemas de control industrial)\nEx3: Los\
             \ l\xEDderes s\xE9nior acuerdan los objetivos de ciberseguridad y los\
             \ utilizan para medir y gestionar el riesgo y el rendimiento"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rm-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rm-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rm
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rm
       ref_id: GV.RM-02
       description: Risk appetite and risk tolerance statements are established, communicated,
         and maintained
@@ -495,10 +495,10 @@ objects:
             Ex3: Refinar peri\xF3dicamente los objetivos de la organizaci\xF3n y el\
             \ apetito de riesgo en funci\xF3n de la exposici\xF3n al riesgo conocida\
             \ y el riesgo residual"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rm-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rm-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rm
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rm
       ref_id: GV.RM-03
       description: Cybersecurity risk management activities and outcomes are included
         in enterprise risk management processes
@@ -535,10 +535,10 @@ objects:
             \ en la planificaci\xF3n de la gesti\xF3n de riesgos empresariales\nEx3:\
             \ Establecer criterios para escalar los riesgos de ciberseguridad dentro\
             \ de la gesti\xF3n de riesgos empresariales"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rm-04
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rm-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rm
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rm
       ref_id: GV.RM-04
       description: Strategic direction that describes appropriate risk response options
         is established and communicated
@@ -577,10 +577,10 @@ objects:
             \ funciones de ciberseguridad, hacer que un tercero realice transacciones\
             \ financieras en nombre de la organizaci\xF3n, utilizar servicios basados\
             \ en la nube p\xFAblica)"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rm-05
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rm-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rm
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rm
       ref_id: GV.RM-05
       description: Lines of communication across the organization are established
         for cybersecurity risks, including risks from suppliers and other third parties
@@ -619,10 +619,10 @@ objects:
             n, las operaciones, los auditores internos, el departamento jur\xEDdico,\
             \ el de adquisiciones, el de seguridad f\xEDsica y el de RRHH sobre los\
             \ riesgos de ciberseguridad."
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rm-06
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rm-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rm
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rm
       ref_id: GV.RM-06
       description: A standardized method for calculating, documenting, categorizing,
         and prioritizing cybersecurity risks is established and communicated
@@ -669,10 +669,10 @@ objects:
             \ dentro de la empresa\nEx4: Utilice una lista coherente de categor\xED\
             as de riesgo para respaldar la integraci\xF3n, la agregaci\xF3n y la comparaci\xF3\
             n de riesgos de ciberseguridad"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rm-07
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rm-07
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rm
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rm
       ref_id: GV.RM-07
       description: Strategic opportunities (i.e., positive risks) are characterized
         and are included in organizational cybersecurity risk discussions
@@ -708,10 +708,10 @@ objects:
             \ oportunidades y amenazas [FODA])\nEx2: Identificar los objetivos ambiciosos\
             \ y documentarlos\nEx3: Calcule, documente y priorice los riesgos positivos\
             \ junto con los riesgos negativos"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rr
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rr
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv
       ref_id: GV.RR
       name: Roles, Responsibilities, and Authorities
       description: Cybersecurity roles, responsibilities, and authorities to foster
@@ -730,10 +730,10 @@ objects:
             \ y las competencias en materia de seguridad cibern\xE9tica para fomentar\
             \ la rendici\xF3n de cuentas, la evaluaci\xF3n del desempe\xF1o y la mejora\
             \ continua."
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rr-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rr-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rr
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rr
       ref_id: GV.RR-01
       description: Organizational leadership is responsible and accountable for cybersecurity
         risk and fosters a culture that is risk-aware, ethical, and continually improving
@@ -787,10 +787,10 @@ objects:
             \ al a\xF1o y despu\xE9s de eventos importantes\nEx4: Llevar a cabo revisiones\
             \ para garantizar la autoridad y la coordinaci\xF3n adecuadas entre los\
             \ responsables de la gesti\xF3n del riesgo de ciberseguridad."
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rr-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rr-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rr
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rr
       ref_id: GV.RR-02
       description: Roles, responsibilities, and authorities related to cybersecurity
         risk management are established, communicated, understood, and enforced
@@ -844,10 +844,10 @@ objects:
             Ex5: Articular claramente las responsabilidades de ciberseguridad dentro\
             \ de las operaciones, las funciones de riesgo y las funciones de auditor\xED\
             a interna"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rr-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rr-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rr
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rr
       ref_id: GV.RR-03
       description: Adequate resources are allocated commensurate with the cybersecurity
         risk strategy, roles, responsibilities, and policies
@@ -888,10 +888,10 @@ objects:
             \ tolerancia al riesgo y la respuesta\nEx3: Proporcionar las personas,\
             \ los procesos y los recursos t\xE9cnicos adecuados y suficientes para\
             \ respaldar la estrategia de ciberseguridad."
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rr-04
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rr-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.rr
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.rr
       ref_id: GV.RR-04
       description: Cybersecurity is included in human resources practices
       annotation: '1st: 1st Party Risk
@@ -937,10 +937,10 @@ objects:
             \ funciones\nEx4: Definir y hacer cumplir las obligaciones para que el\
             \ personal conozca, se adhiera y defienda las pol\xEDticas de seguridad\
             \ en relaci\xF3n con sus funciones"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.po
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.po
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv
       ref_id: GV.PO
       name: Policy
       description: Organizational cybersecurity policy is established, communicated,
@@ -954,10 +954,10 @@ objects:
           name: "Pol\xEDtica"
           description: "La pol\xEDtica de seguridad cibern\xE9tica de la organizaci\xF3\
             n es establecida, comunicada y aplicada."
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.po-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.po-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.po
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.po
       ref_id: GV.PO-01
       description: Policy for managing cybersecurity risks is established based on
         organizational context, cybersecurity strategy, and priorities and is communicated
@@ -1013,10 +1013,10 @@ objects:
             \ y los procesos y procedimientos de apoyo en toda la organizaci\xF3n\n\
             Ex5: Exigir que el personal acuse recibo de la p\xF3liza cuando se contrata\
             \ por primera vez, anualmente y siempre que se actualice la p\xF3liza."
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.po-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.po-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.po
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.po
       ref_id: GV.PO-02
       description: Policy for managing cybersecurity risks is reviewed, updated, communicated,
         and enforced to reflect changes in requirements, threats, technology, and
@@ -1074,10 +1074,10 @@ objects:
             \ los cambios en la tecnolog\xEDa (por ejemplo, la adopci\xF3n de la inteligencia\
             \ artificial) y los cambios en el negocio (por ejemplo, la adquisici\xF3\
             n de un nuevo negocio, los nuevos requisitos del contrato)"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.ov
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.ov
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv
       ref_id: GV.OV
       name: Oversight
       description: Results of organization-wide cybersecurity risk management activities
@@ -1096,10 +1096,10 @@ objects:
             \ de seguridad cibern\xE9tica en toda la organizaci\xF3n y el rendimiento\
             \ se utilizan para informar, mejorar y ajustar la estrategia de gesti\xF3\
             n de riesgos"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.ov-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.ov-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.ov
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.ov
       ref_id: GV.OV-01
       description: Cybersecurity risk management strategy outcomes are reviewed to
         inform and adjust strategy and direction
@@ -1131,10 +1131,10 @@ objects:
             \ organizacionales.\nEx2: Examinar si se deben ajustar las estrategias\
             \ de riesgo de ciberseguridad que obstaculizan las operaciones o la innovaci\xF3\
             n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.ov-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.ov-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.ov
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.ov
       ref_id: GV.OV-02
       description: The cybersecurity risk management strategy is reviewed and adjusted
         to ensure coverage of organizational requirements and risks
@@ -1170,10 +1170,10 @@ objects:
             an funciones relacionadas con la ciberseguridad para determinar si es\
             \ necesario realizar cambios en las pol\xEDticas\nEx3: Revisar la estrategia\
             \ a la luz de los incidentes de ciberseguridad"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.ov-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.ov-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.ov
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.ov
       ref_id: GV.OV-03
       description: Organizational cybersecurity risk management performance is evaluated
         and reviewed for adjustments needed
@@ -1210,10 +1210,10 @@ objects:
             \ que se enfrenta la organizaci\xF3n, incluida la probabilidad y el impacto\
             \ potencial\nEx3: Recopilar y comunicar m\xE9tricas sobre la gesti\xF3\
             n de riesgos de ciberseguridad con la alta direcci\xF3n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv
       ref_id: GV.SC
       name: Cybersecurity Supply Chain Risk Management
       description: Cyber supply chain risk management processes are identified, established,
@@ -1232,10 +1232,10 @@ objects:
           description: "Las partes interesadas de la organizaci\xF3n identifican,\
             \ establecen, gestionan, supervisan y mejoran los procesos de gesti\xF3\
             n de riesgos de la cadena de suministro cibern\xE9tica"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc
       ref_id: GV.SC-01
       description: A cybersecurity supply chain risk management program, strategy,
         objectives, policies, and processes are established and agreed to by organizational
@@ -1299,10 +1299,10 @@ objects:
             \ como la ciberseguridad, la inform\xE1tica, las operaciones, el \xE1\
             mbito jur\xEDdico, el de recursos humanos y el de ingenier\xEDa\n3\xBA\
             : Riesgo de 3\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc
       ref_id: GV.SC-02
       description: Cybersecurity roles and responsibilities for suppliers, customers,
         and partners are established, communicated, and coordinated internally and
@@ -1398,10 +1398,10 @@ objects:
             \ reglas y protocolos para el intercambio de informaci\xF3n y los procesos\
             \ de presentaci\xF3n de informes entre la organizaci\xF3n y sus proveedores.\n\
             3\xBA: Riesgo de 3\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc
       ref_id: GV.SC-03
       description: Cybersecurity supply chain risk management is integrated into cybersecurity
         and enterprise risk management, risk assessment, and improvement processes
@@ -1448,10 +1448,10 @@ objects:
             \ los riesgos materiales de ciberseguridad en las cadenas de suministro\
             \ a la alta direcci\xF3n y abordarlos a nivel de gesti\xF3n de riesgos\
             \ empresariales\n3\xBA: Riesgo de 3\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc-04
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc
       ref_id: GV.SC-04
       description: Suppliers are known and prioritized by criticality
       annotation: 'Ex1: Develop criteria for supplier criticality based on, for example,
@@ -1482,10 +1482,10 @@ objects:
             \ la misi\xF3n de la organizaci\xF3n.\nEx2: Mantener un registro de todos\
             \ los proveedores y priorizar a los proveedores en funci\xF3n de los criterios\
             \ de criticidad\n3\xBA: Riesgo de 3\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc-05
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc
       ref_id: GV.SC-05
       description: Requirements to address cybersecurity risks in supply chains are
         established, prioritized, and integrated into contracts and other types of
@@ -1596,10 +1596,10 @@ objects:
             \ de la organizaci\xF3n, sus proveedores y sus cadenas de suministro,\
             \ con respecto a los posibles riesgos de ciberseguridad\n3\xBA: Riesgo\
             \ de 3\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc-06
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc
       ref_id: GV.SC-06
       description: Planning and due diligence are performed to reduce risks before
         entering into formal supplier or other third-party relationships
@@ -1647,10 +1647,10 @@ objects:
             \ y de ciberseguridad aplicables\nEx4: Evaluar la autenticidad, integridad\
             \ y seguridad de los productos cr\xEDticos antes de su adquisici\xF3n\
             \ y uso\n3\xBA: Riesgo de 3\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc-07
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc-07
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc
       ref_id: GV.SC-07
       description: The risks posed by a supplier, their products and services, and
         other third parties are understood, recorded, prioritized, assessed, responded
@@ -1714,10 +1714,10 @@ objects:
             \ las interrupciones inesperadas relacionadas con los proveedores y la\
             \ cadena de suministro para garantizar la continuidad del negocio\n3\xBA\
             : Riesgo de 3\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc-08
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc-08
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc
       ref_id: GV.SC-08
       description: Relevant suppliers and other third parties are included in incident
         planning, response, and recovery activities
@@ -1766,10 +1766,10 @@ objects:
             \ crisis entre la organizaci\xF3n y sus proveedores cr\xEDticos\nEx5:\
             \ Llevar a cabo sesiones colaborativas de lecciones aprendidas con proveedores\
             \ cr\xEDticos\n3\xBA: Riesgo de 3\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc-09
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc-09
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc
       ref_id: GV.SC-09
       description: Supply chain security practices are integrated into cybersecurity
         and enterprise risk management programs, and their performance is monitored
@@ -1829,10 +1829,10 @@ objects:
             ticas y los procedimientos requieren la comprobaci\xF3n de las actualizaciones\
             \ de hardware cr\xEDtico en busca de cambios no autorizados\n3\xBA: Riesgo\
             \ de 3\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc-10
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc-10
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv.sc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv.sc
       ref_id: GV.SC-10
       description: Cybersecurity supply chain risk management plans include provisions
         for activities that occur after the conclusion of a partnership or service
@@ -1898,7 +1898,7 @@ objects:
             \ los datos y los sistemas creados por la rescisi\xF3n de proveedores\n\
             Ex7: Gestionar los riesgos de fuga de datos asociados a la rescisi\xF3\
             n de proveedores\n3\xBA: Riesgo de 3\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id
       assessable: false
       depth: 1
       ref_id: ID
@@ -1913,10 +1913,10 @@ objects:
           name: IDENTIFICAR
           description: "Se conocen los riesgos de seguridad cibern\xE9tica actuales\
             \ de la organizaci\xF3n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.am
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.am
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id
       ref_id: ID.AM
       name: Asset Management
       description: Assets (e.g., data, hardware, software, systems, facilities, services,
@@ -1938,10 +1938,10 @@ objects:
             n alcanzar sus objetivos empresariales se identifican y gestionan de acuerdo\
             \ con su importancia relativa para los objetivos organizativos y la estrategia\
             \ de riesgos de la organizaci\xF3n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.am-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.am-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.am
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.am
       ref_id: ID.AM-01
       description: Inventories of hardware managed by the organization are maintained
       annotation: '1st: 1st Party Risk
@@ -1967,10 +1967,10 @@ objects:
             \ todo tipo de hardware, incluidos TI, IoT, OT y dispositivos m\xF3viles\n\
             Ex2: Monitoree constantemente las redes para detectar nuevo hardware y\
             \ actualizar autom\xE1ticamente los inventarios"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.am-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.am-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.am
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.am
       ref_id: ID.AM-02
       description: Inventories of software, services, and systems managed by the organization
         are maintained
@@ -2006,10 +2006,10 @@ objects:
             \ las plataformas, incluidos los contenedores y las m\xE1quinas virtuales,\
             \ para detectar cambios en el inventario de software y servicios.\nEx3:\
             \ Mantener un inventario de los sistemas de la organizaci\xF3n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.am-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.am-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.am
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.am
       ref_id: ID.AM-03
       description: Representations of the organization's authorized network communication
         and internal and external network data flows are maintained
@@ -2056,10 +2056,10 @@ objects:
             \ infraestructura como servicio (IaaS) de la organizaci\xF3n\nEx4: Mantener\
             \ la documentaci\xF3n de los puertos de red, protocolos y servicios esperados\
             \ que se utilizan normalmente entre los sistemas autorizados"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.am-04
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.am-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.am
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.am
       ref_id: ID.AM-04
       description: Inventories of services provided by suppliers are maintained
       annotation: 'Ex1: Inventory all external services used by the organization,
@@ -2095,10 +2095,10 @@ objects:
             \ un nuevo servicio externo para garantizar un seguimiento adecuado de\
             \ la gesti\xF3n de riesgos de ciberseguridad del uso de ese servicio por\
             \ parte de la organizaci\xF3n\n3\xBA: Riesgo de 3\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.am-05
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.am-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.am
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.am
       ref_id: ID.AM-05
       description: Assets are prioritized based on classification, criticality, resources,
         and impact on the mission
@@ -2127,10 +2127,10 @@ objects:
             n a los activos\nEx3: Realice un seguimiento de las prioridades de los\
             \ activos y actual\xEDcelas peri\xF3dicamente o cuando se produzcan cambios\
             \ significativos en la organizaci\xF3n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.am-07
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.am-07
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.am
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.am
       ref_id: ID.AM-07
       description: Inventories of data and corresponding metadata for designated data
         types are maintained
@@ -2176,10 +2176,10 @@ objects:
             s de etiquetas o r\xF3tulos\nEx4: Rastree la procedencia, el propietario\
             \ de los datos y la geolocalizaci\xF3n de cada instancia de los tipos\
             \ de datos designados"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.am-08
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.am-08
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.am
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.am
       ref_id: ID.AM-08
       description: Systems, hardware, software, services, and data are managed throughout
         their life cycles
@@ -2262,10 +2262,10 @@ objects:
             \ reasigne o se env\xEDe para su reparaci\xF3n o reemplazo\nEx9: Ofrecer\
             \ m\xE9todos para destruir papel, medios de almacenamiento y otras formas\
             \ f\xEDsicas de almacenamiento de datos."
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id
       ref_id: ID.RA
       name: Risk Assessment
       description: The cybersecurity risk to the organization, assets, and individuals
@@ -2279,10 +2279,10 @@ objects:
           name: "Evaluaci\xF3n de riesgos"
           description: "La organizaci\xF3n comprende el riesgo de seguridad cibern\xE9\
             tica para la organizaci\xF3n, los activos y los individuos"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra
       ref_id: ID.RA-01
       description: Vulnerabilities in assets are identified, validated, and recorded
       annotation: '1st: 1st Party Risk
@@ -2339,10 +2339,10 @@ objects:
             \ obtener informaci\xF3n sobre nuevas vulnerabilidades en productos y\
             \ servicios\nEx6: Revisar los procesos y procedimientos en busca de debilidades\
             \ que puedan aprovecharse para afectar a la ciberseguridad."
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra
       ref_id: ID.RA-02
       description: Cyber threat intelligence is received from information sharing
         forums and sources
@@ -2380,10 +2380,10 @@ objects:
             \ y procedimientos (TTP)\nEx3: Monitorear las fuentes de inteligencia\
             \ de amenazas cibern\xE9ticas para obtener informaci\xF3n sobre los tipos\
             \ de vulnerabilidades que pueden tener las tecnolog\xEDas emergentes"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra
       ref_id: ID.RA-03
       description: Internal and external threats to the organization are identified
         and recorded
@@ -2419,10 +2419,10 @@ objects:
             n\nEx2: Realizar la b\xFAsqueda de amenazas para buscar signos de actores\
             \ de amenazas dentro del entorno\nEx3: Implementar procesos para identificar\
             \ a los actores de amenazas internas"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra-04
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra
       ref_id: ID.RA-04
       description: Potential impacts and likelihoods of threats exploiting vulnerabilities
         are identified and recorded
@@ -2463,10 +2463,10 @@ objects:
             \ los sistemas y los datos de la organizaci\xF3n procesados en o por esos\
             \ sistemas\nEx3: Tener en cuenta los impactos potenciales de los fallos\
             \ en cascada para los sistemas de sistemas"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra-05
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra
       ref_id: ID.RA-05
       description: Threats, vulnerabilities, likelihoods, and impacts are used to
         understand inherent risk and inform risk response prioritization
@@ -2496,10 +2496,10 @@ objects:
             \ adecuadas a los riesgos\nEx2: Priorizar las asignaciones de recursos\
             \ de ciberseguridad y las inversiones en funci\xF3n de las probabilidades\
             \ y los impactos estimados"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra-06
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra
       ref_id: ID.RA-06
       description: Risk responses are chosen, prioritized, planned, tracked, and communicated
       annotation: '1st: 1st Party Risk
@@ -2546,10 +2546,10 @@ objects:
             \ resultados de la evaluaci\xF3n de riesgos para informar las decisiones\
             \ y acciones de respuesta al riesgo\nEx5: Comunicar las respuestas planificadas\
             \ a los riesgos a las partes interesadas afectadas en orden de prioridad"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra-07
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra-07
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra
       ref_id: ID.RA-07
       description: Changes and exceptions are managed, assessed for risk impact, recorded,
         and tracked
@@ -2588,10 +2588,10 @@ objects:
             \ con cada excepci\xF3n solicitada y el plan para responder a esos riesgos.\n\
             Ex4: Revisar peri\xF3dicamente los riesgos que se aceptaron en funci\xF3\
             n de las acciones o hitos futuros planificados"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra-08
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra-08
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra
       ref_id: ID.RA-08
       description: Processes for receiving, analyzing, and responding to vulnerability
         disclosures are established
@@ -2630,10 +2630,10 @@ objects:
             \ y responder a las divulgaciones de amenazas, vulnerabilidades o incidentes\
             \ de ciberseguridad por parte de proveedores, clientes, socios y organizaciones\
             \ gubernamentales de ciberseguridad"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra-09
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra-09
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra
       ref_id: ID.RA-09
       description: The authenticity and integrity of hardware and software are assessed
         prior to acquisition and use
@@ -2655,10 +2655,10 @@ objects:
           annotation: "Ex1: Evaluar la autenticidad y la ciberseguridad de los productos\
             \ y servicios tecnol\xF3gicos cr\xEDticos antes de su adquisici\xF3n y\
             \ uso\n3\xBA: Riesgo de 3\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra-10
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra-10
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.ra
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.ra
       ref_id: ID.RA-10
       description: Critical suppliers are assessed prior to acquisition
       annotation: 'Ex1: Conduct supplier risk assessments against business and applicable
@@ -2676,10 +2676,10 @@ objects:
           annotation: "Ex1: Realizar evaluaciones de riesgos de los proveedores en\
             \ relaci\xF3n con los requisitos empresariales y de ciberseguridad aplicables,\
             \ incluida la cadena de suministro"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.im
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.im
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id
       ref_id: ID.IM
       name: Improvement
       description: Improvements to organizational cybersecurity risk management processes,
@@ -2695,10 +2695,10 @@ objects:
           description: "Se identifican mejoras en los procesos, procedimientos y actividades\
             \ de gesti\xF3n de riesgos de seguridad cibern\xE9tica de la organizaci\xF3\
             n en todas las funciones del CSF"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.im-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.im-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.im
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.im
       ref_id: ID.IM-01
       description: Improvements are identified from evaluations
       annotation: '1st: 1st Party Risk
@@ -2731,10 +2731,10 @@ objects:
             n para identificar las \xE1reas que necesitan mejoras.\nEx3: Evaluar constantemente\
             \ el cumplimiento de los requisitos de ciberseguridad seleccionados a\
             \ trav\xE9s de medios automatizados"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.im-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.im-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.im
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.im
       ref_id: ID.IM-02
       description: Improvements are identified from security tests and exercises,
         including those done in coordination with suppliers and relevant third parties
@@ -2811,10 +2811,10 @@ objects:
             \ alterados antes de su recepci\xF3n\nEx6: Recopilar y analizar m\xE9\
             tricas de rendimiento utilizando herramientas y servicios de seguridad\
             \ para informar sobre las mejoras en el programa de ciberseguridad"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.im-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.im-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.im
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.im
       ref_id: ID.IM-03
       description: Improvements are identified from execution of operational processes,
         procedures, and activities
@@ -2845,10 +2845,10 @@ objects:
             \ las pol\xEDticas, procesos y procedimientos de ciberseguridad para tener\
             \ en cuenta las lecciones aprendidas.\nEx3: Utilice m\xE9tricas para evaluar\
             \ el rendimiento de la ciberseguridad operativa a lo largo del tiempo"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.im-04
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:id.im-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:id.im
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:id.im
       ref_id: ID.IM-04
       description: Incident response plans and other cybersecurity plans that affect
         operations are established, communicated, maintained, and improved
@@ -2911,7 +2911,7 @@ objects:
             \ actualizaciones) a los responsables de llevarlos a cabo y a las partes\
             \ afectadas\nEx5: Revisar y actualizar todos los planes de ciberseguridad\
             \ anualmente o cuando se identifique la necesidad de mejoras significativas."
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr
       assessable: false
       depth: 1
       ref_id: PR
@@ -2927,10 +2927,10 @@ objects:
           name: PROTEGER
           description: "Se utilizan medidas de protecci\xF3n para gestionar los riesgos\
             \ de seguridad cibern\xE9tica de la organizaci\xF3n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.aa
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.aa
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr
       ref_id: PR.AA
       name: Identity Management, Authentication, and Access Control
       description: Access to physical and logical assets is limited to authorized
@@ -2948,10 +2948,10 @@ objects:
           description: "El acceso a los activos f\xEDsicos y l\xF3gicos se limita\
             \ a los usuarios, servicios y hardware autorizados y se gestiona de forma\
             \ proporcional al riesgo evaluado de acceso no autorizado"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.aa-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.aa-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.aa
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.aa
       ref_id: PR.AA-01
       description: Identities and credentials for authorized users, services, and
         hardware are managed by the organization
@@ -2999,10 +2999,10 @@ objects:
             \ de caracter\xEDsticas de hardware inmutables o un identificador aprovisionado\
             \ de forma segura en el dispositivo\nEx4: Etiquete f\xEDsicamente el hardware\
             \ autorizado con un identificador para fines de inventario y servicio"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.aa-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.aa-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.aa
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.aa
       ref_id: PR.AA-02
       description: Identities are proofed and bound to credentials based on the context
         of interactions
@@ -3032,10 +3032,10 @@ objects:
             \ la inscripci\xF3n utilizando credenciales de identidad emitidas por\
             \ el gobierno (p. ej., pasaporte, visa, licencia de conducir)\nEx2: Emitir\
             \ una credencial diferente para cada persona (es decir, no compartir credenciales)"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.aa-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.aa-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.aa
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.aa
       ref_id: PR.AA-03
       description: Users, services, and hardware are authenticated
       annotation: '1st: 1st Party Risk
@@ -3071,10 +3071,10 @@ objects:
             n del riesgo (por ejemplo, en arquitecturas de confianza cero)\nPunto\
             \ 4: Garantizar que el personal autorizado pueda acceder a las cuentas\
             \ esenciales para proteger la seguridad en condiciones de emergencia"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.aa-04
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.aa-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.aa
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.aa
       ref_id: PR.AA-04
       description: Identity assertions are protected, conveyed, and verified
       annotation: '1st: 1st Party Risk
@@ -3117,10 +3117,10 @@ objects:
             \ la generaci\xF3n (p. ej., modelos de datos, metadatos), protecci\xF3\
             n (p. ej., firma digital, cifrado) y verificaci\xF3n (p. ej., validaci\xF3\
             n de firma) de aserciones de identidad"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.aa-05
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.aa-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.aa
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.aa
       ref_id: PR.AA-05
       description: Access permissions, entitlements, and authorizations are defined
         in a policy, managed, enforced, and reviewed, and incorporate the principles
@@ -3173,10 +3173,10 @@ objects:
             \ de confianza cero)\nEx4: Revisar peri\xF3dicamente los privilegios asociados\
             \ con las funciones cr\xEDticas del negocio para confirmar la separaci\xF3\
             n adecuada de funciones"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.aa-06
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.aa-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.aa
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.aa
       ref_id: PR.AA-06
       description: Physical access to assets is managed, monitored, and enforced commensurate
         with risk
@@ -3215,10 +3215,10 @@ objects:
             \ f\xEDsica adicionales para \xE1reas que contienen activos de alto riesgo\n\
             Ex3: Acompa\xF1e a invitados, proveedores y otros terceros dentro de \xE1\
             reas que contengan activos cr\xEDticos para el negocio"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.at
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.at
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr
       ref_id: PR.AT
       name: Awareness and Training
       description: The organization's personnel are provided with cybersecurity awareness
@@ -3234,10 +3234,10 @@ objects:
           description: "Se proporciona al personal de la organizaci\xF3n concienciaci\xF3\
             n y capacitaci\xF3n en seguridad cibern\xE9tica para que puedan realizar\
             \ sus tareas relacionadas con la seguridad cibern\xE9tica"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.at-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.at-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.at
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.at
       ref_id: PR.AT-01
       description: Personnel are provided with awareness and training so that they
         possess the knowledge and skills to perform general tasks with cybersecurity
@@ -3301,10 +3301,10 @@ objects:
             dicamente a los usuarios en su comprensi\xF3n de las pr\xE1cticas b\xE1\
             sicas de ciberseguridad\nEx5: Exigir un repaso anual para reforzar las\
             \ pr\xE1cticas existentes e introducir nuevas pr\xE1cticas"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.at-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.at-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.at
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.at
       ref_id: PR.AT-02
       description: Individuals in specialized roles are provided with awareness and
         training so that they possess the knowledge and skills to perform relevant
@@ -3364,10 +3364,10 @@ objects:
             n de las pr\xE1cticas de ciberseguridad para sus roles especializados\n\
             Ex4: Exigir un repaso anual para reforzar las pr\xE1cticas existentes\
             \ e introducir nuevas pr\xE1cticas"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ds
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ds
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr
       ref_id: PR.DS
       name: Data Security
       description: Data are managed consistent with the organization's risk strategy
@@ -3383,10 +3383,10 @@ objects:
           description: "Los datos se gestionan de forma coherente con la estrategia\
             \ de riesgos de la organizaci\xF3n para proteger la confidencialidad,\
             \ integridad y disponibilidad de la informaci\xF3n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ds-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ds-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ds
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ds
       ref_id: PR.DS-01
       description: The confidentiality, integrity, and availability of data-at-rest
         are protected
@@ -3434,10 +3434,10 @@ objects:
             n de datos\nEx5: Medios extra\xEDbles f\xEDsicamente seguros que contienen\
             \ informaci\xF3n confidencial sin cifrar, como dentro de oficinas o archivadores\
             \ cerrados con llave"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ds-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ds-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ds
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ds
       ref_id: PR.DS-02
       description: The confidentiality, integrity, and availability of data-in-transit
         are protected
@@ -3486,10 +3486,10 @@ objects:
             n de datos confidenciales de entornos de producci\xF3n (por ejemplo, registros\
             \ de clientes) en entornos de desarrollo, pruebas y otros entornos que\
             \ no sean de producci\xF3n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ds-10
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ds-10
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ds
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ds
       ref_id: PR.DS-10
       description: The confidentiality, integrity, and availability of data-in-use
         are protected
@@ -3516,10 +3516,10 @@ objects:
             \ permanecer confidenciales (por ejemplo, de los procesadores y la memoria)\
             \ tan pronto como ya no sean necesarios\nEx2: Proteger los datos en uso\
             \ del acceso de otros usuarios y procesos de la misma plataforma"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ds-11
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ds-11
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ds
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ds
       ref_id: PR.DS-11
       description: Backups of data are created, protected, maintained, and tested
       annotation: '1st: 1st Party Risk
@@ -3559,10 +3559,10 @@ objects:
             \ para que un incidente o desastre no las da\xF1e\nEx4: Aplicar restricciones\
             \ de separaci\xF3n geogr\xE1fica y geolocalizaci\xF3n para el almacenamiento\
             \ de copias de seguridad de datos"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ps
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ps
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr
       ref_id: PR.PS
       name: Platform Security
       description: The hardware, software (e.g., firmware, operating systems, applications),
@@ -3583,10 +3583,10 @@ objects:
             \ aplicaciones) y los servicios de las plataformas f\xEDsicas y virtuales\
             \ se gestionan de acuerdo con la estrategia de riesgos de la organizaci\xF3\
             n para proteger su confidencialidad, integridad y disponibilidad"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ps-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ps-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ps
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ps
       ref_id: PR.PS-01
       description: Configuration management practices are established and applied
       annotation: '1st: 1st Party Risk
@@ -3624,10 +3624,10 @@ objects:
             \ afectar a la ciberseguridad al instalar o actualizar software\nEx3:\
             \ Supervisar el software implementado para detectar desviaciones de las\
             \ l\xEDneas de base aprobadas"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ps-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ps-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ps
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ps
       ref_id: PR.PS-02
       description: Software is maintained, replaced, and removed commensurate with
         risk
@@ -3682,10 +3682,10 @@ objects:
             \ operativo) que los atacantes puedan utilizar indebidamente\nEx6: Definir\
             \ e implementar planes para el soporte de mantenimiento al final de la\
             \ vida \xFAtil del software y los servicios y la obsolescencia"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ps-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ps-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ps
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ps
       ref_id: PR.PS-03
       description: Hardware is maintained, replaced, and removed commensurate with
         risk
@@ -3722,10 +3722,10 @@ objects:
             \ de mantenimiento al final de la vida \xFAtil del hardware y la obsolescencia\n\
             Ex3: Realizar la eliminaci\xF3n de hardware de forma segura, responsable\
             \ y auditable"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ps-04
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ps-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ps
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ps
       ref_id: PR.PS-04
       description: Log records are generated and made available for continuous monitoring
       annotation: '1st: 1st Party Risk
@@ -3759,10 +3759,10 @@ objects:
             \ de infraestructura de registro de la organizaci\xF3n\nEx3: Configurar\
             \ generadores de registros para registrar los datos que necesitan las\
             \ arquitecturas de confianza cero"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ps-05
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ps-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ps
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ps
       ref_id: PR.PS-05
       description: Installation and execution of unauthorized software are prevented
       annotation: '1st: 1st Party Risk
@@ -3802,10 +3802,10 @@ objects:
             \ DNS aprobados que bloqueen el acceso a dominios malintencionados conocidos\n\
             Ex4: Configurar plataformas para permitir la instalaci\xF3n solo de software\
             \ aprobado por la organizaci\xF3n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ps-06
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ps-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ps
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ps
       ref_id: PR.PS-06
       description: Secure software development practices are integrated, and their
         performance is monitored throughout the software development life cycle
@@ -3841,10 +3841,10 @@ objects:
             \ por la organizaci\xF3n, con vulnerabilidades m\xEDnimas en sus versiones\n\
             Ex3: Mantener el software utilizado en los entornos de producci\xF3n y\
             \ desechar de forma segura el software una vez que ya no sea necesario"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ir
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ir
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr
       ref_id: PR.IR
       name: Technology Infrastructure Resilience
       description: Security architectures are managed with the organization's risk
@@ -3863,10 +3863,10 @@ objects:
             \ de riesgos de la organizaci\xF3n a fin de proteger la confidencialidad,\
             \ la integridad y la disponibilidad de los activos, as\xED como la resiliencia\
             \ de la organizaci\xF3n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ir-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ir-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ir
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ir
       ref_id: PR.IR-01
       description: Networks and environments are protected from unauthorized logical
         access and usage
@@ -3919,10 +3919,10 @@ objects:
             \ cada recurso al m\xEDnimo necesario\nEx4: Comprobar el estado cibern\xE9\
             tico de los endpoints antes de permitirles acceder y utilizar los recursos\
             \ de producci\xF3n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ir-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ir-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ir
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ir
       ref_id: PR.IR-02
       description: The organization's technology assets are protected from environmental
         threats
@@ -3958,10 +3958,10 @@ objects:
             \ para una infraestructura operativa adecuada en los requisitos para los\
             \ proveedores de servicios que operan sistemas en nombre de la organizaci\xF3\
             n."
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ir-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ir-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ir
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ir
       ref_id: PR.IR-03
       description: Mechanisms are implemented to achieve resilience requirements in
         normal and adverse situations
@@ -3991,10 +3991,10 @@ objects:
             \ de carga para aumentar la capacidad y mejorar la confiabilidad\nEx3:\
             \ Utilice componentes de alta disponibilidad, como almacenamiento redundante\
             \ y fuentes de alimentaci\xF3n, para mejorar la fiabilidad del sistema"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ir-04
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ir-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:pr.ir
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:pr.ir
       ref_id: PR.IR-04
       description: Adequate resource capacity to ensure availability is maintained
       annotation: 'Ex1: Monitor usage of storage, power, compute, network bandwidth,
@@ -4015,7 +4015,7 @@ objects:
           annotation: "Ex1: Supervise el uso del almacenamiento, la energ\xEDa, la\
             \ computaci\xF3n, el ancho de banda de red y otros recursos\nEx2: Pronostique\
             \ las necesidades futuras y escale los recursos en consecuencia"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:de
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:de
       assessable: false
       depth: 1
       ref_id: DE
@@ -4030,10 +4030,10 @@ objects:
           name: DETECTAR
           description: "Se detectan y analizan posibles ataques y situaciones comprometedoras\
             \ en materia de seguridad cibern\xE9tica."
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.cm
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:de.cm
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:de
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:de
       ref_id: DE.CM
       name: Continuous Monitoring
       description: Assets are monitored to find anomalies, indicators of compromise,
@@ -4048,10 +4048,10 @@ objects:
           name: Monitoreo continuo
           description: "Los activos se monitorean para encontrar anomal\xEDas, indicadores\
             \ de compromiso y otros acontecimientos potencialmente adversos"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.cm-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:de.cm-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.cm
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:de.cm
       ref_id: DE.CM-01
       description: Networks and network services are monitored to find potentially
         adverse events
@@ -4093,10 +4093,10 @@ objects:
             neas de base para detectar desviaciones\nEx5: Supervisar las comunicaciones\
             \ de red para identificar cambios en las posturas de seguridad con fines\
             \ de confianza cero\n1\xBA: Riesgo de 1\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.cm-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:de.cm-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.cm
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:de.cm
       ref_id: DE.CM-02
       description: The physical environment is monitored to find potentially adverse
         events
@@ -4141,10 +4141,10 @@ objects:
             \ pestillos, pasadores de bisagras, alarmas) para detectar signos de manipulaci\xF3\
             n\nEx4: Monitoree el entorno f\xEDsico utilizando sistemas de alarma,\
             \ c\xE1maras y guardias de seguridad\n1\xBA: Riesgo de 1\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.cm-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:de.cm-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.cm
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:de.cm
       ref_id: DE.CM-03
       description: Personnel activity and technology usage are monitored to find potentially
         adverse events
@@ -4180,10 +4180,10 @@ objects:
             \ de acceso fallidos\nEx3: Supervise continuamente la tecnolog\xEDa de\
             \ enga\xF1o, incluidas las cuentas de usuario, para cualquier uso\n1\xBA\
             : Riesgo de 1\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.cm-06
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:de.cm-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.cm
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:de.cm
       ref_id: DE.CM-06
       description: External service provider activities and services are monitored
         to find potentially adverse events
@@ -4214,10 +4214,10 @@ objects:
             \ basados en la nube, los proveedores de servicios de Internet y otros\
             \ proveedores de servicios para detectar desviaciones del comportamiento\
             \ esperado\n3\xBA: Riesgo de 3\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.cm-09
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:de.cm-09
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.cm
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:de.cm
       ref_id: DE.CM-09
       description: Computing hardware and software, runtime environments, and their
         data are monitored to find potentially adverse events
@@ -4274,10 +4274,10 @@ objects:
             \ de malware, software no autorizado) y redirija los puntos finales a\
             \ un entorno de correcci\xF3n antes de que se autorice el acceso\n1\xBA\
             : Riesgo de 1\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.ae
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:de.ae
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:de
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:de
       ref_id: DE.AE
       name: Adverse Event Analysis
       description: Anomalies, indicators of compromise, and other potentially adverse
@@ -4294,10 +4294,10 @@ objects:
           description: "Se analizan anomal\xEDas, indicadores de compromiso y otros\
             \ acontecimientos potencialmente adversos para caracterizarlos y detectar\
             \ incidentes de seguridad cibern\xE9tica"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.ae-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:de.ae-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.ae
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:de.ae
       ref_id: DE.AE-02
       description: Potentially adverse events are analyzed to better understand associated
         activities
@@ -4345,10 +4345,10 @@ objects:
             \ no se pueden supervisar suficientemente mediante la automatizaci\xF3\
             n\nEx4: Utilice herramientas de an\xE1lisis de registros para generar\
             \ informes sobre sus hallazgos\n1\xBA: Riesgo de 1\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.ae-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:de.ae-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.ae
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:de.ae
       ref_id: DE.AE-03
       description: Information is correlated from multiple sources
       annotation: 'Ex1: Constantly transfer log data generated by other sources to
@@ -4381,10 +4381,10 @@ objects:
             ltiples fuentes\nEx3: Utilice la inteligencia de amenazas cibern\xE9ticas\
             \ para ayudar a correlacionar eventos entre or\xEDgenes de registro\n\
             1\xBA: Riesgo de 1\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.ae-04
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:de.ae-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.ae
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:de.ae
       ref_id: DE.AE-04
       description: The estimated impact and scope of adverse events are understood
       annotation: 'Ex1: Use SIEMs or other tools to estimate impact and scope, and
@@ -4408,10 +4408,10 @@ objects:
             \ y el alcance, y revise y perfeccione las estimaciones\nEx2: Una persona\
             \ crea sus propias estimaciones de impacto y alcance\n1\xBA: Riesgo de\
             \ 1\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.ae-06
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:de.ae-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.ae
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:de.ae
       ref_id: DE.AE-06
       description: Information on adverse events is provided to authorized staff and
         tools
@@ -4457,10 +4457,10 @@ objects:
             \ Crear y asignar tickets manualmente en el sistema de tickets de la organizaci\xF3\
             n cuando el personal t\xE9cnico descubra indicadores de compromiso\n1\xBA\
             : Riesgo de 1\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.ae-07
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:de.ae-07
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.ae
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:de.ae
       ref_id: DE.AE-07
       description: Cyber threat intelligence and other contextual information are
         integrated into the analysis
@@ -4497,10 +4497,10 @@ objects:
             \ las divulgaciones de vulnerabilidades de las tecnolog\xEDas de la organizaci\xF3\
             n de proveedores, vendedores y avisos de seguridad de terceros.\n1\xBA\
             : Riesgo de 1\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.ae-08
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:de.ae-08
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:de.ae
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:de.ae
       ref_id: DE.AE-08
       description: Incidents are declared when adverse events meet the defined incident
         criteria
@@ -4526,7 +4526,7 @@ objects:
             \ conocidas y supuestas de la actividad para determinar si un incidente\
             \ debe declararse\nEx2: Tener en cuenta los falsos positivos conocidos\
             \ al aplicar los criterios de incidentes\n1\xBA: Riesgo de 1\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs
       assessable: false
       depth: 1
       ref_id: RS
@@ -4541,10 +4541,10 @@ objects:
           name: RESPONDER
           description: "Se toman medidas en relaci\xF3n con un incidente de seguridad\
             \ cibern\xE9tica detectado"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.ma
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.ma
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs
       ref_id: RS.MA
       name: Incident Management
       description: Responses to detected cybersecurity incidents are managed
@@ -4557,10 +4557,10 @@ objects:
           name: "Gesti\xF3n de incidentes"
           description: "Se gestionan las respuestas a los incidentes de seguridad\
             \ cibern\xE9tica detectados"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.ma-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.ma-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.ma
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.ma
       ref_id: RS.MA-01
       description: The incident response plan is executed in coordination with relevant
         third parties once an incident is declared
@@ -4597,10 +4597,10 @@ objects:
             \ adicionales seg\xFAn sea necesario para respaldar la respuesta a incidentes\
             \ (por ejemplo, continuidad del negocio y recuperaci\xF3n ante desastres)\n\
             3\xBA: Riesgo de 3\xAA parte"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.ma-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.ma-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.ma
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.ma
       ref_id: RS.MA-02
       description: Incident reports are triaged and validated
       annotation: '1st: 1st Party Risk
@@ -4623,10 +4623,10 @@ objects:
             \ los informes de incidentes para confirmar que est\xE1n relacionados\
             \ con la ciberseguridad y requieren actividades de respuesta a incidentes.\n\
             Ex2: Aplicar criterios para estimar la gravedad de un incidente"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.ma-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.ma-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.ma
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.ma
       ref_id: RS.MA-03
       description: Incidents are categorized and prioritized
       annotation: '1st: 1st Party Risk
@@ -4661,10 +4661,10 @@ objects:
             \ incidentes para incidentes activos equilibrando la necesidad de recuperarse\
             \ r\xE1pidamente de un incidente con la necesidad de observar al atacante\
             \ o realizar una investigaci\xF3n m\xE1s exhaustiva"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.ma-04
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.ma-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.ma
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.ma
       ref_id: RS.MA-04
       description: Incidents are escalated or elevated as needed
       annotation: '1st: 1st Party Risk
@@ -4687,10 +4687,10 @@ objects:
             n del estado de todos los incidentes en curso\nEx2: Coordinar la escalada\
             \ o elevaci\xF3n de incidentes con las partes interesadas internas y externas\
             \ designadas"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.ma-05
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.ma-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.ma
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.ma
       ref_id: RS.MA-05
       description: The criteria for initiating incident recovery are applied
       annotation: '1st: 1st Party Risk
@@ -4719,10 +4719,10 @@ objects:
             \ para determinar si se deben iniciar procesos de recuperaci\xF3n de incidentes\n\
             Ex2: Tener en cuenta la posible interrupci\xF3n operativa de las actividades\
             \ de recuperaci\xF3n de incidentes"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.an
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.an
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs
       ref_id: RS.AN
       name: Incident Analysis
       description: Investigations are conducted to ensure effective response and support
@@ -4738,10 +4738,10 @@ objects:
           description: "Se llevan a cabo investigaciones con el fin de garantizar\
             \ una respuesta eficaz y apoyar las actividades forenses y de recuperaci\xF3\
             n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.an-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.an-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.an
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.an
       ref_id: RS.AN-03
       description: Analysis is performed to establish what has taken place during
         an incident and the root cause of the incident
@@ -4781,10 +4781,10 @@ objects:
             \ para encontrar las causas ra\xEDz sist\xE9micas subyacentes\nEx4: Compruebe\
             \ cualquier tecnolog\xEDa de enga\xF1o cibern\xE9tico para obtener informaci\xF3\
             n adicional sobre el comportamiento del atacante"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.an-06
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.an-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.an
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.an
       ref_id: RS.AN-06
       description: Actions performed during an investigation are recorded, and the
         records' integrity and provenance are preserved
@@ -4820,10 +4820,10 @@ objects:
             \ Exigir al l\xEDder del incidente que documente el incidente en detalle\
             \ y sea responsable de preservar la integridad de la documentaci\xF3n\
             \ y las fuentes de toda la informaci\xF3n que se informa."
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.an-07
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.an-07
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.an
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.an
       ref_id: RS.AN-07
       description: Incident data and metadata are collected, and their integrity and
         provenance are preserved
@@ -4849,10 +4849,10 @@ objects:
             \ la integridad de todos los datos y metadatos pertinentes del incidente\
             \ (por ejemplo, fuente de datos, fecha/hora de recopilaci\xF3n) en funci\xF3\
             n de los procedimientos de preservaci\xF3n de pruebas y cadena de custodia"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.an-08
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.an-08
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.an
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.an
       ref_id: RS.AN-08
       description: An incident's magnitude is estimated and validated
       annotation: '1st: 1st Party Risk
@@ -4877,10 +4877,10 @@ objects:
             \ del incidente para buscar indicadores de compromiso y evidencia de persistencia\n\
             Ex2: Ejecute autom\xE1ticamente herramientas en los objetivos para buscar\
             \ indicadores de compromiso y evidencia de persistencia"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.co
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.co
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs
       ref_id: RS.CO
       name: Incident Response Reporting and Communication
       description: Response activities are coordinated with internal and external
@@ -4896,10 +4896,10 @@ objects:
           description: "Las actividades de respuesta se coordinan con las partes interesadas\
             \ internas y externas, seg\xFAn lo exijan las leyes, las normativas o\
             \ las pol\xEDticas"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.co-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.co-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.co
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.co
       ref_id: RS.CO-02
       description: Internal and external stakeholders are notified of incidents
       annotation: '1st: 1st Party Risk
@@ -4940,10 +4940,10 @@ objects:
             n de la ley y a los organismos reguladores de los incidentes en funci\xF3\
             n de los criterios del plan de respuesta a incidentes y la aprobaci\xF3\
             n de la direcci\xF3n."
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.co-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.co-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.co
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.co
       ref_id: RS.CO-03
       description: Information is shared with designated internal and external stakeholders
       annotation: '1st: 1st Party Risk
@@ -4997,10 +4997,10 @@ objects:
             \ intercambio de informaci\xF3n sobre incidentes entre la organizaci\xF3\
             n y sus proveedores\nEx6: Coordinar los m\xE9todos de comunicaci\xF3n\
             \ de crisis entre la organizaci\xF3n y sus proveedores cr\xEDticos"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.mi
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.mi
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs
       ref_id: RS.MI
       name: Incident Mitigation
       description: Activities are performed to prevent expansion of an event and mitigate
@@ -5014,10 +5014,10 @@ objects:
           name: "Mitigaci\xF3n de incidentes"
           description: "Se llevan a cabo actividades a fin de evitar la expansi\xF3\
             n de un incidente y mitigar sus efectos"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.mi-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.mi-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.mi
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.mi
       ref_id: RS.MI-01
       description: Incidents are contained
       annotation: '1st: 1st Party Risk
@@ -5064,10 +5064,10 @@ objects:
             \ administrada) realice acciones de contenci\xF3n en nombre de la organizaci\xF3\
             n\nEx4: Transfiera autom\xE1ticamente los puntos de conexi\xF3n comprometidos\
             \ a una red de \xE1rea local virtual (VLAN) de correcci\xF3n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.mi-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.mi-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rs.mi
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rs.mi
       ref_id: RS.MI-02
       description: Incidents are eradicated
       annotation: '1st: 1st Party Risk
@@ -5106,7 +5106,7 @@ objects:
             n\nEx3: Permitir que un tercero (por ejemplo, un proveedor de servicios\
             \ de seguridad administrados) realice acciones de erradicaci\xF3n en nombre\
             \ de la organizaci\xF3n."
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rc
       assessable: false
       depth: 1
       ref_id: RC
@@ -5122,10 +5122,10 @@ objects:
           name: RECUPERAR
           description: "Se restauran los activos y las operaciones afectados por un\
             \ incidente de seguridad cibern\xE9tica"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.rp
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.rp
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rc
       ref_id: RC.RP
       name: Incident Recovery Plan Execution
       description: Restoration activities are performed to ensure operational availability
@@ -5141,10 +5141,10 @@ objects:
           description: "Se realizan actividades de restauraci\xF3n que garantizan\
             \ la disponibilidad operativa de los sistemas y servicios afectados por\
             \ incidentes de seguridad cibern\xE9tica"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.rp-01
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.rp-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.rp
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.rp
       ref_id: RC.RP-01
       description: The recovery portion of the incident response plan is executed
         once initiated from the incident response process
@@ -5174,10 +5174,10 @@ objects:
             \ incidentes\nEx2: Informar a todas las personas con responsabilidades\
             \ de recuperaci\xF3n de los planes de recuperaci\xF3n y de las autorizaciones\
             \ necesarias para implementar cada aspecto de los planes"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.rp-02
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.rp-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.rp
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.rp
       ref_id: RC.RP-02
       description: Recovery actions are selected, scoped, prioritized, and performed
       annotation: '1st: 1st Party Risk
@@ -5204,10 +5204,10 @@ objects:
             \ de respuesta a incidentes y los recursos disponibles\nEx2: Cambiar las\
             \ acciones de recuperaci\xF3n planificadas en funci\xF3n de una reevaluaci\xF3\
             n de las necesidades y los recursos de la organizaci\xF3n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.rp-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.rp-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.rp
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.rp
       ref_id: RC.RP-03
       description: The integrity of backups and other restoration assets is verified
         before using them for restoration
@@ -5229,10 +5229,10 @@ objects:
           annotation: "1\xBA: Riesgo de 1\xAA parte\nEx1: Compruebe los activos de\
             \ restauraci\xF3n en busca de indicadores de compromiso, da\xF1os en los\
             \ archivos y otros problemas de integridad antes de su uso"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.rp-04
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.rp-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.rp
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.rp
       ref_id: RC.RP-04
       description: Critical mission functions and cybersecurity risk management are
         considered to establish post-incident operational norms
@@ -5272,10 +5272,10 @@ objects:
             \ de los sistemas y el retorno a las operaciones normales\nEx3: Supervisar\
             \ el rendimiento de los sistemas restaurados para verificar la idoneidad\
             \ de la restauraci\xF3n"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.rp-05
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.rp-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.rp
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.rp
       ref_id: RC.RP-05
       description: The integrity of restored assets is verified, systems and services
         are restored, and normal operating status is confirmed
@@ -5304,10 +5304,10 @@ objects:
             \ ra\xEDz del incidente antes del uso en producci\xF3n\nEx2: Verificar\
             \ la exactitud y adecuaci\xF3n de las acciones de restauraci\xF3n realizadas\
             \ antes de poner en l\xEDnea un sistema restaurado"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.rp-06
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.rp-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.rp
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.rp
       ref_id: RC.RP-06
       description: The end of incident recovery is declared based on criteria, and
         incident-related documentation is completed
@@ -5336,10 +5336,10 @@ objects:
             \ respuesta y recuperaci\xF3n tomadas, y las lecciones aprendidas\nEx2:\
             \ Declarar el fin de la recuperaci\xF3n de incidentes una vez que se cumplan\
             \ los criterios"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.co
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.co
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rc
       ref_id: RC.CO
       name: Incident Recovery Communication
       description: Restoration activities are coordinated with internal and external
@@ -5353,10 +5353,10 @@ objects:
           name: "Comunicaci\xF3n de la recuperaci\xF3n del incidente"
           description: "Se coordinan las actividades de restauraci\xF3n con las partes\
             \ internas y externas"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.co-03
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.co-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.co
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.co
       ref_id: RC.CO-03
       description: Recovery activities and progress in restoring operational capabilities
         are communicated to designated internal and external stakeholders
@@ -5405,10 +5405,10 @@ objects:
             \ de informaci\xF3n sobre incidentes entre la organizaci\xF3n y sus proveedores\n\
             Ex4: Coordinar la comunicaci\xF3n de crisis entre la organizaci\xF3n y\
             \ sus proveedores cr\xEDticos"
-    - urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.co-04
+    - urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.co-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-csf-2.0:rc.co
+      parent_urn: urn:ciso:risk:req_node:nist-csf-2.0:rc.co
       ref_id: RC.CO-04
       description: Public updates on incident recovery are shared using approved methods
         and messaging

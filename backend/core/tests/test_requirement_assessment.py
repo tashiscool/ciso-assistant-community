@@ -17,7 +17,7 @@ User = get_user_model()
 @pytest.fixture
 def enisa_5g_scm_framework_fixture():
     enisa_5g_scm_library = StoredLibrary.objects.get(
-        urn="urn:intuitem:risk:library:enisa-5g-scm-v1.3", locale="en"
+        urn="urn:ciso:risk:library:enisa-5g-scm-v1.3", locale="en"
     )
     assert enisa_5g_scm_library is not None
     enisa_5g_scm_library.load()

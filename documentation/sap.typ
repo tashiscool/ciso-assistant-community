@@ -64,7 +64,7 @@
         ]
         #linebreak()
         #text(size: 18pt, weight: "medium", fill: rgb("#64748b"), style: "italic")[
-          intuitem
+          ciso
         ]
       ]
     ],
@@ -121,7 +121,7 @@ This plan covers Intuitem’s SaaS offering of CISO Assistant and the associated
 
 - Policies & ownership: Security policies are owned by Intuitem leadership and reviewed at least annually.
 
-- Roles: A designated Data Protection Officer (DPO) oversees data protection and privacy. Contact: #link("mailto:contact@intuitem.com"). To report a security issue, please use: #link("security@intuitem.com")
+- Roles: A designated Data Protection Officer (DPO) oversees data protection and privacy. Contact: #link("mailto:contact@ciso.com"). To report a security issue, please use: #link("security@ciso.com")
 
 - Defense-in-depth: We apply a multi-layer approach combining preventive, detective, and corrective controls.
 
@@ -273,7 +273,7 @@ This plan covers Intuitem’s SaaS offering of CISO Assistant and the associated
   - Manage user accounts, roles, and MFA inside the product.
   - Configure access settings to align with internal policies and organisation setup.
   - Can generate an export of their data as an extra layer of backup or portability needs.
-- Report suspected security issues to #link("security@intuitem.com") promptly.
+- Report suspected security issues to #link("security@ciso.com") promptly.
 - For self-hosted/on-prem deployments, operate and secure the infrastructure stack per vendor guidance (see @dep).
 
 
@@ -317,6 +317,6 @@ This plan covers Intuitem’s SaaS offering of CISO Assistant and the associated
 
 = Contacts <contact>
 
-- Security: #link("security@intuitem.com")
-- Privacy (DPO): #link("contact@intuitem.com")
-- General: #link("contact@intuitem.com")
+- Security: #link("security@ciso.com")
+- Privacy (DPO): #link("contact@ciso.com")
+- General: #link("contact@ciso.com")

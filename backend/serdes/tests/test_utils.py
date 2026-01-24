@@ -60,22 +60,22 @@ def basic_folder_structure():
 @pytest.fixture
 def framework_fixture():
     library = StoredLibrary.objects.filter(
-        urn="urn:intuitem:risk:library:iso27001-2022"
+        urn="urn:ciso:risk:library:iso27001-2022"
     ).last()
     assert library is not None
     library.load()
-    return Framework.objects.get(urn="urn:intuitem:risk:framework:iso27001-2022")
+    return Framework.objects.get(urn="urn:ciso:risk:framework:iso27001-2022")
 
 
 @pytest.fixture
 def risk_matrix_fixture():
     library = StoredLibrary.objects.filter(
-        urn="urn:intuitem:risk:library:critical_risk_matrix_5x5"
+        urn="urn:ciso:risk:library:critical_risk_matrix_5x5"
     ).last()
     assert library is not None
     library.load()
     return RiskMatrix.objects.get(
-        urn="urn:intuitem:risk:matrix:critical_risk_matrix_5x5"
+        urn="urn:ciso:risk:matrix:critical_risk_matrix_5x5"
     )
 
 

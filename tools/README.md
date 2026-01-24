@@ -378,4 +378,4 @@ For the selection of `refid`, here are a few considerations:
 - However, this version should be generic enough to allow library updates.
 - For example, if the version is `v2.0.4`, it is probably wise to select `v2.0` or even `v2`. Thus if `v2.1.0` is published and it is possible to make a smooth upgrade from `v2.0.4`, the urn will remain meaningful.
 
-The packager name "intuitem" is reserved, other packagers shall use a value that represents their company or themselves.
+The packager name "ciso" is reserved, other packagers shall use a value that represents their company or themselves.

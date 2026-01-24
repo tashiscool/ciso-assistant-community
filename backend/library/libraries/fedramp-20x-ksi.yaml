@@ -1,4 +1,4 @@
-urn: urn:intuitem:risk:library:fedramp-20x-ksi
+urn: urn:ciso:risk:library:fedramp-20x-ksi
 locale: en
 ref_id: FEDRAMP-20X-KSI
 name: FedRAMP 20x Key Security Indicators
@@ -18,10 +18,10 @@ copyright: FedRAMP / GSA
 version: 1
 publication_date: 2025-12-29
 provider: US General Services Administration / FedRAMP
-packager: intuitem
+packager: ciso-assistant
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:fedramp-20x-ksi
+    urn: urn:ciso:risk:framework:fedramp-20x-ksi
     ref_id: FEDRAMP-20X-KSI
     name: FedRAMP 20x Key Security Indicators
     description: |
@@ -42,7 +42,7 @@ objects:
       # ===========================================================================
       # KSI-AFR: Authorization by FedRAMP (11 indicators)
       # ===========================================================================
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr
         assessable: false
         depth: 1
         ref_id: KSI-AFR
@@ -53,10 +53,10 @@ objects:
           requirements for maintaining a secure system and reporting on activities to
           government customers.
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-01
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr-01
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr
         ref_id: KSI-AFR-01
         name: Minimum Assessment Scope
         description: |
@@ -71,10 +71,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-02
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr-02
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr
         ref_id: KSI-AFR-02
         name: Key Security Indicators
         description: |
@@ -89,10 +89,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-03
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr-03
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr
         ref_id: KSI-AFR-03
         name: Authorization Data Sharing
         description: |
@@ -105,10 +105,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-04
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr-04
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr
         ref_id: KSI-AFR-04
         name: Vulnerability Detection and Response
         description: |
@@ -124,10 +124,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-05
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr-05
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr
         ref_id: KSI-AFR-05
         name: Significant Change Notifications
         description: |
@@ -141,10 +141,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-06
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr-06
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr
         ref_id: KSI-AFR-06
         name: Collaborative Continuous Monitoring
         description: |
@@ -156,10 +156,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-07
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr-07
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr
         ref_id: KSI-AFR-07
         name: Recommended Secure Configuration
         description: |
@@ -169,10 +169,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-08
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr-08
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr
         ref_id: KSI-AFR-08
         name: FedRAMP Security Inbox
         description: |
@@ -183,10 +183,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-09
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr-09
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr
         ref_id: KSI-AFR-09
         name: Persistent Validation and Assessment
         description: |
@@ -197,10 +197,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-10
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr-10
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr
         ref_id: KSI-AFR-10
         name: Incident Communications Procedures
         description: |
@@ -210,10 +210,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr-11
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr-11
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-afr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-afr
         ref_id: KSI-AFR-11
         name: Using Cryptographic Modules
         description: |
@@ -227,7 +227,7 @@ objects:
       # ===========================================================================
       # KSI-CED: Cybersecurity Education (4 indicators)
       # ===========================================================================
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-ced
         assessable: false
         depth: 1
         ref_id: KSI-CED
@@ -236,10 +236,10 @@ objects:
           A secure cloud service provider will educate their employees on cybersecurity
           measures, testing them persistently to ensure their knowledge is satisfactory.
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced-01
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-ced-01
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-ced
         ref_id: KSI-CED-01
         name: General Training
         description: |
@@ -251,10 +251,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced-02
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-ced-02
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-ced
         ref_id: KSI-CED-02
         name: Role-Specific Training
         description: |
@@ -266,10 +266,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced-03
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-ced-03
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-ced
         ref_id: KSI-CED-03
         name: Development and Engineering Training
         description: |
@@ -282,10 +282,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced-04
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-ced-04
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-ced
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-ced
         ref_id: KSI-CED-04
         name: Incident Response and Disaster Recovery Training
         description: |
@@ -298,7 +298,7 @@ objects:
       # ===========================================================================
       # KSI-CMT: Change Management (4 indicators)
       # ===========================================================================
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cmt
         assessable: false
         depth: 1
         ref_id: KSI-CMT
@@ -307,10 +307,10 @@ objects:
           A secure cloud service provider will ensure that all changes are properly
           documented and configuration baselines are updated accordingly.
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt-01
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cmt-01
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cmt
         ref_id: KSI-CMT-01
         name: Log and Monitor Changes
         description: |
@@ -321,10 +321,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt-02
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cmt-02
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cmt
         ref_id: KSI-CMT-02
         name: Redeployment
         description: |
@@ -336,10 +336,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt-03
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cmt-03
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cmt
         ref_id: KSI-CMT-03
         name: Automated Testing and Validation
         description: |
@@ -350,10 +350,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt-04
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cmt-04
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cmt
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cmt
         ref_id: KSI-CMT-04
         name: Change Management Procedures
         description: |
@@ -367,7 +367,7 @@ objects:
       # ===========================================================================
       # KSI-CNA: Cloud Native Architecture (8 indicators)
       # ===========================================================================
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna
         assessable: false
         depth: 1
         ref_id: KSI-CNA
@@ -377,10 +377,10 @@ objects:
           principles to enforce and enhance the confidentiality, integrity and availability
           of the system.
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna-01
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna-01
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna
         ref_id: KSI-CNA-01
         name: Restrict Network Traffic
         description: |
@@ -392,10 +392,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna-02
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna-02
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna
         ref_id: KSI-CNA-02
         name: Attack Surface
         description: |
@@ -407,10 +407,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna-03
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna-03
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna
         ref_id: KSI-CNA-03
         name: Enforce Traffic Flow
         description: |
@@ -421,10 +421,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna-04
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna-04
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna
         ref_id: KSI-CNA-04
         name: Immutable Infrastructure
         description: |
@@ -436,10 +436,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna-05
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna-05
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna
         ref_id: KSI-CNA-05
         name: Unwanted Activity
         description: |
@@ -451,10 +451,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna-06
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna-06
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna
         ref_id: KSI-CNA-06
         name: High Availability
         description: |
@@ -463,10 +463,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna-07
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna-07
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna
         ref_id: KSI-CNA-07
         name: Best Practices
         description: |
@@ -477,10 +477,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna-08
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna-08
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-cna
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-cna
         ref_id: KSI-CNA-08
         name: Automated Enforcement
         description: |
@@ -495,7 +495,7 @@ objects:
       # ===========================================================================
       # KSI-IAM: Identity and Access Management (7 indicators)
       # ===========================================================================
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-iam
         assessable: false
         depth: 1
         ref_id: KSI-IAM
@@ -504,10 +504,10 @@ objects:
           A secure cloud service offering will protect user data, control access,
           and apply zero trust principles.
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam-01
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-iam-01
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-iam
         ref_id: KSI-IAM-01
         name: Phishing-Resistant MFA
         description: |
@@ -520,10 +520,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam-02
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-iam-02
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-iam
         ref_id: KSI-IAM-02
         name: Passwordless Authentication
         description: |
@@ -535,10 +535,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam-03
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-iam-03
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-iam
         ref_id: KSI-IAM-03
         name: Non-User Accounts
         description: |
@@ -550,10 +550,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam-04
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-iam-04
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-iam
         ref_id: KSI-IAM-04
         name: Just-in-Time Authorization
         description: |
@@ -565,10 +565,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam-05
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-iam-05
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-iam
         ref_id: KSI-IAM-05
         name: Least Privilege
         description: |
@@ -580,10 +580,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam-06
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-iam-06
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-iam
         ref_id: KSI-IAM-06
         name: Suspicious Activity
         description: |
@@ -594,10 +594,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam-07
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-iam-07
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-iam
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-iam
         ref_id: KSI-IAM-07
         name: Automated Account Management
         description: |
@@ -612,7 +612,7 @@ objects:
       # ===========================================================================
       # KSI-INR: Incident Response (3 indicators)
       # ===========================================================================
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-inr
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-inr
         assessable: false
         depth: 1
         ref_id: KSI-INR
@@ -621,10 +621,10 @@ objects:
           A secure cloud service offering will document, report, and analyze security
           incidents to ensure regulatory compliance and continuous security improvement.
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-inr-01
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-inr-01
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-inr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-inr
         ref_id: KSI-INR-01
         name: Incident Response Procedures
         description: |
@@ -635,10 +635,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-inr-02
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-inr-02
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-inr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-inr
         ref_id: KSI-INR-02
         name: Incident Review
         description: |
@@ -649,10 +649,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-inr-03
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-inr-03
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-inr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-inr
         ref_id: KSI-INR-03
         name: Incident After Action Reports
         description: |
@@ -666,7 +666,7 @@ objects:
       # ===========================================================================
       # KSI-MLA: Monitoring, Logging, and Auditing (5 indicators)
       # ===========================================================================
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-mla
         assessable: false
         depth: 1
         ref_id: KSI-MLA
@@ -675,10 +675,10 @@ objects:
           A secure cloud service offering will monitor, log, and audit all important
           events, activity, and changes.
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla-01
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-mla-01
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-mla
         ref_id: KSI-MLA-01
         name: Security Information and Event Management (SIEM)
         description: |
@@ -690,10 +690,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla-02
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-mla-02
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-mla
         ref_id: KSI-MLA-02
         name: Audit Logging
         description: |
@@ -704,10 +704,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla-05
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-mla-05
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-mla
         ref_id: KSI-MLA-05
         name: Evaluate Configuration
         description: |
@@ -719,10 +719,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla-07
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-mla-07
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-mla
         ref_id: KSI-MLA-07
         name: Event Types
         description: |
@@ -734,10 +734,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla-08
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-mla-08
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-mla
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-mla
         ref_id: KSI-MLA-08
         name: Log Data Access
         description: |
@@ -751,7 +751,7 @@ objects:
       # ===========================================================================
       # KSI-PIY: Policy and Inventory (5 indicators)
       # ===========================================================================
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-piy
         assessable: false
         depth: 1
         ref_id: KSI-PIY
@@ -760,10 +760,10 @@ objects:
           A secure cloud service offering will have intentional, organized, universal
           guidance for how every information resource, including personnel, is secured.
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy-01
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-piy-01
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-piy
         ref_id: KSI-PIY-01
         name: Automated Inventory
         description: |
@@ -775,10 +775,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy-03
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-piy-03
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-piy
         ref_id: KSI-PIY-03
         name: Vulnerability Disclosure Program
         description: |
@@ -790,10 +790,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy-04
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-piy-04
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-piy
         ref_id: KSI-PIY-04
         name: CISA Secure By Design
         description: |
@@ -806,10 +806,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy-06
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-piy-06
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-piy
         ref_id: KSI-PIY-06
         name: Security Investment Effectiveness
         description: |
@@ -820,10 +820,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy-08
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-piy-08
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-piy
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-piy
         ref_id: KSI-PIY-08
         name: Executive Support
         description: |
@@ -835,7 +835,7 @@ objects:
       # ===========================================================================
       # KSI-RPL: Recovery Planning (4 indicators)
       # ===========================================================================
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-rpl
         assessable: false
         depth: 1
         ref_id: KSI-RPL
@@ -845,10 +845,10 @@ objects:
           response plan(s) and recovery capabilities to ensure minimal service disruption
           and data loss during incidents and contingencies.
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl-01
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-rpl-01
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-rpl
         ref_id: KSI-RPL-01
         name: Recovery Objectives
         description: |
@@ -860,10 +860,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl-02
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-rpl-02
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-rpl
         ref_id: KSI-RPL-02
         name: Recovery Plan
         description: |
@@ -874,10 +874,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl-03
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-rpl-03
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-rpl
         ref_id: KSI-RPL-03
         name: System Backups
         description: |
@@ -889,10 +889,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl-04
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-rpl-04
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-rpl
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-rpl
         ref_id: KSI-RPL-04
         name: Recovery Testing
         description: |
@@ -907,7 +907,7 @@ objects:
       # ===========================================================================
       # KSI-SVC: Service Configuration (8 indicators)
       # ===========================================================================
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc
         assessable: false
         depth: 1
         ref_id: KSI-SVC
@@ -917,10 +917,10 @@ objects:
           continuously verify information resource integrity, and restrict access
           to third-party information resources.
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc-01
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc-01
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc
         ref_id: KSI-SVC-01
         name: Continuous Improvement
         description: |
@@ -932,10 +932,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc-02
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc-02
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc
         ref_id: KSI-SVC-02
         name: Network Encryption
         description: |
@@ -946,10 +946,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc-04
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc-04
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc
         ref_id: KSI-SVC-04
         name: Configuration Automation
         description: |
@@ -960,10 +960,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc-05
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc-05
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc
         ref_id: KSI-SVC-05
         name: Resource Integrity
         description: |
@@ -975,10 +975,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc-06
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc-06
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc
         ref_id: KSI-SVC-06
         name: Secret Management
         description: |
@@ -990,10 +990,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc-08
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc-08
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc
         ref_id: KSI-SVC-08
         name: Prevent Residual Risk
         description: |
@@ -1004,10 +1004,10 @@ objects:
         implementation_groups:
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc-09
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc-09
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc
         ref_id: KSI-SVC-09
         name: Communication Integrity
         description: |
@@ -1018,10 +1018,10 @@ objects:
         implementation_groups:
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc-10
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc-10
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-svc
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-svc
         ref_id: KSI-SVC-10
         name: Unwanted Data Removal
         description: |
@@ -1035,7 +1035,7 @@ objects:
       # ===========================================================================
       # KSI-TPR: Third-Party Information Resources (2 indicators)
       # ===========================================================================
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-tpr
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-tpr
         assessable: false
         depth: 1
         ref_id: KSI-TPR
@@ -1044,10 +1044,10 @@ objects:
           A secure cloud service offering will understand, monitor, and manage supply
           chain risks from third-party information resources.
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-tpr-03
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-tpr-03
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-tpr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-tpr
         ref_id: KSI-TPR-03
         name: Supply Chain Risk Management
         description: |
@@ -1058,10 +1058,10 @@ objects:
           - LOW
           - MOD
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-tpr-04
+      - urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-tpr-04
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x-ksi:ksi-tpr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x-ksi:ksi-tpr
         ref_id: KSI-TPR-04
         name: Supply Chain Risk Monitoring
         description: |

@@ -1,15 +1,15 @@
-urn: urn:intuitem:risk:library:critical_risk_matrix_3x3
+urn: urn:ciso:risk:library:critical_risk_matrix_3x3
 locale: en
 ref_id: critical_3x3
 name: Critical risk matrix 3x3
 description: Critical risk matrix 3x3
 version: 1
 publication_date: 2024-03-02
-provider: intuitem
-packager: intuitem
+provider: ciso
+packager: ciso-assistant
 objects:
   risk_matrix:
-    - urn: urn:intuitem:risk:matrix:critical_risk_matrix_3x3
+    - urn: urn:ciso:risk:matrix:critical_risk_matrix_3x3
       ref_id: critical_3x3
       name: critical 3x3
       description: critical risk matrix 3x3

@@ -23,7 +23,7 @@ services:
 
   backend:
     container_name: backend
-    image: ghcr.io/intuitem/ciso-assistant-community/backend:latest
+    image: ghcr.io/tashiscool/ciso-assistant-community/backend:latest
     pull_policy: always
     restart: always
     depends_on:
@@ -61,7 +61,7 @@ services:
 
   huey:
     container_name: huey
-    image: ghcr.io/intuitem/ciso-assistant-community/backend:latest
+    image: ghcr.io/tashiscool/ciso-assistant-community/backend:latest
     pull_policy: always
     depends_on:
       backend:
@@ -103,7 +103,7 @@ services:
       - PUBLIC_BACKEND_API_EXPOSED_URL=https://{{ fqdn }}:{{ port }}/api
       - PROTOCOL_HEADER=x-forwarded-proto
       - HOST_HEADER=x-forwarded-host
-    image: ghcr.io/intuitem/ciso-assistant-community/frontend:latest
+    image: ghcr.io/tashiscool/ciso-assistant-community/frontend:latest
     pull_policy: always
     depends_on:
       backend:
@@ -200,7 +200,7 @@ services:
   {% if kafka_dispatcher.enabled %}
   dispatcher:
     container_name: dispatcher
-    image: ghcr.io/intuitem/ciso-assistant-community/dispatcher:latest
+    image: ghcr.io/tashiscool/ciso-assistant-community/dispatcher:latest
     # build:
     #   context: ../dispatcher
     restart: always

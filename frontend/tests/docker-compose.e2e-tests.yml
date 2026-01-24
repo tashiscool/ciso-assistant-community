@@ -17,7 +17,7 @@ services:
 
   huey:
     container_name: huey
-    image: ghcr.io/intuitem/ciso-assistant-community/backend:latest
+    image: ghcr.io/tashiscool/ciso-assistant-community/backend:latest
     restart: always
     environment:
       - ALLOWED_HOSTS=backend,localhost

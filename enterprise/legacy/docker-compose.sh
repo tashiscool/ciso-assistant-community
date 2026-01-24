@@ -5,7 +5,7 @@ if [ -f db/ciso-assistant.sqlite3 ]; then
   echo "you should launch docker compose up -d"
   echo "for clean start, you can remove the database file, run docker compose down and then docker compose rm and start again"
 else
-  docker rmi ghcr.io/intuitem/ciso-assistant-enterprise-backend:latest ghcr.io/intuitem/ciso-assistant-enterprise-frontend:latest 2>/dev/null
+  docker rmi ghcr.io/tashiscool/ciso-assistant-enterprise-backend:latest ghcr.io/tashiscool/ciso-assistant-enterprise-frontend:latest 2>/dev/null
   docker compose up -d
   echo "Giving some time for the database to be ready, please wait ..."
   sleep 50

@@ -94,7 +94,7 @@ Execute MCP tools in this order:
 
 **Frameworks:**
 - `get_stored_libraries(object_type="framework")` - List available frameworks
-- `import_stored_library(library_urn)` - Load framework (e.g., "urn:intuitem:risk:library:iso27001-2022")
+- `import_stored_library(library_urn)` - Load framework (e.g., "urn:ciso:risk:library:iso27001-2022")
 
 **Risk Assessment (Qualitative):**
 - `get_risk_matrices()` - List available matrices
@@ -136,7 +136,7 @@ User: "I want to set up CISO Assistant for my healthcare startup"
    create_perimeter("Production Environment", "Production systems scope", folder="HealthTech Corp")
    create_asset("Patient Portal", "Main patient-facing application", "PR", folder="HealthTech Corp")
    create_asset("AWS Infrastructure", "Cloud hosting", "SP", folder="HealthTech Corp")
-   import_stored_library("urn:intuitem:risk:library:iso27001-2022")
+   import_stored_library("urn:ciso:risk:library:iso27001-2022")
    create_compliance_assessment("ISO 27001 Audit 2025", framework="ISO 27001:2022", perimeter="Production Environment")
    create_entity("AWS", folder="HealthTech Corp", description="Cloud provider")
    create_solution("Cloud Hosting", provider_entity="AWS", criticality=3, assets=["AWS Infrastructure"])

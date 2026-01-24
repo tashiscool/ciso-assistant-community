@@ -150,7 +150,7 @@ for tab in dataframe:
 wb_output = openpyxl.Workbook()
 ws = wb_output.active
 ws.title = "library_content"
-ws.append(["library_urn", "urn:intuitem:risk:library:ict-minimal"])
+ws.append(["library_urn", "urn:ciso:risk:library:ict-minimal"])
 ws.append(["library_version", "1"])
 ws.append(["library_locale", "en"])
 ws.append(["library_ref_id", "ict-minimal"])
@@ -163,8 +163,8 @@ ws.append(
 )
 ws.append(["library_copyright", "Creative Commons BY."])
 ws.append(["library_provider", "Swiss FONES"])
-ws.append(["library_packager", "intuitem"])
-ws.append(["framework_urn", "urn:intuitem:risk:framework:ict-minimal"])
+ws.append(["library_packager", "ciso"])
+ws.append(["framework_urn", "urn:ciso:risk:framework:ict-minimal"])
 ws.append(["framework_ref_id", "ict-minimal"])
 ws.append(["framework_name", "ICT - Minimum standard"])
 ws.append(

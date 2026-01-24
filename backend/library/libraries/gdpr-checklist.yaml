@@ -1,4 +1,4 @@
-urn: urn:intuitem:risk:library:gdpr-checklist
+urn: urn:ciso:risk:library:gdpr-checklist
 locale: en
 ref_id: GDPR-checklist
 name: GDPR checklist for data controllers
@@ -48,7 +48,7 @@ copyright: "Terms and conditions\n\nThe following terms and conditions govern al
 version: 2
 publication_date: 2024-03-17
 provider: GDPR.EU
-packager: intuitem
+packager: ciso-assistant
 translations:
   pl:
     name: "Lista kontrolna RODO dla administrator\xF3w danych"
@@ -60,7 +60,7 @@ translations:
       \ donn\xE9es  (https://gdpr.eu/checklist/)"
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:gdpr-checklist
+    urn: urn:ciso:risk:framework:gdpr-checklist
     ref_id: GDPR-checklist
     name: GDPR checklist for data controllers
     description: GDPR.EU checklist for data controllers  (https://gdpr.eu/checklist/)
@@ -74,7 +74,7 @@ objects:
         description: "Liste de contr\xF4le RGPD pour les responsables du traitement\
           \ des donn\xE9es  (https://gdpr.eu/checklist/)"
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node2
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node2
       assessable: false
       depth: 1
       name: Lawful basis and transparency
@@ -85,10 +85,10 @@ objects:
         fr:
           name: "Base l\xE9gale et transparence"
           description: null
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node3
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node2
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node2
       name: Conduct an information audit to determine what information you process
         and who has access to it.
       description: "Organizations that have at least 250 employees or conduct higher-risk\
@@ -138,10 +138,10 @@ objects:
             \ organisation, les tiers (et o\xF9 ils se trouvent) qui y ont acc\xE8\
             s, ce que vous faites pour prot\xE9ger les donn\xE9es (par exemple, le\
             \ cryptage) et quand vous pr\xE9voyez de les effacer (si possible)."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node4
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node2
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node2
       name: Have a legal justification for your data processing activities.
       description: "Processing of data is illegal under the GDPR unless you can justify\
         \ it according to one of six conditions listed in\_Article 6. There are other\
@@ -185,10 +185,10 @@ objects:
             galit\xE9 des \xAB int\xE9r\xEAts l\xE9gitimes \xBB, vous devez \xEAtre\
             \ en mesure de d\xE9montrer que vous avez effectu\xE9 une \xE9valuation\
             \ des facteurs relatifs \xE0 la vie priv\xE9e."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node5
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node2
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node2
       name: Provide clear information about your data processing and legal justification
         in your privacy policy.
       description: You need to tell people that you're collecting their data and why
@@ -224,7 +224,7 @@ objects:
             \ concise, transparente, intelligible et facilement accessible, dans un\
             \ langage clair et simple, notamment pour toute information s\u2019adressant\
             \ sp\xE9cifiquement \xE0 un enfant \xBB."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node6
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node6
       assessable: false
       depth: 1
       name: Data security
@@ -235,10 +235,10 @@ objects:
         fr:
           name: "S\xE9curit\xE9 des donn\xE9es"
           description: null
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node7
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node7
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node6
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node6
       name: Take data protection into account at all times, from the moment you begin
         developing a product to each time you process data.
       description: "You must follow the principles of \"data protection by design\
@@ -287,10 +287,10 @@ objects:
             \ de donn\xE9es personnelles que vous collectez ou \xE0 supprimer les\
             \ donn\xE9es dont vous n\u2019avez plus besoin. Le fait est que vous et\
             \ vos employ\xE9s devez en \xEAtre toujours conscients."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node8
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node8
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node6
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node6
       name: Encrypt, pseudonymize, or anonymize personal data wherever possible.
       description: "Most of the productivity tools used by businesses are now available\
         \ with\_end-to-end encryption\_built in, including email, messaging, notes,\
@@ -313,10 +313,10 @@ objects:
             \ en bout int\xE9gr\xE9, notamment les e-mails, la messagerie, les notes\
             \ et le stockage dans le cloud. Le RGPD exige que les organisations utilisent\
             \ le cryptage ou la pseudeonymisation chaque fois que cela est possible."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node9
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node9
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node6
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node6
       name: Create an internal security policy for your team members, and build awareness
         about data protection.
       description: "Even if your technical security is strong,\_operational security\_\
@@ -352,10 +352,10 @@ objects:
             \ des appareils et les VPN. Les employ\xE9s qui ont acc\xE8s aux donn\xE9\
             es personnelles et les employ\xE9s non techniques doivent recevoir une\
             \ formation suppl\xE9mentaire sur les exigences du RGPD."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node10
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node10
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node6
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node6
       name: Know when to conduct a data protection impact assessment, and have a process
         in place to carry it out.
       description: "A\_data protection impact assessment\_(aka privacy impact assessment)\
@@ -398,10 +398,10 @@ objects:
             \ d\u2019entra\xEEner un risque \xE9lev\xE9 pour [leurs] droits et libert\xE9\
             s \xBB. L\u2019ICO recommande de le faire \xE0 tout moment lorsque vous\
             \ \xEAtes sur le point de traiter des donn\xE9es personnelles."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node11
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node11
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node6
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node6
       name: Have a process in place to notify the authorities and your data subjects
         in the event of a data breach.
       description: "If there's a data breach and personal data is exposed, you are\
@@ -446,7 +446,7 @@ objects:
             \ personnes concern\xE9es, sauf si la violation n\u2019est pas susceptible\
             \ de les mettre en danger (par exemple, si les donn\xE9es vol\xE9es sont\
             \ crypt\xE9es)."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node12
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node12
       assessable: false
       depth: 1
       name: Accountability and governance
@@ -457,10 +457,10 @@ objects:
         fr:
           name: Responsabilisation et gouvernance
           description: null
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node13
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node13
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node12
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node12
       name: Designate someone responsible for ensuring GDPR compliance across your
         organization.
       description: Another part of "data protection by design and by default" (article
@@ -485,10 +485,10 @@ objects:
             \ la conformit\xE9 au RGPD. Cette personne devrait \xEAtre habilit\xE9\
             e \xE0 \xE9valuer les politiques de protection des donn\xE9es et la mise\
             \ en \u0153uvre de ces politiques."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node14
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node14
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node12
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node12
       name: Sign a data processing agreement between your organization and any third
         parties that process personal data on your behalf.
       description: "This includes any third-party services that handle the personal\
@@ -524,10 +524,10 @@ objects:
             \ en mati\xE8re de conformit\xE9 au RGPD. Vous ne devez faire appel qu\u2019\
             \xE0 des tiers fiables et capables d\u2019apporter des garanties suffisantes\
             \ en mati\xE8re de protection des donn\xE9es."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node15
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node15
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node12
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node12
       name: If your organization is outside the EU, appoint a representative within
         one of the EU member states.
       description: If you process data relating to people in one particular member
@@ -566,10 +566,10 @@ objects:
             \ qui utilise votre langue. Certaines organisations, comme les organismes\
             \ publics, ne sont pas tenues de d\xE9signer un repr\xE9sentant dans l\u2019\
             UE."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node16
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node16
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node12
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node12
       name: Appoint a Data Protection Officer (if necessary)
       description: "There are three circumstances in which organizations are required\
         \ to have a\_Data Protection Officer\_(DPO), but it's not a bad idea to have\
@@ -600,7 +600,7 @@ objects:
             es, \xE0 donner des conseils sur les analyses d\u2019impact relatives\
             \ \xE0 la protection des donn\xE9es et \xE0 coop\xE9rer avec les r\xE9\
             gulateurs."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node17
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node17
       assessable: false
       depth: 1
       name: Privacy rights
@@ -611,10 +611,10 @@ objects:
         fr:
           name: "Droits \xE0 la vie priv\xE9e"
           description: null
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node18
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node18
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node17
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node17
       name: It's easy for your customers to request and receive all the information
         you have about them.
       description: "People have the\_right to see what personal data you have about\
@@ -650,10 +650,10 @@ objects:
             \ de pouvoir v\xE9rifier l\u2019identit\xE9 de la personne qui demande\
             \ les donn\xE9es. Vous devriez \xEAtre en mesure de donner suite \xE0\
             \ ces demandes dans un d\xE9lai d\u2019un mois."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node19
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node19
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node17
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node17
       name: It's easy for your customers to correct or update inaccurate or incomplete
         information.
       description: Do your best to keep data up to date by putting a data quality
@@ -684,10 +684,10 @@ objects:
             \ v\xE9rifier l\u2019identit\xE9 de la personne qui demande les donn\xE9\
             es. Vous devriez \xEAtre en mesure de donner suite aux demandes au titre\
             \ de l\u2019article 16 dans un d\xE9lai d\u2019un mois."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node20
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node20
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node17
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node17
       name: It's easy for your customers to request to have their personal data deleted.
       description: People generally have the right to ask you to delete all the personal
         data you have about them, and you have to honor their request within about
@@ -715,10 +715,10 @@ objects:
             \ tels que l\u2019exercice de la libert\xE9 d\u2019expression ou le respect\
             \ d\u2019une obligation l\xE9gale. Vous devez \xE9galement tenter de v\xE9\
             rifier l\u2019identit\xE9 de la personne qui fait la demande."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node21
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node21
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node17
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node17
       name: It's easy for your customers to ask you to stop processing their data.
       description: Your data subjects can request to restrict or stop processing of
         their data (Article 18) if certain grounds apply, mainly if there's some dispute
@@ -750,10 +750,10 @@ objects:
             \ autoris\xE9 \xE0 continuer \xE0 stocker leurs donn\xE9es. Vous devez\
             \ informer la personne concern\xE9e avant de recommencer \xE0 traiter\
             \ ses donn\xE9es."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node22
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node22
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node17
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node17
       name: It's easy for your customers to receive a copy of their personal data
         in a format that can be easily transferred to another company.
       description: This means that you should be able to send their personal data
@@ -787,10 +787,10 @@ objects:
             \ point de vue de la protection de la vie priv\xE9e, l\u2019id\xE9e est\
             \ que ce sont les gens qui sont propri\xE9taires de leurs donn\xE9es,\
             \ pas vous."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node23
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node23
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node17
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node17
       name: It's easy for your customers to object to you processing their data.
       description: If you're processing their data for the purposes of direct marketing,
         you have to stop processing it immediately (Article 21) for that purpose.
@@ -813,10 +813,10 @@ objects:
             \ \xE0 cette fin. Sinon, vous pourrez peut-\xEAtre contester leur objection\
             \ si vous pouvez d\xE9montrer l\u2019existence de \xAB motifs l\xE9gitimes\
             \ imp\xE9rieux \xBB."
-    - urn: urn:intuitem:risk:req_node:gdpr-checklist:node24
+    - urn: urn:ciso:risk:req_node:gdpr-checklist:node24
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:gdpr-checklist:node17
+      parent_urn: urn:ciso:risk:req_node:gdpr-checklist:node17
       name: If you make decisions about people based on automated processes, you have
         a procedure to protect their rights.
       description: Some types of organizations use automated processes (Article 22)

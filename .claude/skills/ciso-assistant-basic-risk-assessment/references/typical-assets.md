@@ -133,7 +133,7 @@ Use this to suggest which threats from the INTUITEM Common Catalog are most rele
 
 ## Threat Catalog Reference
 
-The built-in threat catalog (`urn:intuitem:risk:library:intuitem-common-catalog`) contains:
+The built-in threat catalog (`urn:ciso:risk:library:ciso-common-catalog`) contains:
 
 | Ref ID | Threat Name |
 |--------|-------------|

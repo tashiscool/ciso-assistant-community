@@ -24,7 +24,7 @@ This work of ENX's Working Group ISA was provided to the VDA in the present vers
 The Tab ""Data Protection"" is provided, owned and copyrighted by VERBAND DER AUTOMOBILINDUSTRIE e.V. (VDA, German Association of the Automotive Industry); Behrenstr. 35; 10117 Berlin"
 This work has been licensed under Creative Commons Attribution - No Derivative Works 4.0 International Public License. In addition, You are granted the right to distribute derivatives under certain terms as detailed in section 9 which are not part of the Creative Commons license. The complete and valid text of the license is to be found in line 17ff.
 """
-packager = "intuitem"
+packager = "ciso"
 
 library_description = """ISA provides the basis for
 - a self-assessment to determine the state of information security in an organization (e.g. company)

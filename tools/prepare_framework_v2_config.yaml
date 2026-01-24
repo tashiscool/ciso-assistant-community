@@ -56,8 +56,8 @@ description: |
   It outlines example policies, controls, and requirements.
   Designed for illustration and testing of the Excel generator.
 copyright: "© 2025 Example Organization"
-provider: "intuitem"
-packager: "intuitem"
+provider: "ciso"
+packager: "ciso"
 
 # --- Specific to Framework sheets ---
 framework_sheet_base_name: "framework"

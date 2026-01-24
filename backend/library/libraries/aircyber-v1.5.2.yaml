@@ -1,4 +1,4 @@
-urn: urn:intuitem:risk:library:aircyber-v1.5.2
+urn: urn:ciso:risk:library:aircyber-v1.5.2
 locale: en
 ref_id: AirCyber-v1.5.2
 name: Public AirCyber Maturity Level Matrix
@@ -24,10 +24,10 @@ copyright: "\xA9 Boost Aerospace\nThis work is licensed under a Creative Commons
 version: 3
 publication_date: 2024-04-09
 provider: Boost Aerospace
-packager: intuitem
+packager: ciso-assistant
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:aircyber-v1.5.2
+    urn: urn:ciso:risk:framework:aircyber-v1.5.2
     ref_id: AirCyber-v1.5.2
     name: Public AirCyber Maturity Level Matrix
     description: 'AirCyber is the AeroSpace and Defense official standard for Cybersecurity
@@ -58,7 +58,7 @@ objects:
       name: Gold
       description: null
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:1.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:1.1
       assessable: true
       depth: 1
       ref_id: '1.1'
@@ -68,7 +68,7 @@ objects:
         prevention, detection and intervention devices in the event of theft, etc.)?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:1.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:1.2
       assessable: true
       depth: 1
       ref_id: '1.2'
@@ -78,7 +78,7 @@ objects:
         alarm?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:1.3
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:1.3
       assessable: true
       depth: 1
       ref_id: '1.3'
@@ -87,7 +87,7 @@ objects:
         surveillance, an entrance barrier, video surveillance and an alarm?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:1.4
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:1.4
       assessable: true
       depth: 1
       ref_id: '1.4'
@@ -95,7 +95,7 @@ objects:
       description: Are visitors permanently accompanied on your premises?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:1.5
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:1.5
       assessable: true
       depth: 1
       ref_id: '1.5'
@@ -104,7 +104,7 @@ objects:
         supply in case of loss of power)?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:1.6
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:1.6
       assessable: true
       depth: 1
       ref_id: '1.6'
@@ -113,7 +113,7 @@ objects:
         sensitive papers and removable storage media?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:1.7
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:1.7
       assessable: true
       depth: 1
       ref_id: '1.7'
@@ -122,7 +122,7 @@ objects:
         check physical and IT security regularly (min. once every 2 years) ?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.1
       assessable: true
       depth: 1
       ref_id: '2.1'
@@ -134,7 +134,7 @@ objects:
         servers, ...) used for your customers production?'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.1.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.1.1
       assessable: true
       depth: 1
       ref_id: 2.1.1
@@ -142,7 +142,7 @@ objects:
       description: Do you have a complete network diagram of your company?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.1.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.1.2
       assessable: true
       depth: 1
       ref_id: 2.1.2
@@ -151,7 +151,7 @@ objects:
         and service protocols?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.1.3
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.1.3
       assessable: true
       depth: 1
       ref_id: 2.1.3
@@ -161,7 +161,7 @@ objects:
         \ routers, Internet modems\u2026) on your internal network?"
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.2
       assessable: true
       depth: 1
       ref_id: '2.2'
@@ -171,7 +171,7 @@ objects:
         (servers, desktop PCs, laptops, printers, network device, smartphones, etc.)'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.3
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.3
       assessable: true
       depth: 1
       ref_id: '2.3'
@@ -181,7 +181,7 @@ objects:
         computer systems?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.4
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.4
       assessable: true
       depth: 1
       ref_id: '2.4'
@@ -190,7 +190,7 @@ objects:
         equivalent)?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.4.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.4.1
       assessable: true
       depth: 1
       ref_id: 2.4.1
@@ -200,7 +200,7 @@ objects:
         managers?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.5
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.5
       assessable: true
       depth: 1
       ref_id: '2.5'
@@ -210,7 +210,7 @@ objects:
         policies between workstations, gap management, etc.)
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.5.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.5.1
       assessable: true
       depth: 1
       ref_id: 2.5.1
@@ -220,7 +220,7 @@ objects:
         etc.)
       implementation_groups:
       - SIlver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.6
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.6
       assessable: true
       depth: 1
       ref_id: '2.6'
@@ -229,7 +229,7 @@ objects:
         entire IT infrastructure (workstations, servers)?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.7
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.7
       assessable: true
       depth: 1
       ref_id: '2.7'
@@ -238,7 +238,7 @@ objects:
         tool (anti-malware) on the entire IT device?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.8
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.8
       assessable: true
       depth: 1
       ref_id: '2.8'
@@ -248,7 +248,7 @@ objects:
         password and anti-virus policy configuration)?'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.8.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.8.1
       assessable: true
       depth: 1
       ref_id: 2.8.1
@@ -256,7 +256,7 @@ objects:
       description: Do enterprise smartphones have a dedicated security policy?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.8.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.8.2
       assessable: true
       depth: 1
       ref_id: 2.8.2
@@ -266,7 +266,7 @@ objects:
         their configuration, security status?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.9
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.9
       assessable: true
       depth: 1
       ref_id: '2.9'
@@ -277,7 +277,7 @@ objects:
         or internet access?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.9.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.9.1
       assessable: true
       depth: 1
       ref_id: 2.9.1
@@ -287,7 +287,7 @@ objects:
         network equipment, smartphones, etc.)?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.9.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.9.2
       assessable: true
       depth: 1
       ref_id: 2.9.2
@@ -296,7 +296,7 @@ objects:
         au-thentication logs on network, the server and computer device?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.9.3
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.9.3
       assessable: true
       depth: 1
       ref_id: 2.9.3
@@ -305,7 +305,7 @@ objects:
         com-ponents such as firewalls, internet access?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.9.4
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.9.4
       assessable: true
       depth: 1
       ref_id: 2.9.4
@@ -320,7 +320,7 @@ objects:
         privileged accounts...)
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.9.5
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.9.5
       assessable: true
       depth: 1
       ref_id: 2.9.5
@@ -332,7 +332,7 @@ objects:
         \ active \u2013 with alerts \u2013 monitoring of the logs)?"
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.10
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.10
       assessable: true
       depth: 1
       ref_id: '2.10'
@@ -341,7 +341,7 @@ objects:
         components with a tested recovery procedure?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:2.11
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:2.11
       assessable: true
       depth: 1
       ref_id: '2.11'
@@ -352,7 +352,7 @@ objects:
         keys, do not connect any strange device on their computers...)
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:3.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:3.1
       assessable: true
       depth: 1
       ref_id: '3.1'
@@ -361,7 +361,7 @@ objects:
         environments?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:3.1.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:3.1.1
       assessable: true
       depth: 1
       ref_id: 3.1.1
@@ -372,7 +372,7 @@ objects:
         apply to (e.g. senior, IT staff, etc.)?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:3.1.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:3.1.2
       assessable: true
       depth: 1
       ref_id: 3.1.2
@@ -383,7 +383,7 @@ objects:
         of new hires (criminal record/nationality)?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:3.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:3.2
       assessable: true
       depth: 1
       ref_id: '3.2'
@@ -396,7 +396,7 @@ objects:
         '
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:3.3
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:3.3
       assessable: true
       depth: 1
       ref_id: '3.3'
@@ -405,7 +405,7 @@ objects:
         accounts and do you keep it up to date?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:3.31
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:3.31
       assessable: true
       depth: 1
       ref_id: '3.31'
@@ -415,7 +415,7 @@ objects:
         change, etc.)?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:3.4
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:3.4
       assessable: true
       depth: 1
       ref_id: '3.4'
@@ -426,7 +426,7 @@ objects:
         systems security?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:3.5
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:3.5
       assessable: true
       depth: 1
       ref_id: '3.5'
@@ -441,7 +441,7 @@ objects:
         employment contract)?'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:3.5.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:3.5.1
       assessable: true
       depth: 1
       ref_id: 3.5.1
@@ -452,7 +452,7 @@ objects:
         and do you follow up attendance to this training?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:3.6
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:3.6
       assessable: true
       depth: 1
       ref_id: '3.6'
@@ -461,7 +461,7 @@ objects:
         on their laptops? (Screen filter, security cable, VPN, encryption, monitoring,...)
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.1
       assessable: true
       depth: 1
       ref_id: '4.1'
@@ -471,7 +471,7 @@ objects:
         \ deactivation)?\n"
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.2
       assessable: true
       depth: 1
       ref_id: '4.2'
@@ -480,7 +480,7 @@ objects:
         with an admin account or computer support to install software on their computers?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.21
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.21
       assessable: true
       depth: 1
       ref_id: '4.21'
@@ -491,7 +491,7 @@ objects:
         servers, attempt to discover the password...)?  '
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.3
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.3
       assessable: true
       depth: 1
       ref_id: '4.3'
@@ -499,7 +499,7 @@ objects:
       description: Do you protect passwords stored on systems (encryption)?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.4
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.4
       assessable: true
       depth: 1
       ref_id: '4.4'
@@ -509,7 +509,7 @@ objects:
         for administrators, etc.)?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.4.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.4.1
       assessable: true
       depth: 1
       ref_id: 4.4.1
@@ -518,7 +518,7 @@ objects:
         of your in-formation system?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.5
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.5
       assessable: true
       depth: 1
       ref_id: '4.5'
@@ -527,7 +527,7 @@ objects:
         printers, network device, smartphones, etc.)?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.6
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.6
       assessable: true
       depth: 1
       ref_id: '4.6'
@@ -535,7 +535,7 @@ objects:
       description: Do you anticipate the end of software and system maintenance?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.6.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.6.1
       assessable: true
       depth: 1
       ref_id: 4.6.1
@@ -545,7 +545,7 @@ objects:
         computer park?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.6.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.6.2
       assessable: true
       depth: 1
       ref_id: 4.6.2
@@ -553,7 +553,7 @@ objects:
       description: Do you have a list of authorized and prohibited software?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.7
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.7
       assessable: true
       depth: 1
       ref_id: '4.7'
@@ -566,7 +566,7 @@ objects:
         '
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.8
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.8
       assessable: true
       depth: 1
       ref_id: '4.8'
@@ -575,7 +575,7 @@ objects:
         and monitoring the cybersecurity of the information system?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.8.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.8.1
       assessable: true
       depth: 1
       ref_id: 4.8.1
@@ -584,7 +584,7 @@ objects:
         collection tools (SIEM (Security Information Event Management))?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.8.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.8.2
       assessable: true
       depth: 1
       ref_id: 4.8.2
@@ -593,7 +593,7 @@ objects:
         USB key, etc...?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.8.3
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.8.3
       assessable: true
       depth: 1
       ref_id: 4.8.3
@@ -602,7 +602,7 @@ objects:
         elements of the computer system in the event of a major incident?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.8.4
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.8.4
       assessable: true
       depth: 1
       ref_id: 4.8.4
@@ -611,7 +611,7 @@ objects:
         for detecting network security incidents?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.8.5
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.8.5
       assessable: true
       depth: 1
       ref_id: 4.8.5
@@ -619,7 +619,7 @@ objects:
       description: Do you block unauthorized connections to your network?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.8.6
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.8.6
       assessable: true
       depth: 1
       ref_id: 4.8.6
@@ -628,7 +628,7 @@ objects:
         or abnormal activities?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.9
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.9
       assessable: true
       depth: 1
       ref_id: '4.9'
@@ -636,7 +636,7 @@ objects:
       description: Are there escalation and alert processes for security incidents?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.9.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.9.1
       assessable: true
       depth: 1
       ref_id: 4.9.1
@@ -646,7 +646,7 @@ objects:
         or alert abnormal behaviors (IDS/IPS)?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.10
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.10
       assessable: true
       depth: 1
       ref_id: '4.10'
@@ -656,7 +656,7 @@ objects:
         CERTs (ANSSI FR, NIST US), international security monitoring sites?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:4.11
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:4.11
       assessable: true
       depth: 1
       ref_id: '4.11'
@@ -667,7 +667,7 @@ objects:
         have deployed, etc. (professional or sectoral "CERT")?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.1
       assessable: true
       depth: 1
       ref_id: '5.1'
@@ -675,7 +675,7 @@ objects:
       description: Do you know the most sensitive servers in your information system?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.2
       assessable: true
       depth: 1
       ref_id: '5.2'
@@ -684,7 +684,7 @@ objects:
         network?  (Firewall, proxy, etc.)?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.2.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.2.1
       assessable: true
       depth: 1
       ref_id: 5.2.1
@@ -693,7 +693,7 @@ objects:
         PC)?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.2.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.2.2
       assessable: true
       depth: 1
       ref_id: 5.2.2
@@ -702,7 +702,7 @@ objects:
         year?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.3
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.3
       assessable: true
       depth: 1
       ref_id: '5.3'
@@ -715,7 +715,7 @@ objects:
         of Windows Samba v1 file-sharing protocol or NTLMv1 authentication, etc.)?'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.4
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.4
       assessable: true
       depth: 1
       ref_id: '5.4'
@@ -725,7 +725,7 @@ objects:
         accounts against password attempts, regular password change, complex password)?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.5
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.5
       assessable: true
       depth: 1
       ref_id: '5.5'
@@ -735,7 +735,7 @@ objects:
         cloud ser-vices administration and websites?  '
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.5.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.5.1
       assessable: true
       depth: 1
       ref_id: 5.5.1
@@ -744,7 +744,7 @@ objects:
         with an auto-mated password manager and auto fill?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.6
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.6
       assessable: true
       depth: 1
       ref_id: '5.6'
@@ -756,7 +756,7 @@ objects:
         '
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.6.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.6.1
       assessable: true
       depth: 1
       ref_id: 5.6.1
@@ -767,7 +767,7 @@ objects:
         connected to the company network?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.7
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.7
       assessable: true
       depth: 1
       ref_id: '5.7'
@@ -778,7 +778,7 @@ objects:
         computer)?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.7.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.7.1
       assessable: true
       depth: 1
       ref_id: 5.7.1
@@ -787,7 +787,7 @@ objects:
         interac-tion (transparent automatic encryption)?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.8
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.8
       assessable: true
       depth: 1
       ref_id: '5.8'
@@ -797,7 +797,7 @@ objects:
         proce-dure?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.8.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.8.1
       assessable: true
       depth: 1
       ref_id: 5.8.1
@@ -808,7 +808,7 @@ objects:
         \ and professional environments)\n"
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.9
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.9
       assessable: true
       depth: 1
       ref_id: '5.9'
@@ -816,7 +816,7 @@ objects:
       description: 'Are Internet accesses filtered by a proxy server? '
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.9.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.9.1
       assessable: true
       depth: 1
       ref_id: 5.9.1
@@ -825,7 +825,7 @@ objects:
         net-work with WAF (web access filtering) device?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.10
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.10
       assessable: true
       depth: 1
       ref_id: '5.10'
@@ -834,7 +834,7 @@ objects:
         (KPIs) on the use of company data on the Internet?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.10.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.10.1
       assessable: true
       depth: 1
       ref_id: 5.10.1
@@ -843,7 +843,7 @@ objects:
         company and your partners?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.10.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.10.2
       assessable: true
       depth: 1
       ref_id: 5.10.2
@@ -853,7 +853,7 @@ objects:
         the standard computer network?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.11
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.11
       assessable: true
       depth: 1
       ref_id: '5.11'
@@ -862,7 +862,7 @@ objects:
         network? (Specific connection, dedicated Wifi?)
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.12
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.12
       assessable: true
       depth: 1
       ref_id: '5.12'
@@ -873,7 +873,7 @@ objects:
         industrial, professional, visitor, etc.)
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.13
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.13
       assessable: true
       depth: 1
       ref_id: '5.13'
@@ -883,7 +883,7 @@ objects:
         ones? (Anti-spam, removal of suspicious attached files, etc...)
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.13.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.13.1
       assessable: true
       depth: 1
       ref_id: 5.13.1
@@ -892,7 +892,7 @@ objects:
         of e-mails?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.14
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.14
       assessable: true
       depth: 1
       ref_id: '5.14'
@@ -901,7 +901,7 @@ objects:
         and suppli-ers?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.14.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.14.1
       assessable: true
       depth: 1
       ref_id: 5.14.1
@@ -911,7 +911,7 @@ objects:
         and suppli-ers?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.14.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.14.2
       assessable: true
       depth: 1
       ref_id: 5.14.2
@@ -922,7 +922,7 @@ objects:
         (via a segregated network zone, e.g. "DMZ")?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.15
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.15
       assessable: true
       depth: 1
       ref_id: '5.15'
@@ -931,7 +931,7 @@ objects:
         and man-aged by the information system?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:5.17
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:5.17
       assessable: true
       depth: 1
       ref_id: '5.17'
@@ -942,7 +942,7 @@ objects:
         / password, certificates, ...) ?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:6.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:6.1
       assessable: true
       depth: 1
       ref_id: '6.1'
@@ -950,7 +950,7 @@ objects:
       description: Is the important data saved regularly?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:6.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:6.2
       assessable: true
       depth: 1
       ref_id: '6.2'
@@ -960,7 +960,7 @@ objects:
       description: Are your backups protected in a secure room?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:6.3
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:6.3
       assessable: true
       depth: 1
       ref_id: '6.3'
@@ -969,7 +969,7 @@ objects:
         such as a cloud (AWS, O365 Sharepoint, OneDrive, google drive,...)?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:6.4
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:6.4
       assessable: true
       depth: 1
       ref_id: '6.4'
@@ -978,7 +978,7 @@ objects:
         interaction (transparent automatic encryption)?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:6.5
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:6.5
       assessable: true
       depth: 1
       ref_id: '6.5'
@@ -988,7 +988,7 @@ objects:
         (leak de-tection of confidential data, roles and responsibilities, etc.)?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:6.6
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:6.6
       assessable: true
       depth: 1
       ref_id: '6.6'
@@ -997,7 +997,7 @@ objects:
         process), then apply the associated corrective actions?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:6.6.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:6.6.1
       assessable: true
       depth: 1
       ref_id: 6.6.1
@@ -1005,7 +1005,7 @@ objects:
       description: Do you check the compliance of your company's subsidiaries?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:6.6.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:6.6.2
       assessable: true
       depth: 1
       ref_id: 6.6.2
@@ -1013,7 +1013,7 @@ objects:
       description: Do you regularly check the rules of your Firewalls?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:6.7
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:6.7
       assessable: true
       depth: 1
       ref_id: '6.7'
@@ -1023,7 +1023,7 @@ objects:
         then apply the associated corrective actions?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:6.7.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:6.7.1
       assessable: true
       depth: 1
       ref_id: 6.7.1
@@ -1032,7 +1032,7 @@ objects:
         the associ-ated corrective actions?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:6.7.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:6.7.2
       assessable: true
       depth: 1
       ref_id: 6.7.2
@@ -1042,7 +1042,7 @@ objects:
         on your systems, or security project management to update your detection systems)
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:6.8
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:6.8
       assessable: true
       depth: 1
       ref_id: '6.8'
@@ -1052,7 +1052,7 @@ objects:
         data sent outside of the company?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:6.9
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:6.9
       assessable: true
       depth: 1
       ref_id: '6.9'
@@ -1062,7 +1062,7 @@ objects:
         to be applied to this data?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:6.9.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:6.9.1
       assessable: true
       depth: 1
       ref_id: 6.9.1
@@ -1072,7 +1072,7 @@ objects:
         be classified as sensitive?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:6.9.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:6.9.2
       assessable: true
       depth: 1
       ref_id: 6.9.2
@@ -1083,7 +1083,7 @@ objects:
         infor-mation system?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:6.10
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:6.10
       assessable: true
       depth: 1
       ref_id: '6.10'
@@ -1093,7 +1093,7 @@ objects:
         data, etc.)
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.0
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.0
       assessable: true
       depth: 1
       ref_id: '7.0'
@@ -1103,7 +1103,7 @@ objects:
         system, etc.)?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.1.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.1.1
       assessable: true
       depth: 1
       ref_id: 7.1.1
@@ -1112,7 +1112,7 @@ objects:
         devices, identifying the most critical components?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.1.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.1.2
       assessable: true
       depth: 1
       ref_id: 7.1.2
@@ -1121,7 +1121,7 @@ objects:
         systems (con-figuration, source code and data)?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.1.3
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.1.3
       assessable: true
       depth: 1
       ref_id: 7.1.3
@@ -1130,7 +1130,7 @@ objects:
         systems can be restored without problems?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.2
       assessable: true
       depth: 1
       ref_id: '7.2'
@@ -1139,7 +1139,7 @@ objects:
         kept up to date?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.3
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.3
       assessable: true
       depth: 1
       ref_id: '7.3'
@@ -1150,7 +1150,7 @@ objects:
         example, disas-ter recovery after a system crash)
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.4
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.4
       assessable: true
       depth: 1
       ref_id: '7.4'
@@ -1159,7 +1159,7 @@ objects:
         of ICS stored with an appropriate level of security?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.5
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.5
       assessable: true
       depth: 1
       ref_id: '7.5'
@@ -1168,7 +1168,7 @@ objects:
         operation, and monitoring of ICS device?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.6
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.6
       assessable: true
       depth: 1
       ref_id: '7.6'
@@ -1178,7 +1178,7 @@ objects:
         and contractors?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.7
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.7
       assessable: true
       depth: 1
       ref_id: '7.7'
@@ -1187,7 +1187,7 @@ objects:
         and Control Systems (IACS) signed cybersecurity best practices and charter?
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.8
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.8
       assessable: true
       depth: 1
       ref_id: '7.8'
@@ -1195,7 +1195,7 @@ objects:
       description: Are there procedures in place to manage the life cycle of ICS ?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.9
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.9
       assessable: true
       depth: 1
       ref_id: '7.9'
@@ -1204,7 +1204,7 @@ objects:
         of ICS?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.10
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.10
       assessable: true
       depth: 1
       ref_id: '7.10'
@@ -1212,7 +1212,7 @@ objects:
       description: Is there a specifically defined architecture and management rules?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.11
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.11
       assessable: true
       depth: 1
       ref_id: '7.11'
@@ -1220,7 +1220,7 @@ objects:
       description: Are ICS change processes and dedicated solutions audited annually?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.12
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.12
       assessable: true
       depth: 1
       ref_id: '7.12'
@@ -1229,7 +1229,7 @@ objects:
         process?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.13
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.13
       assessable: true
       depth: 1
       ref_id: '7.13'
@@ -1240,7 +1240,7 @@ objects:
         System (ICS)?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:7.14
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:7.14
       assessable: true
       depth: 1
       ref_id: '7.14'
@@ -1251,7 +1251,7 @@ objects:
         it could be caused by a malicious element?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:9.7.1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:9.7.1
       assessable: true
       depth: 1
       ref_id: 9.7.1
@@ -1261,7 +1261,7 @@ objects:
         and in-volve the right internal or external people?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:9.8
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:9.8
       assessable: true
       depth: 1
       ref_id: '9.8'
@@ -1269,7 +1269,7 @@ objects:
       description: 'Have you ever done a cyber-risk analysis on your company? '
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:9.81
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:9.81
       assessable: true
       depth: 1
       ref_id: '9.81'
@@ -1278,7 +1278,7 @@ objects:
         your com-pany's risk analyses?
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:9.82
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:9.82
       assessable: true
       depth: 1
       ref_id: '9.82'
@@ -1289,7 +1289,7 @@ objects:
         way ?
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext1
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext1
       assessable: true
       depth: 1
       ref_id: Ext1
@@ -1300,7 +1300,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext2
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext2
       assessable: true
       depth: 1
       ref_id: Ext2
@@ -1310,7 +1310,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext3
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext3
       assessable: true
       depth: 1
       ref_id: Ext3
@@ -1321,7 +1321,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext4
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext4
       assessable: true
       depth: 1
       ref_id: Ext4
@@ -1331,7 +1331,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext5
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext5
       assessable: true
       depth: 1
       ref_id: Ext5
@@ -1343,7 +1343,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext6
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext6
       assessable: true
       depth: 1
       ref_id: Ext6
@@ -1354,7 +1354,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext7
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext7
       assessable: true
       depth: 1
       ref_id: Ext7
@@ -1365,7 +1365,7 @@ objects:
         \ IT]"
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext8
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext8
       assessable: true
       depth: 1
       ref_id: Ext8
@@ -1375,7 +1375,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext9
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext9
       assessable: true
       depth: 1
       ref_id: Ext9
@@ -1396,7 +1396,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext10
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext10
       assessable: true
       depth: 1
       ref_id: Ext10
@@ -1419,7 +1419,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext11
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext11
       assessable: true
       depth: 1
       ref_id: Ext11
@@ -1433,7 +1433,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext12
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext12
       assessable: true
       depth: 1
       ref_id: Ext12
@@ -1446,7 +1446,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext13
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext13
       assessable: true
       depth: 1
       ref_id: Ext13
@@ -1459,7 +1459,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext14
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext14
       assessable: true
       depth: 1
       ref_id: Ext14
@@ -1472,7 +1472,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext15
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext15
       assessable: true
       depth: 1
       ref_id: Ext15
@@ -1482,7 +1482,7 @@ objects:
         \ for specific devices? \n[Industrial IT]\n[Corporate IT]"
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext16
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext16
       assessable: true
       depth: 1
       ref_id: Ext16
@@ -1495,7 +1495,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext17
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext17
       assessable: true
       depth: 1
       ref_id: Ext17
@@ -1504,7 +1504,7 @@ objects:
         \ \n[Industrial IT]\n[Corporate IT]"
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext18
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext18
       assessable: true
       depth: 1
       ref_id: Ext18
@@ -1517,7 +1517,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext19
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext19
       assessable: true
       depth: 1
       ref_id: Ext19
@@ -1530,7 +1530,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext20
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext20
       assessable: true
       depth: 1
       ref_id: Ext20
@@ -1545,7 +1545,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext21
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext21
       assessable: true
       depth: 1
       ref_id: Ext21
@@ -1558,7 +1558,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext22
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext22
       assessable: true
       depth: 1
       ref_id: Ext22
@@ -1573,7 +1573,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext23
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext23
       assessable: true
       depth: 1
       ref_id: Ext23
@@ -1589,7 +1589,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext24
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext24
       assessable: true
       depth: 1
       ref_id: Ext24
@@ -1602,7 +1602,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext25
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext25
       assessable: true
       depth: 1
       ref_id: Ext25
@@ -1615,7 +1615,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext26
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext26
       assessable: true
       depth: 1
       ref_id: Ext26
@@ -1630,7 +1630,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext27
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext27
       assessable: true
       depth: 1
       ref_id: Ext27
@@ -1642,7 +1642,7 @@ objects:
         [Corporate IT]'
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext28
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext28
       assessable: true
       depth: 1
       ref_id: Ext28
@@ -1652,7 +1652,7 @@ objects:
         - business loss\n[Industrial IT]\n[Corporate IT]"
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext29
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext29
       assessable: true
       depth: 1
       ref_id: Ext29
@@ -1667,7 +1667,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext30
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext30
       assessable: true
       depth: 1
       ref_id: Ext30
@@ -1682,7 +1682,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext31
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext31
       assessable: true
       depth: 1
       ref_id: Ext31
@@ -1693,7 +1693,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext32
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext32
       assessable: true
       depth: 1
       ref_id: Ext32
@@ -1710,7 +1710,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext33
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext33
       assessable: true
       depth: 1
       ref_id: Ext33
@@ -1724,7 +1724,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext34
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext34
       assessable: true
       depth: 1
       ref_id: Ext34
@@ -1739,7 +1739,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext35
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext35
       assessable: true
       depth: 1
       ref_id: Ext35
@@ -1751,7 +1751,7 @@ objects:
         [Product]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext36
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext36
       assessable: true
       depth: 1
       ref_id: Ext36
@@ -1765,7 +1765,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext37
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext37
       assessable: true
       depth: 1
       ref_id: Ext37
@@ -1776,7 +1776,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext38
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext38
       assessable: true
       depth: 1
       ref_id: Ext38
@@ -1789,7 +1789,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext39
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext39
       assessable: true
       depth: 1
       ref_id: Ext39
@@ -1798,7 +1798,7 @@ objects:
         \ customers that records key product actions?  \n[Product]"
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext40
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext40
       assessable: true
       depth: 1
       ref_id: Ext40
@@ -1812,7 +1812,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext41
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext41
       assessable: true
       depth: 1
       ref_id: Ext41
@@ -1828,7 +1828,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext42
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext42
       assessable: true
       depth: 1
       ref_id: Ext42
@@ -1839,7 +1839,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext43
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext43
       assessable: true
       depth: 1
       ref_id: Ext43
@@ -1850,7 +1850,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext44
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext44
       assessable: true
       depth: 1
       ref_id: Ext44
@@ -1860,7 +1860,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext45
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext45
       assessable: true
       depth: 1
       ref_id: Ext45
@@ -1871,7 +1871,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext46
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext46
       assessable: true
       depth: 1
       ref_id: Ext46
@@ -1883,7 +1883,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext47
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext47
       assessable: true
       depth: 1
       ref_id: Ext47
@@ -1892,7 +1892,7 @@ objects:
         \ \n[Industrial IT]"
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext48
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext48
       assessable: true
       depth: 1
       ref_id: Ext48
@@ -1906,7 +1906,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext49
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext49
       assessable: true
       depth: 1
       ref_id: Ext49
@@ -1919,7 +1919,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext50
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext50
       assessable: true
       depth: 1
       ref_id: Ext50
@@ -1929,7 +1929,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext51
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext51
       assessable: true
       depth: 1
       ref_id: Ext51
@@ -1940,7 +1940,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext52
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext52
       assessable: true
       depth: 1
       ref_id: Ext52
@@ -1952,7 +1952,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext53
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext53
       assessable: true
       depth: 1
       ref_id: Ext53
@@ -1963,7 +1963,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext54
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext54
       assessable: true
       depth: 1
       ref_id: Ext54
@@ -1974,7 +1974,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext55
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext55
       assessable: true
       depth: 1
       ref_id: Ext55
@@ -1985,7 +1985,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext56
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext56
       assessable: true
       depth: 1
       ref_id: Ext56
@@ -1996,7 +1996,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext57
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext57
       assessable: true
       depth: 1
       ref_id: Ext57
@@ -2007,7 +2007,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext58
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext58
       assessable: true
       depth: 1
       ref_id: Ext58
@@ -2019,7 +2019,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext59
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext59
       assessable: true
       depth: 1
       ref_id: Ext59
@@ -2031,7 +2031,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext60
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext60
       assessable: true
       depth: 1
       ref_id: Ext60
@@ -2044,7 +2044,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext61
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext61
       assessable: true
       depth: 1
       ref_id: Ext61
@@ -2055,7 +2055,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext62
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext62
       assessable: true
       depth: 1
       ref_id: Ext62
@@ -2066,7 +2066,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext63
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext63
       assessable: true
       depth: 1
       ref_id: Ext63
@@ -2077,7 +2077,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext64
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext64
       assessable: true
       depth: 1
       ref_id: Ext64
@@ -2088,7 +2088,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext65
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext65
       assessable: true
       depth: 1
       ref_id: Ext65
@@ -2099,7 +2099,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext66
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext66
       assessable: true
       depth: 1
       ref_id: Ext66
@@ -2110,7 +2110,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext67
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext67
       assessable: true
       depth: 1
       ref_id: Ext67
@@ -2121,7 +2121,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext68
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext68
       assessable: true
       depth: 1
       ref_id: Ext68
@@ -2132,7 +2132,7 @@ objects:
         [Industrial IT]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext69
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext69
       assessable: true
       depth: 1
       ref_id: Ext69
@@ -2147,7 +2147,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext70
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext70
       assessable: true
       depth: 1
       ref_id: Ext70
@@ -2157,7 +2157,7 @@ objects:
         \ exchange occur? \nIf yes, please precise the frequency.\n[Industrial IT]"
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext71
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext71
       assessable: true
       depth: 1
       ref_id: Ext71
@@ -2171,7 +2171,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext72
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext72
       assessable: true
       depth: 1
       ref_id: Ext72
@@ -2182,7 +2182,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext73
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext73
       assessable: true
       depth: 1
       ref_id: Ext73
@@ -2195,7 +2195,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext74
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext74
       assessable: true
       depth: 1
       ref_id: Ext74
@@ -2208,7 +2208,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext75
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext75
       assessable: true
       depth: 1
       ref_id: Ext75
@@ -2223,7 +2223,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext76
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext76
       assessable: true
       depth: 1
       ref_id: Ext76
@@ -2234,7 +2234,7 @@ objects:
         \ libraries, \u2026) ?\n[Development Environment]"
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext77
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext77
       assessable: true
       depth: 1
       ref_id: Ext77
@@ -2249,7 +2249,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext78
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext78
       assessable: true
       depth: 1
       ref_id: Ext78
@@ -2259,7 +2259,7 @@ objects:
         [Product]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext79
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext79
       assessable: true
       depth: 1
       ref_id: Ext79
@@ -2271,7 +2271,7 @@ objects:
         [Product]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext80
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext80
       assessable: true
       depth: 1
       ref_id: Ext80
@@ -2285,7 +2285,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext81
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext81
       assessable: true
       depth: 1
       ref_id: Ext81
@@ -2300,7 +2300,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext82
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext82
       assessable: true
       depth: 1
       ref_id: Ext82
@@ -2312,7 +2312,7 @@ objects:
         [Product]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext83
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext83
       assessable: true
       depth: 1
       ref_id: Ext83
@@ -2325,7 +2325,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext84
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext84
       assessable: true
       depth: 1
       ref_id: Ext84
@@ -2336,7 +2336,7 @@ objects:
         [Product]'
       implementation_groups:
       - Silver
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext85
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext85
       assessable: true
       depth: 1
       ref_id: Ext85
@@ -2349,7 +2349,7 @@ objects:
         [Product]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext86
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext86
       assessable: true
       depth: 1
       ref_id: Ext86
@@ -2360,7 +2360,7 @@ objects:
         [Product]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext87
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext87
       assessable: true
       depth: 1
       ref_id: Ext87
@@ -2372,7 +2372,7 @@ objects:
         [Product]'
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext88
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext88
       assessable: true
       depth: 1
       ref_id: Ext88
@@ -2383,7 +2383,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext89
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext89
       assessable: true
       depth: 1
       ref_id: Ext89
@@ -2395,7 +2395,7 @@ objects:
         [Product]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext90
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext90
       assessable: true
       depth: 1
       ref_id: Ext90
@@ -2406,7 +2406,7 @@ objects:
         \ in a secure area ?\n[Product]"
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext91
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext91
       assessable: true
       depth: 1
       ref_id: Ext91
@@ -2418,7 +2418,7 @@ objects:
         [Product]'
       implementation_groups:
       - Bronze
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext92
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext92
       assessable: true
       depth: 1
       ref_id: Ext92
@@ -2435,7 +2435,7 @@ objects:
         [Development Environment]'
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext93
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext93
       assessable: true
       depth: 1
       ref_id: Ext93
@@ -2446,7 +2446,7 @@ objects:
         [Product]\n[Development Environment]"
       implementation_groups:
       - Gold
-    - urn: urn:intuitem:risk:req_node:aircyber-v1.5.2:ext94
+    - urn: urn:ciso:risk:req_node:aircyber-v1.5.2:ext94
       assessable: true
       depth: 1
       ref_id: Ext94

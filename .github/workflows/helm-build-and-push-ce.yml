@@ -66,4 +66,4 @@ jobs:
       - name: Push to GitHub Container Registry
         run: |
           cd charts
-          helm push "${PACKAGE_NAME}" oci://ghcr.io/intuitem/helm-charts/ce
+          helm push "${PACKAGE_NAME}" oci://ghcr.io/ciso/helm-charts/ce

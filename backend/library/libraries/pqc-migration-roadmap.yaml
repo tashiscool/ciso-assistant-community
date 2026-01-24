@@ -1,6 +1,6 @@
 convert_library_version: 'v2 ; Compat Mode: [0] {[v2.1] (DEFAULT) D''ont use any Compatibility
   Mode}'
-urn: urn:intuitem:risk:library:pqc-migration-roadmap
+urn: urn:ciso:risk:library:pqc-migration-roadmap
 locale: en
 ref_id: pqc-migration-roadmap
 name: Post-Quantum Cryptography (PQC) Migration Roadmap - May 2025
@@ -15,10 +15,10 @@ copyright: "\xA92025 The MITRE Corporation"
 version: 1
 publication_date: 2025-06-19
 provider: The MITRE Corporation
-packager: intuitem
+packager: ciso-assistant
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:pqc-migration-roadmap
+    urn: urn:ciso:risk:framework:pqc-migration-roadmap
     ref_id: pqc-migration-roadmap
     name: Post-Quantum Cryptography (PQC) Migration Roadmap - May 2025
     description: 'The Post-Quantum Cryptography Coalition (PQCC) is a community of
@@ -29,7 +29,7 @@ objects:
       The PQCC emphasizes classical cryptosystems with quantum-safe security to enable
       information security in an era of cryptographically-relevant quantum computers.'
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:background
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:background
       assessable: false
       depth: 1
       name: Background
@@ -51,10 +51,10 @@ objects:
         Additionally, desired outcomes are listed for each category and their associated
         activities, giving organizations an idea of where they should be throughout
         the process outlined in this roadmap.'
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:background:1
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:background:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:background
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:background
       name: Migration Overview
       description: The migration to PQC across your organization can be broken down
         into four main categories. Accompanying these categories are activities your
@@ -62,42 +62,42 @@ objects:
         of categories and activities will look different organization-to-organization,
         and as seen in Figure 1, components of this roadmap can take place concurrently
         or in a staggered order.
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:background:1:1
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:background:1:1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:background:1
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:background:1
       name: 'Category 1: Preparation'
       description: Your organization sets up its migration to PQC by obtaining an
         overview of its PQC migration aims, assigning a migration lead, identifying
         necessary stakeholders, and aligning stakeholders through strategic messaging.
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:background:1:2
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:background:1:2
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:background:1
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:background:1
       name: 'Category 2: Baseline Understanding'
       description: Your organization gathers a baseline understanding of its data
         inventory, the prioritized assets to be updated, and the required resources
         and available budget.
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:background:1:3
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:background:1:3
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:background:1
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:background:1
       name: 'Category 3: Planning and Execution'
       description: Your organization collaborates with system vendors and internal
         system owners to ensure that post-quantum solutions are acquired externally
         or developed internally and implemented effectively.
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:background:1:4
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:background:1:4
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:background:1
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:background:1
       name: 'Category 4: Monitoring and Evaluation'
       description: Your organization develops measures to track migration process
         and formulates a process for reassessing cryptographic security as quantum
         capabilities evolve.
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:background:1:5
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:background:1:5
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:background:1
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:background:1
       name: Recommended Roadmap Implementation
       description: How an organization applies this roadmap depends on the shelf-life
         and volume of its critical data, the amount of available information about
@@ -105,7 +105,7 @@ objects:
         and numerous other influencing factors. The implementation of categories and
         activities vary by organization, and may occur concurrently, consecutively,
         or individually.
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-1:-preparation
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-1:-preparation
       assessable: true
       depth: 1
       name: 'Category 1: Preparation'
@@ -121,10 +121,10 @@ objects:
         \ identifies and aligns its key stakeholders to PQC migration needs, leveraging\
         \ strategic messaging. \n\t\u2022 Organization begins initial vendor engagement\
         \ for PQC solutions."
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-1:-preparation:1
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-1:-preparation:1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-1:-preparation
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-1:-preparation
       name: 'Activity 1.1: Identify PQC Relevancy'
       description: "Before starting the journey towards PQC migration, your organization\
         \ needs to assess whether it should begin this process now or follow a later\
@@ -155,10 +155,10 @@ objects:
         \ migration aims and determines an appropriate timeline to begin PQC migration.\
         \ \n\t\u2022 Organization familiarizes itself with its vulnerabilities and\
         \ their level of urgency"
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-1:-preparation:2
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-1:-preparation:2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-1:-preparation
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-1:-preparation
       name: 'Activity 1.2: Assign a Lead to Manage PQC Migration'
       description: "When your organization decides to begin its PQC migration timeline,\
         \ it should appoint an individual or team (a \u201Cmigration lead\u201D) to\
@@ -171,10 +171,10 @@ objects:
       annotation: "Activity 1.2 Outcomes: \n\t\u2022 Organization defines the role\
         \ and outcomes expected from its migration lead. \n\t\u2022 Organization assigns\
         \ a migration lead responsible for progressing PQC migration."
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-1:-preparation:3
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-1:-preparation:3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-1:-preparation
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-1:-preparation
       name: 'Activity 1.3: Identify Existing Inventory and Awareness'
       description: "In this activity, the migration lead sets a plan for gathering\
         \ a baseline understanding of its organization\u2019s cryptographic needs.\
@@ -193,10 +193,10 @@ objects:
       annotation: "Activity 1.3 Outcomes: \n\t\u2022 Migration lead has evaluated\
         \ and documented any existing inventories, risk assessments, and awareness\
         \ related to PQC migration.\n\nRelated Activities: 2.2, 2.3"
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-1:-preparation:4
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-1:-preparation:4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-1:-preparation
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-1:-preparation
       name: 'Activity 1.4: Identify Stakeholders and Develop Strategic Messaging'
       description: "Critical to achieving the activities in this roadmap is aligning\
         \ your organization\u2019s leaders and key stakeholders to the value and purpose\
@@ -230,10 +230,10 @@ objects:
         \ its key stakeholders to the categories and activities of PQC migration.\
         \ \n\t\u2022 Organization can decisively communicate the value and purpose\
         \ of PQC migration across an ecosystem of stakeholders."
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-1:-preparation:4:1
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-1:-preparation:4:1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-1:-preparation:4
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-1:-preparation:4
       name: 'Activity 1.4 a: Begin Engagement with System Vendors and Operators'
       description: "Your organization\u2019s key stakeholder engagement will include\
         \ initial conversations with its vendors and internal system operators to\
@@ -249,7 +249,7 @@ objects:
         \ a cadence with its vendors if it has not already. \n\t\u2022 Vendor(s) and\
         \ internal operator(s) help provide estimated timelines for PQC solution availability\
         \ as well as implementation costs and impacts."
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding
       assessable: true
       depth: 1
       name: 'Category 2: Baseline Understanding'
@@ -261,10 +261,10 @@ objects:
         \ has identified and documented all cryptographic assets necessary to achieve\
         \ its desired level of PQC resiliency. \n\t\u2022 Organization prioritizes\
         \ assets in its inventory list based on sensitivity and lifespan."
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding:1
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding:1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding
       name: 'Activity 2.1: Set a Discovery Plan and Budget'
       description: In this activity, the migration lead uses the initial information
         gathered (Activity 1.3) to determine whether the organization should proceed
@@ -278,10 +278,10 @@ objects:
         \ inventorying and prioritization efforts need to be conducted for PQC migration.\
         \ \n\t\u2022 Migration lead identifies a budget for discovery initiatives.\n\
         \nRelated Activities: 1.3, 2.2, 2.3"
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding:2
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding:2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding
       name: 'Activity 2.2: Build an Inventory for PQC Migration'
       description: "Centralized inventories are essential for tracking enterprise-level\
         \ migration timelines and ensuring comprehensive planning to address all security\
@@ -295,10 +295,10 @@ objects:
         \ as considerations to make throughout the process of inventorying."
       annotation: "Activity 2.2 Outcomes: \n\t\u2022 Organization documents its inventory\
         \ of assets and cryptographic use.\n\nRelated Activities: 2.2 (a), 2.2 (b)"
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding:2:1
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding:2:1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding:2
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding:2
       name: 'Activity 2.2 a: Consider Tooling and Methods to Use for Inventory'
       description: Your organization may want to consider using automated tools for
         identifying cryptographic algorithms across various components of an enterprise's
@@ -313,10 +313,10 @@ objects:
       annotation: "Activity 2.2 (a) Outcomes: \n\t\u2022 The migration lead and technical\
         \ teams identify which methods and tools will work best for gathering your\
         \ organization\u2019s inventory."
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding:2:2
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding:2:2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding:2
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding:2
       name: 'Activity 2.2 b: Collect and Categorize Information on Cryptographic Assets'
       description: "In this activity, your organization\u2019s migration lead and\
         \ system operators document detailed technical information about your most\
@@ -334,10 +334,10 @@ objects:
         \ each asset and is aware of what updates it will need to implement itself\
         \ and what updates will need to be carried out by its suppliers.\n\nRelated\
         \ Activities: 3.2 (a)"
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding:3
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding:3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-2:-baseline-understanding
       name: 'Activity 2.3: Prioritize Critical Assets for Migration'
       description: 'In this activity, the migration lead prioritizes critical assets
         and determines their migration timelines. This activity involves reviewing
@@ -370,7 +370,7 @@ objects:
         \ list of all risks, the controls in place to mitigate those risks, and any\
         \ further actions that need to be taken for mitigation.\n\nRelated Activities:\
         \ 1.1, 2.2"
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution
       assessable: true
       depth: 1
       name: 'Category 3: Planning and Execution'
@@ -386,10 +386,10 @@ objects:
         \ developed. \n\t\u2022 Organization has implemented, acquired, or developed\
         \ PQC solutions across their infrastructure. \n\t\u2022 Organization implements\
         \ short-term measures to mitigate the exposure of sensitive data."
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:1
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution
       name: 'Activity 3.1: Set a Migration Plan and Budget'
       description: "Using your prioritized asset list from Activity 2.3, determine\
         \ the appropriate course of action for each prioritized asset\u2014whether\
@@ -406,10 +406,10 @@ objects:
       annotation: "Activity 3.1 Outcomes: \n\t\u2022 Organization estimates the cost\
         \ of migrating its prioritized assets to PQC and builds a budgeting plan.\n\
         \    \nRelated Activities: 2.3, 3.2 (a), 4.3"
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:2
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution
       name: 'Activity 3.2: Identify Solutions'
       description: "In this activity, the migration lead identifies the solutions\
         \ specific to your organization\u2019s migration needs. The migration lead\
@@ -447,10 +447,10 @@ objects:
         \ and desire for agile cryptographic implementations/solutions. \n\t\u2022\
         \ Organization assesses the implementation methods of PQC solutions and projected\
         \ organizational impacts.\n    \nRelated Activities: 2.3"
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:2:1
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:2:1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:2
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:2
       name: 'Activity 3.2 a: Confirm Migration Needs with Vendors'
       description: "Using the prioritized asset list, the migration lead, in coordination\
         \ with relevant organizational acquisition authorities, should continue engagement\
@@ -468,10 +468,10 @@ objects:
         \ solution availability and cost of solutions. \n\t\u2022 Organization coordinates\
         \ with vendors to determine extent of organization disruption during implementation\
         \ processes.\n\nRelated Activities: 1.4 (a), 2.3"
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:2:2
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:2:2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:2
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:2
       name: 'Activity 3.2 b: Build Solutions'
       description: "Using the prioritized asset list, the migration lead should coordinate\
         \ with the system operators of custom systems or systems that do not yet have\
@@ -485,10 +485,10 @@ objects:
         \ custom applications. \n\t\u2022 Organizations determine if commercial solutions\
         \ are available that offer comparable performance.\n    \nRelated Activities:\
         \ 2.3"
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:3
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution
       name: 'Activity 3.3: Establish Short-Term Measures'
       description: "Using the timeline for solution availability and the prioritization\
         \ assessment, the migration lead must determine what measures should be taken\
@@ -508,10 +508,10 @@ objects:
         \ for short-term measures to mitigate risk to quantum threat. \n\t\u2022 Organization\
         \ creates and implements risk mitigation strategies to reduce data exposure.\n\
         \nRelated Activities: 3.2 (a), 3.2 (b)"
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:4
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution
       name: 'Activity 3.4: Acquire/Develop PQC Solutions'
       description: In coordination with organizational acquisition authorities, the
         migration lead begins acquiring post quantum solutions and distributing resources
@@ -522,10 +522,10 @@ objects:
         \ for acquisition and development. \n\t\u2022 Organization purchases PQC solutions\
         \ from vendors. \n\t\u2022 Organization begins internal development of PQC\
         \ solutions.\n    \nRelated Activities: 2.3"
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:5
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution:5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-3:-planning-and-execution
       name: 'Activity 3.5: Implement PQC Solutions'
       description: Your organization installs short-term and long-term mitigations
         and solutions. The migration lead determines the extent of organizational
@@ -535,7 +535,7 @@ objects:
       annotation: "Activity 3.5 Outcomes: \n\t\u2022 Organization implements acquired\
         \ or developed PQC solutions. \n\t\u2022 Organization updates inventory to\
         \ reflect new system status."
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation
       assessable: true
       depth: 1
       name: 'Category 4: Monitoring and Evaluation'
@@ -550,10 +550,10 @@ objects:
         \ tracks its migration progress and validates its desired outcomes. \n\t\u2022\
         \ Organization creates processes to continuously monitor its security against\
         \ technological developments."
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation:1
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation:1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation
       name: 'Activity 4.1: Validate Proper Implementation'
       description: "The migration lead, in collaboration with the system implementors,\
         \ evaluates the effectiveness of the implemented PQC systems. During this\
@@ -569,10 +569,10 @@ objects:
         \ PQC effectiveness in securing priority assets. \n\t\u2022 Interoperability\
         \ and operational requirements are verified and documented. \n\t\u2022 Inventory\
         \ is updated to reflect new system status."
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation:1:1
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation:1:1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation:1
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation:1
       name: 'Activity 4.1 a: Ensure Alignment with Industry Standards'
       description: Depending on the type of data your organization handles, it must
         ensure that its PQC migration considers existing industry regulations. For
@@ -587,10 +587,10 @@ objects:
       annotation: "Activity 4.1 (a) Outcomes: \n\t\u2022 Organization integrates existing\
         \ industry standards into its PQC migration planning. \n\t\u2022 Organization\
         \ documents how its PQC migration adheres to industry standards."
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation:2
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation:2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation
       name: 'Activity 4.2: Create Measures to Track PQC Migration Success'
       description: "Critical to knowing the impact of your organization\u2019s PQC\
         \ migration is determining the amount of sensitive information that has been\
@@ -612,10 +612,10 @@ objects:
         \ that allow it to track PQC migration success. \n\t\u2022 Organization can\
         \ determine the amount of sensitive information that is protected by new PQC\
         \ solutions.\n    \nRelated Activities: 2.3"
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation:3
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation:3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation
       name: 'Activity 4.3: Assess Workforce Needs'
       description: "The migration lead will assess how to optimize your organization\u2019\
         s current workforce to implement and maintain newly acquired/developed PQC\
@@ -630,10 +630,10 @@ objects:
         \u2022 Organization determines if additional workforce is needed to assist\
         \ in the operation/migration of systems to PQC.\n    \nRelated Activities:\
         \ 3.1, 3.5"
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation:4
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation:4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation
+      parent_urn: urn:ciso:risk:req_node:pqc-migration-roadmap:category-4:-monitoring-and-evaluation
       name: 'Activity 4.4: Monitor and Update Continuously'
       description: "The migration lead will continue to monitor and measure developments\
         \ in your organization\u2019s security, updating inventory lists, tracking\
@@ -646,7 +646,7 @@ objects:
         \ measures migration progress against organizational goals. \n\t\u2022 Organization\
         \ maintains preparedness by creating a process to monitor technological developments\
         \ and risk status.\n    \nRelated Activities: All"
-    - urn: urn:intuitem:risk:req_node:pqc-migration-roadmap:conclusion
+    - urn: urn:ciso:risk:req_node:pqc-migration-roadmap:conclusion
       assessable: false
       depth: 1
       name: Conclusion

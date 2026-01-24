@@ -361,7 +361,7 @@ class ConMonTaskGenerator:
 
         Args:
             folder: Folder to create the profile in
-            framework_urn: URN of the framework (e.g., 'urn:intuitem:risk:framework:conmon-schedule')
+            framework_urn: URN of the framework (e.g., 'urn:ciso:risk:framework:conmon-schedule')
             profile_name: Name for the new profile
             profile_type: Profile type (fedramp_low, fedramp_moderate, etc.)
             implementation_groups: List of implementation groups to include

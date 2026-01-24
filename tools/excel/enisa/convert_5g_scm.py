@@ -21,7 +21,7 @@ output_file_name = "enisa-5g-scm-v1.3.xlsx"
 
 library_copyright = """The Matrix is provided on an ‘as is’ basis. ENISA is not responsible for the information contained in the Matrix, including the use that might be made of this information, or the content of any external sources referenced in the Matrix.
 """
-packager = "intuitem"
+packager = "ciso"
 
 library_description = """The main goal of the ENISA 5G security controls matrix is to support the national authorities in the EU Member States with implementing the technical measures of the EU’s 5G Cybersecurity toolbox.
 Source: https://www.enisa.europa.eu/publications/5g-security-controls-matrix

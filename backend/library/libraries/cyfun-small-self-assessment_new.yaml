@@ -1,6 +1,6 @@
 convert_library_version: 'v2 ; Compat Mode: [0] {[v2.1] (DEFAULT) D''ont use any Compatibility
   Mode}'
-urn: urn:intuitem:risk:library:cyfun-small-self-assessment
+urn: urn:ciso:risk:library:cyfun-small-self-assessment
 locale: en
 ref_id: cyfun-small-self-assessment
 name: CCB CyberFundamentals Small - Self assessment
@@ -14,10 +14,10 @@ copyright: All texts, layouts, designs and other elements of any nature in this 
 version: 1
 publication_date: 2025-07-03
 provider: CCB
-packager: intuitem
+packager: ciso-assistant
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:cyfun-small-self-assessment
+    urn: urn:ciso:risk:framework:cyfun-small-self-assessment
     ref_id: cyfun-small-self-assessment
     name: CCB CyberFundamentals Small - Self assessment
     description: Centre For Cybersecurity Belgium - CyberFundamentals Framework -
@@ -158,7 +158,7 @@ objects:
             worden gedocumenteerd en goedgekeurd. Gedocumenteerde en goedgekeurde
             uitzonderingen < 0,5% van de tijd.
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:cyfun-small-self-assessment:passwords
+    - urn: urn:ciso:risk:req_node:cyfun-small-self-assessment:passwords
       assessable: true
       depth: 1
       name: PASSWORDS
@@ -174,7 +174,7 @@ objects:
         are only changed if there is an indication of a violation.
 
         5: Two-factor authentication is in place for all critical systems.'
-    - urn: urn:intuitem:risk:req_node:cyfun-small-self-assessment:system-maintenance
+    - urn: urn:ciso:risk:req_node:cyfun-small-self-assessment:system-maintenance
       assessable: true
       depth: 1
       name: SYSTEM MAINTENANCE
@@ -190,7 +190,7 @@ objects:
 
         5: All updates are done continuously and systematically, and are tested before
         implementation.'
-    - urn: urn:intuitem:risk:req_node:cyfun-small-self-assessment:antivirus-and-anti-malware-management
+    - urn: urn:ciso:risk:req_node:cyfun-small-self-assessment:antivirus-and-anti-malware-management
       assessable: true
       depth: 1
       name: ANTIVIRUS AND ANTI-MALWARE MANAGEMENT
@@ -204,7 +204,7 @@ objects:
         4: On all systems and updated a few times a week.
 
         5: On all systems and updated daily. Suspicious activity is also reported.'
-    - urn: urn:intuitem:risk:req_node:cyfun-small-self-assessment:network-security
+    - urn: urn:ciso:risk:req_node:cyfun-small-self-assessment:network-security
       assessable: true
       depth: 1
       name: NETWORK SECURITY
@@ -223,7 +223,7 @@ objects:
 
         5: The network is compartmentalized into strictly separated areas; anomalies
         are quickly detected and resolved.'
-    - urn: urn:intuitem:risk:req_node:cyfun-small-self-assessment:backup-procedure
+    - urn: urn:ciso:risk:req_node:cyfun-small-self-assessment:backup-procedure
       assessable: true
       depth: 1
       name: BACKUP PROCEDURE
@@ -242,7 +242,7 @@ objects:
 
         5: All data is backed up completely with fast recovery time and without data
         loss.'
-    - urn: urn:intuitem:risk:req_node:cyfun-small-self-assessment:administration-rights
+    - urn: urn:ciso:risk:req_node:cyfun-small-self-assessment:administration-rights
       assessable: true
       depth: 1
       name: ADMINISTRATION RIGHTS
@@ -260,7 +260,7 @@ objects:
 
         5: Administrator accounts are disabled or modified if there are changes and
         anomalies.'
-    - urn: urn:intuitem:risk:req_node:cyfun-small-self-assessment:physical-security
+    - urn: urn:ciso:risk:req_node:cyfun-small-self-assessment:physical-security
       assessable: true
       depth: 1
       name: PHYSICAL SECURITY
@@ -277,7 +277,7 @@ objects:
 
         5: Access control is centralized, regularly reviewed and follows the life
         cycle of employees (entry/change of position/exit).'
-    - urn: urn:intuitem:risk:req_node:cyfun-small-self-assessment:incident-preparedness
+    - urn: urn:ciso:risk:req_node:cyfun-small-self-assessment:incident-preparedness
       assessable: true
       depth: 1
       name: INCIDENT PREPAREDNESS

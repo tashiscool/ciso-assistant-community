@@ -1,32 +1,32 @@
 convert_library_version: 'v2 ; Compat Mode: [0] {[v2.1] (DEFAULT) Don''t use any Compatibility
   Mode}'
-urn: urn:intuitem:risk:library:doc-pol
+urn: urn:ciso:risk:library:doc-pol
 locale: en
 ref_id: usual-controls
 name: Usual reference controls
 description: Usual documents, policies, procedures, training and technical controls
-  recommended by intuitem
-copyright: "\xA9 intuitem - 2026"
+  recommended by ciso
+copyright: "\xA9 ciso - 2026"
 version: 6
 publication_date: 2026-01-09
-provider: intuitem
-packager: intuitem
+provider: ciso
+packager: ciso-assistant
 translations:
   fr:
     name: "Mesures de r\xE9f\xE9rence courantes"
     description: "Documents, politiques, proc\xE9dures, formations et mesures techniques\
-      \ recommand\xE9s par intuitem"
+      \ recommand\xE9s par ciso"
   de:
     name: "\xDCbliche Referenzkontrollen"
     description: "\xDCbliche Dokumente, Richtlinien, Verfahren, Schulungen und technischen\
-      \ Kontrollen, die von intuitem empfohlen werden"
+      \ Kontrollen, die von ciso empfohlen werden"
   es:
     name: "Controles de referencia de uso com\xFAn"
     description: "Documentaci\xF3n, pol\xEDticas, procedimientos, formaci\xF3n y controles\
       \ t\xE9cnicos habituales recomendados por Intuitem"
 objects:
   reference_controls:
-  - urn: urn:intuitem:risk:function:doc-pol:doc.overview
+  - urn: urn:ciso:risk:function:doc-pol:doc.overview
     ref_id: DOC.OVERVIEW
     name: Organization overview document
     category: process
@@ -64,7 +64,7 @@ objects:
         description: "Objetivos de la organizaci\xF3n\nOrganigrama\nObjetivos del\
           \ SGSI\nResponsabilidades del CISO\nRevisi\xF3n del SGSI por la direcci\xF3\
           n"
-  - urn: urn:intuitem:risk:function:doc-pol:doc.context
+  - urn: urn:ciso:risk:function:doc-pol:doc.context
     ref_id: DOC.CONTEXT
     name: Context of organization document
     category: process
@@ -92,7 +92,7 @@ objects:
       es:
         name: "Documento de contexto de la organizaci\xF3n"
         description: "Partes interesadas\nAutoridades\nGrupos de inter\xE9s especial"
-  - urn: urn:intuitem:risk:function:doc-pol:doc.scope
+  - urn: urn:ciso:risk:function:doc-pol:doc.scope
     ref_id: DOC.SCOPE
     name: ISMS Scope document
     category: process
@@ -138,7 +138,7 @@ objects:
           \ negocio\nVista de la arquitectura de datos\nVista de la arquitectura de\
           \ aplicaciones\nVista de la arquitectura tecnol\xF3gica\nVista de la red\n\
           Declaraci\xF3n de alcance"
-  - urn: urn:intuitem:risk:function:doc-pol:doc.legal
+  - urn: urn:ciso:risk:function:doc-pol:doc.legal
     ref_id: DOC.LEGAL
     name: legal register
     category: process
@@ -179,7 +179,7 @@ objects:
           Contratos laborales
 
           Acuerdos de confidencialidad'
-  - urn: urn:intuitem:risk:function:doc-pol:doc.soa
+  - urn: urn:ciso:risk:function:doc-pol:doc.soa
     ref_id: DOC.SOA
     name: Statement of Applicabilty document
     category: process
@@ -191,7 +191,7 @@ objects:
         name: "Dokument zur Geltungsbereichserkl\xE4rung (SoA)"
       es:
         name: "Documento de declaraci\xF3n de aplicabilidad"
-  - urn: urn:intuitem:risk:function:doc-pol:doc.controls
+  - urn: urn:ciso:risk:function:doc-pol:doc.controls
     ref_id: DOC.CONTROLS
     name: Controls accountability matrix
     category: process
@@ -204,7 +204,7 @@ objects:
         name: "Verantwortlichkeitsmatrix f\xFCr Kontrollen"
       es:
         name: Matriz de responsabilidad de los controles
-  - urn: urn:intuitem:risk:function:doc-pol:doc.audit_plan
+  - urn: urn:ciso:risk:function:doc-pol:doc.audit_plan
     ref_id: DOC.AUDIT_PLAN
     name: Audit plan document
     category: process
@@ -249,7 +249,7 @@ objects:
           Soporte\nOperaci\xF3n\nEvaluaci\xF3n del desempe\xF1o\nMejora\nControles\
           \ organizativos\nControles de las personas\nControles f\xEDsicos\nControles\
           \ tecnol\xF3gicos"
-  - urn: urn:intuitem:risk:function:doc-pol:doc.competency
+  - urn: urn:ciso:risk:function:doc-pol:doc.competency
     ref_id: DOC.COMPETENCY
     name: Competency matrix
     category: process
@@ -262,7 +262,7 @@ objects:
         name: Kompetenzmatrix
       es:
         name: Matriz de competencias
-  - urn: urn:intuitem:risk:function:doc-pol:doc.raci
+  - urn: urn:ciso:risk:function:doc-pol:doc.raci
     ref_id: DOC.RACI
     name: Responsibility matrix
     category: process
@@ -278,7 +278,7 @@ objects:
       es:
         name: Matriz de responsabilidades
         description: RACI para el SGSI
-  - urn: urn:intuitem:risk:function:doc-pol:doc.com
+  - urn: urn:ciso:risk:function:doc-pol:doc.com
     ref_id: DOC.COM
     name: Communication plan document
     category: process
@@ -291,7 +291,7 @@ objects:
         name: Kommunikationsplan-Dokument
       es:
         name: "Documento del plan de comunicaci\xF3n"
-  - urn: urn:intuitem:risk:function:doc-pol:doc.risk_register
+  - urn: urn:ciso:risk:function:doc-pol:doc.risk_register
     ref_id: DOC.RISK_REGISTER
     name: Risk register
     category: process
@@ -329,7 +329,7 @@ objects:
         description: "Propietario del riesgo\nImpacto\nProbabilidad\nNivel de riesgo\n\
           Evaluaci\xF3n\nPrioridad\nOpci\xF3n de tratamiento\nMitigaciones \u2013\
           \ medidas de seguridad recomendadas"
-  - urn: urn:intuitem:risk:function:doc-pol:doc.so_register
+  - urn: urn:ciso:risk:function:doc-pol:doc.so_register
     ref_id: DOC.SO_REGISTER
     name: Security objectives register
     category: process
@@ -342,7 +342,7 @@ objects:
         name: "Register f\xFCr Sicherheitsziele"
       es:
         name: Registro de objetivos de seguridad
-  - urn: urn:intuitem:risk:function:doc-pol:doc.mgmt_review
+  - urn: urn:ciso:risk:function:doc-pol:doc.mgmt_review
     ref_id: DOC.MGMT_REVIEW
     name: Management review plan document
     category: process
@@ -373,7 +373,7 @@ objects:
         description: "Revisi\xF3n de riesgos\nRevisi\xF3n de los objetivos de seguridad\n\
           Revisi\xF3n de los incidentes de seguridad\nRevisi\xF3n de la gesti\xF3\
           n de vulnerabilidades\nRevisi\xF3n de las no conformidades"
-  - urn: urn:intuitem:risk:function:doc-pol:doc.educ_register
+  - urn: urn:ciso:risk:function:doc-pol:doc.educ_register
     ref_id: DOC.EDUC_REGISTER
     name: Training and awareness register
     category: process
@@ -388,7 +388,7 @@ objects:
         name: Schulungs- und Bewusstseinsregister
       es:
         name: "Registro de formaci\xF3n y concienciaci\xF3n"
-  - urn: urn:intuitem:risk:function:doc-pol:doc.doc_register
+  - urn: urn:ciso:risk:function:doc-pol:doc.doc_register
     ref_id: DOC.DOC_REGISTER
     name: Document register
     category: process
@@ -414,7 +414,7 @@ objects:
         name: Registro de documentos
         description: "Normas para la edici\xF3n y el mantenimiento\nControl de versiones\n\
           Registro\nMejora continua"
-  - urn: urn:intuitem:risk:function:doc-pol:doc.proc_register
+  - urn: urn:ciso:risk:function:doc-pol:doc.proc_register
     ref_id: DOC.PROC_REGISTER
     name: Operational procedures register
     category: process
@@ -427,7 +427,7 @@ objects:
         name: "Register f\xFCr operative Verfahren"
       es:
         name: Registro de procedimientos operativos
-  - urn: urn:intuitem:risk:function:doc-pol:doc.nc_log
+  - urn: urn:ciso:risk:function:doc-pol:doc.nc_log
     ref_id: DOC.NC_LOG
     name: Log of non-conformities
     category: process
@@ -448,7 +448,7 @@ objects:
         name: Registro de no conformidades
         description: "Lista de no conformidades (incidentes, problemas, \u2026)\n\
           Acci\xF3n correctiva adoptada"
-  - urn: urn:intuitem:risk:function:doc-pol:doc.internal_rules
+  - urn: urn:ciso:risk:function:doc-pol:doc.internal_rules
     ref_id: DOC.INTERNAL_RULES
     name: Rules of procedure document
     category: process
@@ -461,7 +461,7 @@ objects:
         name: Verfahrensregelwerk
       es:
         name: Documento de normas de funcionamiento
-  - urn: urn:intuitem:risk:function:doc-pol:doc.asset_register
+  - urn: urn:ciso:risk:function:doc-pol:doc.asset_register
     ref_id: DOC.ASSET_REGISTER
     name: Registry of assets
     category: process
@@ -474,7 +474,7 @@ objects:
         name: Asset-Register
       es:
         name: Registro de activos
-  - urn: urn:intuitem:risk:function:doc-pol:doc.supplier_register
+  - urn: urn:ciso:risk:function:doc-pol:doc.supplier_register
     ref_id: DOC.SUPPLIER_REGISTER
     name: Registry of suppliers
     category: process
@@ -490,7 +490,7 @@ objects:
       es:
         name: Registro de proveedores
         description: "Gesti\xF3n de riesgos"
-  - urn: urn:intuitem:risk:function:doc-pol:doc.educ_plan
+  - urn: urn:ciso:risk:function:doc-pol:doc.educ_plan
     ref_id: DOC.EDUC_PLAN
     name: Information security awareness and training plan
     category: process
@@ -577,7 +577,7 @@ objects:
           \ ISO 27001) y mantener registros preparados para auditor\xEDa.\nMejora\
           \ continua: Actualizar en funci\xF3n de la retroalimentaci\xF3n y de las\
           \ amenazas emergentes."
-  - urn: urn:intuitem:risk:function:doc-pol:doc.sap
+  - urn: urn:ciso:risk:function:doc-pol:doc.sap
     ref_id: DOC.SAP
     name: Security Assurance Plan
     category: process
@@ -612,7 +612,7 @@ objects:
           \ servicios o sistemas. Demuestra su compromiso con el mantenimiento de\
           \ un entorno seguro y proporciona evidencias de cumplimiento y de las pr\xE1\
           cticas de seguridad."
-  - urn: urn:intuitem:risk:function:doc-pol:doc.is_map
+  - urn: urn:ciso:risk:function:doc-pol:doc.is_map
     ref_id: DOC.IS_MAP
     name: Information System Mapping
     category: process
@@ -636,7 +636,7 @@ objects:
         description: "Representaci\xF3n visual de los componentes del sistema de informaci\xF3\
           n de una organizaci\xF3n y de sus interacciones para mejorar su gesti\xF3\
           n y seguridad."
-  - urn: urn:intuitem:risk:function:doc-pol:doc.pam_register
+  - urn: urn:ciso:risk:function:doc-pol:doc.pam_register
     ref_id: DOC.PAM_REGISTER
     name: Register of privileged access accounts
     category: process
@@ -649,7 +649,7 @@ objects:
         name: "Register f\xFCr privilegierte Zugangskonten"
       es:
         name: Registro de cuentas de acceso privilegiado
-  - urn: urn:intuitem:risk:function:doc-pol:doc.incident_register
+  - urn: urn:ciso:risk:function:doc-pol:doc.incident_register
     ref_id: DOC.INCIDENT_REGISTER
     name: Security Incident Register
     category: process
@@ -662,7 +662,7 @@ objects:
         name: "Register f\xFCr Sicherheitsvorf\xE4lle"
       es:
         name: Registro de incidentes de seguridad
-  - urn: urn:intuitem:risk:function:doc-pol:doc.flow_matrix
+  - urn: urn:ciso:risk:function:doc-pol:doc.flow_matrix
     ref_id: DOC.FLOW_MATRIX
     name: Flow Matrix
     category: process
@@ -686,7 +686,7 @@ objects:
         description: "Documento que mapea los flujos de datos autorizados entre sistemas,\
           \ aplicaciones o zonas de red para garantizar una comunicaci\xF3n segura\
           \ y conforme a los requisitos."
-  - urn: urn:intuitem:risk:function:doc-pol:doc.arc_principles
+  - urn: urn:ciso:risk:function:doc-pol:doc.arc_principles
     ref_id: DOC.ARC_PRINCIPLES
     name: Security Architecture Principles
     category: process
@@ -699,7 +699,7 @@ objects:
         name: "Grunds\xE4tze der Sicherheitsarchitektur"
       es:
         name: Principios de arquitectura de seguridad
-  - urn: urn:intuitem:risk:function:doc-pol:proc.pam
+  - urn: urn:ciso:risk:function:doc-pol:proc.pam
     ref_id: PROC.PAM
     name: Privileged Access Management Procedure
     category: procedure
@@ -733,7 +733,7 @@ objects:
           \ los usuarios autorizados tengan acceso a los sistemas y datos cr\xEDticos,\
           \ mediante medidas como la monitorizaci\xF3n, la auditor\xEDa y el acceso\
           \ con tiempo limitado para minimizar los riesgos."
-  - urn: urn:intuitem:risk:function:doc-pol:proc.recertification
+  - urn: urn:ciso:risk:function:doc-pol:proc.recertification
     ref_id: PROC.RECERTIFICATION
     name: Account recertification procedure
     category: procedure
@@ -767,7 +767,7 @@ objects:
           \ de los sistemas o el cumplimiento de normas. Garantiza que solo los usuarios\
           \ y sistemas autorizados mantengan el acceso o la certificaci\xF3n, y ayuda\
           \ a identificar y revocar permisos obsoletos o innecesarios."
-  - urn: urn:intuitem:risk:function:doc-pol:proc.hr_security
+  - urn: urn:ciso:risk:function:doc-pol:proc.hr_security
     ref_id: PROC.HR_SECURITY
     name: HR Security Procedure
     category: procedure
@@ -809,7 +809,7 @@ objects:
           \ y de seguridad. Incluye los procedimientos de selecci\xF3n, incorporaci\xF3\
           n, cambios de puesto, formaci\xF3n y finalizaci\xF3n de la relaci\xF3n laboral\
           \ para proteger la informaci\xF3n y los activos de la organizaci\xF3n."
-  - urn: urn:intuitem:risk:function:doc-pol:proc.physical_security
+  - urn: urn:ciso:risk:function:doc-pol:proc.physical_security
     ref_id: PROC.PHYSICAL_SECURITY
     name: Physical Security Procedure
     category: procedure
@@ -865,7 +865,7 @@ objects:
           \ registro y el acompa\xF1amiento de visitantes en \xE1reas seguras.\nRespuesta\
           \ ante incidentes: Pasos para abordar brechas de seguridad f\xEDsica o situaciones\
           \ de emergencia."
-  - urn: urn:intuitem:risk:function:doc-pol:proc.gpo
+  - urn: urn:ciso:risk:function:doc-pol:proc.gpo
     ref_id: PROC.GPO
     name: Group Policy Objects Procedure
     category: procedure
@@ -897,7 +897,7 @@ objects:
           ticas de usuario en un entorno Windows. Garantiza la aplicaci\xF3n coherente\
           \ de las pol\xEDticas organizativas para unas operaciones de TI seguras\
           \ y conformes."
-  - urn: urn:intuitem:risk:function:doc-pol:proc.update
+  - urn: urn:ciso:risk:function:doc-pol:proc.update
     ref_id: PROC.UPDATE
     name: Update management procedure
     category: procedure
@@ -933,7 +933,7 @@ objects:
           Planificaci\xF3n de las actualizaciones\nPruebas y validaci\xF3n\nProceso\
           \ de despliegue\nSupervisi\xF3n y verificaci\xF3n\nDocumentaci\xF3n y elaboraci\xF3\
           n de informes"
-  - urn: urn:intuitem:risk:function:doc-pol:proc.incident
+  - urn: urn:ciso:risk:function:doc-pol:proc.incident
     ref_id: PROC.INCIDENT
     name: Incident Management Procedure
     category: procedure
@@ -959,7 +959,7 @@ objects:
         name: "Procedimiento de gesti\xF3n de incidentes"
         description: "Implementaci\xF3n pr\xE1ctica de la pol\xEDtica de gesti\xF3\
           n de incidentes"
-  - urn: urn:intuitem:risk:function:doc-pol:proc.disposal
+  - urn: urn:ciso:risk:function:doc-pol:proc.disposal
     ref_id: PROC.DISPOSAL
     name: Secure Disposal Procedure
     category: procedure
@@ -1006,7 +1006,7 @@ objects:
           \ para su eliminaci\xF3n\nM\xE9todos de eliminaci\xF3n segura\nSaneado de\
           \ datos\nCumplimiento de los requisitos legales y reglamentarios\nDocumentaci\xF3\
           n y mantenimiento de registros\nVerificaci\xF3n y auditor\xEDa"
-  - urn: urn:intuitem:risk:function:doc-pol:proc.ntp
+  - urn: urn:ciso:risk:function:doc-pol:proc.ntp
     ref_id: PROC.NTP
     name: Time Synchronization Procedure
     category: procedure
@@ -1036,7 +1036,7 @@ objects:
           \ servidores NTP).\nConfiguraci\xF3n: Definici\xF3n de intervalos de sincronizaci\xF3\
           n y mecanismos de respaldo.\nSupervisi\xF3n: Verificaci\xF3n peri\xF3dica\
           \ del estado de la sincronizaci\xF3n horaria."
-  - urn: urn:intuitem:risk:function:doc-pol:proc.email_security
+  - urn: urn:ciso:risk:function:doc-pol:proc.email_security
     ref_id: PROC.EMAIL_SECURITY
     name: Email Security Configuration Procedure
     category: procedure
@@ -1076,7 +1076,7 @@ objects:
           \ antispam\nCifrado y comunicaciones seguras\nControl de accesos y monitorizaci\xF3\
           n\nCopia de seguridad y recuperaci\xF3n\nConcienciaci\xF3n y formaci\xF3\
           n de los usuarios"
-  - urn: urn:intuitem:risk:function:doc-pol:proc.logging
+  - urn: urn:ciso:risk:function:doc-pol:proc.logging
     ref_id: PROC.LOGGING
     name: Logging procedure
     category: procedure
@@ -1105,7 +1105,7 @@ objects:
         description: "Recogida y categorizaci\xF3n de registros\nPol\xEDticas de almacenamiento\
           \ seguro y conservaci\xF3n\nAn\xE1lisis para la detecci\xF3n de anomal\xED\
           as y la respuesta a incidentes"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.main
+  - urn: urn:ciso:risk:function:doc-pol:pol.main
     ref_id: POL.MAIN
     name: Main policy
     category: policy
@@ -1144,7 +1144,7 @@ objects:
         description: "Objetivos de seguridad de la informaci\xF3n\nCompromiso\nRevisi\xF3\
           n por la direcci\xF3n\nPol\xEDticas aplicables\nGesti\xF3n de las no conformidades\n\
           Mejora continua"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.educ
+  - urn: urn:ciso:risk:function:doc-pol:pol.educ
     ref_id: POL.EDUC
     name: Information security awareness and training policy
     category: policy
@@ -1177,7 +1177,7 @@ objects:
           \ informaci\xF3n"
         description: "Implicaciones del incumplimiento\nNotificaci\xF3n de eventos\
           \ de seguridad\nMejora continua"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.work
+  - urn: urn:ciso:risk:function:doc-pol:pol.work
     ref_id: POL.WORK
     name: Workstations and teleworking policy
     category: policy
@@ -1213,7 +1213,7 @@ objects:
         name: "Pol\xEDtica de puestos de trabajo y teletrabajo"
         description: "Puestos de trabajo\nDispositivos m\xF3viles\nTeletrabajo\nGesti\xF3\
           n de contrase\xF1as\nDevoluci\xF3n de activos\nMejora continua"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.crypto
+  - urn: urn:ciso:risk:function:doc-pol:pol.crypto
     ref_id: POL.CRYPTO
     name: Cryptographic policy
     category: policy
@@ -1235,7 +1235,7 @@ objects:
       es:
         name: "Pol\xEDtica criptogr\xE1fica"
         description: "Gesti\xF3n de claves\nCifrado\nMejora continua"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.classif
+  - urn: urn:ciso:risk:function:doc-pol:pol.classif
     ref_id: POL.CLASSIF
     name: Information classification and handling policy
     category: policy
@@ -1298,7 +1298,7 @@ objects:
           n\nProtecci\xF3n y tratamiento de los datos personales\nMesa limpia\nPantalla\
           \ limpia\nProtecci\xF3n de los registros\nNormas de conservaci\xF3n\nUso\
           \ de informaci\xF3n de prueba\nMejora continua"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.audit
+  - urn: urn:ciso:risk:function:doc-pol:pol.audit
     ref_id: POL.AUDIT
     name: Internal and external audit policy
     category: policy
@@ -1315,7 +1315,7 @@ objects:
       es:
         name: "Pol\xEDtica de auditor\xEDa interna y externa"
         description: "Protecci\xF3n de la informaci\xF3n de auditor\xEDa"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.bcp
+  - urn: urn:ciso:risk:function:doc-pol:pol.bcp
     ref_id: POL.BCP
     name: Business continuity policy
     category: policy
@@ -1327,7 +1327,7 @@ objects:
         name: "Notfall- und Gesch\xE4ftskontinuit\xE4tsrichtlinie"
       es:
         name: "Pol\xEDtica de continuidad de negocio"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.seg_duty
+  - urn: urn:ciso:risk:function:doc-pol:pol.seg_duty
     ref_id: POL.SEG_DUTY
     name: Segregation of duties policy
     category: policy
@@ -1340,7 +1340,7 @@ objects:
         name: Richtlinie zur Funktionstrennung
       es:
         name: "Pol\xEDtica de segregaci\xF3n de funciones"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.access
+  - urn: urn:ciso:risk:function:doc-pol:pol.access
     ref_id: POL.ACCESS
     name: Access control policy
     category: policy
@@ -1392,7 +1392,7 @@ objects:
           \ de acceso\nAprovisionamiento\nBajas de usuarios\nAcceso remoto\nGesti\xF3\
           n de accesos privilegiados\nAcceso de terceros\nSupervisi\xF3n y elaboraci\xF3\
           n de informes\nMejora continua"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.malware
+  - urn: urn:ciso:risk:function:doc-pol:pol.malware
     ref_id: POL.MALWARE
     name: Malware protection policy
     category: policy
@@ -1416,7 +1416,7 @@ objects:
         description: 'Antivirus
 
           EDR'
-  - urn: urn:intuitem:risk:function:doc-pol:pol.risk
+  - urn: urn:ciso:risk:function:doc-pol:pol.risk
     ref_id: POL.RISK
     name: Risk management policy
     category: policy
@@ -1477,7 +1477,7 @@ objects:
           \ (mitigaci\xF3n, aceptaci\xF3n, transferencia)\nEvaluaci\xF3n del riesgo\n\
           Uso de los controles de la ISO/IEC 27002\nGesti\xF3n de los derechos de\
           \ acceso\nMejora continua"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.asset
+  - urn: urn:ciso:risk:function:doc-pol:pol.asset
     ref_id: POL.ASSET
     name: Asset management policy
     category: policy
@@ -1489,7 +1489,7 @@ objects:
         name: Asset-Management-Richtlinie
       es:
         name: "Pol\xEDtica de gesti\xF3n de activos"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.backup
+  - urn: urn:ciso:risk:function:doc-pol:pol.backup
     ref_id: POL.BACKUP
     name: Backup and restore policy
     category: policy
@@ -1501,7 +1501,7 @@ objects:
         name: Richtlinie zur Sicherung von Backups und Wiederherstellung
       es:
         name: "Pol\xEDtica de copia de seguridad y restauraci\xF3n"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.supplier
+  - urn: urn:ciso:risk:function:doc-pol:pol.supplier
     ref_id: POL.SUPPLIER
     name: Third party supplier security policy
     category: policy
@@ -1514,7 +1514,7 @@ objects:
         name: "Sicherheitsrichtlinie f\xFCr Lieferanten und Dritte"
       es:
         name: "Pol\xEDtica de seguridad de proveedores externos"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.monitor
+  - urn: urn:ciso:risk:function:doc-pol:pol.monitor
     ref_id: POL.MONITOR
     name: Logging and monitoring policy
     category: policy
@@ -1530,7 +1530,7 @@ objects:
       es:
         name: "Pol\xEDtica de registro y monitorizaci\xF3n"
         description: Registro de eventos
-  - urn: urn:intuitem:risk:function:doc-pol:pol.transfer
+  - urn: urn:ciso:risk:function:doc-pol:pol.transfer
     ref_id: POL.TRANSFER
     name: Information transfer policy
     category: policy
@@ -1543,7 +1543,7 @@ objects:
         name: Richtlinie zum Informationsaustausch
       es:
         name: "Pol\xEDtica de transferencia de la informaci\xF3n"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.secdev
+  - urn: urn:ciso:risk:function:doc-pol:pol.secdev
     ref_id: POL.SECDEV
     name: Secure development policy
     category: policy
@@ -1555,7 +1555,7 @@ objects:
         name: "Richtlinie f\xFCr sichere Software- und Systementwicklung"
       es:
         name: "Pol\xEDtica de desarrollo seguro"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.physical
+  - urn: urn:ciso:risk:function:doc-pol:pol.physical
     ref_id: POL.PHYSICAL
     name: Physical security policy
     category: policy
@@ -1591,7 +1591,7 @@ objects:
         description: "Per\xEDmetro de seguridad f\xEDsica\n\xC1reas seguras\nControl\
           \ de acceso de empleados\nControl de acceso de visitantes\nGesti\xF3n de\
           \ entregas\nSeguridad del cableado\nMejora continua"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.network
+  - urn: urn:ciso:risk:function:doc-pol:pol.network
     ref_id: POL.NETWORK
     name: Network security management policy
     category: policy
@@ -1603,7 +1603,7 @@ objects:
         name: Richtlinie zum Management der Netzwerksicherheit
       es:
         name: "Pol\xEDtica de gesti\xF3n de la seguridad de red"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.accept
+  - urn: urn:ciso:risk:function:doc-pol:pol.accept
     ref_id: POL.ACCEPT
     name: Acceptable use policy
     category: policy
@@ -1640,7 +1640,7 @@ objects:
           \ Actividades permitidas y prohibidas, obligaciones de seguridad.\nConfidencialidad:\
           \ Protecci\xF3n de los datos sensibles.\nCumplimiento: Supervisi\xF3n y\
           \ sanciones por incumplimiento."
-  - urn: urn:intuitem:risk:function:doc-pol:pol.project
+  - urn: urn:ciso:risk:function:doc-pol:pol.project
     ref_id: POL.PROJECT
     name: IS project integration policy
     category: policy
@@ -1661,7 +1661,7 @@ objects:
           n"
         description: "Normas para la integraci\xF3n de la seguridad en los proyectos\
           \ de sistemas de informaci\xF3n"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.threat_intel
+  - urn: urn:ciso:risk:function:doc-pol:pol.threat_intel
     ref_id: POL.THREAT_INTEL
     name: Threat intelligence policy
     category: policy
@@ -1688,7 +1688,7 @@ objects:
           Actividad de actores de amenazas
 
           Mejora continua'
-  - urn: urn:intuitem:risk:function:doc-pol:pol.incident
+  - urn: urn:ciso:risk:function:doc-pol:pol.incident
     ref_id: POL.INCIDENT
     name: IS incident management policy
     category: policy
@@ -1736,7 +1736,7 @@ objects:
           Proceso de respuesta a incidentes\nAn\xE1lisis de la causa ra\xEDz y lecciones\
           \ aprendidas\nDocumentaci\xF3n y comunicaci\xF3n\nFunciones y responsabilidades\n\
           Revisi\xF3n y actualizaci\xF3n"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.maintenance
+  - urn: urn:ciso:risk:function:doc-pol:pol.maintenance
     ref_id: POL.MAINTENANCE
     name: Maintenance policy
     category: policy
@@ -1761,7 +1761,7 @@ objects:
         name: "Pol\xEDtica de mantenimiento"
         description: "Gesti\xF3n de la obsolescencia\nContratos de mantenimiento\n\
           Gesti\xF3n de cambios"
-  - urn: urn:intuitem:risk:function:doc-pol:pol.vulnerability
+  - urn: urn:ciso:risk:function:doc-pol:pol.vulnerability
     ref_id: POL.VULNERABILITY
     name: Vulnerability management policy
     category: policy
@@ -1786,7 +1786,7 @@ objects:
         name: "Pol\xEDtica de gesti\xF3n de vulnerabilidades"
         description: "Detecci\xF3n y gesti\xF3n de vulnerabilidades\nGesti\xF3n de\
           \ parches"
-  - urn: urn:intuitem:risk:function:doc-pol:train.legal
+  - urn: urn:ciso:risk:function:doc-pol:train.legal
     ref_id: TRAIN.LEGAL
     name: Legal and regulatory training
     category: process
@@ -1827,7 +1827,7 @@ objects:
           \ normativas (por ejemplo, RGPD), tratamiento de datos, riesgos del incumplimiento.\n\
           M\xE9todos: Formaci\xF3n en l\xEDnea, talleres y estudios de casos.\nEvaluaci\xF3\
           n: Cuestionarios y pruebas basadas en escenarios."
-  - urn: urn:intuitem:risk:function:doc-pol:train.threat
+  - urn: urn:ciso:risk:function:doc-pol:train.threat
     ref_id: TRAIN.THREAT
     name: Threat landscape training
     category: process
@@ -1871,7 +1871,7 @@ objects:
           \ Presentaciones, estudios de casos y debates basados en escenarios.\nResultado:\
           \ Mayor concienciaci\xF3n y preparaci\xF3n para hacer frente a amenazas\
           \ en evoluci\xF3n."
-  - urn: urn:intuitem:risk:function:doc-pol:train.iam
+  - urn: urn:ciso:risk:function:doc-pol:train.iam
     ref_id: TRAIN.IAM
     name: IAM (Identity and Access Management) training
     category: process
@@ -1923,7 +1923,7 @@ objects:
           \ (SAML, OAuth, Active Directory, etc.).\nM\xE9todos: Talleres pr\xE1cticos,\
           \ casos de uso y demostraciones.\nResultado: Mejora de las capacidades para\
           \ proteger y gestionar los accesos de forma segura y eficiente."
-  - urn: urn:intuitem:risk:function:doc-pol:train.network_security
+  - urn: urn:ciso:risk:function:doc-pol:train.network_security
     ref_id: TRAIN.NETWORK_SECURITY
     name: Network security training
     category: process
@@ -1988,7 +1988,7 @@ objects:
           \ (por ejemplo, DDoS, malware).\n  M\xE9todos: Laboratorios interactivos,\
           \ simulaciones y ejercicios pr\xE1cticos.\n  Resultado: Mejora de la capacidad\
           \ para proteger y supervisar entornos de red."
-  - urn: urn:intuitem:risk:function:doc-pol:train.mcs
+  - urn: urn:ciso:risk:function:doc-pol:train.mcs
     ref_id: TRAIN.MCS
     name: Security Condition Maintenance Training (SCM)
     category: process
@@ -2065,7 +2065,7 @@ objects:
           \ casos sobre el mantenimiento de las condiciones de seguridad.\nResultado:\
           \ Mejora de la capacidad para proteger de forma continua los entornos de\
           \ TI, mitigar riesgos y garantizar el cumplimiento."
-  - urn: urn:intuitem:risk:function:doc-pol:train.logging
+  - urn: urn:ciso:risk:function:doc-pol:train.logging
     ref_id: TRAIN.LOGGING
     name: Logging and Monitoring Training
     category: process
@@ -2138,7 +2138,7 @@ objects:
           \ an\xE1lisis de registros.\nResultado: Mejora de la capacidad para recopilar,\
           \ analizar y actuar sobre los datos de registro con el fin de prevenir y\
           \ responder a incidentes."
-  - urn: urn:intuitem:risk:function:doc-pol:train.hardening
+  - urn: urn:ciso:risk:function:doc-pol:train.hardening
     ref_id: TRAIN.HARDENING
     name: Hardening and Secure Configuration Training
     category: process
@@ -2225,7 +2225,7 @@ objects:
           \ de bastionado y soluciones.\nResultado: Los participantes adquirir\xE1\
           n la capacidad de implementar configuraciones seguras y mejorar la resiliencia\
           \ global de los sistemas."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.nac
+  - urn: urn:ciso:risk:function:doc-pol:tech.nac
     ref_id: TECH.NAC
     name: Network Access Control (802.1X)
     category: technical
@@ -2258,7 +2258,7 @@ objects:
           \ un acceso seguro a redes cableadas e inal\xE1mbricas mediante el uso de\
           \ protocolos como 802.1X y RADIUS para validar credenciales y aplicar pol\xED\
           ticas de acceso."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.access_log
+  - urn: urn:ciso:risk:function:doc-pol:tech.access_log
     ref_id: TECH.ACCESS_LOG
     name: Access Logging
     category: technical
@@ -2273,7 +2273,7 @@ objects:
         name: Access Logging
       es:
         name: Registro de accesos
-  - urn: urn:intuitem:risk:function:doc-pol:tech.edr
+  - urn: urn:ciso:risk:function:doc-pol:tech.edr
     ref_id: TECH.EDR
     name: Event Detection and Response (EDR) Capacity
     category: technical
@@ -2288,7 +2288,7 @@ objects:
         name: "Event-Detection- und Response-Kapazit\xE4t (EDR)"
       es:
         name: "Detecci\xF3n y respuesta de eventos (EDR)"
-  - urn: urn:intuitem:risk:function:doc-pol:tech.password_manager
+  - urn: urn:ciso:risk:function:doc-pol:tech.password_manager
     ref_id: TECH.PASSWORD_MANAGER
     name: Password Management Capacity
     category: technical
@@ -2320,7 +2320,7 @@ objects:
           \ y cuentas. Reduce el riesgo de accesos no autorizados mediante la aplicaci\xF3\
           n de pol\xEDticas de contrase\xF1as robustas y garantizando un tratamiento\
           \ seguro de las credenciales."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.uem
+  - urn: urn:ciso:risk:function:doc-pol:tech.uem
     ref_id: TECH.UEM
     name: Unified Endpoint Management Capacity
     category: technical
@@ -2354,7 +2354,7 @@ objects:
           \ plataforma. Garantiza una configuraci\xF3n segura, la aplicaci\xF3n de\
           \ pol\xEDticas, la gesti\xF3n de aplicaciones y la monitorizaci\xF3n en\
           \ todo el ecosistema de endpoints de la organizaci\xF3n."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.endpoint_protection
+  - urn: urn:ciso:risk:function:doc-pol:tech.endpoint_protection
     ref_id: TECH.ENDPOINT_PROTECTION
     name: Host antivirus, firewall and USB control
     category: technical
@@ -2375,7 +2375,7 @@ objects:
         name: Antivirus de host, cortafuegos y control de USB
         description: "Soluciones integradas para la protecci\xF3n de los endpoints,\
           \ que incluyen antivirus, cortafuegos y control de puertos USB."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.disk_encryption
+  - urn: urn:ciso:risk:function:doc-pol:tech.disk_encryption
     ref_id: TECH.DISK_ENCRYPTION
     name: Disk Encryption Capacity
     category: technical
@@ -2392,7 +2392,7 @@ objects:
       es:
         name: Cifrado de discos
         description: Cifrado completo de disco para puestos de trabajo.
-  - urn: urn:intuitem:risk:function:doc-pol:tech.immutable_backup
+  - urn: urn:ciso:risk:function:doc-pol:tech.immutable_backup
     ref_id: TECH.IMMUTABLE_BACKUP
     name: Immutable backup capacity
     category: technical
@@ -2417,7 +2417,7 @@ objects:
         description: Capacidad que garantiza que las copias de seguridad no puedan
           ser modificadas, eliminadas ni sobrescritas, protegiendo la integridad de
           los datos frente a ransomware y accesos no autorizados.
-  - urn: urn:intuitem:risk:function:doc-pol:tech.file_encryption
+  - urn: urn:ciso:risk:function:doc-pol:tech.file_encryption
     ref_id: TECH.FILE_ENCRYPTION
     name: File encryption capacity
     category: technical
@@ -2434,7 +2434,7 @@ objects:
       es:
         name: Cifrado de archivos
         description: Utilidades de cifrado de archivos como 7zip.
-  - urn: urn:intuitem:risk:function:doc-pol:tech.cmdb
+  - urn: urn:ciso:risk:function:doc-pol:tech.cmdb
     ref_id: TECH.CMDB
     name: Configuration Management DataBase (CMDB)
     category: technical
@@ -2458,7 +2458,7 @@ objects:
         description: "Repositorio centralizado que almacena y gestiona informaci\xF3\
           n sobre los activos de TI, sus configuraciones y sus relaciones, para apoyar\
           \ una gesti\xF3n eficaz de los sistemas de informaci\xF3n."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.siem
+  - urn: urn:ciso:risk:function:doc-pol:tech.siem
     ref_id: TECH.SIEM
     name: Security Information and Event Management (SIEM)
     category: technical
@@ -2481,7 +2481,7 @@ objects:
         name: "Gesti\xF3n de informaci\xF3n y eventos de seguridad (SIEM)"
         description: "Sistema que recopila, analiza y correlaciona datos de seguridad\
           \ procedentes de m\xFAltiples fuentes para detectar y responder a amenazas."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.screen_filter
+  - urn: urn:ciso:risk:function:doc-pol:tech.screen_filter
     ref_id: TECH.SCREEN_FILTER
     name: Screen Filter
     category: technical
@@ -2505,7 +2505,7 @@ objects:
         description: "Filtro f\xEDsico o digital que limita la visibilidad de la pantalla\
           \ a usuarios autorizados, reduciendo el riesgo de brechas de seguridad por\
           \ observaci\xF3n visual."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.network_firewall
+  - urn: urn:ciso:risk:function:doc-pol:tech.network_firewall
     ref_id: TECH.NETWORK_FIREWALL
     name: Network Firewall
     category: technical
@@ -2526,7 +2526,7 @@ objects:
         name: Cortafuegos de red
         description: "Sistema de seguridad que supervisa y controla el tr\xE1fico\
           \ de red entrante y saliente en funci\xF3n de reglas predefinidas."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.mail_gateway
+  - urn: urn:ciso:risk:function:doc-pol:tech.mail_gateway
     ref_id: TECH.MAIL_GATEWAY
     name: Secure Mail Gateway
     category: technical
@@ -2548,7 +2548,7 @@ objects:
         name: Pasarela de correo seguro
         description: "Sistema que filtra, supervisa y protege las comunicaciones de\
           \ correo electr\xF3nico frente a spam, malware y accesos no autorizados."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.network_antivirus
+  - urn: urn:ciso:risk:function:doc-pol:tech.network_antivirus
     ref_id: TECH.NETWORK_ANTIVIRUS
     name: Network Antivirus
     category: technical
@@ -2567,7 +2567,7 @@ objects:
         name: Antivirus de red
         description: "Protege el tr\xE1fico de correo electr\xF3nico y web en el per\xED\
           metro de red frente a malware."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.vlan
+  - urn: urn:ciso:risk:function:doc-pol:tech.vlan
     ref_id: TECH.VLAN
     name: VLAN
     category: technical
@@ -2588,7 +2588,7 @@ objects:
         name: VLAN
         description: "Las VLAN a\xEDslan y segmentan el tr\xE1fico de red para reforzar\
           \ la seguridad y optimizar el rendimiento."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.microsegmentation
+  - urn: urn:ciso:risk:function:doc-pol:tech.microsegmentation
     ref_id: TECH.MICROSEGMENTATION
     name: Microsegmentation
     category: technical
@@ -2616,7 +2616,7 @@ objects:
           \ pol\xEDticas granulares y contextuales para aislar cargas de trabajo o\
           \ aplicaciones individuales dentro de una red, limitando el movimiento lateral\
           \ y conteniendo las brechas de seguridad."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.wifi_sec
+  - urn: urn:ciso:risk:function:doc-pol:tech.wifi_sec
     ref_id: TECH.WIFI_SEC
     name: Wi-Fi Security
     category: technical
@@ -2648,7 +2648,7 @@ objects:
           \ seguras mediante cifrado WPA3 Enterprise, autenticaci\xF3n robusta y mecanismos\
           \ avanzados de control de acceso. Aunque WPA2 Enterprise sigue siendo aceptable,\
           \ se recomienda encarecidamente la transici\xF3n a WPA3 para una mayor seguridad."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.reverse_proxy
+  - urn: urn:ciso:risk:function:doc-pol:tech.reverse_proxy
     ref_id: TECH.REVERSE_PROXY
     name: Reverse Proxy
     category: technical
@@ -2671,7 +2671,7 @@ objects:
         description: "Un proxy inverso reenv\xEDa las solicitudes de los clientes\
           \ a los servidores backend, mejorando la seguridad, el equilibrio de carga\
           \ y el rendimiento."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.waf
+  - urn: urn:ciso:risk:function:doc-pol:tech.waf
     ref_id: TECH.WAF
     name: Web Application Firewall (WAF)
     category: technical
@@ -2695,7 +2695,7 @@ objects:
         description: "Un cortafuegos de aplicaciones web (WAF) protege las aplicaciones\
           \ web filtrando y supervisando el tr\xE1fico HTTP para bloquear actividades\
           \ maliciosas."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.ids
+  - urn: urn:ciso:risk:function:doc-pol:tech.ids
     ref_id: TECH.IDS
     name: Intrusion Detection System (IDS)
     category: technical
@@ -2719,7 +2719,7 @@ objects:
         description: "Un sistema de detecci\xF3n de intrusiones (IDS) supervisa el\
           \ tr\xE1fico de red para detectar y alertar sobre posibles amenazas de seguridad\
           \ o actividades no autorizadas."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.web_proxy
+  - urn: urn:ciso:risk:function:doc-pol:tech.web_proxy
     ref_id: TECH.WEB_PROXY
     name: Web Proxy
     category: technical
@@ -2743,7 +2743,7 @@ objects:
         description: "Un proxy web filtra y supervisa el tr\xE1fico web, aplica pol\xED\
           ticas de seguridad y permite la autenticaci\xF3n de usuarios para controlar\
           \ y proteger el acceso a Internet."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.vpn
+  - urn: urn:ciso:risk:function:doc-pol:tech.vpn
     ref_id: TECH.VPN
     name: VPN
     category: technical
@@ -2771,7 +2771,7 @@ objects:
         description: "Una red privada virtual (VPN) protege la transmisi\xF3n de datos\
           \ mediante el cifrado del tr\xE1fico utilizando protocolos como IPsec, garantizando\
           \ la confidencialidad y la protecci\xF3n frente a interceptaciones."
-  - urn: urn:intuitem:risk:function:doc-pol:tech.mfa
+  - urn: urn:ciso:risk:function:doc-pol:tech.mfa
     ref_id: TECH.MFA
     name: Multi-Factor Authentication (MFA)
     category: technical

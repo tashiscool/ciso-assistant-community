@@ -1,11 +1,60 @@
-Source code in this repository is variously licensed under the GNU Affero General Public License (AGPL), or the [intuitem Commercial License](enterprise/LICENSE.md).
+# License
 
-- All the files within the top-level "enterprise" directory are released under the intuitem Commercial Software License.
+CISO Assistant is released under the **MIT License**.
 
-- All the files outside the top-level "enterprise" directory are released under the [AGPLv3](https://choosealicense.com/licenses/agpl-3.0/).
+## MIT License
 
-Binary files are generated for each edition for CISO Assistant:
-- Binaries located at ghcr.io/intuitem/ciso-assistant-community/ are released under the AGPLv3.
-- Binaries located directly under the ghcr.io/intuitem/ namespace are released under the intuitem Commercial Software License.
+```
+MIT License
 
-intuitem Commercial Software License requires a valid contract between the licensee and intuitem.
+Copyright (c) 2026 Tash
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+## What This Means
+
+You can:
+- **Use commercially** - Use the software for commercial purposes
+- **Modify freely** - Change the source code as needed
+- **Distribute copies** - Share the software with others
+- **Use privately** - Use for private/internal purposes
+- **Sublicense** - Grant rights to others
+
+You must:
+- **Include license** - Include the copyright notice and license in copies
+
+## Summary
+
+| Permission | Granted |
+|------------|---------|
+| Commercial use | ✅ |
+| Modification | ✅ |
+| Distribution | ✅ |
+| Private use | ✅ |
+| Sublicensing | ✅ |
+
+| Condition | Required |
+|-----------|----------|
+| License notice | ✅ |
+
+| Limitation | Note |
+|------------|------|
+| Liability | No warranty provided |
+| Warranty | Software provided "as is" |

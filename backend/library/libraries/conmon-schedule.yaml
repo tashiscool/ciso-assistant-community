@@ -1,4 +1,4 @@
-urn: urn:intuitem:risk:library:conmon-schedule
+urn: urn:ciso:risk:library:conmon-schedule
 locale: en
 ref_id: CONMON-SCHEDULE
 name: Continuous Monitoring Operations Schedule
@@ -7,14 +7,14 @@ description: >
   security activities by frequency. This schedule can be used standalone or mapped
   to any compliance framework (FedRAMP, ISO 27001, SOC 2, CMMC, NIST CSF, etc.).
   Activities are organized by frequency from continuous/daily through multi-year cycles.
-copyright: intuitem
+copyright: ciso
 version: 1
 publication_date: 2025-01-23
-provider: intuitem
-packager: intuitem
+provider: ciso
+packager: ciso-assistant
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:conmon-schedule
+    urn: urn:ciso:risk:framework:conmon-schedule
     ref_id: CONMON-SCHEDULE
     name: Continuous Monitoring Operations Schedule
     description: >
@@ -35,7 +35,7 @@ objects:
     # ============================================================
     # CONTINUOUS (DAILY/ONGOING)
     # ============================================================
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+    - urn: urn:ciso:risk:req_node:conmon-schedule:continuous
       assessable: false
       depth: 1
       ref_id: CONT
@@ -44,10 +44,10 @@ objects:
         Always-on continuous monitoring activities that must be operational daily
         or on an ongoing basis. These form the foundation of any security monitoring program.
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:cont-siem-monitoring
+    - urn: urn:ciso:risk:req_node:conmon-schedule:cont-siem-monitoring
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:continuous
       ref_id: CONT-01
       name: Security Information and Event Monitoring (SIEM)
       description: >
@@ -63,10 +63,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:cont-audit-collection
+    - urn: urn:ciso:risk:req_node:conmon-schedule:cont-audit-collection
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:continuous
       ref_id: CONT-02
       name: Audit Event Collection
       description: >
@@ -81,10 +81,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:cont-asset-discovery
+    - urn: urn:ciso:risk:req_node:conmon-schedule:cont-asset-discovery
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:continuous
       ref_id: CONT-03
       name: Automated Asset Discovery
       description: >
@@ -98,10 +98,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:cont-incident-tracking
+    - urn: urn:ciso:risk:req_node:conmon-schedule:cont-incident-tracking
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:continuous
       ref_id: CONT-04
       name: Incident Reporting and Tracking
       description: >
@@ -116,10 +116,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:cont-environmental-monitoring
+    - urn: urn:ciso:risk:req_node:conmon-schedule:cont-environmental-monitoring
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:continuous
       ref_id: CONT-05
       name: Environmental Monitoring
       description: >
@@ -133,10 +133,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:cont-vuln-signatures
+    - urn: urn:ciso:risk:req_node:conmon-schedule:cont-vuln-signatures
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:continuous
       ref_id: CONT-06
       name: Vulnerability Scanner Signature Updates
       description: >
@@ -151,10 +151,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:cont-ids-monitoring
+    - urn: urn:ciso:risk:req_node:conmon-schedule:cont-ids-monitoring
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:continuous
       ref_id: CONT-07
       name: Intrusion Detection/Prevention Monitoring
       description: >
@@ -168,10 +168,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:cont-container-security
+    - urn: urn:ciso:risk:req_node:conmon-schedule:cont-container-security
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:continuous
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:continuous
       ref_id: CONT-08
       name: Container/Image Security Scanning
       description: >
@@ -187,17 +187,17 @@ objects:
     # ============================================================
     # WEEKLY
     # ============================================================
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:weekly
+    - urn: urn:ciso:risk:req_node:conmon-schedule:weekly
       assessable: false
       depth: 1
       ref_id: WEEKLY
       name: Weekly Activities
       description: Activities that must be completed on a weekly basis.
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:weekly-audit-review
+    - urn: urn:ciso:risk:req_node:conmon-schedule:weekly-audit-review
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:weekly
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:weekly
       ref_id: WEEKLY-01
       name: Audit Record Review and Analysis
       description: >
@@ -211,10 +211,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:weekly-backup-verification
+    - urn: urn:ciso:risk:req_node:conmon-schedule:weekly-backup-verification
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:weekly
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:weekly
       ref_id: WEEKLY-02
       name: Backup Status Verification
       description: >
@@ -231,7 +231,7 @@ objects:
     # ============================================================
     # MONTHLY
     # ============================================================
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly
+    - urn: urn:ciso:risk:req_node:conmon-schedule:monthly
       assessable: false
       depth: 1
       ref_id: MONTHLY
@@ -241,18 +241,18 @@ objects:
         scanning, reporting, and remediation tracking.
 
     # -- Reporting --
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-reporting
+    - urn: urn:ciso:risk:req_node:conmon-schedule:monthly-reporting
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:monthly
       ref_id: MONTHLY-RPT
       name: Monthly Reporting
       description: Monthly reporting and status activities.
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-poam-update
+    - urn: urn:ciso:risk:req_node:conmon-schedule:monthly-poam-update
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-reporting
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-reporting
       ref_id: MONTHLY-RPT-01
       name: Plan of Action and Milestones (POA&M) Update
       description: >
@@ -266,10 +266,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-inventory-update
+    - urn: urn:ciso:risk:req_node:conmon-schedule:monthly-inventory-update
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-reporting
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-reporting
       ref_id: MONTHLY-RPT-02
       name: Asset Inventory Update
       description: >
@@ -284,10 +284,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-security-status
+    - urn: urn:ciso:risk:req_node:conmon-schedule:monthly-security-status
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-reporting
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-reporting
       ref_id: MONTHLY-RPT-03
       name: Security Status Report
       description: >
@@ -302,18 +302,18 @@ objects:
       - ENHANCED
 
     # -- Vulnerability Scanning --
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-scanning
+    - urn: urn:ciso:risk:req_node:conmon-schedule:monthly-vuln-scanning
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:monthly
       ref_id: MONTHLY-SCAN
       name: Vulnerability Scanning and Remediation
       description: Monthly vulnerability scanning and remediation activities.
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-os-scans
+    - urn: urn:ciso:risk:req_node:conmon-schedule:monthly-os-scans
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-scanning
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-vuln-scanning
       ref_id: MONTHLY-SCAN-01
       name: OS/Infrastructure Vulnerability Scans
       description: >
@@ -328,10 +328,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-webapp-scans
+    - urn: urn:ciso:risk:req_node:conmon-schedule:monthly-webapp-scans
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-scanning
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-vuln-scanning
       ref_id: MONTHLY-SCAN-02
       name: Web Application Vulnerability Scans
       description: >
@@ -345,10 +345,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-db-scans
+    - urn: urn:ciso:risk:req_node:conmon-schedule:monthly-db-scans
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-scanning
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-vuln-scanning
       ref_id: MONTHLY-SCAN-03
       name: Database Vulnerability Scans
       description: >
@@ -362,10 +362,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-remediation
+    - urn: urn:ciso:risk:req_node:conmon-schedule:monthly-vuln-remediation
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-scanning
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-vuln-scanning
       ref_id: MONTHLY-SCAN-04
       name: Vulnerability Remediation Tracking
       description: >
@@ -381,10 +381,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-patch-management
+    - urn: urn:ciso:risk:req_node:conmon-schedule:monthly-patch-management
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-scanning
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-vuln-scanning
       ref_id: MONTHLY-SCAN-05
       name: Security Patch Application
       description: >
@@ -399,10 +399,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-integrity-scans
+    - urn: urn:ciso:risk:req_node:conmon-schedule:monthly-integrity-scans
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-scanning
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-vuln-scanning
       ref_id: MONTHLY-SCAN-06
       name: File Integrity Monitoring Review
       description: >
@@ -417,18 +417,18 @@ objects:
       - ENHANCED
 
     # -- Access and Configuration --
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-access-config
+    - urn: urn:ciso:risk:req_node:conmon-schedule:monthly-access-config
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:monthly
       ref_id: MONTHLY-ACC
       name: Access and Configuration Management
       description: Monthly access control and configuration management activities.
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-temp-accounts
+    - urn: urn:ciso:risk:req_node:conmon-schedule:monthly-temp-accounts
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-access-config
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-access-config
       ref_id: MONTHLY-ACC-01
       name: Temporary/Emergency Account Review
       description: >
@@ -442,10 +442,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-least-functionality
+    - urn: urn:ciso:risk:req_node:conmon-schedule:monthly-least-functionality
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-access-config
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-access-config
       ref_id: MONTHLY-ACC-02
       name: Least Functionality Review
       description: >
@@ -459,10 +459,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-physical-logs
+    - urn: urn:ciso:risk:req_node:conmon-schedule:monthly-physical-logs
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-access-config
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-access-config
       ref_id: MONTHLY-ACC-03
       name: Physical Access Log Review
       description: >
@@ -479,17 +479,17 @@ objects:
     # ============================================================
     # QUARTERLY (90 DAYS)
     # ============================================================
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly
+    - urn: urn:ciso:risk:req_node:conmon-schedule:quarterly
       assessable: false
       depth: 1
       ref_id: QUARTERLY
       name: Quarterly (90 Days) Activities
       description: Activities that must be completed on a quarterly basis.
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly-inactive-accounts
+    - urn: urn:ciso:risk:req_node:conmon-schedule:quarterly-inactive-accounts
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:quarterly
       ref_id: QUARTERLY-01
       name: Inactive Account Review and Disable
       description: >
@@ -503,10 +503,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly-public-content
+    - urn: urn:ciso:risk:req_node:conmon-schedule:quarterly-public-content
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:quarterly
       ref_id: QUARTERLY-02
       name: Publicly Accessible Content Review
       description: >
@@ -520,10 +520,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly-privileged-access
+    - urn: urn:ciso:risk:req_node:conmon-schedule:quarterly-privileged-access
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:quarterly
       ref_id: QUARTERLY-03
       name: Privileged Access Review
       description: >
@@ -537,10 +537,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly-authenticator-refresh
+    - urn: urn:ciso:risk:req_node:conmon-schedule:quarterly-authenticator-refresh
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:quarterly
       ref_id: QUARTERLY-04
       name: Authenticator/Password Rotation
       description: >
@@ -558,7 +558,7 @@ objects:
     # ============================================================
     # ANNUAL
     # ============================================================
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual
       assessable: false
       depth: 1
       ref_id: ANNUAL
@@ -568,18 +568,18 @@ objects:
         testing, and comprehensive assessments.
 
     # -- Policy Reviews --
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-policy
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-policy
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual
       ref_id: ANNUAL-POL
       name: Policy and Procedure Reviews
       description: Annual review and update of security policies and procedures.
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-policy-review
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-policy-review
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-policy
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-policy
       ref_id: ANNUAL-POL-01
       name: Security Policy Review and Update
       description: >
@@ -594,10 +594,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-procedure-review
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-procedure-review
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-policy
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-policy
       ref_id: ANNUAL-POL-02
       name: Security Procedure Review and Update
       description: >
@@ -612,10 +612,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-architecture-review
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-architecture-review
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-policy
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-policy
       ref_id: ANNUAL-POL-03
       name: Security Architecture Review
       description: >
@@ -629,10 +629,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-isa-review
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-isa-review
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-policy
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-policy
       ref_id: ANNUAL-POL-04
       name: Interconnection Agreements Review
       description: >
@@ -647,18 +647,18 @@ objects:
       - ENHANCED
 
     # -- Training --
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-training
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-training
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual
       ref_id: ANNUAL-TRN
       name: Security Training
       description: Annual security awareness and role-based training activities.
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-awareness-training
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-awareness-training
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-training
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-training
       ref_id: ANNUAL-TRN-01
       name: Security Awareness Training
       description: >
@@ -673,10 +673,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-role-training
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-role-training
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-training
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-training
       ref_id: ANNUAL-TRN-02
       name: Role-Based Security Training
       description: >
@@ -690,10 +690,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-incident-training
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-incident-training
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-training
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-training
       ref_id: ANNUAL-TRN-03
       name: Incident Response Training
       description: >
@@ -707,10 +707,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-contingency-training
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-contingency-training
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-training
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-training
       ref_id: ANNUAL-TRN-04
       name: Contingency/Disaster Recovery Training
       description: >
@@ -725,18 +725,18 @@ objects:
       - ENHANCED
 
     # -- Plans and Testing --
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-plans
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-plans
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual
       ref_id: ANNUAL-PLN
       name: Plans Review and Testing
       description: Annual review of security plans and execution of tests.
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-ssp-review
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-ssp-review
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-plans
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-plans
       ref_id: ANNUAL-PLN-01
       name: System Security Plan Review
       description: >
@@ -750,10 +750,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-cp-review
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-cp-review
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-plans
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-plans
       ref_id: ANNUAL-PLN-02
       name: Contingency Plan Review and Test
       description: >
@@ -767,10 +767,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-ir-review
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-ir-review
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-plans
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-plans
       ref_id: ANNUAL-PLN-03
       name: Incident Response Plan Review and Test
       description: >
@@ -784,10 +784,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-backup-test
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-backup-test
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-plans
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-plans
       ref_id: ANNUAL-PLN-04
       name: Backup Restoration Test
       description: >
@@ -802,10 +802,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-baseline-review
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-baseline-review
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-plans
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-plans
       ref_id: ANNUAL-PLN-05
       name: Configuration Baseline Review
       description: >
@@ -820,18 +820,18 @@ objects:
       - ENHANCED
 
     # -- Access Governance --
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-access
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-access
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual
       ref_id: ANNUAL-ACC
       name: Access Governance
       description: Annual access governance and recertification activities.
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-account-recert
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-account-recert
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-access
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-access
       ref_id: ANNUAL-ACC-01
       name: User Account Recertification
       description: >
@@ -846,10 +846,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-physical-access
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-physical-access
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-access
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-access
       ref_id: ANNUAL-ACC-02
       name: Physical Access Recertification
       description: >
@@ -864,18 +864,18 @@ objects:
       - ENHANCED
 
     # -- Asset Lifecycle --
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-assets
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-assets
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual
       ref_id: ANNUAL-AST
       name: Asset and Software Lifecycle
       description: Annual software and asset lifecycle management activities.
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-software-review
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-software-review
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-assets
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-assets
       ref_id: ANNUAL-AST-01
       name: Authorized Software Review
       description: >
@@ -889,10 +889,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-eol-review
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-eol-review
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-assets
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-assets
       ref_id: ANNUAL-AST-02
       name: End-of-Life Software Review
       description: >
@@ -907,18 +907,18 @@ objects:
       - ENHANCED
 
     # -- Assessments --
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-assessment
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-assessment
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual
       ref_id: ANNUAL-ASM
       name: Security Assessments
       description: Annual security assessment activities.
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-control-assessment
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-control-assessment
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-assessment
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-assessment
       ref_id: ANNUAL-ASM-01
       name: Security Control Assessment
       description: >
@@ -932,10 +932,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-pentest
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-pentest
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-assessment
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-assessment
       ref_id: ANNUAL-ASM-02
       name: Penetration Testing
       description: >
@@ -948,10 +948,10 @@ objects:
       implementation_groups:
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:annual-privacy-assessment
+    - urn: urn:ciso:risk:req_node:conmon-schedule:annual-privacy-assessment
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-assessment
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:annual-assessment
       ref_id: ANNUAL-ASM-03
       name: Privacy Impact Assessment
       description: >
@@ -968,17 +968,17 @@ objects:
     # ============================================================
     # MULTI-YEAR
     # ============================================================
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:multi-year
+    - urn: urn:ciso:risk:req_node:conmon-schedule:multi-year
       assessable: false
       depth: 1
       ref_id: MULTI-YEAR
       name: Multi-Year Activities
       description: Activities with cycles longer than one year.
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:biennial-identifier-reuse
+    - urn: urn:ciso:risk:req_node:conmon-schedule:biennial-identifier-reuse
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:multi-year
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:multi-year
       ref_id: MULTI-YEAR-01
       name: Identifier Reuse Prevention (2 Years)
       description: >
@@ -992,10 +992,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:triennial-risk-assessment
+    - urn: urn:ciso:risk:req_node:conmon-schedule:triennial-risk-assessment
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:multi-year
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:multi-year
       ref_id: MULTI-YEAR-02
       name: Comprehensive Risk Assessment (3 Years)
       description: >
@@ -1009,10 +1009,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:triennial-position-review
+    - urn: urn:ciso:risk:req_node:conmon-schedule:triennial-position-review
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:multi-year
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:multi-year
       ref_id: MULTI-YEAR-03
       name: Position Categorization Review (3 Years)
       description: >
@@ -1025,10 +1025,10 @@ objects:
       implementation_groups:
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:quinquennial-screening
+    - urn: urn:ciso:risk:req_node:conmon-schedule:quinquennial-screening
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:multi-year
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:multi-year
       ref_id: MULTI-YEAR-04
       name: Personnel Rescreening (5 Years)
       description: >
@@ -1044,7 +1044,7 @@ objects:
     # ============================================================
     # EVENT-DRIVEN
     # ============================================================
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:event-driven
+    - urn: urn:ciso:risk:req_node:conmon-schedule:event-driven
       assessable: false
       depth: 1
       ref_id: EVENT
@@ -1052,18 +1052,18 @@ objects:
       description: Activities triggered by specific events or changes.
 
     # -- Significant Change --
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:event-change
+    - urn: urn:ciso:risk:req_node:conmon-schedule:event-change
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:event-driven
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:event-driven
       ref_id: EVENT-CHG
       name: Significant Change Management
       description: Activities triggered by significant changes to the system.
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:event-impact-analysis
+    - urn: urn:ciso:risk:req_node:conmon-schedule:event-impact-analysis
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:event-change
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:event-change
       ref_id: EVENT-CHG-01
       name: Security Impact Analysis
       description: >
@@ -1078,10 +1078,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:event-change-testing
+    - urn: urn:ciso:risk:req_node:conmon-schedule:event-change-testing
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:event-change
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:event-change
       ref_id: EVENT-CHG-02
       name: Post-Change Security Testing
       description: >
@@ -1096,18 +1096,18 @@ objects:
       - ENHANCED
 
     # -- Incident Response --
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:event-incident
+    - urn: urn:ciso:risk:req_node:conmon-schedule:event-incident
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:event-driven
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:event-driven
       ref_id: EVENT-IR
       name: Incident Response Activities
       description: Activities triggered by security incidents.
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:event-incident-notification
+    - urn: urn:ciso:risk:req_node:conmon-schedule:event-incident-notification
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:event-incident
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:event-incident
       ref_id: EVENT-IR-01
       name: Incident Notification
       description: >
@@ -1122,10 +1122,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:event-incident-tracking
+    - urn: urn:ciso:risk:req_node:conmon-schedule:event-incident-tracking
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:event-incident
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:event-incident
       ref_id: EVENT-IR-02
       name: Incident Status Updates
       description: >
@@ -1140,10 +1140,10 @@ objects:
       - STANDARD
       - ENHANCED
 
-    - urn: urn:intuitem:risk:req_node:conmon-schedule:event-lessons-learned
+    - urn: urn:ciso:risk:req_node:conmon-schedule:event-lessons-learned
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:conmon-schedule:event-incident
+      parent_urn: urn:ciso:risk:req_node:conmon-schedule:event-incident
       ref_id: EVENT-IR-03
       name: Incident Lessons Learned
       description: >

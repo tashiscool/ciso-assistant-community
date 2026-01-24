@@ -15,7 +15,7 @@ prepare_meta_file() {
 
 # Check if the database already exists
 echo "building CISO Asisstant Enterprise version..."
-echo "this version is governed by intuitem's commercial license"
+echo "this version is governed by tashiscool's commercial license"
 
 if [ -f db/ciso-assistant.sqlite3 ]; then
     echo "The database seems already created."

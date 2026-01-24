@@ -1,6 +1,6 @@
 convert_library_version: 'v2 ; Compat Mode: [0] {[v2.1] (DEFAULT) Don''t use any Compatibility
   Mode}'
-urn: urn:intuitem:risk:library:iso27001-2022
+urn: urn:ciso:risk:library:iso27001-2022
 locale: en
 ref_id: ISO/IEC 27001:2022
 name: International standard ISO/IEC 27001:2022
@@ -11,7 +11,7 @@ copyright: This is the outline of the ISO27001-2022 standard. You can purchase t
 version: 17
 publication_date: 2026-01-10
 provider: ISO/IEC
-packager: intuitem
+packager: ciso-assistant
 translations:
   fr:
     name: Norme internationale ISO/IEC 27001:2022
@@ -55,10 +55,10 @@ translations:
       \u53EF\u4EE5\u4ECE https://www.iso.org/standard/27001 \u8D2D\u4E70\u5168\u6807\
       \u51C6\u7248"
 dependencies:
-- urn:intuitem:risk:library:doc-pol
+- urn:ciso:risk:library:doc-pol
 objects:
   reference_controls:
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.1
+  - urn: urn:ciso:risk:function:doc-pol:a.5.1
     ref_id: A.5.1
     name: Policies for information security
     category: policy
@@ -106,7 +106,7 @@ objects:
           \u7B56\u3002\u63AA\u65BD\u5305\u62EC\u754C\u5B9A\u8303\u56F4\u3001\u8BBE\
           \u5B9A\u76EE\u6807\uFF0C\u5E76\u786E\u4FDD\u7B26\u5408\u5408\u89C4\u8981\
           \u6C42\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.2
+  - urn: urn:ciso:risk:function:doc-pol:a.5.2
     ref_id: A.5.2
     name: Information security roles and responsibilities
     category: process
@@ -155,7 +155,7 @@ objects:
           \u4FDD\u95EE\u8D23\u5236\u3002\u63AA\u65BD\u5305\u62EC\u660E\u786E\u8D23\
           \u4EFB\u8BB0\u5F55\u3001\u5B9A\u671F\u5BA1\u67E5\u548C\u6267\u6CD5\u673A\
           \u5236\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.3
+  - urn: urn:ciso:risk:function:doc-pol:a.5.3
     ref_id: A.5.3
     name: Segregation of duties
     category: process
@@ -201,7 +201,7 @@ objects:
           \u6388\u6743\u8BBF\u95EE\u7684\u98CE\u9669\u3002\u63AA\u65BD\u5305\u62EC\
           \u89D2\u8272\u5206\u79BB\u3001\u8BBF\u95EE\u9650\u5236\u548C\u5B9A\u671F\
           \u5BA1\u8BA1\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.4
+  - urn: urn:ciso:risk:function:doc-pol:a.5.4
     ref_id: A.5.4
     name: Management responsibilities
     category: process
@@ -247,7 +247,7 @@ objects:
           \u7684\u7BA1\u7406\u804C\u8D23\u88AB\u660E\u786E\u5B9A\u4E49\u5E76\u5F97\
           \u4EE5\u5B9E\u65BD\u3002\u63AA\u65BD\u5305\u62EC\u8BBE\u5B9A\u76EE\u6807\
           \u3001\u5206\u914D\u8D44\u6E90\u548C\u76D1\u7763\u5408\u89C4\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.5
+  - urn: urn:ciso:risk:function:doc-pol:a.5.5
     ref_id: A.5.5
     name: Contact with authorities
     category: process
@@ -295,7 +295,7 @@ objects:
           \u6C9F\u901A\u3002\u63AA\u65BD\u5305\u62EC\u5EFA\u7ACB\u8054\u7CFB\u534F\
           \u8BAE\u3001\u7EF4\u62A4\u8054\u7CFB\u4EBA\u540D\u5355\u66F4\u65B0\u4EE5\
           \u53CA\u5206\u914D\u804C\u8D23\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.6
+  - urn: urn:ciso:risk:function:doc-pol:a.5.6
     ref_id: A.5.6
     name: Contact with special interest groups
     category: process
@@ -339,7 +339,7 @@ objects:
           \u5B9E\u8DF5\u7684\u4E86\u89E3\u3002\u63AA\u65BD\u5305\u62EC\u53C2\u4E0E\
           \u8BBA\u575B\u3001\u4F1A\u5458\u8D44\u683C\u548C\u534F\u4F5C\u9879\u76EE\
           \u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.7
+  - urn: urn:ciso:risk:function:doc-pol:a.5.7
     ref_id: A.5.7
     name: Threat intelligence
     category: process
@@ -386,7 +386,7 @@ objects:
           \u89E3\u5B89\u5168\u98CE\u9669\u3002\u63AA\u65BD\u5305\u62EC\u76D1\u63A7\
           \u5A01\u80C1\u4FE1\u606F\u6D41\u3001\u5206\u6790\u8D8B\u52BF\u4EE5\u53CA\
           \u5206\u4EAB\u53EF\u4F5C\u7684\u89C1\u89E3\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.8
+  - urn: urn:ciso:risk:function:doc-pol:a.5.8
     ref_id: A.5.8
     name: Information security in project management
     category: process
@@ -431,7 +431,7 @@ objects:
           \u62EC\u98CE\u9669\u8BC4\u4F30\u3001\u5408\u89C4\u5BA1\u67E5\u4EE5\u53CA\
           \u9879\u76EE\u751F\u547D\u5468\u671F\u5185\u7684\u5B89\u5168\u68C0\u67E5\
           \u70B9\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.9
+  - urn: urn:ciso:risk:function:doc-pol:a.5.9
     ref_id: A.5.9
     name: Inventory of information and other associated assets
     category: process
@@ -474,7 +474,7 @@ objects:
           \u76F8\u5173\u8D44\u4EA7\u7684\u51C6\u786E\u76D8\u70B9\u3002\u63AA\u65BD\
           \u5305\u62EC\u8D44\u4EA7\u8DDF\u8E2A\u3001\u5B9A\u671F\u5BA1\u8BA1\u4EE5\
           \u53CA\u6309\u654F\u611F\u5EA6\u5206\u7C7B\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.10
+  - urn: urn:ciso:risk:function:doc-pol:a.5.10
     ref_id: A.5.10
     name: Acceptable use of information and other associated assets
     category: process
@@ -524,7 +524,7 @@ objects:
           \u786E\u4FDD\u6B63\u786E\u5904\u7406\u3002\u63AA\u65BD\u5305\u62EC\u6709\
           \u6587\u6863\u5316\u7684\u653F\u7B56\u3001\u7528\u6237\u57F9\u8BAD\u548C\
           \u6267\u884C\u673A\u5236\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.11
+  - urn: urn:ciso:risk:function:doc-pol:a.5.11
     ref_id: A.5.11
     name: Return of assets
     category: process
@@ -569,7 +569,7 @@ objects:
           \uFF0C\u8D44\u4EA7\u80FD\u591F\u5B89\u5168\u56DE\u6536\u3002\u63AA\u65BD\
           \u5305\u62EC\u6E05\u5355\u3001\u8D44\u4EA7\u8DDF\u8E2A\u548C\u9000\u5F79\
           \u534F\u8BAE\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.12
+  - urn: urn:ciso:risk:function:doc-pol:a.5.12
     ref_id: A.5.12
     name: Classification of information
     category: process
@@ -616,7 +616,7 @@ objects:
           \u4EE5\u786E\u4FDD\u9002\u5F53\u7684\u4FDD\u62A4\u3002\u63AA\u65BD\u5305\
           \u62EC\u5206\u7C7B\u65B9\u6848\u3001\u8BBF\u95EE\u9650\u5236\u548C\u6807\
           \u7B7E\u6307\u5357\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.13
+  - urn: urn:ciso:risk:function:doc-pol:a.5.13
     ref_id: A.5.13
     name: Labelling of information
     category: process
@@ -657,7 +657,7 @@ objects:
           \u7B7E\u4E00\u81F4\uFF0C\u53CD\u6620\u5176\u5206\u7C7B\u548C\u5904\u7406\
           \u8981\u6C42\u3002\u8861\u91CF\u6807\u51C6\u5305\u62EC\u6807\u51C6\u5316\
           \u6A21\u677F\u3001\u57F9\u8BAD\u548C\u5BA1\u8BA1\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.14
+  - urn: urn:ciso:risk:function:doc-pol:a.5.14
     ref_id: A.5.14
     name: Information transfer
     category: process
@@ -700,7 +700,7 @@ objects:
           \u7EC4\u7EC7\u4E4B\u95F4\u4FE1\u606F\u4F20\u8F93\u7684\u5B89\u5168\u6D41\
           \u7A0B\u3002\u63AA\u65BD\u5305\u62EC\u52A0\u5BC6\u3001\u8BBF\u95EE\u63A7\
           \u5236\u548C\u5B89\u5168\u4F20\u8F93\u534F\u8BAE\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.15
+  - urn: urn:ciso:risk:function:doc-pol:a.5.15
     ref_id: A.5.15
     name: Access control
     category: process
@@ -747,7 +747,7 @@ objects:
           \u8BBF\u95EE\u3002\u63AA\u65BD\u5305\u62EC\u57FA\u4E8E\u89D2\u8272\u7684\
           \u8BBF\u95EE\u3001\u591A\u56E0\u7D20\u8BA4\u8BC1\u548C\u5B9A\u671F\u5BA1\
           \u67E5\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.16
+  - urn: urn:ciso:risk:function:doc-pol:a.5.16
     ref_id: A.5.16
     name: Identity management
     category: process
@@ -794,7 +794,7 @@ objects:
           \u9760\u8BBF\u95EE\u3002\u63AA\u65BD\u5305\u62EC\u8EAB\u4EFD\u9A8C\u8BC1\
           \u3001\u751F\u547D\u5468\u671F\u7BA1\u7406\u548C\u8BBF\u95EE\u914D\u7F6E\
           \u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.17
+  - urn: urn:ciso:risk:function:doc-pol:a.5.17
     ref_id: A.5.17
     name: Authentication information
     category: process
@@ -837,7 +837,7 @@ objects:
           \u606F\uFF0C\u5982\u5BC6\u7801\uFF0C\u4EE5\u9632\u6B62\u672A\u7ECF\u6388\
           \u6743\u7684\u8BBF\u95EE\u3002\u63AA\u65BD\u5305\u62EC\u52A0\u5BC6\u3001\
           \u5B89\u5168\u5B58\u50A8\u548C\u5B9A\u671F\u66F4\u65B0\u5BC6\u7801\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.18
+  - urn: urn:ciso:risk:function:doc-pol:a.5.18
     ref_id: A.5.18
     name: Access rights
     category: process
@@ -883,7 +883,7 @@ objects:
           \u89D2\u8272\u548C\u804C\u8D23\u3002\u63AA\u65BD\u5305\u62EC\u5B9A\u671F\
           \u5BA1\u8BA1\u3001\u8BBF\u95EE\u64A4\u9500\u548C\u81EA\u52A8\u5316\u8BBF\
           \u95EE\u7BA1\u7406\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.19
+  - urn: urn:ciso:risk:function:doc-pol:a.5.19
     ref_id: A.5.19
     name: Information security in supplier relationships
     category: process
@@ -926,7 +926,7 @@ objects:
           \u5D4C\u5165\u4F9B\u5E94\u5546\u5173\u7CFB\u548C\u6D41\u7A0B\u4E2D\u3002\
           \u63AA\u65BD\u5305\u62EC\u5C3D\u804C\u8C03\u67E5\u3001\u5B89\u5168\u5BA1\
           \u67E5\u548C\u6301\u7EED\u76D1\u63A7\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.20
+  - urn: urn:ciso:risk:function:doc-pol:a.5.20
     ref_id: A.5.20
     name: Addressing information security within supplier agreements
     category: process
@@ -972,7 +972,7 @@ objects:
           \u4E2D\u7684\u4FE1\u606F\u5B89\u5168\u8981\u6C42\u3002\u63AA\u65BD\u5305\
           \u62EC\u660E\u786E\u7684\u5408\u540C\u6761\u6B3E\u3001\u5408\u89C4\u5BA1\
           \u8BA1\u4EE5\u53CA\u5BF9\u8FDD\u89C4\u7684\u660E\u786E\u5904\u7F5A\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.21
+  - urn: urn:ciso:risk:function:doc-pol:a.5.21
     ref_id: A.5.21
     name: Managing information security in the ICT supply chain
     category: process
@@ -1023,7 +1023,7 @@ objects:
           \u7EC4\u4EF6\u7684\u5B89\u5168\u3002\u63AA\u65BD\u5305\u62EC\u98CE\u9669\
           \u8BC4\u4F30\u3001\u4F9B\u5E94\u5546\u8BC4\u4F30\u548C\u4E8B\u6545\u54CD\
           \u5E94\u534F\u8BAE\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.22
+  - urn: urn:ciso:risk:function:doc-pol:a.5.22
     ref_id: A.5.22
     name: Monitor, review and change management of supplier services
     category: process
@@ -1072,7 +1072,7 @@ objects:
           \u4EE5\u7EF4\u62A4\u4FE1\u606F\u5B89\u5168\u3002\u63AA\u65BD\u5305\u62EC\
           \u670D\u52A1\u6C34\u5E73\u534F\u8BAE\u3001\u5B9A\u671F\u5BA1\u67E5\u548C\
           \u5408\u540C\u66F4\u65B0\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.23
+  - urn: urn:ciso:risk:function:doc-pol:a.5.23
     ref_id: A.5.23
     name: Information security for use of cloud services
     category: process
@@ -1117,7 +1117,7 @@ objects:
           \u98CE\u9669\uFF0C\u786E\u4FDD\u4E91\u670D\u52A1\u7684\u5B89\u5168\u4F7F\
           \u7528\u3002\u63AA\u65BD\u5305\u62EC\u6570\u636E\u52A0\u5BC6\u3001\u8BBF\
           \u95EE\u63A7\u5236\u548C\u63D0\u4F9B\u8005\u5408\u89C4\u5BA1\u67E5\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.24
+  - urn: urn:ciso:risk:function:doc-pol:a.5.24
     ref_id: A.5.24
     name: Information security incident management planning and preparation
     category: process
@@ -1166,7 +1166,7 @@ objects:
           \u5168\u4E8B\u4EF6\u7684\u5408\u7406\u89C4\u5212\u548C\u51C6\u5907\u3002\
           \u63AA\u65BD\u5305\u62EC\u4E8B\u4EF6\u54CD\u5E94\u8BA1\u5212\u3001\u57F9\
           \u8BAD\u6F14\u4E60\u548C\u901A\u4FE1\u534F\u8BAE\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.25
+  - urn: urn:ciso:risk:function:doc-pol:a.5.25
     ref_id: A.5.25
     name: Assessment and decision on information security events
     category: process
@@ -1216,7 +1216,7 @@ objects:
           \u52A8\u7684\u6D41\u7A0B\u3002\u63AA\u65BD\u5305\u62EC\u6839\u672C\u539F\
           \u56E0\u5206\u6790\u3001\u98CE\u9669\u8BC4\u4F30\u548C\u7F13\u89E3\u8BA1\
           \u5212\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.26
+  - urn: urn:ciso:risk:function:doc-pol:a.5.26
     ref_id: A.5.26
     name: Response to information security incidents
     category: process
@@ -1263,7 +1263,7 @@ objects:
           \u9650\u5EA6\u5730\u51CF\u5C11\u5F71\u54CD\u5E76\u8FC5\u901F\u6062\u590D\
           \u3002\u63AA\u65BD\u5305\u62EC\u4E8B\u4EF6\u62A5\u544A\u3001\u5347\u7EA7\
           \u534F\u8BAE\u548C\u904F\u5236\u7B56\u7565\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.27
+  - urn: urn:ciso:risk:function:doc-pol:a.5.27
     ref_id: A.5.27
     name: Learning from information security incidents
     category: process
@@ -1312,7 +1312,7 @@ objects:
           \u5F55\u5E76\u52A0\u4EE5\u5B9E\u65BD\uFF0C\u4EE5\u6539\u8FDB\u6D41\u7A0B\
           \u3002\u63AA\u65BD\u5305\u62EC\u4E8B\u4EF6\u540E\u5BA1\u67E5\u3001\u884C\
           \u52A8\u8BA1\u5212\u548C\u653F\u7B56\u66F4\u65B0\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.28
+  - urn: urn:ciso:risk:function:doc-pol:a.5.28
     ref_id: A.5.28
     name: Collection of evidence
     category: process
@@ -1360,7 +1360,7 @@ objects:
           \u4EE5\u652F\u6301\u8C03\u67E5\u3002\u63AA\u65BD\u5305\u62EC\u4FDD\u7BA1\
           \u94FE\u7A0B\u5E8F\u3001\u5B89\u5168\u5B58\u50A8\u548C\u95E8\u7981\u63A7\
           \u5236\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.29
+  - urn: urn:ciso:risk:function:doc-pol:a.5.29
     ref_id: A.5.29
     name: Information security during disruption
     category: process
@@ -1406,7 +1406,7 @@ objects:
           \u8FD0\u8425\u7684\u8FDE\u7EED\u6027\u3002\u63AA\u65BD\u5305\u62EC\u5E94\
           \u6025\u9884\u6848\u3001\u5907\u4EFD\u7CFB\u7EDF\u548C\u6545\u969C\u5207\
           \u6362\u673A\u5236\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.30
+  - urn: urn:ciso:risk:function:doc-pol:a.5.30
     ref_id: A.5.30
     name: ICT readiness for business continuity
     category: process
@@ -1453,7 +1453,7 @@ objects:
           \u51CF\u5C11\u4E2D\u65AD\u671F\u95F4\u7684\u505C\u673A\u65F6\u95F4\u3002\
           \u63AA\u65BD\u5305\u62EC\u6D4B\u8BD5\u6062\u590D\u8BA1\u5212\u3001\u5197\
           \u4F59\u7CFB\u7EDF\u548C\u707E\u96BE\u6062\u590D\u7AD9\u70B9\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.31
+  - urn: urn:ciso:risk:function:doc-pol:a.5.31
     ref_id: A.5.31
     name: Legal, statutory, regulatory and contractual requirements
     category: process
@@ -1499,7 +1499,7 @@ objects:
           \u3001\u6CD5\u5B9A\u3001\u76D1\u7BA1\u548C\u5408\u540C\u4FE1\u606F\u5B89\
           \u5168\u8981\u6C42\u3002\u63AA\u65BD\u5305\u62EC\u653F\u7B56\u5BA1\u67E5\
           \u3001\u5BA1\u8BA1\u548C\u8BC1\u636E\u8BB0\u5F55\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.32
+  - urn: urn:ciso:risk:function:doc-pol:a.5.32
     ref_id: A.5.32
     name: Intellectual property rights
     category: process
@@ -1543,7 +1543,7 @@ objects:
           \u901A\u8FC7\u9002\u5F53\u7684\u4FE1\u606F\u5B89\u5168\u63AA\u65BD\u5F97\
           \u5230\u4FDD\u62A4\u3002\u63AA\u65BD\u5305\u62EC\u8BBF\u95EE\u9650\u5236\
           \u3001\u52A0\u5BC6\u548C\u6CD5\u5F8B\u534F\u8BAE\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.33
+  - urn: urn:ciso:risk:function:doc-pol:a.5.33
     ref_id: A.5.33
     name: Protection of records
     category: process
@@ -1591,7 +1591,7 @@ objects:
           \u7ECF\u6388\u6743\u8BBF\u95EE\u3002\u63AA\u65BD\u5305\u62EC\u4FDD\u7559\
           \u653F\u7B56\u3001\u5B89\u5168\u5B58\u50A8\u548C\u8BBF\u95EE\u63A7\u5236\
           \u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.34
+  - urn: urn:ciso:risk:function:doc-pol:a.5.34
     ref_id: A.5.34
     name: Privacy and protection of PII
     category: process
@@ -1636,7 +1636,7 @@ objects:
           \u4FDD\u4E2A\u4EBA\u8EAB\u4EFD\u4FE1\u606F\uFF08PII\uFF09\u7684\u5B89\u5168\
           \u5904\u7406\u3002\u63AA\u65BD\u5305\u62EC\u533F\u540D\u5316\u3001\u52A0\
           \u5BC6\u4EE5\u53CA\u9075\u5B88\u9690\u79C1\u6CD5\u5F8B\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.35
+  - urn: urn:ciso:risk:function:doc-pol:a.5.35
     ref_id: A.5.35
     name: Independent review of information security
     category: process
@@ -1682,7 +1682,7 @@ objects:
           \u6709\u6548\u6027\u548C\u5408\u89C4\u6027\u3002\u63AA\u65BD\u5305\u62EC\
           \u5916\u90E8\u5BA1\u8BA1\u3001\u98CE\u9669\u8BC4\u4F30\u548C\u540E\u7EED\
           \u884C\u52A8\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.36
+  - urn: urn:ciso:risk:function:doc-pol:a.5.36
     ref_id: A.5.36
     name: Compliance with policies, rules and standards for information security
     category: process
@@ -1731,7 +1731,7 @@ objects:
           \u4FE1\u606F\u5B89\u5168\u7684\u653F\u7B56\u3001\u89C4\u5219\u548C\u6807\
           \u51C6\u3002\u63AA\u65BD\u5305\u62EC\u5B9A\u671F\u57F9\u8BAD\u3001\u653F\
           \u7B56\u5BA1\u67E5\u548C\u6267\u6CD5\u673A\u5236\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.5.37
+  - urn: urn:ciso:risk:function:doc-pol:a.5.37
     ref_id: A.5.37
     name: Documented operating procedures
     category: process
@@ -1774,7 +1774,7 @@ objects:
           \u6863\u7684\u4F5C\u7A0B\u5E8F\uFF0C\u4EE5\u786E\u4FDD\u5B89\u5168\u5B9E\
           \u8DF5\u7684\u4E00\u81F4\u6027\u3002\u63AA\u65BD\u5305\u62EC\u6D41\u7A0B\
           \u6587\u6863\u3001\u7248\u672C\u63A7\u5236\u548C\u65E0\u969C\u788D\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.6.1
+  - urn: urn:ciso:risk:function:doc-pol:a.6.1
     ref_id: A.6.1
     name: Screening
     category: process
@@ -1824,7 +1824,7 @@ objects:
           \u4EBA\u7684\u9002\u4EFB\u6027\u3002\u63AA\u65BD\u5305\u62EC\u80CC\u666F\
           \u8C03\u67E5\u3001\u8EAB\u4EFD\u9A8C\u8BC1\u548C\u8D44\u683C\u8BC4\u4F30\
           \uFF0C\u4EE5\u964D\u4F4E\u5B89\u5168\u98CE\u9669\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.6.2
+  - urn: urn:ciso:risk:function:doc-pol:a.6.2
     ref_id: A.6.2
     name: Terms and conditions of employment
     category: process
@@ -1870,7 +1870,7 @@ objects:
           \u63AA\u65BD\u5305\u62EC\u660E\u786E\u89C4\u5B9A\u4FDD\u5BC6\u3001\u9075\
           \u5B88\u653F\u7B56\u4EE5\u53CA\u8FDD\u89C4\u540E\u679C\u7B49\u6761\u6B3E\
           \u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.6.3
+  - urn: urn:ciso:risk:function:doc-pol:a.6.3
     ref_id: A.6.3
     name: Information security awareness, education and training
     category: process
@@ -1919,7 +1919,7 @@ objects:
           \u57F9\u8BAD\u3002\u63AA\u65BD\u5305\u62EC\u5B9A\u671F\u57F9\u8BAD\u3001\
           \u7535\u5B50\u5B66\u4E60\u9879\u76EE\u548C\u6A21\u62DF\u9493\u9C7C\u6F14\
           \u4E60\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.6.4
+  - urn: urn:ciso:risk:function:doc-pol:a.6.4
     ref_id: A.6.4
     name: Disciplinary process
     category: process
@@ -1966,7 +1966,7 @@ objects:
           \u89C4\u884C\u4E3A\u3002\u63AA\u65BD\u5305\u62EC\u660E\u786E\u7684\u6307\
           \u5BFC\u65B9\u9488\u3001\u5347\u7EA7\u7A0B\u5E8F\u548C\u6301\u7EED\u7684\
           \u6267\u6CD5\uFF0C\u4EE5\u4FDD\u6301\u95EE\u8D23\u5236\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.6.5
+  - urn: urn:ciso:risk:function:doc-pol:a.6.5
     ref_id: A.6.5
     name: Responsibilities after termination or change of employment
     category: process
@@ -2020,7 +2020,7 @@ objects:
           \u66F4\u540E\u5F97\u5230\u5B9A\u4E49\u548C\u6267\u884C\u3002\u63AA\u65BD\
           \u5305\u62EC\u64A4\u9500\u8BBF\u95EE\u6743\u3001\u6536\u7F34\u7EC4\u7EC7\
           \u8D44\u4EA7\u4EE5\u53CA\u8FDB\u884C\u79BB\u804C\u9762\u8C08\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.6.6
+  - urn: urn:ciso:risk:function:doc-pol:a.6.6
     ref_id: A.6.6
     name: Confidentiality or non-disclosure agreements
     category: process
@@ -2069,7 +2069,7 @@ objects:
           \u63AA\u65BD\u5305\u62EC\u5165\u804C\u65F6\u7B7E\u7F72\u534F\u8BAE\u3001\
           \u5B9A\u671F\u63D0\u9192\u4EE5\u53CA\u5728\u8FDD\u89C4\u65F6\u6267\u884C\
           \u6CD5\u5F8B\u884C\u52A8\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.6.7
+  - urn: urn:ciso:risk:function:doc-pol:a.6.7
     ref_id: A.6.7
     name: Remote working
     category: process
@@ -2117,7 +2117,7 @@ objects:
           \u7684\u5B89\u5168\u8BBF\u95EE\u3001\u5F3A\u5236\u4F7F\u7528VPN\uFF0C\u4EE5\
           \u53CA\u5236\u5B9A\u8FDC\u7A0B\u5904\u7406\u654F\u611F\u6570\u636E\u7684\
           \u653F\u7B56\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.6.8
+  - urn: urn:ciso:risk:function:doc-pol:a.6.8
     ref_id: A.6.8
     name: Information security event reporting
     category: process
@@ -2167,7 +2167,7 @@ objects:
           \u65BD\u5305\u62EC\u4E8B\u4EF6\u62A5\u544A\u6E20\u9053\u3001\u5BA3\u4F20\
           \u6D3B\u52A8\u4EE5\u53CA\u8C03\u67E5\u548C\u5904\u7406\u62A5\u544A\u4E8B\
           \u4EF6\u7684\u540E\u7EED\u7A0B\u5E8F\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.7.1
+  - urn: urn:ciso:risk:function:doc-pol:a.7.1
     ref_id: A.7.1
     name: Physical security perimeters
     category: physical
@@ -2217,7 +2217,7 @@ objects:
           \u8BBE\u7F6E\u969C\u788D\u7269\u3001\u95E8\u7981\u63A7\u5236\u548C\u76D1\
           \u63A7\u7CFB\u7EDF\uFF0C\u786E\u4FDD\u53EA\u6709\u6388\u6743\u4EBA\u5458\
           \u624D\u80FD\u8FDB\u5165\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.7.2
+  - urn: urn:ciso:risk:function:doc-pol:a.7.2
     ref_id: A.7.2
     name: Physical entry
     category: physical
@@ -2263,7 +2263,7 @@ objects:
           \u7ECF\u6388\u6743\u7684\u8BBF\u95EE\u3002\u63AA\u65BD\u5305\u62EC\u5FBD\
           \u7AE0\u7CFB\u7EDF\u3001\u5B89\u4FDD\u4EBA\u5458\u548C\u8BBF\u5BA2\u8BB0\
           \u5F55\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.7.3
+  - urn: urn:ciso:risk:function:doc-pol:a.7.3
     ref_id: A.7.3
     name: Securing offices, rooms and facilities
     category: physical
@@ -2308,7 +2308,7 @@ objects:
           \u623F\u95F4\u548C\u8BBE\u65BD\u7684\u5B89\u5168\uFF0C\u4EE5\u4FDD\u62A4\
           \u4FE1\u606F\u548C\u8D44\u6E90\u3002\u63AA\u65BD\u5305\u62EC\u4E0A\u9501\
           \u95E8\u3001\u9650\u5236\u533A\u57DF\u548C\u76D1\u63A7\u7CFB\u7EDF\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.7.4
+  - urn: urn:ciso:risk:function:doc-pol:a.7.4
     ref_id: A.7.4
     name: Physical security monitoring
     category: physical
@@ -2351,7 +2351,7 @@ objects:
           \u76D1\u63A7\uFF0C\u4EE5\u68C0\u6D4B\u5E76\u8FC5\u901F\u54CD\u5E94\u5A01\
           \u80C1\u3002\u63AA\u65BD\u5305\u62EC\u95ED\u8DEF\u7535\u89C6\u7CFB\u7EDF\
           \u3001\u8FD0\u52A8\u63A2\u6D4B\u5668\u548C\u5B9E\u65F6\u8B66\u62A5\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.7.5
+  - urn: urn:ciso:risk:function:doc-pol:a.7.5
     ref_id: A.7.5
     name: Protecting against physical and environmental threats
     category: physical
@@ -2396,7 +2396,7 @@ objects:
           \u6E90\u514D\u53D7\u7269\u7406\u548C\u73AF\u5883\u5A01\u80C1\u3002\u63AA\
           \u65BD\u5305\u62EC\u706D\u706B\u7CFB\u7EDF\u3001\u6E29\u5EA6\u63A7\u5236\
           \u548C\u9632\u6D2A\u5C4F\u969C\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.7.6
+  - urn: urn:ciso:risk:function:doc-pol:a.7.6
     ref_id: A.7.6
     name: Working In secure areas
     category: physical
@@ -2440,7 +2440,7 @@ objects:
           \u53EA\u5141\u8BB8\u6388\u6743\u8BBF\u95EE\u3002\u63AA\u65BD\u5305\u62EC\
           \u95E8\u7981\u7CFB\u7EDF\u3001\u8BBF\u5BA2\u62A4\u9001\u548C\u6D3B\u52A8\
           \u76D1\u6D4B\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.7.7
+  - urn: urn:ciso:risk:function:doc-pol:a.7.7
     ref_id: A.7.7
     name: Clear desk and clear screen
     category: physical
@@ -2488,7 +2488,7 @@ objects:
           \u654F\u611F\u4FE1\u606F\u4E0D\u4F1A\u88AB\u9057\u6F0F\u3002\u63AA\u65BD\
           \u5305\u62EC\u5C06\u654F\u611F\u6587\u4EF6\u9501\u597D\uFF0C\u5E76\u5728\
           \u672A\u4F7F\u7528\u65F6\u81EA\u52A8\u9501\u5B9A\u5C4F\u5E55\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.7.8
+  - urn: urn:ciso:risk:function:doc-pol:a.7.8
     ref_id: A.7.8
     name: Equipment siting and protection
     category: physical
@@ -2533,7 +2533,7 @@ objects:
           \u7684\u8BBF\u95EE\u6216\u635F\u574F\u3002\u63AA\u65BD\u5305\u62EC\u5B89\
           \u5168\u5B89\u88C5\u3001\u4E0A\u9501\u67DC\u5B50\u548C\u9650\u5236\u8FDB\
           \u5165\u533A\u57DF\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.7.9
+  - urn: urn:ciso:risk:function:doc-pol:a.7.9
     ref_id: A.7.9
     name: Security of assets off-premises
     category: physical
@@ -2579,7 +2579,7 @@ objects:
           \u4EE5\u7EF4\u62A4\u673A\u5BC6\u6027\u548C\u5B8C\u6574\u6027\u3002\u63AA\
           \u65BD\u5305\u62EC\u52A0\u5BC6\u3001\u5B89\u5168\u4F20\u8F93\u548C\u8BBF\
           \u95EE\u8FFD\u8E2A\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.7.10
+  - urn: urn:ciso:risk:function:doc-pol:a.7.10
     ref_id: A.7.10
     name: Storage media
     category: physical
@@ -2620,7 +2620,7 @@ objects:
           \uFF0C\u9632\u6B62\u672A\u7ECF\u6388\u6743\u7684\u8BBF\u95EE\u6216\u7BE1\
           \u6539\u3002\u63AA\u65BD\u5305\u62EC\u5B89\u5168\u5B58\u50A8\u3001\u52A0\
           \u5BC6\u548C\u8BBF\u95EE\u9650\u5236\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.7.11
+  - urn: urn:ciso:risk:function:doc-pol:a.7.11
     ref_id: A.7.11
     name: Supporting utilities
     category: physical
@@ -2665,7 +2665,7 @@ objects:
           \u516C\u7528\u4E8B\u4E1A\uFF0C\u5982\u7535\u529B\u548C\u51B7\u5374\u7CFB\
           \u7EDF\uFF0C\u53EF\u9760\u4E14\u4E0D\u53D7\u5E72\u6270\u3002\u63AA\u65BD\
           \u5305\u62EC\u5197\u4F59\u7CFB\u7EDF\u548C\u7269\u7406\u5B89\u5168\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.7.12
+  - urn: urn:ciso:risk:function:doc-pol:a.7.12
     ref_id: A.7.12
     name: Cabling security
     category: physical
@@ -2708,7 +2708,7 @@ objects:
           \u62E6\u622A\u6216\u635F\u574F\u3002\u63AA\u65BD\u5305\u62EC\u4FDD\u62A4\
           \u7BA1\u9053\u3001\u6B63\u786E\u6807\u8BC6\u548C\u5B89\u5168\u5E03\u7EBF\
           \u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.7.13
+  - urn: urn:ciso:risk:function:doc-pol:a.7.13
     ref_id: A.7.13
     name: Equipment maintenance
     category: physical
@@ -2754,7 +2754,7 @@ objects:
           \u6545\u969C\u53D1\u751F\u3002\u63AA\u65BD\u5305\u62EC\u5B9A\u671F\u4FDD\
           \u517B\u3001\u5B89\u5168\u7EF4\u62A4\u5B9E\u8DF5\u4EE5\u53CA\u6388\u6743\
           \u4EBA\u5458\u901A\u884C\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.7.14
+  - urn: urn:ciso:risk:function:doc-pol:a.7.14
     ref_id: A.7.14
     name: Secure disposal or re-use of equipment
     category: physical
@@ -2800,7 +2800,7 @@ objects:
           \u5904\u7F6E\u6216\u518D\u5229\u7528\uFF0C\u4EE5\u4FDD\u62A4\u654F\u611F\
           \u4FE1\u606F\u3002\u63AA\u65BD\u5305\u62EC\u6570\u636E\u51C0\u5316\u3001\
           \u7269\u7406\u9500\u6BC1\u548C\u8BA4\u8BC1\u5904\u7406\u6D41\u7A0B\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.1
+  - urn: urn:ciso:risk:function:doc-pol:a.8.1
     ref_id: A.8.1
     name: User end point devices
     category: technical
@@ -2849,7 +2849,7 @@ objects:
           \u3001\u53F0\u5F0F\u673A\u548C\u79FB\u52A8\u8BBE\u5907\u7B49\u7EC8\u7AEF\
           \u8BBE\u5907\u7684\u4FDD\u62A4\uFF0C\u4EE5\u6700\u5927\u9650\u5EA6\u5730\
           \u964D\u4F4E\u98CE\u9669\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.2
+  - urn: urn:ciso:risk:function:doc-pol:a.8.2
     ref_id: A.8.2
     name: Privileged access rights
     category: technical
@@ -2901,7 +2901,7 @@ objects:
           \u6027\u3002\u63AA\u65BD\u5305\u62EC\u57FA\u4E8E\u89D2\u8272\u7684\u8BBF\
           \u95EE\u63A7\u5236\u3001\u5B9A\u671F\u5BA1\u67E5\u548C\u4E25\u683C\u7684\
           \u8D26\u6237\u7BA1\u7406\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.3
+  - urn: urn:ciso:risk:function:doc-pol:a.8.3
     ref_id: A.8.3
     name: Information access restriction
     category: technical
@@ -2947,7 +2947,7 @@ objects:
           \u95EE\u3002\u63AA\u65BD\u5305\u62EC\u7528\u6237\u8BA4\u8BC1\u3001\u57FA\
           \u4E8E\u89D2\u8272\u7684\u6743\u9650\u4EE5\u53CA\u5B9A\u671F\u7684\u8BBF\
           \u95EE\u5BA1\u67E5\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.4
+  - urn: urn:ciso:risk:function:doc-pol:a.8.4
     ref_id: A.8.4
     name: Access to source code
     category: technical
@@ -2993,7 +2993,7 @@ objects:
           \u4FDD\u969C\u4E86\u5BF9\u6E90\u4EE3\u7801\u7684\u8BBF\u95EE\u3002\u63AA\
           \u65BD\u5305\u62EC\u7248\u672C\u63A7\u5236\u3001\u5B89\u5168\u4ED3\u5E93\
           \u548C\u9650\u5236\u5F00\u53D1\u8005\u8BBF\u95EE\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.5
+  - urn: urn:ciso:risk:function:doc-pol:a.8.5
     ref_id: A.8.5
     name: Secure authentication
     category: technical
@@ -3034,7 +3034,7 @@ objects:
           \uFF0C\u5982\u591A\u56E0\u7D20\u8BA4\u8BC1\uFF0C\u4EE5\u9A8C\u8BC1\u7528\
           \u6237\u8EAB\u4EFD\u5E76\u9632\u6B62\u672A\u7ECF\u6388\u6743\u7684\u8BBF\
           \u95EE\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.6
+  - urn: urn:ciso:risk:function:doc-pol:a.8.6
     ref_id: A.8.6
     name: Capacity management
     category: technical
@@ -3080,7 +3080,7 @@ objects:
           \u80FD\u5E76\u9632\u6B62\u4E2D\u65AD\u3002\u63AA\u65BD\u5305\u62EC\u76D1\
           \u63A7\u8D44\u6E90\u4F7F\u7528\u548C\u89C4\u5212\u672A\u6765\u9700\u6C42\
           \u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.7
+  - urn: urn:ciso:risk:function:doc-pol:a.8.7
     ref_id: A.8.7
     name: Protection against malware
     category: technical
@@ -3121,7 +3121,7 @@ objects:
           \u3001\u5A01\u80C1\u68C0\u6D4B\u5DE5\u5177\u548C\u5B9A\u671F\u66F4\u65B0\
           \u7B49\u63AA\u65BD\uFF0C\u4EE5\u4FDD\u62A4\u7CFB\u7EDF\u514D\u53D7\u6076\
           \u610F\u8F6F\u4EF6\u548C\u6076\u610F\u653B\u51FB\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.8
+  - urn: urn:ciso:risk:function:doc-pol:a.8.8
     ref_id: A.8.8
     name: Management of technical vulnerabilities
     category: technical
@@ -3165,7 +3165,7 @@ objects:
           \u5927\u9650\u5EA6\u5730\u964D\u4F4E\u5B89\u5168\u98CE\u9669\u3002\u63AA\
           \u65BD\u5305\u62EC\u6F0F\u6D1E\u626B\u63CF\u548C\u8865\u4E01\u7BA1\u7406\
           \u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.9
+  - urn: urn:ciso:risk:function:doc-pol:a.8.9
     ref_id: A.8.9
     name: Configuration management
     category: technical
@@ -3203,7 +3203,7 @@ objects:
         description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u7CFB\u7EDF\u914D\u7F6E\
           \u7684\u4E00\u81F4\u7BA1\u7406\uFF0C\u4EE5\u7EF4\u62A4\u5B89\u5168\u8BBE\
           \u7F6E\u5E76\u9632\u6B62\u672A\u7ECF\u6388\u6743\u7684\u66F4\u6539\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.10
+  - urn: urn:ciso:risk:function:doc-pol:a.8.10
     ref_id: A.8.10
     name: Information deletion
     category: technical
@@ -3243,7 +3243,7 @@ objects:
         description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u654F\u611F\u4FE1\u606F\
           \u5728\u4E0D\u518D\u9700\u8981\u9632\u6B62\u672A\u7ECF\u6388\u6743\u7684\
           \u6062\u590D\u6216\u66DD\u5149\u65F6\u88AB\u5B89\u5168\u5220\u9664\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.11
+  - urn: urn:ciso:risk:function:doc-pol:a.8.11
     ref_id: A.8.11
     name: Data masking
     category: technical
@@ -3282,7 +3282,7 @@ objects:
         description: "\u8BE5\u63A7\u5236\u901A\u8FC7\u4F7F\u7528\u6570\u636E\u63A9\
           \u853D\u6280\u672F\u4FDD\u62A4\u654F\u611F\u4FE1\u606F\uFF0C\u9632\u6B62\
           \u672A\u6388\u6743\u7528\u6237\u53D1\u73B0\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.12
+  - urn: urn:ciso:risk:function:doc-pol:a.8.12
     ref_id: A.8.12
     name: Data leakage prevention
     category: technical
@@ -3322,7 +3322,7 @@ objects:
           \u654F\u611F\u6570\u636E\u901A\u8FC7\u7535\u5B50\u90AE\u4EF6\u3001\u53EF\
           \u79FB\u52A8\u5A92\u4F53\u6216\u5176\u4ED6\u6E20\u9053\u610F\u5916\u6CC4\
           \u9732\u7684\u673A\u5236\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.13
+  - urn: urn:ciso:risk:function:doc-pol:a.8.13
     ref_id: A.8.13
     name: Information backup
     category: technical
@@ -3361,7 +3361,7 @@ objects:
           \u80FD\u591F\u5B9A\u671F\u4E14\u5B89\u5168\u5730\u5907\u4EFD\uFF0C\u786E\
           \u4FDD\u5728\u4E8B\u6545\u6216\u707E\u96BE\u53D1\u751F\u65F6\u5176\u53EF\
           \u7528\u6027\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.14
+  - urn: urn:ciso:risk:function:doc-pol:a.8.14
     ref_id: A.8.14
     name: Redundancy of information processing facilities
     category: technical
@@ -3402,7 +3402,7 @@ objects:
           \u5185\u7F6E\u5197\u4F59\uFF0C\u4EE5\u5728\u7CFB\u7EDF\u6545\u969C\u6216\
           \u7D27\u6025\u60C5\u51B5\u4E0B\u4FDD\u6301\u53EF\u7528\u6027\u548C\u8FD0\
           \u884C\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.15
+  - urn: urn:ciso:risk:function:doc-pol:a.8.15
     ref_id: A.8.15
     name: Logging
     category: technical
@@ -3440,7 +3440,7 @@ objects:
         description: "\u8FD9\u79CD\u63A7\u5236\u4F7F\u7CFB\u7EDF\u5185\u6D3B\u52A8\
           \u80FD\u591F\u8BB0\u5F55\uFF0C\u4EE5\u652F\u6301\u76D1\u63A7\u3001\u4E8B\
           \u4EF6\u68C0\u6D4B\u548C\u53D6\u8BC1\u8C03\u67E5\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.16
+  - urn: urn:ciso:risk:function:doc-pol:a.8.16
     ref_id: A.8.16
     name: Monitoring activities
     category: technical
@@ -3477,7 +3477,7 @@ objects:
         description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u7CFB\u7EDF\u6D3B\u52A8\
           \u6301\u7EED\u76D1\u63A7\uFF0C\u4EE5\u68C0\u6D4B\u3001\u54CD\u5E94\u5E76\
           \u7F13\u89E3\u5B89\u5168\u5A01\u80C1\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.17
+  - urn: urn:ciso:risk:function:doc-pol:a.8.17
     ref_id: A.8.17
     name: Clock synchronization
     category: technical
@@ -3514,7 +3514,7 @@ objects:
         description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u7CFB\u7EDF\u65F6\u949F\
           \u540C\u6B65\uFF0C\u4EE5\u4FDD\u6301\u65E5\u5FD7\u53CA\u5176\u4ED6\u5173\
           \u952E\u8FDB\u7A0B\u7684\u65F6\u95F4\u6233\u51C6\u786E\u4E00\u81F4\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.18
+  - urn: urn:ciso:risk:function:doc-pol:a.8.18
     ref_id: A.8.18
     name: Use of privileged utility programs
     category: technical
@@ -3551,7 +3551,7 @@ objects:
         description: "\u8FD9\u79CD\u63A7\u5236\u9650\u5236\u5E76\u76D1\u63A7\u7279\
           \u6743\u5DE5\u5177\u7A0B\u5E8F\u7684\u4F7F\u7528\uFF0C\u4EE5\u9632\u6B62\
           \u6EE5\u7528\u548C\u672A\u7ECF\u6388\u6743\u7684\u884C\u4E3A\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.19
+  - urn: urn:ciso:risk:function:doc-pol:a.8.19
     ref_id: A.8.19
     name: Installation of software on operational systems
     category: technical
@@ -3591,7 +3591,7 @@ objects:
           \u7EDF\u4E0A\u7684\u8F6F\u4EF6\u5B89\u88C5\u5F97\u5230\u5B89\u5168\u7BA1\
           \u7406\uFF0C\u4EE5\u9632\u6B62\u6F0F\u6D1E\u6216\u672A\u7ECF\u6388\u6743\
           \u7684\u66F4\u6539\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.20
+  - urn: urn:ciso:risk:function:doc-pol:a.8.20
     ref_id: A.8.20
     name: Networks security
     category: technical
@@ -3632,7 +3632,7 @@ objects:
           \u5165\u4FB5\u68C0\u6D4B\u7CFB\u7EDF\u548C\u8BBF\u95EE\u63A7\u5236\u786E\
           \u4FDD\u7F51\u7EDC\u5B89\u5168\uFF0C\u9632\u6B62\u672A\u7ECF\u6388\u6743\
           \u7684\u8BBF\u95EE\u548C\u653B\u51FB\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.21
+  - urn: urn:ciso:risk:function:doc-pol:a.8.21
     ref_id: A.8.21
     name: Security of network services
     category: technical
@@ -3670,7 +3670,7 @@ objects:
         description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u7F51\u7EDC\u670D\u52A1\
           \u5728\u4F7F\u7528\u8FC7\u7A0B\u4E2D\u4FDD\u6301\u673A\u5BC6\u6027\u3001\
           \u5B8C\u6574\u6027\u548C\u53EF\u7528\u6027\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.22
+  - urn: urn:ciso:risk:function:doc-pol:a.8.22
     ref_id: A.8.22
     name: Segregation of networks
     category: technical
@@ -3707,7 +3707,7 @@ objects:
           \u79BB\uFF0C\u4EE5\u9650\u5236\u5A01\u80C1\u7684\u6269\u6563\uFF0C\u5E76\
           \u6700\u5927\u9650\u5EA6\u5730\u51CF\u5C11\u6F5C\u5728\u5165\u4FB5\u7684\
           \u5F71\u54CD\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.23
+  - urn: urn:ciso:risk:function:doc-pol:a.8.23
     ref_id: A.8.23
     name: Web filtering
     category: technical
@@ -3743,7 +3743,7 @@ objects:
         description: "\u8BE5\u63A7\u5236\u5229\u7528\u7F51\u7EDC\u8FC7\u6EE4\u5DE5\
           \u5177\u963B\u6B62\u672A\u7ECF\u6388\u6743\u6216\u6709\u5BB3\u5185\u5BB9\
           \u901A\u8FC7\u4E92\u8054\u7F51\u8BBF\u95EE\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.24
+  - urn: urn:ciso:risk:function:doc-pol:a.8.24
     ref_id: A.8.24
     name: Use of cryptography
     category: technical
@@ -3781,7 +3781,7 @@ objects:
         description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u91C7\u7528\u5BC6\u7801\
           \u5B66\u6280\u672F\u6765\u4FDD\u62A4\u6570\u636E\u7684\u673A\u5BC6\u6027\
           \u3001\u5B8C\u6574\u6027\u548C\u771F\u5B9E\u6027\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.25
+  - urn: urn:ciso:risk:function:doc-pol:a.8.25
     ref_id: A.8.25
     name: Secure development life cycle
     category: technical
@@ -3820,7 +3820,7 @@ objects:
         description: "\u8BE5\u63A7\u5236\u5C06\u5B89\u5168\u6574\u5408\u5230\u5F00\
           \u53D1\u751F\u547D\u5468\u671F\u7684\u6240\u6709\u9636\u6BB5\uFF0C\u786E\
           \u4FDD\u7CFB\u7EDF\u548C\u5E94\u7528\u7684\u5B89\u5168\u6784\u5EFA\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.26
+  - urn: urn:ciso:risk:function:doc-pol:a.8.26
     ref_id: A.8.26
     name: Application security requirements
     category: technical
@@ -3854,7 +3854,7 @@ objects:
         description: "\u8FD9\u79CD\u63A7\u5236\u5B9A\u4E49\u5E76\u6267\u884C\u5E94\
           \u7528\u7A0B\u5E8F\u7684\u5B89\u5168\u8981\u6C42\uFF0C\u4EE5\u9632\u8303\
           \u6F0F\u6D1E\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.27
+  - urn: urn:ciso:risk:function:doc-pol:a.8.27
     ref_id: A.8.27
     name: Secure system architecture and engineering principles
     category: technical
@@ -3891,7 +3891,7 @@ objects:
         description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u5728\u7CFB\u7EDF\u67B6\
           \u6784\u5F00\u53D1\u8FC7\u7A0B\u4E2D\u91C7\u7528\u5B89\u5168\u7684\u8BBE\
           \u8BA1\u539F\u5219\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.28
+  - urn: urn:ciso:risk:function:doc-pol:a.8.28
     ref_id: A.8.28
     name: Secure coding
     category: technical
@@ -3925,7 +3925,7 @@ objects:
         description: "\u8FD9\u79CD\u63A7\u5236\u5B9E\u65BD\u4E86\u5B89\u5168\u7684\
           \u7F16\u7801\u5B9E\u8DF5\uFF0C\u4EE5\u6700\u5927\u9650\u5EA6\u5730\u51CF\
           \u5C11\u5F00\u53D1\u8F6F\u4EF6\u4E2D\u7684\u6F0F\u6D1E\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.29
+  - urn: urn:ciso:risk:function:doc-pol:a.8.29
     ref_id: A.8.29
     name: Security testing in development and acceptance
     category: technical
@@ -3962,7 +3962,7 @@ objects:
         description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u5728\u5F00\u53D1\u548C\
           \u9A8C\u6536\u9636\u6BB5\u8FDB\u884C\u5B89\u5168\u6D4B\u8BD5\uFF0C\u4EE5\
           \u8BC6\u522B\u5F31\u70B9\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.30
+  - urn: urn:ciso:risk:function:doc-pol:a.8.30
     ref_id: A.8.30
     name: Outsourced development
     category: technical
@@ -3998,7 +3998,7 @@ objects:
         description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u5728\u5F00\u53D1\u5916\
           \u5305\u7ED9\u7B2C\u4E09\u65B9\u4F9B\u5E94\u5546\u65F6\u5B89\u5168\u98CE\
           \u9669\u5F97\u5230\u6709\u6548\u7BA1\u7406\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.31
+  - urn: urn:ciso:risk:function:doc-pol:a.8.31
     ref_id: A.8.31
     name: Separation of development, test and production environments
     category: technical
@@ -4041,7 +4041,7 @@ objects:
           \u8BD5\u548C\u751F\u4EA7\u73AF\u5883\u88AB\u9694\u79BB\uFF0C\u4EE5\u9632\
           \u6B62\u610F\u5916\u4EA4\u4E92\u548C\u672A\u7ECF\u6388\u6743\u7684\u8BBF\
           \u95EE\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.32
+  - urn: urn:ciso:risk:function:doc-pol:a.8.32
     ref_id: A.8.32
     name: Change management
     category: technical
@@ -4078,7 +4078,7 @@ objects:
         description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u7CFB\u7EDF\u53D8\u66F4\
           \u5F97\u5230\u5B89\u5168\u7BA1\u7406\uFF0C\u4EE5\u964D\u4F4E\u98CE\u9669\
           \u5E76\u4FDD\u6301\u8FD0\u8425\u7A33\u5B9A\u6027\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.33
+  - urn: urn:ciso:risk:function:doc-pol:a.8.33
     ref_id: A.8.33
     name: Test information
     category: technical
@@ -4114,7 +4114,7 @@ objects:
         description: "\u8BE5\u63A7\u5236\u4FDD\u62A4\u6D4B\u8BD5\u6570\u636E\uFF0C\
           \u9632\u6B62\u654F\u611F\u6216\u673A\u5BC6\u4FE1\u606F\u5728\u6D4B\u8BD5\
           \u8FC7\u7A0B\u4E2D\u6CC4\u9732\u3002"
-  - urn: urn:intuitem:risk:function:doc-pol:a.8.34
+  - urn: urn:ciso:risk:function:doc-pol:a.8.34
     ref_id: A.8.34
     name: Protection of information systems during audit testing
     category: technical
@@ -4173,7 +4173,7 @@ objects:
           \u5BC6\u534F\u8BAE\uFF0C\u4EE5\u7EF4\u62A4\u7CFB\u7EDF\u5B89\u5168\u548C\
           \u5B8C\u6574\u6027\u3002"
   framework:
-    urn: urn:intuitem:risk:framework:iso27001-2022
+    urn: urn:ciso:risk:framework:iso27001-2022
     ref_id: ISO/IEC 27001:2022
     name: International standard ISO/IEC 27001:2022
     description: "Information security, cybersecurity and privacy protection \u2014\
@@ -4215,7 +4215,7 @@ objects:
       name: Statement of Applicability
       description: null
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:core
+    - urn: urn:ciso:risk:req_node:iso27001-2022:core
       assessable: false
       depth: 1
       ref_id: core
@@ -4235,10 +4235,10 @@ objects:
           name: Kapitel
         zh:
           name: "\u6761\u6B3E"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:4
+    - urn: urn:ciso:risk:req_node:iso27001-2022:4
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:core
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:core
       ref_id: '4'
       name: Context of the organization
       implementation_groups:
@@ -4256,10 +4256,10 @@ objects:
           name: Kontext der Organisation
         zh:
           name: "\u7EC4\u7EC7\u80CC\u666F"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:4.1
+    - urn: urn:ciso:risk:req_node:iso27001-2022:4.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:4
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:4
       ref_id: '4.1'
       name: Understanding the organization and its context
       description: "Identify internal and external factors that influence the organization\u2019\
@@ -4268,7 +4268,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.context
+      - urn:ciso:risk:function:doc-pol:doc.context
       translations:
         fr:
           name: "Compr\xE9hension de l'organisation et de son contexte"
@@ -4304,10 +4304,10 @@ objects:
             \u5B89\u5168\u76EE\u6807\u80FD\u529B\u7684\u5185\u90E8\u548C\u5916\u90E8\
             \u56E0\u7D20\uFF0C\u786E\u4FDDISMS\u4E0E\u5176\u80CC\u666F\u4FDD\u6301\
             \u4E00\u81F4\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:4.2
+    - urn: urn:ciso:risk:req_node:iso27001-2022:4.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:4
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:4
       ref_id: '4.2'
       name: Understanding the needs and expectations of interested parties
       description: Analyze the needs and expectations of interested parties to incorporate
@@ -4315,7 +4315,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.context
+      - urn:ciso:risk:function:doc-pol:doc.context
       translations:
         fr:
           name: "Compr\xE9hension des besoins et attentes des parties int\xE9ress\xE9\
@@ -4350,10 +4350,10 @@ objects:
           description: "\u5206\u6790\u76F8\u5173\u65B9\u7684\u9700\u6C42\u548C\u671F\
             \u671B\uFF0C\u5C06\u5176\u7EB3\u5165ISMS\uFF0C\u5E76\u6EE1\u8DB3\u76F8\
             \u5173\u7684\u4FE1\u606F\u5B89\u5168\u9700\u6C42\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:4.3
+    - urn: urn:ciso:risk:req_node:iso27001-2022:4.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:4
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:4
       ref_id: '4.3'
       name: Determining the scope of the information security management system
       description: Define the scope of the ISMS by considering internal and external
@@ -4361,7 +4361,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.scope
+      - urn:ciso:risk:function:doc-pol:doc.scope
       translations:
         fr:
           name: "D\xE9termination du domaine d'application du syst\xE8me de management\
@@ -4400,10 +4400,10 @@ objects:
             \u7D20\u3001\u5229\u76CA\u76F8\u5173\u8005\u9700\u6C42\u4EE5\u53CA\u8FD0\
             \u8425\u73AF\u5883\u4E2D\u7684\u4F9D\u8D56\u5173\u7CFB\uFF0C\u5B9A\u4E49\
             ISMS\u7684\u8303\u56F4\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:4.4
+    - urn: urn:ciso:risk:req_node:iso27001-2022:4.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:4
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:4
       ref_id: '4.4'
       name: Information security management system
       description: Build, run, and continually improve an ISMS to effectively manage
@@ -4411,7 +4411,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.overview
+      - urn:ciso:risk:function:doc-pol:doc.overview
       translations:
         fr:
           name: "Syst\xE8me de management de la s\xE9curit\xE9 de l'information"
@@ -4443,10 +4443,10 @@ objects:
           description: "\u6784\u5EFA\u3001\u8FD0\u884C\u5E76\u6301\u7EED\u6539\u8FDB\
             ISM\uFF0C\u4EE5\u6709\u6548\u7BA1\u7406\u4FE1\u606F\u5B89\u5168\u98CE\u9669\
             \u5E76\u5B9E\u73B0\u7EC4\u7EC7\u76EE\u6807\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:5
+    - urn: urn:ciso:risk:req_node:iso27001-2022:5
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:core
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:core
       ref_id: '5'
       name: Leadership
       implementation_groups:
@@ -4464,10 +4464,10 @@ objects:
           name: "F\xFChrung"
         zh:
           name: "\u9886\u5BFC\u5C42"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:5.1
+    - urn: urn:ciso:risk:req_node:iso27001-2022:5.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:5
       ref_id: '5.1'
       name: Leadership and commitment
       description: Demonstrate leadership and commitment by supporting the ISMS, aligning
@@ -4476,12 +4476,12 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.overview
-      - urn:intuitem:risk:function:doc-pol:doc.controls
-      - urn:intuitem:risk:function:doc-pol:doc.com
-      - urn:intuitem:risk:function:doc-pol:doc.audit_plan
-      - urn:intuitem:risk:function:doc-pol:doc.competency
-      - urn:intuitem:risk:function:doc-pol:pol.main
+      - urn:ciso:risk:function:doc-pol:doc.overview
+      - urn:ciso:risk:function:doc-pol:doc.controls
+      - urn:ciso:risk:function:doc-pol:doc.com
+      - urn:ciso:risk:function:doc-pol:doc.audit_plan
+      - urn:ciso:risk:function:doc-pol:doc.competency
+      - urn:ciso:risk:function:doc-pol:pol.main
       translations:
         fr:
           name: Leadership et engagement
@@ -4517,10 +4517,10 @@ objects:
             \u7EC7\u76EE\u6807\u5BF9\u9F50\u3001\u5206\u914D\u8D44\u6E90\u3001\u4FC3\
             \u8FDB\u5B89\u5168\u6587\u5316\u5E76\u63A8\u52A8\u6301\u7EED\u6539\u8FDB\
             \u6765\u5C55\u793A\u9886\u5BFC\u529B\u548C\u627F\u8BFA\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:5.2
+    - urn: urn:ciso:risk:req_node:iso27001-2022:5.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:5
       ref_id: '5.2'
       name: Policy
       description: Establish an information security policy aligned with the organization's
@@ -4529,7 +4529,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.main
+      - urn:ciso:risk:function:doc-pol:pol.main
       translations:
         fr:
           name: Politique
@@ -4567,10 +4567,10 @@ objects:
             \u65B9\u5411\u4E00\u81F4\u7684\u4FE1\u606F\u5B89\u5168\u653F\u7B56\uFF0C\
             \u660E\u786E\u5408\u89C4\u3001\u6301\u7EED\u6539\u8FDB\u548C\u4FE1\u606F\
             \u5B89\u5168\u4FC3\u8FDB\u7684\u627F\u8BFA\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:5.3
+    - urn: urn:ciso:risk:req_node:iso27001-2022:5.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:5
       ref_id: '5.3'
       name: Organizational roles, responsibilities and authorities
       description: Define, assign, and communicate roles, responsibilities, and authorities
@@ -4579,7 +4579,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.raci
+      - urn:ciso:risk:function:doc-pol:doc.raci
       translations:
         fr:
           name: "R\xF4les, responsabilit\xE9s et autorit\xE9s au sein de l'organisation"
@@ -4613,10 +4613,10 @@ objects:
             \u3001\u8D23\u4EFB\u548C\u6743\u9650\uFF0C\u4EE5\u786E\u4FDDISMS\u7684\
             \u6709\u6548\u5B9E\u65BD\u548C\u8FD0\u8425\uFF0C\u5E76\u4E0E\u7EC4\u7EC7\
             \u76EE\u6807\u4FDD\u6301\u4E00\u81F4\u7684\u95EE\u8D23\u5236\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:6
+    - urn: urn:ciso:risk:req_node:iso27001-2022:6
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:core
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:core
       ref_id: '6'
       name: Planning
       implementation_groups:
@@ -4634,10 +4634,10 @@ objects:
           name: Planung
         zh:
           name: "\u89C4\u5212"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:6.1
+    - urn: urn:ciso:risk:req_node:iso27001-2022:6.1
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:6
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:6
       ref_id: '6.1'
       name: Actions to address risks and opportunities
       implementation_groups:
@@ -4655,10 +4655,10 @@ objects:
           name: "Ma\xDFnahmen zum Umgang mit Risiken und Chancen"
         zh:
           name: "\u5E94\u5BF9\u98CE\u9669\u4E0E\u673A\u9047\u7684\u884C\u52A8"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:6.1.1
+    - urn: urn:ciso:risk:req_node:iso27001-2022:6.1.1
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:6.1
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:6.1
       ref_id: 6.1.1
       name: General
       description: Establish a process to identify information security risks and
@@ -4667,8 +4667,8 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.risk
-      - urn:intuitem:risk:function:doc-pol:doc.risk_register
+      - urn:ciso:risk:function:doc-pol:pol.risk
+      - urn:ciso:risk:function:doc-pol:doc.risk_register
       translations:
         fr:
           name: "G\xE9n\xE9ralit\xE9s"
@@ -4708,10 +4708,10 @@ objects:
             \u5916\u90E8\u56E0\u7D20\u3001\u5229\u76CA\u76F8\u5173\u8005\u9700\u6C42\
             \u53CA\u9002\u7528\u8981\u6C42\uFF0C\u786E\u4FDDISMS\u5B9E\u73B0\u5176\
             \u76EE\u6807\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:6.1.2
+    - urn: urn:ciso:risk:req_node:iso27001-2022:6.1.2
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:6.1
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:6.1
       ref_id: 6.1.2
       name: Information security risk assessment requirement
       description: Establish a process to assess information security risks at planned
@@ -4720,8 +4720,8 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.risk
-      - urn:intuitem:risk:function:doc-pol:doc.risk_register
+      - urn:ciso:risk:function:doc-pol:pol.risk
+      - urn:ciso:risk:function:doc-pol:doc.risk_register
       translations:
         fr:
           name: "Appr\xE9ciation des risques de s\xE9curit\xE9 de l'information"
@@ -4764,10 +4764,10 @@ objects:
             \u7528\u5B9A\u4E49\u6807\u51C6\u8BC4\u4F30\u673A\u5BC6\u6027\u3001\u5B8C\
             \u6574\u6027\u548C\u53EF\u7528\u6027\u7684\u5A01\u80C1\uFF0C\u786E\u4FDD\
             \u7ED3\u679C\u4E00\u81F4\u4E14\u53EF\u9760\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:6.1.3
+    - urn: urn:ciso:risk:req_node:iso27001-2022:6.1.3
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:6.1
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:6.1
       ref_id: 6.1.3
       name: Information security risk treatment
       description: Define a process to address identified information security risks
@@ -4776,9 +4776,9 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.risk
-      - urn:intuitem:risk:function:doc-pol:doc.risk_register
-      - urn:intuitem:risk:function:doc-pol:doc.soa
+      - urn:ciso:risk:function:doc-pol:pol.risk
+      - urn:ciso:risk:function:doc-pol:doc.risk_register
+      - urn:ciso:risk:function:doc-pol:doc.soa
       translations:
         fr:
           name: "Traitement des risques de s\xE9curit\xE9 de l'information"
@@ -4818,10 +4818,10 @@ objects:
             \u9669\u5904\u7406\u8BA1\u5212\u4E2D\u8BB0\u5F55\u8FD9\u4E9B\u98CE\u9669\
             \uFF0C\u6765\u5E94\u5BF9\u5DF2\u8BC6\u522B\u7684\u4FE1\u606F\u5B89\u5168\
             \u98CE\u9669\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:6.2
+    - urn: urn:ciso:risk:req_node:iso27001-2022:6.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:6
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:6
       ref_id: '6.2'
       name: Information security objectives and planning to achieve them
       description: Set measurable information security objectives aligned with the
@@ -4830,10 +4830,10 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.main
-      - urn:intuitem:risk:function:doc-pol:doc.so_register
-      - urn:intuitem:risk:function:doc-pol:doc.risk_register
-      - urn:intuitem:risk:function:doc-pol:doc.mgmt_review
+      - urn:ciso:risk:function:doc-pol:pol.main
+      - urn:ciso:risk:function:doc-pol:doc.so_register
+      - urn:ciso:risk:function:doc-pol:doc.risk_register
+      - urn:ciso:risk:function:doc-pol:doc.mgmt_review
       translations:
         fr:
           name: "Objectifs de s\xE9curit\xE9 de l'information et plans pour les atteindre"
@@ -4877,10 +4877,10 @@ objects:
             \u5E76\u89C4\u5212\u5177\u4F53\u7684\u8D23\u4EFB\u3001\u8D44\u6E90\u3001\
             \u65F6\u95F4\u8868\u53CA\u8BC4\u4F30\u65B9\u6CD5\u4EE5\u5B9E\u73B0\u8FD9\
             \u4E9B\u76EE\u6807\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:6.3
+    - urn: urn:ciso:risk:req_node:iso27001-2022:6.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:6
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:6
       ref_id: '6.3'
       name: Planning for changes
       description: Plan changes to the ISMS systematically to ensure alignment with
@@ -4889,7 +4889,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.maintenance
+      - urn:ciso:risk:function:doc-pol:pol.maintenance
       translations:
         fr:
           name: Planification des modifications
@@ -4924,10 +4924,10 @@ objects:
             \u786E\u4FDD\u4E0E\u4FE1\u606F\u5B89\u5168\u8981\u6C42\u4FDD\u6301\u4E00\
             \u81F4\uFF0C\u65E0\u7F1D\u6574\u5408\u4E8E\u73B0\u6709\u6D41\u7A0B\uFF0C\
             \u5E76\u6709\u6548\u7BA1\u7406\u98CE\u9669\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:7
+    - urn: urn:ciso:risk:req_node:iso27001-2022:7
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:core
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:core
       ref_id: '7'
       name: Support
       implementation_groups:
@@ -4945,10 +4945,10 @@ objects:
           name: "Unterst\xFCtzung"
         zh:
           name: "\u652F\u6301"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:7.1
+    - urn: urn:ciso:risk:req_node:iso27001-2022:7.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:7
       ref_id: '7.1'
       name: Resources
       description: Provide the necessary resources to build, run, and continually
@@ -4957,9 +4957,9 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.raci
-      - urn:intuitem:risk:function:doc-pol:doc.competency
-      - urn:intuitem:risk:function:doc-pol:doc.controls
+      - urn:ciso:risk:function:doc-pol:doc.raci
+      - urn:ciso:risk:function:doc-pol:doc.competency
+      - urn:ciso:risk:function:doc-pol:doc.controls
       translations:
         fr:
           name: Ressources
@@ -4993,10 +4993,10 @@ objects:
             \u8FD0\u884C\u5E76\u6301\u7EED\u6539\u8FDBISMS\uFF0C\u786E\u4FDD\u5176\
             \u6709\u6548\u8FD0\u884C\u5E76\u4E0E\u7EC4\u7EC7\u76EE\u6807\u4FDD\u6301\
             \u4E00\u81F4\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:7.2
+    - urn: urn:ciso:risk:req_node:iso27001-2022:7.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:7
       ref_id: '7.2'
       name: Competence
       description: Ensure personnel involved in the ISMS possess the necessary competence
@@ -5005,8 +5005,8 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.educ
-      - urn:intuitem:risk:function:doc-pol:doc.educ_register
+      - urn:ciso:risk:function:doc-pol:pol.educ
+      - urn:ciso:risk:function:doc-pol:doc.educ_register
       translations:
         fr:
           name: "Comp\xE9tences"
@@ -5042,10 +5042,10 @@ objects:
             \u9002\u5F53\u7684\u6559\u80B2\u3001\u57F9\u8BAD\u6216\u7ECF\u9A8C\u5177\
             \u5907\u5FC5\u8981\u7684\u80FD\u529B\uFF0C\u4EE5\u6709\u6548\u5C65\u884C\
             \u804C\u8D23\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:7.3
+    - urn: urn:ciso:risk:req_node:iso27001-2022:7.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:7
       ref_id: '7.3'
       name: Awareness
       description: Promote awareness among relevant personnel about the ISMS, their
@@ -5054,8 +5054,8 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.educ
-      - urn:intuitem:risk:function:doc-pol:doc.educ_register
+      - urn:ciso:risk:function:doc-pol:pol.educ
+      - urn:ciso:risk:function:doc-pol:doc.educ_register
       translations:
         fr:
           name: Sensibilisation
@@ -5090,10 +5090,10 @@ objects:
             \u5728\u4FE1\u606F\u5B89\u5168\u4E2D\u4F5C\u7528\u4EE5\u53CA\u9075\u5B88\
             \u5B89\u5168\u653F\u7B56\u548C\u8981\u6C42\u91CD\u8981\u6027\u7684\u8BA4\
             \u8BC6\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:7.4
+    - urn: urn:ciso:risk:req_node:iso27001-2022:7.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:7
       ref_id: '7.4'
       name: Communication
       description: Establish effective internal and external communication processes,
@@ -5102,7 +5102,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.com
+      - urn:ciso:risk:function:doc-pol:doc.com
       translations:
         fr:
           name: Communication
@@ -5135,10 +5135,10 @@ objects:
             \u7A0B\uFF0C\u786E\u4FDD\u53CA\u65F6\u4E14\u9002\u5F53\u5730\u4EA4\u6362\
             \u4E0EISMS\uFF08\u56FD\u9645\u5B89\u5168\u7BA1\u7406\u7CFB\u7EDF\u53CA\
             \u5176\u76EE\u6807\uFF09\u76F8\u5173\u7684\u4FE1\u606F\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:7.5
+    - urn: urn:ciso:risk:req_node:iso27001-2022:7.5
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:7
       ref_id: '7.5'
       name: Documented Information
       implementation_groups:
@@ -5156,10 +5156,10 @@ objects:
           name: Dokumentierte Information
         zh:
           name: "\u6587\u732E\u4FE1\u606F"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:7.5.1
+    - urn: urn:ciso:risk:req_node:iso27001-2022:7.5.1
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:7.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:7.5
       ref_id: 7.5.1
       name: General
       description: Document the ISMS as needed to ensure effective planning, operation,
@@ -5167,7 +5167,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.doc_register
+      - urn:ciso:risk:function:doc-pol:doc.doc_register
       translations:
         fr:
           name: "G\xE9n\xE9ralit\xE9s"
@@ -5200,10 +5200,10 @@ objects:
             \u4EE5\u786E\u4FDD\u6709\u6548\u7684\u89C4\u5212\u3001\u8FD0\u8425\u3001\
             \u6D41\u7A0B\u63A7\u5236\u5E76\u4E0E\u7EC4\u7EC7\u9700\u6C42\u4FDD\u6301\
             \u4E00\u81F4\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:7.5.2
+    - urn: urn:ciso:risk:req_node:iso27001-2022:7.5.2
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:7.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:7.5
       ref_id: 7.5.2
       name: Creating and Updating documented information
       description: Ensure ISMS documentation is appropriately created, updated, and
@@ -5211,7 +5211,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.doc_register
+      - urn:ciso:risk:function:doc-pol:doc.doc_register
       translations:
         fr:
           name: "Cr\xE9ation et mise \xE0 jour"
@@ -5242,10 +5242,10 @@ objects:
           description: "\u786E\u4FDDISMS\u6587\u6863\u5F97\u5230\u9002\u5F53\u521B\
             \u5EFA\u3001\u66F4\u65B0\u548C\u63A7\u5236\uFF0C\u5305\u62EC\u9002\u5F53\
             \u7684\u5BA1\u6279\u548C\u7248\u672C\u7BA1\u7406\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:7.5.3
+    - urn: urn:ciso:risk:req_node:iso27001-2022:7.5.3
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:7.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:7.5
       ref_id: 7.5.3
       name: Control of documented information
       description: Make ISMS documentation accessible and usable for those who need
@@ -5253,7 +5253,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.doc_register
+      - urn:ciso:risk:function:doc-pol:doc.doc_register
       translations:
         fr:
           name: "Contr\xF4le des informations document\xE9es"
@@ -5285,10 +5285,10 @@ objects:
           description: "\u8BA9ISMS\u6587\u6863\u5BF9\u6709\u9700\u8981\u7684\u4EBA\
             \u53EF\u8BBF\u95EE\u548C\u4F7F\u7528\uFF0C\u540C\u65F6\u4FDD\u62A4\u5176\
             \u514D\u53D7\u672A\u7ECF\u6388\u6743\u8BBF\u95EE\u6216\u4E22\u5931\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:8
+    - urn: urn:ciso:risk:req_node:iso27001-2022:8
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:core
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:core
       ref_id: '8'
       name: Operations
       implementation_groups:
@@ -5306,10 +5306,10 @@ objects:
           name: Betrieb
         zh:
           name: "\u8FD0\u8425"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:8.1
+    - urn: urn:ciso:risk:req_node:iso27001-2022:8.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:8
       ref_id: '8.1'
       name: Operational planning and control
       description: Plan and control ISMS processes, ensuring consistency with requirements
@@ -5317,8 +5317,8 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.raci
-      - urn:intuitem:risk:function:doc-pol:doc.proc_register
+      - urn:ciso:risk:function:doc-pol:doc.raci
+      - urn:ciso:risk:function:doc-pol:doc.proc_register
       translations:
         fr:
           name: "Planification et contr\xF4le op\xE9rationnels"
@@ -5349,10 +5349,10 @@ objects:
           description: "\u89C4\u5212\u548C\u63A7\u5236ISMS\u6D41\u7A0B\uFF0C\u786E\
             \u4FDD\u4E0E\u9700\u6C42\u4E00\u81F4\uFF0C\u5E76\u505A\u51FA\u5FC5\u8981\
             \u8C03\u6574\u4EE5\u5E94\u5BF9\u98CE\u9669\u548C\u673A\u9047\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:8.2
+    - urn: urn:ciso:risk:req_node:iso27001-2022:8.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:8
       ref_id: '8.2'
       name: Information security risk assessment
       description: Implement the risk assessment process to identify, evaluate, and
@@ -5360,8 +5360,8 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.proc_register
-      - urn:intuitem:risk:function:doc-pol:doc.risk_register
+      - urn:ciso:risk:function:doc-pol:doc.proc_register
+      - urn:ciso:risk:function:doc-pol:doc.risk_register
       translations:
         fr:
           name: "Appr\xE9ciation des risques de s\xE9curit\xE9 de l'information"
@@ -5394,10 +5394,10 @@ objects:
           description: "\u5B9E\u65BD\u98CE\u9669\u8BC4\u4F30\u6D41\u7A0B\uFF0C\u8BC6\
             \u522B\u3001\u8BC4\u4F30\u5E76\u4F18\u5148\u6392\u5E8FISMS\u6846\u67B6\
             \u4E2D\u5B9A\u4E49\u7684\u4FE1\u606F\u5B89\u5168\u98CE\u9669\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:8.3
+    - urn: urn:ciso:risk:req_node:iso27001-2022:8.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:8
       ref_id: '8.3'
       name: Information security risk treatment
       description: "Apply the risk treatment process by selecting and implementing\
@@ -5406,8 +5406,8 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.proc_register
-      - urn:intuitem:risk:function:doc-pol:doc.risk_register
+      - urn:ciso:risk:function:doc-pol:doc.proc_register
+      - urn:ciso:risk:function:doc-pol:doc.risk_register
       translations:
         fr:
           name: "Traitement des risques de s\xE9curit\xE9 de l'information"
@@ -5444,10 +5444,10 @@ objects:
             \u9669\uFF0C\u5E94\u7528\u98CE\u9669\u5904\u7406\u6D41\u7A0B\uFF0C\u786E\
             \u4FDD\u4E0E\u7EC4\u7EC7\u7684\u98CE\u9669\u63A5\u53D7\u6807\u51C6\u4FDD\
             \u6301\u4E00\u81F4\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:9
+    - urn: urn:ciso:risk:req_node:iso27001-2022:9
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:core
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:core
       ref_id: '9'
       name: Performance evaluation
       implementation_groups:
@@ -5465,10 +5465,10 @@ objects:
           name: Bewertung der Leistung
         zh:
           name: "\u7EE9\u6548\u8BC4\u4F30"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:9.1
+    - urn: urn:ciso:risk:req_node:iso27001-2022:9.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:9
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:9
       ref_id: '9.1'
       name: Monitoring, measurement, analysis, evaluation
       description: "Monitor, measure, analyze, and evaluate the ISMS\u2019s performance\
@@ -5477,8 +5477,8 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.monitor
-      - urn:intuitem:risk:function:doc-pol:doc.audit_plan
+      - urn:ciso:risk:function:doc-pol:pol.monitor
+      - urn:ciso:risk:function:doc-pol:doc.audit_plan
       translations:
         fr:
           name: "Surveillance, mesurages, analyse et \xE9valuation"
@@ -5510,10 +5510,10 @@ objects:
           description: "\u4F7F\u7528\u7B26\u5408\u7EC4\u7EC7\u76EE\u6807\u7684\u9002\
             \u5F53\u65B9\u6CD5\uFF0C\u76D1\u63A7\u3001\u6D4B\u91CF\u3001\u5206\u6790\
             \u548C\u8BC4\u4F30ISMS\u7684\u7EE9\u6548\u548C\u6709\u6548\u6027\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:9.2
+    - urn: urn:ciso:risk:req_node:iso27001-2022:9.2
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:9
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:9
       ref_id: '9.2'
       name: Internal audit
       implementation_groups:
@@ -5531,10 +5531,10 @@ objects:
           name: Internes Audit
         zh:
           name: "\u5185\u90E8\u5BA1\u8BA1"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:9.2.1
+    - urn: urn:ciso:risk:req_node:iso27001-2022:9.2.1
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:9.2
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:9.2
       ref_id: 9.2.1
       name: General
       description: Conduct internal audits at planned intervals to ensure the ISMS
@@ -5543,7 +5543,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.audit
+      - urn:ciso:risk:function:doc-pol:pol.audit
       translations:
         fr:
           name: "G\xE9n\xE9ralit\xE9s"
@@ -5576,10 +5576,10 @@ objects:
           description: "\u6309\u8BA1\u5212\u95F4\u9694\u8FDB\u884C\u5185\u90E8\u5BA1\
             \u8BA1\uFF0C\u786E\u4FDDISMS\u7B26\u5408ISO/IEC 27001\u8981\u6C42\u5E76\
             \u6709\u6548\u5B9E\u65BD\u548C\u7EF4\u62A4\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:9.2.2
+    - urn: urn:ciso:risk:req_node:iso27001-2022:9.2.2
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:9.2
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:9.2
       ref_id: 9.2.2
       name: Internal audit programme
       description: Plan and perform internal audits, including defining criteria,
@@ -5587,7 +5587,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.audit_plan
+      - urn:ciso:risk:function:doc-pol:doc.audit_plan
       translations:
         fr:
           name: Programme d'audit interne
@@ -5621,10 +5621,10 @@ objects:
             \u5305\u62EC\u5B9A\u4E49\u6807\u51C6\u3001\u8303\u56F4\u3001\u65B9\u6CD5\
             \u548C\u804C\u8D23\uFF0C\u5E76\u5C06\u7ED3\u679C\u62A5\u544A\u7ED9\u76F8\
             \u5173\u7BA1\u7406\u5C42\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:9.3
+    - urn: urn:ciso:risk:req_node:iso27001-2022:9.3
       assessable: false
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:9
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:9
       ref_id: '9.3'
       name: Management review
       implementation_groups:
@@ -5642,10 +5642,10 @@ objects:
           name: Managementbewertung
         zh:
           name: "\u7BA1\u7406\u6743\u5BA1\u67E5"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:9.3.1
+    - urn: urn:ciso:risk:req_node:iso27001-2022:9.3.1
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:9.3
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:9.3
       ref_id: 9.3.1
       name: General
       description: Review the ISMS periodically to ensure its suitability, adequacy,
@@ -5653,7 +5653,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.main
+      - urn:ciso:risk:function:doc-pol:pol.main
       translations:
         fr:
           name: "G\xE9n\xE9ralit\xE9s"
@@ -5685,10 +5685,10 @@ objects:
           description: "\u5B9A\u671F\u5BA1\u67E5ISMS\u4EE5\u786E\u4FDD\u5176\u5728\
             \u5B9E\u73B0\u7EC4\u7EC7\u76EE\u6807\u65B9\u9762\u7684\u9002\u7528\u6027\
             \u3001\u5145\u5206\u6027\u548C\u6709\u6548\u6027\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:9.3.2
+    - urn: urn:ciso:risk:req_node:iso27001-2022:9.3.2
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:9.3
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:9.3
       ref_id: 9.3.2
       name: Management review inputs
       description: Include inputs such as audit results, ISMS performance, risk status,
@@ -5696,7 +5696,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.mgmt_review
+      - urn:ciso:risk:function:doc-pol:doc.mgmt_review
       translations:
         fr:
           name: "El\xE9ments d'entr\xE9e de la revue de direction"
@@ -5730,10 +5730,10 @@ objects:
             \u3001\u98CE\u9669\u72B6\u6001\u3001\u6539\u8FDB\u673A\u4F1A\u4EE5\u53CA\
             \u7BA1\u7406\u5BA1\u67E5\u4E2D\u6240\u9700\u7684\u53D8\u66F4\u7B49\u8F93\
             \u5165\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:9.3.3
+    - urn: urn:ciso:risk:req_node:iso27001-2022:9.3.3
       assessable: true
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:9.3
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:9.3
       ref_id: 9.3.3
       name: Management review results
       description: Document the results of the management reviews, including decisions
@@ -5741,7 +5741,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.mgmt_review
+      - urn:ciso:risk:function:doc-pol:doc.mgmt_review
       translations:
         fr:
           name: "R\xE9sultats des revues de direction"
@@ -5772,10 +5772,10 @@ objects:
           description: "\u8BB0\u5F55\u7BA1\u7406\u5BA1\u67E5\u7684\u7ED3\u679C\uFF0C\
             \u5305\u62EC\u6539\u8FDB\u51B3\u7B56\u3001ISMS\u53D8\u66F4\u548C\u8D44\
             \u6E90\u9700\u6C42\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:10
+    - urn: urn:ciso:risk:req_node:iso27001-2022:10
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:core
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:core
       ref_id: '10'
       name: Improvement
       implementation_groups:
@@ -5793,10 +5793,10 @@ objects:
           name: Verbesserung
         zh:
           name: "\u6539\u8FDB"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:10.1
+    - urn: urn:ciso:risk:req_node:iso27001-2022:10.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:10
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:10
       ref_id: '10.1'
       name: Continual improvement
       description: Identify and act on opportunities for continual improvement to
@@ -5804,7 +5804,7 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.main
+      - urn:ciso:risk:function:doc-pol:pol.main
       translations:
         fr:
           name: "Am\xE9lioration continue"
@@ -5837,10 +5837,10 @@ objects:
           description: "\u8BC6\u522B\u5E76\u91C7\u53D6\u884C\u52A8\uFF0C\u4EE5\u6301\
             \u7EED\u6539\u8FDB\uFF0C\u4EE5\u63D0\u5347ISMS\u7684\u6548\u80FD\u548C\
             \u4E0E\u7EC4\u7EC7\u76EE\u6807\u7684\u4E00\u81F4\u6027\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:10.2
+    - urn: urn:ciso:risk:req_node:iso27001-2022:10.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:10
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:10
       ref_id: '10.2'
       name: Nonconformity and corrective action
       description: Address nonconformities by taking corrective actions, identifying
@@ -5849,12 +5849,12 @@ objects:
       implementation_groups:
       - Clauses
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.main
-      - urn:intuitem:risk:function:doc-pol:pol.incident
-      - urn:intuitem:risk:function:doc-pol:doc.nc_log
-      - urn:intuitem:risk:function:doc-pol:doc.proc_register
-      - urn:intuitem:risk:function:doc-pol:doc.raci
-      - urn:intuitem:risk:function:doc-pol:doc.mgmt_review
+      - urn:ciso:risk:function:doc-pol:pol.main
+      - urn:ciso:risk:function:doc-pol:pol.incident
+      - urn:ciso:risk:function:doc-pol:doc.nc_log
+      - urn:ciso:risk:function:doc-pol:doc.proc_register
+      - urn:ciso:risk:function:doc-pol:doc.raci
+      - urn:ciso:risk:function:doc-pol:doc.mgmt_review
       translations:
         fr:
           name: "Non-conformit\xE9 et action corrective"
@@ -5888,7 +5888,7 @@ objects:
             \u522B\u6839\u672C\u539F\u56E0\u5E76\u5B9E\u65BD\u9632\u6B62\u590D\u53D1\
             \u63AA\u65BD\uFF0C\u540C\u65F6\u8BB0\u5F55\u6D41\u7A0B\uFF0C\u89E3\u51B3\
             \u4E0D\u5408\u89C4\u95EE\u9898\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:annex-a
+    - urn: urn:ciso:risk:req_node:iso27001-2022:annex-a
       assessable: false
       depth: 1
       ref_id: annex-a
@@ -5908,10 +5908,10 @@ objects:
           name: "Erkl\xE4rung zur Anwendbarkeit"
         zh:
           name: "\u9002\u7528\u6027\u8BF4\u660E"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:annex-a
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:annex-a
       ref_id: A.5
       name: Organisational controls
       implementation_groups:
@@ -5929,10 +5929,10 @@ objects:
           name: "Organisatorische Ma\xDFnahmen"
         zh:
           name: "\u7EC4\u7EC7\u63A7\u5236"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.1
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.1
       name: Policies for information security
       description: This control establishes and maintains information security policies
@@ -5941,7 +5941,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.1
+      - urn:ciso:risk:function:doc-pol:a.5.1
       translations:
         fr:
           name: "Politiques de s\xE9curit\xE9 de l'information"
@@ -5985,10 +5985,10 @@ objects:
             \u7B56\u3002\u63AA\u65BD\u5305\u62EC\u754C\u5B9A\u8303\u56F4\u3001\u8BBE\
             \u5B9A\u76EE\u6807\uFF0C\u5E76\u786E\u4FDD\u7B26\u5408\u5408\u89C4\u8981\
             \u6C42\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.2
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.2
       name: Information security roles and responsibilities
       description: This control defines and assigns roles and responsibilities for
@@ -5997,7 +5997,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.2
+      - urn:ciso:risk:function:doc-pol:a.5.2
       translations:
         fr:
           name: "Fonctions et responsabilit\xE9s li\xE9es \xE0 la s\xE9curit\xE9 de\
@@ -6042,10 +6042,10 @@ objects:
             \u4FDD\u95EE\u8D23\u5236\u3002\u63AA\u65BD\u5305\u62EC\u660E\u786E\u8D23\
             \u4EFB\u8BB0\u5F55\u3001\u5B9A\u671F\u5BA1\u67E5\u548C\u6267\u6CD5\u673A\
             \u5236\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.3
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.3
       name: Segregation of duties
       description: This control ensures segregation of duties to reduce the risk of
@@ -6054,7 +6054,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.3
+      - urn:ciso:risk:function:doc-pol:a.5.3
       translations:
         fr:
           name: "S\xE9paration des t\xE2ches"
@@ -6094,10 +6094,10 @@ objects:
             \u6388\u6743\u8BBF\u95EE\u7684\u98CE\u9669\u3002\u63AA\u65BD\u5305\u62EC\
             \u89D2\u8272\u5206\u79BB\u3001\u8BBF\u95EE\u9650\u5236\u548C\u5B9A\u671F\
             \u5BA1\u8BA1\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.4
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.4
       name: Management responsibilities
       description: This control ensures management responsibilities for information
@@ -6106,7 +6106,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.4
+      - urn:ciso:risk:function:doc-pol:a.5.4
       translations:
         fr:
           name: "Responsabilit\xE9s de la direction"
@@ -6147,10 +6147,10 @@ objects:
             \u7684\u7BA1\u7406\u804C\u8D23\u88AB\u660E\u786E\u5B9A\u4E49\u5E76\u5F97\
             \u4EE5\u5B9E\u65BD\u3002\u63AA\u65BD\u5305\u62EC\u8BBE\u5B9A\u76EE\u6807\
             \u3001\u5206\u914D\u8D44\u6E90\u548C\u76D1\u7763\u5408\u89C4\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.5
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.5
       name: Contact with authorities
       description: This control ensures timely communication with relevant authorities
@@ -6159,7 +6159,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.5
+      - urn:ciso:risk:function:doc-pol:a.5.5
       translations:
         fr:
           name: "Contact avec les autorit\xE9s"
@@ -6203,10 +6203,10 @@ objects:
             \u6C9F\u901A\u3002\u63AA\u65BD\u5305\u62EC\u5EFA\u7ACB\u8054\u7CFB\u534F\
             \u8BAE\u3001\u7EF4\u62A4\u8054\u7CFB\u4EBA\u540D\u5355\u66F4\u65B0\u4EE5\
             \u53CA\u5206\u914D\u804C\u8D23\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.6
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.6
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.6
       name: Contact with special interest groups
       description: This control facilitates contact with special interest groups to
@@ -6215,7 +6215,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.6
+      - urn:ciso:risk:function:doc-pol:a.5.6
       translations:
         fr:
           name: "Contact avec des groupes d'int\xE9r\xEAt sp\xE9cifiques"
@@ -6253,10 +6253,10 @@ objects:
             \u5B9E\u8DF5\u7684\u4E86\u89E3\u3002\u63AA\u65BD\u5305\u62EC\u53C2\u4E0E\
             \u8BBA\u575B\u3001\u4F1A\u5458\u8D44\u683C\u548C\u534F\u4F5C\u9879\u76EE\
             \u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.7
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.7
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.7
       name: Threat intelligence
       description: This control ensures threat intelligence is developed and maintained
@@ -6265,7 +6265,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.7
+      - urn:ciso:risk:function:doc-pol:a.5.7
       translations:
         fr:
           name: Renseignements sur les menaces
@@ -6306,10 +6306,10 @@ objects:
             \u89E3\u5B89\u5168\u98CE\u9669\u3002\u63AA\u65BD\u5305\u62EC\u76D1\u63A7\
             \u5A01\u80C1\u4FE1\u606F\u6D41\u3001\u5206\u6790\u8D8B\u52BF\u4EE5\u53CA\
             \u5206\u4EAB\u53EF\u4F5C\u7684\u89C1\u89E3\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.8
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.8
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.8
       name: Information security in project management
       description: This control incorporates information security into project management
@@ -6318,7 +6318,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.8
+      - urn:ciso:risk:function:doc-pol:a.5.8
       translations:
         fr:
           name: "S\xE9curit\xE9 de l'information dans la gestion de projet"
@@ -6359,10 +6359,10 @@ objects:
             \u62EC\u98CE\u9669\u8BC4\u4F30\u3001\u5408\u89C4\u5BA1\u67E5\u4EE5\u53CA\
             \u9879\u76EE\u751F\u547D\u5468\u671F\u5185\u7684\u5B89\u5168\u68C0\u67E5\
             \u70B9\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.9
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.9
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.9
       name: Inventory of information and other associated assets
       description: This control ensures an accurate inventory of information and associated
@@ -6371,7 +6371,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.9
+      - urn:ciso:risk:function:doc-pol:a.5.9
       translations:
         fr:
           name: "Inventaire des informations et autres actifs associ\xE9s"
@@ -6408,10 +6408,10 @@ objects:
             \u76F8\u5173\u8D44\u4EA7\u7684\u51C6\u786E\u76D8\u70B9\u3002\u63AA\u65BD\
             \u5305\u62EC\u8D44\u4EA7\u8DDF\u8E2A\u3001\u5B9A\u671F\u5BA1\u8BA1\u4EE5\
             \u53CA\u6309\u654F\u611F\u5EA6\u5206\u7C7B\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.10
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.10
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.10
       name: Acceptable use of information and other associated assets
       description: This control defines acceptable use of information and associated
@@ -6420,7 +6420,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.10
+      - urn:ciso:risk:function:doc-pol:a.5.10
       translations:
         fr:
           name: "Utilisation correcte des informations et autres actifs associ\xE9\
@@ -6465,10 +6465,10 @@ objects:
             \u786E\u4FDD\u6B63\u786E\u5904\u7406\u3002\u63AA\u65BD\u5305\u62EC\u6709\
             \u6587\u6863\u5316\u7684\u653F\u7B56\u3001\u7528\u6237\u57F9\u8BAD\u548C\
             \u6267\u884C\u673A\u5236\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.11
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.11
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.11
       name: Return of assets
       description: This control ensures the secure return of assets when employees
@@ -6477,7 +6477,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.11
+      - urn:ciso:risk:function:doc-pol:a.5.11
       translations:
         fr:
           name: Restitution des actifs
@@ -6517,10 +6517,10 @@ objects:
             \uFF0C\u8D44\u4EA7\u80FD\u591F\u5B89\u5168\u56DE\u6536\u3002\u63AA\u65BD\
             \u5305\u62EC\u6E05\u5355\u3001\u8D44\u4EA7\u8DDF\u8E2A\u548C\u9000\u5F79\
             \u534F\u8BAE\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.12
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.12
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.12
       name: Classification of information
       description: This control ensures information is classified based on its sensitivity
@@ -6529,7 +6529,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.12
+      - urn:ciso:risk:function:doc-pol:a.5.12
       translations:
         fr:
           name: Classification des informations
@@ -6570,10 +6570,10 @@ objects:
             \u4EE5\u786E\u4FDD\u9002\u5F53\u7684\u4FDD\u62A4\u3002\u63AA\u65BD\u5305\
             \u62EC\u5206\u7C7B\u65B9\u6848\u3001\u8BBF\u95EE\u9650\u5236\u548C\u6807\
             \u7B7E\u6307\u5357\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.13
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.13
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.13
       name: Labelling of information
       description: This control ensures consistent labeling of information to reflect
@@ -6582,7 +6582,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.13
+      - urn:ciso:risk:function:doc-pol:a.5.13
       translations:
         fr:
           name: Marquage des informations
@@ -6618,10 +6618,10 @@ objects:
             \u7B7E\u4E00\u81F4\uFF0C\u53CD\u6620\u5176\u5206\u7C7B\u548C\u5904\u7406\
             \u8981\u6C42\u3002\u8861\u91CF\u6807\u51C6\u5305\u62EC\u6807\u51C6\u5316\
             \u6A21\u677F\u3001\u57F9\u8BAD\u548C\u5BA1\u8BA1\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.14
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.14
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.14
       name: Information transfer
       description: This control establishes secure processes for transferring information
@@ -6630,7 +6630,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.14
+      - urn:ciso:risk:function:doc-pol:a.5.14
       translations:
         fr:
           name: Transfert des informations
@@ -6667,10 +6667,10 @@ objects:
             \u7EC4\u7EC7\u4E4B\u95F4\u4FE1\u606F\u4F20\u8F93\u7684\u5B89\u5168\u6D41\
             \u7A0B\u3002\u63AA\u65BD\u5305\u62EC\u52A0\u5BC6\u3001\u8BBF\u95EE\u63A7\
             \u5236\u548C\u5B89\u5168\u4F20\u8F93\u534F\u8BAE\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.15
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.15
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.15
       name: Access control
       description: This control implements and maintains access control mechanisms
@@ -6679,7 +6679,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.15
+      - urn:ciso:risk:function:doc-pol:a.5.15
       translations:
         fr:
           name: "Contr\xF4le d'acc\xE8s"
@@ -6720,10 +6720,10 @@ objects:
             \u8BBF\u95EE\u3002\u63AA\u65BD\u5305\u62EC\u57FA\u4E8E\u89D2\u8272\u7684\
             \u8BBF\u95EE\u3001\u591A\u56E0\u7D20\u8BA4\u8BC1\u548C\u5B9A\u671F\u5BA1\
             \u67E5\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.16
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.16
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.16
       name: Identity management
       description: This control ensures identities are managed securely to guarantee
@@ -6732,7 +6732,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.16
+      - urn:ciso:risk:function:doc-pol:a.5.16
       translations:
         fr:
           name: "Gestion des identit\xE9s"
@@ -6773,10 +6773,10 @@ objects:
             \u9760\u8BBF\u95EE\u3002\u63AA\u65BD\u5305\u62EC\u8EAB\u4EFD\u9A8C\u8BC1\
             \u3001\u751F\u547D\u5468\u671F\u7BA1\u7406\u548C\u8BBF\u95EE\u914D\u7F6E\
             \u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.17
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.17
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.17
       name: Authentication information
       description: This control protects authentication information, such as passwords,
@@ -6785,7 +6785,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.17
+      - urn:ciso:risk:function:doc-pol:a.5.17
       translations:
         fr:
           name: Informations d'authentification
@@ -6822,10 +6822,10 @@ objects:
             \u606F\uFF0C\u5982\u5BC6\u7801\uFF0C\u4EE5\u9632\u6B62\u672A\u7ECF\u6388\
             \u6743\u7684\u8BBF\u95EE\u3002\u63AA\u65BD\u5305\u62EC\u52A0\u5BC6\u3001\
             \u5B89\u5168\u5B58\u50A8\u548C\u5B9A\u671F\u66F4\u65B0\u5BC6\u7801\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.18
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.18
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.18
       name: Access rights
       description: This control ensures access rights are regularly reviewed and managed
@@ -6834,7 +6834,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.18
+      - urn:ciso:risk:function:doc-pol:a.5.18
       translations:
         fr:
           name: "Droits d'acc\xE8s"
@@ -6874,10 +6874,10 @@ objects:
             \u89D2\u8272\u548C\u804C\u8D23\u3002\u63AA\u65BD\u5305\u62EC\u5B9A\u671F\
             \u5BA1\u8BA1\u3001\u8BBF\u95EE\u64A4\u9500\u548C\u81EA\u52A8\u5316\u8BBF\
             \u95EE\u7BA1\u7406\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.19
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.19
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.19
       name: Information security in supplier relationships
       description: This control ensures information security is embedded in supplier
@@ -6886,7 +6886,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.19
+      - urn:ciso:risk:function:doc-pol:a.5.19
       translations:
         fr:
           name: "S\xE9curit\xE9 de l'information dans les relations avec les fournisseurs"
@@ -6923,10 +6923,10 @@ objects:
             \u5D4C\u5165\u4F9B\u5E94\u5546\u5173\u7CFB\u548C\u6D41\u7A0B\u4E2D\u3002\
             \u63AA\u65BD\u5305\u62EC\u5C3D\u804C\u8C03\u67E5\u3001\u5B89\u5168\u5BA1\
             \u67E5\u548C\u6301\u7EED\u76D1\u63A7\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.20
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.20
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.20
       name: Addressing information security within supplier agreements
       description: This control addresses information security requirements within
@@ -6935,7 +6935,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.20
+      - urn:ciso:risk:function:doc-pol:a.5.20
       translations:
         fr:
           name: "La s\xE9curit\xE9 de l'information dans les accords conclus avec\
@@ -6976,10 +6976,10 @@ objects:
             \u4E2D\u7684\u4FE1\u606F\u5B89\u5168\u8981\u6C42\u3002\u63AA\u65BD\u5305\
             \u62EC\u660E\u786E\u7684\u5408\u540C\u6761\u6B3E\u3001\u5408\u89C4\u5BA1\
             \u8BA1\u4EE5\u53CA\u5BF9\u8FDD\u89C4\u7684\u660E\u786E\u5904\u7F5A\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.21
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.21
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.21
       name: Managing information security in the ICT supply chain
       description: This control manages information security risks in the ICT supply
@@ -6988,7 +6988,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.21
+      - urn:ciso:risk:function:doc-pol:a.5.21
       translations:
         fr:
           name: "Gestion de la s\xE9curit\xE9 de l'information dans la cha\xEEne d'approvisionnement\
@@ -7033,10 +7033,10 @@ objects:
             \u7EC4\u4EF6\u7684\u5B89\u5168\u3002\u63AA\u65BD\u5305\u62EC\u98CE\u9669\
             \u8BC4\u4F30\u3001\u4F9B\u5E94\u5546\u8BC4\u4F30\u548C\u4E8B\u6545\u54CD\
             \u5E94\u534F\u8BAE\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.22
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.22
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.22
       name: Monitor, review and change management of supplier services
       description: This control ensures supplier services are monitored, reviewed,
@@ -7045,7 +7045,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.22
+      - urn:ciso:risk:function:doc-pol:a.5.22
       translations:
         fr:
           name: "Surveillance, r\xE9vision et gestion des changements des services\
@@ -7093,10 +7093,10 @@ objects:
             \u4EE5\u7EF4\u62A4\u4FE1\u606F\u5B89\u5168\u3002\u63AA\u65BD\u5305\u62EC\
             \u670D\u52A1\u6C34\u5E73\u534F\u8BAE\u3001\u5B9A\u671F\u5BA1\u67E5\u548C\
             \u5408\u540C\u66F4\u65B0\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.23
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.23
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.23
       name: Information security for use of cloud services
       description: This control ensures the secure use of cloud services by addressing
@@ -7105,7 +7105,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.23
+      - urn:ciso:risk:function:doc-pol:a.5.23
       translations:
         fr:
           name: "S\xE9curit\xE9 de l'information dans l'utilisation de services en\
@@ -7146,10 +7146,10 @@ objects:
             \u98CE\u9669\uFF0C\u786E\u4FDD\u4E91\u670D\u52A1\u7684\u5B89\u5168\u4F7F\
             \u7528\u3002\u63AA\u65BD\u5305\u62EC\u6570\u636E\u52A0\u5BC6\u3001\u8BBF\
             \u95EE\u63A7\u5236\u548C\u63D0\u4F9B\u8005\u5408\u89C4\u5BA1\u67E5\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.24
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.24
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.24
       name: Information security incident management planning and preparation
       description: This control ensures proper planning and preparation for managing
@@ -7158,7 +7158,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.24
+      - urn:ciso:risk:function:doc-pol:a.5.24
       translations:
         fr:
           name: "Planification et pr\xE9paration de la gestion des incidents de s\xE9\
@@ -7201,10 +7201,10 @@ objects:
             \u5168\u4E8B\u4EF6\u7684\u5408\u7406\u89C4\u5212\u548C\u51C6\u5907\u3002\
             \u63AA\u65BD\u5305\u62EC\u4E8B\u4EF6\u54CD\u5E94\u8BA1\u5212\u3001\u57F9\
             \u8BAD\u6F14\u4E60\u548C\u901A\u4FE1\u534F\u8BAE\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.25
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.25
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.25
       name: Assessment and decision on information security events
       description: This control establishes processes for assessing and deciding on
@@ -7213,7 +7213,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.25
+      - urn:ciso:risk:function:doc-pol:a.5.25
       translations:
         fr:
           name: "\xC9valuation des \xE9v\xE9nements de s\xE9curit\xE9 de l'information\
@@ -7259,10 +7259,10 @@ objects:
             \u52A8\u7684\u6D41\u7A0B\u3002\u63AA\u65BD\u5305\u62EC\u6839\u672C\u539F\
             \u56E0\u5206\u6790\u3001\u98CE\u9669\u8BC4\u4F30\u548C\u7F13\u89E3\u8BA1\
             \u5212\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.26
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.26
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.26
       name: Response to information security incidents
       description: This control ensures effective response to information security
@@ -7271,7 +7271,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.26
+      - urn:ciso:risk:function:doc-pol:a.5.26
       translations:
         fr:
           name: "R\xE9ponse aux incidents de s\xE9curit\xE9 de l'information"
@@ -7312,10 +7312,10 @@ objects:
             \u9650\u5EA6\u5730\u51CF\u5C11\u5F71\u54CD\u5E76\u8FC5\u901F\u6062\u590D\
             \u3002\u63AA\u65BD\u5305\u62EC\u4E8B\u4EF6\u62A5\u544A\u3001\u5347\u7EA7\
             \u534F\u8BAE\u548C\u904F\u5236\u7B56\u7565\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.27
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.27
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.27
       name: Learning from information security incidents
       description: This control ensures lessons learned from information security
@@ -7324,7 +7324,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.27
+      - urn:ciso:risk:function:doc-pol:a.5.27
       translations:
         fr:
           name: "Tirer des enseignements des incidents de s\xE9curit\xE9 de l'information"
@@ -7367,10 +7367,10 @@ objects:
             \u5F55\u5E76\u52A0\u4EE5\u5B9E\u65BD\uFF0C\u4EE5\u6539\u8FDB\u6D41\u7A0B\
             \u3002\u63AA\u65BD\u5305\u62EC\u4E8B\u4EF6\u540E\u5BA1\u67E5\u3001\u884C\
             \u52A8\u8BA1\u5212\u548C\u653F\u7B56\u66F4\u65B0\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.28
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.28
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.28
       name: Collection of evidence
       description: This control ensures evidence is collected and preserved during
@@ -7379,7 +7379,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.28
+      - urn:ciso:risk:function:doc-pol:a.5.28
       translations:
         fr:
           name: Collecte de preuves
@@ -7421,10 +7421,10 @@ objects:
             \u4EE5\u652F\u6301\u8C03\u67E5\u3002\u63AA\u65BD\u5305\u62EC\u4FDD\u7BA1\
             \u94FE\u7A0B\u5E8F\u3001\u5B89\u5168\u5B58\u50A8\u548C\u95E8\u7981\u63A7\
             \u5236\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.29
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.29
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.29
       name: Information security during disruption
       description: This control ensures information security is maintained during
@@ -7433,7 +7433,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.29
+      - urn:ciso:risk:function:doc-pol:a.5.29
       translations:
         fr:
           name: "S\xE9curit\xE9 de l'information pendant une perturbation"
@@ -7473,10 +7473,10 @@ objects:
             \u8FD0\u8425\u7684\u8FDE\u7EED\u6027\u3002\u63AA\u65BD\u5305\u62EC\u5E94\
             \u6025\u9884\u6848\u3001\u5907\u4EFD\u7CFB\u7EDF\u548C\u6545\u969C\u5207\
             \u6362\u673A\u5236\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.30
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.30
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.30
       name: ICT readiness for business continuity
       description: This control ensures ICT readiness for business continuity to minimize
@@ -7485,7 +7485,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.30
+      - urn:ciso:risk:function:doc-pol:a.5.30
       translations:
         fr:
           name: "Pr\xE9paration des TIC la continuit\xE9 d'activit\xE9"
@@ -7527,10 +7527,10 @@ objects:
             \u51CF\u5C11\u4E2D\u65AD\u671F\u95F4\u7684\u505C\u673A\u65F6\u95F4\u3002\
             \u63AA\u65BD\u5305\u62EC\u6D4B\u8BD5\u6062\u590D\u8BA1\u5212\u3001\u5197\
             \u4F59\u7CFB\u7EDF\u548C\u707E\u96BE\u6062\u590D\u7AD9\u70B9\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.31
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.31
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.31
       name: Legal, statutory, regulatory and contractual requirements
       description: This control ensures compliance with legal, statutory, regulatory,
@@ -7539,7 +7539,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.31
+      - urn:ciso:risk:function:doc-pol:a.5.31
       translations:
         fr:
           name: "Exigences l\xE9gales, statutaires, r\xE9glementaires et contractuelles"
@@ -7579,10 +7579,10 @@ objects:
             \u3001\u6CD5\u5B9A\u3001\u76D1\u7BA1\u548C\u5408\u540C\u4FE1\u606F\u5B89\
             \u5168\u8981\u6C42\u3002\u63AA\u65BD\u5305\u62EC\u653F\u7B56\u5BA1\u67E5\
             \u3001\u5BA1\u8BA1\u548C\u8BC1\u636E\u8BB0\u5F55\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.32
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.32
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.32
       name: Intellectual property rights
       description: This control ensures intellectual property rights are protected
@@ -7591,7 +7591,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.32
+      - urn:ciso:risk:function:doc-pol:a.5.32
       translations:
         fr:
           name: "Droits de propri\xE9t\xE9 intellectuelle"
@@ -7630,10 +7630,10 @@ objects:
             \u901A\u8FC7\u9002\u5F53\u7684\u4FE1\u606F\u5B89\u5168\u63AA\u65BD\u5F97\
             \u5230\u4FDD\u62A4\u3002\u63AA\u65BD\u5305\u62EC\u8BBF\u95EE\u9650\u5236\
             \u3001\u52A0\u5BC6\u548C\u6CD5\u5F8B\u534F\u8BAE\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.33
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.33
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.33
       name: Protection of records
       description: This control ensures records are securely stored and protected
@@ -7642,7 +7642,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.33
+      - urn:ciso:risk:function:doc-pol:a.5.33
       translations:
         fr:
           name: Protection des enregistrements
@@ -7684,10 +7684,10 @@ objects:
             \u7ECF\u6388\u6743\u8BBF\u95EE\u3002\u63AA\u65BD\u5305\u62EC\u4FDD\u7559\
             \u653F\u7B56\u3001\u5B89\u5168\u5B58\u50A8\u548C\u8BBF\u95EE\u63A7\u5236\
             \u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.34
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.34
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.34
       name: Privacy and protection of PII
       description: This control protects privacy and ensures the secure handling of
@@ -7696,7 +7696,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.34
+      - urn:ciso:risk:function:doc-pol:a.5.34
       translations:
         fr:
           name: "Protection de la vie priv\xE9e et des donn\xE9es \xE0 caract\xE8\
@@ -7736,10 +7736,10 @@ objects:
             \u4FDD\u4E2A\u4EBA\u8EAB\u4EFD\u4FE1\u606F\uFF08PII\uFF09\u7684\u5B89\u5168\
             \u5904\u7406\u3002\u63AA\u65BD\u5305\u62EC\u533F\u540D\u5316\u3001\u52A0\
             \u5BC6\u4EE5\u53CA\u9075\u5B88\u9690\u79C1\u6CD5\u5F8B\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.35
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.35
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.35
       name: Independent review of information security
       description: This control ensures independent reviews of information security
@@ -7748,7 +7748,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.35
+      - urn:ciso:risk:function:doc-pol:a.5.35
       translations:
         fr:
           name: "R\xE9vision ind\xE9pendante de la s\xE9curit\xE9 de l'information"
@@ -7789,10 +7789,10 @@ objects:
             \u6709\u6548\u6027\u548C\u5408\u89C4\u6027\u3002\u63AA\u65BD\u5305\u62EC\
             \u5916\u90E8\u5BA1\u8BA1\u3001\u98CE\u9669\u8BC4\u4F30\u548C\u540E\u7EED\
             \u884C\u52A8\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.36
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.36
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.36
       name: Compliance with policies, rules and standards for information security
       description: This control ensures compliance with all policies, rules, and standards
@@ -7801,7 +7801,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.36
+      - urn:ciso:risk:function:doc-pol:a.5.36
       translations:
         fr:
           name: "Conformit\xE9 aux politiques, r\xE8gles et normes de s\xE9curit\xE9\
@@ -7844,10 +7844,10 @@ objects:
             \u4FE1\u606F\u5B89\u5168\u7684\u653F\u7B56\u3001\u89C4\u5219\u548C\u6807\
             \u51C6\u3002\u63AA\u65BD\u5305\u62EC\u5B9A\u671F\u57F9\u8BAD\u3001\u653F\
             \u7B56\u5BA1\u67E5\u548C\u6267\u6CD5\u673A\u5236\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.5.37
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.5.37
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.5
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.5
       ref_id: A.5.37
       name: Documented operating procedures
       description: This control develops and maintains documented operating procedures
@@ -7856,7 +7856,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.5.37
+      - urn:ciso:risk:function:doc-pol:a.5.37
       translations:
         fr:
           name: "Proc\xE9dures d'exploitation document\xE9es"
@@ -7894,10 +7894,10 @@ objects:
             \u6863\u7684\u4F5C\u7A0B\u5E8F\uFF0C\u4EE5\u786E\u4FDD\u5B89\u5168\u5B9E\
             \u8DF5\u7684\u4E00\u81F4\u6027\u3002\u63AA\u65BD\u5305\u62EC\u6D41\u7A0B\
             \u6587\u6863\u3001\u7248\u672C\u63A7\u5236\u548C\u65E0\u969C\u788D\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.6
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.6
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:annex-a
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:annex-a
       ref_id: A.6
       name: People controls
       implementation_groups:
@@ -7915,10 +7915,10 @@ objects:
           name: "Personenbezogene Ma\xDFnahmen"
         zh:
           name: "\u4EBA\u5458\u63A7\u5236"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.6.1
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.6.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.6
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.6
       ref_id: A.6.1
       name: Screening
       description: This control ensures the implementation of screening processes
@@ -7928,7 +7928,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.6.1
+      - urn:ciso:risk:function:doc-pol:a.6.1
       translations:
         fr:
           name: "S\xE9lection des candidats"
@@ -7972,10 +7972,10 @@ objects:
             \u4EBA\u7684\u9002\u4EFB\u6027\u3002\u63AA\u65BD\u5305\u62EC\u80CC\u666F\
             \u8C03\u67E5\u3001\u8EAB\u4EFD\u9A8C\u8BC1\u548C\u8D44\u683C\u8BC4\u4F30\
             \uFF0C\u4EE5\u964D\u4F4E\u5B89\u5168\u98CE\u9669\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.6.2
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.6.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.6
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.6
       ref_id: A.6.2
       name: Terms and conditions of employment
       description: This control ensures that terms and conditions of employment include
@@ -7984,7 +7984,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.6.2
+      - urn:ciso:risk:function:doc-pol:a.6.2
       translations:
         fr:
           name: Termes et conditions du contrat de travail
@@ -8025,10 +8025,10 @@ objects:
             \u63AA\u65BD\u5305\u62EC\u660E\u786E\u89C4\u5B9A\u4FDD\u5BC6\u3001\u9075\
             \u5B88\u653F\u7B56\u4EE5\u53CA\u8FDD\u89C4\u540E\u679C\u7B49\u6761\u6B3E\
             \u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.6.3
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.6.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.6
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.6
       ref_id: A.6.3
       name: Information security awareness, education and training
       description: This control ensures that employees receive regular information
@@ -8037,7 +8037,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.6.3
+      - urn:ciso:risk:function:doc-pol:a.6.3
       translations:
         fr:
           name: "Sensibilisation, enseignement et formation en s\xE9curit\xE9 de l'information"
@@ -8081,10 +8081,10 @@ objects:
             \u57F9\u8BAD\u3002\u63AA\u65BD\u5305\u62EC\u5B9A\u671F\u57F9\u8BAD\u3001\
             \u7535\u5B50\u5B66\u4E60\u9879\u76EE\u548C\u6A21\u62DF\u9493\u9C7C\u6F14\
             \u4E60\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.6.4
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.6.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.6
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.6
       ref_id: A.6.4
       name: Disciplinary process
       description: This control establishes a disciplinary process to address breaches
@@ -8093,7 +8093,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.6.4
+      - urn:ciso:risk:function:doc-pol:a.6.4
       translations:
         fr:
           name: "Proc\xE9dure disciplinaire"
@@ -8134,10 +8134,10 @@ objects:
             \u89C4\u884C\u4E3A\u3002\u63AA\u65BD\u5305\u62EC\u660E\u786E\u7684\u6307\
             \u5BFC\u65B9\u9488\u3001\u5347\u7EA7\u7A0B\u5E8F\u548C\u6301\u7EED\u7684\
             \u6267\u6CD5\uFF0C\u4EE5\u4FDD\u6301\u95EE\u8D23\u5236\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.6.5
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.6.5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.6
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.6
       ref_id: A.6.5
       name: Responsibilities after termination or change of employment
       description: This control ensures that responsibilities related to information
@@ -8147,7 +8147,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.6.5
+      - urn:ciso:risk:function:doc-pol:a.6.5
       translations:
         fr:
           name: "Responsabilit\xE9s apr\xE8s la fin ou le changement d'emploi"
@@ -8195,10 +8195,10 @@ objects:
             \u66F4\u540E\u5F97\u5230\u5B9A\u4E49\u548C\u6267\u884C\u3002\u63AA\u65BD\
             \u5305\u62EC\u64A4\u9500\u8BBF\u95EE\u6743\u3001\u6536\u7F34\u7EC4\u7EC7\
             \u8D44\u4EA7\u4EE5\u53CA\u8FDB\u884C\u79BB\u804C\u9762\u8C08\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.6.6
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.6.6
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.6
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.6
       ref_id: A.6.6
       name: Confidentiality or non-disclosure agreements
       description: This control implements confidentiality or non-disclosure agreements
@@ -8208,7 +8208,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.6.6
+      - urn:ciso:risk:function:doc-pol:a.6.6
       translations:
         fr:
           name: "Accords de confidentialit\xE9 ou de non-divulgation"
@@ -8250,10 +8250,10 @@ objects:
             \u63AA\u65BD\u5305\u62EC\u5165\u804C\u65F6\u7B7E\u7F72\u534F\u8BAE\u3001\
             \u5B9A\u671F\u63D0\u9192\u4EE5\u53CA\u5728\u8FDD\u89C4\u65F6\u6267\u884C\
             \u6CD5\u5F8B\u884C\u52A8\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.6.7
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.6.7
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.6
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.6
       ref_id: A.6.7
       name: Remote working
       description: This control ensures the secure management of information security
@@ -8262,7 +8262,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.6.7
+      - urn:ciso:risk:function:doc-pol:a.6.7
       translations:
         fr:
           name: "Travail \xE0 distance"
@@ -8307,10 +8307,10 @@ objects:
             \u7684\u5B89\u5168\u8BBF\u95EE\u3001\u5F3A\u5236\u4F7F\u7528VPN\uFF0C\u4EE5\
             \u53CA\u5236\u5B9A\u8FDC\u7A0B\u5904\u7406\u654F\u611F\u6570\u636E\u7684\
             \u653F\u7B56\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.6.8
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.6.8
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.6
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.6
       ref_id: A.6.8
       name: Information security event reporting
       description: This control ensures employees can promptly report information
@@ -8319,7 +8319,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.6.8
+      - urn:ciso:risk:function:doc-pol:a.6.8
       translations:
         fr:
           name: "D\xE9claration des \xE9v\xE9nements de s\xE9curit\xE9 de l'information"
@@ -8364,10 +8364,10 @@ objects:
             \u65BD\u5305\u62EC\u4E8B\u4EF6\u62A5\u544A\u6E20\u9053\u3001\u5BA3\u4F20\
             \u6D3B\u52A8\u4EE5\u53CA\u8C03\u67E5\u548C\u5904\u7406\u62A5\u544A\u4E8B\
             \u4EF6\u7684\u540E\u7EED\u7A0B\u5E8F\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.7
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.7
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:annex-a
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:annex-a
       ref_id: A.7
       name: Physical controls
       implementation_groups:
@@ -8385,10 +8385,10 @@ objects:
           name: "Physische Ma\xDFnahmen"
         zh:
           name: "\u7269\u7406\u63A7\u5236"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.7.1
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.7.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.7
       ref_id: A.7.1
       name: Physical security perimeters
       description: This control establishes physical security perimeters to protect
@@ -8398,7 +8398,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.7.1
+      - urn:ciso:risk:function:doc-pol:a.7.1
       translations:
         fr:
           name: "P\xE9rim\xE8tres de s\xE9curit\xE9 physique"
@@ -8442,10 +8442,10 @@ objects:
             \u8BBE\u7F6E\u969C\u788D\u7269\u3001\u95E8\u7981\u63A7\u5236\u548C\u76D1\
             \u63A7\u7CFB\u7EDF\uFF0C\u786E\u4FDD\u53EA\u6709\u6388\u6743\u4EBA\u5458\
             \u624D\u80FD\u8FDB\u5165\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.7.2
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.7.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.7
       ref_id: A.7.2
       name: Physical entry
       description: This control ensures physical entry points are controlled and monitored
@@ -8454,7 +8454,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.7.2
+      - urn:ciso:risk:function:doc-pol:a.7.2
       translations:
         fr:
           name: "Les entr\xE9es physiques"
@@ -8494,10 +8494,10 @@ objects:
             \u7ECF\u6388\u6743\u7684\u8BBF\u95EE\u3002\u63AA\u65BD\u5305\u62EC\u5FBD\
             \u7AE0\u7CFB\u7EDF\u3001\u5B89\u4FDD\u4EBA\u5458\u548C\u8BBF\u5BA2\u8BB0\
             \u5F55\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.7.3
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.7.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.7
       ref_id: A.7.3
       name: Securing offices, rooms and facilities
       description: This control ensures that offices, rooms, and facilities are secured
@@ -8506,7 +8506,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.7.3
+      - urn:ciso:risk:function:doc-pol:a.7.3
       translations:
         fr:
           name: "S\xE9curisation des bureaux, des salles et des installations"
@@ -8545,10 +8545,10 @@ objects:
             \u623F\u95F4\u548C\u8BBE\u65BD\u7684\u5B89\u5168\uFF0C\u4EE5\u4FDD\u62A4\
             \u4FE1\u606F\u548C\u8D44\u6E90\u3002\u63AA\u65BD\u5305\u62EC\u4E0A\u9501\
             \u95E8\u3001\u9650\u5236\u533A\u57DF\u548C\u76D1\u63A7\u7CFB\u7EDF\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.7.4
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.7.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.7
       ref_id: A.7.4
       name: Physical security monitoring
       description: This control implements physical security monitoring to detect
@@ -8557,7 +8557,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.7.4
+      - urn:ciso:risk:function:doc-pol:a.7.4
       translations:
         fr:
           name: "Surveillance de la s\xE9curit\xE9 physique"
@@ -8594,10 +8594,10 @@ objects:
             \u76D1\u63A7\uFF0C\u4EE5\u68C0\u6D4B\u5E76\u8FC5\u901F\u54CD\u5E94\u5A01\
             \u80C1\u3002\u63AA\u65BD\u5305\u62EC\u95ED\u8DEF\u7535\u89C6\u7CFB\u7EDF\
             \u3001\u8FD0\u52A8\u63A2\u6D4B\u5668\u548C\u5B9E\u65F6\u8B66\u62A5\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.7.5
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.7.5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.7
       ref_id: A.7.5
       name: Protecting against physical and environmental threats
       description: This control protects systems and resources from physical and environmental
@@ -8606,7 +8606,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.7.5
+      - urn:ciso:risk:function:doc-pol:a.7.5
       translations:
         fr:
           name: Protection contre les menaces physiques et environnementales
@@ -8645,10 +8645,10 @@ objects:
             \u6E90\u514D\u53D7\u7269\u7406\u548C\u73AF\u5883\u5A01\u80C1\u3002\u63AA\
             \u65BD\u5305\u62EC\u706D\u706B\u7CFB\u7EDF\u3001\u6E29\u5EA6\u63A7\u5236\
             \u548C\u9632\u6D2A\u5C4F\u969C\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.7.6
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.7.6
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.7
       ref_id: A.7.6
       name: Working In secure areas
       description: This control ensures that secure areas are managed to allow authorized
@@ -8657,7 +8657,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.7.6
+      - urn:ciso:risk:function:doc-pol:a.7.6
       translations:
         fr:
           name: "Travail dans les zones s\xE9curis\xE9es"
@@ -8696,10 +8696,10 @@ objects:
             \u53EA\u5141\u8BB8\u6388\u6743\u8BBF\u95EE\u3002\u63AA\u65BD\u5305\u62EC\
             \u95E8\u7981\u7CFB\u7EDF\u3001\u8BBF\u5BA2\u62A4\u9001\u548C\u6D3B\u52A8\
             \u76D1\u6D4B\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.7.7
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.7.7
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.7
       ref_id: A.7.7
       name: Clear desk and clear screen
       description: This control ensures sensitive information is not left exposed
@@ -8708,7 +8708,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.7.7
+      - urn:ciso:risk:function:doc-pol:a.7.7
       translations:
         fr:
           name: "Bureau propre et \xE9cran vide"
@@ -8750,10 +8750,10 @@ objects:
             \u654F\u611F\u4FE1\u606F\u4E0D\u4F1A\u88AB\u9057\u6F0F\u3002\u63AA\u65BD\
             \u5305\u62EC\u5C06\u654F\u611F\u6587\u4EF6\u9501\u597D\uFF0C\u5E76\u5728\
             \u672A\u4F7F\u7528\u65F6\u81EA\u52A8\u9501\u5B9A\u5C4F\u5E55\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.7.8
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.7.8
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.7
       ref_id: A.7.8
       name: Equipment siting and protection
       description: This control ensures that equipment is positioned and protected
@@ -8762,7 +8762,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.7.8
+      - urn:ciso:risk:function:doc-pol:a.7.8
       translations:
         fr:
           name: "Emplacement et protection du mat\xE9riel"
@@ -8803,10 +8803,10 @@ objects:
             \u7684\u8BBF\u95EE\u6216\u635F\u574F\u3002\u63AA\u65BD\u5305\u62EC\u5B89\
             \u5168\u5B89\u88C5\u3001\u4E0A\u9501\u67DC\u5B50\u548C\u9650\u5236\u8FDB\
             \u5165\u533A\u57DF\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.7.9
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.7.9
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.7
       ref_id: A.7.9
       name: Security of assets off-premises
       description: This control ensures assets used or stored off-premises are secured
@@ -8815,7 +8815,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.7.9
+      - urn:ciso:risk:function:doc-pol:a.7.9
       translations:
         fr:
           name: "S\xE9curit\xE9 des actifs hors des locaux"
@@ -8855,10 +8855,10 @@ objects:
             \u4EE5\u7EF4\u62A4\u673A\u5BC6\u6027\u548C\u5B8C\u6574\u6027\u3002\u63AA\
             \u65BD\u5305\u62EC\u52A0\u5BC6\u3001\u5B89\u5168\u4F20\u8F93\u548C\u8BBF\
             \u95EE\u8FFD\u8E2A\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.7.10
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.7.10
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.7
       ref_id: A.7.10
       name: Storage media
       description: This control safeguards storage media to prevent unauthorized access
@@ -8866,7 +8866,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.7.10
+      - urn:ciso:risk:function:doc-pol:a.7.10
       translations:
         fr:
           name: Supports de stockage
@@ -8903,10 +8903,10 @@ objects:
             \uFF0C\u9632\u6B62\u672A\u7ECF\u6388\u6743\u7684\u8BBF\u95EE\u6216\u7BE1\
             \u6539\u3002\u63AA\u65BD\u5305\u62EC\u5B89\u5168\u5B58\u50A8\u3001\u52A0\
             \u5BC6\u548C\u8BBF\u95EE\u9650\u5236\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.7.11
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.7.11
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.7
       ref_id: A.7.11
       name: Supporting utilities
       description: This control ensures that supporting utilities, such as power and
@@ -8915,7 +8915,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.7.11
+      - urn:ciso:risk:function:doc-pol:a.7.11
       translations:
         fr:
           name: Services supports
@@ -8954,10 +8954,10 @@ objects:
             \u516C\u7528\u4E8B\u4E1A\uFF0C\u5982\u7535\u529B\u548C\u51B7\u5374\u7CFB\
             \u7EDF\uFF0C\u53EF\u9760\u4E14\u4E0D\u53D7\u5E72\u6270\u3002\u63AA\u65BD\
             \u5305\u62EC\u5197\u4F59\u7CFB\u7EDF\u548C\u7269\u7406\u5B89\u5168\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.7.12
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.7.12
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.7
       ref_id: A.7.12
       name: Cabling security
       description: This control ensures that cables are secured to prevent unauthorized
@@ -8966,7 +8966,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.7.12
+      - urn:ciso:risk:function:doc-pol:a.7.12
       translations:
         fr:
           name: "S\xE9curit\xE9 du c\xE2blage"
@@ -9004,10 +9004,10 @@ objects:
             \u62E6\u622A\u6216\u635F\u574F\u3002\u63AA\u65BD\u5305\u62EC\u4FDD\u62A4\
             \u7BA1\u9053\u3001\u6B63\u786E\u6807\u8BC6\u548C\u5B89\u5168\u5E03\u7EBF\
             \u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.7.13
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.7.13
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.7
       ref_id: A.7.13
       name: Equipment maintenance
       description: This control ensures that equipment is maintained to guarantee
@@ -9016,7 +9016,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.7.13
+      - urn:ciso:risk:function:doc-pol:a.7.13
       translations:
         fr:
           name: "Maintenance du mat\xE9riel"
@@ -9057,10 +9057,10 @@ objects:
             \u6545\u969C\u53D1\u751F\u3002\u63AA\u65BD\u5305\u62EC\u5B9A\u671F\u4FDD\
             \u517B\u3001\u5B89\u5168\u7EF4\u62A4\u5B9E\u8DF5\u4EE5\u53CA\u6388\u6743\
             \u4EBA\u5458\u901A\u884C\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.7.14
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.7.14
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.7
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.7
       ref_id: A.7.14
       name: Secure disposal or re-use of equipment
       description: This control ensures the secure disposal or reuse of equipment
@@ -9069,7 +9069,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.7.14
+      - urn:ciso:risk:function:doc-pol:a.7.14
       translations:
         fr:
           name: "\xC9limination ou recyclage s\xE9curis\xE9(e) du mat\xE9riel"
@@ -9110,10 +9110,10 @@ objects:
             \u5904\u7F6E\u6216\u518D\u5229\u7528\uFF0C\u4EE5\u4FDD\u62A4\u654F\u611F\
             \u4FE1\u606F\u3002\u63AA\u65BD\u5305\u62EC\u6570\u636E\u51C0\u5316\u3001\
             \u7269\u7406\u9500\u6BC1\u548C\u8BA4\u8BC1\u5904\u7406\u6D41\u7A0B\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:annex-a
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:annex-a
       ref_id: A.8
       name: Technological controls
       implementation_groups:
@@ -9131,10 +9131,10 @@ objects:
           name: "Technologische Ma\xDFnahmen"
         zh:
           name: "\u6280\u672F\u63A7\u5236"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.1
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.1
       name: User end point devices
       description: This control ensures the protection of endpoint devices such as
@@ -9143,7 +9143,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.1
+      - urn:ciso:risk:function:doc-pol:a.8.1
       translations:
         fr:
           name: Terminaux finaux des utilisateurs
@@ -9186,10 +9186,10 @@ objects:
             \u3001\u53F0\u5F0F\u673A\u548C\u79FB\u52A8\u8BBE\u5907\u7B49\u7EC8\u7AEF\
             \u8BBE\u5907\u7684\u4FDD\u62A4\uFF0C\u4EE5\u6700\u5927\u9650\u5EA6\u5730\
             \u964D\u4F4E\u98CE\u9669\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.2
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.2
       name: Privileged access rights
       description: This control ensures that privileged access rights are granted,
@@ -9198,7 +9198,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.2
+      - urn:ciso:risk:function:doc-pol:a.8.2
       translations:
         fr:
           name: "Droits d'acc\xE8s privil\xE9gi\xE9s"
@@ -9244,10 +9244,10 @@ objects:
             \u6027\u3002\u63AA\u65BD\u5305\u62EC\u57FA\u4E8E\u89D2\u8272\u7684\u8BBF\
             \u95EE\u63A7\u5236\u3001\u5B9A\u671F\u5BA1\u67E5\u548C\u4E25\u683C\u7684\
             \u8D26\u6237\u7BA1\u7406\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.3
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.3
       name: Information access restriction
       description: This control restricts access to sensitive information based on
@@ -9256,7 +9256,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.3
+      - urn:ciso:risk:function:doc-pol:a.8.3
       translations:
         fr:
           name: "Restriction d'acc\xE8s aux informations"
@@ -9296,10 +9296,10 @@ objects:
             \u95EE\u3002\u63AA\u65BD\u5305\u62EC\u7528\u6237\u8BA4\u8BC1\u3001\u57FA\
             \u4E8E\u89D2\u8272\u7684\u6743\u9650\u4EE5\u53CA\u5B9A\u671F\u7684\u8BBF\
             \u95EE\u5BA1\u67E5\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.4
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.4
       name: Access to source code
       description: This control secures access to source code by preventing unauthorized
@@ -9308,7 +9308,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.4
+      - urn:ciso:risk:function:doc-pol:a.8.4
       translations:
         fr:
           name: "Acc\xE8s aux codes source"
@@ -9348,10 +9348,10 @@ objects:
             \u4FDD\u969C\u4E86\u5BF9\u6E90\u4EE3\u7801\u7684\u8BBF\u95EE\u3002\u63AA\
             \u65BD\u5305\u62EC\u7248\u672C\u63A7\u5236\u3001\u5B89\u5168\u4ED3\u5E93\
             \u548C\u9650\u5236\u5F00\u53D1\u8005\u8BBF\u95EE\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.5
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.5
       name: Secure authentication
       description: This control implements strong authentication mechanisms, such
@@ -9360,7 +9360,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.5
+      - urn:ciso:risk:function:doc-pol:a.8.5
       translations:
         fr:
           name: "Authentification s\xE9curis\xE9e"
@@ -9395,10 +9395,10 @@ objects:
             \uFF0C\u5982\u591A\u56E0\u7D20\u8BA4\u8BC1\uFF0C\u4EE5\u9A8C\u8BC1\u7528\
             \u6237\u8EAB\u4EFD\u5E76\u9632\u6B62\u672A\u7ECF\u6388\u6743\u7684\u8BBF\
             \u95EE\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.6
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.6
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.6
       name: Capacity management
       description: This control ensures system capacity is managed to provide adequate
@@ -9407,7 +9407,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.6
+      - urn:ciso:risk:function:doc-pol:a.8.6
       translations:
         fr:
           name: Dimensionnement
@@ -9447,10 +9447,10 @@ objects:
             \u80FD\u5E76\u9632\u6B62\u4E2D\u65AD\u3002\u63AA\u65BD\u5305\u62EC\u76D1\
             \u63A7\u8D44\u6E90\u4F7F\u7528\u548C\u89C4\u5212\u672A\u6765\u9700\u6C42\
             \u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.7
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.7
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.7
       name: Protection against malware
       description: This control deploys measures like antivirus software, threat detection
@@ -9458,7 +9458,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.7
+      - urn:ciso:risk:function:doc-pol:a.8.7
       translations:
         fr:
           name: Protection contre les programmes malveillants (malware)
@@ -9494,10 +9494,10 @@ objects:
             \u3001\u5A01\u80C1\u68C0\u6D4B\u5DE5\u5177\u548C\u5B9A\u671F\u66F4\u65B0\
             \u7B49\u63AA\u65BD\uFF0C\u4EE5\u4FDD\u62A4\u7CFB\u7EDF\u514D\u53D7\u6076\
             \u610F\u8F6F\u4EF6\u548C\u6076\u610F\u653B\u51FB\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.8
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.8
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.8
       name: Management of technical vulnerabilities
       description: This control identifies, evaluates, and remediates technical vulnerabilities
@@ -9506,7 +9506,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.8
+      - urn:ciso:risk:function:doc-pol:a.8.8
       translations:
         fr:
           name: "Gestion des vuln\xE9rabilit\xE9s techniques"
@@ -9544,10 +9544,10 @@ objects:
             \u5927\u9650\u5EA6\u5730\u964D\u4F4E\u5B89\u5168\u98CE\u9669\u3002\u63AA\
             \u65BD\u5305\u62EC\u6F0F\u6D1E\u626B\u63CF\u548C\u8865\u4E01\u7BA1\u7406\
             \u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.9
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.9
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.9
       name: Configuration management
       description: This control ensures consistent management of system configurations
@@ -9555,7 +9555,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.9
+      - urn:ciso:risk:function:doc-pol:a.8.9
       translations:
         fr:
           name: Gestion des configurations
@@ -9588,10 +9588,10 @@ objects:
           description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u7CFB\u7EDF\u914D\u7F6E\
             \u7684\u4E00\u81F4\u7BA1\u7406\uFF0C\u4EE5\u7EF4\u62A4\u5B89\u5168\u8BBE\
             \u7F6E\u5E76\u9632\u6B62\u672A\u7ECF\u6388\u6743\u7684\u66F4\u6539\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.10
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.10
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.10
       name: Information deletion
       description: This control ensures sensitive information is securely deleted
@@ -9599,7 +9599,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.10
+      - urn:ciso:risk:function:doc-pol:a.8.10
       translations:
         fr:
           name: Suppression des informations
@@ -9635,10 +9635,10 @@ objects:
           description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u654F\u611F\u4FE1\u606F\
             \u5728\u4E0D\u518D\u9700\u8981\u9632\u6B62\u672A\u7ECF\u6388\u6743\u7684\
             \u6062\u590D\u6216\u66DD\u5149\u65F6\u88AB\u5B89\u5168\u5220\u9664\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.11
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.11
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.11
       name: Data masking
       description: This control protects sensitive information during processing or
@@ -9647,7 +9647,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.11
+      - urn:ciso:risk:function:doc-pol:a.8.11
       translations:
         fr:
           name: "Masquage des donn\xE9es"
@@ -9682,10 +9682,10 @@ objects:
           description: "\u8BE5\u63A7\u5236\u901A\u8FC7\u4F7F\u7528\u6570\u636E\u63A9\
             \u853D\u6280\u672F\u4FDD\u62A4\u654F\u611F\u4FE1\u606F\uFF0C\u9632\u6B62\
             \u672A\u6388\u6743\u7528\u6237\u53D1\u73B0\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.12
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.12
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.12
       name: Data leakage prevention
       description: This control implements mechanisms to prevent the accidental exposure
@@ -9693,7 +9693,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.12
+      - urn:ciso:risk:function:doc-pol:a.8.12
       translations:
         fr:
           name: "Pr\xE9vention de la fuite de donn\xE9es"
@@ -9728,10 +9728,10 @@ objects:
             \u654F\u611F\u6570\u636E\u901A\u8FC7\u7535\u5B50\u90AE\u4EF6\u3001\u53EF\
             \u79FB\u52A8\u5A92\u4F53\u6216\u5176\u4ED6\u6E20\u9053\u610F\u5916\u6CC4\
             \u9732\u7684\u673A\u5236\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.13
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.13
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.13
       name: Information backup
       description: This control ensures critical information is backed up regularly
@@ -9739,7 +9739,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.13
+      - urn:ciso:risk:function:doc-pol:a.8.13
       translations:
         fr:
           name: Sauvegarde des informations
@@ -9775,10 +9775,10 @@ objects:
             \u80FD\u591F\u5B9A\u671F\u4E14\u5B89\u5168\u5730\u5907\u4EFD\uFF0C\u786E\
             \u4FDD\u5728\u4E8B\u6545\u6216\u707E\u96BE\u53D1\u751F\u65F6\u5176\u53EF\
             \u7528\u6027\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.14
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.14
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.14
       name: Redundancy of information processing facilities
       description: This control ensures redundancy is built into processing facilities
@@ -9786,7 +9786,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.14
+      - urn:ciso:risk:function:doc-pol:a.8.14
       translations:
         fr:
           name: Redondance des moyens de traitement de l'information
@@ -9823,10 +9823,10 @@ objects:
             \u5185\u7F6E\u5197\u4F59\uFF0C\u4EE5\u5728\u7CFB\u7EDF\u6545\u969C\u6216\
             \u7D27\u6025\u60C5\u51B5\u4E0B\u4FDD\u6301\u53EF\u7528\u6027\u548C\u8FD0\
             \u884C\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.15
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.15
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.15
       name: Logging
       description: This control enables logging of activities within systems to support
@@ -9834,7 +9834,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.15
+      - urn:ciso:risk:function:doc-pol:a.8.15
       translations:
         fr:
           name: Journalisation
@@ -9867,10 +9867,10 @@ objects:
           description: "\u8FD9\u79CD\u63A7\u5236\u4F7F\u7CFB\u7EDF\u5185\u6D3B\u52A8\
             \u80FD\u591F\u8BB0\u5F55\uFF0C\u4EE5\u652F\u6301\u76D1\u63A7\u3001\u4E8B\
             \u4EF6\u68C0\u6D4B\u548C\u53D6\u8BC1\u8C03\u67E5\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.16
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.16
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.16
       name: Monitoring activities
       description: This control ensures the ongoing monitoring of system activities
@@ -9878,7 +9878,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.16
+      - urn:ciso:risk:function:doc-pol:a.8.16
       translations:
         fr:
           name: "Activit\xE9s de surveillance"
@@ -9910,10 +9910,10 @@ objects:
           description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u7CFB\u7EDF\u6D3B\u52A8\
             \u6301\u7EED\u76D1\u63A7\uFF0C\u4EE5\u68C0\u6D4B\u3001\u54CD\u5E94\u5E76\
             \u7F13\u89E3\u5B89\u5168\u5A01\u80C1\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.17
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.17
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.17
       name: Clock synchronization
       description: This control ensures system clocks are synchronized to maintain
@@ -9921,7 +9921,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.17
+      - urn:ciso:risk:function:doc-pol:a.8.17
       translations:
         fr:
           name: Synchronisation des horloges
@@ -9953,10 +9953,10 @@ objects:
           description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u7CFB\u7EDF\u65F6\u949F\
             \u540C\u6B65\uFF0C\u4EE5\u4FDD\u6301\u65E5\u5FD7\u53CA\u5176\u4ED6\u5173\
             \u952E\u8FDB\u7A0B\u7684\u65F6\u95F4\u6233\u51C6\u786E\u4E00\u81F4\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.18
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.18
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.18
       name: Use of privileged utility programs
       description: This control restricts and monitors the use of privileged utility
@@ -9964,7 +9964,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.18
+      - urn:ciso:risk:function:doc-pol:a.8.18
       translations:
         fr:
           name: "Utilisation de programmes utilitaires \xE0 privil\xE8ges"
@@ -9996,10 +9996,10 @@ objects:
           description: "\u8FD9\u79CD\u63A7\u5236\u9650\u5236\u5E76\u76D1\u63A7\u7279\
             \u6743\u5DE5\u5177\u7A0B\u5E8F\u7684\u4F7F\u7528\uFF0C\u4EE5\u9632\u6B62\
             \u6EE5\u7528\u548C\u672A\u7ECF\u6388\u6743\u7684\u884C\u4E3A\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.19
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.19
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.19
       name: Installation of software on operational systems
       description: This control ensures software installation on operational systems
@@ -10007,7 +10007,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.19
+      - urn:ciso:risk:function:doc-pol:a.8.19
       translations:
         fr:
           name: "Installation de logiciels sur des syst\xE8mes op\xE9rationnels"
@@ -10042,10 +10042,10 @@ objects:
             \u7EDF\u4E0A\u7684\u8F6F\u4EF6\u5B89\u88C5\u5F97\u5230\u5B89\u5168\u7BA1\
             \u7406\uFF0C\u4EE5\u9632\u6B62\u6F0F\u6D1E\u6216\u672A\u7ECF\u6388\u6743\
             \u7684\u66F4\u6539\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.20
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.20
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.20
       name: Networks security
       description: This control ensures network security through firewalls, intrusion
@@ -10054,7 +10054,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.20
+      - urn:ciso:risk:function:doc-pol:a.8.20
       translations:
         fr:
           name: "S\xE9curit\xE9 des r\xE9seaux"
@@ -10089,10 +10089,10 @@ objects:
             \u5165\u4FB5\u68C0\u6D4B\u7CFB\u7EDF\u548C\u8BBF\u95EE\u63A7\u5236\u786E\
             \u4FDD\u7F51\u7EDC\u5B89\u5168\uFF0C\u9632\u6B62\u672A\u7ECF\u6388\u6743\
             \u7684\u8BBF\u95EE\u548C\u653B\u51FB\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.21
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.21
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.21
       name: Security of network services
       description: This control ensures network services are protected to maintain
@@ -10100,7 +10100,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.21
+      - urn:ciso:risk:function:doc-pol:a.8.21
       translations:
         fr:
           name: "S\xE9curit\xE9 des services r\xE9seau"
@@ -10133,10 +10133,10 @@ objects:
           description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u7F51\u7EDC\u670D\u52A1\
             \u5728\u4F7F\u7528\u8FC7\u7A0B\u4E2D\u4FDD\u6301\u673A\u5BC6\u6027\u3001\
             \u5B8C\u6574\u6027\u548C\u53EF\u7528\u6027\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.22
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.22
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.22
       name: Segregation of networks
       description: This control implements network segregation to limit the spread
@@ -10144,7 +10144,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.22
+      - urn:ciso:risk:function:doc-pol:a.8.22
       translations:
         fr:
           name: "Cloisonnement des r\xE9seaux"
@@ -10176,10 +10176,10 @@ objects:
             \u79BB\uFF0C\u4EE5\u9650\u5236\u5A01\u80C1\u7684\u6269\u6563\uFF0C\u5E76\
             \u6700\u5927\u9650\u5EA6\u5730\u51CF\u5C11\u6F5C\u5728\u5165\u4FB5\u7684\
             \u5F71\u54CD\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.23
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.23
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.23
       name: Web filtering
       description: This control uses web filtering tools to block unauthorized or
@@ -10187,7 +10187,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.23
+      - urn:ciso:risk:function:doc-pol:a.8.23
       translations:
         fr:
           name: Filtrage web
@@ -10218,10 +10218,10 @@ objects:
           description: "\u8BE5\u63A7\u5236\u5229\u7528\u7F51\u7EDC\u8FC7\u6EE4\u5DE5\
             \u5177\u963B\u6B62\u672A\u7ECF\u6388\u6743\u6216\u6709\u5BB3\u5185\u5BB9\
             \u901A\u8FC7\u4E92\u8054\u7F51\u8BBF\u95EE\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.24
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.24
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.24
       name: Use of cryptography
       description: This control ensures cryptographic techniques are applied to protect
@@ -10229,7 +10229,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.24
+      - urn:ciso:risk:function:doc-pol:a.8.24
       translations:
         fr:
           name: Utilisation de la cryptographie
@@ -10262,10 +10262,10 @@ objects:
           description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u91C7\u7528\u5BC6\u7801\
             \u5B66\u6280\u672F\u6765\u4FDD\u62A4\u6570\u636E\u7684\u673A\u5BC6\u6027\
             \u3001\u5B8C\u6574\u6027\u548C\u771F\u5B9E\u6027\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.25
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.25
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.25
       name: Secure development life cycle
       description: This control integrates security into all stages of the development
@@ -10273,7 +10273,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.25
+      - urn:ciso:risk:function:doc-pol:a.8.25
       translations:
         fr:
           name: "Cycle de vie de d\xE9veloppement s\xE9curis\xE9"
@@ -10307,10 +10307,10 @@ objects:
           description: "\u8BE5\u63A7\u5236\u5C06\u5B89\u5168\u6574\u5408\u5230\u5F00\
             \u53D1\u751F\u547D\u5468\u671F\u7684\u6240\u6709\u9636\u6BB5\uFF0C\u786E\
             \u4FDD\u7CFB\u7EDF\u548C\u5E94\u7528\u7684\u5B89\u5168\u6784\u5EFA\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.26
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.26
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.26
       name: Application security requirements
       description: This control defines and enforces security requirements for applications
@@ -10318,7 +10318,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.26
+      - urn:ciso:risk:function:doc-pol:a.8.26
       translations:
         fr:
           name: "Exigences de s\xE9curit\xE9 des applications"
@@ -10347,10 +10347,10 @@ objects:
           description: "\u8FD9\u79CD\u63A7\u5236\u5B9A\u4E49\u5E76\u6267\u884C\u5E94\
             \u7528\u7A0B\u5E8F\u7684\u5B89\u5168\u8981\u6C42\uFF0C\u4EE5\u9632\u8303\
             \u6F0F\u6D1E\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.27
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.27
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.27
       name: Secure system architecture and engineering principles
       description: This control ensures secure design principles are adopted during
@@ -10358,7 +10358,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.27
+      - urn:ciso:risk:function:doc-pol:a.8.27
       translations:
         fr:
           name: "Principes d'ing\xE9nierie et d'architecture des syst\xE8mes s\xE9\
@@ -10390,10 +10390,10 @@ objects:
           description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u5728\u7CFB\u7EDF\u67B6\
             \u6784\u5F00\u53D1\u8FC7\u7A0B\u4E2D\u91C7\u7528\u5B89\u5168\u7684\u8BBE\
             \u8BA1\u539F\u5219\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.28
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.28
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.28
       name: Secure coding
       description: This control implements secure coding practices to minimize vulnerabilities
@@ -10401,7 +10401,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.28
+      - urn:ciso:risk:function:doc-pol:a.8.28
       translations:
         fr:
           name: "Codage s\xE9curis\xE9"
@@ -10430,10 +10430,10 @@ objects:
           description: "\u8FD9\u79CD\u63A7\u5236\u5B9E\u65BD\u4E86\u5B89\u5168\u7684\
             \u7F16\u7801\u5B9E\u8DF5\uFF0C\u4EE5\u6700\u5927\u9650\u5EA6\u5730\u51CF\
             \u5C11\u5F00\u53D1\u8F6F\u4EF6\u4E2D\u7684\u6F0F\u6D1E\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.29
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.29
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.29
       name: Security testing in development and acceptance
       description: This control ensures security testing is conducted during development
@@ -10441,7 +10441,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.29
+      - urn:ciso:risk:function:doc-pol:a.8.29
       translations:
         fr:
           name: "Tests de s\xE9curit\xE9 dans le d\xE9veloppement et l'acceptation"
@@ -10474,10 +10474,10 @@ objects:
           description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u5728\u5F00\u53D1\u548C\
             \u9A8C\u6536\u9636\u6BB5\u8FDB\u884C\u5B89\u5168\u6D4B\u8BD5\uFF0C\u4EE5\
             \u8BC6\u522B\u5F31\u70B9\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.30
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.30
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.30
       name: Outsourced development
       description: This control ensures security risks are managed effectively when
@@ -10485,7 +10485,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.30
+      - urn:ciso:risk:function:doc-pol:a.8.30
       translations:
         fr:
           name: "D\xE9veloppement externalis\xE9"
@@ -10516,10 +10516,10 @@ objects:
           description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u5728\u5F00\u53D1\u5916\
             \u5305\u7ED9\u7B2C\u4E09\u65B9\u4F9B\u5E94\u5546\u65F6\u5B89\u5168\u98CE\
             \u9669\u5F97\u5230\u6709\u6548\u7BA1\u7406\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.31
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.31
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.31
       name: Separation of development, test and production environments
       description: This control ensures development, test, and production environments
@@ -10527,7 +10527,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.31
+      - urn:ciso:risk:function:doc-pol:a.8.31
       translations:
         fr:
           name: "S\xE9paration des environnements de d\xE9veloppement, de test et\
@@ -10566,10 +10566,10 @@ objects:
             \u8BD5\u548C\u751F\u4EA7\u73AF\u5883\u88AB\u9694\u79BB\uFF0C\u4EE5\u9632\
             \u6B62\u610F\u5916\u4EA4\u4E92\u548C\u672A\u7ECF\u6388\u6743\u7684\u8BBF\
             \u95EE\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.32
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.32
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.32
       name: Change management
       description: This control ensures changes to systems are managed securely to
@@ -10577,7 +10577,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.32
+      - urn:ciso:risk:function:doc-pol:a.8.32
       translations:
         fr:
           name: Gestion des changements
@@ -10609,10 +10609,10 @@ objects:
           description: "\u8FD9\u79CD\u63A7\u5236\u786E\u4FDD\u7CFB\u7EDF\u53D8\u66F4\
             \u5F97\u5230\u5B89\u5168\u7BA1\u7406\uFF0C\u4EE5\u964D\u4F4E\u98CE\u9669\
             \u5E76\u4FDD\u6301\u8FD0\u8425\u7A33\u5B9A\u6027\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.33
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.33
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.33
       name: Test information
       description: This control protects test data to prevent the exposure of sensitive
@@ -10620,7 +10620,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.33
+      - urn:ciso:risk:function:doc-pol:a.8.33
       translations:
         fr:
           name: Informations de test
@@ -10651,10 +10651,10 @@ objects:
           description: "\u8BE5\u63A7\u5236\u4FDD\u62A4\u6D4B\u8BD5\u6570\u636E\uFF0C\
             \u9632\u6B62\u654F\u611F\u6216\u673A\u5BC6\u4FE1\u606F\u5728\u6D4B\u8BD5\
             \u8FC7\u7A0B\u4E2D\u6CC4\u9732\u3002"
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:a.8.34
+    - urn: urn:ciso:risk:req_node:iso27001-2022:a.8.34
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:a.8
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:a.8
       ref_id: A.8.34
       name: Protection of information systems during audit testing
       description: This control ensures that systems and data are safeguarded during
@@ -10664,7 +10664,7 @@ objects:
       implementation_groups:
       - SoA
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:a.8.34
+      - urn:ciso:risk:function:doc-pol:a.8.34
       translations:
         fr:
           name: "Protection des syst\xE8mes d'information pendant les tests d'audit"
