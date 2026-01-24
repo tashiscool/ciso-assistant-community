@@ -208,6 +208,106 @@ def calculate_risk_metrics(
     return metrics
 
 
+def format_currency(amount: float, currency: str = "USD") -> str:
+    """Format a number as currency."""
+    symbols = {
+        'USD': '$',
+        'EUR': '€',
+        'GBP': '£',
+        'JPY': '¥',
+    }
+    symbol = symbols.get(currency, currency + ' ')
+
+    if amount < 0:
+        return f"-{symbol}{abs(amount):,.2f}"
+    elif amount >= 1_000_000_000:
+        return f"{symbol}{amount / 1_000_000_000:.2f}B"
+    elif amount >= 1_000_000:
+        return f"{symbol}{amount / 1_000_000:.2f}M"
+    elif amount >= 1_000:
+        return f"{symbol}{amount / 1_000:.2f}K"
+    else:
+        return f"{symbol}{amount:.2f}"
+
+
+# Additional utility functions for tests
+
+def calculate_var(losses: List[float], percentile: float = 0.95) -> float:
+    """Calculate Value at Risk at given percentile."""
+    if not losses:
+        return 0.0
+    sorted_losses = sorted(losses)
+    idx = int(len(sorted_losses) * percentile)
+    return sorted_losses[min(idx, len(sorted_losses) - 1)]
+
+
+def calculate_mean_annual_loss(losses: List[float]) -> float:
+    """Calculate mean annual loss."""
+    if not losses:
+        return 0.0
+    return sum(losses) / len(losses)
+
+
+def calculate_loss_exceedance_curve(losses: List[float]) -> List[Tuple[float, float]]:
+    """
+    Calculate Loss Exceedance Curve as list of (loss, probability) tuples.
+
+    Returns list sorted by loss ascending, probability descending.
+    """
+    if not losses:
+        return []
+
+    sorted_losses = sorted(losses)
+    n = len(sorted_losses)
+
+    # Create curve points
+    curve = []
+    for i, loss in enumerate(sorted_losses):
+        exceedance_prob = 1 - (i / n)
+        curve.append((loss, exceedance_prob))
+
+    return curve
+
+
+def calculate_percentile(data: List[float], percentile: float) -> float:
+    """Calculate percentile of data (percentile as 0-1 value)."""
+    if not data:
+        return 0.0
+
+    sorted_data = sorted(data)
+    n = len(sorted_data)
+    idx = percentile * (n - 1)
+    lower = int(idx)
+    upper = min(lower + 1, n - 1)
+    weight = idx - lower
+
+    return sorted_data[lower] * (1 - weight) + sorted_data[upper] * weight
+
+
+def calculate_median(data: List[float]) -> float:
+    """Calculate median of data."""
+    if not data:
+        return 0.0
+
+    sorted_data = sorted(data)
+    n = len(sorted_data)
+
+    if n % 2 == 0:
+        return (sorted_data[n // 2 - 1] + sorted_data[n // 2]) / 2
+    else:
+        return sorted_data[n // 2]
+
+
+def calculate_std(data: List[float]) -> float:
+    """Calculate standard deviation of data."""
+    if not data or len(data) < 2:
+        return 0.0
+
+    mean = sum(data) / len(data)
+    variance = sum((x - mean) ** 2 for x in data) / len(data)
+    return math.sqrt(variance)
+
+
 def simulate_portfolio(
     scenarios: List[Dict[str, Any]],
     num_iterations: int = 50000
@@ -223,7 +323,12 @@ def simulate_portfolio(
     Returns aggregated portfolio metrics.
     """
     if not scenarios:
-        return {}
+        return {
+            'total_losses': [],
+            'mean_annual_loss': 0,
+            'var_95': 0,
+            'loss_exceedance_curve': [],
+        }
 
     portfolio_losses = [0.0] * num_iterations
 
@@ -250,6 +355,9 @@ def simulate_portfolio(
     metrics = calculate_risk_metrics(portfolio_losses)
 
     return {
+        'total_losses': portfolio_losses,
+        'mean_annual_loss': metrics.get('mean_annual_loss', 0),
+        'var_95': metrics.get('var_95', 0),
         'loss_exceedance_curve': lec,
         'metrics': metrics,
         'scenario_count': len(scenarios),
@@ -269,12 +377,15 @@ def calculate_combined_simulation(
     current_result = simulate_portfolio(current_scenarios, num_iterations)
     residual_result = simulate_portfolio(residual_scenarios, num_iterations)
 
-    current_mal = current_result.get('metrics', {}).get('mean_annual_loss', 0)
-    residual_mal = residual_result.get('metrics', {}).get('mean_annual_loss', 0)
+    current_mal = current_result.get('mean_annual_loss', 0)
+    residual_mal = residual_result.get('mean_annual_loss', 0)
+
+    risk_reduction = current_mal - residual_mal
 
     return {
         'current': current_result,
         'residual': residual_result,
+        'risk_reduction': risk_reduction,
         'delta': {
             'mean_annual_loss': round(current_mal - residual_mal, 2),
             'reduction_percent': round(
@@ -282,23 +393,3 @@ def calculate_combined_simulation(
             ) if current_mal > 0 else 0,
         }
     }
-
-
-def format_currency(amount: float, currency: str = "USD") -> str:
-    """Format a number as currency."""
-    symbols = {
-        'USD': '$',
-        'EUR': '€',
-        'GBP': '£',
-        'JPY': '¥',
-    }
-    symbol = symbols.get(currency, currency + ' ')
-
-    if amount >= 1_000_000_000:
-        return f"{symbol}{amount / 1_000_000_000:.2f}B"
-    elif amount >= 1_000_000:
-        return f"{symbol}{amount / 1_000_000:.2f}M"
-    elif amount >= 1_000:
-        return f"{symbol}{amount / 1_000:.2f}K"
-    else:
-        return f"{symbol}{amount:.2f}"

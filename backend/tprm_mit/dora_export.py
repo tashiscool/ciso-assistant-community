@@ -436,3 +436,60 @@ def generate_parameters(organization_id: str) -> str:
         writer.writerow(param)
 
     return output.getvalue()
+
+
+# Aliases for test compatibility
+generate_b_02_01_ict_services = generate_b_04_01_ict_services
+generate_b_03_01_contracts = generate_b_02_01_contractual_arrangements
+generate_b_04_01_subcontracting = generate_b_05_01_provider_chain
+
+
+# Utility functions
+def format_date_for_csv(date_obj) -> str:
+    """Format a date for CSV output (YYYY-MM-DD)."""
+    if date_obj is None:
+        return ""
+    if hasattr(date_obj, 'strftime'):
+        return date_obj.strftime('%Y-%m-%d')
+    return str(date_obj)
+
+
+def format_bool_for_csv(value) -> str:
+    """Format a boolean for CSV output (Y/N)."""
+    if value is None:
+        return ""
+    return "Y" if value else "N"
+
+
+def escape_csv_value(value: str) -> str:
+    """Escape special characters in CSV values."""
+    if value is None:
+        return ""
+    if ',' in value or '"' in value or '\n' in value:
+        return '"' + value.replace('"', '""') + '"'
+    return value
+
+
+def validate_lei(lei: str) -> bool:
+    """Validate LEI (Legal Entity Identifier) format."""
+    if not lei:
+        return False
+    if len(lei) != 20:
+        return False
+    return lei.isalnum()
+
+
+# ISO 3166-1 alpha-2 country codes (subset)
+VALID_COUNTRY_CODES = {
+    'AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'ES', 'FI',
+    'FR', 'GR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT',
+    'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK', 'GB', 'US', 'CH',
+    'NO', 'IS', 'LI',
+}
+
+
+def validate_country_code(code: str) -> bool:
+    """Validate ISO 3166-1 alpha-2 country code."""
+    if not code:
+        return False
+    return code.upper() in VALID_COUNTRY_CODES

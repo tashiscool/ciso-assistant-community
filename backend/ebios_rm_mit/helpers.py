@@ -5,8 +5,212 @@ Chart data generation and analysis utilities for EBIOS RM.
 Copyright (c) 2026 Tash
 """
 
-from typing import Dict, List, Any
+import math
+from typing import Dict, List, Any, Optional
 from collections import defaultdict
+
+
+# Color mappings
+CATEGORY_COLORS = {
+    'client': '#4CAF50',
+    'supplier': '#2196F3',
+    'partner': '#FF9800',
+    'internal': '#9C27B0',
+    'other': '#607D8B',
+}
+
+
+def get_risk_color(risk_level: int) -> str:
+    """Get color for a risk level (1-16 scale)."""
+    if risk_level <= 3:
+        return 'green'
+    elif risk_level <= 6:
+        return 'yellow'
+    elif risk_level <= 12:
+        return 'orange'
+    else:
+        return 'red'
+
+
+def get_category_color(category: str) -> str:
+    """Get color for a stakeholder category."""
+    return CATEGORY_COLORS.get(category, '#607D8B')
+
+
+def format_stakeholder_for_chart(stakeholder: Dict[str, Any]) -> Dict[str, Any]:
+    """Format a stakeholder dict for chart display."""
+    return {
+        'id': stakeholder.get('id'),
+        'label': stakeholder.get('name'),
+        'size': stakeholder.get('criticality', 1),
+        'color': get_category_color(stakeholder.get('category', 'other')),
+    }
+
+
+def generate_radar_chart_data(stakeholders: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    Generate radar chart data from stakeholder list.
+
+    Args:
+        stakeholders: List of stakeholder dicts with exposure, reliability, criticality
+
+    Returns:
+        Chart.js compatible radar chart data
+    """
+    if not stakeholders:
+        return {'labels': [], 'datasets': []}
+
+    labels = ['Exposure', 'Reliability', 'Criticality']
+    datasets = []
+
+    for stakeholder in stakeholders:
+        datasets.append({
+            'label': stakeholder.get('name', 'Unknown'),
+            'data': [
+                stakeholder.get('exposure', 0),
+                stakeholder.get('reliability', 0),
+                stakeholder.get('criticality', 0),
+            ],
+            'backgroundColor': f"rgba(59, 130, 246, 0.3)",
+            'borderColor': 'rgba(59, 130, 246, 1)',
+        })
+
+    return {'labels': labels, 'datasets': datasets}
+
+
+def generate_circular_chart_data(stakeholders: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """
+    Generate circular ecosystem chart data.
+
+    Args:
+        stakeholders: List of stakeholder dicts with id, name, category, criticality, depends_on
+
+    Returns:
+        D3.js compatible force graph data with nodes and links
+    """
+    if not stakeholders:
+        return {'nodes': [], 'links': []}
+
+    nodes = []
+    links = []
+
+    n = len(stakeholders)
+    for i, s in enumerate(stakeholders):
+        # Calculate position on circle
+        angle = (2 * math.pi * i) / n
+        x = math.cos(angle)
+        y = math.sin(angle)
+
+        nodes.append({
+            'id': s.get('id'),
+            'name': s.get('name'),
+            'category': s.get('category'),
+            'criticality': s.get('criticality', 1),
+            'x': x,
+            'y': y,
+        })
+
+        # Create links for dependencies
+        depends_on = s.get('depends_on', [])
+        for dep_id in depends_on:
+            links.append({
+                'source': s.get('id'),
+                'target': dep_id,
+            })
+
+    return {'nodes': nodes, 'links': links}
+
+
+def generate_visual_analysis_data(
+    scenarios: List[Dict[str, Any]],
+    feared_events: List[Dict[str, Any]]
+) -> Dict[str, Any]:
+    """
+    Generate visual analysis data for scenarios and feared events.
+
+    Args:
+        scenarios: List of operational scenario dicts
+        feared_events: List of feared event dicts
+
+    Returns:
+        Analysis data including risk matrix and treatment stats
+    """
+    # Risk matrix cell counts
+    risk_matrix_cells = defaultdict(int)
+    treatment_counts = defaultdict(int)
+
+    for scenario in scenarios:
+        likelihood = scenario.get('likelihood', 0)
+        gravity = scenario.get('gravity', 0)
+        treatment = scenario.get('treatment', 'untreated')
+
+        risk_matrix_cells[(likelihood, gravity)] += 1
+        treatment_counts[treatment] += 1
+
+    # Format risk matrix cells
+    cells = [
+        {'likelihood': k[0], 'gravity': k[1], 'count': v}
+        for k, v in risk_matrix_cells.items()
+    ]
+
+    # Feared events summary
+    fe_summary = [
+        {'name': fe.get('name'), 'gravity': fe.get('gravity', 0)}
+        for fe in feared_events
+    ]
+
+    return {
+        'risk_matrix': {'cells': cells},
+        'treatment_stats': {
+            'total': len(scenarios),
+            **treatment_counts,
+        },
+        'feared_events_summary': fe_summary,
+    }
+
+
+def generate_report_data(
+    study_data: Dict[str, Any],
+    feared_events: List[Dict[str, Any]],
+    risk_origins: List[Dict[str, Any]],
+    stakeholders: List[Dict[str, Any]],
+    scenarios: List[Dict[str, Any]]
+) -> Dict[str, Any]:
+    """
+    Generate comprehensive report data for EBIOS RM study.
+
+    Args:
+        study_data: Study metadata dict
+        feared_events: List of feared events
+        risk_origins: List of risk origins
+        stakeholders: List of stakeholders
+        scenarios: List of operational scenarios
+
+    Returns:
+        Complete report structure
+    """
+    return {
+        'study': study_data,
+        'workshops': {
+            'workshop1': {
+                'feared_events': feared_events,
+            },
+            'workshop2': {
+                'risk_origins': risk_origins,
+            },
+            'workshop3': {
+                'stakeholders': stakeholders,
+            },
+            'workshop4': {
+                'scenarios': scenarios,
+            },
+        },
+        'statistics': {
+            'total_scenarios': len(scenarios),
+            'total_feared_events': len(feared_events),
+            'total_stakeholders': len(stakeholders),
+        },
+    }
 
 
 def generate_ecosystem_radar_chart(study) -> Dict[str, Any]:
