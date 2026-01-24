@@ -1,1 +1,1 @@
-# AI Assistant Tests
+"""Tests for AI Assistant services."""
