@@ -35,18 +35,50 @@ class BusinessContinuityPlanSerializer(serializers.ModelSerializer):
 
     def get_last_test_date(self, obj):
         """Get the most recent audit date as last test date"""
-        # TODO: Query audits by bcpId and get latest performed_at
-        return None
+        # Check for optimized data from view context (list optimization)
+        optimized_data = self.context.get("optimized_data")
+        if optimized_data:
+            audit_data = optimized_data.get("latest_audits", {}).get(obj.id)
+            if audit_data:
+                return audit_data.get("performed_at")
+
+        # Fallback: query for latest audit by bcpId
+        latest_audit = BcpAudit.objects.filter(
+            bcpId=obj.id,
+            performed_at__isnull=False
+        ).order_by('-performed_at').first()
+
+        return latest_audit.performed_at if latest_audit else None
 
     def get_last_test_result(self, obj):
         """Get the most recent audit outcome as last test result"""
-        # TODO: Query audits by bcpId and get latest outcome
-        return None
+        # Check for optimized data from view context
+        optimized_data = self.context.get("optimized_data")
+        if optimized_data:
+            audit_data = optimized_data.get("latest_audits", {}).get(obj.id)
+            if audit_data:
+                return audit_data.get("outcome")
+
+        # Fallback: query for latest audit with outcome by bcpId
+        latest_audit = BcpAudit.objects.filter(
+            bcpId=obj.id,
+            outcome__isnull=False
+        ).order_by('-performed_at').first()
+
+        return latest_audit.outcome if latest_audit else None
 
     def get_business_impact(self, obj):
-        """Derive business impact from service/asset criticality"""
-        # TODO: Calculate from linked assets/services
-        return 'medium'
+        """Derive business impact from linked services/assets count"""
+        # Simple heuristic: more linked services/assets = higher impact
+        total_linked = len(obj.serviceIds or []) + len(obj.assetIds or [])
+
+        if total_linked >= 10:
+            return 'critical'
+        elif total_linked >= 5:
+            return 'high'
+        elif total_linked >= 2:
+            return 'medium'
+        return 'low'
 
 
 class BcpTaskSerializer(serializers.ModelSerializer):

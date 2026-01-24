@@ -14,34 +14,126 @@ from .aggregates.data_flow import DataFlow
 from .serializers import (
     DataAssetSerializer,
     DataFlowSerializer,
+    ConsentRecordSerializer,
+    DataSubjectRightSerializer,
 )
+from .aggregates.consent_record import ConsentRecord
+from .aggregates.data_subject_right import DataSubjectRight
 
 
-# Stub ViewSets for endpoints the frontend expects but models aren't implemented yet
-class ConsentRecordViewSet(viewsets.ViewSet):
-    """Stub ViewSet for ConsentRecord - returns empty results until model is implemented"""
+class ConsentRecordViewSet(viewsets.ModelViewSet):
+    """ViewSet for ConsentRecord aggregates"""
+
+    queryset = ConsentRecord.objects.all()
+    serializer_class = ConsentRecordSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['lifecycle_state', 'consent_method', 'data_subject_type']
+    search_fields = ['data_subject_email', 'data_subject_reference']
+    ordering_fields = ['consent_date', 'created_at', 'valid_until']
+    ordering = ['-consent_date']
 
-    def list(self, request):
-        """Return empty list - model not yet implemented"""
-        return Response({'results': [], 'count': 0})
+    @action(detail=True, methods=['post'])
+    def withdraw(self, request, pk=None):
+        """Withdraw consent"""
+        record = self.get_object()
+        record.withdraw()
+        record.save()
+        return Response({'status': 'withdrawn'})
 
-    def retrieve(self, request, pk=None):
-        """Return 404 - model not yet implemented"""
-        return Response({'error': 'Not implemented'}, status=status.HTTP_404_NOT_FOUND)
+    @action(detail=True, methods=['post'])
+    def add_processing_purpose(self, request, pk=None):
+        """Add a processing purpose to this consent"""
+        record = self.get_object()
+        purpose_id = request.data.get('purpose_id')
+        if purpose_id:
+            record.add_processing_purpose(purpose_id)
+            record.save()
+            return Response({'status': 'purpose added'})
+        return Response({'error': 'purpose_id required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'])
+    def add_data_asset(self, request, pk=None):
+        """Add a data asset to this consent"""
+        record = self.get_object()
+        data_asset_id = request.data.get('data_asset_id')
+        if data_asset_id:
+            record.add_data_asset(data_asset_id)
+            record.save()
+            return Response({'status': 'data asset added'})
+        return Response({'error': 'data_asset_id required'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class DataSubjectRightViewSet(viewsets.ViewSet):
-    """Stub ViewSet for DataSubjectRight - returns empty results until model is implemented"""
+class DataSubjectRightViewSet(viewsets.ModelViewSet):
+    """ViewSet for DataSubjectRight aggregates"""
+
+    queryset = DataSubjectRight.objects.all()
+    serializer_class = DataSubjectRightSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['lifecycle_state', 'right_type', 'priority']
+    search_fields = ['reference_number', 'data_subject_email', 'data_subject_name']
+    ordering_fields = ['received_date', 'due_date', 'created_at']
+    ordering = ['-received_date']
 
-    def list(self, request):
-        """Return empty list - model not yet implemented"""
-        return Response({'results': [], 'count': 0})
+    @action(detail=True, methods=['post'])
+    def start_processing(self, request, pk=None):
+        """Start processing the request"""
+        dsr = self.get_object()
+        assigned_to = request.data.get('assigned_to_user_id')
+        dsr.start_processing(assigned_to)
+        dsr.save()
+        return Response({'status': 'in_progress'})
 
-    def retrieve(self, request, pk=None):
-        """Return 404 - model not yet implemented"""
-        return Response({'error': 'Not implemented'}, status=status.HTTP_404_NOT_FOUND)
+    @action(detail=True, methods=['post'])
+    def complete(self, request, pk=None):
+        """Complete the request"""
+        dsr = self.get_object()
+        response_notes = request.data.get('response_notes')
+        dsr.complete(response_notes)
+        dsr.save()
+        return Response({'status': 'completed'})
+
+    @action(detail=True, methods=['post'])
+    def reject(self, request, pk=None):
+        """Reject the request"""
+        dsr = self.get_object()
+        rejection_reason = request.data.get('rejection_reason')
+        if rejection_reason:
+            dsr.reject(rejection_reason)
+            dsr.save()
+            return Response({'status': 'rejected'})
+        return Response({'error': 'rejection_reason required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'])
+    def cancel(self, request, pk=None):
+        """Cancel the request"""
+        dsr = self.get_object()
+        dsr.cancel()
+        dsr.save()
+        return Response({'status': 'cancelled'})
+
+    @action(detail=True, methods=['post'])
+    def add_data_asset(self, request, pk=None):
+        """Add a data asset to this request"""
+        dsr = self.get_object()
+        data_asset_id = request.data.get('data_asset_id')
+        if data_asset_id:
+            dsr.add_data_asset(data_asset_id)
+            dsr.save()
+            return Response({'status': 'data asset added'})
+        return Response({'error': 'data_asset_id required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'])
+    def add_evidence(self, request, pk=None):
+        """Add evidence to this request"""
+        dsr = self.get_object()
+        evidence_id = request.data.get('evidence_id')
+        if evidence_id:
+            dsr.add_evidence(evidence_id)
+            dsr.save()
+            return Response({'status': 'evidence added'})
+        return Response({'error': 'evidence_id required'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DataAssetViewSet(viewsets.ModelViewSet):

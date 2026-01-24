@@ -108,7 +108,7 @@ class WorkflowViewSet(viewsets.ModelViewSet):
     def list(self, request):
         queryset = self.get_queryset()
         data = [self.get_serializer_data(w) for w in queryset]
-        return Response(data)
+        return Response({'results': data, 'count': len(data)})
 
     def retrieve(self, request, pk=None):
         workflow = get_object_or_404(Workflow, pk=pk)
@@ -326,7 +326,7 @@ class WorkflowExecutionViewSet(viewsets.ReadOnlyModelViewSet):
     def list(self, request):
         queryset = self.get_queryset()[:100]  # Limit to 100
         data = [self.get_serializer_data(e) for e in queryset]
-        return Response(data)
+        return Response({'results': data, 'count': len(data)})
 
     def retrieve(self, request, pk=None):
         execution = get_object_or_404(WorkflowExecution, pk=pk)
@@ -402,7 +402,7 @@ class WorkflowScheduleViewSet(viewsets.ModelViewSet):
     def list(self, request):
         queryset = self.get_queryset()
         data = [self.get_serializer_data(s) for s in queryset]
-        return Response(data)
+        return Response({'results': data, 'count': len(data)})
 
     def retrieve(self, request, pk=None):
         schedule = get_object_or_404(WorkflowSchedule, pk=pk)
@@ -487,7 +487,7 @@ class WorkflowWebhookViewSet(viewsets.ModelViewSet):
     def list(self, request):
         queryset = self.get_queryset()
         data = [self.get_serializer_data(w) for w in queryset]
-        return Response(data)
+        return Response({'results': data, 'count': len(data)})
 
     def retrieve(self, request, pk=None):
         webhook = get_object_or_404(WorkflowWebhook, pk=pk)

@@ -5,6 +5,8 @@ Serializers for Privacy bounded context
 from rest_framework import serializers
 from .aggregates.data_asset import DataAsset
 from .aggregates.data_flow import DataFlow
+from .aggregates.consent_record import ConsentRecord
+from .aggregates.data_subject_right import DataSubjectRight
 
 
 class DataAssetSerializer(serializers.ModelSerializer):
@@ -19,7 +21,7 @@ class DataAssetSerializer(serializers.ModelSerializer):
     compliance_status = serializers.SerializerMethodField()
     pia_required = serializers.SerializerMethodField()
     pia_completed = serializers.SerializerMethodField()
-    estimated_data_subjects = serializers.SerializerMethodField()
+    estimated_data_subjects = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = DataAsset
@@ -29,11 +31,13 @@ class DataAssetSerializer(serializers.ModelSerializer):
             'data_categories', 'contains_personal_data', 'retention_policy',
             'lifecycle_state',
             'assetIds', 'ownerOrgUnitIds',
+            # PIA fields
+            'pia_completed_at', 'pia_ref_id', 'estimated_data_subjects',
             'tags',
             # Frontend-expected alias fields
             'status', 'asset_id', 'asset_name', 'primary_data_category',
             'sensitivity_level', 'compliance_status', 'pia_required',
-            'pia_completed', 'estimated_data_subjects',
+            'pia_completed',
         ]
         read_only_fields = ['id', 'version', 'created_at', 'updated_at']
 
@@ -64,17 +68,13 @@ class DataAssetSerializer(serializers.ModelSerializer):
         return obj.contains_personal_data
 
     def get_pia_completed(self, obj):
-        """Check if PIA is completed - default False until PIA tracking is added"""
-        return False  # TODO: Add PIA tracking to model
-
-    def get_estimated_data_subjects(self, obj):
-        """Return estimated data subjects count - placeholder"""
-        return 0  # TODO: Add to model or calculate
+        """Check if PIA is completed based on pia_completed_at timestamp"""
+        return obj.pia_completed_at is not None
 
 
 class DataFlowSerializer(serializers.ModelSerializer):
     """Serializer for DataFlow aggregate"""
-    
+
     class Meta:
         model = DataFlow
         fields = [
@@ -88,4 +88,73 @@ class DataFlowSerializer(serializers.ModelSerializer):
             'tags',
         ]
         read_only_fields = ['id', 'version', 'created_at', 'updated_at']
+
+
+class ConsentRecordSerializer(serializers.ModelSerializer):
+    """Serializer for ConsentRecord aggregate"""
+
+    # Alias fields to match frontend expectations
+    consent_id = serializers.UUIDField(source='id', read_only=True)
+    status = serializers.CharField(source='lifecycle_state', read_only=True)
+    processing_purposes_count = serializers.SerializerMethodField()
+    is_valid = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ConsentRecord
+        fields = [
+            'id', 'version', 'created_at', 'updated_at',
+            'data_subject_email', 'data_subject_type', 'data_subject_reference',
+            'consent_method', 'consent_date', 'valid_until',
+            'lifecycle_state', 'withdrawn_at',
+            'processing_purpose_ids', 'data_asset_ids',
+            'consent_text', 'consent_version', 'ip_address',
+            'tags',
+            # Frontend-expected alias fields
+            'consent_id', 'status', 'processing_purposes_count', 'is_valid',
+        ]
+        read_only_fields = ['id', 'version', 'created_at', 'updated_at', 'withdrawn_at']
+
+    def get_processing_purposes_count(self, obj):
+        """Return count of processing purposes"""
+        return len(obj.processing_purpose_ids or [])
+
+    def get_is_valid(self, obj):
+        """Check if consent is still valid"""
+        return obj.is_valid()
+
+
+class DataSubjectRightSerializer(serializers.ModelSerializer):
+    """Serializer for DataSubjectRight aggregate"""
+
+    # Alias fields to match frontend expectations
+    request_id = serializers.CharField(source='reference_number', read_only=True)
+    primary_right = serializers.CharField(source='right_type', read_only=True)
+    status = serializers.CharField(source='lifecycle_state', read_only=True)
+    is_overdue = serializers.SerializerMethodField()
+    days_until_due = serializers.SerializerMethodField()
+
+    class Meta:
+        model = DataSubjectRight
+        fields = [
+            'id', 'version', 'created_at', 'updated_at',
+            'reference_number', 'data_subject_email', 'data_subject_name',
+            'right_type', 'description', 'priority',
+            'lifecycle_state',
+            'received_date', 'due_date', 'response_date',
+            'assigned_to_user_id',
+            'data_asset_ids', 'evidence_ids',
+            'response_notes', 'rejection_reason',
+            'tags',
+            # Frontend-expected alias fields
+            'request_id', 'primary_right', 'status', 'is_overdue', 'days_until_due',
+        ]
+        read_only_fields = ['id', 'version', 'created_at', 'updated_at', 'reference_number', 'response_date']
+
+    def get_is_overdue(self, obj):
+        """Check if the request is overdue"""
+        return obj.is_overdue()
+
+    def get_days_until_due(self, obj):
+        """Get number of days until due date"""
+        return obj.days_until_due()
 

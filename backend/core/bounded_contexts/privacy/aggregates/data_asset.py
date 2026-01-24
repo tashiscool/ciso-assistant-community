@@ -72,6 +72,23 @@ class DataAsset(AggregateRoot):
         help_text="Array of owner organizational unit IDs"
     )
     
+    # PIA (Privacy Impact Assessment) tracking
+    pia_completed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When the Privacy Impact Assessment was completed"
+    )
+    pia_ref_id = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Reference ID of the completed PIA document"
+    )
+    estimated_data_subjects = models.PositiveIntegerField(
+        default=0,
+        help_text="Estimated number of data subjects affected by this data asset"
+    )
+
     # Additional fields
     tags = models.JSONField(default=list, blank=True)
     

@@ -37,10 +37,27 @@ class ThirdParty(AggregateRoot):
         MEDIUM = "medium", "Medium"
         HIGH = "high", "High"
         CRITICAL = "critical", "Critical"
+
+    class EntityType(models.TextChoices):
+        VENDOR = "vendor", "Vendor"
+        PARTNER = "partner", "Partner"
+        SUPPLIER = "supplier", "Supplier"
+        CONTRACTOR = "contractor", "Contractor"
+        SERVICE_PROVIDER = "service_provider", "Service Provider"
+        CONSULTANT = "consultant", "Consultant"
     
     # Basic fields
     name = models.CharField(max_length=255, db_index=True)
     description = models.TextField(blank=True, null=True)
+
+    # Entity type
+    entity_type = models.CharField(
+        max_length=30,
+        choices=EntityType.choices,
+        default=EntityType.VENDOR,
+        db_index=True,
+        help_text="Type of third party entity"
+    )
     
     # Criticality
     criticality = models.CharField(

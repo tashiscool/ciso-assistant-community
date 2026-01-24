@@ -349,15 +349,19 @@ class NessusScanSerializer(serializers.ModelSerializer):
         return obj.total_severe_vulnerabilities
 
     def get_processing_percentage(self, obj):
-        # Simple estimation based on status
-        if obj.processing_status == 'completed':
-            return 100
-        elif obj.processing_status == 'processing':
-            return 50  # Could be enhanced with actual progress tracking
-        elif obj.processing_status == 'failed':
-            return 0
-        else:  # uploaded
-            return 0
+        """Return processing percentage based on status and optional progress metadata"""
+        # Check if model has detailed progress tracking
+        if hasattr(obj, 'processing_progress') and obj.processing_progress is not None:
+            return obj.processing_progress
+
+        # Status-based estimation
+        status_percentages = {
+            'uploaded': 10,
+            'processing': 50,
+            'completed': 100,
+            'failed': 0,
+        }
+        return status_percentages.get(obj.processing_status, 0)
 
     def create(self, validated_data):
         """Create a new Nessus scan"""
@@ -403,9 +407,23 @@ class StigTemplateSerializer(serializers.ModelSerializer):
         return obj.is_outdated
 
     def get_usage_percentage(self, obj):
-        # This would require calculating against total templates
-        # For now, return a placeholder
-        return 0.0
+        """Calculate usage percentage relative to total template usage"""
+        # Check for optimized data from view context
+        optimized_data = self.context.get("optimized_data")
+        if optimized_data:
+            return optimized_data.get("usage_percentages", {}).get(obj.id, 0.0)
+
+        # Fallback calculation
+        from django.db.models import Sum
+
+        total_usage = StigTemplate.objects.filter(
+            is_active=True
+        ).aggregate(total=Sum('usage_count'))['total'] or 0
+
+        if total_usage == 0:
+            return 0.0
+
+        return round((obj.usage_count / total_usage) * 100, 2)
 
 
 class ArtifactSerializer(serializers.ModelSerializer):

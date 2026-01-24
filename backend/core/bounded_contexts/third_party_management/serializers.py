@@ -12,7 +12,7 @@ class ThirdPartySerializer(serializers.ModelSerializer):
     # Alias fields to match frontend expectations
     status = serializers.CharField(source='lifecycle_state', read_only=True)
     entity_name = serializers.CharField(source='name', read_only=True)
-    entity_type = serializers.SerializerMethodField()
+    # entity_type now comes from model field
     risk_level = serializers.SerializerMethodField()
     compliance_status = serializers.SerializerMethodField()
     contract_status = serializers.SerializerMethodField()
@@ -22,20 +22,16 @@ class ThirdPartySerializer(serializers.ModelSerializer):
         fields = [
             'id', 'version', 'created_at', 'updated_at',
             'name', 'description',
+            'entity_type',  # Model field
             'criticality', 'lifecycle_state',
             'serviceIds', 'contractIds',
             'assessmentRunIds', 'riskIds', 'controlImplementationIds',
             'tags',
             # Frontend-expected alias fields
-            'status', 'entity_name', 'entity_type',
+            'status', 'entity_name',
             'risk_level', 'compliance_status', 'contract_status',
         ]
         read_only_fields = ['id', 'version', 'created_at', 'updated_at']
-
-    def get_entity_type(self, obj):
-        """Derive entity type - default to vendor"""
-        # TODO: Add entity_type field to model
-        return 'vendor'
 
     def get_risk_level(self, obj):
         """Map criticality to risk level"""
