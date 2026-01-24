@@ -1,4 +1,4 @@
-import { base } from '$app/paths';
+import { BASE_API_URL } from '$lib/utils/constants';
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { safeTranslate } from '$lib/utils/i18n';
@@ -8,7 +8,7 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 
 	try {
 		// Load BCP plans summary
-		const plansResponse = await fetch(`${base}/api/business-continuity/bcp-plans/?limit=1000`);
+		const plansResponse = await fetch(`${BASE_API_URL}/business-continuity/bcp-plans/?limit=1000`);
 		const plansData = plansResponse.ok ? await plansResponse.json() : { results: [], count: 0 };
 
 		// Calculate metrics

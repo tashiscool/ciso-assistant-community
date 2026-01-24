@@ -1,4 +1,4 @@
-import { base } from '$app/paths';
+import { BASE_API_URL } from '$lib/utils/constants';
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { safeTranslate } from '$lib/utils/i18n';
@@ -8,8 +8,8 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 
 	try {
 		// Load compliance assessment data
-		const assessmentsResponse = await fetch(`${base}/api/compliance/assessments/?limit=1000`);
-		const assessmentsData = assessmentsResponse.ok ? await assessmentsData.json() : { results: [] };
+		const assessmentsResponse = await fetch(`${BASE_API_URL}/compliance/assessments/?limit=1000`);
+		const assessmentsData = assessmentsResponse.ok ? await assessmentsResponse.json() : { results: [] };
 
 		const assessments = assessmentsData.results || [];
 

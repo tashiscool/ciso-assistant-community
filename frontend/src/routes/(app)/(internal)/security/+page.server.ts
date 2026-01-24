@@ -1,4 +1,4 @@
-import { base } from '$app/paths';
+import { BASE_API_URL } from '$lib/utils/constants';
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { safeTranslate } from '$lib/utils/i18n';
@@ -8,7 +8,7 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 
 	try {
 		// Load security incidents summary
-		const incidentsResponse = await fetch(`${base}/api/security/incidents/?limit=1000`);
+		const incidentsResponse = await fetch(`${BASE_API_URL}/security/incidents/?limit=1000`);
 		const incidentsData = incidentsResponse.ok ? await incidentsResponse.json() : { results: [], count: 0 };
 
 		// Calculate metrics

@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
+  import { BASE_API_URL } from '$lib/utils/constants';
   import {
     ArrowLeft,
     Download,
@@ -129,7 +130,7 @@
       if (scoreRes.success) score = scoreRes.data;
 
       // Check for upgrade
-      const upgradeRes = await fetch(`/api/v1/rmf/checklists/${id}/check-upgrade/`);
+      const upgradeRes = await fetch(`${BASE_API_URL}/rmf/checklists/${id}/check-upgrade/`);
       if (upgradeRes.ok) {
         const data = await upgradeRes.json();
         if (data.available) upgradeAvailable = data;
@@ -249,7 +250,7 @@
 
   async function upgradeChecklist() {
     try {
-      const res = await fetch(`/api/v1/rmf/checklists/${$page.params.id}/upgrade/`, {
+      const res = await fetch(`${BASE_API_URL}/rmf/checklists/${$page.params.id}/upgrade/`, {
         method: 'POST'
       });
       if (res.ok) {

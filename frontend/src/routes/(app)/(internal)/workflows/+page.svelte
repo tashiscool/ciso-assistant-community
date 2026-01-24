@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import * as m from '$paraglide/messages';
 	import { base } from '$app/paths';
+	import { BASE_API_URL } from '$lib/utils/constants';
 	import { goto } from '$app/navigation';
 	import Breadcrumbs from '$lib/components/Breadcrumbs/Breadcrumbs.svelte';
 	import WorkflowBuilder from '$lib/components/WorkflowBuilder/WorkflowBuilder.svelte';
@@ -80,7 +81,7 @@
 
 		loading = true;
 		try {
-			const res = await fetch('/api/workflows/', {
+			const res = await fetch(`${BASE_API_URL}/workflows/', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -111,7 +112,7 @@
 		if (!confirm('Are you sure you want to delete this workflow?')) return;
 
 		try {
-			const res = await fetch(`/api/workflows/${id}/`, { method: 'DELETE' });
+			const res = await fetch(`${BASE_API_URL}/workflows/${id}/`, { method: 'DELETE' });
 			if (res.ok) {
 				workflows = workflows.filter(w => w.id !== id);
 			}
@@ -122,7 +123,7 @@
 
 	async function activateWorkflow(id: string) {
 		try {
-			const res = await fetch(`/api/workflows/${id}/activate/`, { method: 'POST' });
+			const res = await fetch(`${BASE_API_URL}/workflows/${id}/activate/`, { method: 'POST' });
 			if (res.ok) {
 				const updated = await res.json();
 				workflows = workflows.map(w => w.id === id ? { ...w, status: 'active' } : w);
@@ -134,7 +135,7 @@
 
 	async function deactivateWorkflow(id: string) {
 		try {
-			const res = await fetch(`/api/workflows/${id}/deactivate/`, { method: 'POST' });
+			const res = await fetch(`${BASE_API_URL}/workflows/${id}/deactivate/`, { method: 'POST' });
 			if (res.ok) {
 				workflows = workflows.map(w => w.id === id ? { ...w, status: 'inactive' } : w);
 			}
@@ -145,7 +146,7 @@
 
 	async function executeWorkflow(id: string) {
 		try {
-			const res = await fetch(`/api/workflows/${id}/execute/`, { method: 'POST' });
+			const res = await fetch(`${BASE_API_URL}/workflows/${id}/execute/`, { method: 'POST' });
 			if (res.ok) {
 				const result = await res.json();
 				alert(`Workflow started. Execution ID: ${result.execution_id}`);

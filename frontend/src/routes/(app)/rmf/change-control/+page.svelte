@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import * as m from '$paraglide/messages';
+	import { BASE_API_URL } from '$lib/utils/constants';
 	import KanbanBoard from '$lib/components/Kanban/KanbanBoard.svelte';
 	import { transformToKanbanColumns } from '$lib/components/Kanban';
 	import WayfinderWorkflow from '$lib/components/Wayfinder/WayfinderWorkflow.svelte';
@@ -221,8 +222,8 @@
 			if (csoId) params.set('cso_id', csoId);
 
 			const [dashboardRes, listRes] = await Promise.all([
-				fetch(`/api/rmf/change-control/dashboard/?${params}`),
-				fetch(`/api/rmf/change-requests/?${params}`)
+				fetch(`${BASE_API_URL}/rmf/change-control/dashboard/?${params}`),
+				fetch(`${BASE_API_URL}/rmf/change-requests/?${params}`)
 			]);
 
 			if (!dashboardRes.ok || !listRes.ok) {

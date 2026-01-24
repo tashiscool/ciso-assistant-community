@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import * as m from '$paraglide/messages';
 	import { base } from '$app/paths';
+	import { BASE_API_URL } from '$lib/utils/constants';
 	import Breadcrumbs from '$lib/components/Breadcrumbs/Breadcrumbs.svelte';
 	import type { PageData } from './$types';
 
@@ -90,7 +91,7 @@
 	async function syncConnector(id: string) {
 		loading = true;
 		try {
-			const res = await fetch(`/api/connectors/${id}/sync/`, { method: 'POST' });
+			const res = await fetch(`${BASE_API_URL}/connectors/${id}/sync/`, { method: 'POST' });
 			if (res.ok) {
 				await loadConnectors();
 			}
@@ -102,7 +103,7 @@
 	async function deleteConnector(id: string) {
 		if (!confirm('Are you sure you want to delete this connector?')) return;
 		try {
-			const res = await fetch(`/api/connectors/${id}/`, { method: 'DELETE' });
+			const res = await fetch(`${BASE_API_URL}/connectors/${id}/`, { method: 'DELETE' });
 			if (res.ok) {
 				connectors = connectors.filter(c => c.id !== id);
 			}
@@ -113,7 +114,7 @@
 
 	async function loadConnectors() {
 		try {
-			const res = await fetch('/api/connectors/');
+			const res = await fetch(`${BASE_API_URL}/connectors/`);
 			if (res.ok) {
 				const data = await res.json();
 				connectors = data.results || data || [];

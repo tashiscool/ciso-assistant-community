@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import * as m from '$paraglide/messages';
+	import { BASE_API_URL } from '$lib/utils/constants';
 	import KanbanBoard from '$lib/components/Kanban/KanbanBoard.svelte';
 	import { transformToKanbanColumns } from '$lib/components/Kanban';
 	import WayfinderWorkflow from '$lib/components/Wayfinder/WayfinderWorkflow.svelte';
@@ -253,8 +254,8 @@
 			if (showOpenOnly) params.set('open_only', 'true');
 
 			const [dashboardRes, listRes] = await Promise.all([
-				fetch(`/api/rmf/incident-response/dashboard/?${csoId ? `cso_id=${csoId}` : ''}`),
-				fetch(`/api/rmf/incidents/?${params}`)
+				fetch(`${BASE_API_URL}/rmf/incident-response/dashboard/?${csoId ? `cso_id=${csoId}` : ''}`),
+				fetch(`${BASE_API_URL}/rmf/incidents/?${params}`)
 			]);
 
 			if (!dashboardRes.ok || !listRes.ok) {

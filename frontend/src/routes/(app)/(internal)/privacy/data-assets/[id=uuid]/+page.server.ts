@@ -1,4 +1,4 @@
-import { base } from '$app/paths';
+import { BASE_API_URL } from '$lib/utils/constants';
 import type { PageServerLoad, Actions } from './$types';
 import { error, fail } from '@sveltejs/kit';
 import { getModelInfo } from '$lib/utils/crud';
@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ params, fetch, depends }) => {
 	}
 
 	try {
-		const response = await fetch(`${base}/api/privacy/data-assets/${params.id}/`);
+		const response = await fetch(`${BASE_API_URL}/privacy/data-assets/${params.id}/`);
 		if (!response.ok) {
 			if (response.status === 404) {
 				throw error(404, 'Data asset not found');
@@ -30,11 +30,11 @@ export const load: PageServerLoad = async ({ params, fetch, depends }) => {
 		const dataAsset = await response.json();
 
 		// Load related consent records
-		const consentResponse = await fetch(`${base}/api/privacy/consent-records/?data_subject_id=${encodeURIComponent(dataAsset.asset_id)}`);
+		const consentResponse = await fetch(`${BASE_API_URL}/privacy/consent-records/?data_subject_id=${encodeURIComponent(dataAsset.asset_id)}`);
 		const consentRecords = consentResponse.ok ? (await consentResponse.json()).results || [] : [];
 
 		// Load related data subject rights
-		const rightsResponse = await fetch(`${base}/api/privacy/data-subject-rights/?data_subject_id=${encodeURIComponent(dataAsset.asset_id)}`);
+		const rightsResponse = await fetch(`${BASE_API_URL}/privacy/data-subject-rights/?data_subject_id=${encodeURIComponent(dataAsset.asset_id)}`);
 		const dataSubjectRights = rightsResponse.ok ? (await rightsResponse.json()).results || [] : [];
 
 		return {
@@ -60,7 +60,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			const response = await fetch(`${base}/api/privacy/data-assets/${params.id}/`, {
+			const response = await fetch(`${BASE_API_URL}/privacy/data-assets/${params.id}/`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json'
@@ -92,7 +92,7 @@ export const actions: Actions = {
 
 	conduct_pia: async ({ params, fetch }) => {
 		try {
-			const response = await fetch(`${base}/api/privacy/data-assets/${params.id}/conduct-pia/`, {
+			const response = await fetch(`${BASE_API_URL}/privacy/data-assets/${params.id}/conduct-pia/`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -121,7 +121,7 @@ export const actions: Actions = {
 
 	delete: async ({ params, fetch }) => {
 		try {
-			const response = await fetch(`${base}/api/privacy/data-assets/${params.id}/`, {
+			const response = await fetch(`${BASE_API_URL}/privacy/data-assets/${params.id}/`, {
 				method: 'DELETE'
 			});
 

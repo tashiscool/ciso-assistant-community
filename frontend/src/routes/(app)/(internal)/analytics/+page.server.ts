@@ -1,4 +1,4 @@
-import { base } from '$app/paths';
+import { BASE_API_URL } from '$lib/utils/constants';
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { safeTranslate } from '$lib/utils/i18n';
@@ -16,12 +16,12 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 			businessContinuityData,
 			complianceData
 		] = await Promise.all([
-			fetch(`${base}/api/privacy/data-assets/?limit=1000`).then(r => r.ok ? r.json() : { results: [] }),
-			fetch(`${base}/api/risks/asset-risks/?limit=1000`).then(r => r.ok ? r.json() : { results: [] }),
-			fetch(`${base}/api/security/incidents/?limit=1000`).then(r => r.ok ? r.json() : { results: [] }),
-			fetch(`${base}/api/third-party/entities/?limit=1000`).then(r => r.ok ? r.json() : { results: [] }),
-			fetch(`${base}/api/business-continuity/bcp-plans/?limit=1000`).then(r => r.ok ? r.json() : { results: [] }),
-			fetch(`${base}/api/compliance/assessments/?limit=1000`).then(r => r.ok ? r.json() : { results: [] })
+			fetch(`${BASE_API_URL}/privacy/data-assets/?limit=1000`).then(r => r.ok ? r.json() : { results: [] }),
+			fetch(`${BASE_API_URL}/risks/asset-risks/?limit=1000`).then(r => r.ok ? r.json() : { results: [] }),
+			fetch(`${BASE_API_URL}/security/incidents/?limit=1000`).then(r => r.ok ? r.json() : { results: [] }),
+			fetch(`${BASE_API_URL}/third-party/entities/?limit=1000`).then(r => r.ok ? r.json() : { results: [] }),
+			fetch(`${BASE_API_URL}/business-continuity/bcp-plans/?limit=1000`).then(r => r.ok ? r.json() : { results: [] }),
+			fetch(`${BASE_API_URL}/compliance/assessments/?limit=1000`).then(r => r.ok ? r.json() : { results: [] })
 		]);
 
 		// Calculate comprehensive GRC metrics

@@ -1,4 +1,4 @@
-import { base } from '$app/paths';
+import { BASE_API_URL } from '$lib/utils/constants';
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { safeTranslate } from '$lib/utils/i18n';
@@ -8,11 +8,11 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 
 	try {
 		// Load asset risks summary
-		const risksResponse = await fetch(`${base}/api/risks/asset-risks/?limit=1000`);
-		const risksData = risksResponse.ok ? await risksData.json() : { results: [], count: 0 };
+		const risksResponse = await fetch(`${BASE_API_URL}/risks/asset-risks/?limit=1000`);
+		const risksData = risksResponse.ok ? await risksResponse.json() : { results: [], count: 0 };
 
 		// Load risk registers summary
-		const registersResponse = await fetch(`${base}/api/risks/risk-registers/?limit=1000`);
+		const registersResponse = await fetch(`${BASE_API_URL}/risks/risk-registers/?limit=1000`);
 		const registersData = registersResponse.ok ? await registersResponse.json() : { results: [], count: 0 };
 
 		// Calculate metrics

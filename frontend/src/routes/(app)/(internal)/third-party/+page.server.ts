@@ -1,4 +1,4 @@
-import { base } from '$app/paths';
+import { BASE_API_URL } from '$lib/utils/constants';
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { safeTranslate } from '$lib/utils/i18n';
@@ -8,7 +8,7 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 
 	try {
 		// Load third party entities summary
-		const entitiesResponse = await fetch(`${base}/api/third-party/entities/?limit=1000`);
+		const entitiesResponse = await fetch(`${BASE_API_URL}/third-party/entities/?limit=1000`);
 		const entitiesData = entitiesResponse.ok ? await entitiesResponse.json() : { results: [], count: 0 };
 
 		// Calculate metrics

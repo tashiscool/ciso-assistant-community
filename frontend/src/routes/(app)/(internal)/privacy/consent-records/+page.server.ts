@@ -1,4 +1,4 @@
-import { base } from '$app/paths';
+import { BASE_API_URL } from '$lib/utils/constants';
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { getModelInfo } from '$lib/utils/crud';
@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ url, fetch, depends }) => {
 	const queryParams = url.searchParams;
 
 	try {
-		const response = await fetch(`${base}/api/privacy/consent-records/?${queryParams.toString()}`);
+		const response = await fetch(`${BASE_API_URL}/privacy/consent-records/?${queryParams.toString()}`);
 		if (!response.ok) {
 			throw error(response.status, 'Failed to load consent records');
 		}

@@ -1,4 +1,4 @@
-import { base } from '$app/paths';
+import { BASE_API_URL } from '$lib/utils/constants';
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { safeTranslate } from '$lib/utils/i18n';
@@ -8,15 +8,15 @@ export const load: PageServerLoad = async ({ fetch, depends }) => {
 
 	try {
 		// Load data assets summary
-		const assetsResponse = await fetch(`${base}/api/privacy/data-assets/?limit=1000`);
+		const assetsResponse = await fetch(`${BASE_API_URL}/privacy/data-assets/?limit=1000`);
 		const assetsData = assetsResponse.ok ? await assetsResponse.json() : { results: [], count: 0 };
 
 		// Load consent records summary
-		const consentResponse = await fetch(`${base}/api/privacy/consent-records/?limit=1000`);
+		const consentResponse = await fetch(`${BASE_API_URL}/privacy/consent-records/?limit=1000`);
 		const consentData = consentResponse.ok ? await consentResponse.json() : { results: [], count: 0 };
 
 		// Load data subject rights summary
-		const rightsResponse = await fetch(`${base}/api/privacy/data-subject-rights/?limit=1000`);
+		const rightsResponse = await fetch(`${BASE_API_URL}/privacy/data-subject-rights/?limit=1000`);
 		const rightsData = rightsResponse.ok ? await rightsResponse.json() : { results: [], count: 0 };
 
 		// Calculate metrics
