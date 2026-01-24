@@ -90,8 +90,8 @@ class MasterAssessment(models.Model):
     assessor_team = models.JSONField(default=list)  # List of user IDs
 
     # Configuration
-    settings = models.JSONField(default=dict)
-    # Example settings:
+    assessment_settings = models.JSONField(default=dict)
+    # Example assessment_settings:
     # {
     #   "sampling_rate": 0.3,
     #   "evidence_required": true,
@@ -313,7 +313,7 @@ class MasterAssessmentService:
         planned_start: date = None,
         planned_end: date = None,
         description: str = "",
-        settings: Dict = None,
+        assessment_settings: Dict = None,
         created_by: UUID = None,
     ) -> MasterAssessment:
         """
@@ -328,7 +328,7 @@ class MasterAssessmentService:
             planned_start: Planned start date
             planned_end: Planned end date
             description: Assessment description
-            settings: Assessment configuration
+            assessment_settings: Assessment configuration
             created_by: User creating the assessment
 
         Returns:
@@ -342,7 +342,7 @@ class MasterAssessmentService:
             target_frameworks=target_frameworks or [],
             planned_start_date=planned_start,
             planned_end_date=planned_end,
-            settings=settings or {},
+            assessment_settings=assessment_settings or {},
             lead_assessor_id=lead_assessor_id,
             created_by_id=created_by,
         )

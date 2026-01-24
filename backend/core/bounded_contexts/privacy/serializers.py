@@ -5,8 +5,8 @@ Serializers for Privacy bounded context
 from rest_framework import serializers
 from .aggregates.data_asset import DataAsset
 from .aggregates.data_flow import DataFlow
-from .aggregates.consent_record import ConsentRecord
-from .aggregates.data_subject_right import DataSubjectRight
+from privacy.models.consent_record import ConsentRecord
+from privacy.models.data_subject_right import DataSubjectRight
 
 
 class DataAssetSerializer(serializers.ModelSerializer):
@@ -94,67 +94,62 @@ class ConsentRecordSerializer(serializers.ModelSerializer):
     """Serializer for ConsentRecord aggregate"""
 
     # Alias fields to match frontend expectations
-    consent_id = serializers.UUIDField(source='id', read_only=True)
-    status = serializers.CharField(source='lifecycle_state', read_only=True)
     processing_purposes_count = serializers.SerializerMethodField()
-    is_valid = serializers.SerializerMethodField()
+    is_valid_consent = serializers.SerializerMethodField()
 
     class Meta:
         model = ConsentRecord
         fields = [
             'id', 'version', 'created_at', 'updated_at',
-            'data_subject_email', 'data_subject_type', 'data_subject_reference',
+            'consent_id', 'data_subject_id', 'data_subject_type',
             'consent_method', 'consent_date', 'valid_until',
-            'lifecycle_state', 'withdrawn_at',
-            'processing_purpose_ids', 'data_asset_ids',
-            'consent_text', 'consent_version', 'ip_address',
+            'status', 'withdrawn', 'withdrawal_date',
+            'processing_purposes', 'related_data_assets',
+            'consent_text', 'consent_language',
             'tags',
             # Frontend-expected alias fields
-            'consent_id', 'status', 'processing_purposes_count', 'is_valid',
+            'processing_purposes_count', 'is_valid_consent',
         ]
-        read_only_fields = ['id', 'version', 'created_at', 'updated_at', 'withdrawn_at']
+        read_only_fields = ['id', 'version', 'created_at', 'updated_at']
 
     def get_processing_purposes_count(self, obj):
         """Return count of processing purposes"""
-        return len(obj.processing_purpose_ids or [])
+        return len(obj.processing_purposes or [])
 
-    def get_is_valid(self, obj):
+    def get_is_valid_consent(self, obj):
         """Check if consent is still valid"""
-        return obj.is_valid()
+        return obj.is_valid
 
 
 class DataSubjectRightSerializer(serializers.ModelSerializer):
     """Serializer for DataSubjectRight aggregate"""
 
     # Alias fields to match frontend expectations
-    request_id = serializers.CharField(source='reference_number', read_only=True)
-    primary_right = serializers.CharField(source='right_type', read_only=True)
-    status = serializers.CharField(source='lifecycle_state', read_only=True)
-    is_overdue = serializers.SerializerMethodField()
+    is_overdue_flag = serializers.SerializerMethodField()
     days_until_due = serializers.SerializerMethodField()
 
     class Meta:
         model = DataSubjectRight
         fields = [
             'id', 'version', 'created_at', 'updated_at',
-            'reference_number', 'data_subject_email', 'data_subject_name',
-            'right_type', 'description', 'priority',
-            'lifecycle_state',
-            'received_date', 'due_date', 'response_date',
+            'request_id', 'data_subject_id', 'contact_email',
+            'primary_right', 'request_description', 'priority',
+            'status',
+            'received_date', 'due_date', 'completion_date',
             'assigned_to_user_id',
-            'data_asset_ids', 'evidence_ids',
-            'response_notes', 'rejection_reason',
+            'related_data_assets', 'data_located',
+            'response_summary', 'rejection_reason',
             'tags',
             # Frontend-expected alias fields
-            'request_id', 'primary_right', 'status', 'is_overdue', 'days_until_due',
+            'is_overdue_flag', 'days_until_due',
         ]
-        read_only_fields = ['id', 'version', 'created_at', 'updated_at', 'reference_number', 'response_date']
+        read_only_fields = ['id', 'version', 'created_at', 'updated_at']
 
-    def get_is_overdue(self, obj):
+    def get_is_overdue_flag(self, obj):
         """Check if the request is overdue"""
-        return obj.is_overdue()
+        return obj.is_overdue
 
     def get_days_until_due(self, obj):
         """Get number of days until due date"""
-        return obj.days_until_due()
+        return obj.days_to_due
 

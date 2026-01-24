@@ -17,8 +17,8 @@ from .serializers import (
     ConsentRecordSerializer,
     DataSubjectRightSerializer,
 )
-from .aggregates.consent_record import ConsentRecord
-from .aggregates.data_subject_right import DataSubjectRight
+from privacy.models.consent_record import ConsentRecord
+from privacy.models.data_subject_right import DataSubjectRight
 
 
 class ConsentRecordViewSet(viewsets.ModelViewSet):
@@ -28,8 +28,8 @@ class ConsentRecordViewSet(viewsets.ModelViewSet):
     serializer_class = ConsentRecordSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['lifecycle_state', 'consent_method', 'data_subject_type']
-    search_fields = ['data_subject_email', 'data_subject_reference']
+    filterset_fields = ['status', 'consent_method', 'data_subject_type']
+    search_fields = ['data_subject_id', 'consent_id']
     ordering_fields = ['consent_date', 'created_at', 'valid_until']
     ordering = ['-consent_date']
 
@@ -37,7 +37,9 @@ class ConsentRecordViewSet(viewsets.ModelViewSet):
     def withdraw(self, request, pk=None):
         """Withdraw consent"""
         record = self.get_object()
-        record.withdraw()
+        withdrawal_method = request.data.get('withdrawal_method', 'digital_request')
+        withdrawal_reason = request.data.get('withdrawal_reason')
+        record.withdraw_consent(withdrawal_method, withdrawal_reason)
         record.save()
         return Response({'status': 'withdrawn'})
 
@@ -45,12 +47,14 @@ class ConsentRecordViewSet(viewsets.ModelViewSet):
     def add_processing_purpose(self, request, pk=None):
         """Add a processing purpose to this consent"""
         record = self.get_object()
-        purpose_id = request.data.get('purpose_id')
-        if purpose_id:
-            record.add_processing_purpose(purpose_id)
+        purpose = request.data.get('purpose')
+        if purpose:
+            if not record.processing_purposes:
+                record.processing_purposes = []
+            record.processing_purposes.append(purpose)
             record.save()
             return Response({'status': 'purpose added'})
-        return Response({'error': 'purpose_id required'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'purpose required'}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'])
     def add_data_asset(self, request, pk=None):
@@ -58,7 +62,9 @@ class ConsentRecordViewSet(viewsets.ModelViewSet):
         record = self.get_object()
         data_asset_id = request.data.get('data_asset_id')
         if data_asset_id:
-            record.add_data_asset(data_asset_id)
+            if not record.related_data_assets:
+                record.related_data_assets = []
+            record.related_data_assets.append(data_asset_id)
             record.save()
             return Response({'status': 'data asset added'})
         return Response({'error': 'data_asset_id required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -71,26 +77,31 @@ class DataSubjectRightViewSet(viewsets.ModelViewSet):
     serializer_class = DataSubjectRightSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['lifecycle_state', 'right_type', 'priority']
-    search_fields = ['reference_number', 'data_subject_email', 'data_subject_name']
+    filterset_fields = ['status', 'primary_right', 'priority']
+    search_fields = ['request_id', 'data_subject_id', 'contact_email']
     ordering_fields = ['received_date', 'due_date', 'created_at']
     ordering = ['-received_date']
 
     @action(detail=True, methods=['post'])
     def start_processing(self, request, pk=None):
         """Start processing the request"""
+        import uuid
         dsr = self.get_object()
-        assigned_to = request.data.get('assigned_to_user_id')
-        dsr.start_processing(assigned_to)
+        assigned_to_user_id = request.data.get('assigned_to_user_id')
+        assigned_to_username = request.data.get('assigned_to_username', '')
+        if assigned_to_user_id:
+            dsr.assign_processor(uuid.UUID(assigned_to_user_id), assigned_to_username)
+        dsr.status = 'processing'
         dsr.save()
-        return Response({'status': 'in_progress'})
+        return Response({'status': 'processing'})
 
     @action(detail=True, methods=['post'])
     def complete(self, request, pk=None):
         """Complete the request"""
         dsr = self.get_object()
-        response_notes = request.data.get('response_notes')
-        dsr.complete(response_notes)
+        response_summary = request.data.get('response_summary', '')
+        response_method = request.data.get('response_method', 'email')
+        dsr.fulfill_request(response_summary, response_method)
         dsr.save()
         return Response({'status': 'completed'})
 
@@ -100,7 +111,7 @@ class DataSubjectRightViewSet(viewsets.ModelViewSet):
         dsr = self.get_object()
         rejection_reason = request.data.get('rejection_reason')
         if rejection_reason:
-            dsr.reject(rejection_reason)
+            dsr.reject_request(rejection_reason)
             dsr.save()
             return Response({'status': 'rejected'})
         return Response({'error': 'rejection_reason required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -109,7 +120,8 @@ class DataSubjectRightViewSet(viewsets.ModelViewSet):
     def cancel(self, request, pk=None):
         """Cancel the request"""
         dsr = self.get_object()
-        dsr.cancel()
+        dsr.status = 'rejected'
+        dsr.rejection_reason = 'Cancelled by user'
         dsr.save()
         return Response({'status': 'cancelled'})
 
@@ -119,7 +131,9 @@ class DataSubjectRightViewSet(viewsets.ModelViewSet):
         dsr = self.get_object()
         data_asset_id = request.data.get('data_asset_id')
         if data_asset_id:
-            dsr.add_data_asset(data_asset_id)
+            if not dsr.related_data_assets:
+                dsr.related_data_assets = []
+            dsr.related_data_assets.append(data_asset_id)
             dsr.save()
             return Response({'status': 'data asset added'})
         return Response({'error': 'data_asset_id required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -130,7 +144,9 @@ class DataSubjectRightViewSet(viewsets.ModelViewSet):
         dsr = self.get_object()
         evidence_id = request.data.get('evidence_id')
         if evidence_id:
-            dsr.add_evidence(evidence_id)
+            if not dsr.data_located:
+                dsr.data_located = []
+            dsr.data_located.append({'evidence_id': evidence_id})
             dsr.save()
             return Response({'status': 'evidence added'})
         return Response({'error': 'evidence_id required'}, status=status.HTTP_400_BAD_REQUEST)
