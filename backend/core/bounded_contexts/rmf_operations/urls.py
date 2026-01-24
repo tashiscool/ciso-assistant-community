@@ -63,15 +63,15 @@ from .api.change_control_views import (
 
 # Create router and register viewsets
 router = routers.DefaultRouter()
-router.register(r'system-groups', SystemGroupViewSet, basename='system-groups')
-router.register(r'checklists', StigChecklistViewSet, basename='checklists')
-router.register(r'vulnerability-findings', VulnerabilityFindingViewSet, basename='vulnerability-findings')
-router.register(r'checklist-scores', ChecklistScoreViewSet, basename='checklist-scores')
-router.register(r'nessus-scans', NessusScanViewSet, basename='nessus-scans')
-router.register(r'templates', StigTemplateViewSet, basename='templates')
-router.register(r'artifacts', ArtifactViewSet, basename='artifacts')
-router.register(r'change-requests', SignificantChangeRequestViewSet, basename='change-requests')
-router.register(r'incidents', SecurityIncidentViewSet, basename='incidents')
+router.register(r'system-groups', SystemGroupViewSet, basename='rmf-system-groups')
+router.register(r'checklists', StigChecklistViewSet, basename='rmf-checklists')
+router.register(r'vulnerability-findings', VulnerabilityFindingViewSet, basename='rmf-vulnerability-findings')
+router.register(r'checklist-scores', ChecklistScoreViewSet, basename='rmf-checklist-scores')
+router.register(r'nessus-scans', NessusScanViewSet, basename='rmf-nessus-scans')
+router.register(r'templates', StigTemplateViewSet, basename='rmf-templates')
+router.register(r'artifacts', ArtifactViewSet, basename='rmf-artifacts')
+router.register(r'change-requests', SignificantChangeRequestViewSet, basename='rmf-change-requests')
+router.register(r'incidents', SecurityIncidentViewSet, basename='rmf-incidents')
 
 urlpatterns = [
     path("", include(router.urls)),

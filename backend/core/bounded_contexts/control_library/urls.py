@@ -13,11 +13,11 @@ from .views import (
 )
 
 router = routers.DefaultRouter()
-router.register(r'controls', ControlViewSet, basename='controls')
-router.register(r'policies', PolicyViewSet, basename='policies')
-router.register(r'evidence-items', EvidenceItemViewSet, basename='evidence-items')
-router.register(r'control-implementations', ControlImplementationViewSet, basename='control-implementations')
-router.register(r'policy-acknowledgements', PolicyAcknowledgementViewSet, basename='policy-acknowledgements')
+router.register(r'controls', ControlViewSet, basename='control-library-controls')
+router.register(r'policies', PolicyViewSet, basename='control-library-policies')
+router.register(r'evidence-items', EvidenceItemViewSet, basename='control-library-evidence-items')
+router.register(r'control-implementations', ControlImplementationViewSet, basename='control-library-control-implementations')
+router.register(r'policy-acknowledgements', PolicyAcknowledgementViewSet, basename='control-library-policy-acknowledgements')
 
 urlpatterns = [
     path('', include(router.urls)),

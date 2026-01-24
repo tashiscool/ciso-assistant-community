@@ -121,13 +121,8 @@ class TrustCenterCSODetailView(APIView):
     )
     def get(self, request, cso_id):
         """Get CSO detail."""
-        try:
-            cso_uuid = UUID(cso_id)
-        except (TypeError, ValueError):
-            return Response({
-                'success': False,
-                'error': 'Invalid cso_id format',
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # Django's URL pattern already converts cso_id to UUID
+        cso_uuid = cso_id if isinstance(cso_id, UUID) else UUID(str(cso_id))
 
         try:
             service = get_trust_center_service()
@@ -181,13 +176,8 @@ class TrustCenterKSIComplianceView(APIView):
     )
     def get(self, request, cso_id):
         """Get KSI compliance report."""
-        try:
-            cso_uuid = UUID(cso_id)
-        except (TypeError, ValueError):
-            return Response({
-                'success': False,
-                'error': 'Invalid cso_id format',
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # Django's URL pattern already converts cso_id to UUID
+        cso_uuid = cso_id if isinstance(cso_id, UUID) else UUID(str(cso_id))
 
         include_details = request.query_params.get('include_details', 'false').lower() == 'true'
 
@@ -246,15 +236,13 @@ class TrustCenterOARHistoryView(APIView):
     )
     def get(self, request, cso_id):
         """Get OAR history."""
-        try:
-            cso_uuid = UUID(cso_id)
-        except (TypeError, ValueError):
-            return Response({
-                'success': False,
-                'error': 'Invalid cso_id format',
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # Django's URL pattern already converts cso_id to UUID
+        cso_uuid = cso_id if isinstance(cso_id, UUID) else UUID(str(cso_id))
 
-        limit = int(request.query_params.get('limit', 8))
+        try:
+            limit = int(request.query_params.get('limit', 8))
+        except (TypeError, ValueError):
+            limit = 8  # Default to 8 on invalid input
 
         try:
             service = get_trust_center_service()
@@ -304,13 +292,8 @@ class TrustCenterOSCALExcerptView(APIView):
     )
     def get(self, request, cso_id):
         """Get OSCAL excerpt."""
-        try:
-            cso_uuid = UUID(cso_id)
-        except (TypeError, ValueError):
-            return Response({
-                'success': False,
-                'error': 'Invalid cso_id format',
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # Django's URL pattern already converts cso_id to UUID
+        cso_uuid = cso_id if isinstance(cso_id, UUID) else UUID(str(cso_id))
 
         sections_str = request.query_params.get('sections')
         sections = sections_str.split(',') if sections_str else None
@@ -370,13 +353,8 @@ class TrustCenterPublishView(APIView):
     )
     def post(self, request, cso_id):
         """Publish/unpublish CSO."""
-        try:
-            cso_uuid = UUID(cso_id)
-        except (TypeError, ValueError):
-            return Response({
-                'success': False,
-                'error': 'Invalid cso_id format',
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # Django's URL pattern already converts cso_id to UUID
+        cso_uuid = cso_id if isinstance(cso_id, UUID) else UUID(str(cso_id))
 
         publish = request.data.get('publish', True)
 
@@ -445,13 +423,8 @@ class TrustCenterConfigView(APIView):
     )
     def post(self, request, cso_id):
         """Configure Trust Center display."""
-        try:
-            cso_uuid = UUID(cso_id)
-        except (TypeError, ValueError):
-            return Response({
-                'success': False,
-                'error': 'Invalid cso_id format',
-            }, status=status.HTTP_400_BAD_REQUEST)
+        # Django's URL pattern already converts cso_id to UUID
+        cso_uuid = cso_id if isinstance(cso_id, UUID) else UUID(str(cso_id))
 
         config = {
             'show_ksi_details': request.data.get('show_ksi_details', True),

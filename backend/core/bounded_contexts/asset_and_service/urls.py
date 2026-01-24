@@ -12,10 +12,10 @@ from .views import (
 )
 
 router = routers.DefaultRouter()
-router.register(r'assets', AssetViewSet, basename='assets')
-router.register(r'services', ServiceViewSet, basename='services')
-router.register(r'processes', ProcessViewSet, basename='processes')
-router.register(r'service-contracts', ServiceContractViewSet, basename='service-contracts')
+router.register(r'assets', AssetViewSet, basename='asset-service-assets')
+router.register(r'services', ServiceViewSet, basename='asset-service-services')
+router.register(r'processes', ProcessViewSet, basename='asset-service-processes')
+router.register(r'service-contracts', ServiceContractViewSet, basename='asset-service-service-contracts')
 
 urlpatterns = [
     path('', include(router.urls)),
