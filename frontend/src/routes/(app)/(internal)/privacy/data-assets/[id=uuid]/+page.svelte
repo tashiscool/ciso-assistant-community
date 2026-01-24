@@ -10,8 +10,7 @@
 	import Breadcrumbs from '$lib/components/Breadcrumbs/Breadcrumbs.svelte';
 	import type { PageData, ActionData } from './$types';
 
-	let { data }: { data: PageData } = $props();
-	export let form: ActionData;
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	let activeTab = 'overview';
 	let editing = false;
@@ -33,7 +32,7 @@
 		{ id: 'consent', label: 'Consent', icon: 'check-circle' },
 		{ id: 'rights', label: 'Subject Rights', icon: 'user-check' },
 		{ id: 'security', label: 'Security', icon: 'lock' }
-	]);
+	];
 
 	const dataCategories = {
 		'personal_data': 'Personal Data',

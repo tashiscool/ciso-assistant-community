@@ -5,14 +5,13 @@
 	import type { PageData, ActionData } from './$types';
 	import { m } from '$paraglide/messages';
 
-	let { data }: { data: PageData } = $props();
-	export let form: ActionData;
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 
-	let selectedFramework: string = '';
-	let selectedProfileType: string = 'custom';
-	let profileName: string = '';
-	let generateTasks: boolean = true;
-	let selectedGroups: string[] = [];
+	let selectedFramework = $state('');
+	let selectedProfileType = $state('custom');
+	let profileName = $state('');
+	let generateTasks = $state(true);
+	let selectedGroups = $state<string[]>([]);
 
 	const breadcrumbs = $derived([
 		{ label: m.continuousMonitoring?.() || 'Continuous Monitoring', href: `${base}/continuous-monitoring` },
@@ -20,7 +19,7 @@
 	]);
 
 	// Implementation groups based on framework selection
-	$: implementationGroups = getImplementationGroups(selectedFramework);
+	const implementationGroups = $derived(getImplementationGroups(selectedFramework));
 
 	function getImplementationGroups(frameworkUrn: string): { ref_id: string; name: string; description: string }[] {
 		if (!frameworkUrn || data.frameworks.length === 0) return [];
@@ -33,26 +32,26 @@
 
 	// Profile types
 	const profileTypes = [
-		{ value: 'fedramp_low', label: m.fedrampLow?.() || 'FedRAMP Low' },
-		{ value: 'fedramp_moderate', label: m.fedrampModerate?.() || 'FedRAMP Moderate' },
-		{ value: 'fedramp_high', label: m.fedrampHigh?.() || 'FedRAMP High' },
-		{ value: 'iso_27001', label: m.iso27001?.() || 'ISO 27001' },
-		{ value: 'soc_2', label: m.soc2?.() || 'SOC 2' },
-		{ value: 'nist_csf', label: m.nistCsf?.() || 'NIST CSF' },
-		{ value: 'cmmc_l1', label: m.cmmcL1?.() || 'CMMC Level 1' },
-		{ value: 'cmmc_l2', label: m.cmmcL2?.() || 'CMMC Level 2' },
-		{ value: 'cmmc_l3', label: m.cmmcL3?.() || 'CMMC Level 3' },
-		{ value: 'custom', label: m.custom?.() || 'Custom' }
-	]);
+		{ value: 'fedramp_low', label: 'FedRAMP Low' },
+		{ value: 'fedramp_moderate', label: 'FedRAMP Moderate' },
+		{ value: 'fedramp_high', label: 'FedRAMP High' },
+		{ value: 'iso_27001', label: 'ISO 27001' },
+		{ value: 'soc_2', label: 'SOC 2' },
+		{ value: 'nist_csf', label: 'NIST CSF' },
+		{ value: 'cmmc_l1', label: 'CMMC Level 1' },
+		{ value: 'cmmc_l2', label: 'CMMC Level 2' },
+		{ value: 'cmmc_l3', label: 'CMMC Level 3' },
+		{ value: 'custom', label: 'Custom' }
+	];
 
 	// Auto-select profile type based on framework
-	$: {
+	$effect(() => {
 		if (selectedFramework.includes('fedramp')) {
 			if (selectedGroups.includes('L')) selectedProfileType = 'fedramp_low';
 			else if (selectedGroups.includes('M')) selectedProfileType = 'fedramp_moderate';
 			else if (selectedGroups.includes('H')) selectedProfileType = 'fedramp_high';
 		}
-	}
+	});
 
 	function toggleGroup(refId: string) {
 		if (selectedGroups.includes(refId)) {

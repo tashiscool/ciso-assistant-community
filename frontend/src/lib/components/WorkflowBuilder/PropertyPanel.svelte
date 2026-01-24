@@ -158,7 +158,7 @@
 									rows="5"
 									value={stringifyJson(config[field.name] || field.defaultValue || {})}
 									oninput={(e) => updateConfig(field.name, parseJson((e.target as HTMLTextAreaElement).value))}
-									placeholder="{}"
+									placeholder={'{}'}
 								></textarea>
 							{:else if field.type === 'expression'}
 								<div class="relative">

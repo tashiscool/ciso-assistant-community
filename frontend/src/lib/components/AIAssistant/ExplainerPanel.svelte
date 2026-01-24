@@ -478,7 +478,7 @@
 					<label class="block text-sm font-medium text-gray-700 mb-1">Data (JSON format)</label>
 					<textarea
 						class="w-full rounded-md border-gray-300 shadow-sm h-48 font-mono text-sm"
-						placeholder='{"compliance_rate": 85, "critical_findings": 2, "total_controls": 100, ...}'
+						placeholder={'{"compliance_rate": 85, "critical_findings": 2, "total_controls": 100, ...}'}
 						bind:value={summaryData}
 					></textarea>
 				</div>

@@ -339,7 +339,7 @@
 					</label>
 					<textarea
 						class="w-full rounded-md border-gray-300 shadow-sm h-48 font-mono text-sm"
-						placeholder='{"controls_implemented": ["AC-1", "AC-2"], "policies": ["access_control"], ...}'
+						placeholder={'{"controls_implemented": ["AC-1", "AC-2"], "policies": ["access_control"], ...}'}
 						bind:value={currentStateJson}
 					></textarea>
 					<p class="text-xs text-gray-500 mt-1">
