@@ -81,7 +81,7 @@
 
 		loading = true;
 		try {
-			const res = await fetch(`${BASE_API_URL}/workflows/', {
+			const res = await fetch(`${BASE_API_URL}/workflows/`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
