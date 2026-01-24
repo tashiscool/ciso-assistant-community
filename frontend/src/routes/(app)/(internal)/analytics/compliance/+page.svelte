@@ -5,12 +5,12 @@
 	import Breadcrumbs from '$lib/components/Breadcrumbs/Breadcrumbs.svelte';
 	import type { PageData } from './$types';
 
-	export let data: PageData;
+	let { data }: { data: PageData } = $props();
 
-	$: breadcrumbs = [
+	const breadcrumbs = $derived([
 		{ label: 'Analytics', href: `${base}/analytics` },
 		{ label: 'Compliance Analytics', href: `${base}/analytics/compliance` }
-	];
+	]);
 
 	const getStatusColor = (status: string) => {
 		const colors = {

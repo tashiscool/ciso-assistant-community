@@ -5,13 +5,13 @@
 	import type { PageData } from './$types';
 	import { m } from '$paraglide/messages';
 
-	export let data: PageData;
+	let { data }: { data: PageData } = $props();
 
 	let selectedProfileId: string = '';
 
-	$: breadcrumbs = [
+	const breadcrumbs = $derived([
 		{ label: m.continuousMonitoring?.() || 'Continuous Monitoring', href: `${base}/continuous-monitoring` }
-	];
+	]);
 
 	// Helper functions for styling
 	const getHealthColor = (score: number) => {

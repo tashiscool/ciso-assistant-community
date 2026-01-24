@@ -10,7 +10,7 @@
 	import Breadcrumbs from '$lib/components/Breadcrumbs/Breadcrumbs.svelte';
 	import type { PageData, ActionData } from './$types';
 
-	export let data: PageData;
+	let { data }: { data: PageData } = $props();
 	export let form: ActionData;
 
 	let activeTab = 'overview';
@@ -33,7 +33,7 @@
 		{ id: 'consent', label: 'Consent', icon: 'check-circle' },
 		{ id: 'rights', label: 'Subject Rights', icon: 'user-check' },
 		{ id: 'security', label: 'Security', icon: 'lock' }
-	];
+	]);
 
 	const dataCategories = {
 		'personal_data': 'Personal Data',
@@ -69,11 +69,11 @@
 		'not_assessed': { label: 'Not Assessed', color: 'bg-gray-100 text-gray-800' }
 	};
 
-	$: breadcrumbs = [
+	const breadcrumbs = $derived([
 		{ label: 'Privacy', href: `${base}/privacy` },
 		{ label: 'Data Assets', href: `${base}/privacy/data-assets` },
 		{ label: data.dataAsset.asset_name, href: `${base}/privacy/data-assets/${data.dataAsset.id}` }
-	];
+	]);
 </script>
 
 <svelte:head>

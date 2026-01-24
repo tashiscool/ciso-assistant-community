@@ -28,6 +28,31 @@ from .api.fedramp_20x_views import (
     ChangeControlExportView,
     OperationsExportView,
     OperationsDownloadView,
+    # KSI Import views
+    KSIImportPreviewView,
+    KSIImportExecuteView,
+    KSICategoriesView,
+    KSILibraryMetadataView,
+    # Validation Template views
+    ValidationTemplateListView,
+    ValidationTemplateDetailView,
+    ValidationTemplateInstantiateView,
+    ValidationTemplateCategoriesView,
+    ValidationTemplateBulkInstantiateView,
+    # OAR Generation views
+    OARGenerateView,
+    OARExportPackageView,
+    OARDownloadView,
+)
+from .api.trust_center_views import (
+    TrustCenterSummaryView,
+    TrustCenterCSOListView,
+    TrustCenterCSODetailView,
+    TrustCenterKSIComplianceView,
+    TrustCenterOARHistoryView,
+    TrustCenterOSCALExcerptView,
+    TrustCenterPublishView,
+    TrustCenterConfigView,
 )
 from .api.change_control_views import (
     SignificantChangeRequestViewSet,
@@ -71,4 +96,29 @@ urlpatterns = [
     path("export/changes/", ChangeControlExportView.as_view(), name="export-changes"),
     path("export/operations/", OperationsExportView.as_view(), name="export-operations"),
     path("export/download/", OperationsDownloadView.as_view(), name="export-download"),
+    # KSI Import endpoints
+    path("ksi/import/preview/", KSIImportPreviewView.as_view(), name="ksi-import-preview"),
+    path("ksi/import/<uuid:cso_id>/", KSIImportExecuteView.as_view(), name="ksi-import-execute"),
+    path("ksi/categories/", KSICategoriesView.as_view(), name="ksi-categories"),
+    path("ksi/library/", KSILibraryMetadataView.as_view(), name="ksi-library"),
+    # Validation Rule Template endpoints
+    path("validation-templates/", ValidationTemplateListView.as_view(), name="validation-template-list"),
+    path("validation-templates/categories/", ValidationTemplateCategoriesView.as_view(), name="validation-template-categories"),
+    path("validation-templates/bulk-instantiate/", ValidationTemplateBulkInstantiateView.as_view(), name="validation-template-bulk-instantiate"),
+    path("validation-templates/<str:template_id>/", ValidationTemplateDetailView.as_view(), name="validation-template-detail"),
+    path("validation-templates/<str:template_id>/instantiate/", ValidationTemplateInstantiateView.as_view(), name="validation-template-instantiate"),
+    # OAR Generation endpoints
+    path("oar/generate/", OARGenerateView.as_view(), name="oar-generate"),
+    path("oar/export/", OARExportPackageView.as_view(), name="oar-export"),
+    path("oar/download/", OARDownloadView.as_view(), name="oar-download"),
+    # Trust Center endpoints (public)
+    path("trust-center/", TrustCenterSummaryView.as_view(), name="trust-center-summary"),
+    path("trust-center/csos/", TrustCenterCSOListView.as_view(), name="trust-center-cso-list"),
+    path("trust-center/csos/<uuid:cso_id>/", TrustCenterCSODetailView.as_view(), name="trust-center-cso-detail"),
+    path("trust-center/csos/<uuid:cso_id>/compliance/", TrustCenterKSIComplianceView.as_view(), name="trust-center-compliance"),
+    path("trust-center/csos/<uuid:cso_id>/oar-history/", TrustCenterOARHistoryView.as_view(), name="trust-center-oar-history"),
+    path("trust-center/csos/<uuid:cso_id>/oscal/", TrustCenterOSCALExcerptView.as_view(), name="trust-center-oscal"),
+    # Trust Center endpoints (authenticated)
+    path("trust-center/csos/<uuid:cso_id>/publish/", TrustCenterPublishView.as_view(), name="trust-center-publish"),
+    path("trust-center/csos/<uuid:cso_id>/config/", TrustCenterConfigView.as_view(), name="trust-center-config"),
 ]

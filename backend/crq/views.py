@@ -1402,3 +1402,525 @@ class QuantitativeRiskStudyActionPlanList(ActionPlanList):
         return AppliedControl.objects.filter(
             quantitative_risk_hypotheses_added__in=hypotheses
         ).distinct()
+
+
+# =============================================================================
+# Advanced Analytics Views
+# =============================================================================
+
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+
+
+class PortfolioAnalysisView(APIView):
+    """Perform advanced portfolio risk analysis."""
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Analyze portfolio risk",
+        description="Performs comprehensive portfolio-level risk analysis including "
+                    "scenario contributions, concentration analysis, and diversification metrics.",
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'scenarios': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'object',
+                            'properties': {
+                                'name': {'type': 'string'},
+                                'probability': {'type': 'number'},
+                                'lower_bound': {'type': 'number'},
+                                'upper_bound': {'type': 'number'},
+                            },
+                        },
+                    },
+                    'include_contributions': {'type': 'boolean', 'default': True},
+                    'include_concentration': {'type': 'boolean', 'default': True},
+                },
+                'required': ['scenarios'],
+            }
+        },
+        responses={200: dict},
+        tags=['CRQ Analytics'],
+    )
+    def post(self, request):
+        """Analyze portfolio risk."""
+        from .services import get_portfolio_analyzer
+
+        scenarios = request.data.get('scenarios', [])
+        include_contributions = request.data.get('include_contributions', True)
+        include_concentration = request.data.get('include_concentration', True)
+
+        if not scenarios:
+            return Response({
+                'success': False,
+                'error': 'scenarios list is required',
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            analyzer = get_portfolio_analyzer()
+            metrics = analyzer.analyze_portfolio(
+                scenarios=scenarios,
+                include_contributions=include_contributions,
+                include_concentration=include_concentration,
+            )
+
+            return Response({
+                'success': True,
+                'data': metrics.to_dict(),
+            })
+
+        except Exception as e:
+            logger.error("Error analyzing portfolio")
+            return Response({
+                'success': False,
+                'error': str(e),
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class PortfolioStressTestView(APIView):
+    """Run stress tests on a portfolio."""
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Run portfolio stress tests",
+        description="Runs stress test scenarios against a portfolio to assess "
+                    "resilience under adverse conditions.",
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'scenarios': {'type': 'array'},
+                    'stress_scenarios': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'object',
+                            'properties': {
+                                'name': {'type': 'string'},
+                                'description': {'type': 'string'},
+                                'probability_multiplier': {'type': 'number'},
+                                'impact_multiplier': {'type': 'number'},
+                                'affected_scenarios': {'type': 'array'},
+                            },
+                        },
+                    },
+                },
+                'required': ['scenarios', 'stress_scenarios'],
+            }
+        },
+        responses={200: dict},
+        tags=['CRQ Analytics'],
+    )
+    def post(self, request):
+        """Run stress tests."""
+        from .services import get_portfolio_analyzer
+
+        scenarios = request.data.get('scenarios', [])
+        stress_scenarios = request.data.get('stress_scenarios', [])
+
+        if not scenarios or not stress_scenarios:
+            return Response({
+                'success': False,
+                'error': 'scenarios and stress_scenarios are required',
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            analyzer = get_portfolio_analyzer()
+            results = analyzer.run_stress_test(
+                scenarios=scenarios,
+                stress_scenarios=stress_scenarios,
+            )
+
+            return Response({
+                'success': True,
+                'data': {
+                    'stress_test_results': [r.to_dict() for r in results],
+                    'count': len(results),
+                },
+            })
+
+        except Exception as e:
+            logger.error("Error running stress tests")
+            return Response({
+                'success': False,
+                'error': str(e),
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class PortfolioCompareView(APIView):
+    """Compare two portfolio configurations."""
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Compare portfolios",
+        description="Compares two portfolio configurations to identify "
+                    "risk reduction and diversification improvements.",
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'portfolio_a': {'type': 'array'},
+                    'portfolio_b': {'type': 'array'},
+                    'portfolio_a_name': {'type': 'string'},
+                    'portfolio_b_name': {'type': 'string'},
+                },
+                'required': ['portfolio_a', 'portfolio_b'],
+            }
+        },
+        responses={200: dict},
+        tags=['CRQ Analytics'],
+    )
+    def post(self, request):
+        """Compare portfolios."""
+        from .services import get_portfolio_analyzer
+
+        portfolio_a = request.data.get('portfolio_a', [])
+        portfolio_b = request.data.get('portfolio_b', [])
+        name_a = request.data.get('portfolio_a_name', 'Current')
+        name_b = request.data.get('portfolio_b_name', 'Alternative')
+
+        if not portfolio_a or not portfolio_b:
+            return Response({
+                'success': False,
+                'error': 'Both portfolio_a and portfolio_b are required',
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            analyzer = get_portfolio_analyzer()
+            comparison = analyzer.compare_portfolios(
+                portfolio_a=portfolio_a,
+                portfolio_b=portfolio_b,
+                portfolio_a_name=name_a,
+                portfolio_b_name=name_b,
+            )
+
+            return Response({
+                'success': True,
+                'data': comparison,
+            })
+
+        except Exception as e:
+            logger.error("Error comparing portfolios")
+            return Response({
+                'success': False,
+                'error': str(e),
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ControlROIView(APIView):
+    """Calculate ROI for security controls."""
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Calculate control ROI",
+        description="Calculates Return on Security Investment (ROSI) for a control.",
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'control_id': {'type': 'string'},
+                    'control_name': {'type': 'string'},
+                    'annual_cost': {'type': 'number'},
+                    'implementation_cost': {'type': 'number'},
+                    'current_risk': {
+                        'type': 'object',
+                        'properties': {
+                            'probability': {'type': 'number'},
+                            'lower_bound': {'type': 'number'},
+                            'upper_bound': {'type': 'number'},
+                        },
+                    },
+                    'residual_risk': {
+                        'type': 'object',
+                        'properties': {
+                            'probability': {'type': 'number'},
+                            'lower_bound': {'type': 'number'},
+                            'upper_bound': {'type': 'number'},
+                        },
+                    },
+                },
+                'required': ['control_id', 'control_name', 'annual_cost',
+                            'implementation_cost', 'current_risk', 'residual_risk'],
+            }
+        },
+        responses={200: dict},
+        tags=['CRQ Analytics'],
+    )
+    def post(self, request):
+        """Calculate control ROI."""
+        from .services import get_roi_calculator
+
+        control_id = request.data.get('control_id')
+        control_name = request.data.get('control_name')
+        annual_cost = request.data.get('annual_cost')
+        implementation_cost = request.data.get('implementation_cost')
+        current_risk = request.data.get('current_risk')
+        residual_risk = request.data.get('residual_risk')
+
+        if not all([control_id, control_name, annual_cost is not None,
+                   implementation_cost is not None, current_risk, residual_risk]):
+            return Response({
+                'success': False,
+                'error': 'All parameters are required',
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            calculator = get_roi_calculator()
+            roi = calculator.calculate_control_roi(
+                control_id=control_id,
+                control_name=control_name,
+                annual_cost=annual_cost,
+                implementation_cost=implementation_cost,
+                current_risk=current_risk,
+                residual_risk=residual_risk,
+            )
+
+            return Response({
+                'success': True,
+                'data': roi.to_dict(),
+            })
+
+        except Exception as e:
+            logger.error("Error calculating control ROI")
+            return Response({
+                'success': False,
+                'error': str(e),
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class TreatmentComparisonView(APIView):
+    """Compare treatment options."""
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Compare treatment options",
+        description="Compares multiple treatment options for risk mitigation.",
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'current_risk': {'type': 'object'},
+                    'treatment_options': {'type': 'array'},
+                },
+                'required': ['current_risk', 'treatment_options'],
+            }
+        },
+        responses={200: dict},
+        tags=['CRQ Analytics'],
+    )
+    def post(self, request):
+        """Compare treatment options."""
+        from .services import get_roi_calculator
+
+        current_risk = request.data.get('current_risk')
+        treatment_options = request.data.get('treatment_options', [])
+
+        if not current_risk or not treatment_options:
+            return Response({
+                'success': False,
+                'error': 'current_risk and treatment_options are required',
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            calculator = get_roi_calculator()
+            comparisons = calculator.compare_treatment_options(
+                current_risk=current_risk,
+                treatment_options=treatment_options,
+            )
+
+            return Response({
+                'success': True,
+                'data': {
+                    'comparisons': [c.to_dict() for c in comparisons],
+                    'count': len(comparisons),
+                    'best_option': comparisons[0].treatment_name if comparisons else None,
+                },
+            })
+
+        except Exception as e:
+            logger.error("Error comparing treatment options")
+            return Response({
+                'success': False,
+                'error': str(e),
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class OptimalControlsView(APIView):
+    """Optimize control selection within a budget."""
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Optimize control selection",
+        description="Selects optimal set of controls within a given budget "
+                    "to maximize risk reduction.",
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'budget': {'type': 'number'},
+                    'available_controls': {'type': 'array'},
+                    'current_risk': {'type': 'object'},
+                },
+                'required': ['budget', 'available_controls', 'current_risk'],
+            }
+        },
+        responses={200: dict},
+        tags=['CRQ Analytics'],
+    )
+    def post(self, request):
+        """Optimize control selection."""
+        from .services import get_roi_calculator
+
+        budget = request.data.get('budget')
+        available_controls = request.data.get('available_controls', [])
+        current_risk = request.data.get('current_risk')
+
+        if budget is None or not available_controls or not current_risk:
+            return Response({
+                'success': False,
+                'error': 'budget, available_controls, and current_risk are required',
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            calculator = get_roi_calculator()
+            optimal_set = calculator.optimize_control_selection(
+                budget=budget,
+                available_controls=available_controls,
+                current_risk=current_risk,
+            )
+
+            return Response({
+                'success': True,
+                'data': optimal_set.to_dict(),
+            })
+
+        except Exception as e:
+            logger.error("Error optimizing control selection")
+            return Response({
+                'success': False,
+                'error': str(e),
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class BreakevenAnalysisView(APIView):
+    """Calculate break-even point for control investment."""
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Calculate break-even point",
+        description="Calculates the break-even point for a control investment.",
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'control_name': {'type': 'string'},
+                    'annual_cost': {'type': 'number'},
+                    'implementation_cost': {'type': 'number'},
+                    'current_risk': {'type': 'object'},
+                },
+                'required': ['control_name', 'annual_cost', 'implementation_cost', 'current_risk'],
+            }
+        },
+        responses={200: dict},
+        tags=['CRQ Analytics'],
+    )
+    def post(self, request):
+        """Calculate break-even."""
+        from .services import get_roi_calculator
+
+        control_name = request.data.get('control_name')
+        annual_cost = request.data.get('annual_cost')
+        implementation_cost = request.data.get('implementation_cost')
+        current_risk = request.data.get('current_risk')
+
+        if not all([control_name, annual_cost is not None,
+                   implementation_cost is not None, current_risk]):
+            return Response({
+                'success': False,
+                'error': 'All parameters are required',
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            calculator = get_roi_calculator()
+            analysis = calculator.calculate_breakeven(
+                control_name=control_name,
+                annual_cost=annual_cost,
+                implementation_cost=implementation_cost,
+                current_risk=current_risk,
+            )
+
+            return Response({
+                'success': True,
+                'data': analysis.to_dict(),
+            })
+
+        except Exception as e:
+            logger.error("Error calculating break-even")
+            return Response({
+                'success': False,
+                'error': str(e),
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class SensitivityAnalysisView(APIView):
+    """Perform sensitivity analysis on ROI."""
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Sensitivity analysis",
+        description="Analyzes how ROI changes with variations in key parameters.",
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'control_id': {'type': 'string'},
+                    'control_name': {'type': 'string'},
+                    'annual_cost': {'type': 'number'},
+                    'implementation_cost': {'type': 'number'},
+                    'current_risk': {'type': 'object'},
+                    'residual_risk': {'type': 'object'},
+                },
+                'required': ['control_id', 'control_name', 'annual_cost',
+                            'implementation_cost', 'current_risk', 'residual_risk'],
+            }
+        },
+        responses={200: dict},
+        tags=['CRQ Analytics'],
+    )
+    def post(self, request):
+        """Perform sensitivity analysis."""
+        from .services import get_roi_calculator
+
+        try:
+            calculator = get_roi_calculator()
+            analysis = calculator.sensitivity_analysis(
+                control_id=request.data.get('control_id'),
+                control_name=request.data.get('control_name'),
+                annual_cost=request.data.get('annual_cost'),
+                implementation_cost=request.data.get('implementation_cost'),
+                current_risk=request.data.get('current_risk'),
+                residual_risk=request.data.get('residual_risk'),
+            )
+
+            return Response({
+                'success': True,
+                'data': analysis,
+            })
+
+        except Exception as e:
+            logger.error("Error performing sensitivity analysis")
+            return Response({
+                'success': False,
+                'error': str(e),
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

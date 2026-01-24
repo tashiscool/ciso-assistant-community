@@ -44,7 +44,7 @@
 	}
 
 	// Server data
-	export let data: PageData;
+	let { data }: { data: PageData } = $props();
 
 	// State - initialize from server data
 	let dashboardData: DashboardData | null = $state(data.dashboard);

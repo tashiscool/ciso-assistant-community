@@ -13,6 +13,8 @@ router.register(
 )
 
 urlpatterns = [
+    # OCSF Integration
+    path("ocsf/", include("integrations.ocsf.urls")),
     path(
         "providers/",
         views.IntegrationProviderListView.as_view(),

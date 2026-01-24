@@ -7,7 +7,7 @@
 	import WorkflowBuilder from '$lib/components/WorkflowBuilder/WorkflowBuilder.svelte';
 	import type { PageData } from './$types';
 
-	export let data: PageData;
+	let { data }: { data: PageData } = $props();
 
 	interface Workflow {
 		id: string;
@@ -36,9 +36,9 @@
 	let newWorkflowName = $state('');
 	let newWorkflowDescription = $state('');
 
-	$: breadcrumbs = [
+	const breadcrumbs = $derived([
 		{ label: m.workflows?.() || 'Workflows', href: `${base}/workflows` }
-	];
+	]);
 
 	// Derived: filtered workflows
 	const filteredWorkflows = $derived.by(() => {

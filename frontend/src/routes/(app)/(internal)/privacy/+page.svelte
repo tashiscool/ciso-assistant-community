@@ -5,11 +5,11 @@
 	import Breadcrumbs from '$lib/components/Breadcrumbs/Breadcrumbs.svelte';
 	import type { PageData } from './$types';
 
-	export let data: PageData;
+	let { data }: { data: PageData } = $props();
 
-	$: breadcrumbs = [
+	const breadcrumbs = $derived([
 		{ label: 'Privacy Program Dashboard', href: `${base}/privacy` }
-	];
+	]);
 </script>
 
 <svelte:head>

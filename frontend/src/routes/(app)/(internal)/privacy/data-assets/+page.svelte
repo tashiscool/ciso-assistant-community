@@ -8,7 +8,7 @@
 	import Breadcrumbs from '$lib/components/Breadcrumbs/Breadcrumbs.svelte';
 	import { onMount } from 'svelte';
 
-	export let data: PageData;
+	let { data }: { data: PageData } = $props();
 
 	let model: any = null;
 	let tableConfig: any = null;
@@ -130,10 +130,10 @@
 		};
 	});
 
-	$: breadcrumbs = [
+	const breadcrumbs = $derived([
 		{ label: 'Privacy', href: `${base}/privacy` },
 		{ label: 'Data Assets', href: `${base}/privacy/data-assets` }
-	];
+	]);
 </script>
 
 <svelte:head>

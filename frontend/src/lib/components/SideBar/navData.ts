@@ -158,6 +158,12 @@ export const navData = {
 					permissions: ['view_riskassessment', 'view_assessment']
 				},
 				{
+					name: 'aiAssistant',
+					fa_icon: 'fa-solid fa-robot',
+					href: '/ai-assistant',
+					permissions: ['view_appliedcontrol', 'view_riskassessment']
+				},
+				{
 					name: 'incidents',
 					fa_icon: 'fa-solid fa-bug',
 					href: '/incidents'
@@ -228,6 +234,12 @@ export const navData = {
 					href: '/risk-assessments'
 				},
 				{
+					name: 'securityGraph',
+					fa_icon: 'fa-solid fa-diagram-project',
+					href: '/security-graph',
+					permissions: ['view_asset', 'view_appliedcontrol']
+				},
+				{
 					name: 'ebiosRM',
 					fa_icon: 'fa-solid fa-gopuram',
 					href: '/ebios-rm'
@@ -236,6 +248,12 @@ export const navData = {
 					name: 'quantitativeRiskStudies',
 					fa_icon: 'fa-solid fa-calculator',
 					href: '/quantitative-risk-studies',
+					permissions: ['view_quantitativeriskstudy']
+				},
+				{
+					name: 'riskAnalytics',
+					fa_icon: 'fa-solid fa-chart-line',
+					href: '/risk-analytics',
 					permissions: ['view_quantitativeriskstudy']
 				},
 				{

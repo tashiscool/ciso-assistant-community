@@ -5,7 +5,7 @@
 	import Breadcrumbs from '$lib/components/Breadcrumbs/Breadcrumbs.svelte';
 	import type { PageData } from './$types';
 
-	export let data: PageData;
+	let { data }: { data: PageData } = $props();
 
 	interface Connector {
 		id: string;
@@ -39,9 +39,9 @@
 	let showAddModal = $state(false);
 	let selectedConnectorType = $state<AvailableConnector | null>(null);
 
-	$: breadcrumbs = [
+	const breadcrumbs = $derived([
 		{ label: m.connectors?.() || 'Connectors', href: `${base}/connectors` }
-	];
+	]);
 
 	// Derived: filter available connectors
 	const filteredAvailable = $derived.by(() => {

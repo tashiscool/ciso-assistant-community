@@ -1,5 +1,111 @@
 # AI Assistant Services
 from .suggestion_engine import SuggestionEngine
 from .context_builder import ContextBuilder
+from .llm_client import (
+    LLMProvider,
+    LLMConfig,
+    LLMMessage,
+    LLMResponse,
+    BaseLLMClient,
+    OpenAIClient,
+    AnthropicClient,
+    AzureOpenAIClient,
+    LocalLLMClient,
+    MockLLMClient,
+    create_llm_client,
+    get_default_llm_client,
+    set_default_llm_client,
+)
+from .ai_author import (
+    AIAuthorService,
+    ControlDraft,
+    PolicyDraft,
+    ProcedureDraft,
+    DocumentType,
+    Framework,
+    get_ai_author_service,
+)
+from .ai_extractor import (
+    AIExtractorService,
+    DocumentParser,
+    ExtractedControl,
+    ExtractedRequirement,
+    ExtractedPolicy,
+    ExtractionResult,
+    ExtractionType,
+    DocumentFormat,
+    get_ai_extractor_service,
+)
+from .ai_auditor import (
+    AIAuditorService,
+    ControlEvaluation,
+    GapFinding,
+    ComplianceAssessment,
+    EvidenceReview,
+    EffectivenessRating,
+    GapSeverity,
+    get_ai_auditor_service,
+)
+from .ai_explainer import (
+    AIExplainerService,
+    Explanation,
+    ControlExplanation,
+    RiskExplanation,
+    Audience,
+    ExplanationFormat,
+    get_ai_explainer_service,
+)
 
-__all__ = ['SuggestionEngine', 'ContextBuilder']
+__all__ = [
+    'SuggestionEngine',
+    'ContextBuilder',
+    # LLM Client
+    'LLMProvider',
+    'LLMConfig',
+    'LLMMessage',
+    'LLMResponse',
+    'BaseLLMClient',
+    'OpenAIClient',
+    'AnthropicClient',
+    'AzureOpenAIClient',
+    'LocalLLMClient',
+    'MockLLMClient',
+    'create_llm_client',
+    'get_default_llm_client',
+    'set_default_llm_client',
+    # AI Author
+    'AIAuthorService',
+    'ControlDraft',
+    'PolicyDraft',
+    'ProcedureDraft',
+    'DocumentType',
+    'Framework',
+    'get_ai_author_service',
+    # AI Extractor
+    'AIExtractorService',
+    'DocumentParser',
+    'ExtractedControl',
+    'ExtractedRequirement',
+    'ExtractedPolicy',
+    'ExtractionResult',
+    'ExtractionType',
+    'DocumentFormat',
+    'get_ai_extractor_service',
+    # AI Auditor
+    'AIAuditorService',
+    'ControlEvaluation',
+    'GapFinding',
+    'ComplianceAssessment',
+    'EvidenceReview',
+    'EffectivenessRating',
+    'GapSeverity',
+    'get_ai_auditor_service',
+    # AI Explainer
+    'AIExplainerService',
+    'Explanation',
+    'ControlExplanation',
+    'RiskExplanation',
+    'Audience',
+    'ExplanationFormat',
+    'get_ai_explainer_service',
+]

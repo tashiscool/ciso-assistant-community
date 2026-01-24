@@ -5,7 +5,7 @@
 	import type { PageData, ActionData } from './$types';
 	import { m } from '$paraglide/messages';
 
-	export let data: PageData;
+	let { data }: { data: PageData } = $props();
 	export let form: ActionData;
 
 	let selectedFramework: string = '';
@@ -14,10 +14,10 @@
 	let generateTasks: boolean = true;
 	let selectedGroups: string[] = [];
 
-	$: breadcrumbs = [
+	const breadcrumbs = $derived([
 		{ label: m.continuousMonitoring?.() || 'Continuous Monitoring', href: `${base}/continuous-monitoring` },
 		{ label: m.setupConmon?.() || 'Setup', href: `${base}/continuous-monitoring/setup` }
-	];
+	]);
 
 	// Implementation groups based on framework selection
 	$: implementationGroups = getImplementationGroups(selectedFramework);
@@ -43,7 +43,7 @@
 		{ value: 'cmmc_l2', label: m.cmmcL2?.() || 'CMMC Level 2' },
 		{ value: 'cmmc_l3', label: m.cmmcL3?.() || 'CMMC Level 3' },
 		{ value: 'custom', label: m.custom?.() || 'Custom' }
-	];
+	]);
 
 	// Auto-select profile type based on framework
 	$: {
