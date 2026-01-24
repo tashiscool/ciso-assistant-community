@@ -101,7 +101,7 @@
 
 = Introduction
 
-Document purpose: This Security Assurance Plan explains the controls, processes, and evidence that Intuitem provides to protect customer data and ensure the availability, integrity, and confidentiality of the CISO Assistant platform.
+Document purpose: This Security Assurance Plan explains the controls, processes, and evidence that CISO Assistant provides to protect customer data and ensure the availability, integrity, and confidentiality of the CISO Assistant platform.
 
 Intended audience: Security, risk, compliance, procurement, and technical stakeholders at customer organizations.
 
@@ -111,7 +111,7 @@ Last updated: 2025-08-15
 
 = Scope & Applicability
 
-This plan covers Intuitem’s SaaS offering of CISO Assistant and the associated managed infrastructure, operations, and support services. Customer-managed (on-premises) deployments are covered where explicitly noted (see @srm).
+This plan covers CISO Assistant’s SaaS offering of CISO Assistant and the associated managed infrastructure, operations, and support services. Customer-managed (on-premises) deployments are covered where explicitly noted (see @srm).
 
 
 
@@ -119,7 +119,7 @@ This plan covers Intuitem’s SaaS offering of CISO Assistant and the associated
 
 - Frameworks: Our program is aligned with NIST CSF for cybersecurity management and OWASP ASVS for application security.
 
-- Policies & ownership: Security policies are owned by Intuitem leadership and reviewed at least annually.
+- Policies & ownership: Security policies are owned by CISO Assistant leadership and reviewed at least annually.
 
 - Roles: A designated Data Protection Officer (DPO) oversees data protection and privacy. Contact: #link("mailto:contact@ciso.com"). To report a security issue, please use: #link("security@ciso.com")
 
@@ -281,7 +281,7 @@ This plan covers Intuitem’s SaaS offering of CISO Assistant and the associated
 = Compliance & Certification Roadmap
 
 - Current: Alignment with GDPR, CCPA; use of ISO 27001 certified providers.
-- Planned: Progressing toward ISO 27001 certification for Intuitem’s own ISMS, targeted for Q1/2026.
+- Planned: Progressing toward ISO 27001 certification for CISO Assistant’s own ISMS, targeted for Q1/2026.
 
 
 
@@ -303,8 +303,8 @@ This plan covers Intuitem’s SaaS offering of CISO Assistant and the associated
 
 = Deployment Options <dep>
 
-- SaaS (managed by Intuitem): Covered by this plan end-to-end.
-- On-premises (PRO plan): Intuitem provides guidance and reference configurations; customers are responsible for the security of the hosting environment and operations.
+- SaaS (managed by CISO Assistant): Covered by this plan end-to-end.
+- On-premises (PRO plan): CISO Assistant provides guidance and reference configurations; customers are responsible for the security of the hosting environment and operations.
 
 
 

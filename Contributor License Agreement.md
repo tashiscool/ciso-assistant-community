@@ -8,13 +8,13 @@ This is a human-readable summary of (and not a substitute for) the full agreemen
 - Grant of patent license. If your contributed work uses a patent, you give ciso a license to use that patent including within open-source and commercial products. You also agree that you have permission to grant this license.
 - No Warranty or Support Obligations. By making a contribution, you are not obligating yourself to provide support for the contribution, and you are not taking on any warranty obligations or providing any assurances about how it will perform.
 
-The CLA does not change the terms of the underlying license used by our software such as the AGPLv3 License. You are still free to use our projects within your own projects or businesses, republish modified source code, and more subject to the terms of the project license.
+The CLA does not change the terms of the underlying license used by our software such as the MIT License. You are still free to use our projects within your own projects or businesses, republish modified source code, and more subject to the terms of the project license.
 
 ## Why Require a CLA?
 
 Agreeing to a CLA explicitly states that you are entitled to provide a contribution, that you cannot withdraw permission to use your contribution at a later date, and that ciso has permission to use your contribution in our open-source and commercial products.
 
-This removes any ambiguities or uncertainties caused by not having a CLA and allows users and customers to confidently adopt our projects. At the same time, the CLA ensures that all contributions to our open source projects are licensed under the project's respective open source license, such as AGPLv3.
+This removes any ambiguities or uncertainties caused by not having a CLA and allows users and customers to confidently adopt our projects. At the same time, the CLA ensures that all contributions to our open source projects are licensed under the project's respective open source license, such as MIT.
 
 ciso is committed to open-source for its non-commercial software. A CLA enables ciso to safely commercialize its products while promoting open-source, which allows to build a sustainable business.
 
@@ -32,7 +32,7 @@ You only have to sign the CLA once. Once you've signed the CLA, future contribut
 
 ### Introduction
 
-The purpose of this contributor agreement ("Agreement") is to clarify and document the rights granted by contributors to Intuitem SARL ("**ciso**").
+The purpose of this contributor agreement ("Agreement") is to clarify and document the rights granted by contributors to Tash ("**ciso**").
 
 By contributing to any open-source project maintained by ciso, you acknowledge and accept these terms and conditions.
 

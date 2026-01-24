@@ -387,4 +387,4 @@ server {
 
 ## License
 
-CISO Assistant Community Edition is licensed under AGPLv3.
+CISO Assistant Community Edition is licensed under MIT.

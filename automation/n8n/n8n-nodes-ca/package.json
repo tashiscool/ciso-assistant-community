@@ -2,7 +2,7 @@
   "name": "n8n-nodes-ciso-assistant",
   "version": "1.0.0",
   "description": "Custom n8n node to interact with CISO Assistant API",
-  "license": "AGPL",
+  "license": "MIT",
   "homepage": "https://github.com/tashiscool/ciso-assistant-community",
   "author": {
     "name": "tash"

@@ -1,47 +1,34 @@
-# Intuitem Commercial License
+# MIT License
 
-## Preamble
-Usage of files in this directory and its subdirectories, and of **CISO Assistant PRO** and **Enterprise** features, is governed by the terms set forth in the Intuitem Commercial License below. A valid license from Intuitem is required for any authorized use.
+All code in this directory is released under the MIT License.
 
-Access to files in this directory and its subdirectories does not constitute permission to use this code. The full terms of the Intuitem Commercial License are detailed herein.
+```
+MIT License
 
----
+Copyright (c) 2026 Tash
 
-## Copyright Notice
-Copyright (c) 2024 tashiscool SARL.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
----
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-## License Overview
-This license governs the use of the **CISO Assistant** source code located in the `"enterprise"` directory (the "Software"). These components are not part of the Community Edition and are subject to the following terms.
-
----
-
-## Terms of Use
-1. **Production Use**: The Software may only be used in production with a valid subscription for the appropriate number of users.
-2. **Testing and Contributions**:
-   - You may modify the Software solely for testing purposes.
-   - Modifications may be submitted to Intuitem as pull requests (PRs) for possible inclusion in the Software.
-3. **Prohibited Actions**: The Software may not be used in production, copied, modified, distributed, sublicensed, or sold without authorization, except as expressly permitted above.
-
----
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
 
 ## Scope
-- This license applies to the content of the `"enterprise"` directory.
-- Binaries for **CISO Assistant** located directly under the `ghcr.io/tashiscool/` namespace are also released under this Intuitem Commercial License.
-- Third-party components incorporated into the Software are licensed under their respective original licenses.
 
----
+This license applies to all content in the `enterprise` directory, which includes
+additional features and integrations for CISO Assistant.
 
-## Additional Licensing
-For a non-AGPLv3 license of the Community Edition, please contact Intuitem.
-
----
-
-## Disclaimer
-The Software is provided "AS IS," without any warranties. Intuitem and its licensors are not liable for damages arising from its use.
-
----
-
-## Contact
-For licensing inquiries, subscriptions, or more information, please contact **[contact@tashiscool.com](mailto:contact@tashiscool.com)** or visit **[www.tashiscool.com](http://www.tashiscool.com)**.
+All code is open source and can be freely used, modified, and distributed.

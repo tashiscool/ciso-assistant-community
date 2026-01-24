@@ -6,7 +6,7 @@ Name:           ciso-assistant
 Version:        %{_version}
 Release:        1%{?dist}
 Summary:        CISO Assistant - Cybersecurity GRC Platform
-License:        AGPLv3
+License:        MIT
 URL:            https://github.com/tashiscool/ciso-assistant-community
 BuildArch:      x86_64
 

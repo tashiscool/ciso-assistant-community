@@ -116,7 +116,7 @@ Use this reference when users cannot identify their assets. Suggest relevant ass
 
 ## Threat-Asset Relevance Matrix
 
-Use this to suggest which threats from the INTUITEM Common Catalog are most relevant to specific assets:
+Use this to suggest which threats from the CISO Common Catalog are most relevant to specific assets:
 
 | Asset Category | Most Relevant Threats (ref_id) |
 |---------------|-------------------------------|

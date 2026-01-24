@@ -39,7 +39,7 @@ Pipeline Overview
        anssi-points-de-controle-active-directory.xlsx
 
 3) **YAML Framework Conversion**
-   - Converts the final Excel into Intuitem Framework YAML.
+   - Converts the final Excel into CISO Framework YAML.
 
    Output:
        anssi-points-de-controle-active-directory.yaml
