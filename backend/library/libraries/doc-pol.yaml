@@ -23,7 +23,7 @@ translations:
   es:
     name: "Controles de referencia de uso com\xFAn"
     description: "Documentaci\xF3n, pol\xEDticas, procedimientos, formaci\xF3n y controles\
-      \ t\xE9cnicos habituales recomendados por Intuitem"
+      \ t\xE9cnicos habituales recomendados por CISO"
 objects:
   reference_controls:
   - urn: urn:ciso:risk:function:doc-pol:doc.overview

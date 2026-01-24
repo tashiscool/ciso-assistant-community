@@ -16,7 +16,7 @@ class TestFolderModel(unittest.TestCase):
 
     def test_folder_content_types(self):
         """Test folder content type choices."""
-        # Verify content types match AGPL structure
+        # Verify content types match expected structure
         content_types = ['GL', 'DO', 'EN']
         expected_names = ['Global (Root)', 'Domain', 'Enclave']
 

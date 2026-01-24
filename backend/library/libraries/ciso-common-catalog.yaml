@@ -3,8 +3,8 @@ convert_library_version: 'v2 ; Compat Mode: [0] {[v2.1] (DEFAULT) D''ont use any
 urn: urn:ciso:risk:library:ciso-common-catalog
 locale: en
 ref_id: ciso-common-catalog
-name: INTUITEM Common Catalog
-description: INTUITEM Common Catalog - Threats
+name: CISO Common Catalog
+description: CISO Common Catalog - Threats
 copyright: "\xA9 ciso - 2025"
 version: 2
 publication_date: 2025-06-14
@@ -12,8 +12,8 @@ provider: ciso
 packager: ciso-assistant
 translations:
   fr:
-    name: Catalogue commun INTUITEM
-    description: Catalogue commun INTUITEM - Menaces
+    name: Catalogue commun CISO
+    description: Catalogue commun CISO - Menaces
 objects:
   threats:
   - urn: urn:ciso:risk:threat:ciso-common-catalog:ict-001
