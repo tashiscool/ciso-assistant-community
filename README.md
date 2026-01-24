@@ -61,7 +61,7 @@ CISO Assistant includes advanced enterprise capabilities built on a **Domain-Dri
 
 ### Domain-Driven Architecture
 
-The platform is organized into **9 bounded contexts**, each handling a specific domain:
+The platform is organized into **12 bounded contexts**, each handling a specific domain:
 
 | Context | Purpose |
 |---------|---------|
@@ -75,6 +75,8 @@ The platform is organized into **9 bounded contexts**, each handling a specific 
 | **Third-Party Management** | Vendor assessments, supply chain risk |
 | **Business Continuity** | BCP plans, disaster recovery, resilience planning |
 | **RMF Operations** | STIG checklists, vulnerability management, RMF workflows |
+| **Security Graph** | Relationship visualization, blast radius analysis, critical nodes |
+| **Workflow Engine** | Custom GRC processes, approval chains, automation |
 
 For detailed architecture documentation, see [DDD Infrastructure](backend/core/domain/README.md) and the [bounded context READMEs](backend/core/bounded_contexts/).
 
@@ -109,12 +111,13 @@ Dynamic assessment capabilities inspired by GovReady-Q:
 
 ### AI Assistant
 
-Intelligent assistance for GRC workflows:
+Intelligent assistance for GRC workflows with specialized capabilities:
 
-- **Context-Aware Suggestions**: AI-powered recommendations based on your organization's data
-- **Control Mapping**: Automatic suggestions for control implementations
-- **Risk Analysis**: Intelligent risk scoring and mitigation recommendations
-- **Compliance Guidance**: Framework-specific guidance and gap analysis
+- **AI Auditor**: Automated compliance auditing with gap detection and remediation suggestions
+- **AI Author**: Generate policies, procedures, and control documentation from templates
+- **AI Explainer**: Natural language explanations of controls, requirements, and compliance status
+- **AI Extractor**: Extract structured data from uploaded documents (policies, SOC reports, etc.)
+- **Control Mapping**: Automatic suggestions for control implementations across frameworks
 
 ### Evidence Automation
 
@@ -177,6 +180,42 @@ Visual workflow builder for custom GRC processes:
 - **Conditional Logic**: Branch workflows based on data conditions
 - **Approval Chains**: Multi-level approval routing
 - **Integration Actions**: Trigger connectors, send notifications, update records
+
+### Security Graph
+
+Visual representation of security relationships and impact analysis:
+
+- **Graph Visualization**: Interactive graph showing relationships between assets, controls, and risks
+- **Blast Radius Analysis**: Identify cascading impacts when a control fails or asset is compromised
+- **Critical Node Detection**: Automatically identify high-impact nodes in your security posture
+- **Path Analysis**: Trace attack paths and dependency chains across your infrastructure
+
+### Trust Center
+
+Public-facing portal for sharing compliance status with stakeholders:
+
+- **Public Compliance Portal**: Share certifications and compliance status externally
+- **Document Publishing**: Publish security policies, SOC 2 reports, and attestations
+- **Access Controls**: Granular permissions for what information is publicly visible
+- **Branded Experience**: Customizable portal matching your organization's branding
+
+### Quantitative Risk (CRQ)
+
+Financial risk quantification using industry-standard methodologies:
+
+- **Loss Exceedance Curves**: Monte Carlo simulation for probabilistic risk analysis
+- **ROI Calculator**: Calculate return on investment for security controls
+- **Portfolio Analysis**: Aggregate risk across multiple scenarios and assets
+- **FAIR Integration**: Support for Factor Analysis of Information Risk methodology
+
+### OCSF Integration
+
+Open Cybersecurity Schema Framework support for security event normalization:
+
+- **Event Normalization**: Convert security events to OCSF standard format
+- **OSCAL Mapping**: Transform OCSF events to OSCAL findings
+- **Multi-Source Ingestion**: Normalize events from diverse security tools
+- **Compliance Correlation**: Link security events to control assessments
 
 ---
 
