@@ -5,6 +5,7 @@ API Views for Asset and Service bounded context
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 
@@ -22,9 +23,10 @@ from .serializers import (
 
 class AssetViewSet(viewsets.ModelViewSet):
     """ViewSet for Asset aggregates"""
-    
+
     queryset = Asset.objects.all()
     serializer_class = AssetSerializer
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['lifecycle_state', 'asset_type', 'assetClassificationId']
     search_fields = ['name', 'ref_id', 'description']

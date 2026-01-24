@@ -5,6 +5,7 @@ API Views for Privacy bounded context
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 
@@ -18,9 +19,10 @@ from .serializers import (
 
 class DataAssetViewSet(viewsets.ModelViewSet):
     """ViewSet for DataAsset aggregates"""
-    
+
     queryset = DataAsset.objects.all()
     serializer_class = DataAssetSerializer
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['lifecycle_state', 'contains_personal_data']
     search_fields = ['name', 'description']
@@ -79,9 +81,10 @@ class DataAssetViewSet(viewsets.ModelViewSet):
 
 class DataFlowViewSet(viewsets.ModelViewSet):
     """ViewSet for DataFlow aggregates"""
-    
+
     queryset = DataFlow.objects.all()
     serializer_class = DataFlowSerializer
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['lifecycle_state', 'encryption_in_transit']
     search_fields = ['name', 'description', 'purpose']

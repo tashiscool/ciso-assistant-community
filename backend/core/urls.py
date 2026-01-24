@@ -149,17 +149,14 @@ urlpatterns = [
     path("workflows/", include("core.bounded_contexts.workflow_engine.urls")),  # Workflow Engine bounded context API
     path("security-graph/", include("core.bounded_contexts.security_graph.urls")),  # Security Graph bounded context API
     path("connectors/", include("connectors.urls")),  # Connectors API
-    path("privacy/", include("privacy.api.urls")),  # Privacy bounded context API
-    path("security/", include("security_operations.api.urls")),  # Security Operations bounded context API
-    path("third-party/", include("third_party_management.api.urls")),  # Third Party Management bounded context API
-    path("business-continuity/", include("business_continuity.api.urls")),  # Business Continuity bounded context API
+    # Note: privacy/, security/, third-party/, business-continuity/ routes are handled by bounded contexts above
     path("oscal/", include("oscal_integration.api.urls")),  # OSCAL Integration API
     path("serdes/", include("serdes.urls")),
     path("data-wizard/", include("data_wizard.urls")),
     path("settings/", include("global_settings.urls")),
     path("user-preferences/", UserPreferencesView.as_view(), name="user-preferences"),
     path("ebios-rm/", include("ebios_rm.urls")),
-    path("privacy/", include("privacy.urls")),
+    path("gdpr/", include("privacy.urls")),  # GDPR-specific privacy module (purposes, personal-data, etc.)
     path("resilience/", include("resilience.urls")),
     path("crq/", include("crq.urls")),
     path("pmbok/", include("pmbok.urls")),
