@@ -11,14 +11,7 @@ This module provides:
 - Import/export of libraries, frameworks, and assessments
 """
 
-from .backup import create_backup, BackupWriter
-from .restore import restore_backup, BackupReader
-from .utils import (
-    serialize_model_instance,
-    deserialize_model_instance,
-    resolve_dependencies,
-)
-
+# Lazy imports to allow testing without Django
 __all__ = [
     'create_backup',
     'BackupWriter',
@@ -28,3 +21,17 @@ __all__ = [
     'deserialize_model_instance',
     'resolve_dependencies',
 ]
+
+
+def __getattr__(name):
+    """Lazy import to avoid Django dependency at import time."""
+    if name in ('create_backup', 'BackupWriter'):
+        from . import backup
+        return getattr(backup, name)
+    elif name in ('restore_backup', 'BackupReader'):
+        from . import restore
+        return getattr(restore, name)
+    elif name in ('serialize_model_instance', 'deserialize_model_instance', 'resolve_dependencies'):
+        from . import utils
+        return getattr(utils, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -12,14 +12,21 @@ This module provides:
 - Portfolio risk aggregation
 """
 
-from .models import (
-    QuantitativeRiskStudy,
-    QuantitativeRiskScenario,
-    QuantitativeRiskHypothesis,
-)
-
+# Lazy imports to allow testing without Django
 __all__ = [
     'QuantitativeRiskStudy',
     'QuantitativeRiskScenario',
     'QuantitativeRiskHypothesis',
 ]
+
+
+def __getattr__(name):
+    """Lazy import to avoid Django dependency at import time."""
+    if name in __all__:
+        from .models import (
+            QuantitativeRiskStudy,
+            QuantitativeRiskScenario,
+            QuantitativeRiskHypothesis,
+        )
+        return locals()[name]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

@@ -13,20 +13,7 @@ is a French risk assessment methodology with 5 workshops:
 5. Risk Treatment
 """
 
-from .models import (
-    EbiosRMStudy,
-    FearedEvent,
-    RiskOrigin,
-    TargetObjective,
-    RoTo,
-    Stakeholder,
-    StrategicScenario,
-    AttackPath,
-    OperationalScenario,
-    ElementaryAction,
-    OperatingMode,
-)
-
+# Lazy imports to allow testing without Django
 __all__ = [
     'EbiosRMStudy',
     'FearedEvent',
@@ -39,4 +26,13 @@ __all__ = [
     'OperationalScenario',
     'ElementaryAction',
     'OperatingMode',
+    'KillChain',
 ]
+
+
+def __getattr__(name):
+    """Lazy import to avoid Django dependency at import time."""
+    if name in __all__:
+        from . import models
+        return getattr(models, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

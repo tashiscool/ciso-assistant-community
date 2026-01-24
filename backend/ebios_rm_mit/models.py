@@ -747,6 +747,104 @@ class OperationalScenario(models.Model):
         return self.likelihood * self.gravity
 
 
+class KillChain(models.Model):
+    """
+    Attack kill chain definition.
+
+    Kill chains provide a structured framework for categorizing
+    attack stages (e.g., MITRE ATT&CK, Lockheed Martin Kill Chain).
+    """
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, default="")
+    ref_id = models.CharField(max_length=100, blank=True, default="")
+
+    # Framework source
+    class KillChainFramework(models.TextChoices):
+        MITRE_ATTACK = 'mitre_attack', 'MITRE ATT&CK'
+        LOCKHEED_MARTIN = 'lockheed_martin', 'Lockheed Martin'
+        EBIOS_RM = 'ebios_rm', 'EBIOS RM (Know/Enter/Discover/Exploit)'
+        CUSTOM = 'custom', 'Custom'
+
+    framework = models.CharField(
+        max_length=20,
+        choices=KillChainFramework.choices,
+        default=KillChainFramework.EBIOS_RM
+    )
+
+    # Stages defined in JSON format
+    # e.g., [{"id": "recon", "name": "Reconnaissance", "order": 1}, ...]
+    stages = models.JSONField(
+        default=list,
+        help_text="Kill chain stages in order"
+    )
+
+    # Organization scope (null = global/template)
+    organization_id = models.UUIDField(
+        null=True,
+        blank=True,
+        db_index=True
+    )
+
+    is_default = models.BooleanField(
+        default=False,
+        help_text="Whether this is a default kill chain"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Kill Chain"
+        verbose_name_plural = "Kill Chains"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def get_ebios_default(cls):
+        """Get the default EBIOS RM kill chain."""
+        return {
+            'name': 'EBIOS RM Kill Chain',
+            'framework': 'ebios_rm',
+            'stages': [
+                {'id': 'know', 'name': 'Know (Reconnaissance)', 'order': 1},
+                {'id': 'enter', 'name': 'Enter (Initial Access)', 'order': 2},
+                {'id': 'discover', 'name': 'Discover (Discovery)', 'order': 3},
+                {'id': 'exploit', 'name': 'Exploit (Impact)', 'order': 4},
+            ]
+        }
+
+    @classmethod
+    def get_mitre_attack_default(cls):
+        """Get the default MITRE ATT&CK kill chain."""
+        return {
+            'name': 'MITRE ATT&CK',
+            'framework': 'mitre_attack',
+            'stages': [
+                {'id': 'reconnaissance', 'name': 'Reconnaissance', 'order': 1},
+                {'id': 'resource_development', 'name': 'Resource Development', 'order': 2},
+                {'id': 'initial_access', 'name': 'Initial Access', 'order': 3},
+                {'id': 'execution', 'name': 'Execution', 'order': 4},
+                {'id': 'persistence', 'name': 'Persistence', 'order': 5},
+                {'id': 'privilege_escalation', 'name': 'Privilege Escalation', 'order': 6},
+                {'id': 'defense_evasion', 'name': 'Defense Evasion', 'order': 7},
+                {'id': 'credential_access', 'name': 'Credential Access', 'order': 8},
+                {'id': 'discovery', 'name': 'Discovery', 'order': 9},
+                {'id': 'lateral_movement', 'name': 'Lateral Movement', 'order': 10},
+                {'id': 'collection', 'name': 'Collection', 'order': 11},
+                {'id': 'command_and_control', 'name': 'Command and Control', 'order': 12},
+                {'id': 'exfiltration', 'name': 'Exfiltration', 'order': 13},
+                {'id': 'impact', 'name': 'Impact', 'order': 14},
+            ]
+        }
+
+
 class OperatingMode(models.Model):
     """
     An operating mode for an operational scenario.

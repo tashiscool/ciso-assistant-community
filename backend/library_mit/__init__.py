@@ -11,9 +11,7 @@ This module provides:
 - Version management and updates
 """
 
-from .models import StoredLibrary, LoadedLibrary
-from .utils import LibraryImporter, validate_library, preview_library
-
+# Lazy imports to allow testing without Django
 __all__ = [
     'StoredLibrary',
     'LoadedLibrary',
@@ -21,3 +19,14 @@ __all__ = [
     'validate_library',
     'preview_library',
 ]
+
+
+def __getattr__(name):
+    """Lazy import to avoid Django dependency at import time."""
+    if name in ('StoredLibrary', 'LoadedLibrary'):
+        from . import models
+        return getattr(models, name)
+    elif name in ('LibraryImporter', 'validate_library', 'preview_library'):
+        from . import utils
+        return getattr(utils, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
