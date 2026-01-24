@@ -5,7 +5,9 @@ Service for generating FedRAMP System Security Plan (SSP) Appendix A
 Word documents from CISO Assistant compliance assessments.
 """
 
+import json
 import logging
+import re
 import subprocess
 import tempfile
 import os

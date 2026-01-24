@@ -390,10 +390,11 @@ class OCSFToOSCALTranslator:
         if not status:
             return 'not-satisfied'
         status_lower = status.lower()
-        if 'pass' in status_lower or 'compliant' in status_lower:
-            return 'satisfied'
-        elif 'fail' in status_lower or 'non-compliant' in status_lower:
+        # Check 'non' first before 'compliant' to avoid false positive
+        if 'non' in status_lower or 'fail' in status_lower:
             return 'not-satisfied'
+        elif 'pass' in status_lower or 'compliant' in status_lower:
+            return 'satisfied'
         elif 'warn' in status_lower or 'partial' in status_lower:
             return 'partially-satisfied'
         return 'not-satisfied'
