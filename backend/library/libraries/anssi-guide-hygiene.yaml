@@ -1,6 +1,6 @@
 convert_library_version: 'v2 ; Compat Mode: [0] {[v2.1] (DEFAULT) Don''t use any Compatibility
   Mode}'
-urn: urn:intuitem:risk:library:anssi-guide-hygiene
+urn: urn:ciso:risk:library:anssi-guide-hygiene
 locale: fr
 ref_id: ANSSI-GUIDE-HYGIENE
 name: "ANSSI - Guide d'hygi\xE8ne informatique"
@@ -10,7 +10,7 @@ copyright: Licence Ouverte/Open Licence (Etalab - V1)
 version: 3
 publication_date: 2025-11-28
 provider: ANSSI
-packager: intuitem
+packager: ciso-assistant
 translations:
   en:
     name: Guideline for a healthy information system
@@ -18,10 +18,10 @@ translations:
 
       https://cyber.gouv.fr/sites/default/files/2013/01/guideline-for-a-healthy-information-system-in-42-measures_v2.pdf'
 dependencies:
-- urn:intuitem:risk:library:doc-pol
+- urn:ciso:risk:library:doc-pol
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:anssi-guide-hygiene
+    urn: urn:ciso:risk:framework:anssi-guide-hygiene
     ref_id: ANSSI-GUIDE-HYGIENE
     name: "ANSSI - Guide d'hygi\xE8ne informatique"
     description: "Renforcer la s\xE9curit\xE9 de son syst\xE8me d\u2019information\
@@ -46,7 +46,7 @@ objects:
         en:
           name: strengthened
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:i
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:i
       assessable: false
       depth: 1
       ref_id: I
@@ -54,10 +54,10 @@ objects:
       translations:
         en:
           name: Raise awareness and train
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:1
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:i
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:i
       ref_id: '1'
       name: "Former les \xE9quipes op\xE9rationnelles \xE0 la s\xE9curit\xE9 des syst\xE8\
         mes d\u2019information"
@@ -89,17 +89,17 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.educ
-      - urn:intuitem:risk:function:doc-pol:doc.educ_plan
-      - urn:intuitem:risk:function:doc-pol:doc.educ_register
-      - urn:intuitem:risk:function:doc-pol:train.legal
-      - urn:intuitem:risk:function:doc-pol:train.threat
-      - urn:intuitem:risk:function:doc-pol:train.mcs
-      - urn:intuitem:risk:function:doc-pol:train.iam
-      - urn:intuitem:risk:function:doc-pol:train.hardening
-      - urn:intuitem:risk:function:doc-pol:train.network_security
-      - urn:intuitem:risk:function:doc-pol:train.logging
-      - urn:intuitem:risk:function:doc-pol:pol.supplier
+      - urn:ciso:risk:function:doc-pol:pol.educ
+      - urn:ciso:risk:function:doc-pol:doc.educ_plan
+      - urn:ciso:risk:function:doc-pol:doc.educ_register
+      - urn:ciso:risk:function:doc-pol:train.legal
+      - urn:ciso:risk:function:doc-pol:train.threat
+      - urn:ciso:risk:function:doc-pol:train.mcs
+      - urn:ciso:risk:function:doc-pol:train.iam
+      - urn:ciso:risk:function:doc-pol:train.hardening
+      - urn:ciso:risk:function:doc-pol:train.network_security
+      - urn:ciso:risk:function:doc-pol:train.logging
+      - urn:ciso:risk:function:doc-pol:pol.supplier
       translations:
         en:
           name: Train the operational teams in information system security
@@ -123,10 +123,10 @@ objects:
             \ for ISSMs, etc.\nMoreover, it is necessary to mention specific clauses\
             \ in service agreements in order to guarantee regular training in information\
             \ system security for external staff and especially outsourcers."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:2
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:i
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:i
       ref_id: '2'
       name: "Sensibiliser les utilisateurs aux bonnes pratiques \xE9l\xE9mentaires\
         \ de s\xE9curit\xE9 informatique"
@@ -154,10 +154,10 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.accept
-      - urn:intuitem:risk:function:doc-pol:pol.educ
-      - urn:intuitem:risk:function:doc-pol:doc.educ_plan
-      - urn:intuitem:risk:function:doc-pol:doc.educ_register
+      - urn:ciso:risk:function:doc-pol:pol.accept
+      - urn:ciso:risk:function:doc-pol:pol.educ
+      - urn:ciso:risk:function:doc-pol:doc.educ_plan
+      - urn:ciso:risk:function:doc-pol:doc.educ_register
       translations:
         en:
           name: "Raise users\u2019 awareness about basic information security"
@@ -190,10 +190,10 @@ objects:
             > the means available and involved in computer security: systematically
             locking the session when the user leaves his device, password protection
             tool, etc.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:2.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:2.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:i
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:i
       ref_id: 2.R
       name: "Sensibiliser les utilisateurs aux bonnes pratiques \xE9l\xE9mentaires\
         \ de s\xE9curit\xE9 informatique (renforc\xE9)"
@@ -204,17 +204,17 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.internal_rules
+      - urn:ciso:risk:function:doc-pol:doc.internal_rules
       translations:
         en:
           name: "Raise users\u2019 awareness about basic information security (strengthened)"
           description: To strengthen these measures, the creation and signature of
             an IT resource charter specifying the rules and instructions that must
             be adhered to by users may be considered.
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:3
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:i
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:i
       ref_id: '3'
       name: "Ma\xEEtriser les risques de l\u2019infog\xE9rance"
       description: "Lorsqu\u2019une entit\xE9 souhaite externaliser son syst\xE8me\
@@ -246,10 +246,10 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.supplier
-      - urn:intuitem:risk:function:doc-pol:doc.risk_register
-      - urn:intuitem:risk:function:doc-pol:doc.sap
-      - urn:intuitem:risk:function:doc-pol:doc.asset_register
+      - urn:ciso:risk:function:doc-pol:pol.supplier
+      - urn:ciso:risk:function:doc-pol:doc.risk_register
+      - urn:ciso:risk:function:doc-pol:doc.sap
+      - urn:ciso:risk:function:doc-pol:doc.asset_register
       translations:
         en:
           name: Control outsourced services
@@ -275,7 +275,7 @@ objects:
             The use of digital solutions or tools (hosted in the Cloud for example)\
             \ is not considered here as it comes under the area of managed services\
             \ and, moreover, is not advisable when processing sensitive data."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:ii
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:ii
       assessable: false
       depth: 1
       ref_id: II
@@ -283,10 +283,10 @@ objects:
       translations:
         en:
           name: Know the Information System
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:4
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:ii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:ii
       ref_id: '4'
       name: "Identifier les informations et serveurs les plus sensibles et maintenir\
         \ un sch\xE9ma du r\xE9seau"
@@ -311,11 +311,11 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.asset
-      - urn:intuitem:risk:function:doc-pol:pol.classif
-      - urn:intuitem:risk:function:doc-pol:doc.asset_register
-      - urn:intuitem:risk:function:doc-pol:doc.proc_register
-      - urn:intuitem:risk:function:doc-pol:doc.is_map
+      - urn:ciso:risk:function:doc-pol:pol.asset
+      - urn:ciso:risk:function:doc-pol:pol.classif
+      - urn:ciso:risk:function:doc-pol:doc.asset_register
+      - urn:ciso:risk:function:doc-pol:doc.proc_register
+      - urn:ciso:risk:function:doc-pol:doc.is_map
       translations:
         en:
           name: Identify the most sensitive information and servers and maintain a
@@ -335,10 +335,10 @@ objects:
             \ relays, etc.) and the networks with the outside (Internet, private networks,\
             \ etc.) and\npartners. This diagram must also be able to locate the servers\
             \ holding the entity\u2019s sensitive information."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:5
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:ii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:ii
       ref_id: '5'
       name: "Disposer d\u2019un inventaire exhaustif des comptes privil\xE9gi\xE9\
         s et le maintenir \xE0 jour"
@@ -367,10 +367,10 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:proc.pam
-      - urn:intuitem:risk:function:doc-pol:doc.pam_register
-      - urn:intuitem:risk:function:doc-pol:proc.recertification
-      - urn:intuitem:risk:function:doc-pol:pol.access
+      - urn:ciso:risk:function:doc-pol:proc.pam
+      - urn:ciso:risk:function:doc-pol:doc.pam_register
+      - urn:ciso:risk:function:doc-pol:proc.recertification
+      - urn:ciso:risk:function:doc-pol:pol.access
       translations:
         en:
           name: Have an exhaustive inventory of privileged accounts and keep it updated
@@ -400,10 +400,10 @@ objects:
             Lastly, defining and using a simple, clear nomenclature to identify system
             accounts and administration accounts is desirable. This will make review
             and intrusion detection easier.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:6
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:6
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:ii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:ii
       ref_id: '6'
       name: "Organiser les proc\xE9dures d\u2019arriv\xE9e, de d\xE9part et de changement\
         \ de fonction des utilisateurs"
@@ -427,11 +427,11 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.access
-      - urn:intuitem:risk:function:doc-pol:proc.hr_security
-      - urn:intuitem:risk:function:doc-pol:proc.physical_security
-      - urn:intuitem:risk:function:doc-pol:pol.work
-      - urn:intuitem:risk:function:doc-pol:pol.classif
+      - urn:ciso:risk:function:doc-pol:pol.access
+      - urn:ciso:risk:function:doc-pol:proc.hr_security
+      - urn:ciso:risk:function:doc-pol:proc.physical_security
+      - urn:ciso:risk:function:doc-pol:pol.work
+      - urn:ciso:risk:function:doc-pol:pol.classif
       translations:
         en:
           name: Organise the procedures relating to users joining, departing and changing
@@ -459,10 +459,10 @@ objects:
 
             > the management of sensitive documents and information (transferring
             passwords, changing passwords or codes in existing systems).'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:6.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:6.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:ii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:ii
       ref_id: 6.R
       name: "Organiser les proc\xE9dures d\u2019arriv\xE9e, de d\xE9part et de changement\
         \ de fonction des utilisateurs (renforc\xE9)"
@@ -471,17 +471,17 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.proc_register
+      - urn:ciso:risk:function:doc-pol:doc.proc_register
       translations:
         en:
           name: Organise the procedures relating to users joining, departing and changing
             positions (strengthened)
           description: The procedures must be formalised and updated according to
             the context.
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:7
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:7
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:ii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:ii
       ref_id: '7'
       name: "Autoriser la connexion au r\xE9seau de l\u2019entit\xE9 aux seuls \xE9\
         quipements ma\xEEtris\xE9s"
@@ -506,8 +506,8 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.network
-      - urn:intuitem:risk:function:doc-pol:pol.accept
+      - urn:ciso:risk:function:doc-pol:pol.network
+      - urn:ciso:risk:function:doc-pol:pol.accept
       translations:
         en:
           name: Only allow controlled devices to connect to the network of the organization
@@ -526,10 +526,10 @@ objects:
             \ must therefore be accompanied by pragmatic solutions responding to their\
             \ needs. For example, the provision of a Wi-Fi network with dedicated\
             \ SSID for personal and visitor devices"
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:7.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:7.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:ii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:ii
       ref_id: 7.R
       name: "Autoriser la connexion au r\xE9seau de l\u2019entit\xE9 aux seuls \xE9\
         quipements ma\xEEtris\xE9s (renforc\xE9)"
@@ -539,8 +539,8 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.network
-      - urn:intuitem:risk:function:doc-pol:tech.nac
+      - urn:ciso:risk:function:doc-pol:pol.network
+      - urn:ciso:risk:function:doc-pol:tech.nac
       translations:
         en:
           name: Only allow controlled devices to connect to the network of the organization
@@ -548,7 +548,7 @@ objects:
           description: These developments can be supplemented by technical measures
             such as the authentication of devices on the network (for example thanks
             to 802.1X standard or an equivalent).
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iii
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iii
       assessable: false
       depth: 1
       ref_id: III
@@ -556,10 +556,10 @@ objects:
       translations:
         en:
           name: Authenticate and control accesses
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:8
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:8
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iii
       ref_id: '8'
       name: "Identifier nomm\xE9ment chaque personne acc\xE9dant au syst\xE8me et\
         \ distinguer les r\xF4les utilisateur/administrateur"
@@ -585,9 +585,9 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.access
-      - urn:intuitem:risk:function:doc-pol:proc.pam
-      - urn:intuitem:risk:function:doc-pol:doc.pam_register
+      - urn:ciso:risk:function:doc-pol:pol.access
+      - urn:ciso:risk:function:doc-pol:proc.pam
+      - urn:ciso:risk:function:doc-pol:doc.pam_register
       translations:
         en:
           name: Identify each individual accessing the system by name and distinguish
@@ -611,10 +611,10 @@ objects:
             exclusively dedicated to administration actions. Furthermore, it must
             be used in environments dedicated to administration in order that no connection
             traces or password hashes are left in a more exposed environment.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:8.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:8.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iii
       ref_id: 8.R
       name: "Identifier nomm\xE9ment chaque personne acc\xE9dant au syst\xE8me et\
         \ distinguer les r\xF4les utilisateur/administrateur (renforc\xE9)"
@@ -624,19 +624,19 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.monitor
-      - urn:intuitem:risk:function:doc-pol:tech.access_log
-      - urn:intuitem:risk:function:doc-pol:tech.edr
+      - urn:ciso:risk:function:doc-pol:pol.monitor
+      - urn:ciso:risk:function:doc-pol:tech.access_log
+      - urn:ciso:risk:function:doc-pol:tech.edr
       translations:
         en:
           name: Identify each individual accessing the system by name and distinguish
             the user/administrator roles (strengthened)
           description: 'As soon as possible, the logging linked to accounts (e.g.:
             list of successful/failed connections) must be activated.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:9
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:9
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iii
       ref_id: '9'
       name: "Attribuer les bons droits sur les ressources sensibles du syst\xE8me\
         \ d\u2019information"
@@ -661,12 +661,12 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.asset_register
-      - urn:intuitem:risk:function:doc-pol:pol.access
-      - urn:intuitem:risk:function:doc-pol:proc.pam
-      - urn:intuitem:risk:function:doc-pol:pol.accept
-      - urn:intuitem:risk:function:doc-pol:pol.network
-      - urn:intuitem:risk:function:doc-pol:proc.recertification
+      - urn:ciso:risk:function:doc-pol:doc.asset_register
+      - urn:ciso:risk:function:doc-pol:pol.access
+      - urn:ciso:risk:function:doc-pol:proc.pam
+      - urn:ciso:risk:function:doc-pol:pol.accept
+      - urn:ciso:risk:function:doc-pol:pol.network
+      - urn:ciso:risk:function:doc-pol:proc.recertification
       translations:
         en:
           name: "Allocate the appropriate rights to the information system\u2019s\
@@ -685,10 +685,10 @@ objects:
             \ files, information system technical documentation, business databases,\
             \ etc.\nA regular review of the access rights must, moreover, be carried\
             \ out, in order to identify any unauthorised access"
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:10
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:10
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iii
       ref_id: '10'
       name: "D\xE9finir et v\xE9rifier des r\xE8gles de choix et de dimensionnement\
         \ des mots de passe"
@@ -710,8 +710,8 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.access
-      - urn:intuitem:risk:function:doc-pol:doc.educ_plan
+      - urn:ciso:risk:function:doc-pol:pol.access
+      - urn:ciso:risk:function:doc-pol:doc.educ_plan
       translations:
         en:
           name: Set and verify rules for the choice and size of passwords
@@ -732,10 +732,10 @@ objects:
 
             In advance of such procedures, communication aiming to explain the reason
             for these rules and raise awareness of their importance is fundamental.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:11
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:11
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iii
       ref_id: '11'
       name: "Prot\xE9ger les mots de passe stock\xE9s sur les syst\xE8mes"
       description: "La complexit\xE9, la diversit\xE9 ou encore l\u2019utilisation\
@@ -756,9 +756,9 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:tech.password_manager
-      - urn:intuitem:risk:function:doc-pol:pol.access
-      - urn:intuitem:risk:function:doc-pol:doc.educ_plan
+      - urn:ciso:risk:function:doc-pol:tech.password_manager
+      - urn:ciso:risk:function:doc-pol:pol.access
+      - urn:ciso:risk:function:doc-pol:doc.educ_plan
       translations:
         en:
           name: Protect passwords stored on systems
@@ -776,10 +776,10 @@ objects:
             Of course, the password chosen for this digital safe must respect the
             rules set out previously and be memorised by the user, who only has to
             remember this password.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:12
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:12
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iii
       ref_id: '12'
       name: "Changer les \xE9l\xE9ments d\u2019authentification par d\xE9faut sur\
         \ les \xE9quipements et services"
@@ -802,7 +802,7 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.access
+      - urn:ciso:risk:function:doc-pol:pol.access
       translations:
         en:
           name: Change the default authentication settings on devices and services
@@ -822,10 +822,10 @@ objects:
             or certificate being "hardcoded" onto a device, this critical problem
             must be raised with the product supplier so that it can correct this vulnerability
             as fast as possible.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:12.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:12.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iii
       ref_id: 12.R
       name: "Changer les \xE9l\xE9ments d\u2019authentification par d\xE9faut sur\
         \ les \xE9quipements et services (renforc\xE9)"
@@ -836,7 +836,7 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.access
+      - urn:ciso:risk:function:doc-pol:pol.access
       translations:
         en:
           name: Change the default authentication settings on devices and services
@@ -844,10 +844,10 @@ objects:
           description: In order to limit the consequences of a compromise, it is,
             moreover, essential, after changing the default authentication settings,
             to renew them regularly.
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:13
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:13
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iii
       ref_id: '13'
       name: "Privil\xE9gier lorsque c\u2019est possible une authentification forte"
       description: "Il est vivement recommand\xE9 de mettre en \u0153uvre une authentification\
@@ -860,7 +860,7 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.access
+      - urn:ciso:risk:function:doc-pol:pol.access
       translations:
         en:
           name: Prefer a two-factor authentication when possible
@@ -874,10 +874,10 @@ objects:
             to receive an SMS);
 
             > something I am (a digital fingerprint).'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:13.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:13.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iii
       ref_id: 13.R
       name: "Privil\xE9gier lorsque c\u2019est possible une authentification forte\
         \ (renforc\xE9)"
@@ -893,7 +893,7 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.access
+      - urn:ciso:risk:function:doc-pol:pol.access
       translations:
         en:
           name: Prefer a two-factor authentication when possible (strengthened)
@@ -905,7 +905,7 @@ objects:
             key management structure. However, they have the advantage of being re-usable
             for various purposes: encryption, message authentication, authentication
             on the workstation, etc.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iv
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iv
       assessable: false
       depth: 1
       ref_id: IV
@@ -913,10 +913,10 @@ objects:
       translations:
         en:
           name: Secure the devices
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:14
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:14
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iv
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iv
       ref_id: '14'
       name: "Mettre en place un niveau de s\xE9curit\xE9 minimal sur l\u2019ensemble\
         \ du parc informatique"
@@ -939,13 +939,13 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.work
-      - urn:intuitem:risk:function:doc-pol:tech.uem
-      - urn:intuitem:risk:function:doc-pol:pol.malware
-      - urn:intuitem:risk:function:doc-pol:tech.endpoint_protection
-      - urn:intuitem:risk:function:doc-pol:tech.disk_encryption
-      - urn:intuitem:risk:function:doc-pol:proc.gpo
-      - urn:intuitem:risk:function:doc-pol:pol.network
+      - urn:ciso:risk:function:doc-pol:pol.work
+      - urn:ciso:risk:function:doc-pol:tech.uem
+      - urn:ciso:risk:function:doc-pol:pol.malware
+      - urn:ciso:risk:function:doc-pol:tech.endpoint_protection
+      - urn:ciso:risk:function:doc-pol:tech.disk_encryption
+      - urn:ciso:risk:function:doc-pol:proc.gpo
+      - urn:ciso:risk:function:doc-pol:pol.network
       translations:
         en:
           name: Implement a minimum level of security across the whole IT stock
@@ -963,10 +963,10 @@ objects:
             \ applicable to devices, these devices must be isolated from the system\
             \ (if it is impossible to update certain applications for interoperability\
             \ reasons for example)."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:14.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:14.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iv
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iv
       ref_id: 14.R
       name: "Mettre en place un niveau de s\xE9curit\xE9 minimal sur l\u2019ensemble\
         \ du parc informatique (renforc\xE9)"
@@ -981,9 +981,9 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.backup
-      - urn:intuitem:risk:function:doc-pol:tech.immutable_backup
-      - urn:intuitem:risk:function:doc-pol:pol.bcp
+      - urn:ciso:risk:function:doc-pol:pol.backup
+      - urn:ciso:risk:function:doc-pol:tech.immutable_backup
+      - urn:ciso:risk:function:doc-pol:pol.bcp
       translations:
         en:
           name: Implement a minimum level of security across the whole IT stock (strengthened)
@@ -994,10 +994,10 @@ objects:
             \ are subject to attacks which make their data unavailable (for example\
             \ demanding, in exchange for returning the data, the payment of a significant\
             \ amount of money (ransomware))."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:15
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:15
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iv
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iv
       ref_id: '15'
       name: "Se prot\xE9ger des menaces relatives \xE0 l\u2019utilisation de supports\
         \ amovibles"
@@ -1018,8 +1018,8 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.work
-      - urn:intuitem:risk:function:doc-pol:tech.endpoint_protection
+      - urn:ciso:risk:function:doc-pol:pol.work
+      - urn:ciso:risk:function:doc-pol:tech.endpoint_protection
       translations:
         en:
           name: Protect against threats relating to the use of removable media
@@ -1035,10 +1035,10 @@ objects:
             \ much as possible, the use of uncontrolled sticks (the origin of which\
             \ is known but not the integrity) on the information system, or at least\
             \ have their content examined by the workstation\u2019s anti-virus."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:15.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:15.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iv
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iv
       ref_id: 15.R
       name: "Se prot\xE9ger des menaces relatives \xE0 l\u2019utilisation de supports\
         \ amovibles (renforc\xE9)"
@@ -1053,8 +1053,8 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:tech.endpoint_protection
-      - urn:intuitem:risk:function:doc-pol:proc.disposal
+      - urn:ciso:risk:function:doc-pol:tech.endpoint_protection
+      - urn:ciso:risk:function:doc-pol:proc.disposal
       translations:
         en:
           name: Protect against threats relating to the use of removable media (strengthened)
@@ -1064,10 +1064,10 @@ objects:
             \ removable media\u2019s life span, it will be necessary to implement\
             \ and respect a strict disposal procedure which may extend to their secure\
             \ destruction, in order to limit the leaking of sensitive information."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:16
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:16
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iv
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iv
       ref_id: '16'
       name: "Utiliser un outil de gestion centralis\xE9e afin d\u2019homog\xE9n\xE9\
         iser les politiques de s\xE9curit\xE9"
@@ -1092,7 +1092,7 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:tech.uem
+      - urn:ciso:risk:function:doc-pol:tech.uem
       translations:
         en:
           name: Use a centralised management tool to standardise security policies
@@ -1111,10 +1111,10 @@ objects:
             \ for the operating system or applications may easily be applied from\
             \ a central point while favouring the expected responsiveness in the event\
             \ reconfiguration is required."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:17
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:17
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iv
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iv
       ref_id: '17'
       name: Activer et configurer le pare-feu local des postes de travail
       description: "Apr\xE8s avoir r\xE9ussi \xE0 prendre le contr\xF4le d\u2019un\
@@ -1131,7 +1131,7 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:tech.endpoint_protection
+      - urn:ciso:risk:function:doc-pol:tech.endpoint_protection
       translations:
         en:
           name: Activate and configure the firewall on workstations
@@ -1144,10 +1144,10 @@ objects:
             \ or specialised software.\nFlows from device to device are very rare\
             \ in a traditional office network: files are stored on file servers, applications\
             \ are accessible on business servers, etc."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:17.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:17.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iv
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iv
       ref_id: 17.R
       name: "Activer et configurer le pare-feu local des postes de travail (renforc\xE9\
         )"
@@ -1168,9 +1168,9 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:tech.endpoint_protection
-      - urn:intuitem:risk:function:doc-pol:doc.flow_matrix
-      - urn:intuitem:risk:function:doc-pol:tech.edr
+      - urn:ciso:risk:function:doc-pol:tech.endpoint_protection
+      - urn:ciso:risk:function:doc-pol:doc.flow_matrix
+      - urn:ciso:risk:function:doc-pol:tech.edr
       translations:
         en:
           name: Activate and configure the firewall on workstations (strengthened)
@@ -1186,10 +1186,10 @@ objects:
             \ (\xABwhite list\xBB).\nThe firewall must also be configured to log the\
             \ blocked flows and therefore identify the application configuration errors\
             \ or intrusion attempts."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:18
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:18
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:iv
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:iv
       ref_id: '18'
       name: "Chiffrer les donn\xE9es sensibles transmises par voie Internet"
       description: "Internet est un r\xE9seau sur lequel il est quasi impossible d\u2019\
@@ -1209,9 +1209,9 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.transfer
-      - urn:intuitem:risk:function:doc-pol:pol.crypto
-      - urn:intuitem:risk:function:doc-pol:tech.file_encryption
+      - urn:ciso:risk:function:doc-pol:pol.transfer
+      - urn:ciso:risk:function:doc-pol:pol.crypto
+      - urn:ciso:risk:function:doc-pol:tech.file_encryption
       translations:
         en:
           name: Encrypt sensitive data sent through the Internet
@@ -1231,7 +1231,7 @@ objects:
             or, failing that, a different channel from the data transmission channel.
             Therefore, although the encrypted data is sent by mail, handing over the
             password by hand or, failing that, over the phone must be favoured.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:v
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:v
       assessable: false
       depth: 1
       ref_id: V
@@ -1239,10 +1239,10 @@ objects:
       translations:
         en:
           name: Secure the network
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:19
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:19
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:v
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:v
       ref_id: '19'
       name: "Segmenter le r\xE9seau et mettre en place un cloisonnement entre ces\
         \ zones"
@@ -1270,10 +1270,10 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.network
-      - urn:intuitem:risk:function:doc-pol:tech.vlan
-      - urn:intuitem:risk:function:doc-pol:tech.network_firewall
-      - urn:intuitem:risk:function:doc-pol:tech.microsegmentation
+      - urn:ciso:risk:function:doc-pol:pol.network
+      - urn:ciso:risk:function:doc-pol:tech.vlan
+      - urn:ciso:risk:function:doc-pol:tech.network_firewall
+      - urn:ciso:risk:function:doc-pol:tech.microsegmentation
       translations:
         en:
           name: Segment the network and implement a partitioning between these areas
@@ -1294,10 +1294,10 @@ objects:
             \ tasks are segregated as far as possible.\nFor networks for which subsequent\
             \ partitioning would not be easy, integrating this approach in any new\
             \ network extension or when devices are changed is recommended."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:20
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:20
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:v
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:v
       ref_id: '20'
       name: "S'assurer de la s\xE9curit\xE9 des r\xE9seaux d'acc\xE8s Wi-Fi et de\
         \ la s\xE9paration des usages"
@@ -1327,10 +1327,10 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:tech.vlan
-      - urn:intuitem:risk:function:doc-pol:tech.network_firewall
-      - urn:intuitem:risk:function:doc-pol:tech.wifi_sec
-      - urn:intuitem:risk:function:doc-pol:pol.network
+      - urn:ciso:risk:function:doc-pol:tech.vlan
+      - urn:ciso:risk:function:doc-pol:tech.network_firewall
+      - urn:ciso:risk:function:doc-pol:tech.wifi_sec
+      - urn:ciso:risk:function:doc-pol:pol.network
       translations:
         en:
           name: Ensure the security of Wi-Fi access networks and that uses are separated
@@ -1355,10 +1355,10 @@ objects:
             \ from staff or visitor terminals (laptops, smartphones) must be separate\
             \ from Wi-Fi connections from the organization\u2019s devices (e.g.: distinct\
             \ SSID and VLAN, dedicated internet access)."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:21
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:21
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:v
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:v
       ref_id: '21'
       name: "Utiliser des protocoles r\xE9seaux s\xE9curis\xE9s d\xE8s qu'ils existent"
       description: "Si aujourd\u2019hui la s\xE9curit\xE9 n\u2019est plus optionnelle,\
@@ -1381,8 +1381,8 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.transfer
-      - urn:intuitem:risk:function:doc-pol:pol.crypto
+      - urn:ciso:risk:function:doc-pol:pol.transfer
+      - urn:ciso:risk:function:doc-pol:pol.crypto
       translations:
         en:
           name: Use secure network protocols when they exist
@@ -1399,10 +1399,10 @@ objects:
             \ were designed securely from their creation to replace prior, insecure\
             \ protocols. As an example SSH (Secure SHell) which came to replace the\
             \ TELNET and RLOGIN historic communication protocols.."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:22
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:22
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:v
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:v
       ref_id: '22'
       name: "Mettre en place une passerelle d'acc\xE8s s\xE9curis\xE9 \xE0 Internet"
       description: "L\u2019acc\xE8s \xE0 Internet, devenu indispensable, pr\xE9sente\
@@ -1420,9 +1420,9 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.network
-      - urn:intuitem:risk:function:doc-pol:tech.network_firewall
-      - urn:intuitem:risk:function:doc-pol:tech.web_proxy
+      - urn:ciso:risk:function:doc-pol:pol.network
+      - urn:ciso:risk:function:doc-pol:tech.network_firewall
+      - urn:ciso:risk:function:doc-pol:tech.web_proxy
       translations:
         en:
           name: Implement a secure access gateway to the Internet
@@ -1435,10 +1435,10 @@ objects:
             \ as a minimum, a firewall as close to the Internet access as possible\
             \ to filter the connections and a proxy server with different security\
             \ mechanisms. This ensures users are authenticated and requests are logged."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:22.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:22.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:v
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:v
       ref_id: 22.R
       name: "Mettre en place une passerelle d'acc\xE8s s\xE9curis\xE9 \xE0 Internet"
       description: "Des m\xE9canismes compl\xE9mentaires sur le serveur mandataire\
@@ -1457,10 +1457,10 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.maintenance
-      - urn:intuitem:risk:function:doc-pol:tech.network_firewall
-      - urn:intuitem:risk:function:doc-pol:tech.web_proxy
-      - urn:intuitem:risk:function:doc-pol:tech.vpn
+      - urn:ciso:risk:function:doc-pol:pol.maintenance
+      - urn:ciso:risk:function:doc-pol:tech.network_firewall
+      - urn:ciso:risk:function:doc-pol:tech.web_proxy
+      - urn:ciso:risk:function:doc-pol:tech.vpn
       translations:
         en:
           name: Implement a secure access gateway to the Internet (strengthened)
@@ -1475,10 +1475,10 @@ objects:
             \ is strongly recommended that mobile devices establish a prior secure\
             \ connection to the organization\u2019s information system to browse the\
             \ web securely through the gateway."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:23
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:23
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:v
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:v
       ref_id: '23'
       name: "Cloisonner les services visibles depuis Internet du reste du syst\xE8\
         me d'information"
@@ -1502,11 +1502,11 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.educ_plan
-      - urn:intuitem:risk:function:doc-pol:pol.network
-      - urn:intuitem:risk:function:doc-pol:tech.network_firewall
-      - urn:intuitem:risk:function:doc-pol:tech.reverse_proxy
-      - urn:intuitem:risk:function:doc-pol:tech.waf
+      - urn:ciso:risk:function:doc-pol:doc.educ_plan
+      - urn:ciso:risk:function:doc-pol:pol.network
+      - urn:ciso:risk:function:doc-pol:tech.network_firewall
+      - urn:ciso:risk:function:doc-pol:tech.reverse_proxy
+      - urn:ciso:risk:function:doc-pol:tech.waf
       translations:
         en:
           name: Segregate the services visible from the Internet from the rest of
@@ -1528,10 +1528,10 @@ objects:
             to services differently from the other flows of the organization. It also
             concerns ensuring incoming flows go through a reverse proxy server with
             different security mechanisms.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:24
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:24
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:v
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:v
       ref_id: '24'
       name: "Prot\xE9ger sa messagerie professionnelle"
       description: "La messagerie est le principal vecteur d\u2019infection du poste\
@@ -1560,12 +1560,12 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.educ_plan
-      - urn:intuitem:risk:function:doc-pol:pol.seg_duty
-      - urn:intuitem:risk:function:doc-pol:pol.accept
-      - urn:intuitem:risk:function:doc-pol:tech.network_antivirus
-      - urn:intuitem:risk:function:doc-pol:pol.transfer
-      - urn:intuitem:risk:function:doc-pol:pol.crypto
+      - urn:ciso:risk:function:doc-pol:doc.educ_plan
+      - urn:ciso:risk:function:doc-pol:pol.seg_duty
+      - urn:ciso:risk:function:doc-pol:pol.accept
+      - urn:ciso:risk:function:doc-pol:tech.network_antivirus
+      - urn:ciso:risk:function:doc-pol:pol.transfer
+      - urn:ciso:risk:function:doc-pol:pol.crypto
       translations:
         en:
           name: Protect your professional email
@@ -1595,10 +1595,10 @@ objects:
             > that it has activated TLS encryption for exchanges between email servers
             (from the organization or public) as well as between the user devices
             and servers hosting the mailboxes.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:24.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:24.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:v
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:v
       ref_id: 24.R
       name: "Prot\xE9ger sa messagerie professionnelle"
       description: "Il est souhaitable de ne pas exposer directement les serveurs\
@@ -1615,8 +1615,8 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:tech.mail_gateway
-      - urn:intuitem:risk:function:doc-pol:proc.email_security
+      - urn:ciso:risk:function:doc-pol:tech.mail_gateway
+      - urn:ciso:risk:function:doc-pol:proc.email_security
       translations:
         en:
           name: Protect your professional email (strengthened)
@@ -1631,10 +1631,10 @@ objects:
             Finally, the email administrator will ensure the implementation of authenticity
             verification mechanisms and the correct configuration of public DNS records
             linked to its email infrastructure (MX, SPF, DKIM, DMARC).'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:25
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:25
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:v
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:v
       ref_id: '25'
       name: "S\xE9curiser les interconnexions r\xE9seau d\xE9di\xE9es avec les partenaires"
       description: "Pour des besoins op\xE9rationnels, une entit\xE9 peut \xEAtre\
@@ -1654,8 +1654,8 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:tech.vpn
-      - urn:intuitem:risk:function:doc-pol:tech.network_firewall
+      - urn:ciso:risk:function:doc-pol:tech.vpn
+      - urn:ciso:risk:function:doc-pol:tech.network_firewall
       translations:
         en:
           name: Secure the dedicated network interconnections with partners
@@ -1671,10 +1671,10 @@ objects:
             \ organization\u2019s network. The flow matrix (incoming and outgoing)\
             \ must be strictly reduced to the operational need, maintained over time\
             \ and the devices\u2019 configuration must be in accordance with it."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:25.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:25.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:v
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:v
       ref_id: 25.R
       name: "S\xE9curiser les interconnexions r\xE9seau d\xE9di\xE9es avec les partenaires"
       description: "Pour des entit\xE9s ayant des besoins de s\xE9curit\xE9 plus exigeants,\
@@ -1687,9 +1687,9 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:tech.network_firewall
-      - urn:intuitem:risk:function:doc-pol:tech.ids
-      - urn:intuitem:risk:function:doc-pol:proc.incident
+      - urn:ciso:risk:function:doc-pol:tech.network_firewall
+      - urn:ciso:risk:function:doc-pol:tech.ids
+      - urn:ciso:risk:function:doc-pol:proc.incident
       translations:
         en:
           name: Secure the dedicated network interconnections with partners (strengthened)
@@ -1700,10 +1700,10 @@ objects:
 
             Moreover, knowing an up-to-date point of contact for the partner is necessary
             to be able to react in the event of a security incident.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:26
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:26
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:v
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:v
       ref_id: '26'
       name: "Contr\xF4ler et prot\xE9ger l'acc\xE8s aux salles serveurs et aux locaux\
         \ techniques"
@@ -1731,10 +1731,10 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.physical
-      - urn:intuitem:risk:function:doc-pol:proc.physical_security
-      - urn:intuitem:risk:function:doc-pol:proc.hr_security
-      - urn:intuitem:risk:function:doc-pol:pol.network
+      - urn:ciso:risk:function:doc-pol:pol.physical
+      - urn:ciso:risk:function:doc-pol:proc.physical_security
+      - urn:ciso:risk:function:doc-pol:proc.hr_security
+      - urn:ciso:risk:function:doc-pol:pol.network
       translations:
         en:
           name: Control and protect access to the server rooms and technical areas
@@ -1754,7 +1754,7 @@ objects:
             \ the network sockets in areas open to the public (meeting room, reception\
             \ hall, corridors, etc.) must be restricted or deactivated in order to\
             \ stop a hacker easily gaining access to the company\u2019s network."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:vi
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:vi
       assessable: false
       depth: 1
       ref_id: VI
@@ -1762,10 +1762,10 @@ objects:
       translations:
         en:
           name: Secure administration
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:27
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:27
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:vi
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:vi
       ref_id: '27'
       name: "Interdire l\u2019acc\xE8s \xE0 Internet depuis les postes ou serveurs\
         \ utilis\xE9s pour l\u2019administration du syst\xE8me d\u2019information"
@@ -1786,8 +1786,8 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.network
-      - urn:intuitem:risk:function:doc-pol:proc.pam
+      - urn:ciso:risk:function:doc-pol:pol.network
+      - urn:ciso:risk:function:doc-pol:proc.pam
       translations:
         en:
           name: Prohibit Internet access from devices or servers used by the information
@@ -1804,10 +1804,10 @@ objects:
             of providing remote access to an admin infrastructure from an office device,
             is not advisable as it can lead to a privilege elevation in the event
             admin authenticators are recuperated.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:27.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:27.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:vi
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:vi
       ref_id: 27.R
       name: "Interdire l\u2019acc\xE8s \xE0 Internet depuis les postes ou serveurs\
         \ utilis\xE9s pour l\u2019administration du syst\xE8me d\u2019information"
@@ -1822,7 +1822,7 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:proc.update
+      - urn:ciso:risk:function:doc-pol:proc.update
       translations:
         en:
           name: Prohibit Internet access from devices or servers used by the information
@@ -1835,10 +1835,10 @@ objects:
 
             For organizations wishing to automate certain tasks, the implementation
             of secure interchange area is advisable.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:28
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:28
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:vi
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:vi
       ref_id: '28'
       name: "Utiliser un r\xE9seau d\xE9di\xE9 et cloisonn\xE9 pour l\u2019administration\
         \ du syst\xE8me d\u2019information"
@@ -1859,7 +1859,7 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.network
+      - urn:ciso:risk:function:doc-pol:pol.network
       translations:
         en:
           name: Use a dedicated and separated network for information system administration
@@ -1875,10 +1875,10 @@ objects:
             \ the integrity and confidentiality of data carried in the administration\
             \ network over the user office network;\n> as a minimum, implement logical\
             \ partitioning using VLAN."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:28.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:28.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:vi
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:vi
       ref_id: 28.R
       name: "Utiliser un r\xE9seau d\xE9di\xE9 et cloisonn\xE9 pour l\u2019administration\
         \ du syst\xE8me d\u2019information"
@@ -1889,7 +1889,7 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.network
+      - urn:ciso:risk:function:doc-pol:pol.network
       translations:
         en:
           name: Use a dedicated and separated network for information system administration
@@ -1898,10 +1898,10 @@ objects:
             \ advisable:\n> to firstly favour a physical partitioning of networks\
             \ as soon as this is possible, as this solution can represent significant\
             \ costs and deployment time;"
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:29
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:29
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:vi
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:vi
       ref_id: '29'
       name: "Limiter au strict besoin op\xE9rationnel les droits d\u2019administration\
         \ sur les postes de travail"
@@ -1926,10 +1926,10 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.work
-      - urn:intuitem:risk:function:doc-pol:pol.access
-      - urn:intuitem:risk:function:doc-pol:proc.pam
-      - urn:intuitem:risk:function:doc-pol:doc.pam_register
+      - urn:ciso:risk:function:doc-pol:pol.work
+      - urn:ciso:risk:function:doc-pol:pol.access
+      - urn:ciso:risk:function:doc-pol:proc.pam
+      - urn:ciso:risk:function:doc-pol:doc.pam_register
       translations:
         en:
           name: Reduce administration rights on workstations to strictly operational
@@ -1951,7 +1951,7 @@ objects:
             If delegating privileges to a workstation is really necessary to respond
             to a one-off need from the user, it must be monitored, for a limited time,
             and be withdrawn afterwards.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:vii
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:vii
       assessable: false
       depth: 1
       ref_id: VII
@@ -1959,10 +1959,10 @@ objects:
       translations:
         en:
           name: Manage mobile working
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:30
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:30
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:vii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:vii
       ref_id: '30'
       name: "Prendre des mesures de s\xE9curisation physique des terminaux nomades"
       description: "Les terminaux nomades (ordinateurs portables, tablettes, ordiphones)\
@@ -1987,11 +1987,11 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.work
-      - urn:intuitem:risk:function:doc-pol:pol.educ
-      - urn:intuitem:risk:function:doc-pol:doc.educ_plan
-      - urn:intuitem:risk:function:doc-pol:doc.educ_register
-      - urn:intuitem:risk:function:doc-pol:tech.screen_filter
+      - urn:ciso:risk:function:doc-pol:pol.work
+      - urn:ciso:risk:function:doc-pol:pol.educ
+      - urn:ciso:risk:function:doc-pol:doc.educ_plan
+      - urn:ciso:risk:function:doc-pol:doc.educ_register
+      - urn:ciso:risk:function:doc-pol:tech.screen_filter
       translations:
         en:
           name: Take measures to physically secure mobile devices
@@ -2010,10 +2010,10 @@ objects:
             \ with the colours of the organization for example).\nTo avoid any indiscretion\
             \ during journeys, especially on public transport or in waiting areas,\
             \ a privacy filter must be placed on each screen."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:30.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:30.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:vii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:vii
       ref_id: 30.R
       name: "Prendre des mesures de s\xE9curisation physique des terminaux nomades"
       description: "Enfin, afin de rendre inutilisable le poste seul, l\u2019utilisation\
@@ -2024,7 +2024,7 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:tech.disk_encryption
+      - urn:ciso:risk:function:doc-pol:tech.disk_encryption
       translations:
         en:
           name: Take measures to physically secure mobile devices (strengthened)
@@ -2032,10 +2032,10 @@ objects:
             use of an additional external media (smart card or USB token for example)
             to hold decryption or authentication secrets may be considered. In this
             case, it must be kept separate
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:31
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:31
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:vii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:vii
       ref_id: '31'
       name: "Chiffrer les donn\xE9es sensibles, en particulier sur le mat\xE9riel\
         \ potentiellement perdable"
@@ -2060,10 +2060,10 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.crypto
-      - urn:intuitem:risk:function:doc-pol:tech.disk_encryption
-      - urn:intuitem:risk:function:doc-pol:tech.file_encryption
-      - urn:intuitem:risk:function:doc-pol:tech.disk_encryption
+      - urn:ciso:risk:function:doc-pol:pol.crypto
+      - urn:ciso:risk:function:doc-pol:tech.disk_encryption
+      - urn:ciso:risk:function:doc-pol:tech.file_encryption
+      - urn:ciso:risk:function:doc-pol:tech.disk_encryption
       translations:
         en:
           name: Encrypt sensitive data, in particular on hardware that can potentially
@@ -2087,10 +2087,10 @@ objects:
             before considering archive and file encryption. These last two respond
             to different needs and can potentially leave the data storage medium unencrypted
             (backup files from office suites for example).'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:32
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:32
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:vii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:vii
       ref_id: '32'
       name: "S\xE9curiser la connexion r\xE9seau des postes utilis\xE9s en situation\
         \ de nomadisme"
@@ -2113,9 +2113,9 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:tech.vpn
-      - urn:intuitem:risk:function:doc-pol:pol.work
-      - urn:intuitem:risk:function:doc-pol:tech.endpoint_protection
+      - urn:ciso:risk:function:doc-pol:tech.vpn
+      - urn:ciso:risk:function:doc-pol:pol.work
+      - urn:ciso:risk:function:doc-pol:tech.endpoint_protection
       translations:
         en:
           name: Secure the network connection of devices used in a mobile working
@@ -2133,10 +2133,10 @@ objects:
             \ the organization may choose to depart from automatic connection by authorising\
             \ a connection upon request, or keep this recommendation by encouraging\
             \ the user to use tethering on a trusted mobile phone."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:32.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:32.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:vii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:vii
       ref_id: 32.R
       name: "S\xE9curiser la connexion r\xE9seau des postes utilis\xE9s en situation\
         \ de nomadisme"
@@ -2149,7 +2149,7 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:tech.mfa
+      - urn:ciso:risk:function:doc-pol:tech.mfa
       translations:
         en:
           name: Secure the network connection of devices used in a mobile working
@@ -2159,10 +2159,10 @@ objects:
             to use two-factor authentication, with a password and a certificate stored
             on an external medium (smart card or USB token) or a one-time password
             mechanism, for example.
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:33
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:33
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:vii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:vii
       ref_id: '33'
       name: "Adopter des politiques de s\xE9curit\xE9 d\xE9di\xE9es aux terminaux\
         \ mobiles"
@@ -2188,9 +2188,9 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.work
-      - urn:intuitem:risk:function:doc-pol:pol.accept
-      - urn:intuitem:risk:function:doc-pol:tech.uem
+      - urn:ciso:risk:function:doc-pol:pol.work
+      - urn:ciso:risk:function:doc-pol:pol.accept
+      - urn:ciso:risk:function:doc-pol:tech.uem
       translations:
         en:
           name: Adopt security policies dedicated to mobile devices
@@ -2209,10 +2209,10 @@ objects:
             \ of the application store to validated applications from a security point\
             \ of view, etc.\nOtherwise, configuration prior to distribution of the\
             \ device and an awareness raising session with users is desirable."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:33.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:33.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:vii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:vii
       ref_id: 33.R
       name: "Adopter des politiques de s\xE9curit\xE9 d\xE9di\xE9es aux terminaux\
         \ mobiles"
@@ -2223,8 +2223,8 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.work
-      - urn:intuitem:risk:function:doc-pol:tech.uem
+      - urn:ciso:risk:function:doc-pol:pol.work
+      - urn:ciso:risk:function:doc-pol:tech.uem
       translations:
         en:
           name: Adopt security policies dedicated to mobile devices (strengthened)
@@ -2232,7 +2232,7 @@ objects:
             \ markedly increases the terminal\u2019s vulnerabilities to hacking and\
             \ incidents of hacks have been demonstrated. For these reasons, it is\
             \ therefore not advisable."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:viii
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:viii
       assessable: false
       depth: 1
       ref_id: VIII
@@ -2240,10 +2240,10 @@ objects:
       translations:
         en:
           name: Keep the Information System up to date
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:34
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:34
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:viii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:viii
       ref_id: '34'
       name: "D\xE9finir une politique de mise \xE0 jour des composants du syst\xE8\
         me d\u2019information"
@@ -2271,10 +2271,10 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.maintenance
-      - urn:intuitem:risk:function:doc-pol:proc.update
-      - urn:intuitem:risk:function:doc-pol:pol.threat_intel
-      - urn:intuitem:risk:function:doc-pol:pol.network
+      - urn:ciso:risk:function:doc-pol:pol.maintenance
+      - urn:ciso:risk:function:doc-pol:proc.update
+      - urn:ciso:risk:function:doc-pol:pol.threat_intel
+      - urn:ciso:risk:function:doc-pol:pol.network
       translations:
         en:
           name: Define an update policy for the components of the information system
@@ -2305,10 +2305,10 @@ objects:
             as much on the network level, by strict filtering of flows, as it does
             as regards the authentication secrets which must be dedicated to these
             systems.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:35
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:35
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:viii
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:viii
       ref_id: '35'
       name: "Anticiper la fin de la maintenance des logiciels et syst\xE8mes et limiter\
         \ les adh\xE9rences logicielles"
@@ -2337,10 +2337,10 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:tech.file_encryption
-      - urn:intuitem:risk:function:doc-pol:pol.maintenance
-      - urn:intuitem:risk:function:doc-pol:doc.arc_principles
-      - urn:intuitem:risk:function:doc-pol:pol.supplier
+      - urn:ciso:risk:function:doc-pol:tech.file_encryption
+      - urn:ciso:risk:function:doc-pol:pol.maintenance
+      - urn:ciso:risk:function:doc-pol:doc.arc_principles
+      - urn:ciso:risk:function:doc-pol:pol.supplier
       translations:
         en:
           name: Anticipate the software and system end of life/maintenance and limit
@@ -2375,7 +2375,7 @@ objects:
             budgetary) for the migration of each software package at the end of its
             life (non-regression tests, backup procedure, data migration procedure,
             etc.).'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:ix
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:ix
       assessable: false
       depth: 1
       ref_id: IX
@@ -2383,10 +2383,10 @@ objects:
       translations:
         en:
           name: Supervise, audit, react
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:36
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:36
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:ix
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:ix
       ref_id: '36'
       name: Activer et configurer les journaux des composants les plus importants
       description: "Disposer de journaux pertinents est n\xE9cessaire afin de pouvoir\
@@ -2415,13 +2415,13 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.monitor
-      - urn:intuitem:risk:function:doc-pol:doc.asset_register
-      - urn:intuitem:risk:function:doc-pol:doc.is_map
-      - urn:intuitem:risk:function:doc-pol:proc.logging
-      - urn:intuitem:risk:function:doc-pol:tech.network_firewall
-      - urn:intuitem:risk:function:doc-pol:tech.edr
-      - urn:intuitem:risk:function:doc-pol:proc.ntp
+      - urn:ciso:risk:function:doc-pol:pol.monitor
+      - urn:ciso:risk:function:doc-pol:doc.asset_register
+      - urn:ciso:risk:function:doc-pol:doc.is_map
+      - urn:ciso:risk:function:doc-pol:proc.logging
+      - urn:ciso:risk:function:doc-pol:tech.network_firewall
+      - urn:ciso:risk:function:doc-pol:tech.edr
+      - urn:ciso:risk:function:doc-pol:proc.ntp
       translations:
         en:
           name: Activate and configure the most important component logs
@@ -2453,10 +2453,10 @@ objects:
 
             In order to be able to correlate the events between the different components,
             their time synchronisation source (thanks to NTP protocol) must be identical.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:36.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:36.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:ix
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:ix
       ref_id: 36.R
       name: "Activer et configurer les journaux des composants les plus importants\
         \ (renforc\xE9)"
@@ -2469,7 +2469,7 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:tech.siem
+      - urn:ciso:risk:function:doc-pol:tech.siem
       translations:
         en:
           name: Activate and configure the most important component logs (strengthened)
@@ -2479,10 +2479,10 @@ objects:
             for the archiving of logs over the long term, as well as stopping a hacker
             from deleting possible traces of their intrusion on the devices that he
             or she has compromised.
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:37
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:37
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:ix
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:ix
       ref_id: '37'
       name: "D\xE9finir et appliquer une politique de sauvegarde des composants critiques"
       description: "Suite \xE0 un incident d\u2019exploitation ou en contexte de gestion\
@@ -2507,9 +2507,9 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.backup
-      - urn:intuitem:risk:function:doc-pol:proc.disposal
-      - urn:intuitem:risk:function:doc-pol:pol.bcp
+      - urn:ciso:risk:function:doc-pol:pol.backup
+      - urn:ciso:risk:function:doc-pol:proc.disposal
+      - urn:ciso:risk:function:doc-pol:pol.bcp
       translations:
         en:
           name: Define and apply a backup policy for critical components
@@ -2542,10 +2542,10 @@ objects:
             > one-off, in the event of an error in files;
 
             > general, for complete backup and restoration of the information system.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:37.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:37.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:ix
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:ix
       ref_id: 37.R
       name: "D\xE9finir et appliquer une politique de sauvegarde des composants critiques\
         \ (renforc\xE9)"
@@ -2555,14 +2555,14 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.bcp
+      - urn:ciso:risk:function:doc-pol:pol.bcp
       translations:
         en:
           name: Define and apply a backup policy for critical components (strengthened)
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:38.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:38.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:ix
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:ix
       ref_id: 38.R
       name: "Proc\xE9der \xE0 des contr\xF4les et audits de s\xE9curit\xE9 r\xE9guliers\
         \ puis appliquer les actions correctives associ\xE9es (renforc\xE9)"
@@ -2591,10 +2591,10 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.audit
-      - urn:intuitem:risk:function:doc-pol:doc.audit_plan
-      - urn:intuitem:risk:function:doc-pol:doc.nc_log
-      - urn:intuitem:risk:function:doc-pol:pol.main
+      - urn:ciso:risk:function:doc-pol:pol.audit
+      - urn:ciso:risk:function:doc-pol:doc.audit_plan
+      - urn:ciso:risk:function:doc-pol:doc.nc_log
+      - urn:ciso:risk:function:doc-pol:pol.main
       translations:
         en:
           name: Undertake regular controls and security audits then apply the associated
@@ -2620,10 +2620,10 @@ objects:
             system by being able to show possible vulnerabilities, they are never
             proof of their absence and therefore do not negate the need for other
             control measures.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:39
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:39
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:ix
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:ix
       ref_id: '39'
       name: "D\xE9signer un r\xE9f\xE9rent en s\xE9curit\xE9 des syst\xE8mes  d\u2019\
         information et le faire conna\xEEtre  aupr\xE8s du personnel"
@@ -2648,8 +2648,8 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:doc.raci
-      - urn:intuitem:risk:function:doc-pol:doc.educ_plan
+      - urn:ciso:risk:function:doc-pol:doc.raci
+      - urn:ciso:risk:function:doc-pol:doc.educ_plan
       translations:
         en:
           name: Designate a point of contact in information system security and make
@@ -2669,10 +2669,10 @@ objects:
             \ grievances and identify the themes to deal with in the context of awareness\
             \ raising, therefore allowing the security level of the information system\
             \ to be raised within the organization."
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:40
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:40
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:ix
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:ix
       ref_id: '40'
       name: "D\xE9finir une proc\xE9dure de gestion des incidents de s\xE9curit\xE9"
       description: "Le constat d\u2019un comportement inhabituel de la part d\u2019\
@@ -2701,9 +2701,9 @@ objects:
       implementation_groups:
       - S
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.incident
-      - urn:intuitem:risk:function:doc-pol:proc.incident
-      - urn:intuitem:risk:function:doc-pol:doc.incident_register
+      - urn:ciso:risk:function:doc-pol:pol.incident
+      - urn:ciso:risk:function:doc-pol:proc.incident
+      - urn:ciso:risk:function:doc-pol:doc.incident_register
       translations:
         en:
           name: Define a security incident management procedure
@@ -2728,7 +2728,7 @@ objects:
             hacker may have and to change compromised passwords. Any incident must
             be recorded in a centralised register. Charges may also be pressed with
             the competent legal service.'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:x
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:x
       assessable: false
       depth: 1
       ref_id: X
@@ -2736,10 +2736,10 @@ objects:
       translations:
         en:
           name: To go even further
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:41.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:41.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:x
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:x
       ref_id: 41.R
       name: "Mener une analyse de risques formelle (renforc\xE9)"
       description: "Chaque entit\xE9 \xE9volue dans un environnement informationnel\
@@ -2773,8 +2773,8 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.risk
-      - urn:intuitem:risk:function:doc-pol:pol.audit
+      - urn:ciso:risk:function:doc-pol:pol.risk
+      - urn:ciso:risk:function:doc-pol:pol.audit
       translations:
         en:
           name: Carry out a formal risk assessment (strengthened)
@@ -2809,10 +2809,10 @@ objects:
             In this last case, the EBIOS method referenced by ANSSI is recommended.
             It is able to write down security needs, identify the security objectives
             and determine the security demands'
-    - urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:42.r
+    - urn: urn:ciso:risk:req_node:anssi-guide-hygiene:42.r
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-guide-hygiene:x
+      parent_urn: urn:ciso:risk:req_node:anssi-guide-hygiene:x
       ref_id: 42.R
       name: "Privil\xE9gier l\u2019usage de produits et de services qualifi\xE9s par\
         \ l'ANSSI (renforc\xE9)"
@@ -2838,7 +2838,7 @@ objects:
       implementation_groups:
       - R
       reference_controls:
-      - urn:intuitem:risk:function:doc-pol:pol.supplier
+      - urn:ciso:risk:function:doc-pol:pol.supplier
       translations:
         en:
           name: Favour the use of products and services qualified by ANSSI (strengthened)

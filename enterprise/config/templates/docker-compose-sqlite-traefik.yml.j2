@@ -1,7 +1,7 @@
 services:
   backend:
     container_name: backend
-    image: ghcr.io/intuitem/ciso-assistant-enterprise-backend:latest
+    image: ghcr.io/tashiscool/ciso-assistant-enterprise-backend:latest
     pull_policy: always
     restart: always
     environment:
@@ -36,7 +36,7 @@ services:
       - "traefik.http.routers.backend.tls.certresolver=letsencrypt"{% endif %}
   huey:
     container_name: huey
-    image: ghcr.io/intuitem/ciso-assistant-enterprise-backend:latest
+    image: ghcr.io/tashiscool/ciso-assistant-enterprise-backend:latest
     pull_policy: always
     depends_on:
       backend:
@@ -71,7 +71,7 @@ services:
       - PUBLIC_BACKEND_API_EXPOSED_URL=https://{{ fqdn }}:{{ port }}/api
       - PROTOCOL_HEADER=x-forwarded-proto
       - HOST_HEADER=x-forwarded-host
-    image: ghcr.io/intuitem/ciso-assistant-enterprise-frontend:latest
+    image: ghcr.io/tashiscool/ciso-assistant-enterprise-frontend:latest
     pull_policy: always
     depends_on:
       backend:

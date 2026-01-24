@@ -2,7 +2,7 @@ import secureRedirectRule from './secure-redirect.js';
 
 const plugin = {
 	meta: {
-		name: 'eslint-plugin-intuitem-sveltekit',
+		name: 'eslint-plugin-ciso-sveltekit',
 		version: '0.1.0'
 	},
 	configs: {},

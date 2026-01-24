@@ -140,10 +140,10 @@ def save_to_excel(rows, output_path, columns):
 def main():
     # Paths
     strm_dir = Path(
-        "/Users/abder/mydev/intuitem/staging/securecontrolsframework/Set Theory Relationship Mapping (STRM)"
+        "/Users/abder/mydev/ciso/staging/securecontrolsframework/Set Theory Relationship Mapping (STRM)"
     )
     output_dir = Path(
-        "/Users/abder/mydev/intuitem/staging/ciso-assistant-community/tools/scf_toolbox/strm_exports"
+        "/Users/abder/mydev/ciso/staging/ciso-assistant-community/tools/scf_toolbox/strm_exports"
     )
     output_dir.mkdir(exist_ok=True)
 

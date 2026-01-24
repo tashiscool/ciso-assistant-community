@@ -146,9 +146,9 @@ importers:
       eslint-config-prettier:
         specifier: ^10.1.8
         version: 10.1.8(eslint@9.39.2(jiti@2.4.2))
-      eslint-plugin-intuitem-sveltekit:
-        specifier: file:plugins/eslint/eslint-plugin-intuitem-sveltekit
-        version: file:plugins/eslint/eslint-plugin-intuitem-sveltekit
+      eslint-plugin-ciso-sveltekit:
+        specifier: file:plugins/eslint/eslint-plugin-ciso-sveltekit
+        version: file:plugins/eslint/eslint-plugin-ciso-sveltekit
       eslint-plugin-svelte:
         specifier: ^3.14.0
         version: 3.14.0(eslint@9.39.2(jiti@2.4.2))(svelte@5.34.8)
@@ -2136,8 +2136,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-intuitem-sveltekit@file:plugins/eslint/eslint-plugin-intuitem-sveltekit:
-    resolution: {directory: plugins/eslint/eslint-plugin-intuitem-sveltekit, type: directory}
+  eslint-plugin-ciso-sveltekit@file:plugins/eslint/eslint-plugin-ciso-sveltekit:
+    resolution: {directory: plugins/eslint/eslint-plugin-ciso-sveltekit, type: directory}
 
   eslint-plugin-svelte@3.14.0:
     resolution: {integrity: sha512-Isw0GvaMm0yHxAj71edAdGFh28ufYs+6rk2KlbbZphnqZAzrH3Se3t12IFh2H9+1F/jlDhBBL4oiOJmLqmYX0g==}
@@ -5657,7 +5657,7 @@ snapshots:
     dependencies:
       eslint: 9.39.2(jiti@2.4.2)
 
-  eslint-plugin-intuitem-sveltekit@file:plugins/eslint/eslint-plugin-intuitem-sveltekit: {}
+  eslint-plugin-ciso-sveltekit@file:plugins/eslint/eslint-plugin-ciso-sveltekit: {}
 
   eslint-plugin-svelte@3.14.0(eslint@9.39.2(jiti@2.4.2))(svelte@5.34.8):
     dependencies:

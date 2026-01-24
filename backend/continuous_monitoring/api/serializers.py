@@ -356,7 +356,7 @@ class ConMonSetupSerializer(serializers.Serializer):
     """Serializer for ConMon setup request."""
 
     framework_urn = serializers.CharField(
-        help_text="URN of the framework to use (e.g., 'urn:intuitem:risk:framework:conmon-schedule')"
+        help_text="URN of the framework to use (e.g., 'urn:ciso:risk:framework:conmon-schedule')"
     )
     profile_name = serializers.CharField(
         help_text="Name for the new ConMon profile"

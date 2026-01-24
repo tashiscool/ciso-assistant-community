@@ -1,39 +1,40 @@
 """
 Identity and Access Management Models - MIT Licensed
 
-Clean-room implementation of IAM for GRC platform.
+Clean-room implementation of folder-based hierarchical RBAC.
 Copyright (c) 2026 Tash
 
 This module provides:
-- User: Extended user model for GRC users
-- Role: Role-based access control
-- Permission: Fine-grained permissions
-- UserGroup: User grouping for easier management
-- AccessPolicy: Policy-based access control
+- Folder: Hierarchical organizational structure (ROOT, DOMAIN, ENCLAVE)
+- FolderMixin: Multi-tenant scoping mixin for models
+- User, UserGroup: User and group management
+- Role, RoleAssignment: Permission management with folder-based scoping
+- PersonalAccessToken: API authentication
+- AuditLog: Security event logging
 """
 
-from .models import (
-    User,
-    Role,
-    Permission,
-    RolePermission,
-    UserRole,
-    UserGroup,
-    GroupMembership,
-    AccessPolicy,
-    APIKey,
-    AuditLog,
-)
-
+# Lazy imports to allow testing without Django
 __all__ = [
+    # Folder hierarchy
+    'Folder',
+    'FolderMixin',
+    'PublishInRootFolderMixin',
+    # User management
     'User',
-    'Role',
-    'Permission',
-    'RolePermission',
-    'UserRole',
     'UserGroup',
-    'GroupMembership',
-    'AccessPolicy',
-    'APIKey',
+    # RBAC
+    'Role',
+    'RoleAssignment',
+    # API authentication
+    'PersonalAccessToken',
+    # Audit
     'AuditLog',
 ]
+
+
+def __getattr__(name):
+    """Lazy import to avoid Django dependency at import time."""
+    if name in __all__:
+        from . import models
+        return getattr(models, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

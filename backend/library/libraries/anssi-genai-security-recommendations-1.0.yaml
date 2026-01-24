@@ -1,4 +1,4 @@
-urn: urn:intuitem:risk:library:anssi-genai-security-recommendations-1.0
+urn: urn:ciso:risk:library:anssi-genai-security-recommendations-1.0
 locale: fr
 ref_id: anssi-genai-security-recommendations-1.0
 name: "ANSSI: RECOMMANDATIONS DE S\xC9CURIT\xC9 POUR UN SYST\xC8ME D'IA G\xC9N\xC9\
@@ -10,10 +10,10 @@ copyright: ANSSI Etalab
 version: 1
 publication_date: 2024-05-01
 provider: ANSSI
-packager: intuitem
+packager: ciso-assistant
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:anssi-genai-security-recommendations-1.0
+    urn: urn:ciso:risk:framework:anssi-genai-security-recommendations-1.0
     ref_id: anssi-genai-security-recommendations-1.0
     name: "ANSSI: RECOMMANDATIONS DE S\xC9CURIT\xC9 POUR UN SYST\xC8ME D'IA G\xC9\
       N\xC9RATIVE"
@@ -21,15 +21,15 @@ objects:
       curit\xE9 sur la mise en oeuvre\nde solutions d\u2019IA g\xE9n\xE9rative reposant\
       \ sur des LLM au sein d\u2019entit\xE9s publiques et priv\xE9es."
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:3.1
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:3.1
       assessable: false
       depth: 1
       ref_id: '3.1'
       name: "Cycle de vie d'un syst\xE8me d'IA g\xE9n\xE9rative"
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r1
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:3.1
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:3.1
       ref_id: R1
       name: "Int\xE9grer la s\xE9curit\xE9 dans toutes les phases du cycle de vie\
         \ d\u2019un syst\xE8me d\u2019IA"
@@ -41,15 +41,15 @@ objects:
         \ des interactions avec d'autres applications ou composants internes ou externes\
         \ au SI.\nIl est possible de se r\xE9f\xE9rer au guide d'hygi\xE8ne de l'ANSSI\
         \ pour disposer d'un socle de base de s\xE9curit\xE9 \xE0 appliquer."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:4
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:4
       assessable: false
       depth: 1
       ref_id: '4'
       name: Analyse de risque
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r2
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:4
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:4
       ref_id: R2
       name: "Mener une analyse de risque sur les syst\xE8mes d\u2019IA avant la phase\
         \ d\u2019entra\xEEnement"
@@ -64,35 +64,35 @@ objects:
         \ les impacts directs et indirects en cas de r\xE9ponses erron\xE9es ou malveillantes\
         \ du mod\xE8le d\u2019IA aux utilisateurs ;\n- consid\xE9rer la protection\
         \ des donn\xE9es d\u2019entra\xEEnement du mod\xE8le d\u2019IA."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
       assessable: false
       depth: 1
       ref_id: '5.1'
       name: "Recommandations g\xE9n\xE9rales"
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r3
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
       ref_id: R3
       name: "\xC9valuer le niveau de confiance des biblioth\xE8ques et modules externes\
         \ utilis\xE9s dans le syst\xE8me d\u2019IA"
       description: "Il est recommand\xE9 de cartographier l\u2019ensemble des biblioth\xE8\
         ques et modules externes utilis\xE9s dans le cadre du projet et d\u2019\xE9\
         valuer leur niveau de confiance."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r4
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
       ref_id: R4
       name: "\xC9valuer le niveau de confiance des sources de donn\xE9es externes\
         \ utilis\xE9es dans le syst\xE8me d\u2019IA"
       description: "Il est recommand\xE9 de cartographier l\u2019ensemble des sources\
         \ de donn\xE9es externes utilis\xE9es dans le cadre du projet et d\u2019\xE9\
         valuer leur niveau de confiance."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r5
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
       ref_id: R5
       name: "Appliquer les principes de DevSecOps sur l\u2019ensemble des phases du\
         \ projet"
@@ -110,20 +110,20 @@ objects:
         acc\xE8s, etc.) ;\n- recourir \xE0 des langages de d\xE9veloppement s\xE9\
         curis\xE9s (scripts de fine tuning, d\xE9veloppement du mod\xE8le, maintenance,\
         \ d\xE9ploiement, etc.)."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r6
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r6
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
       ref_id: R6
       name: "Utiliser des formats de mod\xE8les d\u2019IA s\xE9curis\xE9s"
       description: "Il est recommand\xE9 d\u2019utiliser des formats \xE0 l\u2019\xE9\
         tat de l\u2019art du point de vue de la s\xE9curit\xE9, comme le format safetensor\
         \ par exemple. Certains formats peu s\xE9curis\xE9s, comme le format pickle,\
         \ sont \xE0 proscrire."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r7
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r7
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
       ref_id: R7
       name: "Prendre en compte les enjeux de confidentialit\xE9 des donn\xE9es d\xE8\
         s la conception du syst\xE8me d\u2019IA"
@@ -137,10 +137,10 @@ objects:
         IA. L\u2019analyse peut \xE9galement traiter le cas de la protection en confidentialit\xE9\
         \ des param\xE8tres du mod\xE8le lui-m\xEAme, par exemple pour des mod\xE8\
         les propri\xE9taires."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r8
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r8
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
       ref_id: R8
       name: "Prendre en compte la probl\xE9matique de besoin d\u2019en conna\xEEtre\
         \ d\xE8s la conception du syst\xE8me d\u2019IA"
@@ -154,10 +154,10 @@ objects:
         \ r\xE9-entra\xEEne le mod\xE8le et sur la base de quelles donn\xE9es (donn\xE9\
         es additionnelles m\xE9tier, requ\xEAtes des utilisateurs, r\xE9ponses du\
         \ mod\xE8le, etc.)."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r9
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r9
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
       ref_id: R9
       name: "Proscrire l\u2019usage automatis\xE9 de syst\xE8mes d\u2019IA pour des\
         \ actions critiques sur le SI"
@@ -169,10 +169,10 @@ objects:
         \ critiques sur l\u2019infrastructure du SI (reconfiguration de composants\
         \ r\xE9seaux, cr\xE9ations d\u2019utilisateurs \xE0 privil\xE8ge, d\xE9ploiement\
         \ de serveurs virtuels, etc.)."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r10
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r10
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
       ref_id: R10
       name: "Ma\xEEtriser et s\xE9curiser les acc\xE8s \xE0 privil\xE8ges des d\xE9\
         veloppeurs et des administrateurs sur le syst\xE8me d\u2019IA"
@@ -189,10 +189,10 @@ objects:
         \ \xEAtre privil\xE9gi\xE9 ;\n- l\u2019environnement de d\xE9veloppement doit\
         \ \xEAtre ma\xEEtris\xE9 et administr\xE9 au m\xEAme niveau de s\xE9curit\xE9\
         \ que l\u2019environnement de production."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r11
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r11
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
       ref_id: R11
       name: "H\xE9berger le syst\xE8me d\u2019IA dans des environnements de confiance\
         \ coh\xE9rents avec les besoins de s\xE9curit\xE9"
@@ -202,10 +202,10 @@ objects:
         grit\xE9. En particulier, la s\xE9curisation des donn\xE9es d\u2019entra\xEE\
         nement du mod\xE8le (au repos, en transit, lors d\u2019un traitement) ne doit\
         \ pas \xEAtre n\xE9glig\xE9e."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r12
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r12
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
       ref_id: R12
       name: "Cloisonner chaque phase du syst\xE8me d\u2019IA dans un environnement\
         \ d\xE9di\xE9"
@@ -220,10 +220,10 @@ objects:
         \ est appliqu\xE9 ;\n- un cloisonnement des comptes et des secrets : chaque\
         \ environnement dispose de ses propres comptes utilisateurs et administrateurs\
         \ et de secrets distincts."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r13
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r13
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
       ref_id: R13
       name: "Impl\xE9menter une passerelle Internet s\xE9curis\xE9e dans le cas d\u2019\
         un syst\xE8me d\u2019IA expos\xE9 sur Internet"
@@ -239,10 +239,10 @@ objects:
         \ hyperviseur des fonctions de s\xE9curit\xE9 distinctes de la passerelle\
         \ Internet s\xE9curis\xE9e (pare-feux, reverse-proxy, serveur de journalisation,\
         \ etc.)."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r14
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r14
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
       ref_id: R14
       name: "Privil\xE9gier un h\xE9bergement SecNumCloud dans le cas d\u2019un d\xE9\
         ploiement d\u2019un syst\xE8me d\u2019IA dans un Cloud public"
@@ -253,10 +253,10 @@ objects:
         - l\u2019impact du syst\xE8me d\u2019IA sur le m\xE9tier est consid\xE9r\xE9\
         \ comme critique ;\n- les utilisateurs du syst\xE8me d\u2019IA ne sont pas\
         \ consid\xE9r\xE9s comme de confiance."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r15
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r15
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
       ref_id: R15
       name: "Pr\xE9voir un mode d\xE9grad\xE9 des services m\xE9tier sans syst\xE8\
         me d\u2019IA"
@@ -264,10 +264,10 @@ objects:
         \ dans les r\xE9ponses apport\xE9es par le mod\xE8le d\u2019IA, il est recommand\xE9\
         \ de pr\xE9voir au minimum une proc\xE9dure de contournement du syst\xE8me\
         \ d\u2019IA pour les utilisateurs, afin de r\xE9pondre aux besoins m\xE9tier."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r16
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r16
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
       ref_id: R16
       name: "D\xE9dier les composants GPU au syst\xE8me d\u2019IA"
       description: "Il est recommand\xE9 de d\xE9dier les composants physiques GPU\
@@ -277,10 +277,10 @@ objects:
         \ qu\u2019il y ait une fonction de filtrage mat\xE9riel (ex. : IOMMU) permettant\
         \ de restreindre les acc\xE8s des machines virtuelles \xE0 la m\xE9moire de\
         \ ces cartes GPU."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r17
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r17
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.1
       ref_id: R17
       name: "Prendre en compte les attaques par canaux auxiliaires sur le syst\xE8\
         me d\u2019IA"
@@ -288,25 +288,25 @@ objects:
         IA n\u2019est pas vuln\xE9rable \xE0 des attaques par canaux auxiliaires (temporels,\
         \ consommation, etc.) qui pourraient par exemple permettre \xE0 un attaquant\
         \ de reconstruire une r\xE9ponse apport\xE9e par un mod\xE8le d\u2019IA."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.2
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.2
       assessable: false
       depth: 1
       ref_id: '5.2'
       name: "Recommandations pour la phase d\u2019entra\xEEnement"
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r18
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r18
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.2
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.2
       ref_id: R18
       name: "Entra\xEEner un mod\xE8le d\u2019IA uniquement avec des donn\xE9es l\xE9\
         gitimement accessibles par les utilisateurs"
       description: "Il est fortement recommand\xE9 d\u2019entra\xEEner un mod\xE8\
         le avec des donn\xE9es dont la sensibilit\xE9 est coh\xE9rente avec le besoin\
         \ d\u2019en conna\xEEtre des utilisateurs."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r19
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r19
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.2
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.2
       ref_id: R19
       name: "Prot\xE9ger en int\xE9grit\xE9 les donn\xE9es d\u2019entra\xEEnement\
         \ du mod\xE8le d\u2019IA"
@@ -316,10 +316,10 @@ objects:
         \ v\xE9rification syst\xE9matique de la signature ou de l\u2019empreinte (hash)\
         \ des fichiers utilis\xE9s ou bien des archives compress\xE9s de l\u2019ensemble\
         \ de ces donn\xE9es."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r20
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r20
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.2
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.2
       ref_id: R20
       name: "Prot\xE9ger en int\xE9grit\xE9 les fichiers du syst\xE8me d\u2019IA"
       description: "Il est recommand\xE9 de prot\xE9ger en int\xE9grit\xE9 les fichiers\
@@ -327,25 +327,25 @@ objects:
         \ ceux-ci n\u2019ont pas \xE9t\xE9 alt\xE9r\xE9s. La recommandation vaut \xE9\
         galement par extension pour tous les fichiers inh\xE9rents au fonctionnement\
         \ du syst\xE8me d\u2019IA (scripts, binaires, etc.)."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r21
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r21
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.2
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.2
       ref_id: R21
       name: "Proscrire le r\xE9-entra\xEEnement du mod\xE8le d\u2019IA en production"
       description: "Il est fortement recommand\xE9 de ne pas r\xE9-entra\xEEner un\
         \ mod\xE8le d\u2019IA directement en production. Cette action de r\xE9-entra\xEE\
         nement doit d\xE9marrer avec le cycle en 3 phases, dans les environnements\
         \ ad\xE9quats pour chacune des phases."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.3
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.3
       assessable: false
       depth: 1
       ref_id: '5.3'
       name: "Recommandations pour la phase de d\xE9ploiement"
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r22
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r22
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.3
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.3
       ref_id: R22
       name: "S\xE9curiser la cha\xEEne de d\xE9ploiement en production des syst\xE8\
         mes d\u2019IA"
@@ -353,10 +353,10 @@ objects:
         mes d\u2019IA g\xE9n\xE9rative depuis un SI d\u2019administration, en respectant\
         \ les bonnes pratiques du guide d\u2019administration s\xE9curis\xE9e de l\u2019\
         ANSSI."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r23
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r23
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.3
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.3
       ref_id: R23
       name: "Pr\xE9voir des audits de s\xE9curit\xE9 des syst\xE8mes d\u2019IA avant\
         \ d\xE9ploiement en production"
@@ -371,25 +371,25 @@ objects:
         le, etc.) ;\n- des tests manuels d\u2019auditeurs visant sp\xE9cifiquement\
         \ \xE0 tester la robustesse d\u2019un mod\xE8le d\u2019IA g\xE9n\xE9rative\
         \ sur des sc\xE9narios d\u2019attaques plus sophistiqu\xE9s."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r24
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r24
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.3
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.3
       ref_id: R24
       name: "Pr\xE9voir des tests fonctionnels m\xE9tier des syst\xE8mes d\u2019IA\
         \ avant d\xE9ploiement en production"
       description: "Il est recommand\xE9 de pr\xE9voir des tests de performance et\
         \ de qualit\xE9 des r\xE9ponses apport\xE9es par un syst\xE8me d\u2019IA g\xE9\
         n\xE9rative."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.4
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.4
       assessable: false
       depth: 1
       ref_id: '5.4'
       name: Recommandations pour la phase de production
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r25
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r25
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.4
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.4
       ref_id: R25
       name: "Prot\xE9ger le syst\xE8me d\u2019IA en filtrant les entr\xE9es et les\
         \ sorties des utilisateurs"
@@ -403,10 +403,10 @@ objects:
         \ de filtre d\u2019informations d\xE9finies comme sensibles dans les r\xE9\
         ponses (ex. : coordonn\xE9es personnelles, r\xE9f\xE9rences de projets, etc.)\
         \ ;\n- une limite sur la taille des r\xE9ponses (nombre de caract\xE8res maximum)."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r26
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r26
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.4
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.4
       ref_id: R26
       name: "Ma\xEEtriser et s\xE9curiser les interactions du syst\xE8me d\u2019IA\
         \ avec d\u2019autres applications m\xE9tier"
@@ -421,10 +421,10 @@ objects:
         \ un contr\xF4le des autorisations d\u2019acc\xE8s \xE0 la ressource en compl\xE9\
         ment de l\u2019authentification ;\n- ils doivent faire l\u2019objet d\u2019\
         une journalisation au niveau de granularit\xE9 ad\xE9quat."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r27
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r27
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.4
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.4
       ref_id: R27
       name: "Limiter les actions automatiques depuis un syst\xE8me d\u2019IA traitant\
         \ des entr\xE9es non-ma\xEEtris\xE9es"
@@ -432,20 +432,20 @@ objects:
         \ actions automatiques sur le SI d\xE9clench\xE9es depuis un syst\xE8me d\u2019\
         IA et \xE0 partir d\u2019entr\xE9es non-ma\xEEtris\xE9es (ex. : donn\xE9es\
         \ issues d\u2019Internet ou de mails, etc.)."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r28
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r28
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.4
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.4
       ref_id: R28
       name: "Cloisonner le syst\xE8me d\u2019IA dans un ou plusieurs environnements\
         \ techniques d\xE9di\xE9s"
       description: "Il est recommand\xE9 que le syst\xE8me d\u2019IA soit cloisonn\xE9\
         \ dans des zones logiques d\xE9di\xE9es, afin de limiter les risques de lat\xE9\
         ralisation d\u2019un attaquant qui aurait compromis ce syst\xE8me."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r29
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r29
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.4
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.4
       ref_id: R29
       name: "Journaliser l\u2019ensemble des traitements r\xE9alis\xE9s au sein du\
         \ syst\xE8me d\u2019IA"
@@ -457,16 +457,16 @@ objects:
         \ l\u2019envoi au mod\xE8le ;\n- les appels \xE0 des plugins ;\n- les appels\
         \ \xE0 des donn\xE9es additionnelles ;\n- les traitements r\xE9alis\xE9s par\
         \ les filtres en sortie ;\n- les r\xE9ponses aux utilisateurs."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.5
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.5
       assessable: false
       depth: 1
       ref_id: '5.5'
       name: "Cas particulier de la g\xE9n\xE9ration de code source assist\xE9e par\
         \ l'IA"
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r30
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r30
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.5
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.5
       ref_id: R30
       name: "Contr\xF4ler syst\xE9matiquement le code source g\xE9n\xE9r\xE9 par IA"
       description: "Le code source g\xE9n\xE9r\xE9 par IA doit faire l\u2019objet\
@@ -480,10 +480,10 @@ objects:
         \ g\xE9n\xE9r\xE9 par IA ;\n- faire contr\xF4ler r\xE9guli\xE8rement par un\
         \ humain la qualit\xE9 du code source g\xE9n\xE9r\xE9 \xE0 partir de requ\xEA\
         tes types suffisamment sophistiqu\xE9es."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r31
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r31
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.5
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.5
       ref_id: R31
       name: "Limiter la g\xE9n\xE9ration de code source par IA pour des modules critiques\
         \ d\u2019applications"
@@ -493,10 +493,10 @@ objects:
         \ (authentification, chiffrement, signature, etc.) ;\n- les modules de gestion\
         \ des droits d\u2019acc\xE8s des utilisateurs et administrateurs ;\n- les\
         \ modules de traitement de donn\xE9es sensibles."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r32
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r32
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.5
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.5
       ref_id: R32
       name: "Sensibiliser les d\xE9veloppeurs sur les risques li\xE9s au code source\
         \ g\xE9n\xE9r\xE9 par IA"
@@ -509,15 +509,15 @@ objects:
         \ d\u2019IA pour l\u2019optimisation de leurs requ\xEAtes (prompt engineering\
         \ 24) afin d\u2019am\xE9liorer la qualit\xE9 et la s\xE9curit\xE9 du code\
         \ g\xE9n\xE9r\xE9."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.6
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.6
       assessable: false
       depth: 1
       ref_id: '5.6'
       name: "Cas particulier de services d'IA grand public expos\xE9s sur Internet"
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r33
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r33
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.6
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.6
       ref_id: R33
       name: "Durcir les mesures de s\xE9curit\xE9 pour des services d\u2019IA grand\
         \ public expos\xE9s sur Internet"
@@ -533,15 +533,15 @@ objects:
         tes et des r\xE9ponses, etc.) ;\n- mettre en place des mesures contre les\
         \ d\xE9nis de service distribu\xE9s (DDoS);\n- s\xE9curiser le service web\
         \ en frontal des utilisateurs."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.7
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.7
       assessable: false
       depth: 1
       ref_id: '5.7'
       name: "Cas particulier de l'utilisation de solutions d'IA g\xE9n\xE9rative tierces"
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r34
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r34
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.7
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.7
       ref_id: R34
       name: "Proscrire l\u2019utilisation d\u2019outils d\u2019IA g\xE9n\xE9rative\
         \ sur Internet pour un usage professionnel impliquant des donn\xE9es sensibles"
@@ -551,10 +551,10 @@ objects:
         e respecte les besoins de s\xE9curit\xE9 de l\u2019entit\xE9.\nPar mesure\
         \ de pr\xE9caution, il est donc obligatoire de ne jamais int\xE9grer de donn\xE9\
         es sensibles de l\u2019entit\xE9 dans les requ\xEAtes des utilisateurs."
-    - urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:r35
+    - urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:r35
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-genai-security-recommendations-1.0:5.7
+      parent_urn: urn:ciso:risk:req_node:anssi-genai-security-recommendations-1.0:5.7
       ref_id: R35
       name: "Effectuer une revue r\xE9guli\xE8re de la configuration des droits des\
         \ outils d\u2019IA g\xE9n\xE9rative sur les applications m\xE9tier"

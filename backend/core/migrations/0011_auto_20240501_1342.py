@@ -5,10 +5,10 @@ from django.db import migrations
 
 
 WELL_KNOWN_SCORES = {
-    "urn:intuitem:risk:framework:tisax-v6.0.2": (0, 5),
-    "urn:intuitem:risk:framework:ccb-cff-2023-03-01": (1, 5),
-    "urn:intuitem:risk:framework:nist-csf-2.0": (1, 4),
-    "urn:intuitem:risk:framework:nist-csf-1.1": (1, 4),
+    "urn:ciso:risk:framework:tisax-v6.0.2": (0, 5),
+    "urn:ciso:risk:framework:ccb-cff-2023-03-01": (1, 5),
+    "urn:ciso:risk:framework:nist-csf-2.0": (1, 4),
+    "urn:ciso:risk:framework:nist-csf-1.1": (1, 4),
 }
 
 

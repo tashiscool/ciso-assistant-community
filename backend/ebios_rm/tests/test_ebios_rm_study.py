@@ -14,13 +14,13 @@ class TestEbiosRMStudy:
             name="test study",
             description="test study description",
             risk_matrix=RiskMatrix.objects.get(
-                urn="urn:intuitem:risk:matrix:risk-matrix-4x4-ebios-rm"
+                urn="urn:ciso:risk:matrix:risk-matrix-4x4-ebios-rm"
             ),
         )
         assert study.name == "test study"
         assert study.description == "test study description"
         assert study.risk_matrix == RiskMatrix.objects.get(
-            urn="urn:intuitem:risk:matrix:risk-matrix-4x4-ebios-rm"
+            urn="urn:ciso:risk:matrix:risk-matrix-4x4-ebios-rm"
         )
         assert study.assets.count() == 0
         assert study.reference_entity == Entity.get_main_entity()
@@ -31,14 +31,14 @@ class TestEbiosRMStudy:
             name="test study",
             description="test study description",
             risk_matrix=RiskMatrix.objects.get(
-                urn="urn:intuitem:risk:matrix:risk-matrix-4x4-ebios-rm"
+                urn="urn:ciso:risk:matrix:risk-matrix-4x4-ebios-rm"
             ),
         )
         study.assets.set(Asset.objects.filter(name="Primary Asset 1"))
         assert study.name == "test study"
         assert study.description == "test study description"
         assert study.risk_matrix == RiskMatrix.objects.get(
-            urn="urn:intuitem:risk:matrix:risk-matrix-4x4-ebios-rm"
+            urn="urn:ciso:risk:matrix:risk-matrix-4x4-ebios-rm"
         )
 
         assert study.assets.count() == 1

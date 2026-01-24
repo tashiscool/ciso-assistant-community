@@ -23,7 +23,7 @@ from iam.models import Folder, Role, RoleAssignment, User
 @pytest.fixture
 def risk_matrix_fixture():
     library = StoredLibrary.objects.filter(
-        urn="urn:intuitem:risk:library:critical_risk_matrix_5x5"
+        urn="urn:ciso:risk:library:critical_risk_matrix_5x5"
     ).last()
     assert library is not None
     library.load()

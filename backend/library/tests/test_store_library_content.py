@@ -2,7 +2,7 @@ import pytest
 from core.models import StoredLibrary
 
 SAMPLE_YAML_LIB_WITH_MAPPINGS = """
-urn: urn:intuitem:test:library:map-nist-csf-1.1-nist-csf-2.0
+urn: urn:ciso:test:library:map-nist-csf-1.1-nist-csf-2.0
 locale: en
 ref_id: test-map-nist-csf-1.1-nist-csf-2.0
 name: Sample test mapping from nist-csf-1.1 to nist-csf-2.0
@@ -11,27 +11,27 @@ version: 1
 publication_date: 2024-06-29
 copyright: NIST
 provider: NIST
-packager: intuitem
+packager: ciso
 dependencies:
-- urn:intuitem:risk:library:nist-csf-2.0
-- urn:intuitem:risk:library:nist-csf-1.1
+- urn:ciso:risk:library:nist-csf-2.0
+- urn:ciso:risk:library:nist-csf-1.1
 objects:
   requirement_mapping_set:
-    urn: urn:intuitem:test:requirement_mapping_set:nist-csf-1.1-to-nist-csf-2.0
+    urn: urn:ciso:test:requirement_mapping_set:nist-csf-1.1-to-nist-csf-2.0
     ref_id: test-mapping-nist-csf-1.1-nist-csf-2.0
     name: test-mapping-nist-csf-1.1-nist-csf-2.0
-    source_framework_urn: urn:intuitem:risk:framework:nist-csf-1.1
-    target_framework_urn: urn:intuitem:risk:framework:nist-csf-2.0
+    source_framework_urn: urn:ciso:risk:framework:nist-csf-1.1
+    target_framework_urn: urn:ciso:risk:framework:nist-csf-2.0
     requirement_mappings:
-    - source_requirement_urn: urn:intuitem:risk:req_node:nist-csf-1.1:id.gv
-      target_requirement_urn: urn:intuitem:risk:req_node:nist-csf-2.0:gv
+    - source_requirement_urn: urn:ciso:risk:req_node:nist-csf-1.1:id.gv
+      target_requirement_urn: urn:ciso:risk:req_node:nist-csf-2.0:gv
       relationship: intersect
       rationale: semantic
       annotation: ''
 """.lstrip().encode("utf-8")
 
 SAMPLE_YAML_LIB_NO_MAPPINGS = """
-urn: urn:intuitem:test:library:nist-csf-1.1
+urn: urn:ciso:test:library:nist-csf-1.1
 locale: en
 ref_id: NIST-CSF-1.1
 name: NIST CSF v1.1
@@ -42,7 +42,7 @@ copyright: With the exception of material marked as copyrighted, information pre
 version: 5
 publication_date: 2025-05-22
 provider: NIST
-packager: intuitem
+packager: ciso
 translations:
   fr:
     name: NIST CSF version 1.1
@@ -50,7 +50,7 @@ translations:
       (CSF 1.1)
 objects:
   framework:
-    urn: urn:intuitem:test:framework:nist-csf-1.1
+    urn: urn:ciso:test:framework:nist-csf-1.1
     ref_id: NIST-CSF-1.1
     name: NIST CSF v1.1
     description: NIST Cybersecurity Framework
@@ -125,7 +125,7 @@ objects:
             \ activit\xe9s pass\xe9es et pr\xe9sentes, y compris les retours d\u2019\
             exp\xe9rience et les indicateurs pr\xe9dictifs."
     requirement_nodes:
-    - urn: urn:intuitem:test:req_node:nist-csf-1.1:id
+    - urn: urn:ciso:test:req_node:nist-csf-1.1:id
       assessable: false
       depth: 1
       ref_id: ID

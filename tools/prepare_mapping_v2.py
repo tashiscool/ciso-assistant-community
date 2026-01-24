@@ -88,7 +88,7 @@ def compute_base_urn(req_nodes: List[Dict], *, name: str) -> str:
 
 def generate_mapping_excel(source_yaml, target_yaml):
 
-    packager = "intuitem"
+    packager = "ciso"
 
     print(f"⌛ Parsing \"{os.path.basename(source_yaml)}\" and \"{os.path.basename(target_yaml)}\"...")
 

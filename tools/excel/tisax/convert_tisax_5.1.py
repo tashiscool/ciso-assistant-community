@@ -22,7 +22,7 @@ output_file_name = "tisax-v5.1.xlsx"
 library_copyright = """Publisher: VERBAND DER AUTOMOBILINDUSTRIE e. V. (VDA, German Association of the Automotive Industry); Behrenstr. 35; 10117 Berlin; www.vda.de
 © 2022 Verband der Automobilindustrie e.V., Berlin
 This work has been licensed under Creative Commons Attribution - No Derivative Works 4.0 International Public License. In addition, You are granted the right to distribute derivatives under certain terms."""
-packager = "intuitem"
+packager = "ciso"
 
 library_description = """VDA ISA provides the basis for
 - a self-assessment to determine the state of information security in an organization (e.g. company)

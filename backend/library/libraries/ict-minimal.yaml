@@ -1,4 +1,4 @@
-urn: urn:intuitem:risk:library:ict-minimal
+urn: urn:ciso:risk:library:ict-minimal
 locale: en
 ref_id: ict-minimal
 name: ICT - Minimum standard
@@ -7,7 +7,7 @@ copyright: Creative Commons BY.
 version: 1
 publication_date: 2024-08-29
 provider: Swiss FONES
-packager: intuitem
+packager: ciso-assistant
 translations:
   de:
     name: IKT - Minimalstandard
@@ -21,7 +21,7 @@ translations:
     description: Standard minimo per migliorare la resilienza delle TIC
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:ict-minimal
+    urn: urn:ciso:risk:framework:ict-minimal
     ref_id: ict-minimal
     name: ICT - Minimum standard
     description: Minimum standard for improving ICT resilience - Version may 2023
@@ -107,7 +107,7 @@ objects:
           name: dinamica, attuata, verificata costantemente, migliorata
           description: null
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id
+    - urn: urn:ciso:risk:req_node:ict-minimal:id
       assessable: false
       depth: 1
       ref_id: ID
@@ -122,10 +122,10 @@ objects:
         it:
           name: Identificare (ID-Identify)
           description: null
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.am
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.am
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id
       ref_id: ID.AM
       name: 'Asset Management '
       description: "The data, personnel, devices, systems, and facilities that enable\
@@ -153,10 +153,10 @@ objects:
             \ o di un\u2019impresa sono identificati, catalogati e valutati. La valutazione\
             \ deve corrispondere alla loro criticit\xE0 in relazione alle procedure\
             \ operative da attuare e alla strategia di rischio adottata."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.am-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.am-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.am
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.am
       ref_id: ID.AM-1
       description: Draw up an inventory-taking process which ensures that you have
         a complete inventory of all your ICT assets at all times.
@@ -174,10 +174,10 @@ objects:
           name: null
           description: Definite una procedura che garantisca la costante presenza
             di un inventario completo dei vostri strumenti operativi TIC (asset).
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.am-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.am-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.am
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.am
       ref_id: ID.AM-2
       description: Produce an inventory of all of the software platforms/licences
         and applications within your organisation.
@@ -194,10 +194,10 @@ objects:
           name: null
           description: "Inventariate tutte le piattaforme/licenze e applicazioni di\
             \ software all\u2019interno dell\u2019organismo."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.am-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.am-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.am
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.am
       ref_id: ID.AM-3
       description: Catalogue all of your internal communication and data flows.
       translations:
@@ -211,10 +211,10 @@ objects:
         it:
           name: null
           description: Catalogate tutti i flussi di comunicazione e di dati interni.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.am-4
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.am-4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.am
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.am
       ref_id: ID.AM-4
       description: Catalogue all external ICT systems that are relevant to your organisation.
       translations:
@@ -229,10 +229,10 @@ objects:
           name: null
           description: Catalogate tutti i sistemi TIC esterni pertinenti per il vostro
             organismo o la vostra impresa.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.am-5
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.am-5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.am
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.am
       ref_id: ID.AM-5
       description: Resources (e.g., hardware, devices, data, time, personnel, and
         software) are prioritized based on their classification, criticality, and
@@ -254,10 +254,10 @@ objects:
           description: "Le risorse (ad esempio, hardware, dispositivi, dati, tempo,\
             \ personale e software) vengono classificate in base alla loro classificazione,\
             \ criticit\xE0 e valore aziendale."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.am-6
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.am-6
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.am
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.am
       ref_id: ID.AM-6
       description: Cybersecurity roles and responsibilities for the entire workforce
         and third-party stakeholders (e.g., suppliers, customers, partners) are established.
@@ -277,10 +277,10 @@ objects:
           description: "Vengono stabiliti i ruoli e le responsabilit\xE0 in materia\
             \ di cybersecurity per l'intera forza lavoro e per gli stakeholder terzi\
             \ (ad esempio, fornitori, clienti, partner)."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.be
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.be
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id
       ref_id: ID.BE
       name: 'Business Environment '
       description: "The business\u2019s objectives, tasks and activities are rated\
@@ -302,10 +302,10 @@ objects:
           description: "Obiettivi, mansioni e attivit\xE0 dell\u2019impresa sono definiti\
             \ in ordine di priorit\xE0 e valutati. Queste informazioni servono da\
             \ riferimento per l\u2019attribuzione delle responsabilit\xE0."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.be-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.be-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.be
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.be
       ref_id: ID.BE-1
       description: Identify, document and communicate the exact role of your business
         within the (critical) supply chain.
@@ -323,10 +323,10 @@ objects:
           description: "Identificate, documentate e comunicate il ruolo esatto del\
             \ vostro organismo o della vostra impresa all\u2019interno della catena\
             \ di approvvigionamento (critica)."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.be-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.be-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.be
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.be
       ref_id: ID.BE-2
       description: The importance of the organisation as a critical infrastructure
         operator, and its position within the critical sector, is identified and communicated.
@@ -346,10 +346,10 @@ objects:
           description: "Il significato dell\u2019organismo o dell\u2019impresa come\
             \ infrastrutture critiche e la loro posizione all\u2019interno del settore\
             \ sono identificati e comunicati."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.be-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.be-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.be
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.be
       ref_id: ID.BE-3
       description: Objectives, tasks and activities within the organisation are prioritised
         and rated.
@@ -366,10 +366,10 @@ objects:
           name: null
           description: "Obiettivi, mansioni e attivit\xE0 all\u2019interno dell\u2019\
             impresa sono definiti in ordine di priorit\xE0 e valutati."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.be-4
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.be-4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.be
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.be
       ref_id: ID.BE-4
       description: Dependencies and critical functions for delivery of critical services
         are established.
@@ -386,10 +386,10 @@ objects:
           name: null
           description: Catalogate tutti i sistemi TIC esterni pertinenti per il vostro
             organismo o la vostra impresa.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.be-5
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.be-5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.be
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.be
       ref_id: ID.BE-5
       description: Resilience requirements to support delivery of critical services
         are established for all operating states (e.g. under duress/attack, during
@@ -411,10 +411,10 @@ objects:
           description: I requisiti di resilienza per supportare l'erogazione dei servizi
             critici sono stabiliti per tutti gli stati operativi (ad esempio, in caso
             di stress/attacco, durante il recupero, durante le normali operazioni).
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.gv
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.gv
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id
       ref_id: ID.GV
       name: 'Governance '
       description: Governance determines responsibilities, monitors, and ensures compliance
@@ -439,10 +439,10 @@ objects:
           description: "La governance regola competenze e controlla e garantisce il\
             \ rispetto dei requisiti regolatori, giuridici e operazionali dell\u2019\
             ambiente operativo."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.gv-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.gv-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.gv
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.gv
       ref_id: ID.GV-1
       description: Organizational cybersecurity policy is established and communicated
       translations:
@@ -458,10 +458,10 @@ objects:
           name: null
           description: La politica di cybersecurity dell'organizzazione viene stabilita
             e comunicata.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.gv-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.gv-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.gv
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.gv
       ref_id: ID.GV-2
       description: Information security roles and responsibilities are coordinated
         with internal roles (e.g. those in risk management) and external partners.
@@ -481,10 +481,10 @@ objects:
           description: "Ruoli e responsabilit\xE0 nel settore della sicurezza dell\u2019\
             informazione sono coordinati con i ruoli interni (p.es. della gestione\
             \ dei rischi) e con i partner esterni."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.gv-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.gv-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.gv
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.gv
       ref_id: ID.GV-3
       description: Ensure that your organisation complies with all statutory and regulatory
         cybersecurity requirements, including those applicable to data protection.
@@ -504,10 +504,10 @@ objects:
           description: Assicuratevi che il vostro organismo o la vostra impresa soddisfino
             tutte le direttive legali e regolatorie nel settore della cybersicurezza,
             incluse quelle che riguardano la protezione dei dati.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.gv-4
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.gv-4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.gv
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.gv
       ref_id: ID.GV-4
       description: Ensure that cybersecurity risks are embedded in business-wide risk
         management structures.
@@ -524,10 +524,10 @@ objects:
           name: null
           description: "Assicuratevi che i cyberrischi siano parte della gestione\
             \ dei rischi a livello dell\u2019organismo o dell\u2019impresa."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.ra
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.ra
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id
       ref_id: ID.RA
       name: 'Risk Assessment '
       description: The organisation understands the effects of cybersecurity risks
@@ -548,10 +548,10 @@ objects:
           description: "L\u2019organismo o l\u2019impresa conoscono le conseguenze\
             \ dei cyberrischi sull\u2019attivit\xE0, gli strumenti operativi e gli\
             \ individui, inclusi i rischi legati alla propria reputazione."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.ra-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.ra-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.ra
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.ra
       ref_id: ID.RA-1
       description: Identify the (technical) vulnerabilities of your assets, and document
         them.
@@ -568,10 +568,10 @@ objects:
           name: null
           description: "Identificate le vulnerabilit\xE0 (tecniche) dei vostri strumenti\
             \ operativi e documentatele."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.ra-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.ra-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.ra
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.ra
       ref_id: ID.RA-2
       description: Share intelligence regularly in fora and other bodies to stay up
         to date about cybersecurity threats.
@@ -588,10 +588,10 @@ objects:
           name: null
           description: Scambiate regolarmente opinioni ed esperienze in forum e comitati
             per ottenere informazioni aggiornate sulle cyberminacce.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.ra-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.ra-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.ra
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.ra
       ref_id: ID.RA-3
       description: Identify and document internal and external cybersecurity threats.
       translations:
@@ -605,10 +605,10 @@ objects:
         it:
           name: null
           description: Identificate e documentate cyberminacce interne ed esterne.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.ra-4
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.ra-4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.ra
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.ra
       ref_id: ID.RA-4
       description: Identify the possible business impacts of cybersecurity threats,
         and calculate the probability of their occurring.
@@ -625,10 +625,10 @@ objects:
           name: null
           description: "Identificate possibili effetti delle cyberminacce sull\u2019\
             attivit\xE0 operativa e valutate le probabilit\xE0 che si verifichino."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.ra-5
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.ra-5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.ra
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.ra
       ref_id: ID.RA-5
       description: Rate the risks to your organisation based on threats, vulnerabilities,
         impacts (on business activity) and probabilities.
@@ -648,10 +648,10 @@ objects:
           description: "Valutate i rischi per il vostro organismo o la vostra impresa\
             \ basandovi su minacce, vulnerabilit\xE0, conseguenze (sull\u2019attivit\xE0\
             \ operativa) e probabilit\xE0 che si verifichino."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.ra-6
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.ra-6
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.ra
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.ra
       ref_id: ID.RA-6
       description: Define possible immediate responses should a risk occur, and prioritise
         these measures.
@@ -668,10 +668,10 @@ objects:
           name: null
           description: "Definite possibili misure immediate in presenza di un rischio\
             \ e classificatele secondo le priorit\xE0."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.rm
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.rm
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id
       ref_id: ID.RM
       name: 'Risk Management Strategy '
       description: Determine the priorities, constraints and maximum risk tolerances
@@ -692,10 +692,10 @@ objects:
           name: Strategia di gestione dei rischi (Risk Management Strategy ID.RM)
           description: "Definite priorit\xE0, limiti e rischi massimi ammissibili.\
             \ Valutate in base a questi elementi i rischi operativi."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.rm-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.rm-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.rm
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.rm
       ref_id: ID.RM-1
       description: Establish risk management processes, manage them actively and have
         them confirmed by the persons/stakeholders concerned.
@@ -714,10 +714,10 @@ objects:
           name: null
           description: Definite procedure di gestione dei rischi, applicatele e chiedete
             riscontro alle persone/ai gruppi di riferimento coinvolti.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.rm-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.rm-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.rm
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.rm
       ref_id: ID.RM-2
       description: "Define and communicate your organisation\u203As maximum risk tolerance."
       translations:
@@ -733,10 +733,10 @@ objects:
           name: null
           description: Definite e comunicate i rischi massimi ammissibili del vostro
             organismo o della vostra impresa.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.rm-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.rm-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.rm
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.rm
       ref_id: ID.RM-3
       description: "Ensure that maximum risk tolerance is calculated taking into account\
         \ your organisation\u2019s importance as an operator of a critical infrastructure.\
@@ -760,10 +760,10 @@ objects:
             \ considerando l\u2019importanza del vostro organismo o della vostra impresa\
             \ come gestori di un\u2019infrastruttura sensibile. Tenete conto anche\
             \ delle analisi dei rischi specifiche al settore."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.sc
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.sc
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id
       ref_id: ID.SC
       name: 'Supply Chain Riskmanagement '
       description: Determine priorities, constraints, and the maximum risks that your
@@ -786,10 +786,10 @@ objects:
           description: "(Supply Chain Riskmanagement ID.SC) Definite priorit\xE0,\
             \ limiti e rischi massimi che il vostro organismo o la vostra impresa\
             \ sono disposti ad assumere in relazione ai fornitori."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.sc-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.sc-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.sc
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.sc
       ref_id: ID.SC-1
       description: Establish clear procedures to manage supply chain risks. Have these
         procedures reviewed and agreed by all of the stakeholders involved.
@@ -810,10 +810,10 @@ objects:
           description: Definite procedure chiare per la gestione dei rischi relativi
             ai fornitori. Fatele verificare da tutti i gruppi di riferimento e chiedete
             il loro consenso.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.sc-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.sc-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.sc
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.sc
       ref_id: ID.SC-2
       description: Suppliers and third party partners of information systems, components,
         and services are identified, prioritized, and assessed using a cyber supply
@@ -837,10 +837,10 @@ objects:
             e servizi vengono identificati, classificati e valutati utilizzando un
             processo di valutazione del rischio della catena di approvvigionamento
             informatico.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.sc-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.sc-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.sc
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.sc
       ref_id: ID.SC-3
       description: Place your suppliers and service-providers under a contractual
         obligation to develop and implement appropriate measures to meet the objectives
@@ -864,10 +864,10 @@ objects:
           description: Obbligate per contratto fornitori e operatori a sviluppare
             e introdurre misure adeguate a rispettare obiettivi e direttive relativi
             alla procedura di gestione dei rischi nella catena di fornitori.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.sc-4
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.sc-4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.sc
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.sc
       ref_id: ID.SC-4
       description: Establish a system of monitoring to ensure that all of your suppliers
         and service-providers are fulfilling their obligations as required. Have this
@@ -891,10 +891,10 @@ objects:
             e operatori si attengano ai loro obblighi secondo le direttive. Chiedete
             regolarmente riscontro in sede di rapporti su audit o risultati di prove
             tecniche.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:id.sc-5
+    - urn: urn:ciso:risk:req_node:ict-minimal:id.sc-5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:id.sc
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:id.sc
       ref_id: ID.SC-5
       description: Work with your suppliers and service-providers to define response
         and recovery procedures following cybersecurity incidents. Conduct drills
@@ -913,7 +913,7 @@ objects:
           name: null
           description: Definite con fornitori e operatori procedure di reazione e
             ripristino susseguenti a cybereventi. Verificatele in sede di test.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr
       assessable: false
       depth: 1
       ref_id: PR
@@ -928,10 +928,10 @@ objects:
         it:
           name: Proteggere (PR - Protect)
           description: null
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ac
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ac
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr
       ref_id: PR.AC
       name: 'Access Management '
       description: Ensure that physical and logical access to ICT assets and facilities
@@ -958,10 +958,10 @@ objects:
           description: "Assicuratevi che l\u2019accesso fisico e logico a strumenti\
             \ e impianti operativi TIC sia possibile solo a persone, procedure e apparecchi\
             \ autorizzati e unicamente per attivit\xE0 consentite."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ac-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ac-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ac
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ac
       ref_id: PR.AC-1
       description: Establish a clearly defined procedure for granting and managing
         permissions and access data for users, devices and processes.
@@ -980,10 +980,10 @@ objects:
           name: null
           description: Definite una procedura chiaramente definita per attribuire
             e gestire autorizzazioni e dati di accesso per utenti, apparecchi e procedure.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ac-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ac-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ac
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ac
       ref_id: PR.AC-2
       description: Ensure that only authorised individuals have physical access to
         ICT assets. Take action (on building security, for example) to ensure that
@@ -1006,10 +1006,10 @@ objects:
           description: Assicuratevi che unicamente persone autorizzate abbiano accesso
             agli strumenti operativi TIC. Proteggete con misure (strutturali) gli
             strumenti operativi TIC da accessi fisici non autorizzati.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ac-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ac-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ac
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ac
       ref_id: PR.AC-3
       description: Establish procedures by which to manage remote access.
       translations:
@@ -1023,10 +1023,10 @@ objects:
         it:
           name: null
           description: Definite procedure per gestire gli accessi a distanza.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ac-4
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ac-4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ac
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ac
       ref_id: PR.AC-4
       description: Define permission levels according to the principle of least privilege,
         as well as separation of functions.
@@ -1045,10 +1045,10 @@ objects:
           name: null
           description: Definite livelli di autorizzazione secondo il principio del
             privilegio minimo e della separazione delle funzioni.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ac-5
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ac-5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ac
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ac
       ref_id: PR.AC-5
       description: Ensure that the integrity of your network is protected. Segregate
         your network both logically and physically where necessary and sensible.
@@ -1068,10 +1068,10 @@ objects:
           description: "Assicuratevi che l\u2019integrit\xE0 della vostra rete sia\
             \ protetta. Separate la vostra rete sul piano fisico e logico qualora\
             \ utile e necessario."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ac-6
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ac-6
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ac
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ac
       ref_id: PR.AC-6
       description: Ensure that digital identities are allocated to unambiguously authenticated
         individuals or processes.
@@ -1089,10 +1089,10 @@ objects:
           name: null
           description: "Assicuratevi che le identit\xE0 digitali siano attribuite\
             \ chiaramente a persone e procedure verificate."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ac-7
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ac-7
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ac
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ac
       ref_id: PR.AC-7
       description: "Users, devices, and other assets are authenticated (e.g., single-factor,\
         \ multi-factor) commensurate with the risk of the transaction (e.g., individuals\u2019\
@@ -1117,10 +1117,10 @@ objects:
             \ (ad esempio, a un solo fattore o a pi\xF9 fattori) in base al rischio\
             \ della transazione (ad esempio, i rischi per la sicurezza e la privacy\
             \ degli individui e altri rischi organizzativi)."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.at
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.at
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr
       ref_id: PR.AT
       name: 'Awareness and Training '
       description: Ensure that your staff and external partners receive appropriate,
@@ -1148,10 +1148,10 @@ objects:
             regolarmente una formazione su tutti gli aspetti legati alla cybersicurezza.
             Assicuratevi che il vostro personale e i partner esterni svolgano le mansioni
             pertinenti per la sicurezza secondo le relative procedure e direttive.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.at-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.at-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.at
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.at
       ref_id: PR.AT-1
       description: Ensure that all members of staff are informed and trained on cybersecurity.
       translations:
@@ -1167,10 +1167,10 @@ objects:
           name: null
           description: Assicuratevi che tutto il personale sia informato e istruito
             sulla cybersicurezza.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.at-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.at-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.at
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.at
       ref_id: PR.AT-2
       description: Ensure that higher-level users are particularly aware of their
         role and responsibility.
@@ -1189,10 +1189,10 @@ objects:
           description: "Assicuratevi che gli utenti con livelli di autorizzazione\
             \ elevati siano consapevoli del loro ruolo e delle relative responsabilit\xE0\
             ."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.at-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.at-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.at
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.at
       ref_id: PR.AT-3
       description: Ensure that all third-party stakeholders (suppliers, customers
         and partners) are aware of their role and responsibility.
@@ -1212,10 +1212,10 @@ objects:
           description: "Assicuratevi che tutti i soggetti coinvolti al di fuori dell\u2019\
             impresa (fornitori, clienti, partner) siano consapevoli del loro ruolo\
             \ e delle relative responsabilit\xE0."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.at-4
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.at-4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.at
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.at
       ref_id: PR.AT-4
       description: Ensure that all managers are aware of their particular role and
         responsibility.
@@ -1232,10 +1232,10 @@ objects:
           name: null
           description: "Assicuratevi che tutti i quadri dirigenti siano consapevoli\
             \ del loro ruolo e delle relative responsabilit\xE0."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.at-5
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.at-5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.at
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.at
       ref_id: PR.AT-5
       description: Ensure that those in charge of physical security and information
         security are aware of their particular role and responsibilities.
@@ -1255,10 +1255,10 @@ objects:
           description: "Assicuratevi che i responsabili della sicurezza fisica e della\
             \ sicurezza dell\u2019informazione siano consapevoli del loro ruolo e\
             \ delle loro responsabilit\xE0 particolari."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ds
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr
       ref_id: PR.DS
       name: 'Data Security '
       description: "Ensure that information, data and data carriers are managed in\
@@ -1282,10 +1282,10 @@ objects:
             \ gestiti in modo da proteggere confidenzialit\xE0, integrit\xE0 e disponibilit\xE0\
             \ dei dati secondo la strategia dei rischi del vostro organismo o della\
             \ vostra impresa."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ds-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ds
       ref_id: PR.DS-1
       description: Ensure that stored data is protected (against violations of confidentiality,
         integrity and availability).
@@ -1304,10 +1304,10 @@ objects:
           description: "Assicuratevi che i dati memorizzati siano protetti (da violazioni\
             \ della confidenzialit\xE0, dell\u2019integrit\xE0 e della disponibilit\xE0\
             )."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ds-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ds
       ref_id: PR.DS-2
       description: Ensure that data is protected while in transit (against violations
         of confidentiality, integrity and availability).
@@ -1327,10 +1327,10 @@ objects:
           description: "Assicuratevi che in sede di trasmissione i dati siano protetti\
             \ (da violazioni della confidenzialit\xE0, dell\u2019integrit\xE0 e della\
             \ disponibilit\xE0)."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ds-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ds
       ref_id: PR.DS-3
       description: Ensure that you have a formal procedure in place for your ICT assets
         which protects data upon removal, transfer or the replacement of those assets.
@@ -1351,10 +1351,10 @@ objects:
           description: Assicuratevi che per i vostri strumenti operativi TIC venga
             definita una procedura formale idonea a proteggere i dati in caso di eliminazione,
             spostamento o sostituzione di tali strumenti.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds-4
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ds-4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ds
       ref_id: PR.DS-4
       description: Ensure that your ICT assets have sufficient capacity to ensure
         data availability is maintained.
@@ -1374,10 +1374,10 @@ objects:
           description: "Assicuratevi che i vostri strumenti operativi TIC dispongano\
             \ di riserve di capacit\xE0 sufficienti in relazione alla disponibilit\xE0\
             \ dei dati."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds-5
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ds-5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ds
       ref_id: PR.DS-5
       description: Ensure that appropriate action has been taken to prevent data leaks.
       translations:
@@ -1393,10 +1393,10 @@ objects:
           name: null
           description: Assicuratevi che vengano introdotte misure adeguate conto le
             fughe di dati (Data leak).
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds-6
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ds-6
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ds
       ref_id: PR.DS-6
       description: Establish a procedure to check the integrity of firmware, operating
         systems, application software and data.
@@ -1414,10 +1414,10 @@ objects:
           name: null
           description: "Definite una procedura per verificare l\u2019integrit\xE0\
             \ di firmware, sistemi operativi, software applicativi e dati."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds-7
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ds-7
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ds
       ref_id: PR.DS-7
       description: Provide a development and testing IT environment which is completely
         separate from productive systems.
@@ -1435,10 +1435,10 @@ objects:
           name: null
           description: Mettete a disposizione un ambiente IT per lo sviluppo e i test
             completamente indipendente dai sistemi produttivi.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds-8
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ds-8
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ds
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ds
       ref_id: PR.DS-8
       description: Establish a procedure to check the integrity of the hardware you
         use.
@@ -1455,10 +1455,10 @@ objects:
           name: null
           description: "Definite una procedura per verificare l\u2019integrit\xE0\
             \ dell\u2019hardware."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ip
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr
       ref_id: PR.IP
       name: 'Information Protection Processes and Procedures '
       description: Draw up policies to protect information systems and assets. Apply
@@ -1484,10 +1484,10 @@ objects:
           description: Definite direttive per la protezione di sistemi di informazione
             e strumenti operativi. Applicate le direttive per proteggere i sistemi
             di informazione e gli strumenti operativi.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ip-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ip
       ref_id: PR.IP-1
       description: Draw up a baseline configuration for your information and communication
         infrastructure, as well as for industrial control systems. Ensure that this
@@ -1514,10 +1514,10 @@ objects:
             \ industriali. Assicuratevi che questa configurazione standard preveda\
             \ principi di sicurezza tipici (p.es. ridondanza N-1, configurazione minima\
             \ ecc.)."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ip-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ip
       ref_id: PR.IP-2
       description: Establish a life cycle procedure for the use of ICT assets.
       translations:
@@ -1533,10 +1533,10 @@ objects:
           name: null
           description: "Definite una procedura per il ciclo di vita relativa all\u2019\
             impiego di strumenti operativi TIC."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ip-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ip
       ref_id: PR.IP-3
       description: Establish a procedure to monitor configuration changes.
       translations:
@@ -1552,10 +1552,10 @@ objects:
           name: null
           description: Definite una procedura per il controllo delle modifiche alla
             configurazione.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip-4
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ip-4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ip
       ref_id: PR.IP-4
       description: Ensure that backups of your information are conducted, maintained
         and tested on a regular basis (check that you are able to revert to your backups).
@@ -1575,10 +1575,10 @@ objects:
           description: Assicuratevi che le duplicazioni delle informazioni (backup)
             vengano effettuate, gestite e testate regolarmente (sperimentare il ripristino
             del backup).
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip-5
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ip-5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ip
       ref_id: PR.IP-5
       description: Ensure that you comply with all (regulatory) requirements and policies
         concerning your physical assets.
@@ -1596,10 +1596,10 @@ objects:
           name: null
           description: Assicuratevi di rispettare tutte le disposizioni e le direttive
             regolatorie in relazione agli strumenti operativi fisici.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip-6
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ip-6
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ip
       ref_id: PR.IP-6
       description: Ensure that data is destroyed according to requirements.
       translations:
@@ -1614,10 +1614,10 @@ objects:
         it:
           name: null
           description: Assicuratevi che i dati vengano smaltiti secondo le direttive.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip-7
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ip-7
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ip
       ref_id: PR.IP-7
       description: Ensure that your information security procedures are enhanced and
         improved continuously.
@@ -1634,10 +1634,10 @@ objects:
           name: null
           description: "Assicuratevi che le procedure relative alla sicurezza dell\u2019\
             informazione vengano costantemente aggiornate e migliorate."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip-8
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ip-8
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ip
       ref_id: PR.IP-8
       description: Share information about the effectiveness of various protection
         technologies with your partners.
@@ -1654,10 +1654,10 @@ objects:
           name: null
           description: "Scambiate con i vostri partner esperienze sull\u2019efficacia\
             \ delle tecnologie di protezione."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip-9
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ip-9
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ip
       ref_id: PR.IP-9
       description: Establish response procedures for any cyber incidents that may
         occur. (Incident response planning, business continuity management, incident
@@ -1677,10 +1677,10 @@ objects:
           name: null
           description: Definite procedure per reagire a cybereventi (incident response-planning,
             business continuity management, incident recovery, disaster recovery).
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip-10
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ip-10
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ip
       ref_id: PR.IP-10
       description: Test response and recovery plans.
       translations:
@@ -1693,10 +1693,10 @@ objects:
         it:
           name: null
           description: Testate i piani di reazione e ripristino.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip-11
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ip-11
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ip
       ref_id: PR.IP-11
       description: Embed aspects of cybersecurity in the staff recruitment process
         at an early stage (e.g. by conducting background checks and individual security
@@ -1717,10 +1717,10 @@ objects:
           description: "Definite gli aspetti della cybersicurezza gi\xE0 in sede di\
             \ iter di assunzione del personale (p.es. tramite controlli/verifiche\
             \ di sicurezza sulle persone)."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip-12
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ip-12
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ip
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ip
       ref_id: PR.IP-12
       description: Develop and implement a procedure for dealing with identified vulnerabilities.
       translations:
@@ -1736,10 +1736,10 @@ objects:
           name: null
           description: Sviluppate e introducete una procedura per gestire le carenze
             individuate.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ma
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ma
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr
       ref_id: PR.MA
       name: 'Maintenance '
       description: Ensure that maintenance and repair work to components of the ICT
@@ -1760,10 +1760,10 @@ objects:
           description: "Assicuratevi che i lavori di riparazione e manutenzione su\
             \ componenti del sistema TIC e/o dell\u2019ICS vengano effettuati conformemente\
             \ alle direttive a alle procedure vigenti."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ma-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ma-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ma
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ma
       ref_id: PR.MA-1
       description: Ensure that the operation and maintenance of, and any repairs to
         assets are logged. Ensure that such work is conducted promptly and uses only
@@ -1789,10 +1789,10 @@ objects:
             riparazioni agli strumenti operativi vengano registrati e documentati
             (logging). Assicuratevi che queste operazioni siano effettuate rapidamente
             e unicamente utilizzando mezzi verificati e autorizzati.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.ma-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.ma-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.ma
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.ma
       ref_id: PR.MA-2
       description: Ensure that maintenance work on your systems that is carried out
         via remote access is logged. Ensure that no unauthorised access is possible.
@@ -1812,10 +1812,10 @@ objects:
           description: Assicuratevi che i lavori di manutenzione a sistemi accessibili
             a distanza siano registrati e documentati. Assicuratevi che non siano
             possibili accessi non autorizzati.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.pt
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.pt
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr
       ref_id: PR.PT
       name: 'Protective Technology '
       description: Install technical security solutions in accordance with requirements
@@ -1837,10 +1837,10 @@ objects:
           description: Installate soluzioni tecniche per garantire la sicurezza e
             la resilienza dei sistemi TIC e dei loro dati secondo le direttive e le
             procedure definite.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.pt-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.pt-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.pt
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.pt
       ref_id: PR.PT-1
       description: Define requirements for audits and log records. Produce and check
         the regular logs in accordance with those requirements and policies.
@@ -1859,10 +1859,10 @@ objects:
           name: null
           description: Definite le direttive per gli audit e le registrazioni log.
             Definite e verificate i log regolari secondo le disposizioni e le direttive.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.pt-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.pt-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.pt
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.pt
       ref_id: PR.PT-2
       description: Ensure that removable media are protected, and that they are used
         only in accordance with policy.
@@ -1879,10 +1879,10 @@ objects:
           name: null
           description: Assicuratevi che i supporti rimovibili siano protetti e vengano
             utilizzati unicamente in base alle direttive.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.pt-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.pt-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.pt
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.pt
       ref_id: PR.PT-3
       description: Ensure that your system is configured so that a minimum level of
         functionality is guaranteed at all times.
@@ -1901,10 +1901,10 @@ objects:
           name: null
           description: "Assicuratevi che il vostro sistema sia configurato in modo\
             \ da garantire sempre un livello minimo di funzionalit\xE0."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.pt-4
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.pt-4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.pt
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.pt
       ref_id: PR.PT-4
       description: Ensure that your communications and control networks are protected.
       translations:
@@ -1920,10 +1920,10 @@ objects:
           name: null
           description: Assicuratevi che le vostre reti di comunicazione e di controllo
             siano protette.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:pr.pt-5
+    - urn: urn:ciso:risk:req_node:ict-minimal:pr.pt-5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:pr.pt
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:pr.pt
       ref_id: PR.PT-5
       description: Ensure that mechanisms (e.g. failsafe, load balancing, hot swap)
         are implemented to achieve resilience requirements in normal and adverse situations.
@@ -1945,7 +1945,7 @@ objects:
           description: "Assicuratevi che i vostri sistemi funzionino conformemente\
             \ agli scenari predefiniti. P.es.: funzionalit\xE0 durante un attacco,\
             \ nella fase di ripristino e nella fase operativa normale."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de
+    - urn: urn:ciso:risk:req_node:ict-minimal:de
       assessable: false
       depth: 1
       ref_id: DE
@@ -1960,10 +1960,10 @@ objects:
         it:
           name: Intercettare (DE - Detect)
           description: null
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.ae
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.ae
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de
       ref_id: DE.AE
       name: 'Anomalies and Events '
       description: Ensure that anomalies (abnormal behaviours) and security-related
@@ -1984,10 +1984,10 @@ objects:
           description: Assicuratevi che le anomalie (comportamenti anormali) e gli
             eventi pertinenti per la sicurezza vengano individuati in tempo utile
             e i loro effetti potenziali siano recepiti.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.ae-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.ae-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.ae
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.ae
       ref_id: DE.AE-1
       description: Define a baseline for permitted network operations and expected
         data flows for users and systems. Manage these values continuously.
@@ -2006,10 +2006,10 @@ objects:
           name: null
           description: Definite valori standard per operazioni di rete ammesse e relativi
             flussi di dati per utenti e sistemi. Gestite regolarmente questi valori.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.ae-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.ae-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.ae
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.ae
       ref_id: DE.AE-2
       description: Ensure that detected cybersecurity incidents are analysed to understand
         their targets and methods.
@@ -2026,10 +2026,10 @@ objects:
           name: null
           description: Assicuratevi che gli eventi di cybersicurezza individuati siano
             analizzati in funzione di obiettivi e metodi.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.ae-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.ae-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.ae
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.ae
       ref_id: DE.AE-3
       description: Ensure that information on cybersecurity incidents is aggregated
         and correlated from multiple sources and sensors.
@@ -2048,10 +2048,10 @@ objects:
           name: null
           description: Assicuratevi che le informazioni sugli eventi di cybersicurezza
             provenienti da fonti e sensori diversi siano raggruppate ed elaborate.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.ae-4
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.ae-4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.ae
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.ae
       ref_id: DE.AE-4
       description: Determine the impact of possible events.
       translations:
@@ -2064,10 +2064,10 @@ objects:
         it:
           name: null
           description: Definite gli effetti di possibili eventi.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.ae-5
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.ae-5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.ae
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.ae
       ref_id: DE.AE-5
       description: Define the thresholds above which cybersecurity incidents trigger
         an alert.
@@ -2084,10 +2084,10 @@ objects:
           name: null
           description: Definite i valori soglia a partire dai quali gli eventi di
             cybersicurezza innescano una situazione di allarme.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.cm
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.cm
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de
       ref_id: DE.CM
       name: 'Security Continuous Monitoring '
       description: Ensure that ICT systems, including all assets, are monitored at
@@ -2110,10 +2110,10 @@ objects:
           description: Assicuratevi che le anomalie (comportamenti anormali) e gli
             eventi pertinenti per la sicurezza vengano individuati in tempo utile
             e i loro effetti potenziali siano recepiti.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.cm-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.cm-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.cm
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.cm
       ref_id: DE.CM-1
       description: Monitor networks continuously to detect potential cybersecurity
         events.
@@ -2130,10 +2130,10 @@ objects:
           name: null
           description: Mettete a punto un sistema di monitoraggio costante della rete
             per individuare eventi di cybersicurezza.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.cm-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.cm-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.cm
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.cm
       ref_id: DE.CM-2
       description: Continuous monitoring/surveillance of all physical assets and buildings
         to detect cybersecurity incidents.
@@ -2153,10 +2153,10 @@ objects:
           description: Definite un sistema di monitoraggio/controllo costanti di tutti
             gli strumenti operativi fisici e degli edifici per individuare eventi
             di cybersicurezza.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.cm-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.cm-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.cm
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.cm
       ref_id: DE.CM-3
       description: Establish a system to monitor ICT use on the part of your staff,
         to detect potential cybersecurity incidents.
@@ -2174,10 +2174,10 @@ objects:
           name: null
           description: "Definite un sistema di monitoraggio sull\u2019uso dei TIC\
             \ da parte del personale per individuare potenziali eventi di cybersicurezza."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.cm-4
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.cm-4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.cm
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.cm
       ref_id: DE.CM-4
       description: Ensure that malware can be detected.
       translations:
@@ -2190,10 +2190,10 @@ objects:
         it:
           name: null
           description: Assicuratevi che i software dannosi vengano identificati.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.cm-5
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.cm-5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.cm
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.cm
       ref_id: DE.CM-5
       description: Ensure that malware can be detected on mobile devices.
       translations:
@@ -2209,10 +2209,10 @@ objects:
           name: null
           description: Assicuratevi che i software dannosi su apparecchi mobili vengano
             identificati.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.cm-6
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.cm-6
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.cm
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.cm
       ref_id: DE.CM-6
       description: Ensure that the activities of external service providers can be
         monitored so that cybersecurity incidents can be detected.
@@ -2231,10 +2231,10 @@ objects:
           name: null
           description: "Assicuratevi che le attivit\xE0 degli operatori esterni siano\
             \ sottoposte a controllo in modo da poter individuare eventi di cybersicurezza."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.cm-7
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.cm-7
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.cm
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.cm
       ref_id: DE.CM-7
       description: Monitor your system continuously to ensure that activities or access
         by unauthorised persons, devices and software are detected.
@@ -2254,10 +2254,10 @@ objects:
           description: "Controllate costantemente il vostro sistema per garantire\
             \ che le attivit\xE0/gli accessi di persone, apparecchi e software non\
             \ autorizzati possano essere individuati."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.cm-8
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.cm-8
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.cm
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.cm
       ref_id: DE.CM-8
       description: Vulnerability scans are performed.
       translations:
@@ -2270,10 +2270,10 @@ objects:
         it:
           name: null
           description: "Vengono eseguite scansioni di vulnerabilit\xE0"
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.dp
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.dp
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de
       ref_id: DE.DP
       name: 'Detection Processes '
       description: Processes and instructions for detecting cybersecurity incidents
@@ -2292,10 +2292,10 @@ objects:
           name: Procedure di intercettazione (Detection processes DE.DP)
           description: "Procedure e istruzioni operative per l\u2019intercettazione\
             \ di eventi di cybersicurezza vengono gestite, testate e aggiornate."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.dp-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.dp-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.dp
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.dp
       ref_id: DE.DP-1
       description: Define clear roles and responsibilities so that there is no doubt
         about who is responsible for what, and who holds what authority.
@@ -2313,10 +2313,10 @@ objects:
           name: null
           description: "Definite ruoli e responsabilit\xE0 in modo che sia chiaro\
             \ chi svolge quali mansioni e con quali competenze."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.dp-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.dp-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.dp
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.dp
       ref_id: DE.DP-2
       description: Ensure that detection processes comply with all requirements and
         conditions.
@@ -2333,10 +2333,10 @@ objects:
           name: null
           description: Assicuratevi che le procedure di intercettazione rispettino
             tutte le direttive e le condizioni vigenti..
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.dp-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.dp-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.dp
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.dp
       ref_id: DE.DP-3
       description: Test your detection processes.
       translations:
@@ -2349,10 +2349,10 @@ objects:
         it:
           name: null
           description: Testate le procedure di intercettazione.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.dp-4
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.dp-4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.dp
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.dp
       ref_id: DE.DP-4
       description: Communicate detected incidents to the relevant actors (e.g. suppliers,
         customers, partners, authorities, etc.).
@@ -2370,10 +2370,10 @@ objects:
           name: null
           description: "Segnalate gli eventi intercettati alle persone competenti\
             \ (p. es. fornitori, clienti, partner, autorit\xE0 ecc.)"
-    - urn: urn:intuitem:risk:req_node:ict-minimal:de.dp-5
+    - urn: urn:ciso:risk:req_node:ict-minimal:de.dp-5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:de.dp
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:de.dp
       ref_id: DE.DP-5
       description: Improve your detection processes continuously.
       translations:
@@ -2386,7 +2386,7 @@ objects:
         it:
           name: null
           description: Migliorate continuamente le vostre procedure di intercettazione.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs
       assessable: false
       depth: 1
       ref_id: RS
@@ -2401,10 +2401,10 @@ objects:
         it:
           name: Reagire (RS - Respond)
           description: null
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.rp
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.rp
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs
       ref_id: RS.RP
       name: 'Response Planning '
       description: Draw up a response plan to address detected cybersecurity incidents.
@@ -2426,10 +2426,10 @@ objects:
           description: Definite un piano di reazione per indirizzare gli eventi di
             cybersicurezza individuati. Assicuratevi che il piano di reazione venga
             applicato correttamente e tempestivamente nel caso di un evento.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.rp-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.rp-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs.rp
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs.rp
       ref_id: RS.RP-1
       description: Ensure that the response plan is executed promptly and properly
         during or after a detected incident.
@@ -2448,10 +2448,10 @@ objects:
           name: null
           description: Assicuratevi che il piano di reazione venga applicato correttamente
             e immediatamente durante o dopo un evento di cybersicurezza intercettato.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.co
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.co
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs
       ref_id: RS.CO
       name: 'Communications '
       description: Ensure that your response procedures are coordinated with internal
@@ -2475,10 +2475,10 @@ objects:
             \ con i gruppi di riferimento interni ed esterni. Assicuratevi di poter\
             \ contare in caso di evento, se necessario e opportuno, sull\u2019appoggio\
             \ di uffici statali."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.co-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.co-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs.co
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs.co
       ref_id: RS.CO-1
       description: Ensure that all individuals are familiar with their response and
         the sequence of their actions if and when a cybersecurity incident occurs.
@@ -2497,10 +2497,10 @@ objects:
           name: null
           description: "Assicuratevi che tutte le persone conoscano le proprie mansioni\
             \ in termini di reazione e priorit\xE0 in caso di eventi di cybersicurezza."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.co-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.co-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs.co
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs.co
       ref_id: RS.CO-2
       description: Define reporting criteria and ensure that cybersecurity incidents
         are reported and processed in accordance with these criteria.
@@ -2520,10 +2520,10 @@ objects:
           description: "Definite i criteri di segnalazione e assicuratevi che gli\
             \ eventi di cybersicurezza siano resi noti e gestiti in loro conformit\xE0\
             ."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.co-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.co-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs.co
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs.co
       ref_id: RS.CO-3
       description: Share information and findings about detected cybersecurity incidents
         in accordance with the defined criteria.
@@ -2541,10 +2541,10 @@ objects:
           name: null
           description: Attribuite agli eventi di cybersicurezza intercettati informazioni
             e risultati in base ai criteri definiti.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.co-4
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.co-4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs.co
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs.co
       ref_id: RS.CO-4
       description: Coordination with stakeholders occurs consistent with response
         plans
@@ -2563,10 +2563,10 @@ objects:
           name: null
           description: "Il coordinamento con le parti interessate \xE8 coerente con\
             \ i piani di risposta."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.co-5
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.co-5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs.co
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs.co
       ref_id: RS.CO-5
       description: Voluntary information sharing occurs with external stakeholders
         to achieve broader cybersecurity situational awareness
@@ -2586,10 +2586,10 @@ objects:
           description: "La condivisione volontaria delle informazioni avviene con\
             \ gli stakeholder esterni per ottenere una pi\xF9 ampia consapevolezza\
             \ della situazione della cybersicurezza."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.an
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.an
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs
       ref_id: RS.AN
       name: 'Analysis '
       description: Ensure that regular analyses are conducted to permit an effective
@@ -2607,10 +2607,10 @@ objects:
           name: Analisi (Analysis RS.AN)
           description: Assicuratevi che vengano effettuate regolarmente analisi tali
             da consentirvi di reagire adeguatamente a eventi di cybersicurezza.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.an-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.an-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs.an
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs.an
       ref_id: RS.AN-1
       description: Ensure that notifications from detection systems are noted and
         investigated.
@@ -2628,10 +2628,10 @@ objects:
           description: Assicuratevi che le segnalazioni provenienti dai sistemi di
             intercettamento vengano prese in considerazione e che siano attivate le
             relative ricerche.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.an-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.an-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs.an
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs.an
       ref_id: RS.AN-2
       description: Ensure that the impact of a cybersecurity incident is properly
         understood.
@@ -2648,10 +2648,10 @@ objects:
           name: null
           description: Assicuratevi che le conseguenze di un evento di cybersicurezza
             siano individuate correttamente.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.an-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.an-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs.an
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs.an
       ref_id: RS.AN-3
       description: Conduct a forensic analysis after any incident that occurs.
       translations:
@@ -2665,10 +2665,10 @@ objects:
         it:
           name: null
           description: Dopo il verificarsi di un evento effettuate analisi forensi.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.an-4
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.an-4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs.an
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs.an
       ref_id: RS.AN-4
       description: Categorise incidents that occur in accordance with the requirements
         of the response plan.
@@ -2685,10 +2685,10 @@ objects:
           name: null
           description: Classificate gli eventi verificatisi in base alle direttive
             contenute nel piano di reazione.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.an-5
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.an-5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs.an
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs.an
       ref_id: RS.AN-5
       description: Processes are established to receive, analyze and respond to vulnerabilities
         disclosed to the organization from internal and external sources (e.g. internal
@@ -2712,10 +2712,10 @@ objects:
             \ alle vulnerabilit\xE0 divulgate all'organizzazione da fonti interne\
             \ ed esterne (ad esempio, test interni, bollettini di sicurezza o ricercatori\
             \ di sicurezza)."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.mi
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.mi
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs
       ref_id: RS.MI
       name: 'Mitigation '
       description: Act to prevent the further spread of a cybersecurity incident and
@@ -2734,10 +2734,10 @@ objects:
           name: Diminuzione del danno (Mitigation RS.MI)
           description: Operate in modo da evitare il propagarsi di un evento di cybersicurezza
             e ridurre possibili danni.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.mi-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.mi-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs.mi
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs.mi
       ref_id: RS.MI-1
       description: Ensure that cybersecurity incidents can be contained and their
         further spread blocked.
@@ -2754,10 +2754,10 @@ objects:
           name: null
           description: Assicuratevi che gli eventi di cybersicurezza possano essere
             circoscritti e che ne venga interrotta la diffusione.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.mi-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.mi-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs.mi
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs.mi
       ref_id: RS.MI-2
       description: Ensure that the impact of cybersecurity incidents can be mitigated.
       translations:
@@ -2773,10 +2773,10 @@ objects:
           name: null
           description: Assicuratevi che le conseguenze di un evento di cybersicurezza
             siano individuate correttamente.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.mi-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.mi-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs.mi
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs.mi
       ref_id: RS.MI-3
       description: Ensure that newly identified vulnerabilities are reduced or documented
         as accepted risks.
@@ -2793,10 +2793,10 @@ objects:
           name: null
           description: "Assicuratevi che le nuove vulnerabilit\xE0 individuate vengano\
             \ ridotte o documentate come rischi accettati."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.im
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.im
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs
       ref_id: RS.IM
       name: 'Improvements '
       description: "Ensure that your organisation\u2019s capacity to respond to cybersecurity\
@@ -2817,10 +2817,10 @@ objects:
           description: "Assicuratevi che la capacit\xE0 di reazione del vostro organismo\
             \ o della vostra impresa in caso di eventi di cybersicurezza venga costantemente\
             \ migliorata basandovi sulle esperienze precedenti."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.im-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.im-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs.im
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs.im
       ref_id: RS.IM-1
       description: Ensure that the findings and lessons of previous cybersecurity
         incidents are incorporated into your response plans.
@@ -2838,10 +2838,10 @@ objects:
           name: null
           description: Assicuratevi che gli elementi e le esperienze raccolti dagli
             eventi di cybersicurezza vengano recepiti nei vostri piani di reazione.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rs.im-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:rs.im-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rs.im
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rs.im
       ref_id: RS.IM-2
       description: Update your response strategies.
       translations:
@@ -2854,7 +2854,7 @@ objects:
         it:
           name: null
           description: Aggiornate le vostre strategie di reazione.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rc
+    - urn: urn:ciso:risk:req_node:ict-minimal:rc
       assessable: false
       depth: 1
       ref_id: RC
@@ -2869,10 +2869,10 @@ objects:
         it:
           name: Ripristinare (RC - Recover)
           description: null
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rc.rp
+    - urn: urn:ciso:risk:req_node:ict-minimal:rc.rp
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rc
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rc
       ref_id: RC.RP
       name: 'Recovery Planning '
       description: Ensure that recovery procedures are (can be) maintained and executed
@@ -2893,10 +2893,10 @@ objects:
           name: Piano di ripristino (Recovery planning RC.RP)
           description: Assicuratevi che le procedure di ripristino siano gestite e
             svolte in modo tale da garantire la tempestiva riattivazione dei sistemi.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rc.rp-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:rc.rp-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rc.rp
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rc.rp
       ref_id: RC.RP-1
       description: Ensure that recovery plans can be executed properly after any cybersecurity
         incident.
@@ -2913,10 +2913,10 @@ objects:
           name: null
           description: Assicuratevi che il piano di ripristino dopo un evento di cybersicurezza
             venga effettuato correttamente.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rc.im
+    - urn: urn:ciso:risk:req_node:ict-minimal:rc.im
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rc
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rc
       ref_id: RC.IM
       name: 'Improvements '
       description: Ensure that your recovery procedures improve continuously by learning
@@ -2936,10 +2936,10 @@ objects:
           name: Miglioramenti (Improvements RC.IM)
           description: Assicuratevi che le vostre procedure di ripristino vengano
             costantemente migliorate avvalendovi di quanto appreso da precedenti esperienze.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rc.im-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:rc.im-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rc.im
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rc.im
       ref_id: RC.IM-1
       description: Ensure that the findings and lessons of previous cybersecurity
         incidents are incorporated into your recovery plans.
@@ -2957,10 +2957,10 @@ objects:
           name: null
           description: Assicuratevi che gli elementi e le esperienze raccolti dagli
             eventi di cybersicurezza vengano recepiti nei piani di ripristino..
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rc.im-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:rc.im-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rc.im
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rc.im
       ref_id: RC.IM-2
       description: Update your recovery strategy.
       translations:
@@ -2973,10 +2973,10 @@ objects:
         it:
           name: null
           description: Aggiornate le vostre strategie di ripristino.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rc.co
+    - urn: urn:ciso:risk:req_node:ict-minimal:rc.co
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rc
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rc
       ref_id: RC.CO
       name: 'Communications '
       description: Coordinate your recovery activities with internal and external
@@ -2998,10 +2998,10 @@ objects:
           description: "Coordinate le attivit\xE0 di ripristino con partner interni\
             \ ed esterni, p.es. internet service provider, CERT, autorit\xE0, integratori\
             \ di sistemi ecc."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rc.co-1
+    - urn: urn:ciso:risk:req_node:ict-minimal:rc.co-1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rc.co
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rc.co
       ref_id: RC.CO-1
       description: Ensure that public perceptions of your organisation are addressed
         actively.
@@ -3017,10 +3017,10 @@ objects:
         it:
           name: null
           description: Confrontatevi attivamente con la vostra immagine pubblica.
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rc.co-2
+    - urn: urn:ciso:risk:req_node:ict-minimal:rc.co-2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rc.co
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rc.co
       ref_id: RC.CO-2
       description: Ensure that your organisation is perceived positively once again
         after any cybersecurity incident.
@@ -3037,10 +3037,10 @@ objects:
           name: null
           description: "Assicuratevi che dopo l\u2019evento di cybersicurezza l\u2019\
             immagine del vostro organismo o della vostra impresa torni a essere positiva."
-    - urn: urn:intuitem:risk:req_node:ict-minimal:rc.co-3
+    - urn: urn:ciso:risk:req_node:ict-minimal:rc.co-3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:ict-minimal:rc.co
+      parent_urn: urn:ciso:risk:req_node:ict-minimal:rc.co
       ref_id: RC.CO-3
       description: Communicate all of your recovery activities to internal stakeholder
         groups, and especially also to (senior) management.

@@ -1,4 +1,4 @@
-urn: urn:intuitem:risk:library:risk-matrix-3x3-mult
+urn: urn:ciso:risk:library:risk-matrix-3x3-mult
 locale: fr
 ref_id: risk-matrix-3x3-mult
 name: Matrice 3x3 multiplicative
@@ -6,8 +6,8 @@ description: Matrice de risque simple 3x3 multiplicative
 copyright: domaine public
 version: 2
 publication_date: 2024-05-04
-provider: intuitem
-packager: intuitem
+provider: ciso
+packager: ciso-assistant
 translations:
   en:
     name: 3x3 multiplicative matrix
@@ -15,7 +15,7 @@ translations:
     copyright: public domain
 objects:
   risk_matrix:
-  - urn: urn:intuitem:risk:matrix:3x3-mult
+  - urn: urn:ciso:risk:matrix:3x3-mult
     ref_id: risk-matrix-3x3-mult
     name: Matrice 3x3 multiplicative
     description: Matrice de risque simple 3x3 multiplicative

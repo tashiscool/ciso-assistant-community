@@ -609,17 +609,17 @@ The following values are preloaded:
 
 | abbreviation | q_order | so_order | name            | description | translations | urn                                             |
 | ------------ | ------- | -------- | --------------- | ----------- | ------------ | ----------------------------------------------- |
-| C            | 1       | 1        | confidentiality |             | ...          | urn:intuitem:risk:qualification:confidentiality |
-| I            | 2       | 2        | integrity       |             | ...          | urn:intuitem:risk:qualification:integrity       |
-| A            | 3       | 3        | availability    |             | ...          | urn:intuitem:risk:qualification:availability    |
-| P            | 4       | 4        | proof           |             | ...          | urn:intuitem:risk:qualification:proof           |
-| Aut          | 5       | 5        | authenticity    |             | ...          | urn:intuitem:risk:qualification:authenticity    |
-| Priv         | 6       | 6        | privacy         |             | ...          | urn:intuitem:risk:qualification:privacy         |
-| Safe         | 7       | 7        | safety          |             | ...          | urn:intuitem:risk:qualification:safety          |
-| Rep          | 8       |          | reputation      |             | ...          | urn:intuitem:risk:qualification:safety          |
-| Ope          | 9       |          | operational     |             | ...          | urn:intuitem:risk:qualification:operational     |
-| Leg          | 10      |          | legal           |             | ...          | urn:intuitem:risk:qualification:legal           |
-| Fin          | 11      |          | financial       |             | ...          | urn:intuitem:risk:qualification:financial       |
+| C            | 1       | 1        | confidentiality |             | ...          | urn:ciso:risk:qualification:confidentiality |
+| I            | 2       | 2        | integrity       |             | ...          | urn:ciso:risk:qualification:integrity       |
+| A            | 3       | 3        | availability    |             | ...          | urn:ciso:risk:qualification:availability    |
+| P            | 4       | 4        | proof           |             | ...          | urn:ciso:risk:qualification:proof           |
+| Aut          | 5       | 5        | authenticity    |             | ...          | urn:ciso:risk:qualification:authenticity    |
+| Priv         | 6       | 6        | privacy         |             | ...          | urn:ciso:risk:qualification:privacy         |
+| Safe         | 7       | 7        | safety          |             | ...          | urn:ciso:risk:qualification:safety          |
+| Rep          | 8       |          | reputation      |             | ...          | urn:ciso:risk:qualification:safety          |
+| Ope          | 9       |          | operational     |             | ...          | urn:ciso:risk:qualification:operational     |
+| Leg          | 10      |          | legal           |             | ...          | urn:ciso:risk:qualification:legal           |
+| Fin          | 11      |          | financial       |             | ...          | urn:ciso:risk:qualification:financial       |
 
 Qualifications that have so_order defined can be used to set security objectives to primary assets.
 
@@ -711,7 +711,7 @@ The order_id variable allows to sort the requirements nodes, it starts at 0 and 
 
 ```yaml
 {
-  - urn: urn:intuitem:risk:req_node:example-questionnaire:1_governance-1
+  - urn: urn:ciso:risk:req_node:example-questionnaire:1_governance-1
         assessable: true
         weight: 1
         importance: mandatory
@@ -856,12 +856,12 @@ The format for questions and answers json fields will evolve over time. The init
 
 ```json
 {
-  "urn:intuitem:risk:req_node:example:a.1:question:1": {
+  "urn:ciso:risk:req_node:example:a.1:question:1": {
     "type": "unique_choice",
     "text": "Do you maintain an access control policy?",
     "choices": [
       {
-        "urn": "urn:intuitem:risk:framework:example:answer01:choice:1",
+        "urn": "urn:ciso:risk:framework:example:answer01:choice:1",
         "value": "yes",
         "add_score": 20,
         "compute_result": true,
@@ -870,7 +870,7 @@ The format for questions and answers json fields will evolve over time. The init
         "color": "#28a745" // to be retrieved with the excel cell
       },
       {
-        "urn": "urn:intuitem:risk:framework:example:answer01:choice:2",
+        "urn": "urn:ciso:risk:framework:example:answer01:choice:2",
         "value": "no",
         "add_score": 0,
         "compute_result": false,
@@ -880,26 +880,26 @@ The format for questions and answers json fields will evolve over time. The init
     ]
   },
 
-  "urn:intuitem:risk:req_node:example:a.1:question:2": {
+  "urn:ciso:risk:req_node:example:a.1:question:2": {
     "type": "unique_choice",
     "text": "Is the policy reviewed annually?",
     "depends_on": {
-      "question": "urn:intuitem:risk:req_node:example:a.1:question:1",
+      "question": "urn:ciso:risk:req_node:example:a.1:question:1",
       "answers": [
-        "urn:intuitem:risk:framework:example:answer01:choice:1"
+        "urn:ciso:risk:framework:example:answer01:choice:1"
       ],
       "condition": "any"
     },
     "choices": [
       {
-        "urn": "urn:intuitem:risk:framework:example:answer02:choice:1",
+        "urn": "urn:ciso:risk:framework:example:answer02:choice:1",
         "value": "yes",
         "add_score": 10,
         "compute_result": true,
         "select_implementation_groups": ["2"]
       },
       {
-        "urn": "urn:intuitem:risk:framework:example:answer02:choice:2",
+        "urn": "urn:ciso:risk:framework:example:answer02:choice:2",
         "value": "no",
         "add_score": 0,
         "compute_result": false
@@ -907,38 +907,38 @@ The format for questions and answers json fields will evolve over time. The init
     ]
   },
 
-  "urn:intuitem:risk:req_node:example:a.1:question:3": {
+  "urn:ciso:risk:req_node:example:a.1:question:3": {
     "type": "multiple_choice",
     "text": "Which access controls are implemented?",
     "depends_on": {
-      "question": "urn:intuitem:risk:req_node:example:a.1:question:1",
+      "question": "urn:ciso:risk:req_node:example:a.1:question:1",
       "answers": [
-        "urn:intuitem:risk:framework:example:answer01:choice:1"
+        "urn:ciso:risk:framework:example:answer01:choice:1"
       ],
       "condition": "any" // or "all" (optional, defaults to "any")
     },
     "choices": [
       {
-        "urn": "urn:intuitem:risk:framework:example:answer03:choice:1",
+        "urn": "urn:ciso:risk:framework:example:answer03:choice:1",
         "value": "Role-based access control",
         "add_score": 5,
         "compute_result": true
       },
       {
-        "urn": "urn:intuitem:risk:framework:example:answer03:choice:2",
+        "urn": "urn:ciso:risk:framework:example:answer03:choice:2",
         "value": "MFA for privileged accounts",
         "add_score": 5,
         "compute_result": true,
         "select_implementation_groups": ["1", "2"]
       },
       {
-        "urn": "urn:intuitem:risk:framework:example:answer03:choice:3",
+        "urn": "urn:ciso:risk:framework:example:answer03:choice:3",
         "value": "Audit logging",
         "add_score": 5,
         "compute_result": true
       },
       {
-        "urn": "urn:intuitem:risk:framework:example:answer03:choice:4",
+        "urn": "urn:ciso:risk:framework:example:answer03:choice:4",
         "value": "None of the above", // or N/A
         "add_score": 0,
         "compute_result": false
@@ -952,11 +952,11 @@ The format for questions and answers json fields will evolve over time. The init
 
 ```json
 {
-    "urn:intuitem:risk:req_node:example:a.1:question:1": "urn:intuitem:risk:framework:example:answer01:choice:1",
-    "urn:intuitem:risk:req_node:example:a.1:question:2": "urn:intuitem:risk:framework:example:answer02:choice:2",
-    "urn:intuitem:risk:req_node:example:a.1:question:3": [
-        "urn:intuitem:risk:framework:example:answer03:choice:1",
-        "urn:intuitem:risk:framework:example:answer03:choice:2"
+    "urn:ciso:risk:req_node:example:a.1:question:1": "urn:ciso:risk:framework:example:answer01:choice:1",
+    "urn:ciso:risk:req_node:example:a.1:question:2": "urn:ciso:risk:framework:example:answer02:choice:2",
+    "urn:ciso:risk:req_node:example:a.1:question:3": [
+        "urn:ciso:risk:framework:example:answer03:choice:1",
+        "urn:ciso:risk:framework:example:answer03:choice:2"
     ]
     ...
 }
@@ -1200,7 +1200,7 @@ Frameworks (including requirement nodes), mappings, threats, reference controls 
 
 Referential objects can be downloaded from a library. They are called "global referential objects" or "library objects" in that case, and they have the following characteristics:
 
-- they have a non-null URN identifier _urn_ of the form: `urn:intuitem:<domain>:<object_type>:[<framework>:]<short_id>`. Client-defined URNs are also possible. The framework part is present for items that are part of a framework.
+- they have a non-null URN identifier _urn_ of the form: `urn:ciso:<domain>:<object_type>:[<framework>:]<short_id>`. Client-defined URNs are also possible. The framework part is present for items that are part of a framework.
 - they are read-only in the database once imported. They can be removed only by removing the corresponding library.
 - they are attached to the root folder.
 - Everyone has the right to read them, they are "published" to all domains.
@@ -1238,10 +1238,10 @@ Example:
 
 ```yaml
 {
-    - urn: urn:intuitem:risk:req_node:iso27001-2022:4
+    - urn: urn:ciso:risk:req_node:iso27001-2022:4
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:iso27001-2022:core
+      parent_urn: urn:ciso:risk:req_node:iso27001-2022:core
       ref_id: '4'
       name: 'Context of the organization '
       translations:
@@ -1258,7 +1258,7 @@ Example:
 
 ```yaml
 {
-    urn: urn:intuitem:risk:library:iso27001-2022
+    urn: urn:ciso:risk:library:iso27001-2022
     locale: en
     ref_id: ISO/IEC 27001:2022
     name: International standard ISO/IEC 27001:2022
@@ -1267,7 +1267,7 @@ Example:
     copyright: See https://www.iso.org/standard/27001
     version: 3
     provider: ISO/IEC
-    packager: intuitem
+    packager: ciso
     translations:
     fr:
         name: Norme internationale ISO/IEC 27001:2022

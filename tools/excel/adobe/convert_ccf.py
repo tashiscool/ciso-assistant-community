@@ -20,7 +20,7 @@ input_file_name = args.filename
 output_file_name = "adobe-ccf-v5.xlsx"
 
 library_copyright = """Creative Commons"""
-packager = "intuitem"
+packager = "ciso"
 
 library_description = """Adobe Common Controls Framework (CCF) version 5
 https://www.adobe.com/trust/compliance/adobe-ccf.html

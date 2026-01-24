@@ -16,6 +16,7 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="MIT License"/>
   <img src="https://img.shields.io/github/v/release/tashiscool/ciso-assistant-community?style=flat-square" alt="Release"/>
   <img src="https://img.shields.io/github/stars/tashiscool/ciso-assistant-community?style=flat-square" alt="Stars"/>
 </p>
@@ -30,7 +31,7 @@ CISO Assistant is a comprehensive **Governance, Risk, and Compliance (GRC)** pla
 - **90+ Frameworks**: Built-in support for ISO 27001, NIST CSF, SOC 2, FedRAMP, CMMC, GDPR, and more
 - **AI-Powered**: Intelligent assistance for control mapping, gap analysis, and documentation
 - **API-First**: Full REST API for automation and integration with your security stack
-- **Open Source**: AGPL v3 licensed with an active community
+- **MIT Licensed**: Fully open source under the permissive MIT license - use freely in commercial projects
 
 ---
 
@@ -308,8 +309,9 @@ CISO Assistant maintains comprehensive test coverage across all critical modules
 | **Questionnaire Engine** | 39 | Conditional logic, scoring, progress tracking |
 | **Bounded Contexts** | 100+ | FedRAMP 20x, Trust Center, Privacy, Third-Party |
 | **Continuous Monitoring** | 50+ | ConMon profiles, KSI tracking, alerts |
+| **MIT Modules** | 424 | All core GRC models, IAM, privacy, risk, integrations |
 
-**Total**: 900+ backend tests ensuring enterprise-grade reliability.
+**Total**: 1,300+ backend tests ensuring enterprise-grade reliability.
 
 ### Quality Assurance
 
@@ -317,6 +319,84 @@ CISO Assistant maintains comprehensive test coverage across all critical modules
 - **Service Layer Testing**: All business logic services are comprehensively tested
 - **Mock-Based Testing**: No database dependencies for unit tests
 - **Edge Case Coverage**: Boundary conditions and error handling tested
+
+---
+
+## Module Overview
+
+CISO Assistant provides a complete set of GRC modules:
+
+| Module | Models | Lines | Description |
+|--------|--------|-------|-------------|
+| **iam_mit** | 10 | 868 | Folder-based hierarchical RBAC |
+| **core/models_mit** | 42 | 4,018 | Complete GRC domain models |
+| **core/utils_mit** | - | 412 | String, date, hash utilities |
+| **core/helpers_mit** | - | 448 | Status, scoring, statistics helpers |
+| **privacy_mit** | 9 | 1,041 | GDPR/data protection compliance |
+| **resilience_mit** | 3 | 636 | Business continuity management |
+| **ebios_rm_mit** | 12 | 944 | EBIOS RM methodology |
+| **tprm_mit** | 5 | 658 | Third-party risk management |
+| **library_mit** | 2 | 221 | Framework library management |
+| **cal_mit** | 2 | 438 | Calendar and event scheduling |
+| **global_settings_mit** | 2 | 377 | Application settings & feature flags |
+| **metrology_mit** | 6 | 809 | Metrics and dashboards |
+| **webhooks_mit** | 3 | 461 | Webhook notifications |
+| **integrations_mit** | 4 | 553 | External tool integrations |
+| **pmbok_mit** | 2 | 385 | Portfolio management |
+| **data_wizard_mit** | - | 976 | Excel import/export (EBIOS, ARM) |
+
+### Key Features
+
+**IAM Module** - Complete folder-based RBAC:
+- Hierarchical folders (ROOT/DOMAIN/ENCLAVE)
+- FolderMixin for multi-tenant scoping
+- Role assignments with perimeter folders
+- Recursive permission checking
+
+**Core Module** - Full GRC domain:
+- Organization, Domain, Perimeter
+- Framework, Control, Policy, AppliedControl
+- RiskMatrix, RiskScenario, RiskAssessment
+- Evidence, Incident, Campaign, Audit
+
+**Privacy Module** - GDPR compliance:
+- Processing activities (ROPA)
+- Data subject rights (DSAR)
+- Data breach management
+- Cross-border transfers
+
+**EBIOS RM Module** - French ANSSI methodology:
+- 5-workshop structure
+- RoTo (Risk Origin/Target Objective)
+- Attack paths and kill chains
+- Stakeholder criticality
+
+**Metrology Module** - Metrics and dashboards:
+- Custom and builtin metrics
+- Configurable dashboards
+- Time-series tracking
+
+**Integrations Module** - External tools:
+- Provider registry
+- Bi-directional sync
+- Webhook delivery
+
+**Data Wizard Module** - Excel import/export:
+- EBIOS RM study import/export
+- ARM format support (French/English)
+- Configurable sheet mapping
+- Header normalization
+
+### Usage
+
+Modules can be imported independently:
+
+```python
+# Use models in your project
+from iam_mit import Folder, Role, RoleAssignment
+from privacy_mit import Processing, DataBreach, RightRequest
+from ebios_rm_mit import EbiosRMStudy, FearedEvent, RoTo
+```
 
 ---
 
@@ -336,15 +416,38 @@ CISO Assistant provides feature parity with commercial GRC platforms:
 | Security Graph | ✅ | ❌ | ❌ |
 | Open Source | ✅ | ❌ | ❌ |
 | Self-Hosted | ✅ | ❌ | ✅ |
+| MIT Licensed | ✅ | ❌ | ❌ |
 
 ---
 
 ## License
 
-- **Community Edition**: [AGPL v3](LICENSE-AGPL.txt)
-- **Enterprise Edition**: [Commercial License](LICENSE.md)
+CISO Assistant is released under the **MIT License**.
 
-Files in the `enterprise/` directory are commercially licensed. All other files are AGPL v3.
+```
+MIT License
+
+Copyright (c) 2026 Tash
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+```
+
+This means you can:
+- ✅ Use commercially
+- ✅ Modify freely
+- ✅ Distribute copies
+- ✅ Use privately
+- ✅ Sublicense
+
+See [LICENSE](LICENSE) for the full license text.
 
 ---
 
@@ -355,5 +458,5 @@ Built with [Django](https://www.djangoproject.com/), [SvelteKit](https://kit.sve
 ---
 
 <p align="center">
-  Maintained by <strong>tash</strong>
+  Maintained by <strong>Tash</strong>
 </p>

@@ -76,7 +76,7 @@ These developer-focused features add complexity without directly improving core 
 
 **Structure:**
 ```yaml
-urn: urn:intuitem:risk:library:fedramp-20x
+urn: urn:ciso:risk:library:fedramp-20x
 locale: en
 ref_id: FEDRAMP-20X-KSI
 name: FedRAMP 20x Key Security Indicators
@@ -84,11 +84,11 @@ description: FedRAMP 20x modernized authorization framework based on Key Securit
 version: 25.12A
 publication_date: 2025-12-29
 provider: FedRAMP / GSA
-packager: intuitem
+packager: ciso
 
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:fedramp-20x
+    urn: urn:ciso:risk:framework:fedramp-20x
     ref_id: FEDRAMP-20X
     name: FedRAMP 20x Key Security Indicators
     implementation_groups_definition:
@@ -101,17 +101,17 @@ objects:
 
     requirement_nodes:
       # 11 KSI Categories with ~61 indicators
-      - urn: urn:intuitem:risk:req_node:fedramp-20x:ksi-afr
+      - urn: urn:ciso:risk:req_node:fedramp-20x:ksi-afr
         assessable: false
         depth: 1
         ref_id: KSI-AFR
         name: Authorization by FedRAMP
         description: Government-specific requirements for maintaining authorization
 
-      - urn: urn:intuitem:risk:req_node:fedramp-20x:ksi-afr-01
+      - urn: urn:ciso:risk:req_node:fedramp-20x:ksi-afr-01
         assessable: true
         depth: 2
-        parent_urn: urn:intuitem:risk:req_node:fedramp-20x:ksi-afr
+        parent_urn: urn:ciso:risk:req_node:fedramp-20x:ksi-afr
         ref_id: KSI-AFR-01
         name: Minimum Assessment Scope
         description: Apply FedRAMP MAS to identify and document scope

@@ -25,7 +25,7 @@ DISCLAIMERS
 ALL DOCUMENTS AND THE INFORMATION CONTAINED THEREIN ARE PROVIDED ON AN "AS IS" BASIS AND THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS OR IS SPONSORED BY (IF ANY), THE MITRE CORPORATION, ITS BOARD OF TRUSTEES, OFFICERS, AGENTS, AND EMPLOYEES, DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION THEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 """
 
-packager = "intuitem"
+packager = "ciso"
 
 
 with open("d3fend.csv", newline="") as csvfile:
@@ -53,7 +53,7 @@ with open("d3fend.csv", newline="") as csvfile:
     ws.append(
         [
             "reference_control_base_urn",
-            "urn:intuitem:risk:reference-controls:mitre-d3fend",
+            "urn:ciso:risk:reference-controls:mitre-d3fend",
         ]
     )
     ws1 = wb_output.create_sheet("controls")

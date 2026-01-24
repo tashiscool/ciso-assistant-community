@@ -1,6 +1,6 @@
 convert_library_version: 'v2 ; Compat Mode: [0] {[v2.1] (DEFAULT) Don''t use any Compatibility
   Mode}'
-urn: urn:intuitem:risk:library:norea-dora-in-control
+urn: urn:ciso:risk:library:norea-dora-in-control
 locale: en
 ref_id: NOREA-DORA-in-control
 name: NOREA - DORA in Control Framework V3.0
@@ -22,7 +22,7 @@ copyright: "The NOREA DORA in Control Framework and Dashboard is licensed under 
 version: 2
 publication_date: 2025-09-17
 provider: NOREA
-packager: intuitem
+packager: ciso-assistant
 translations:
   fr:
     name: "NOREA - Cadre de ma\xEEtrise DORA V3.0"
@@ -45,7 +45,7 @@ translations:
       \ sugg\xE8re que le conc\xE9dant vous approuve ou approuve votre utilisation."
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:norea-dora-in-control
+    urn: urn:ciso:risk:framework:norea-dora-in-control
     ref_id: NOREA-DORA-in-control
     name: NOREA - DORA in Control Framework V3.0
     description: 'The NOREA DORA in Control Framework is a practical tool designed
@@ -207,7 +207,7 @@ objects:
             \ de mani\xE8re proactive dans l\u2019am\xE9lioration des mesures de contr\xF4\
             le."
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:grm
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:grm
       assessable: false
       depth: 1
       ref_id: GRM
@@ -215,19 +215,19 @@ objects:
       translations:
         fr:
           name: Gouvernance et gestion des risques
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:grm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:grm
       ref_id: '1'
       name: Management Responsibilities
       translations:
         fr:
           name: "Responsabilit\xE9s de la direction"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:1.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:1.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:1
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:1
       ref_id: '1.1'
       name: Governance of ICT risk
       description: 'The Management body shall take ultimate responsibility for effectively
@@ -268,10 +268,10 @@ objects:
             \ de services tiers, et comprend l\u2019incidence de ces changements sur\
             \ les fonctions critiques et importantes de l\u2019entit\xE9 (y compris\
             \ les r\xE9sultats de l\u2019\xE9valuation des risques)."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:1.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:1.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:1
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:1
       ref_id: '1.2'
       name: Knowledge of the Management Body
       description: The Management body shall ensure that it is kept up to date with
@@ -285,10 +285,10 @@ objects:
             \ de connaissances et de comp\xE9tences suffisantes pour comprendre et\
             \ \xE9valuer les risques et les op\xE9rations li\xE9s aux TIC (par exemple,\
             \ par le biais de formations p\xE9riodiques)."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:1.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:1.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:1
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:1
       ref_id: '1.3'
       name: Digital Operational Resilience Strategy
       description: "The Management body shall set and approve the digital operational\
@@ -341,10 +341,10 @@ objects:
             rique.\n\nVeiller \xE0 ce qu\u2019un suivi soit organis\xE9 sur l\u2019\
             efficacit\xE9 de la mise en \u0153uvre de la r\xE9silience op\xE9rationnelle\
             \ num\xE9rique."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:1.4
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:1.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:1
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:1
       ref_id: '1.4'
       name: Business Continuity Oversight
       description: The Management body reviews and approves periodically (e.g. annually)
@@ -357,10 +357,10 @@ objects:
             \ (par exemple une fois par an) la politique de continuit\xE9 des activit\xE9\
             s TIC ainsi que les plans d\u2019intervention et de relance dans le domaine\
             \ des TIC."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:1.5
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:1.5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:1
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:1
       ref_id: '1.5'
       name: Audit Plan Approval and Review
       description: The Management body reviews and approves periodically (e.g. annually)
@@ -372,19 +372,19 @@ objects:
           description: "L\u2019organe de direction examine et approuve p\xE9riodiquement\
             \ (par exemple une fois par an) les plans d\u2019audit interne des TIC,\
             \ les audits TIC et les modifications importantes apport\xE9es aux audits."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:grm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:grm
       ref_id: '2'
       name: Risk Management Framework
       translations:
         fr:
           name: Cadre de gestion des risques
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:2.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:2.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:2
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:2
       ref_id: '2.1'
       name: Protection Measures
       description: "Implement policies and procedures to protect all information,\
@@ -494,10 +494,10 @@ objects:
             \ et l\u2019utilisation abusive des donn\xE9es et d\xE9finir la mani\xE8\
             re dont l\u2019entit\xE9 exploite, surveille, contr\xF4le et restaure\
             \ les actifs TIC, y compris la documentation des op\xE9rations TIC)"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:2.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:2.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:2
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:2
       ref_id: '2.2'
       name: Critical and Important Functions
       description: Identify, classify and adequately document all critical and important
@@ -583,10 +583,10 @@ objects:
             terminer quelles fonctions sont essentielles \xE0 la stabilit\xE9 et \xE0\
             \ la continuit\xE9 op\xE9rationnelles de l\u2019entit\xE9.  Examinez au\
             \ besoin, et au moins une fois par an, la pertinence de cette classification."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:2.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:2.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:2
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:2
       ref_id: '2.3'
       name: Clear Segregation of Duties (SoD)
       description: Establish Segregation of Duties (SoD) with regard to risk management
@@ -670,10 +670,10 @@ objects:
             \ les fonctions de gestion des risques, selon le mod\xE8le des trois lignes\
             \ de d\xE9fense ou le mod\xE8le interne de gestion et de contr\xF4le des\
             \ risques."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:2.4
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:2.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:2
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:2
       ref_id: '2.4'
       name: ICT Risk management framework
       description: A sound, comprehensive and well-documented ICT risk management
@@ -760,10 +760,10 @@ objects:
             \ niveau de r\xE9silience num\xE9rique. La responsabilit\xE9 de la gestion\
             \ des risques est correctement attribu\xE9e \xE0 une fonction de contr\xF4\
             le."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:2.5
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:2.5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:2
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:2
       ref_id: '2.5'
       name: Annual Framework Review and Audit Process
       description: The effectiveness of the risk management framework is monitored
@@ -852,10 +852,10 @@ objects:
             \ minimum du cadre, d\xE9clench\xE9 par des incidents informatiques majeurs,\
             \ des instructions des organismes de r\xE9glementation ou des r\xE9sultats\
             \ d\u2019audit majeurs."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:2.6
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:2.6
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:2
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:2
       ref_id: '2.6'
       name: Third-Party (Multi-vendor) Risk Management Program
       description: "Maintain a comprehensive third-party risk management program which\
@@ -958,19 +958,19 @@ objects:
             \ vis-\xE0-vis des fournisseurs de services tiers TIC et expliquant la\
             \ raison d\u2019\xEAtre de la combinaison d\u2019achats des fournisseurs\
             \ de services tiers TIC."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:3
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:grm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:grm
       ref_id: '3'
       name: Risk Asessments
       translations:
         fr:
           name: "\xC9valuation des risques"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:3.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:3.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:3
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:3
       ref_id: '3.1'
       name: Risk Assessment
       description: Identify all sources of ICT risk on a continuous basis, including
@@ -997,10 +997,10 @@ objects:
             s li\xE9es aux TIC pertinentes aux fonctions et aux actifs de l\u2019\
             entreprise. \xC9valuez l\u2019impact (potentiel) de ces menaces et vuln\xE9\
             rabilit\xE9s sur les actifs."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:3.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:3.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:3
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:3
       ref_id: '3.2'
       name: Major change risk assessment
       description: Perform a risk assessment upon each major change in the network,
@@ -1022,10 +1022,10 @@ objects:
             \ majeur dans le r\xE9seau, l\u2019infrastructure informatique et les\
             \ processus ou proc\xE9dures affectant les fonctions et les actifs de\
             \ l\u2019entreprise."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:3.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:3.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:3
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:3
       ref_id: '3.3'
       name: Legacy Systems risk assessment
       description: Conduct specific risk assessments on all legacy ICT systems, applications,
@@ -1047,19 +1047,19 @@ objects:
             \ tous les syst\xE8mes, applications ou syst\xE8mes TIC existants au moins\
             \ une fois par an. Effectuez des \xE9valuations avant et apr\xE8s la connexion\
             \ de syst\xE8mes, d\u2019applications ou de syst\xE8mes TIC existants."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:4
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:4
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:grm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:grm
       ref_id: '4'
       name: (Internal) ICT Audit
       translations:
         fr:
           name: (Interne) Audit des TIC
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:4.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:4.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:4
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:4
       ref_id: '4.1'
       name: Audit approach and frequency
       description: "The Internal audit department shall conduct audits on the following\
@@ -1091,10 +1091,10 @@ objects:
             \ des TIC\n- Fournisseurs de services tiers ICT\n\nAjustez la fr\xE9quence\
             \ et l\u2019orientation des audits en fonction du profil de risque ICT\
             \ de l\u2019entit\xE9."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:4.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:4.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:4
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:4
       ref_id: '4.2'
       name: Auditor requirements
       description: Ensure that the internal audit staff possess sufficient ICT risk
@@ -1122,10 +1122,10 @@ objects:
             de suffisamment de connaissances, de comp\xE9tences et d\u2019expertise\
             \ en mati\xE8re de risques TIC pour effectuer les audits. Assurez-vous\
             \ \xE9galement de l\u2019ind\xE9pendance de la fonction d\u2019audit."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:4.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:4.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:4
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:4
       ref_id: '4.3'
       name: Audit findings
       description: Establish a follow-up process for audit findings, including rules
@@ -1164,10 +1164,10 @@ objects:
             \ de direction. Le format et le contenu du rapport d\u2019examen doivent\
             \ satisfaire aux exigences \xE9nonc\xE9es au chapitre 5 (article 27) du\
             \ RTS RM."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:4.4
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:4.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:4
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:4
       ref_id: '4.4'
       name: Reliance Third-Party Assurance and Certifications
       description: 'Use, where appropriate, third-party certifications, third-party
@@ -1220,7 +1220,7 @@ objects:
             \ de demander l\u2019\xE9largissement de la port\xE9e est couvert par\
             \ le contrat et le droit d\u2019effectuer des v\xE9rifications discr\xE9\
             tionnaires est conserv\xE9."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:om
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:om
       assessable: false
       depth: 1
       ref_id: OM
@@ -1228,19 +1228,19 @@ objects:
       translations:
         fr:
           name: "Gestion op\xE9rationnelle"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:5
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:5
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:om
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:om
       ref_id: '5'
       name: Asset Management
       translations:
         fr:
           name: "Gestion d\u2019actifs"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:5.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:5.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:5
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:5
       ref_id: '5.1'
       name: Resilient Systems
       description: 'Use and maintain ICT systems, protocols, and tools that are up
@@ -1268,10 +1268,10 @@ objects:
             silience technologique pour faire face aux besoins de traitement suppl\xE9\
             mentaires dans des conditions de march\xE9 tendues ou d\u2019autres conditions\
             \ de march\xE9 d\xE9favorables."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:5.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:5.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:5
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:5
       ref_id: '5.2'
       name: Inventory Management
       description: "Keep an inventory of (ICT) assets, monitor their life-cycle and\
@@ -1309,10 +1309,10 @@ objects:
             s quoi il n\u2019est plus pris en charge par son fournisseur ou par un\
             \ fournisseur de services tiers TIC.\n\nId\xE9alement, la gestion des\
             \ stocks est effectu\xE9e de mani\xE8re automatis\xE9e et continue."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:5.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:5.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:5
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:5
       ref_id: '5.3'
       name: Asset Classification and Documentation
       description: Identify, classify and document all ICT-supported business functions,
@@ -1355,19 +1355,19 @@ objects:
             \ et de cette documentation au moins une fois par ann\xE9e, en s\u2019\
             assurant qu\u2019elles r\xE9pondent aux exigences relatives \xE0 la tenue\
             \ de registres exacts et \xE0 jour des biens."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:6
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:6
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:om
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:om
       ref_id: '6'
       name: Change Management
       translations:
         fr:
           name: Gestion du changement
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:6.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:6.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:6
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:6
       ref_id: '6.1'
       name: Change Procedures
       description: Ensure that all changes to software, hardware, firmware components,
@@ -1403,10 +1403,10 @@ objects:
             ind\xE9pendance entre les fonctions qui approuvent les changements et\
             \ ceux qui sont responsables de les demander et de les mettre en \u0153\
             uvre."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:6.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:6.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:6
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:6
       ref_id: '6.2'
       name: Security Requirements
       description: Identify the potential impact of a change on existing security
@@ -1433,10 +1433,10 @@ objects:
             s en cas d\u2019abandon des modifications ou de r\xE9cup\xE9ration des\
             \ modifications qui n\u2019ont pas \xE9t\xE9 mises en \u0153uvre avec\
             \ succ\xE8s."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:6.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:6.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:6
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:6
       ref_id: '6.3'
       name: Emergency Change Management
       description: Define procedures for documenting, reevaluating, assessing, and
@@ -1455,10 +1455,10 @@ objects:
           description: "D\xE9finir des proc\xE9dures pour documenter, r\xE9\xE9valuer,\
             \ \xE9valuer et approuver la mise en \u0153uvre des modifications d\u2019\
             urgence, y compris les solutions de contournement et les correctifs."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:6.4
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:6.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:6
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:6
       ref_id: '6.4'
       name: OTAP Implementation
       description: Ensure segregation of production environments from development,
@@ -1486,19 +1486,19 @@ objects:
             s dans un environnement de production sont clairement identifi\xE9s, justifi\xE9\
             s, pour des p\xE9riodes de temps limit\xE9es approuv\xE9es par la fonction\
             \ concern\xE9e."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:7
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:7
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:om
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:om
       ref_id: '7'
       name: ICT Operations
       translations:
         fr:
           name: "Op\xE9rations TIC"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:7.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:7.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:7
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:7
       ref_id: '7.1'
       name: ICT Monitoring
       description: Develop, document and implement capacity and performance management
@@ -1525,10 +1525,10 @@ objects:
             \ et am\xE9liorer la disponibilit\xE9 des donn\xE9es et des syst\xE8mes\
             \ TIC et l\u2019efficacit\xE9 des syst\xE8mes TIC et pr\xE9venir les p\xE9\
             nuries de capacit\xE9s TIC."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:7.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:7.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:7
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:7
       ref_id: '7.2'
       name: Clock Synchronization Standardization
       description: Ensure clock synchronization of all ICT systems to a single reliable
@@ -1547,10 +1547,10 @@ objects:
           name: "Normalisation de la synchronisation de l\u2019horloge"
           description: "Assurer la synchronisation de l\u2019horloge de tous les syst\xE8\
             mes ICT avec une seule source de temps de r\xE9f\xE9rence fiable."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:7.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:7.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:7
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:7
       ref_id: '7.3'
       name: System Management and Security
       description: Provide system descriptions that encompass secure installation,
@@ -1574,10 +1574,10 @@ objects:
             limination s\xE9curis\xE9es des actifs TIC. Cela comprend la gestion des\
             \ actifs, \xE0 la fois automatis\xE9e et manuelle, ainsi que l\u2019identification\
             \ et le contr\xF4le des syst\xE8mes TIC existants."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:7.4
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:7.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:7
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:7
       ref_id: '7.4'
       name: Error Handling and Recovery
       description: Establish guidelines for handling errors, including support and
@@ -1606,7 +1606,7 @@ objects:
             \ utiliser en cas de perturbation du syst\xE8me TIC. Assurez-vous que\
             \ les coordonn\xE9es sont disponibles au cas o\xF9 les syst\xE8mes ne\
             \ seraient pas disponibles."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:cm
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:cm
       assessable: false
       depth: 1
       ref_id: CM
@@ -1614,19 +1614,19 @@ objects:
       translations:
         fr:
           name: "Gestion de la continuit\xE9"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:8
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:8
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:cm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:cm
       ref_id: '8'
       name: Backup Management
       translations:
         fr:
           name: Gestion des sauvegardes
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:8.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:8.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:8
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:8
       ref_id: '8.1'
       name: Backup Policy
       description: Define backup policies aimed at ensuring minimum downtime, limited
@@ -1659,10 +1659,10 @@ objects:
             \ des donn\xE9es et de l\u2019impact global sur l\u2019efficacit\xE9 du\
             \ march\xE9 pour garantir que les niveaux de service sont respect\xE9\
             s dans des sc\xE9narios extr\xEAmes."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:8.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:8.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:8
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:8
       ref_id: '8.2'
       name: Restore Procedures
       description: "Ensure that the activation of backup systems will not jeopardize\
@@ -1718,19 +1718,19 @@ objects:
             \ de sauvegarde et de restauration afin d\u2019offrir et de maintenir\
             \ leurs services \xE0 tout moment.\n\n*Pour la d\xE9finition du DRSP,\
             \ voir\_: https://www.esma.europa.eu/esmas-activities/markets-and-infrastructure/data-reporting-services-providers"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:9
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:9
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:cm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:cm
       ref_id: '9'
       name: Response and Recovery
       translations:
         fr:
           name: "R\xE9ponse et r\xE9tablissement"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:9.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:9.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:9
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:9
       ref_id: '9.1'
       name: Business Continuity Policy
       description: 'Establish an ICT business continuity policy that enables the continuity
@@ -1807,10 +1807,10 @@ objects:
             \ RTS RM pour les exigences sp\xE9cifiques applicables aux contreparties\
             \ centrales, aux plates-formes de n\xE9gociation et aux d\xE9positaires\
             \ centraux de titres."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:9.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:9.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:9
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:9
       ref_id: '9.2'
       name: Crisis Management
       description: Formulate and maintain a crisis management team tasked with overseeing
@@ -1871,10 +1871,10 @@ objects:
             \ crise ou d\u2019une perturbation majeure. Examiner r\xE9guli\xE8rement\
             \ les plans de r\xE9tablissement et d\u2019intervention. Faites les ajustements\
             \ n\xE9cessaires pour am\xE9liorer l\u2019efficacit\xE9."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:9.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:9.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:9
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:9
       ref_id: '9.3'
       name: Record Keeping
       description: Keep detailed records of activities conducted before, during, and
@@ -1937,10 +1937,10 @@ objects:
             ts et des pertes annuels agr\xE9g\xE9s r\xE9sultant de perturbations majeures.\
             \ Ces informations doivent \xEAtre communiqu\xE9es \xE0 l\u2019organisme\
             \ de r\xE9glementation \xE0 leur demande."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:9.4
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:9.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:9
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:9
       ref_id: '9.4'
       name: Business Impact analysis
       description: Perform a comprehensive Business Impact Analysis (BIA) of exposures
@@ -2014,10 +2014,10 @@ objects:
             \ et les services TIC soient con\xE7us et utilis\xE9s dans le plein alignement\
             \ sur le BIA, en particulier en ce qui concerne la garantie ad\xE9quate\
             \ de la redondance de tous les composants critiques."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:9.5
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:9.5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:9
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:9
       ref_id: '9.5'
       name: Response and Recovery
       description: Establish comprehensive response and recovery plans encompassing
@@ -2097,10 +2097,10 @@ objects:
             \ le co\xFBt, les risques, la logistique ou des circonstances impr\xE9\
             vues. S\u2019attaquer aux d\xE9faillances potentielles des principaux\
             \ fournisseurs de services tiers dans le domaine des TIC dans les plans."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:9.6
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:9.6
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:9
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:9
       ref_id: '9.6'
       name: Testing and Assessment
       description: "Regularly test ICT business continuity, response, and recovery\
@@ -2192,7 +2192,7 @@ objects:
             \ tests.\n\nSe r\xE9f\xE9rer aux articles 24.2-3 des RTS RM pour les exigences\
             \ sp\xE9cifiques applicables aux contreparties centrales et aux d\xE9\
             positaires centraux de garanties."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:im
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:im
       assessable: false
       depth: 1
       ref_id: IM
@@ -2200,19 +2200,19 @@ objects:
       translations:
         fr:
           name: Gestion des incidents
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:10
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:10
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:im
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:im
       ref_id: '10'
       name: Incident Classification
       translations:
         fr:
           name: Classification des incidents
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:10.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:10.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:10
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:10
       ref_id: '10.1'
       name: Incident Classification Criteria
       description: 'Classify ICT-related incidents based on their impact using the
@@ -2287,10 +2287,10 @@ objects:
             \ en 6 mois, (2) les incidents ont la m\xEAme cause profonde apparente,\
             \ (3) les incidents sont collectivement class\xE9s comme des incidents\
             \ majeurs."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:10.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:10.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:10
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:10
       ref_id: '10.2'
       name: Cyber Threat Classification Criteria
       description: Classify significant cyber threats. A threat is considered significant
@@ -2346,19 +2346,19 @@ objects:
             entit\xE9 financi\xE8re, ou si elle pourrait affecter d\u2019autres entit\xE9\
             s financi\xE8res, des fournisseurs tiers, des clients ou des contreparties\
             \ financi\xE8res."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:11
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:11
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:im
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:im
       ref_id: '11'
       name: Incident Management
       translations:
         fr:
           name: Gestion des incidents
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:11.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:11.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:11
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:11
       ref_id: '11.1'
       name: Incident Management Process
       description: Implement an incident management process to detect, manage, and
@@ -2444,10 +2444,10 @@ objects:
             s aux TIC apr\xE8s des perturbations majeures. Analysez les causes, \xE9\
             valuez la rapidit\xE9 et la qualit\xE9 des r\xE9ponses, et \xE9valuez\
             \ l\u2019escalade des incidents et l\u2019efficacit\xE9 de la communication."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:11.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:11.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:11
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:11
       ref_id: '11.2'
       name: Incident Tracking
       description: Develop procedures to identify, track, log, categorize, and classify
@@ -2502,10 +2502,10 @@ objects:
             \ touch\xE9s. Tenir des registres de tous les incidents li\xE9s aux TIC\
             \ et des cybermenaces importantes. Mettre en place un processus de surveillance\
             \ pour suivre les incidents et les cybermenaces."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:11.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:11.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:11
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:11
       ref_id: '11.3'
       name: Incident Communication and Reporting
       description: 'Create communication plans to inform both internal (staff, senior
@@ -2588,7 +2588,7 @@ objects:
             \ d\u2019incidents et les notifications sur les cybermenaces doivent suivre\
             \ les lignes directrices en mati\xE8re de contenu d\xE9finies dans les\
             \ RTS/ITS correspondantes."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:ssd
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:ssd
       assessable: false
       depth: 1
       ref_id: SSD
@@ -2596,19 +2596,19 @@ objects:
       translations:
         fr:
           name: "D\xE9veloppement de logiciels et de syst\xE8mes"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:12
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:12
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:ssd
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:ssd
       ref_id: '12'
       name: Acquisition, Development, and Maintenance
       translations:
         fr:
           name: "Acquisition, d\xE9veloppement et maintenance"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:12.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:12.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:12
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:12
       ref_id: '12.1'
       name: Policy Framework
       description: Establish and maintain a policy governing the acquisition, development,
@@ -2638,10 +2638,10 @@ objects:
             \ de s\xE9curit\xE9. Obtenir l\u2019approbation des fonctions commerciales\
             \ et des propri\xE9taires d\u2019actifs concern\xE9s conform\xE9ment \xE0\
             \ la gouvernance interne."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:12.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:12.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:12
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:12
       ref_id: '12.2'
       name: Environment Risk Mitigation Measures
       description: "Put in place measures to mitigate the risk of unintentional alteration\
@@ -2677,10 +2677,10 @@ objects:
             s approbation par la fonction concern\xE9e et, pour les entit\xE9s financi\xE8\
             res autres que les microentreprises, la notification de ces occasions\
             \ \xE0 l\u2019ICT\nfonction de gestion des risques."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:12.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:12.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:12
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:12
       ref_id: '12.3'
       name: Systems Testing Procedures
       description: Develop and follow procedures for testing and approval of all ICT
@@ -2710,10 +2710,10 @@ objects:
             quats pour fonctionner comme pr\xE9vu, y compris la qualit\xE9 des logiciels\
             \ d\xE9velopp\xE9s en interne. Effectuer des tests de s\xE9curit\xE9 des\
             \ progiciels au plus tard lors de la phase d\u2019int\xE9gration."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:12.4
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:12.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:12
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:12
       ref_id: '12.4'
       name: Source Code Reviews
       description: Conduct source code reviews encompassing static and dynamic testing,
@@ -2748,19 +2748,19 @@ objects:
             \ les vuln\xE9rabilit\xE9s du code source et des logiciels propri\xE9\
             taires fournis par des fournisseurs de services tiers ou issus de projets\
             \ open source."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:13
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:13
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:ssd
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:ssd
       ref_id: '13'
       name: Project Management
       translations:
         fr:
           name: Gestion de projet
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:13.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:13.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:13
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:13
       ref_id: '13.1'
       name: ICT Project Management Practices
       description: 'Ensure effective management of ICT projects related to acquisition,
@@ -2807,10 +2807,10 @@ objects:
             \ p\xE9riodiquement et, si n\xE9cessaire, en fonction des \xE9v\xE9nements,\
             \ en tenant compte de l\u2019importance et de la taille des projets TIC\
             \ et de l\u2019\xE9valuation des risques du projet."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:13.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:13.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:13
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:13
       ref_id: '13.2'
       name: Project Risk Management
       description: Perform a risk assessment of the ICT project. Conduct testing of
@@ -2832,7 +2832,7 @@ objects:
             \ des tests de toutes les exigences de gestion de projet, y compris les\
             \ exigences de s\xE9curit\xE9. \xC9tablissez un processus d\u2019approbation\
             \ pour le d\xE9ploiement dans l\u2019environnement de production."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:tprm
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:tprm
       assessable: false
       depth: 1
       ref_id: TPRM
@@ -2840,19 +2840,19 @@ objects:
       translations:
         fr:
           name: "Gestion des risques li\xE9s aux tiers"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:14
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:14
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:tprm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:tprm
       ref_id: '14'
       name: Third-party Due Diligence and Selection
       translations:
         fr:
           name: "Diligence raisonnable et s\xE9lection de tiers"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:14.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:14.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:14
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:14
       ref_id: '14.1'
       name: Suitability Criteria
       description: Ensure that the third-party service provider has the business reputation,
@@ -2884,10 +2884,10 @@ objects:
             \ ou des autorisations ou enregistrements requis pour fournir des services\
             \ TIC soutenant les fonctions critiques ou importantes de mani\xE8re fiable\
             \ et professionnelle."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:14.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:14.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:14
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:14
       ref_id: '14.2'
       name: Selection Criteria
       description: 'Take the following into account when selecting and assessing the
@@ -2935,19 +2935,19 @@ objects:
             \ de r\xE9glementation). V\xE9rifiez si le fournisseur de services a l\u2019\
             intention de faire appel \xE0 des sous-traitants en TIC pour une partie\
             \ importante de ses services."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:15
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:15
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:tprm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:tprm
       ref_id: '15'
       name: Third-party (Standard) Contract Management
       translations:
         fr:
           name: Gestion des contrats par des tiers (standard)
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:15.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:15.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:15
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:15
       ref_id: '15.1'
       name: Termination Rights and Conditions
       description: Define explicit termination rights including significant breaches
@@ -2975,10 +2975,10 @@ objects:
             \ donn\xE9es dans un format facilement accessible en cas de r\xE9siliation,\
             \ d\u2019insolvabilit\xE9, de r\xE9solution ou d\u2019interruption des\
             \ activit\xE9s commerciales du fournisseur de services."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:15.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:15.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:15
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:15
       ref_id: '15.2'
       name: Service Level Management
       description: Define clear and measurable service level descriptions outlining
@@ -3003,10 +3003,10 @@ objects:
             \ TIC offerts, y compris les ententes de sous-traitance. Mettre en place\
             \ des dispositions garantissant des niveaux appropri\xE9s de protection\
             \ des donn\xE9es conform\xE9ment aux exigences r\xE9glementaires."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:15.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:15.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:15
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:15
       ref_id: '15.3'
       name: Service Locations and Data Processing
       description: Specify service locations and data processing sites. Require timely
@@ -3024,10 +3024,10 @@ objects:
           description: "Sp\xE9cifiez les emplacements de service et les sites de traitement\
             \ des donn\xE9es. Exiger un avis en temps opportun de tout changement\
             \ pr\xE9vu \xE0 ces emplacements."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:15.4
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:15.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:15
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:15
       ref_id: '15.4'
       name: Cooperation in Incident Response
       description: Oblige the ICT third-party service provider to fully cooperate
@@ -3046,10 +3046,10 @@ objects:
           description: "Obliger le fournisseur de services tiers ICT \xE0 coop\xE9\
             rer pleinement avec le r\xE9gulateur et \xE0 fournir l\u2019assistance\
             \ n\xE9cessaire en cas d\u2019incident li\xE9 au service fourni."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:15.5
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:15.5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:15
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:15
       ref_id: '15.5'
       name: Participation in Security Awareness Programs
       description: Specify conditions for the participation of the service provider
@@ -3068,19 +3068,19 @@ objects:
           description: "Pr\xE9ciser les conditions de participation du prestataire\
             \ de services aux programmes/formations de sensibilisation \xE0 la s\xE9\
             curit\xE9 et de r\xE9silience."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:16
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:16
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:tprm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:tprm
       ref_id: '16'
       name: Third-party (Critical) Contract Management
       translations:
         fr:
           name: Gestion des contrats avec des tiers (critiques)
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:16.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:16.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:16
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:16
       ref_id: '16.1'
       name: (Critical) Service Level Management
       description: Ensure the contract with ICT third-party service provider delivering
@@ -3127,10 +3127,10 @@ objects:
             \ Sp\xE9cifiez des p\xE9riodes de notification pour tout changement important\
             \ susceptible d\u2019avoir une incidence sur l\u2019entit\xE9 ou les niveaux\
             \ de service convenus."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:16.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:16.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:16
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:16
       ref_id: '16.2'
       name: Contractual Clauses
       description: Secure rights for continuous performance monitoring, including
@@ -3172,10 +3172,10 @@ objects:
             me de gestion de la s\xE9curit\xE9 par le fournisseur de services. Exiger\
             \ la participation du fournisseur de services au programme de tests (avanc\xE9\
             s) de l\u2019entit\xE9, le cas \xE9ch\xE9ant."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:16.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:16.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:16
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:16
       ref_id: '16.3'
       name: Third-party Critical Subcontracting Management
       description: Delineate critical and important ICT services in contracts with
@@ -3225,19 +3225,19 @@ objects:
             \ convenus. Mettre en \u0153uvre les changements relatifs aux ententes\
             \ contractuelles d\xE8s que possible et documenter l\u2019\xE9ch\xE9ancier\
             \ pr\xE9vu pour la mise en \u0153uvre."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:17
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:17
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:tprm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:tprm
       ref_id: '17'
       name: Third-party Risk Management
       translations:
         fr:
           name: "Gestion des risques li\xE9s aux tiers"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:17.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:17.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:17
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:17
       ref_id: '17.1'
       name: Third-party Risk Management
       description: Manage third-party risks proportionate to dependency nature, service-related
@@ -3272,10 +3272,10 @@ objects:
             \ la disponibilit\xE9 des activit\xE9s de l\u2019entit\xE9. Testez la\
             \ r\xE9ponse et la r\xE9cup\xE9ration des services de soutien aux fonctions\
             \ critiques fournis par des tiers."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:17.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:17.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:17
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:17
       ref_id: '17.2'
       name: Pre-Contract Risk Assessment
       description: 'Perform pre-contract risk assessment. This assessment must assess
@@ -3306,10 +3306,10 @@ objects:
             r\xEAts. \xC9valuer les ressources du fournisseur de services pour assurer\
             \ la conformit\xE9 de l\u2019entit\xE9 \xE0 toutes les exigences l\xE9\
             gales et r\xE9glementaires."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:17.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:17.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:17
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:17
       ref_id: '17.3'
       name: Register of Information
       description: Maintain a comprehensive register of information related to contractual
@@ -3326,10 +3326,10 @@ objects:
             \ ceux qui soutiennent les fonctions critiques et importantes. S\u2019\
             assurer que le registre est conforme \xE0 tous les champs obligatoires\
             \ d\xE9finis dans le STI sur le registre d\u2019informations."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:17.4
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:17.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:17
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:17
       ref_id: '17.4'
       name: Contractual Requisites
       description: Only contract with service providers meeting appropriate information
@@ -3348,10 +3348,10 @@ objects:
             \ audits pour les fournisseurs de services, en s\u2019assurant que les\
             \ auditeurs poss\xE8dent les comp\xE9tences et les connaissances requises\
             \ pour des services complexes."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:17.5
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:17.5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:17
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:17
       ref_id: '17.5'
       name: Exit strategies
       description: Develop and periodically test exit strategies and plans, considering
@@ -3381,10 +3381,10 @@ objects:
             \ une sortie en douceur et une migration de la charge de travail vers\
             \ un autre fournisseur de services sans interruption de l\u2019activit\xE9\
             , perte de conformit\xE9 ou baisse de la qualit\xE9 du service."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:17.6
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:17.6
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:17
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:17
       ref_id: '17.6'
       name: Annual Reporting of New Arrangements
       description: Report new service provider arrangements to the regulator, especially
@@ -3399,19 +3399,19 @@ objects:
             \ les nouvelles ententes conclues avec les fournisseurs de services, en\
             \ particulier ceux qui soutiennent des fonctions essentielles ou importantes,\
             \ et en aviser imm\xE9diatement les services essentiels."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:18
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:18
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:tprm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:tprm
       ref_id: '18'
       name: Subcontracting Management
       translations:
         fr:
           name: Gestion de la sous-traitance
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:18.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:18.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:18
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:18
       ref_id: '18.1'
       name: Third-Party Subcontractor Due Diligence
       description: Implement due diligence procedures to evaluate third-party ICT
@@ -3476,10 +3476,10 @@ objects:
             \ stabilit\xE9 financi\xE8re. \xC9liminer les obstacles \xE0 l\u2019audit\
             \ et aux droits d\u2019acc\xE8s pour les autorit\xE9s comp\xE9tentes et\
             \ l\u2019institution financi\xE8re."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:18.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:18.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:18
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:18
       ref_id: '18.2'
       name: Subcontracting Risk Management
       description: Establish a risk management process to oversee subcontracting activities
@@ -3538,10 +3538,10 @@ objects:
             \ de services TIC tiers qui fournissent des fonctions critiques ou importantes.\
             \ Mettre en \u0153uvre des mesures proactives pour g\xE9rer les risques\
             \ cern\xE9s et am\xE9liorer la surveillance de la sous-traitance."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:18.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:18.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:18
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:18
       ref_id: '18.3'
       name: Subcontracting Monitoring
       description: Institute a process of continuous improvement and monitoring to
@@ -3596,7 +3596,7 @@ objects:
             \ d\u2019examens ind\xE9pendants et d\u2019audits de conformit\xE9. Cerner\
             \ et corriger de mani\xE8re proactive les lacunes ou les risques \xE9\
             mergents afin de renforcer la gouvernance et la surveillance de la sous-traitance."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:rt
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:rt
       assessable: false
       depth: 1
       ref_id: RT
@@ -3604,19 +3604,19 @@ objects:
       translations:
         fr:
           name: "Tests de r\xE9silience"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:19
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:19
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:rt
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:rt
       ref_id: '19'
       name: Digital Operational Resilience Testing
       translations:
         fr:
           name: "Tests de r\xE9silience op\xE9rationnelle num\xE9rique"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:19.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:19.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:19
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:19
       ref_id: '19.1'
       name: Resilience Testing Program
       description: Establish a risk-based digital operational resilience testing program
@@ -3652,10 +3652,10 @@ objects:
             \ sur tous les syst\xE8mes et applications prenant en charge des fonctions\
             \ critiques ou importantes (voir les contr\xF4les 19-20 pour les tests\
             \ de r\xE9silience op\xE9rationnelle num\xE9rique)."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:19.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:19.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:19
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:19
       ref_id: '19.2'
       name: Diverse Testing Modalities
       description: Employ a range of tests including vulnerability assessments, open
@@ -3687,10 +3687,10 @@ objects:
             \ tests bas\xE9s sur des sc\xE9narios, des tests de compatibilit\xE9,\
             \ des tests de performance, des tests de bout en bout et des tests d\u2019\
             intrusion, le cas \xE9ch\xE9ant."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:19.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:19.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:19
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:19
       ref_id: '19.3'
       name: Periodic TLPT Testing
       description: "Conduct Threat-led penetration testing (TLPT) every three years,\
@@ -3756,19 +3756,19 @@ objects:
             le ne s\u2019applique qu\u2019aux institutions financi\xE8res qui sont\
             \ \xE9ligibles au TLPT. Reportez-vous aux RTS sur TLPT pour plus d\u2019\
             informations sur l\u2019applicabilit\xE9."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:20
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:20
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:rt
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:rt
       ref_id: '20'
       name: Threat-led Penetration Testing (TLPT)
       translations:
         fr:
           name: "Tests d\u2019intrusion bas\xE9s sur la menace (TLPT)"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:20.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:20.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:20
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:20
       ref_id: '20.1'
       name: Outsourced System testing
       description: 'Extend TLPT to critical outsourced systems, processes, and technologies.
@@ -3829,10 +3829,10 @@ objects:
             \n*Notez que ce contr\xF4le ne s\u2019applique qu\u2019aux institutions\
             \ financi\xE8res qui sont \xE9ligibles au TLPT. Reportez-vous aux RTS\
             \ sur TLPT pour plus d\u2019informations sur l\u2019applicabilit\xE9."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:20.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:20.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:20
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:20
       ref_id: '20.2'
       name: Selection of TLPT Testers
       description: 'Engage either internal or external TLPT testers, with external
@@ -3900,7 +3900,7 @@ objects:
             \ ce contr\xF4le ne s\u2019applique qu\u2019aux institutions financi\xE8\
             res qui sont \xE9ligibles au TLPT. Reportez-vous aux RTS sur TLPT pour\
             \ plus d\u2019informations sur l\u2019applicabilit\xE9."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:sm
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:sm
       assessable: false
       depth: 1
       ref_id: SM
@@ -3908,19 +3908,19 @@ objects:
       translations:
         fr:
           name: "Gestion de la s\xE9curit\xE9"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:21
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:21
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:sm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:sm
       ref_id: '21'
       name: Architectural and Network Security
       translations:
         fr:
           name: "S\xE9curit\xE9 architecturale et r\xE9seau"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:21.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:21.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:21
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:21
       ref_id: '21.1'
       name: Network Design and Segmentation
       description: Design the network infrastructure in a way that allows it to be
@@ -3956,10 +3956,10 @@ objects:
             \ de tous les r\xE9seaux et flux de donn\xE9es. Effectuer des \xE9valuations\
             \ annuelles des performances de l\u2019architecture et de la conception\
             \ du r\xE9seau."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:21.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:21.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:21
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:21
       ref_id: '21.2'
       name: Network Security
       description: "Implement controls to prevent and detect unauthorized network\
@@ -4013,10 +4013,10 @@ objects:
             \ ou importantes, les entit\xE9s financi\xE8res v\xE9rifient l\u2019ad\xE9\
             quation des r\xE8gles de pare-feu et des filtres de connexion existants\
             \ au moins tous les six mois."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:21.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:21.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:21
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:21
       ref_id: '21.3'
       name: Session Management
       description: Enforce procedures to limit, lock, and terminate system and remote
@@ -4034,19 +4034,19 @@ objects:
           description: "Appliquez des proc\xE9dures pour limiter, verrouiller et mettre\
             \ fin aux sessions syst\xE8me et \xE0 distance apr\xE8s une p\xE9riode\
             \ d\u2019inactivit\xE9 pr\xE9d\xE9finie."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:22
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:22
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:sm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:sm
       ref_id: '22'
       name: Security Monitoring & Log Management
       translations:
         fr:
           name: "Surveillance de la s\xE9curit\xE9 et gestion des journaux"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:22.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:22.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:22
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:22
       ref_id: '22.1'
       name: Security Monitoring (SIEM)
       description: Put in place mechanisms to detect anomalous activities, including
@@ -4093,10 +4093,10 @@ objects:
             \ soutenant des fonctions critiques ou importantes. Consacrer des ressources\
             \ suffisantes aux activit\xE9s de d\xE9tection et de surveillance, en\
             \ particulier aux attaques de cybers\xE9curit\xE9."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:22.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:22.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:22
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:22
       ref_id: '22.2'
       name: Event Identification for Logging
       description: Identify events to be logged, covering logical access, physical
@@ -4139,10 +4139,10 @@ objects:
             \ de conservation des journaux, en tenant compte des objectifs commerciaux\
             \ et de s\xE9curit\xE9, de l\u2019objectif de l\u2019enregistrement des\
             \ journaux et des \xE9valuations des risques."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:22.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:22.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:22
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:22
       ref_id: '22.3'
       name: Secure Handling of Log Data
       description: Implement measures to secure and handle log data, taking into account
@@ -4179,19 +4179,19 @@ objects:
             \ Prot\xE9gez l\u2019enregistrement des activit\xE9s anormales contre\
             \ les manipulations et les acc\xE8s non autoris\xE9s au repos, en cours\
             \ d\u2019utilisation, le cas \xE9ch\xE9ant et en transit."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:23
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:23
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:sm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:sm
       ref_id: '23'
       name: Data and (Legacy) System Security
       translations:
         fr:
           name: "S\xE9curit\xE9 des donn\xE9es et des syst\xE8mes (h\xE9rit\xE9s)"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:23.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:23.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:23
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:23
       ref_id: '23.1'
       name: ICT (Security) Systems, tools, and solutions
       description: Design, procure, and implement security solutions and tooling with
@@ -4211,10 +4211,10 @@ objects:
             \ et des outils de s\xE9curit\xE9 dans le but d\u2019assurer la r\xE9\
             silience, la continuit\xE9 et l\u2019ICA des syst\xE8mes TIC, en particulier\
             \ ceux qui soutiennent des fonctions critiques ou importantes."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:23.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:23.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:23
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:23
       ref_id: '23.2'
       name: Data Protection Practices
       description: Establish a secure configuration baseline for ICT assets, incorporating
@@ -4250,10 +4250,10 @@ objects:
             \ restrictions d\u2019acc\xE8s bas\xE9es sur des sch\xE9mas de classification\
             \ des donn\xE9es. V\xE9rifier r\xE9guli\xE8rement le d\xE9ploiement effectif\
             \ de ces r\xE9f\xE9rences."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:23.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:23.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:23
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:23
       ref_id: '23.3'
       name: Vendor Recommended Security Settings
       description: Consider the security measures and settings recommended by the
@@ -4275,10 +4275,10 @@ objects:
             \ service TIC. Mettre en \u0153uvre des mesures techniques et organisationnelles\
             \ pour minimiser les risques li\xE9s \xE0 l\u2019infrastructure utilis\xE9\
             e et g\xE9r\xE9e par le fournisseur de services tiers ICT."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:23.4
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:23.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:23
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:23
       ref_id: '23.4'
       name: Endpoint Devices
       description: Enforce usage requirements for portable and nonportable endpoint
@@ -4317,10 +4317,10 @@ objects:
             \ reste dans les niveaux de tol\xE9rance au risque pr\xE9d\xE9finis. Appliquez\
             \ des mesures de s\xE9curit\xE9 pour autoriser uniquement l\u2019installation\
             \ de logiciels autoris\xE9s sur les syst\xE8mes et les terminaux."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:23.5
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:23.5
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:23
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:23
       ref_id: '23.5'
       name: Secure Data Deletion and Disposal
       description: Establish a process to securely delete data on and offpremises.
@@ -4341,19 +4341,19 @@ objects:
             \ \xE9liminer ou d\xE9sactiver en toute s\xE9curit\xE9 les dispositifs\
             \ de stockage de donn\xE9es sur site et hors site qui contiennent des\
             \ informations confidentielles."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:24
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:24
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:sm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:sm
       ref_id: '24'
       name: Encryption and Cryptography
       translations:
         fr:
           name: Cryptage et cryptographie
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:24.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:24.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:24
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:24
       ref_id: '24.1'
       name: Data Encryption
       description: Define rules for encrypting data at rest, in transit, and, where
@@ -4394,10 +4394,10 @@ objects:
             \ des r\xE8gles de chiffrement des connexions r\xE9seau internes et du\
             \ trafic avec des parties externes, align\xE9es sur la classification\
             \ des donn\xE9es et les \xE9valuations des risques."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:24.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:24.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:24
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:24
       ref_id: '24.2'
       name: Cryptographic Key Management and Lifecycle
       description: Establish protocols for the proper use, protection, and lifecycle
@@ -4452,19 +4452,19 @@ objects:
             est pas possible de modifier ou de mettre \xE0 jour la technologie cryptographique.\
             \ Tenez un registre pour tous les certificats et les p\xE9riph\xE9riques\
             \ de stockage de certificats."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:25
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:25
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:sm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:sm
       ref_id: '25'
       name: Identity and Access Management
       translations:
         fr:
           name: "Gestion des identit\xE9s et des acc\xE8s"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:25.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:25.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:25
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:25
       ref_id: '25.1'
       name: Identity Management
       description: Assign a unique identity to each staff member or staff of the third-party
@@ -4487,10 +4487,10 @@ objects:
             \ recertification, la d\xE9sactivation temporaire et la r\xE9siliation\
             \ des comptes utilisateur. Utiliser des solutions automatis\xE9es, le\
             \ cas \xE9ch\xE9ant."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:25.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:25.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:25
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:25
       ref_id: '25.2'
       name: Privilige Access Management
       description: Define access rights based on need-to-know, need-to-use, and least
@@ -4517,10 +4517,10 @@ objects:
             \ permettant l\u2019identification des utilisateurs pour toutes les actions\
             \ du syst\xE8me TIC. Mettre en \u0153uvre des contr\xF4les et des outils\
             \ pour restreindre l\u2019acc\xE8s non autoris\xE9."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:25.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:25.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:25
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:25
       ref_id: '25.3'
       name: Account Management
       description: Establish procedures for granting, changing, and revoking access
@@ -4551,10 +4551,10 @@ objects:
             \ des droits d\u2019acc\xE8s, en veillant \xE0 ce qu\u2019ils soient examin\xE9\
             s au moins une fois par an pour les syst\xE8mes TIC non critiques et semestriels\
             \ pour les syst\xE8mes critiques."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:25.4
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:25.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:25
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:25
       ref_id: '25.4'
       name: Authentication Methods
       description: Use authentication methods commensurate  with the classification
@@ -4573,19 +4573,19 @@ objects:
             \ en \u0153uvre des m\xE9thodes d\u2019authentification fortes, en particulier\
             \ pour l\u2019acc\xE8s \xE0 distance, l\u2019acc\xE8s privil\xE9gi\xE9\
             \ et l\u2019acc\xE8s aux actifs ICT critiques."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:26
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:26
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:sm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:sm
       ref_id: '26'
       name: Physical and Environmental Security
       translations:
         fr:
           name: "S\xE9curit\xE9 physique et environnementale"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:26.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:26.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:26
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:26
       ref_id: '26.1'
       name: Physical and Environmental Security
       description: Implement measures to safeguard the environment (premises, data
@@ -4636,19 +4636,19 @@ objects:
             \ fonction de la classification des actifs et de la criticit\xE9 de la\
             \ zone. R\xE9examinez r\xE9guli\xE8rement et r\xE9voquez rapidement les\
             \ droits d\u2019acc\xE8s physique inutiles."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:27
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:27
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:sm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:sm
       ref_id: '27'
       name: Security Awareness
       translations:
         fr:
           name: "Sensibilisation \xE0 la s\xE9curit\xE9"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:27.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:27.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:27
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:27
       ref_id: '27.1'
       name: Resilience Training Programs
       description: Implement security awareness and digital operational resilience
@@ -4686,10 +4686,10 @@ objects:
             \ et des canaux de signalement mis en place pour d\xE9tecter les activit\xE9\
             s anormales. En cas de cessation d\u2019emploi, tous les membres du personnel\
             \ sont tenus de restituer tous les actifs informatiques et informationnels."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:27.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:27.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:27
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:27
       ref_id: '27.2'
       name: Inclusion of Third-Party Providers
       description: Incorporate ICT third-party service providers as participants in
@@ -4715,19 +4715,19 @@ objects:
             \ En cas de cessation d\u2019emploi ou de cessation de contrat, les tiers\
             \ sont tenus de restituer tous les actifs TIC et les actifs informationnels\
             \ appartenant \xE0 l\u2019entit\xE9 financi\xE8re."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:28
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:28
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:sm
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:sm
       ref_id: '28'
       name: Vulnerability and Patch Management
       translations:
         fr:
           name: "Gestion des vuln\xE9rabilit\xE9s et des correctifs"
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:28.1
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:28.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:28
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:28
       ref_id: '28.1'
       name: Resource Management
       description: Identify and maintain relevant and trustworthy information resources
@@ -4751,10 +4751,10 @@ objects:
             \ aux vuln\xE9rabilit\xE9s. Suivez l\u2019utilisation des biblioth\xE8\
             ques tierces, y compris les biblioth\xE8ques open source, en surveillant\
             \ les versions et les mises \xE0 jour potentielles (voir aussi 28.2-3)."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:28.2
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:28.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:28
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:28
       ref_id: '28.2'
       name: Vulnerability Management
       description: 'Conduct automated vulnerability scanning and assessments on ICT
@@ -4801,10 +4801,10 @@ objects:
             rabilit\xE9 avant tout d\xE9ploiement ou red\xE9ploiement d\u2019applications\
             \ et de composants d\u2019infrastructure nouveaux ou existants, ainsi\
             \ que de services ICT soutenant des fonctions critiques ou importantes."
-    - urn: urn:intuitem:risk:req_node:norea-dora-in-control:28.3
+    - urn: urn:ciso:risk:req_node:norea-dora-in-control:28.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:norea-dora-in-control:28
+      parent_urn: urn:ciso:risk:req_node:norea-dora-in-control:28
       ref_id: '28.3'
       name: Patch Management
       description: Identify and evaluate available ICT assets (e.g., software and

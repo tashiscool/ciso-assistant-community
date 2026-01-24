@@ -74,7 +74,7 @@ wb.remove(wb.active)
 meta_data = {
     "library_meta": [
         ["type", "library"],
-        ["urn", "urn:intuitem:risk:library:vcsa-v1.1"],
+        ["urn", "urn:ciso:risk:library:vcsa-v1.1"],
         ["version", "1"],
         ["locale", "en"],
         ["ref_id", "vcsa-v1.1"],
@@ -89,12 +89,12 @@ Contact: vcs@enx.com +49 69 9866927-71
 www.enx.com
 This work has been licensed under the Creative Commons Attribution - NoDerivs 4.0 International Public License. In addition, You are granted the right to distribute derivatives under certain terms. The complete and valid text of the license is to be found in line 17ff."""],
         ["provider", "ENX"],
-        ["packager", "intuitem"]
+        ["packager", "ciso"]
     ],
     "vcsa_meta": [
         ["type", "framework"],
-        ["base_urn", "urn:intuitem:risk:req_node:vcsa-v1.1"],
-        ["urn", "urn:intuitem:risk:framework:vcsa-v1.1"],
+        ["base_urn", "urn:ciso:risk:req_node:vcsa-v1.1"],
+        ["urn", "urn:ciso:risk:framework:vcsa-v1.1"],
         ["ref_id", "vcsa-v1.1"],
         ["name", "Vehicle CyberSecurity Audit (VCSA) v1.1"],
         ["description", """The VCSA serves as the basis for 

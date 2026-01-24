@@ -1,5 +1,5 @@
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
-import intuitemSveltekit from './plugins/eslint/eslint-plugin-intuitem-sveltekit/index.js';
+import cisoSveltekit from './plugins/eslint/eslint-plugin-ciso-sveltekit/index.js';
 import globals from 'globals';
 import tsParser from '@typescript-eslint/parser';
 import parser from 'svelte-eslint-parser';
@@ -44,7 +44,7 @@ export default [
 	{
 		plugins: {
 			'@typescript-eslint': typescriptEslint,
-			'eslint-plugin-intuitem-sveltekit': intuitemSveltekit
+			'eslint-plugin-ciso-sveltekit': cisoSveltekit
 		},
 
 		languageOptions: {
@@ -63,7 +63,7 @@ export default [
 		},
 
 		rules: {
-			'eslint-plugin-intuitem-sveltekit/secure-redirect': 'error'
+			'eslint-plugin-ciso-sveltekit/secure-redirect': 'error'
 		}
 	},
 	{

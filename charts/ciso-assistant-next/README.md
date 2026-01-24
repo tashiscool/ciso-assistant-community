@@ -19,14 +19,14 @@ A Helm chart for CISO Assistant k8s's deployment
 To install the chart, firt get the values.yaml file and customize values.
 
 ```
-helm show values oci://ghcr.io/intuitem/helm-charts/ce/ciso-assistant > custom.yaml
+helm show values oci://ghcr.io/tashiscool/helm-charts/ce/ciso-assistant > custom.yaml
 ```
 
 Make sure to pin the appVersion to one of the official releases, if you don't want the app to auto-update each time you restart the deployment.
 
 To deploy the release :
 ```
-helm install ciso-assistant-release oci://ghcr.io/intuitem/helm-charts/ce/ciso-assistant -f custom.yaml
+helm install ciso-assistant-release oci://ghcr.io/tashiscool/helm-charts/ce/ciso-assistant -f custom.yaml
 ```
 
 ## Values
@@ -53,7 +53,7 @@ helm install ciso-assistant-release oci://ghcr.io/intuitem/helm-charts/ce/ciso-a
 | backend.huey.resources | object | `{}` | Resources for Huey |
 | backend.image.imagePullPolicy | string | `""` (defaults to global.image.imagePullPolicy) | Image pull policy for the backend |
 | backend.image.registry | string | `""` (defaults to global.image.registry) | Registry to use for the backend |
-| backend.image.repository | string | `"intuitem/ciso-assistant-community/backend"` | Repository to use for the backend |
+| backend.image.repository | string | `"tashiscool/ciso-assistant-community/backend"` | Repository to use for the backend |
 | backend.image.tag | string | `""` (defaults to global.image.tag) | Tag to use for the backend |
 | backend.imagePullSecrets | list | `[]` (defaults to global.imagePullSecrets) | Secrets with credentials to pull images from a private registry |
 | backend.name | string | `"backend"` | Backend container name |
@@ -86,7 +86,7 @@ helm install ciso-assistant-release oci://ghcr.io/intuitem/helm-charts/ce/ciso-a
 | frontend.env | list | `[]` | Environment variables to pass to frontend |
 | frontend.image.imagePullPolicy | string | `""` (defaults to global.image.imagePullPolicy) | Image pull policy for the frontend |
 | frontend.image.registry | string | `""` (defaults to global.image.registry) | Registry to use for the frontend |
-| frontend.image.repository | string | `"intuitem/ciso-assistant-community/frontend"` | Repository to use for the frontend |
+| frontend.image.repository | string | `"tashiscool/ciso-assistant-community/frontend"` | Repository to use for the frontend |
 | frontend.image.tag | string | `""` (defaults to global.image.tag) | Tag to use for the frontend |
 | frontend.imagePullSecrets | list | `[]` (defaults to global.imagePullSecrets) | Secrets with credentials to pull images from a private registry |
 | frontend.name | string | `"frontend"` | Frontend container name |

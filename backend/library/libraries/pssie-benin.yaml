@@ -1,4 +1,4 @@
-urn: urn:intuitem:risk:library:pssie-benin
+urn: urn:ciso:risk:library:pssie-benin
 locale: fr
 ref_id: PSSIE-BENIN
 name: "PSSIE du B\xE9nin "
@@ -11,7 +11,7 @@ provider: ASIN BENIN
 packager: Joanny DEGBOE
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:pssie-benin
+    urn: urn:ciso:risk:framework:pssie-benin
     ref_id: PSSIE-BENIN
     name: "PSSIE du B\xE9nin"
     description: "Politique de s\xE9curit\xE9 des syst\xE8mes d'information de l'Etat\
@@ -24,23 +24,23 @@ objects:
       name: Normal
       description: null
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.1
       assessable: false
       depth: 1
       ref_id: '4.1'
       name: "Organisation de la s\xE9curit\xE9 des syst\xE8mes d'information"
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.1:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.1:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.1
       name: OBJECTIF 1
       description: "Etablir un cadre de gestion pour engager, puis v\xE9rifier la\
         \ mise en oeuvre et le fonctionnement de la s\xE9curit\xE9 des syst\xE8mes\
         \ d'information au sein de l'entit\xE9."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:org-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:org-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.1:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.1:1
       ref_id: ORG-01
       name: "Fonction s\xE9curit\xE9"
       description: "R\xE8gle :\nChaque entit\xE9 est tenue de d\xE9signer un RSSI\
@@ -54,10 +54,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:org-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:org-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.1:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.1:1
       ref_id: ORG-02
       name: "Coordination de la s\xE9curit\xE9"
       description: "R\xE8gle :\nL'entit\xE9 cr\xE9e un comit\xE9 s\xE9curit\xE9 des\
@@ -72,10 +72,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:org-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:org-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.1:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.1:1
       ref_id: ORG-03
       name: "S\xE9paration des t\xE2ches"
       description: "R\xE8gle :\nL'administration des diff\xE9rents composants du syst\xE8\
@@ -91,10 +91,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:org-04
+    - urn: urn:ciso:risk:req_node:pssie-benin:org-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.1:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.1:1
       ref_id: ORG-04
       name: "Responsabilit\xE9s des administrateurs informatiques"
       description: "R\xE8gle : \nL'entit\xE9 doit encadrer, d'un point de vue s\xE9\
@@ -105,10 +105,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:org-05
+    - urn: urn:ciso:risk:req_node:pssie-benin:org-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.1:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.1:1
       ref_id: ORG-05
       name: "Relations avec les autorit\xE9s comp\xE9tentes en s\xE9curit\xE9 SI"
       description: "L'entit\xE9 doit entretenir des relations \xE9troites avec l'ANSSI,\
@@ -119,10 +119,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:org-06
+    - urn: urn:ciso:risk:req_node:pssie-benin:org-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.1:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.1:1
       ref_id: ORG-06
       name: "Relations avec des groupes de sp\xE9cialites en s\xE9curit\xE9 SI."
       description: "L'entit\xE9 doit d\xE9finir une proc\xE9dure de veille permettant\
@@ -134,22 +134,22 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.2
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.2
       assessable: false
       depth: 1
       ref_id: '4.2'
       name: "S\xE9curit\xE9 des ressources humaines"
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.2:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.2:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.2
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.2
       name: OBJECTIF 2
       description: "Faire des ressources humaines, un maillon fort de la s\xE9curit\xE9\
         \ des syst\xE8mes."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:rh-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:rh-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.2:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.2:1
       ref_id: RH-01
       name: "S\xE9lection des candidats"
       description: "R\xE8gle :\nLe recrutement des r\xF4les de confiance (administrateurs\
@@ -163,10 +163,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:rh-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:rh-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.2:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.2:1
       ref_id: RH-02
       name: "Engagement s\xE9curit\xE9"
       description: "R\xE8gle :\nTout personnel embauch\xE9 (interne, partenaire ou\
@@ -182,10 +182,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:rh-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:rh-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.2:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.2:1
       ref_id: RH-03
       name: "Int\xE9gration des nouvelles recrues"
       description: "R\xE8gle : \nLe circuit d'int\xE9gration des nouvelles recrues\
@@ -195,10 +195,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:rh-04
+    - urn: urn:ciso:risk:req_node:pssie-benin:rh-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.2:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.2:1
       ref_id: RH-04
       name: Sensibilisation du personnel
       description: "R\xE8gle : \nL'entit\xE9 doit dispenser r\xE9guli\xE8rement et\
@@ -210,10 +210,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:rh-05
+    - urn: urn:ciso:risk:req_node:pssie-benin:rh-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.2:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.2:1
       ref_id: RH-05
       name: Mouvement du personnel
       description: "R\xE8gle :\nUne proc\xE9dure permettant de g\xE9rer les mobilit\xE9\
@@ -228,10 +228,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:rh-06
+    - urn: urn:ciso:risk:req_node:pssie-benin:rh-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.2:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.2:1
       ref_id: RH-06
       name: Mesures disciplinaires
       description: "R\xE8gle : \nL'entit\xE9 doit pr\xE9voir les sanctions applicables\
@@ -241,23 +241,23 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.3
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.3
       assessable: false
       depth: 1
       ref_id: '4.3'
       name: "Gestion des actifs du syst\xE8me d'information"
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.3:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.3:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.3
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.3
       name: OBJECTIF 3
       description: "Identifier les actifs du syst\xE8me d'information de l'entit\xE9\
         \ et s'assurer que les responsabilit\xE9s sont d\xE9finies pour la protection\
         \ des actifs."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:act-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:act-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.3:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.3:1
       ref_id: ACT-01
       name: Inventaire des actifs SI
       description: "R\xE8gle : \nChaque entit\xE9 \xE9tablit et maintient \xE0 jour\
@@ -268,10 +268,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:act-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:act-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.3:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.3:1
       ref_id: ACT-02
       name: "Responsabilit\xE9s sur les actifs"
       description: "R\xE8gle : \nA chaque actif SI identifi\xE9, l'entit\xE9 doit\
@@ -280,10 +280,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:act-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:act-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.3:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.3:1
       ref_id: ACT-03
       name: Usage correct des actifs SI
       description: "R\xE8gle : \nA chaque actif SI identifi\xE9, l'entit\xE9 doit\
@@ -294,17 +294,17 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.3:2
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.3:2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.3
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.3
       name: OBJECTIF 4
       description: "Identifier la sensibilit\xE9 des actifs du SI pour permettre aux\
         \ utilisateurs d'en faire un bon usage."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:act-04
+    - urn: urn:ciso:risk:req_node:pssie-benin:act-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.3:2
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.3:2
       ref_id: ACT-04
       name: "Sensibilit\xE9 des actifs"
       description: "R\xE8gle :\nLa sensibilit\xE9 de tout actif SI identifi\xE9 doit\
@@ -318,10 +318,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:act-05
+    - urn: urn:ciso:risk:req_node:pssie-benin:act-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.3:2
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.3:2
       ref_id: ACT-05
       name: Marquage des actifs SI sensibles
       description: "R\xE8gle : \nL'entit\xE9 doit proc\xE9der au marquage physique\
@@ -331,16 +331,16 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.3:3
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.3:3
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.3
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.3
       name: OBJECTIF 5
       description: "Ma\xEEtriser la s\xE9curit\xE9 du cycle de la vie des actifs."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:act-06
+    - urn: urn:ciso:risk:req_node:pssie-benin:act-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.3:3
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.3:3
       ref_id: ACT-06
       name: Cycle de vie des actifs SI
       description: "R\xE8gle : \nL'entit\xE9 d\xE9finit des proc\xE9dures encadrant\
@@ -349,17 +349,17 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.3:4
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.3:4
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.3
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.3
       name: OBJECTIF 6
       description: "S\xE9curiser les informations qui sont stock\xE9es sur les supports\
         \ num\xE9riques."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:act-07
+    - urn: urn:ciso:risk:req_node:pssie-benin:act-07
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.3:4
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.3:4
       ref_id: ACT-07
       name: "Chiffrement des supports num\xE9riques"
       description: "R\xE8gle :\nLes supports num\xE9riques stockant des donn\xE9es\
@@ -368,10 +368,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:act-08
+    - urn: urn:ciso:risk:req_node:pssie-benin:act-08
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.3:4
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.3:4
       ref_id: ACT-08
       name: Supports physiques en transit
       description: "R\xE8gle : \nL'entit\xE9 doit \xE9laborer et appliquer une proc\xE9\
@@ -381,10 +381,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:act-09
+    - urn: urn:ciso:risk:req_node:pssie-benin:act-09
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.3:4
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.3:4
       ref_id: ACT-09
       name: Reforme (cession ou vente) des passifs du SI/Mise au rebut
       description: "R\xE8gle : \nL'entit\xE9 doit s'assurer que les mat\xE9riels et\
@@ -397,21 +397,21 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.4
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.4
       assessable: false
       depth: 1
       ref_id: '4.4'
       name: "Contr\xF4le d'acc\xE8s logique au syst\xE8me d'information"
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.4:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.4:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.4
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.4
       name: OBJECTIF 7
       description: "Limiter l'acc\xE8s aux SI aux seules personnes autoris\xE9es."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:cal-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:cal-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.4:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.4:1
       ref_id: CAL-01
       name: "Politique de contr\xF4le d'acc\xE8s"
       description: "R\xE8gle : \nUn document de politique de contr\xF4le d'acc\xE8\
@@ -423,10 +423,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:cal-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:cal-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.4:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.4:1
       ref_id: CAL-02
       name: Identifiant utilisateur
       description: "R\xE8gle : \nChaque utilisateur interne ou externe \xE0 l'entit\xE9\
@@ -436,10 +436,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:cal-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:cal-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.4:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.4:1
       ref_id: CAL-03
       name: Identifiant administrateur
       description: "Les identifiants \xAB administrateurs \xBB donnant acc\xE8s aux\
@@ -450,10 +450,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:cal-04
+    - urn: urn:ciso:risk:req_node:pssie-benin:cal-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.4:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.4:1
       ref_id: CAL-04
       name: Authentifiant utilisateur
       description: "R\xE8gle : \nChaque utilisateur acc\xE9dant au syst\xE8me d'information\
@@ -466,10 +466,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:cal-05
+    - urn: urn:ciso:risk:req_node:pssie-benin:cal-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.4:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.4:1
       ref_id: CAL-05
       name: Authentifiant administrateur
       description: "R\xE8gle : \nLes identifiants permettant l'administration des\
@@ -480,10 +480,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:cal-06
+    - urn: urn:ciso:risk:req_node:pssie-benin:cal-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.4:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.4:1
       ref_id: CAL-06
       name: "Enregistrement et d\xE9sinscription des utilisateurs"
       description: "R\xE8gle : \nUne proc\xE9dure formelle de cr\xE9ation et de suspension\
@@ -496,10 +496,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:cal-07
+    - urn: urn:ciso:risk:req_node:pssie-benin:cal-07
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.4:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.4:1
       ref_id: CAL-07
       name: "Ma\xEEtrise des acc\xE8s utilisiteurs"
       description: "R\xE8gle : \nUne proc\xE9dure formelle de cr\xE9ation, de revue\
@@ -512,10 +512,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:cal-08
+    - urn: urn:ciso:risk:req_node:pssie-benin:cal-08
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.4:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.4:1
       ref_id: CAL-08
       name: Politique de mot de passe
       description: "R\xE8gle : \nL'entit\xE9 doit d\xE9finir et impl\xE9menter au\
@@ -525,24 +525,24 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.5
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.5
       assessable: false
       depth: 1
       ref_id: '4.5'
       name: "S\xE9curit\xE9 physique des locaux et mat\xE9riels abritant les actifs\
         \ SI"
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.5:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.5:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.5
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.5
       name: OBJECTIF 8
       description: "Identifier les actifs du syst\xE8me d'information de l'entit\xE9\
         \ et s'assurer que les responsabilit\xE9s sont d\xE9finies pour la protection\
         \ des actifs."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:phy-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:phy-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.5:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.5:1
       ref_id: PHY-01
       name: "P\xE9rim\xE8tre de s\xE9curit\xE9"
       description: "R\xE8gle : \nTous les \xE9quipements qui sont r\xE9pertori\xE9\
@@ -553,10 +553,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:phy-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:phy-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.5:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.5:1
       ref_id: PHY-02
       name: "Contr\xF4le physique des acc\xE8s du personnel"
       description: "R\xE8gle : \nSeules les personnes autoris\xE9es \xE0 p\xE9n\xE9\
@@ -567,10 +567,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:phy-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:phy-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.5:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.5:1
       ref_id: PHY-03
       name: Locaux sensibles
       description: "R\xE8gle : \nSeules les personnes autoris\xE9es \xE0 p\xE9n\xE9\
@@ -584,10 +584,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:phy-04
+    - urn: urn:ciso:risk:req_node:pssie-benin:phy-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.5:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.5:1
       ref_id: PHY-04
       name: "Acc\xE8s des visiteurs"
       description: "R\xE8gle : \nL'entit\xE9 doit d\xE9finir une proc\xE9dure formelle\
@@ -597,10 +597,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:phy-05
+    - urn: urn:ciso:risk:req_node:pssie-benin:phy-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.5:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.5:1
       ref_id: PHY-05
       name: "Protection des ports physiques d'acc\xE8s au r\xE9seau"
       description: "R\xE8gle : \nTout acc\xE8s r\xE9seau install\xE9 dans une zone\
@@ -609,10 +609,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:phy-06
+    - urn: urn:ciso:risk:req_node:pssie-benin:phy-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.5:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.5:1
       ref_id: PHY-06
       name: "Gestion des cl\xE9s physiques des locaux"
       description: "R\xE8gle : \nPour des raisons de continuit\xE9 de service, l'usage\
@@ -622,10 +622,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:phy-07
+    - urn: urn:ciso:risk:req_node:pssie-benin:phy-07
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.5:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.5:1
       ref_id: PHY-07
       name: Travail dans les locaux abritant les actifs SI
       description: "R\xE8gle : \nL'entit\xE9 doit r\xE9diger et afficher dans tous\
@@ -634,17 +634,17 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.5:2
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.5:2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.5
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.5
       name: OBJECTIF 9
       description: "Emp\xEAcher la perte, l'endommagement, le vol, ou la compromission\
         \ des actifs SI."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:phy-08
+    - urn: urn:ciso:risk:req_node:pssie-benin:phy-08
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.5:2
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.5:2
       ref_id: PHY-08
       name: "Emplacement du mat\xE9riel"
       description: "R\xE8gle : \nLes mat\xE9riels sensibles sont install\xE9s dans\
@@ -656,10 +656,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:phy-09
+    - urn: urn:ciso:risk:req_node:pssie-benin:phy-09
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.5:2
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.5:2
       ref_id: PHY-09
       name: "Service g\xE9n\xE9raux"
       description: "R\xE8gle : \nL'ensemble des mat\xE9riels sensibles doit \xEAtre\
@@ -668,10 +668,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:phy-10
+    - urn: urn:ciso:risk:req_node:pssie-benin:phy-10
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.5:2
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.5:2
       ref_id: PHY-10
       name: "S\xE9curit\xE9 du c\xE2blage r\xE9seau"
       description: "R\xE8gle : \nL'ensemble des c\xE2bles r\xE9seaux doit \xEAtre\
@@ -682,10 +682,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:phy-11
+    - urn: urn:ciso:risk:req_node:pssie-benin:phy-11
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.5:2
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.5:2
       ref_id: PHY-11
       name: "Maintenance du mat\xE9riel"
       description: "R\xE8gle : \nPour les actifs SI vitaux, un contrat de maintenance\
@@ -695,10 +695,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:phy-12
+    - urn: urn:ciso:risk:req_node:pssie-benin:phy-12
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.5:2
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.5:2
       ref_id: PHY-12
       name: "Sortie du mat\xE9riel"
       description: "R\xE8gle : \nAucun mat\xE9riel contenant des donn\xE9es de l'entit\xE9\
@@ -709,22 +709,22 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.6
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.6
       assessable: false
       depth: 1
       ref_id: '4.6'
       name: "S\xE9curit\xE9 des r\xE9seaux informatiques"
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.6:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.6:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.6
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.6
       name: OBJECTIF 10
       description: "Garantir la protection de l'information sur les r\xE9seaux informatiques\
         \ de l'entit\xE9."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:resx-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:resx-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.6:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.6:1
       ref_id: RESX-01
       name: "Architecture r\xE9seau"
       description: "R\xE8gle :\nL'architecture r\xE9seau du syst\xE8me d'information\
@@ -736,10 +736,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:resx-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:resx-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.6:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.6:1
       ref_id: RESX-02
       name: "Cloisonment r\xE9seau"
       description: "R\xE8gle : \nAfin de r\xE9duire les risques d'interception de\
@@ -751,10 +751,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:resx-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:resx-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.6:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.6:1
       ref_id: RESX-03
       name: "Contr\xF4le sur les r\xE9seaux"
       description: "R\xE8gle : \nL'ensemble des flux entrants et sortants d'une zone\
@@ -764,10 +764,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:resx-04
+    - urn: urn:ciso:risk:req_node:pssie-benin:resx-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.6:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.6:1
       ref_id: RESX-04
       name: "Ma\xEEtrise des flux"
       description: "R\xE8gle : \nL'entit\xE9 doit \xE9tablir et maintenir \xE0 jour\
@@ -779,10 +779,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:resx-05
+    - urn: urn:ciso:risk:req_node:pssie-benin:resx-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.6:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.6:1
       ref_id: RESX-05
       name: "Configuration des \xE9quipements r\xE9seaux"
       description: "R\xE8gle : \nLes configurations op\xE9rationnelles des \xE9quipements\
@@ -792,10 +792,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:resx-06
+    - urn: urn:ciso:risk:req_node:pssie-benin:resx-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.6:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.6:1
       ref_id: RESX-06
       name: "Acc\xE8s distants"
       description: "R\xE8gle : \nL'acc\xE8s d'utilisateurs distants ne doit \xEAtre\
@@ -806,10 +806,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:resx-07
+    - urn: urn:ciso:risk:req_node:pssie-benin:resx-07
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.6:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.6:1
       ref_id: RESX-07
       name: "Services g\xE9n\xE9raux"
       description: "R\xE8gle :\nLe d\xE9ploiement du r\xE9seau sans fil doit \xEA\
@@ -821,10 +821,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:resx-08
+    - urn: urn:ciso:risk:req_node:pssie-benin:resx-08
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.6:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.6:1
       ref_id: RESX-08
       name: "Interconnexion avec les r\xE9seaux externes"
       description: "R\xE8gle : \nUn inventaire exact de l'ensemble des interconnexions\
@@ -837,10 +837,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:resx-09
+    - urn: urn:ciso:risk:req_node:pssie-benin:resx-09
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.6:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.6:1
       ref_id: RESX-09
       name: "Connexion des \xE9quipements au r\xE9seau"
       description: "R\xE8gle : \nSeuls les \xE9quipements ma\xEEtris\xE9s (configur\xE9\
@@ -849,22 +849,22 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.7
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.7
       assessable: false
       depth: 1
       ref_id: '4.7'
       name: "S\xE9curit\xE9 du poste de travail utilisateur"
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.7:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.7:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.7
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.7
       name: OBJECTIF 11
       description: "Fournir aux utilisateurs, des postes de travail s\xE9curis\xE9\
         s pour leurs activit\xE9s professionnelles."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:pdt-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:pdt-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.7:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.7:1
       ref_id: PDT-01
       name: Attribution, usage et restitution
       description: "R\xE8gle : \nLe processus d'attribution des postes de travail\
@@ -873,10 +873,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:pdt-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:pdt-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.7:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.7:1
       ref_id: PDT-02
       name: "Privil\xE8ges sur les postes"
       description: "R\xE8gle : \nLes utilisateurs ne doivent pas avoir, par d\xE9\
@@ -889,10 +889,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:pdt-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:pdt-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.7:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.7:1
       ref_id: PDT-03
       name: Configuration des postes de travail
       description: "R\xE8gle :\nLes postes de travail sont d\xE9ploy\xE9s conform\xE9\
@@ -907,10 +907,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:pdt-04
+    - urn: urn:ciso:risk:req_node:pssie-benin:pdt-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.7:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.7:1
       ref_id: PDT-04
       name: "Installation des composants logiciels et mat\xE9riels"
       description: "Seuls les composants logiciels ou mat\xE9riels valid\xE9s peuvent\
@@ -920,10 +920,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:pdt-05
+    - urn: urn:ciso:risk:req_node:pssie-benin:pdt-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.7:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.7:1
       ref_id: PDT-05
       name: Partage des fichiers
       description: "R\xE8gle :\nLe partage de r\xE9pertoires ou de donn\xE9es h\xE9\
@@ -934,10 +934,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:pdt-06
+    - urn: urn:ciso:risk:req_node:pssie-benin:pdt-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.7:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.7:1
       ref_id: PDT-06
       name: "Sauvegarde des donn\xE9es"
       description: "R\xE8gle : \nDans le cas o\xF9 des donn\xE9es doivent \xEAtre\
@@ -947,10 +947,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:pdt-07
+    - urn: urn:ciso:risk:req_node:pssie-benin:pdt-07
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.7:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.7:1
       ref_id: PDT-07
       name: "R\xE9affectation d'un poste de travail d\xE9j\xE0 utilis\xE9"
       description: "R\xE8gle : \nL'entit\xE9 d\xE9finit une proc\xE9dure concernant\
@@ -959,10 +959,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:pdt-08
+    - urn: urn:ciso:risk:req_node:pssie-benin:pdt-08
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.7:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.7:1
       ref_id: PDT-08
       name: "Utilisation des \xE9quipements personnels (BYOD)"
       description: "R\xE8gle : \nL'entit\xE9 d\xE9finit une politique d'utilisation\
@@ -972,10 +972,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:pdt-09
+    - urn: urn:ciso:risk:req_node:pssie-benin:pdt-09
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.7:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.7:1
       ref_id: PDT-09
       name: Chiffrement des postes de travail
       description: "R\xE8gle : \nLes unit\xE9s de stockages des postes de travail\
@@ -985,21 +985,21 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.8
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.8
       assessable: false
       depth: 1
       ref_id: '4.8'
       name: "S\xE9curit\xE9 des \xE9quipements itin\xE9rants"
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.8:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.8:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.8
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.8
       name: OBJECTIF 12
       description: "Prot\xE9ger l'information stock\xE9e sur des \xE9quipements nomades."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:itin-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:itin-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.8:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.8:1
       ref_id: ITIN-01
       name: "Stockage des donn\xE9es sensibles"
       description: "R\xE8gle : \nLe stockage local d'information sur les postes de\
@@ -1009,10 +1009,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:itin-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:itin-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.8:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.8:1
       ref_id: ITIN-02
       name: "Filtre de confidentialit\xE9"
       description: "R\xE8gle : \nPour les postes de travail nomades manipulant des\
@@ -1022,10 +1022,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:itin-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:itin-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.8:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.8:1
       ref_id: ITIN-03
       name: Pare-feu local
       description: "R\xE8gle : \nUn pare-feu local conforme aux recommandations de\
@@ -1033,10 +1033,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:itin-04
+    - urn: urn:ciso:risk:req_node:pssie-benin:itin-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.8:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.8:1
       ref_id: ITIN-04
       name: Protection physique
       description: "R\xE8gle : \nUn c\xE2ble physique de s\xE9curit\xE9 doit \xEA\
@@ -1044,10 +1044,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:itin-05
+    - urn: urn:ciso:risk:req_node:pssie-benin:itin-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.8:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.8:1
       ref_id: ITIN-05
       name: Incident de perte/vol
       description: "R\xE8gle : \nL'entit\xE9 doit d\xE9finir une proc\xE9dure de r\xE9\
@@ -1056,22 +1056,22 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.9
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.9
       assessable: false
       depth: 1
       ref_id: '4.9'
       name: "S\xE9curit\xE9 li\xE9e \xE0 l'exploitation des SI"
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.9:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.9:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.9
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.9
       name: OBJECTIF 13
       description: "Assurer l'exploitation correcte et s\xE9curis\xE9e des SI et g\xE9\
         rer les actions d'administration du SI."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:exp-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:exp-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.9:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.9:1
       ref_id: EXP-01
       name: "Proc\xE9dures d'exploitation"
       description: "R\xE8gle : \nChaque entit\xE9 doit documenter les proc\xE9dures\
@@ -1084,10 +1084,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:exp-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:exp-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.9:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.9:1
       ref_id: EXP-02
       name: "Acc\xE8s aux outils et interfaces d'administration"
       description: "R\xE8gle : \nL'acc\xE8s aux outils et interfaces d'administration\
@@ -1096,10 +1096,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:exp-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:exp-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.9:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.9:1
       ref_id: EXP-03
       name: "Administration \xE0 distance"
       description: "R\xE8gle : \nLes actions d'administration \xE0 distance sur les\
@@ -1108,10 +1108,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:exp-04
+    - urn: urn:ciso:risk:req_node:pssie-benin:exp-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.9:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.9:1
       ref_id: EXP-04
       name: "Configuration syst\xE8me"
       description: "R\xE8gle : \nLes syst\xE8mes d'exploitation et les logiciels doivent\
@@ -1121,10 +1121,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:exp-05
+    - urn: urn:ciso:risk:req_node:pssie-benin:exp-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.9:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.9:1
       ref_id: EXP-05
       name: Dimensionnement
       description: "R\xE8gle : \nDes analyses r\xE9guli\xE8res du bon dimensionnement\
@@ -1135,10 +1135,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:exp-06
+    - urn: urn:ciso:risk:req_node:pssie-benin:exp-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.9:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.9:1
       ref_id: EXP-06
       name: Protection contre les codes malveillants
       description: "Regle :\nL'entit\xE9 doit formaliser et mettre en \u0153uvre une\
@@ -1151,10 +1151,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:exp-07
+    - urn: urn:ciso:risk:req_node:pssie-benin:exp-07
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.9:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.9:1
       ref_id: EXP-07
       name: Utilisation de la messagerie personnelle et professionnelle
       description: "R\xE8gle : \nLe syst\xE8me de messagerie professionnelle mis en\
@@ -1164,10 +1164,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:exp-08
+    - urn: urn:ciso:risk:req_node:pssie-benin:exp-08
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.9:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.9:1
       ref_id: EXP-08
       name: "Sauvegarde des donn\xE9es"
       description: "R\xE8gle : \nChaque entit\xE9 doit mettre en place des proc\xE9\
@@ -1181,10 +1181,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:exp-09
+    - urn: urn:ciso:risk:req_node:pssie-benin:exp-09
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.9:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.9:1
       ref_id: EXP-09
       name: "Journalisation des \xE9v\xE8nements s\xE9curit\xE9"
       description: "R\xE8gle : \nDes m\xE9canismes permettant de surveiller l'utilisation\
@@ -1196,10 +1196,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:exp-10
+    - urn: urn:ciso:risk:req_node:pssie-benin:exp-10
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.9:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.9:1
       ref_id: EXP-10
       name: Synchronisation des horloges
       description: "Regle :\nLes serveurs et \xE9quipements r\xE9seaux doivent \xE9\
@@ -1208,10 +1208,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:exp-11
+    - urn: urn:ciso:risk:req_node:pssie-benin:exp-11
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.9:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.9:1
       ref_id: EXP-11
       name: "Mesures relatives aux vuln\xE9rabilit\xE9s techniques"
       description: "R\xE8gle :\nDes \xE9tudes de vuln\xE9rabilit\xE9s syst\xE8me et\
@@ -1224,10 +1224,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:exp-12
+    - urn: urn:ciso:risk:req_node:pssie-benin:exp-12
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.9:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.9:1
       ref_id: EXP-12
       name: "Surveillance des  \xE9v\xE8nements s\xE9curit\xE9"
       description: "R\xE8gle : \nLes actifs critiques (serveurs, routeurs de t\xEA\
@@ -1239,24 +1239,24 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.10
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.10
       assessable: false
       depth: 1
       ref_id: '4.10'
       name: " S\xE9curit\xE9 dans l'acquisition, le d\xE9veloppement et la maintenance\
         \ des SI"
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.10:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.10:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.10
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.10
       name: OBJECTIF 14
       description: "Int\xE9grer la s\xE9curit\xE9 dans le cycle de vie des syst\xE8\
         mes d'information qu'ils soient acquis ou d\xE9velopp\xE9s par l'entit\xE9\
         ."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:adm-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:adm-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.10:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.10:1
       ref_id: ADM-01
       name: "S\xE9curit\xE9 dans les projets"
       description: "R\xE8gle :\nLa s\xE9curit\xE9 doit \xEAtre int\xE9gr\xE9e \xE0\
@@ -1271,10 +1271,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:adm-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:adm-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.10:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.10:1
       ref_id: ADM-02
       name: "Sp\xE9cifications s\xE9curit\xE9"
       description: "R\xE8gle : \nLes cahiers de charges en vue de l'acquisition, du\
@@ -1283,10 +1283,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:adm-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:adm-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.10:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.10:1
       ref_id: ADM-03
       name: Choix des produits
       description: "R\xE8gle : \nLes progiciels et produits achet\xE9s sont soit certifi\xE9\
@@ -1297,10 +1297,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:adm-04
+    - urn: urn:ciso:risk:req_node:pssie-benin:adm-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.10:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.10:1
       ref_id: ADM-04
       name: "D\xE9veloppement des applications"
       description: "R\xE8gle :\nLes applications d\xE9velopp\xE9es par l'entit\xE9\
@@ -1312,10 +1312,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:adm-05
+    - urn: urn:ciso:risk:req_node:pssie-benin:adm-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.10:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.10:1
       ref_id: ADM-05
       name: "Externalisation du d\xE9veloppement applicatif"
       description: "R\xE8gle : \nLes fournisseurs externes de logiciels doivent garantir\
@@ -1327,10 +1327,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:adm-06
+    - urn: urn:ciso:risk:req_node:pssie-benin:adm-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.10:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.10:1
       ref_id: ADM-06
       name: "Recette s\xE9curit\xE9 (Homologation)"
       description: "R\xE8gle :\nPar d\xE9faut, avant la mise en production de tout\
@@ -1344,10 +1344,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:adm-07
+    - urn: urn:ciso:risk:req_node:pssie-benin:adm-07
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.10:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.10:1
       ref_id: ADM-07
       name: "Donn\xE9es de test"
       description: "R\xE8gle :\nEn r\xE8gle g\xE9n\xE9rale, les donn\xE9es utilis\xE9\
@@ -1361,10 +1361,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:adm-08
+    - urn: urn:ciso:risk:req_node:pssie-benin:adm-08
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.10:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.10:1
       ref_id: ADM-08
       name: "Collecte et traitement des donn\xE9es \xE0 caract\xE8re personnel"
       description: "R\xE8gle : \nLes entit\xE9s doivent se r\xE9f\xE9rer \xE0 l'APDP\
@@ -1373,22 +1373,22 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.11
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.11
       assessable: false
       depth: 1
       ref_id: '4.11'
       name: "S\xE9curit\xE9 des e-services"
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.11:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.11:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.11
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.11
       name: OBJECTIF 15
       description: "S\xE9curiser les informations impliqu\xE9es dans les applications\
         \ de e-services."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:esv-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:esv-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.11:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.11:1
       ref_id: ESV-01
       name: "S\xE9curit\xE9 des services d'application en ligne"
       description: "R\xE8gle :\nToute plateforme de e-services doit employer des m\xE9\
@@ -1401,10 +1401,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:esv-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:esv-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.11:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.11:1
       ref_id: ESV-02
       name: Filtrage applicatif
       description: "R\xE8gle : \nL'entit\xE9 qui met en \u0153uvre une plateforme\
@@ -1412,21 +1412,21 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.12
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.12
       assessable: false
       depth: 1
       ref_id: '4.12'
       name: "S\xE9curit\xE9 des applications Web"
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.12:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.12:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.12
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.12
       name: OBJECTIF 16
       description: "S\xE9curiser les applications expos\xE9es sur Internet."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:saw-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:saw-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.12:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.12:1
       ref_id: SAW-01
       name: "Evaluation des risques sp\xE9cifiques"
       description: "R\xE8gle : \nL'entit\xE9 doit identifier et documenter les risques\
@@ -1436,10 +1436,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:saw-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:saw-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.12:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.12:1
       ref_id: SAW-02
       name: "Exigences de s\xE9curit\xE9 sp\xE9cifiques"
       description: "R\xE8gle : \nLes exigences de s\xE9curit\xE9 doivent \xEAtre \xE9\
@@ -1452,10 +1452,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:saw-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:saw-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.12:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.12:1
       ref_id: SAW-03
       name: "Utilisation des outils de d\xE9veloppement des applications et sites\
         \ web"
@@ -1469,10 +1469,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:saw-04
+    - urn: urn:ciso:risk:req_node:pssie-benin:saw-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.12:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.12:1
       ref_id: SAW-04
       name: "Donn\xE9es en transit"
       description: "R\xE8gle : \nLe protocole SSL doit \xEAtre utilis\xE9 \xE0 tous\
@@ -1483,10 +1483,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:saw-05
+    - urn: urn:ciso:risk:req_node:pssie-benin:saw-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.12:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.12:1
       ref_id: SAW-05
       name: Certificats SSL
       description: "R\xE8gle : \nL'entit\xE9 doit avoir recours \xE0 des certificats\
@@ -1498,10 +1498,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:saw-06
+    - urn: urn:ciso:risk:req_node:pssie-benin:saw-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.12:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.12:1
       ref_id: SAW-06
       name: Pages d'erreur
       description: "R\xE8gle : \nToutes les pages d'erreurs doivent \xEAtre personnalis\xE9\
@@ -1509,10 +1509,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:saw-07
+    - urn: urn:ciso:risk:req_node:pssie-benin:saw-07
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.12:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.12:1
       ref_id: SAW-07
       name: "Infrastructure d'h\xE9bergement"
       description: "R\xE8gle : \nL'infrastructure pr\xE9vue pour h\xE9berger l'application\
@@ -1523,23 +1523,23 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.13
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.13
       assessable: false
       depth: 1
       ref_id: '4.13'
       name: Mesures cryptographiques
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.13:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.13:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.13
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.13
       name: OBJECTIF 17
       description: "Garantir l'utilisation correcte et efficace de la cryptographie\
         \ en vue de prot\xE9ger la confidentialit\xE9, l'authenticit\xE9 et/ou l'int\xE9\
         grit\xE9 de l'information."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:cry-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:cry-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.13:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.13:1
       ref_id: CRY-01
       name: Politique cryptographique
       description: "Regle :\nLorsqu'elle met en oeuvre des fonctions de s\xE9curit\xE9\
@@ -1554,10 +1554,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:cry-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:cry-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.13:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.13:1
       ref_id: CRY-02
       name: "Usage des certificats \xE9lctroniques"
       description: "Regle :\nLorsque l'entit\xE9 recourt \xE0 des certificats \xE9\
@@ -1571,10 +1571,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:cry-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:cry-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.13:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.13:1
       ref_id: CRY-03
       name: "Exigences de s\xE9curit\xE9 sp\xE9cifiques"
       description: "R\xE8gle : \nL'entit\xE9 doit documenter les proc\xE9dures pour\
@@ -1586,23 +1586,23 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.14
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.14
       assessable: false
       depth: 1
       ref_id: '4.14'
       name: Relations avec les fournisseurs
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.14:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.14:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.14
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.14
       name: OBJECTIF 18
       description: "Int\xE9grer la s\xE9curit\xE9 dans le cycle de vie des syst\xE8\
         mes d'information qu'ils soient acquis ou d\xE9velopp\xE9s par l'entit\xE9\
         ."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:frn-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:frn-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.14:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.14:1
       ref_id: FRN-01
       name: Accord de non-divulgation
       description: "R\xE8gle : \nTout contrat commercial entre l'entit\xE9 et un tiers\
@@ -1612,10 +1612,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:frn-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:frn-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.14:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.14:1
       ref_id: FRN-02
       name: "Contractualisation des exigences de s\xE9curit\xE9"
       description: "R\xE8gle : \nToute fourniture de biens et/ou services dans le\
@@ -1630,10 +1630,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:frn-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:frn-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.14:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.14:1
       ref_id: FRN-03
       name: "Contr\xF4le des acc\xE8s des intervenants tiers"
       description: "R\xE8gle : \nUn inventaire des acc\xE8s physiques et/ou logiques\
@@ -1644,10 +1644,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:frn-04
+    - urn: urn:ciso:risk:req_node:pssie-benin:frn-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.14:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.14:1
       ref_id: FRN-04
       name: "Engagement s\xE9curit\xE9 des intervenants tiers"
       description: "R\xE8gle : \nTout intervenant d'un tiers amen\xE9 \xE0 interf\xE9\
@@ -1657,10 +1657,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:frn-05
+    - urn: urn:ciso:risk:req_node:pssie-benin:frn-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.14:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.14:1
       ref_id: FRN-05
       name: "Surveillance de la s\xE9curit\xE9 li\xE9e aux prestations"
       description: "R\xE8gle : \nDurant la prestation, les diff\xE9rentes mesures\
@@ -1672,10 +1672,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:frn-06
+    - urn: urn:ciso:risk:req_node:pssie-benin:frn-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.14:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.14:1
       ref_id: FRN-06
       name: Cessation de la relation
       description: "R\xE8gle : \nTous les actifs SI confi\xE9s au tiers dans le cadre\
@@ -1686,22 +1686,22 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.15
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.15
       assessable: false
       depth: 1
       ref_id: '4.15'
       name: "S\xE9curit\xE9 du cloud computing"
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.15:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.15:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.15
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.15
       name: OBJECTIF 19
       description: " Assurer la s\xE9curit\xE9 des informations h\xE9berg\xE9es dans\
         \ une infrastructure cloud."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:scc-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:scc-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.15:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.15:1
       ref_id: SCC-01
       name: Externalisation dans le cloud
       description: "R\xE8gle : \nLes processus m\xE9tiers et les services \xE0 externaliser\
@@ -1713,10 +1713,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:scc-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:scc-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.15:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.15:1
       ref_id: SCC-02
       name: "S\xE9lection d'un fournisseur cloud national"
       description: "R\xE8gle : \nL'entit\xE9 doit donner priorit\xE9 aux Datacenters\
@@ -1724,10 +1724,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:scc-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:scc-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.15:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.15:1
       ref_id: SCC-03
       name: "S\xE9lection d'un fournisseur cloud non national"
       description: "R\xE8gle :\nL'entit\xE9 doit veiller \xE0 souscrire \xE0 des services\
@@ -1742,10 +1742,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:scc-04
+    - urn: urn:ciso:risk:req_node:pssie-benin:scc-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.15:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.15:1
       ref_id: SCC-04
       name: Aspect contractuels
       description: "R\xE8gle : \nUn accord de non-divulgation doit \xEAtre sign\xE9\
@@ -1760,10 +1760,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:scc-05
+    - urn: urn:ciso:risk:req_node:pssie-benin:scc-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.15:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.15:1
       ref_id: SCC-05
       name: "Protection des donn\xE9es"
       description: "R\xE8gle : \nL'entit\xE9 doit veiller \xE0 impl\xE9menter des\
@@ -1776,23 +1776,23 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.16
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.16
       assessable: false
       depth: 1
       ref_id: '4.16'
       name: "Gestion des incidents de s\xE9curit\xE9"
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.16:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.16:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.16
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.16
       name: OBJECTIF 20
       description: "Garantir une m\xE9thode coh\xE9rente et efficace de gestion des\
         \ incidents li\xE9s \xE0 la s\xE9curit\xE9 du SI, incluant la communication\
         \ des \xE9v\xE9nements et des failles li\xE9s \xE0 la s\xE9curit\xE9."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:inc-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:inc-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.16:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.16:1
       ref_id: INC-01
       name: "Signalement des incidents s\xE9curit\xE9 SI"
       description: "R\xE8gle : \nUne proc\xE9dure de signalement d'incidents li\xE9\
@@ -1802,10 +1802,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:inc-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:inc-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.16:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.16:1
       ref_id: INC-02
       name: "R\xE9ponse aux incidents s\xE9curit\xE9 SI"
       description: "R\xE8gle : \nLes proc\xE9dures de r\xE9ponse aux incidents li\xE9\
@@ -1816,10 +1816,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:inc-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:inc-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.16:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.16:1
       ref_id: INC-03
       name: "R\xE9pertoire des incidents s\xE9curit\xE9 SI"
       description: "R\xE8gle : \nLa typologie et la description des incidents li\xE9\
@@ -1830,10 +1830,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:inc-04
+    - urn: urn:ciso:risk:req_node:pssie-benin:inc-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.16:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.16:1
       ref_id: INC-04
       name: Collecte des traces
       description: "R\xE8gle :\nL'entit\xE9 doit mettre en place une proc\xE9dure\
@@ -1846,23 +1846,23 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.17
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.17
       assessable: false
       depth: 1
       ref_id: '4.17'
       name: "Gestion de la continuit\xE9 de la s\xE9curit\xE9 du SI"
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.17:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.17:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.17
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.17
       name: OBJECTIF 21
       description: "Faire en sorte que la s\xE9curit\xE9 des syst\xE8mes d'information\
         \ fasse partie int\xE9grante du processus de continuit\xE9 d'activit\xE9 de\
         \ l'entit\xE9."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:cont-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:cont-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.17:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.17:1
       ref_id: CONT-01
       name: "Plan de continuit\xE9 de la s\xE9curit\xE9 SI"
       description: "R\xE8gle : \nChaque entit\xE9 doit d\xE9velopper un plan de continuit\xE9\
@@ -1872,10 +1872,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:cont-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:cont-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.17:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.17:1
       ref_id: CONT-02
       name: "Int\xE9gration de la s\xE9curit\xE9 dans les plans de continuit\xE9/reprise\
         \ d'activit\xE9 informatique"
@@ -1886,10 +1886,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:cont-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:cont-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.17:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.17:1
       ref_id: CONT-03
       name: Redondance
       description: "R\xE8gle : \nLes architectures SI doivent \xEAtre d\xE9pourvues\
@@ -1897,10 +1897,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:cont-04
+    - urn: urn:ciso:risk:req_node:pssie-benin:cont-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.17:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.17:1
       ref_id: CONT-04
       name: "tests du plan de continuit\xE9 de la s\xE9curit\xE9 SI"
       description: "R\xE8gle : \nLe plan de continuit\xE9 de la s\xE9curit\xE9 du\
@@ -1910,24 +1910,24 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.18
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.18
       assessable: false
       depth: 1
       ref_id: '4.18'
       name: "Conformit\xE9, audit et contr\xF4les de s\xE9curit\xE9"
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.18:1
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.18:1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.18
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.18
       name: OBJECTIF 22
       description: "\xC9viter toute violation des obligations l\xE9gales, statutaires,\
         \ r\xE9glementaires ou contractuelles relatives \xE0 la s\xE9curit\xE9 de\
         \ l'information, \xE9viter toute violation des exigences de s\xE9curit\xE9\
         ."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:conf-01
+    - urn: urn:ciso:risk:req_node:pssie-benin:conf-01
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.18:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.18:1
       ref_id: CONF-01
       name: "Droits de propri\xE9t\xE9 intellectuelle"
       description: "R\xE8gle : \nL'entit\xE9 doit se soumettre au texte du code du\
@@ -1941,10 +1941,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:conf-02
+    - urn: urn:ciso:risk:req_node:pssie-benin:conf-02
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.18:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.18:1
       ref_id: CONF-02
       name: "Donn\xE9es \xE0 caract\xE8re personnel"
       description: "R\xE8gle : \nLes entit\xE9s doivent se r\xE9f\xE9rer \xE0 l'APDP\
@@ -1953,10 +1953,10 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:conf-03
+    - urn: urn:ciso:risk:req_node:pssie-benin:conf-03
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.18:1
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.18:1
       ref_id: CONF-03
       name: Mesures cryptographiques
       description: "R\xE8gle : \nL'entit\xE9 doit se conformer aux dispositions du\
@@ -1965,17 +1965,17 @@ objects:
       annotation: Normal
       implementation_groups:
       - N
-    - urn: urn:intuitem:risk:req_node:pssie-benin:4.18:2
+    - urn: urn:ciso:risk:req_node:pssie-benin:4.18:2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.18
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.18
       name: OBJECTIF 23
       description: "Effectuer des contr\xF4les et des exercices r\xE9guliers de fa\xE7\
         on \xE0 mesurer les progr\xE8s accomplis et corriger les manquements."
-    - urn: urn:intuitem:risk:req_node:pssie-benin:conf-04
+    - urn: urn:ciso:risk:req_node:pssie-benin:conf-04
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.18:2
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.18:2
       ref_id: CONF-04
       name: "Contr\xF4les locaux"
       description: "R\xE8gle : \nLa conformit\xE9 \xE0 la PSSIE et \xE0 la PSSI sp\xE9\
@@ -1986,10 +1986,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:conf-05
+    - urn: urn:ciso:risk:req_node:pssie-benin:conf-05
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.18:2
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.18:2
       ref_id: CONF-05
       name: "Audits de s\xE9curit\xE9"
       description: "R\xE8gle : \nDes audits de s\xE9curit\xE9 approfondis du SI doivent\
@@ -1998,10 +1998,10 @@ objects:
       annotation: Critique
       implementation_groups:
       - C
-    - urn: urn:intuitem:risk:req_node:pssie-benin:conf-06
+    - urn: urn:ciso:risk:req_node:pssie-benin:conf-06
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:pssie-benin:4.18:2
+      parent_urn: urn:ciso:risk:req_node:pssie-benin:4.18:2
       ref_id: CONF-06
       name: "Encadrement des audits effectu\xE9s par les tierces parties"
       description: "R\xE8gle : \nLes audits de s\xE9curit\xE9 r\xE9alis\xE9s sur les\

@@ -1,4 +1,4 @@
-urn: urn:intuitem:risk:library:risk-matrix-5x5-iso27005
+urn: urn:ciso:risk:library:risk-matrix-5x5-iso27005
 locale: en
 ref_id: risk-matrix-5x5-iso27005
 name: 5x5 ISO-27005
@@ -6,8 +6,8 @@ description: 5x5 matrix from ISO 27005 Annex A
 copyright: ISO
 version: 4
 publication_date: 2025-02-21
-provider: intuitem
-packager: intuitem
+provider: ciso
+packager: ciso-assistant
 translations:
   fr:
     name: Matrice 5x5 ISO-27005
@@ -17,7 +17,7 @@ translations:
     description: Matrice 5x5 descritta nella norma ISO-27005 allegato A
 objects:
   risk_matrix:
-  - urn: urn:intuitem:risk:matrix:5x5-iso27005
+  - urn: urn:ciso:risk:matrix:5x5-iso27005
     ref_id: risk-matrix-5x5-iso27005
     name: 5x5 ISO-27005
     description: 5x5 matrix from ISO 27005 Annex A

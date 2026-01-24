@@ -1,7 +1,7 @@
 services:
   backend:
     container_name: backend
-    image: ghcr.io/intuitem/ciso-assistant-community/backend:latest
+    image: ghcr.io/tashiscool/ciso-assistant-community/backend:latest
     pull_policy: always
     restart: always
     environment:
@@ -21,7 +21,7 @@ services:
 
   huey:
     container_name: huey
-    image: ghcr.io/intuitem/ciso-assistant-community/backend:latest
+    image: ghcr.io/tashiscool/ciso-assistant-community/backend:latest
     pull_policy: always
     depends_on:
       backend:
@@ -48,7 +48,7 @@ services:
       - PUBLIC_BACKEND_API_EXPOSED_URL=https://localhost:8443/api
       - PROTOCOL_HEADER=x-forwarded-proto
       - HOST_HEADER=x-forwarded-host
-    image: ghcr.io/intuitem/ciso-assistant-community/frontend:latest
+    image: ghcr.io/tashiscool/ciso-assistant-community/frontend:latest
     pull_policy: always
     restart: always
     depends_on:

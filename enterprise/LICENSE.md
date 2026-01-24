@@ -8,7 +8,7 @@ Access to files in this directory and its subdirectories does not constitute per
 ---
 
 ## Copyright Notice
-Copyright (c) 2024 intuitem SARL.
+Copyright (c) 2024 tashiscool SARL.
 
 ---
 
@@ -28,7 +28,7 @@ This license governs the use of the **CISO Assistant** source code located in th
 
 ## Scope
 - This license applies to the content of the `"enterprise"` directory.
-- Binaries for **CISO Assistant** located directly under the `ghcr.io/intuitem/` namespace are also released under this Intuitem Commercial License.
+- Binaries for **CISO Assistant** located directly under the `ghcr.io/tashiscool/` namespace are also released under this Intuitem Commercial License.
 - Third-party components incorporated into the Software are licensed under their respective original licenses.
 
 ---
@@ -44,4 +44,4 @@ The Software is provided "AS IS," without any warranties. Intuitem and its licen
 ---
 
 ## Contact
-For licensing inquiries, subscriptions, or more information, please contact **[contact@intuitem.com](mailto:contact@intuitem.com)** or visit **[www.intuitem.com](http://www.intuitem.com)**.
+For licensing inquiries, subscriptions, or more information, please contact **[contact@tashiscool.com](mailto:contact@tashiscool.com)** or visit **[www.tashiscool.com](http://www.tashiscool.com)**.

@@ -1,4 +1,4 @@
-urn: urn:intuitem:risk:library:nist-ssdf-1.1
+urn: urn:ciso:risk:library:nist-ssdf-1.1
 locale: en
 ref_id: nist-ssdf-1.1
 name: Secure Software Development Framework (SSDF)
@@ -11,10 +11,10 @@ copyright: With the exception of material marked as copyrighted, information pre
 version: 1
 publication_date: 2024-05-02
 provider: NIST
-packager: intuitem
+packager: ciso-assistant
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:nist-ssdf-1.1
+    urn: urn:ciso:risk:framework:nist-ssdf-1.1
     ref_id: nist-ssdf-1.1
     name: Secure Software Development Framework (SSDF)
     description: The Secure Software Development Framework (SSDF), SP 800-218, is
@@ -22,7 +22,7 @@ objects:
       on established secure software development practice documents from organizations
       such as BSA, OWASP, and SAFECode
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po
       assessable: false
       depth: 1
       ref_id: PO
@@ -31,10 +31,10 @@ objects:
         are prepared to perform secure software development at the organization level.
         Many organizations will find some PO practices to also be applicable to subsets
         of their software development, like individual development groups or projects.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po
       ref_id: PO.1
       name: Define Security Requirements for Software Development
       description: "Ensure that security requirements for software development are\
@@ -44,18 +44,18 @@ objects:
         \ from internal sources (e.g., the organization\u2019s policies, business\
         \ objectives, and risk management strategy) and external sources (e.g., applicable\
         \ laws and regulations)."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.1.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.1.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.1
       ref_id: PO.1.1
       description: "Identify and document all security requirements for the organization\u2019\
         s software development infrastructures and processes, and maintain the requirements\
         \ over time."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node5
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node5
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.1.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.1.1
       description: "Example 1: Define policies for securing software development infrastructures\
         \ and their components, including development endpoints, throughout the SDLC\
         \ and maintaining that security.\nExample 2: Define policies for securing\
@@ -66,17 +66,17 @@ objects:
         \ from internal or external sources, or a major security incident targeting\
         \ software development infrastructure has occurred. \nExample 4: Educate affected\
         \ individuals on impending changes to requirements."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.1.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.1.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.1
       ref_id: PO.1.2
       description: Identify and document all security requirements for organization-developed
         software to meet, and maintain the requirements over time.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node7
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node7
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.1.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.1.2
       description: "Example 1: Define policies that specify risk-based software architecture\
         \ and design requirements, such as making code modular to facilitate code\
         \ reuse and updates; isolating security components from other components during\
@@ -100,18 +100,18 @@ objects:
         \ or a major security incident targeting organization-developed software has\
         \ occurred. \nExample 7: Establish and follow processes for handling requirement\
         \ exception requests, including periodic reviews of all approved exceptions."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.1.3
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.1.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.1
       ref_id: PO.1.3
       description: "Communicate requirements to all third parties who will provide\
         \ commercial software components to the organization for reuse by the organization\u2019\
         s own software. [Formerly PW.3.1]"
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node9
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node9
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.1.3
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.1.3
       description: "Example 1: Define a core set of security requirements for software\
         \ components, and include it in acquisition documents, software contracts,\
         \ and other agreements with third parties.\nExample 2: Define security-related\
@@ -125,27 +125,27 @@ objects:
         \ follow processes to address risk when there are security requirements that\
         \ third-party software components to be acquired do not meet; this should\
         \ include periodic reviews of all approved exceptions to requirements."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po
       ref_id: PO.2
       name: Implement Roles and Responsibilities
       description: Ensure that everyone inside and outside of the organization involved
         in the SDLC is prepared to perform their SDLC-related roles and responsibilities
         throughout the SDLC.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.2.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.2.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.2
       ref_id: PO.2.1
       description: Create new roles and alter responsibilities for existing roles
         as needed to encompass all parts of the SDLC. Periodically review and maintain
         the defined roles and responsibilities, updating them as needed.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node12
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node12
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.2.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.2.1
       description: 'Example 1: Define SDLC-related roles and responsibilities for
         all members of the software development team.
 
@@ -168,18 +168,18 @@ objects:
 
         Example 7: Designate a group of individuals or a team as the code owner for
         each project.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.2.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.2.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.2
       ref_id: PO.2.2
       description: Provide role-based training for all personnel with responsibilities
         that contribute to secure development. Periodically review personnel proficiency
         and role-based training, and update the training as needed.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node14
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node14
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.2.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.2.2
       description: 'Example 1: Document the desired outcomes of training for each
         role.
 
@@ -193,18 +193,18 @@ objects:
 
         Example 5: Measure outcome performance to identify areas where changes to
         training may be beneficial.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.2.3
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.2.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.2
       ref_id: PO.2.3
       description: Obtain upper management or authorizing official commitment to secure
         development, and convey that commitment to all with development-related roles
         and responsibilities.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node16
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node16
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.2.3
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.2.3
       description: "Example 1: Appoint a single leader or leadership team to be responsible\
         \ for the entire secure software development process, including being accountable\
         \ for releasing software to production and delegating responsibilities as\
@@ -216,10 +216,10 @@ objects:
         \ roles and responsibilities.\nExample 4: Educate all personnel with development-related\
         \ roles and responsibilities on upper management\u2019s commitment to secure\
         \ development and the importance of secure development to the organization."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.3
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.3
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po
       ref_id: PO.3
       name: Implement Supporting Toolchains
       description: Use automation to reduce human effort and improve the accuracy,
@@ -228,18 +228,18 @@ objects:
         these practices. Toolchains and tools may be used at different levels of the
         organization, such as organization-wide or project-specific, and may address
         a particular part of the SDLC, like a build pipeline.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.3.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.3.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.3
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.3
       ref_id: PO.3.1
       description: Specify which tools or tool types must or should be included in
         each toolchain to mitigate identified risks, as well as how the toolchain
         components are to be integrated with each other.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node19
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node19
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.3.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.3.1
       description: "Example 1: Define categories of toolchains, and specify the mandatory\
         \ tools or tool types to be used for each category.\nExample 2: Identify security\
         \ tools to integrate into the developer toolchain.\nExample 3: Define what\
@@ -247,17 +247,17 @@ objects:
         \ used.\nExample 4: Evaluate tools\u2019 signing capabilities to create immutable\
         \ records/logs for auditability within the toolchain.\nExample 5: Use automated\
         \ technology for toolchain management and orchestration."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.3.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.3.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.3
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.3
       ref_id: PO.3.2
       description: Follow recommended security practices to deploy, operate, and maintain
         tools and toolchains.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node21
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node21
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.3.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.3.2
       description: 'Example 1: Evaluate, select, and acquire tools, and assess the
         security of each tool.
 
@@ -282,17 +282,17 @@ objects:
         Example 8: See PW.6 regarding compiler, interpreter, and build tools.
 
         Example 9: See PO.5 regarding implementing and maintaining secure environments.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.3.3
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.3.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.3
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.3
       ref_id: PO.3.3
       description: Configure tools to generate artifacts  of their support of secure
         software development practices as defined by the organization.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node23
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node23
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.3.3
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.3.3
       description: 'Example 1: Use existing tooling (e.g., workflow tracking, issue
         tracking, value stream mapping) to create an audit trail of the secure development-related
         actions that are performed for continuous improvement purposes.
@@ -305,26 +305,26 @@ objects:
 
         Example 4: Assign responsibility for creating any needed artifacts that tools
         cannot generate.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.4
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.4
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po
       ref_id: PO.4
       name: Define and Use Criteria for Software Security Checks
       description: "Help ensure that the software resulting from the SDLC meets the\
         \ organization\u2019s expectations by defining and using criteria for checking\
         \ the software\u2019s security during development."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.4.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.4.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.4
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.4
       ref_id: PO.4.1
       description: Define criteria for software security checks and track throughout
         the SDLC.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node26
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node26
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.4.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.4.1
       description: "Example 1: Ensure that the criteria adequately indicate how effectively\
         \ security risk is being managed.\nExample 2: Define key performance indicators\
         \ (KPIs), key risk indicators (KRIs), vulnerability severity scores, and other\
@@ -336,17 +336,17 @@ objects:
         \ the workflow and tracking system.\nExample 6: Analyze collected data in\
         \ the context of the security successes and failures of each development project,\
         \ and use the results to improve the SDLC."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.4.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.4.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.4
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.4
       ref_id: PO.4.2
       description: Implement processes, mechanisms, etc. to gather and safeguard the
         necessary information in support of the criteria.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node28
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node28
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.4.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.4.2
       description: 'Example 1: Use the toolchain to automatically gather information
         that informs security decision-making.
 
@@ -358,10 +358,10 @@ objects:
 
         Example 4: Only allow authorized personnel to access the gathered information,
         and prevent any alteration or deletion of the information.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.5
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.5
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po
       ref_id: PO.5
       name: Implement and Maintain Secure Environments for Software Development
       description: Ensure that all components of the environments for software development
@@ -369,16 +369,16 @@ objects:
         of the environments or the software being developed or maintained within them.
         Examples of environments for software development include development, build,
         test, and distribution environments.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.5.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.5.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.5
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.5
       ref_id: PO.5.1
       description: Separate and protect each environment involved in software development.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node31
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node31
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.5.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.5.1
       description: "Example 1: Use multi-factor, risk-based authentication and conditional\
         \ access for each environment.\nExample 2: Use network segmentation and access\
         \ controls to separate the environments from each other and from production\
@@ -402,18 +402,18 @@ objects:
         \ appropriately following a risk-based approach.\nExample 10: Configure and\
         \ implement measures to secure the environments\u2019 hosting infrastructures\
         \ following a zero trust architecture."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.5.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.5.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.5
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.5
       ref_id: PO.5.2
       description: Secure and harden development endpoints (i.e., endpoints for software
         designers, developers, testers, builders, etc.) to perform development-related
         tasks using a risk-based approach.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node33
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node33
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:po.5.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:po.5.2
       description: 'Example 1: Configure each development endpoint based on approved
         hardening guides, checklists, etc.; for example, enable FIPS-compliant encryption
         of all sensitive data at rest and in transit.
@@ -436,17 +436,17 @@ objects:
         production networks for all other tasks.
 
         Example 7: Configure each development endpoint following a zero trust architecture.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps
       assessable: false
       depth: 1
       ref_id: PS
       name: Protect the Software
       description: Organizations should protect all components of their software from
         tampering and unauthorized access.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps.1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps
       ref_id: PS.1
       name: Protect All Forms of Code from Unauthorized Access and Tampering
       description: Help prevent unauthorized changes to code, both inadvertent and
@@ -454,19 +454,19 @@ objects:
         of the software. For code that is not intended to be publicly accessible,
         this helps prevent theft of the software and may make it more difficult or
         time-consuming for attackers to find vulnerabilities in the software.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps.1.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps.1.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps.1
       ref_id: PS.1.1
       description: "Store all forms of code \u2013 including source code, executable\
         \ code, and configuration-as-code \u2013  based on the principle of least\
         \ privilege so that only authorized personnel, tools, services, etc. have\
         \ access."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node37
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node37
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps.1.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps.1.1
       description: 'Example 1: Store all source code and configuration-as-code in
         a code repository, and restrict access to it based on the nature of the code.
         For example, open-source code intended for public access may need its integrity
@@ -484,69 +484,69 @@ objects:
 
         Example 6: Use cryptography (e.g., cryptographic hashes) to help protect file
         integrity.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps.2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps
       ref_id: PS.2
       name: Provide a Mechanism for Verifying Software Release Integrity
       description: Help software acquirers ensure that the software they acquire is
         legitimate and has not been tampered with.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps.2.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps.2.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps.2
       ref_id: PS.2.1
       description: Make software integrity verification information available to software
         acquirers.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node40
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node40
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps.2.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps.2.1
       description: "Example 1: Post cryptographic hashes for release files on a well-secured\
         \ website.\nExample 2: Use an established certificate authority for code signing\
         \ so that consumers\u2019 operating systems or other tools and services can\
         \ confirm the validity of signatures before use.\nExample 3: Periodically\
         \ review the code signing processes, including certificate renewal, rotation,\
         \ revocation, and protection."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps.3
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps.3
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps
       ref_id: PS.3
       name: Archive and Protect Each Software Release
       description: Preserve software releases in order to help identify, analyze,
         and eliminate vulnerabilities discovered in the software after release.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps.3.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps.3.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps.3
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps.3
       ref_id: PS.3.1
       description: Securely archive the necessary files and supporting data (e.g.,
         integrity verification information, provenance data) to be retained for each
         software release.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node43
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node43
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps.3.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps.3.1
       description: "Example 1: Store the release files, associated images, etc. in\
         \ repositories following the organization\u2019s established policy. Allow\
         \ read-only access to them by necessary personnel and no access by anyone\
         \ else.\nExample 2: Store and protect release integrity verification information\
         \ and provenance data, such as by keeping it in a separate location from the\
         \ release files or by signing the data."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps.3.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps.3.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps.3
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps.3
       ref_id: PS.3.2
       description: Collect, safeguard, maintain, and share provenance data for all
         components of each software release (e.g., in a software bill of materials
         [SBOM]).
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node45
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node45
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:ps.3.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:ps.3.2
       description: "Example 1: Make the provenance data available to software acquirers\
         \ in accordance with the organization\u2019s policies, preferably using standards-based\
         \ formats.\nExample 2: Make the provenance data available to the organization\u2019\
@@ -554,17 +554,17 @@ objects:
         Example 3: Protect the integrity of provenance data, and provide a way for\
         \ recipients to verify provenance data integrity.\nExample 4: Update the provenance\
         \ data every time any of the software\u2019s components are updated."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw
       assessable: false
       depth: 1
       ref_id: PW
       name: Produce Well-Secured Software
       description: Organizations should produce well-secured software with minimal
         security vulnerabilities in its releases.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw
       ref_id: PW.1
       name: Design Software to Meet Security Requirements and Mitigate Security Risks
       description: "Identify and evaluate the security requirements for the software;\
@@ -574,18 +574,18 @@ objects:
         \ requirements should be relaxed or waived. Addressing security requirements\
         \ and risks during software design (secure by design) is key for improving\
         \ software security and also helps improve development efficiency."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.1.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.1.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.1
       ref_id: PW.1.1
       description: "Use forms of risk modeling \u2013 such as threat modeling, attack\
         \ modeling, or attack surface mapping \u2013 to help assess the security risk\
         \ for the software."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node49
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node49
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.1.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.1.1
       description: 'Example 1: Train the development team (security champions, in
         particular) or collaborate with a risk modeling expert to create models and
         analyze how to use a risk-based approach to communicate the risks and determine
@@ -600,17 +600,17 @@ objects:
 
         Example 4: Use data classification methods to identify and characterize each
         type of data that the software will interact with.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.1.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.1.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.1
       ref_id: PW.1.2
       description: "Track and maintain the software\u2019s security requirements,\
         \ risks, and design decisions."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node51
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node51
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.1.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.1.2
       description: "Example 1: Record the response to each risk, including how mitigations\
         \ are to be achieved and what the rationales are for any approved exceptions\
         \ to the security requirements. Add any mitigations to the software\u2019\
@@ -619,20 +619,20 @@ objects:
         \ maintenance purposes throughout the rest of the software life cycle.\nExample\
         \ 3: Periodically re-evaluate all approved exceptions to the security requirements,\
         \ and implement changes as needed."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.1.3
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.1.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.1
       ref_id: PW.1.3
       description: Where appropriate, build in support for using standardized security
         features and services (e.g., enabling software to integrate with existing
         log management, identity management, access control, and vulnerability management
         systems) instead of creating proprietary implementations of security features
         and services. [Formerly PW.4.3]
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node53
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node53
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.1.3
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.1.3
       description: 'Example 1: Maintain one or more software repositories of modules
         for supporting standardized security features and services.
 
@@ -642,28 +642,28 @@ objects:
 
         Example 3: Define criteria for which security features and services must be
         supported by software to be developed.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw
       ref_id: PW.2
       name: Review the Software Design to Verify Compliance with Security Requirements
         and Risk Information
       description: Help ensure that the software will meet the security requirements
         and satisfactorily address the identified risk information.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.2.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.2.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.2
       ref_id: PW.2.1
       description: Have 1) a qualified person (or people) who were not involved with
         the design and/or 2) automated processes instantiated in the toolchain review
         the software design to confirm and enforce that it meets all of the security
         requirements and satisfactorily addresses the identified risk information.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node56
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node56
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.2.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.2.1
       description: "Example 1: Review the software design to confirm that it addresses\
         \ applicable security requirements.\nExample 2: Review the risk models created\
         \ during software design to determine if they appear to adequately identify\
@@ -674,10 +674,10 @@ objects:
         \ cannot be met.\nExample 6: Record the findings of design reviews to serve\
         \ as artifacts (e.g., in the software specification, in the issue tracking\
         \ system, in the threat model)."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.4
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.4
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw
       ref_id: PW.4
       name: Reuse Existing, Well-Secured Software When Feasible Instead of Duplicating
         Functionality
@@ -687,18 +687,18 @@ objects:
         had their security posture checked. This is particularly important for software
         that implements security functionality, such as cryptographic modules and
         protocols.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.4.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.4.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.4
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.4
       ref_id: PW.4.1
       description: "Acquire and maintain well-secured software components (e.g., software\
         \ libraries, modules, middleware, frameworks) from commercial, open-source,\
         \ and other third-party developers for use by the organization\u2019s software."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node59
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node59
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.4.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.4.1
       description: "Example 1: Review and evaluate third-party software components\
         \ in the context of their expected use. If a component is to be used in a\
         \ substantially different way in the future, perform the review and evaluation\
@@ -718,18 +718,18 @@ objects:
         \ integrity or provenance of acquired binaries cannot be confirmed, build\
         \ binaries from source code after verifying the source code\u2019s integrity\
         \ and provenance."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.4.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.4.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.4
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.4
       ref_id: PW.4.2
       description: Create and maintain well-secured software components in-house following
         SDLC processes to meet common internal software development needs that cannot
         be better met by third-party software components.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node61
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node61
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.4.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.4.2
       description: 'Example 1: Follow organization-established security practices
         for secure software development when creating and maintaining the components.
 
@@ -744,18 +744,18 @@ objects:
         Example 5: Implement processes to update deployed software components to newer
         versions, and maintain older versions of software components until all transitions
         from those versions have been completed successfully.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.4.4
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.4.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.4
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.4
       ref_id: PW.4.4
       description: Verify that acquired commercial, open-source, and all other third-party
         software components comply with the requirements, as defined by the organization,
         throughout their life cycles.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node63
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node63
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.4.4
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.4.4
       description: 'Example 1: Regularly check whether there are publicly known vulnerabilities
         in the software modules and services that vendors have not yet fixed.
 
@@ -776,26 +776,26 @@ objects:
         or other mechanisms.
 
         Example 7: Review, analyze, and/or test code. See PW.7 and PW.8.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.5
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.5
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw
       ref_id: PW.5
       name: Create Source Code by Adhering to Secure Coding Practices
       description: Decrease the number of security vulnerabilities in the software,
         and reduce costs by minimizing vulnerabilities introduced during source code
         creation that meet or exceed organization-defined vulnerability severity criteria.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.5.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.5.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.5
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.5
       ref_id: PW.5.1
       description: "Follow all secure coding practices that are appropriate to the\
         \ development languages and environment to meet the organization\u2019s requirements."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node66
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node66
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.5.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.5.1
       description: 'Example 1: Validate all inputs, and validate and properly encode
         all outputs.
 
@@ -819,26 +819,26 @@ objects:
 
         Example 9: Have the developer review their own human-readable code to complement
         (not replace) code review performed by other people or tools. See PW.7.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.6
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.6
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw
       ref_id: PW.6
       name: Configure the Compilation, Interpreter, and Build Processes to Improve
         Executable Security
       description: Decrease the number of security vulnerabilities in the software
         and reduce costs by eliminating vulnerabilities before testing occurs.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.6.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.6.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.6
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.6
       ref_id: PW.6.1
       description: Use compiler, interpreter, and build tools that offer features
         to improve executable security.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node69
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node69
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.6.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.6.1
       description: 'Example 1: Use up-to-date versions of compiler, interpreter, and
         build tools.
 
@@ -847,18 +847,18 @@ objects:
 
         Example 3: Regularly validate the authenticity and integrity of compiler,
         interpreter, and build tools. See PO.3.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.6.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.6.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.6
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.6
       ref_id: PW.6.2
       description: Determine which compiler, interpreter, and build tool features
         should be used and how each should be configured, then implement and use the
         approved configurations.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node71
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node71
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.6.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.6.2
       description: "Example 1: Enable compiler features that produce warnings for\
         \ poorly secured code during the compilation process.\nExample 2: Implement\
         \ the \u201Cclean build\u201D concept, where all compiler warnings are treated\
@@ -872,10 +872,10 @@ objects:
         \ 6: Continuously verify that the approved configurations are being used.\n\
         Example 7: Make the approved tool configurations available as configuration-as-code\
         \ so developers can readily use them."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.7
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.7
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw
       ref_id: PW.7
       name: Review and/or Analyze Human-Readable Code to Identify Vulnerabilities
         and Verify Compliance with Security Requirements
@@ -884,19 +884,19 @@ objects:
         lowers the effort and resources needed to detect vulnerabilities. Human-readable
         code includes source code, scripts, and any other form of code that an organization
         deems human-readable.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.7.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.7.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.7
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.7
       ref_id: PW.7.1
       description: Determine whether code review (a person looks directly at the code
         to find issues) and/or code analysis (tools are used to find issues in code,
         either in a fully automated way or in conjunction with a person) should be
         used, as defined by the organization.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node74
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node74
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.7.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.7.1
       description: "Example 1: Follow the organization\u2019s policies or guidelines\
         \ for when code review should be performed and how it should be conducted.\
         \ This may include third-party code and reusable code modules written in-house.\n\
@@ -904,19 +904,19 @@ objects:
         \ code analysis should be performed and how it should be conducted.\nExample\
         \ 3: Choose code review and/or analysis methods based on the stage of the\
         \ software."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.7.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.7.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.7
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.7
       ref_id: PW.7.2
       description: "Perform the code review and/or code analysis based on the organization\u2019\
         s secure coding standards, and record and triage all discovered issues and\
         \ recommended remediations in the development team\u2019s workflow or issue\
         \ tracking system."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node76
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node76
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.7.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.7.2
       description: "Example 1: Perform peer review of code, and review any existing\
         \ code review, analysis, or testing results as part of the peer review.\n\
         Example 2: Use expert reviewers to check code for backdoors and other malicious\
@@ -932,10 +932,10 @@ objects:
         \ Identify and document the root causes of discovered issues.\nExample 8:\
         \ Document lessons learned from code review and analysis in a wiki that developers\
         \ can access and search."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.8
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.8
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw
       ref_id: PW.8
       name: Test Executable Code to Identify Vulnerabilities and Verify Compliance
         with Security Requirements
@@ -945,36 +945,36 @@ objects:
         improves traceability and repeatability. Executable code includes binaries,
         directly executed bytecode and source code, and any other form of code that
         an organization deems executable.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.8.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.8.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.8
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.8
       ref_id: PW.8.1
       description: Determine whether executable code testing should be performed to
         find vulnerabilities not identified by previous reviews, analysis, or testing
         and, if so, which types of testing should be used.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node79
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node79
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.8.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.8.1
       description: "Example 1: Follow the organization\u2019s policies or guidelines\
         \ for when code testing should be performed and how it should be conducted\
         \ (e.g., within a sandboxed environment). This may include third-party executable\
         \ code and reusable executable code modules written in-house.\nExample 2:\
         \ Choose testing methods based on the stage of the software."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.8.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.8.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.8
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.8
       ref_id: PW.8.2
       description: "Scope the testing, design the tests, perform the testing, and\
         \ document the results, including recording and triaging all discovered issues\
         \ and recommended remediations in the development team\u2019s workflow or\
         \ issue tracking system."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node81
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node81
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.8.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.8.2
       description: "Example 1: Perform robust functional testing of security features.\n\
         Example 2: Integrate dynamic vulnerability testing into the project\u2019\
         s automated test suite.\nExample 3: Incorporate tests for previously reported\
@@ -988,42 +988,42 @@ objects:
         \ of discovered issues.\nExample 8: Document lessons learned from code testing\
         \ in a wiki that developers can access and search.\nExample 9: Use source\
         \ code, design records, and other resources when developing test plans."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.9
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.9
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw
       ref_id: PW.9
       name: Configure Software to Have Secure Settings by Default
       description: Help improve the security of the software at the time of installation
         to reduce the likelihood of the software being deployed with weak security
         settings, putting it at greater risk of compromise.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.9.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.9.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.9
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.9
       ref_id: PW.9.1
       description: Define a secure baseline by determining how to configure each setting
         that has an effect on security or a security-related setting so that the default
         settings are secure and do not weaken the security functions provided by the
         platform, network infrastructure, or services.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node84
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node84
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.9.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.9.1
       description: 'Example 1: Conduct testing to ensure that the settings, including
         the default settings, are working as expected and are not inadvertently causing
         any security weaknesses, operational issues, or other problems.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.9.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.9.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.9
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.9
       ref_id: PW.9.2
       description: Implement the default settings (or groups of default settings,
         if applicable), and document each setting for software administrators.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node86
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node86
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:pw.9.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:pw.9.2
       description: "Example 1: Verify that the approved configuration is in place\
         \ for the software.\nExample 2: Document each setting\u2019s purpose, options,\
         \ default value, security relevance, potential operational impact, and relationships\
@@ -1032,7 +1032,7 @@ objects:
         \ software administrators.\nExample 4: Store the default configuration in\
         \ a usable format and follow change control practices for modifying it (e.g.,\
         \ configuration-as-code)."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv
       assessable: false
       depth: 1
       ref_id: RV
@@ -1040,27 +1040,27 @@ objects:
       description: Organizations should identify residual vulnerabilities in their
         software releases and respond appropriately to address those vulnerabilities
         and prevent similar ones from occurring in the future.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.1
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv
       ref_id: RV.1
       name: Identify and Confirm Vulnerabilities on an Ongoing Basis
       description: Help ensure that vulnerabilities are identified more quickly so
         that they can be remediated more quickly in accordance with risk, reducing
         the window of opportunity for attackers.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.1.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.1.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.1
       ref_id: RV.1.1
       description: Gather information from software acquirers, users, and public sources
         on potential vulnerabilities in the software and third-party components that
         the software uses, and investigate all credible reports.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node90
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node90
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.1.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.1.1
       description: 'Example 1: Monitor vulnerability databases , security mailing
         lists, and other sources of vulnerability reports through manual or automated
         means.
@@ -1070,33 +1070,33 @@ objects:
 
         Example 3: Automatically review provenance and software composition data for
         all software components to identify any new vulnerabilities they have.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.1.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.1.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.1
       ref_id: RV.1.2
       description: "Review, analyze, and/or test the software\u2019s code to identify\
         \ or confirm the presence of previously undetected vulnerabilities."
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node92
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node92
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.1.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.1.2
       description: 'Example 1: Configure the toolchain to perform automated code analysis
         and testing on a regular or continuous basis for all supported releases.
 
         Example 2: See PW.7 and PW.8.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.1.3
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.1.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.1
       ref_id: RV.1.3
       description: Have a policy that addresses vulnerability disclosure and remediation,
         and implement the roles, responsibilities, and processes needed to support
         that policy.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node94
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node94
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.1.3
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.1.3
       description: 'Example 1: Establish a vulnerability disclosure program, and make
         it easy for security researchers to learn about your program and report possible
         vulnerabilities.
@@ -1112,41 +1112,41 @@ objects:
 
         Example 4: Periodically conduct exercises of the product security incident
         response processes.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.2
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv
       ref_id: RV.2
       name: Assess, Prioritize, and Remediate Vulnerabilities
       description: Help ensure that vulnerabilities are remediated in accordance with
         risk to reduce the window of opportunity for attackers.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.2.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.2.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.2
       ref_id: RV.2.1
       description: Analyze each vulnerability to gather sufficient information about
         risk to plan its remediation or other risk response.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node97
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node97
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.2.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.2.1
       description: 'Example 1: Use existing issue tracking software to record each
         vulnerability.
 
         Example 2: Perform risk calculations for each vulnerability based on estimates
         of its exploitability, the potential impact if exploited, and any other relevant
         characteristics.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.2.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.2.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.2
       ref_id: RV.2.2
       description: Plan and implement risk responses for vulnerabilities.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node99
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node99
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.2.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.2.2
       description: 'Example 1: Make a risk-based decision as to whether each vulnerability
         will be remediated or if the risk will be addressed through other means (e.g.,
         risk acceptance, risk transference), and prioritize any actions to be taken.
@@ -1167,38 +1167,38 @@ objects:
 
         Example 5: Update records of design decisions, risk responses, and approved
         exceptions as needed. See PW.1.2.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.3
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.3
       assessable: false
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv
       ref_id: RV.3
       name: Analyze Vulnerabilities to Identify Their Root Causes
       description: Help reduce the frequency of vulnerabilities in the future.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.3.1
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.3.1
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.3
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.3
       ref_id: RV.3.1
       description: Analyze identified vulnerabilities to determine their root causes.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node102
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node102
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.3.1
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.3.1
       description: 'Example 1: Record the root cause of discovered issues.
 
         Example 2: Record lessons learned through root cause analysis in a wiki that
         developers can access and search.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.3.2
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.3.2
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.3
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.3
       ref_id: RV.3.2
       description: Analyze the root causes over time to identify patterns, such as
         a particular secure coding practice not being followed consistently.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node104
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node104
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.3.2
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.3.2
       description: 'Example 1: Record lessons learned through root cause analysis
         in a wiki that developers can access and search.
 
@@ -1207,31 +1207,31 @@ objects:
 
         Example 3: Update manual processes to detect future instances of the root
         cause.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.3.3
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.3.3
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.3
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.3
       ref_id: RV.3.3
       description: Review the software for similar vulnerabilities to eradicate a
         class of vulnerabilities, and proactively fix them rather than waiting for
         external reports.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node106
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node106
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.3.3
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.3.3
       description: 'Example 1: See PW.7 and PW.8.'
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.3.4
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.3.4
       assessable: true
       depth: 3
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.3
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.3
       ref_id: RV.3.4
       description: Review the SDLC process, and update it if appropriate to prevent
         (or reduce the likelihood of) the root cause recurring in updates to the software
         or in new software that is created.
-    - urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:node108
+    - urn: urn:ciso:risk:req_node:nist-ssdf-1.1:node108
       assessable: false
       depth: 4
-      parent_urn: urn:intuitem:risk:req_node:nist-ssdf-1.1:rv.3.4
+      parent_urn: urn:ciso:risk:req_node:nist-ssdf-1.1:rv.3.4
       description: 'Example 1: Record lessons learned through root cause analysis
         in a wiki that developers can access and search.
 

@@ -77,7 +77,7 @@ async def import_stored_library(urn_or_id: str) -> str:
     """Import library (framework) to make it available for compliance assessments. Use get_stored_libraries() to find URNs
 
     Args:
-        urn_or_id: Library URN/ID (e.g. "urn:intuitem:risk:library:nist-csf-2.0")
+        urn_or_id: Library URN/ID (e.g. "urn:ciso:risk:library:nist-csf-2.0")
     """
     try:
         res = make_post_request(f"/stored-libraries/{urn_or_id}/import/", {})

@@ -7,17 +7,17 @@ def fix_nis2_framework(apps, schema_editor):
     """fix inconsistent urn if present"""
     RequirementNode = apps.get_model("core", "RequirementNode")
     if node := RequirementNode.objects.filter(
-        urn="urn:intuitem:risk:req_node:annex-technical-and-methodological-requirements-nis2:2.1.2;g"
+        urn="urn:ciso:risk:req_node:annex-technical-and-methodological-requirements-nis2:2.1.2;g"
     ).first():
         print("custom migration for", node.urn)
-        node.urn = "urn:intuitem:risk:req_node:annex-technical-and-methodological-requirements-nis2:2.1.2.g"
+        node.urn = "urn:ciso:risk:req_node:annex-technical-and-methodological-requirements-nis2:2.1.2.g"
         node.save()
 
     elif node := RequirementNode.objects.filter(
-        urn="urn:intuitem:risk:req_node:annex-technical-and-methodological-requirements-nis2:2.1.2_g"
+        urn="urn:ciso:risk:req_node:annex-technical-and-methodological-requirements-nis2:2.1.2_g"
     ).first():
         print("custom migration for", node.urn)
-        node.urn = "urn:intuitem:risk:req_node:annex-technical-and-methodological-requirements-nis2:2.1.2.g"
+        node.urn = "urn:ciso:risk:req_node:annex-technical-and-methodological-requirements-nis2:2.1.2.g"
         node.save()
 
 

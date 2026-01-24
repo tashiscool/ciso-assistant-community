@@ -26,12 +26,12 @@ bodySizeLimit: "50000000"
 
 image:
   backend:
-    repository: ghcr.io/intuitem/ciso-assistant-community/backend
+    repository: ghcr.io/tashiscool/ciso-assistant-community/backend
     # Use .Chart.AppVersion if global.appVersion is not set
     tag: "{{ default .Chart.AppVersion .Values.global.appVersion }}"
     pullPolicy: Always
   frontend:
-    repository: ghcr.io/intuitem/ciso-assistant-community/frontend
+    repository: ghcr.io/tashiscool/ciso-assistant-community/frontend
     tag: "{{ default .Chart.AppVersion .Values.global.appVersion }}"
     pullPolicy: Always
   caddy:

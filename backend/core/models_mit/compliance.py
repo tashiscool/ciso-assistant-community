@@ -645,3 +645,111 @@ class ComplianceException(AbstractGRCEntity):
         verbose_name = "Compliance Exception"
         verbose_name_plural = "Compliance Exceptions"
         ordering = ['-requested_date']
+
+
+class EvidenceRevision(models.Model):
+    """
+    A revision/version of evidence.
+
+    Evidence revisions track historical versions of evidence
+    documents, providing an audit trail of changes.
+    """
+    import uuid
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
+
+    evidence = models.ForeignKey(
+        Evidence,
+        on_delete=models.CASCADE,
+        related_name='revisions'
+    )
+
+    # Revision number
+    revision_number = models.PositiveIntegerField(
+        help_text="Sequential revision number"
+    )
+
+    # File information at this revision
+    file_path = models.CharField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text="Path to evidence file at this revision"
+    )
+    file_name = models.CharField(
+        max_length=255,
+        blank=True,
+        default=""
+    )
+    file_size = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="File size in bytes"
+    )
+    file_hash = models.CharField(
+        max_length=64,
+        blank=True,
+        default="",
+        help_text="SHA-256 hash of file"
+    )
+
+    # Content at this revision (for text-based evidence)
+    content = models.TextField(
+        blank=True,
+        default="",
+        help_text="Evidence content at this revision"
+    )
+
+    # Revision metadata
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='created_evidence_revisions'
+    )
+
+    # Change description
+    change_description = models.TextField(
+        blank=True,
+        default="",
+        help_text="Description of changes in this revision"
+    )
+
+    # Whether this is the current version
+    is_current = models.BooleanField(
+        default=True,
+        help_text="Whether this is the current revision"
+    )
+
+    class Meta:
+        verbose_name = "Evidence Revision"
+        verbose_name_plural = "Evidence Revisions"
+        ordering = ['-revision_number']
+        unique_together = [['evidence', 'revision_number']]
+
+    def __str__(self):
+        return f"{self.evidence.name} - Revision {self.revision_number}"
+
+    def save(self, *args, **kwargs):
+        # Auto-increment revision number if not set
+        if not self.revision_number:
+            last_revision = EvidenceRevision.objects.filter(
+                evidence=self.evidence
+            ).order_by('-revision_number').first()
+            self.revision_number = (last_revision.revision_number + 1) if last_revision else 1
+
+        # Set all other revisions as not current when saving a new current revision
+        if self.is_current:
+            EvidenceRevision.objects.filter(
+                evidence=self.evidence,
+                is_current=True
+            ).exclude(pk=self.pk).update(is_current=False)
+
+        super().save(*args, **kwargs)

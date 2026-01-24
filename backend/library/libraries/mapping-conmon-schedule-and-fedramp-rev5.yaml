@@ -1,4 +1,4 @@
-urn: urn:intuitem:risk:library:mapping-conmon-schedule-and-fedramp-rev5
+urn: urn:ciso:risk:library:mapping-conmon-schedule-and-fedramp-rev5
 locale: en
 ref_id: MAPPING-CONMON-FEDRAMP-REV5
 name: ConMon Schedule <-> FedRAMP Rev5 Mapping
@@ -6,266 +6,266 @@ description: >
   Mapping between the generic Continuous Monitoring Operations Schedule and
   FedRAMP Rev5 controls. Links operational ConMon activities to their
   corresponding NIST SP 800-53 Rev 5 control requirements.
-copyright: intuitem
+copyright: ciso
 version: 1
 publication_date: 2025-01-23
-provider: intuitem
-packager: intuitem
+provider: ciso
+packager: ciso-assistant
 dependencies:
-- urn:intuitem:risk:library:conmon-schedule
-- urn:intuitem:risk:library:fedramp-rev5
+- urn:ciso:risk:library:conmon-schedule
+- urn:ciso:risk:library:fedramp-rev5
 objects:
   requirement_mapping_sets:
-  - urn: urn:intuitem:risk:req_mapping_set:mapping-conmon-schedule-and-fedramp-rev5
+  - urn: urn:ciso:risk:req_mapping_set:mapping-conmon-schedule-and-fedramp-rev5
     ref_id: MAPPING-CONMON-FEDRAMP-REV5
     name: ConMon Schedule <-> FedRAMP Rev5
     description: >
       Maps generic ConMon schedule activities to FedRAMP Rev5 controls,
       enabling traceability between operational activities and control requirements.
-    source_framework_urn: urn:intuitem:risk:framework:conmon-schedule
-    target_framework_urn: urn:intuitem:risk:framework:fedramp-rev5
+    source_framework_urn: urn:ciso:risk:framework:conmon-schedule
+    target_framework_urn: urn:ciso:risk:framework:fedramp-rev5
     requirement_mappings:
     # ============================================================
     # CONTINUOUS ACTIVITIES
     # ============================================================
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:cont-siem-monitoring
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:si-4
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:cont-siem-monitoring
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:si-4
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:cont-audit-collection
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:au-2
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:cont-audit-collection
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:au-2
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:cont-audit-collection
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:au-3
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:cont-audit-collection
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:au-3
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:cont-asset-discovery
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cm-8-(3)
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:cont-asset-discovery
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:cm-8-(3)
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:cont-incident-tracking
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ir-6
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:cont-incident-tracking
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ir-6
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:cont-environmental-monitoring
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:pe-14
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:cont-environmental-monitoring
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:pe-14
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:cont-vuln-signatures
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ra-5-(2)
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:cont-vuln-signatures
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ra-5-(2)
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:cont-ids-monitoring
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:si-4-(4)
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:cont-ids-monitoring
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:si-4-(4)
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:cont-container-security
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cm-7
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:cont-container-security
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:cm-7
       relationship: subset
 
     # ============================================================
     # WEEKLY ACTIVITIES
     # ============================================================
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:weekly-audit-review
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:au-6
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:weekly-audit-review
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:au-6
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:weekly-backup-verification
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cp-9
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:weekly-backup-verification
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:cp-9
       relationship: subset
 
     # ============================================================
     # MONTHLY ACTIVITIES
     # ============================================================
     # Reporting
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-poam-update
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ca-5
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-poam-update
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ca-5
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-inventory-update
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cm-8
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-inventory-update
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:cm-8
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-security-status
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ca-7
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-security-status
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ca-7
       relationship: subset
 
     # Vulnerability Scanning
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-os-scans
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ra-5
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-os-scans
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ra-5
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-webapp-scans
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ra-5
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-webapp-scans
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ra-5
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-db-scans
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ra-5
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-db-scans
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ra-5
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-remediation
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ra-5
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-vuln-remediation
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ra-5
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-vuln-remediation
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:si-2
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-vuln-remediation
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:si-2
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-patch-management
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:si-2
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-patch-management
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:si-2
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-integrity-scans
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:si-7-(1)
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-integrity-scans
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:si-7-(1)
       relationship: subset
 
     # Access and Configuration
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-temp-accounts
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ac-2-(2)
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-temp-accounts
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ac-2-(2)
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-least-functionality
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cm-7-(1)
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-least-functionality
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:cm-7-(1)
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-physical-logs
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:pe-6
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-physical-logs
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:pe-6
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:monthly-physical-logs
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:pe-8
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:monthly-physical-logs
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:pe-8
       relationship: subset
 
     # ============================================================
     # QUARTERLY ACTIVITIES
     # ============================================================
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly-inactive-accounts
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ac-2-(3)
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:quarterly-inactive-accounts
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ac-2-(3)
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly-inactive-accounts
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ia-4
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:quarterly-inactive-accounts
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ia-4
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly-public-content
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ac-22
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:quarterly-public-content
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ac-22
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly-privileged-access
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ac-6
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:quarterly-privileged-access
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ac-6
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly-privileged-access
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cm-5-(5)
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:quarterly-privileged-access
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:cm-5-(5)
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:quarterly-authenticator-refresh
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ia-5
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:quarterly-authenticator-refresh
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ia-5
       relationship: subset
 
     # ============================================================
     # ANNUAL ACTIVITIES
     # ============================================================
     # Policy Reviews
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-policy-review
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ac-1
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-policy-review
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ac-1
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-procedure-review
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ac-1
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-procedure-review
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ac-1
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-architecture-review
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:pl-8
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-architecture-review
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:pl-8
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-isa-review
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ca-3
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-isa-review
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ca-3
       relationship: subset
 
     # Training
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-awareness-training
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:at-2
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-awareness-training
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:at-2
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-role-training
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:at-3
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-role-training
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:at-3
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-incident-training
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ir-2
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-incident-training
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ir-2
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-contingency-training
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cp-3
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-contingency-training
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:cp-3
       relationship: subset
 
     # Plans and Testing
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-ssp-review
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:pl-2
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-ssp-review
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:pl-2
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-cp-review
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cp-2
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-cp-review
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:cp-2
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-cp-review
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cp-4
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-cp-review
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:cp-4
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-ir-review
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ir-3
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-ir-review
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ir-3
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-ir-review
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ir-8
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-ir-review
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ir-8
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-backup-test
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cp-9-(1)
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-backup-test
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:cp-9-(1)
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-baseline-review
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cm-2-(1)
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-baseline-review
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:cm-2-(1)
       relationship: subset
 
     # Access Governance
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-account-recert
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ac-2
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-account-recert
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ac-2
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-physical-access
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:pe-2
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-physical-access
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:pe-2
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-physical-access
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:pe-3
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-physical-access
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:pe-3
       relationship: subset
 
     # Asset Lifecycle
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-software-review
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cm-7-(5)
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-software-review
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:cm-7-(5)
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-eol-review
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cm-8
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-eol-review
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:cm-8
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-eol-review
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:sa-22
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-eol-review
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:sa-22
       relationship: subset
 
     # Assessments
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-control-assessment
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ca-2
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-control-assessment
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ca-2
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-pentest
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ca-8
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-pentest
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ca-8
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:annual-privacy-assessment
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:pt-5
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:annual-privacy-assessment
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:pt-5
       relationship: subset
 
     # ============================================================
     # MULTI-YEAR ACTIVITIES
     # ============================================================
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:biennial-identifier-reuse
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ia-4
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:biennial-identifier-reuse
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ia-4
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:triennial-risk-assessment
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ra-3
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:triennial-risk-assessment
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ra-3
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:triennial-position-review
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ps-2
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:triennial-position-review
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ps-2
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:quinquennial-screening
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ps-3
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:quinquennial-screening
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ps-3
       relationship: subset
 
     # ============================================================
     # EVENT-DRIVEN ACTIVITIES
     # ============================================================
     # Significant Change
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:event-impact-analysis
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cm-4
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:event-impact-analysis
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:cm-4
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:event-change-testing
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:cm-4
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:event-change-testing
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:cm-4
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:event-change-testing
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ca-2
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:event-change-testing
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ca-2
       relationship: subset
 
     # Incident Response
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:event-incident-notification
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ir-6
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:event-incident-notification
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ir-6
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:event-incident-tracking
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ir-5
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:event-incident-tracking
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ir-5
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:event-incident-tracking
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ir-6
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:event-incident-tracking
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ir-6
       relationship: subset
-    - source_requirement_urn: urn:intuitem:risk:req_node:conmon-schedule:event-lessons-learned
-      target_requirement_urn: urn:intuitem:risk:req_node:fedramp-rev5:ir-4
+    - source_requirement_urn: urn:ciso:risk:req_node:conmon-schedule:event-lessons-learned
+      target_requirement_urn: urn:ciso:risk:req_node:fedramp-rev5:ir-4
       relationship: subset

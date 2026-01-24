@@ -1,19 +1,19 @@
-urn: urn:intuitem:risk:library:critical_risk_matrix_5x5
+urn: urn:ciso:risk:library:critical_risk_matrix_5x5
 locale: en
 ref_id: critical_5x5
 name: Critical risk matrix 5x5
 description: Critical risk matrix 5x5
 version: 2
 publication_date: 2024-03-02
-provider: intuitem
-packager: intuitem
+provider: ciso
+packager: ciso-assistant
 translations:
   fr:
     name: Matrice de risque critique 5x5
     description: Matrice de risque critique 5x5
 objects:
   risk_matrix:
-    - urn: urn:intuitem:risk:matrix:critical_risk_matrix_5x5
+    - urn: urn:ciso:risk:matrix:critical_risk_matrix_5x5
       ref_id: critical_5x5
       name: critical 5x5
       description: critical risk matrix 5x5

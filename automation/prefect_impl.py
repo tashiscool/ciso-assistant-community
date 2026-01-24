@@ -126,8 +126,8 @@ def update_audit(audit_id, prepared_data, mode="std"):
 @task(log_prints=True)
 def match_framework_urn(audit_id) -> str:
     PROWLER_FWK_KEYS = {
-        "urn:intuitem:risk:framework:iso27001-2022": "ISO27001-2022",
-        "urn:intuitem:risk:framework:cis-benchmark-kubernetes": "CIS-1.10",
+        "urn:ciso:risk:framework:iso27001-2022": "ISO27001-2022",
+        "urn:ciso:risk:framework:cis-benchmark-kubernetes": "CIS-1.10",
     }
     with httpx.Client() as client:
         response = client.get(

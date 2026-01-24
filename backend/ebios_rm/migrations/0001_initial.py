@@ -158,7 +158,7 @@ class Migration(migrations.Migration):
                 (
                     "risk_matrix",
                     models.ForeignKey(
-                        help_text="Risk matrix used as a reference for the study. Defaults to `urn:intuitem:risk:library:risk-matrix-4x4-ebios-rm`",
+                        help_text="Risk matrix used as a reference for the study. Defaults to `urn:ciso:risk:library:risk-matrix-4x4-ebios-rm`",
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="ebios_rm_studies",
                         to="core.riskmatrix",

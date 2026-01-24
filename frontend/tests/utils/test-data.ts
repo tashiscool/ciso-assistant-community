@@ -591,17 +591,17 @@ export default {
 	framework: {
 		name: 'NIST CSF v1.1',
 		ref: 'NIST-CSF-1.1',
-		urn: 'urn:intuitem:risk:library:nist-csf-1.1'
+		urn: 'urn:ciso:risk:library:nist-csf-1.1'
 	},
 	questionnaire: {
 		name: 'CMMC version 2.0',
 		ref: 'CMMC-2.0',
-		urn: 'urn:intuitem:risk:framework:cmmc-2.0'
+		urn: 'urn:ciso:risk:framework:cmmc-2.0'
 	},
 	matrix: {
 		name: 'Critical risk matrix 5x5',
 		displayName: 'critical 5x5',
-		urn: 'urn:intuitem:risk:library:critical_risk_matrix_5x5'
+		urn: 'urn:ciso:risk:library:critical_risk_matrix_5x5'
 	},
 	referenceControl: {
 		name: 'POL.PHYSICAL - Physical security policy',
@@ -610,9 +610,9 @@ export default {
 		library: {
 			name: 'Usual reference controls',
 			ref: 'doc-pol',
-			urn: 'urn:intuitem:risk:library:doc-pol'
+			urn: 'urn:ciso:risk:library:doc-pol'
 		},
-		urn: 'urn:intuitem:risk:function:POL.PHYSICAL'
+		urn: 'urn:ciso:risk:function:POL.PHYSICAL'
 	},
 	referenceControl2: {
 		name: 'DOC.CONTROLS - Controls accountability matrix',
@@ -621,34 +621,34 @@ export default {
 		library: {
 			name: 'Usual reference controls',
 			ref: 'doc-pol',
-			urn: 'urn:intuitem:risk:library:doc-pol'
+			urn: 'urn:ciso:risk:library:doc-pol'
 		},
-		urn: 'urn:intuitem:risk:function:DOC.CONTROLS'
+		urn: 'urn:ciso:risk:function:DOC.CONTROLS'
 	},
 	threat: {
 		name: 'T1011 - Exfiltration Over Other Network Medium',
 		library: {
 			name: 'Mitre ATT&CK v18.1 - Threats and mitigations',
 			ref: 'mitre-attack',
-			urn: 'urn:intuitem:risk:library:mitre-attack'
+			urn: 'urn:ciso:risk:library:mitre-attack'
 		},
-		urn: 'urn:intuitem:risk:threat:mitre-attack:T1011'
+		urn: 'urn:ciso:risk:threat:mitre-attack:T1011'
 	},
 	threat2: {
 		name: 'T1052 - Exfiltration Over Physical Medium',
 		library: {
 			name: 'Mitre ATT&CK v18.1 - Threats and mitigations',
 			ref: 'mitre-attack',
-			urn: 'urn:intuitem:risk:library:mitre-attack'
+			urn: 'urn:ciso:risk:library:mitre-attack'
 		},
-		urn: 'urn:intuitem:risk:threat:mitre-attack:T1052'
+		urn: 'urn:ciso:risk:threat:mitre-attack:T1052'
 	},
 	requirement_assessment: {
 		name: 'RC.RP - Recovery Planning',
 		library: {
 			name: 'NIST CSF v1.1',
 			ref: 'NIST-CSF-1.1',
-			urn: 'urn:intuitem:risk:library:nist-csf-1.1'
+			urn: 'urn:ciso:risk:library:nist-csf-1.1'
 		}
 	},
 	requirement_assessment2: {
@@ -656,7 +656,7 @@ export default {
 		library: {
 			name: 'NIST CSF v1.1',
 			ref: 'NIST-CSF-1.1',
-			urn: 'urn:intuitem:risk:library:nist-csf-1.1'
+			urn: 'urn:ciso:risk:library:nist-csf-1.1'
 		}
 	}
 } as { [key: string]: any };

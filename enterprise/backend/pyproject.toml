@@ -2,7 +2,7 @@
 name = "enterprise_core"
 version = "0.1.0"
 description = ""
-authors = ["intuitem <contact@intuitem.com>"]
+authors = ["tashiscool <contact@tashiscool.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]

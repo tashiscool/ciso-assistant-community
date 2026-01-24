@@ -1484,10 +1484,10 @@ class TestRequirementMapping:
     @pytest.mark.usefixtures("iso27001_csf1_1_frameworks_fixture")
     def test_requirement_mapping_creation(self):
         target_framework = Framework.objects.get(
-            urn="urn:intuitem:risk:framework:iso27001-2022"
+            urn="urn:ciso:risk:framework:iso27001-2022"
         )
         source_framework = Framework.objects.get(
-            urn="urn:intuitem:risk:framework:nist-csf-1.1"
+            urn="urn:ciso:risk:framework:nist-csf-1.1"
         )
         mapping_set = RequirementMappingSet.objects.create(
             source_framework=source_framework,
@@ -1495,10 +1495,10 @@ class TestRequirementMapping:
         )
 
         target_requirement = RequirementNode.objects.filter(
-            urn="urn:intuitem:risk:req_node:nist-csf-1.1:pr.ac-1"
+            urn="urn:ciso:risk:req_node:nist-csf-1.1:pr.ac-1"
         ).last()
         source_requirement = RequirementNode.objects.get(
-            urn="urn:intuitem:risk:req_node:iso27001-2022:a.5.15"
+            urn="urn:ciso:risk:req_node:iso27001-2022:a.5.15"
         )
 
         mapping = RequirementMapping.objects.create(
@@ -1521,9 +1521,9 @@ class TestRequirementMappingSet:
     def test_requirement_mapping_set_creation(self):
         root_folder = Folder.objects.get(content_type=Folder.ContentType.ROOT)
         iso27001 = Framework.objects.get(
-            urn="urn:intuitem:risk:framework:iso27001-2022"
+            urn="urn:ciso:risk:framework:iso27001-2022"
         )
-        csf1_1 = Framework.objects.get(urn="urn:intuitem:risk:framework:nist-csf-1.1")
+        csf1_1 = Framework.objects.get(urn="urn:ciso:risk:framework:nist-csf-1.1")
         requirement_mapping_set = RequirementMappingSet.objects.create(
             name="Requirement Mapping Set",
             description="Requirement Mapping Set description",
@@ -1543,7 +1543,7 @@ class TestRequirementMappingSet:
     def test_requirement_mapping_set_source_and_target_frameworks_must_be_distinct(
         self,
     ):
-        csf1_1 = Framework.objects.get(urn="urn:intuitem:risk:framework:nist-csf-1.1")
+        csf1_1 = Framework.objects.get(urn="urn:ciso:risk:framework:nist-csf-1.1")
         with pytest.raises(ValidationError):
             RequirementMappingSet.objects.create(
                 name="Requirement Mapping Set",

@@ -124,7 +124,7 @@ test('user usual routine actions are working correctly', async ({
 			csf_function: 'protect',
 			status: 'To do',
 			eta: '2025-01-01',
-			link: 'https://intuitem.com/',
+			link: 'https://ciso-assistant.com/',
 			effort: 'Large',
 			cost: 24.42,
 			folder: vars.folderName,
@@ -180,7 +180,7 @@ test('user usual routine actions are working correctly', async ({
 			description: vars.description,
 			attachment: vars.file,
 			folder: vars.folderName,
-			link: 'https://intuitem.com/'
+			link: 'https://ciso-assistant.com/'
 		});
 
 		//TODO assert that the evidence data are displayed in the table

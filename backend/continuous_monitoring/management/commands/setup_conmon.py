@@ -82,9 +82,9 @@ class Command(BaseCommand):
         # Determine framework URN
         framework_key = options['framework']
         if framework_key == 'conmon-schedule':
-            framework_urn = 'urn:intuitem:risk:framework:conmon-schedule'
+            framework_urn = 'urn:ciso:risk:framework:conmon-schedule'
         elif framework_key == 'fedramp-conmon-checklist':
-            framework_urn = 'urn:intuitem:risk:framework:fedramp-conmon-checklist'
+            framework_urn = 'urn:ciso:risk:framework:fedramp-conmon-checklist'
         elif framework_key.startswith('urn:'):
             framework_urn = framework_key
         else:

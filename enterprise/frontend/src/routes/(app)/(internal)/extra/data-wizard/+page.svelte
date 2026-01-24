@@ -174,7 +174,7 @@
 				</h4>
 				<a
 					class="text-indigo-600 hover:text-indigo-400"
-					href="https://intuitem.gitbook.io/ciso-assistant/guide/data-import-wizard"
+					href="https://tashiscool.gitbook.io/ciso-assistant/guide/data-import-wizard"
 					>{m.dataWizardTemplatesAndGuidelines()}</a
 				>
 			</div>

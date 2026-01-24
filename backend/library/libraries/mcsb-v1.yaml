@@ -1,6 +1,6 @@
 convert_library_version: 'v2 ; Compat Mode: [0] {[v2.1] (DEFAULT) Don''t use any Compatibility
   Mode}'
-urn: urn:intuitem:risk:library:mcsb-v1
+urn: urn:ciso:risk:library:mcsb-v1
 locale: en
 ref_id: mcsb-v1
 name: Microsoft cloud security benchmark
@@ -15,10 +15,10 @@ copyright: Microsoft
 version: 1
 publication_date: 2023-04-03
 provider: Microsoft
-packager: intuitem
+packager: ciso-assistant
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:mcsb-v1
+    urn: urn:ciso:risk:framework:mcsb-v1
     ref_id: mcsb-v1
     name: Microsoft cloud security benchmark
     description: The Microsoft cloud security benchmark provides prescriptive best
@@ -27,15 +27,15 @@ objects:
       on cloud-centric security areas with input from a set of holistic Microsoft
       and industry security guidance
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ns
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ns
       assessable: false
       depth: 1
       ref_id: NS
       name: Network Security
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ns-1
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ns-1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ns
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ns
       ref_id: NS-1
       name: Establish network segmentation boundaries
       description: "Ensure that your virtual network deployment aligns to your enterprise\
@@ -77,10 +77,10 @@ objects:
         \ for ingress and egress traffic to the subnet. \n\nNote: To control VPC traffic,\
         \ Internet and NAT Gateway should be configured to ensure the traffic from/to\
         \ the internet are restricted."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ns-2
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ns-2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ns
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ns
       ref_id: NS-2
       name: Secure cloud native services with network controls
       description: Secure cloud services by establishing a private access point for
@@ -112,10 +112,10 @@ objects:
         \ resources in your VPC, unless there is a strong use case, you should avoid\
         \ assigning public IPs/subnet directly to your resources and instead use private\
         \ IPs/subnet."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ns-3
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ns-3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ns
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ns
       ref_id: NS-3
       name: Deploy firewall at the edge of enterprise network
       description: 'Deploy a firewall to perform advanced filtering on network traffic
@@ -143,10 +143,10 @@ objects:
         \ VPC route tables to ensure the traffic goes through the desired route. \
         \ For example, you have the option to use a custom route to redirect egress\
         \ internet traffic through a specific AWS Firewall or a network virtual appliance."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ns-4
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ns-4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ns
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ns
       ref_id: NS-4
       name: Deploy intrusion detection/intrusion prevention systems (IDS/IPS)
       description: 'Use network intrusion detection and intrusion prevention systems
@@ -172,10 +172,10 @@ objects:
         \ IDS/IPS, at the VM level in conjunction with the network IDS/IPS. \n\nNote:\
         \ If using a third-party IDS/IPS from marketplace, use Transit Gateway and\
         \ Gateway Balancer to direct the traffic for in-line inspection."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ns-5
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ns-5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ns
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ns
       ref_id: NS-5
       name: Deploy DDOS protection
       description: Deploy distributed denial of service (DDoS) protection to protect
@@ -193,10 +193,10 @@ objects:
         \ floods, enable AWS Shield Advanced protection on Amazon EC2, Elastic Load\
         \ Balancing (ELB), Amazon CloudFront, AWS Global Accelerator, and Amazon Route\
         \ 53."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ns-6
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ns-6
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ns
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ns
       ref_id: NS-6
       name: Deploy web application firewall
       description: Deploy a web application firewall (WAF) and configure the appropriate
@@ -217,10 +217,10 @@ objects:
         \ the WAF rules deployment, you can also use the AWS WAF Security Automations\
         \ solution to automatically deploy pre-defined AWS WAF rules that filters\
         \ web-based attacks on your web ACL."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ns-7
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ns-7
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ns
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ns
       ref_id: NS-7
       name: Simplify network security configuration
       description: When managing a complex network environment, use tools to simplify,
@@ -242,10 +242,10 @@ objects:
         \ analyze your firewall-related policies and create findings for non-compliant\
         \ resources and for detected attacks and sends them to AWS Security Hub for\
         \ investigation."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ns-8
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ns-8
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ns
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ns
       ref_id: NS-8
       name: Detect and disable insecure services and  protocols
       description: Detect and disable insecure services and protocols at the OS, application,
@@ -268,10 +268,10 @@ objects:
         \ or protocols is not possible, use compensating controls such as blocking\
         \ access to the resources through security groups, AWS Network Firewall, or\
         \ AWS Web Application Firewall to reduce the attack surface."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ns-9
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ns-9
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ns
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ns
       ref_id: NS-9
       name: Connect on-premises or cloud network privately
       description: Use private connections for secure communication between different
@@ -296,10 +296,10 @@ objects:
         \ peered VPC is private and is kept on the AWS backbone network.  When you\
         \ need to join multiple VPCs to create a large flat subnet, you also have\
         \ the option to use VPC Sharing."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ns-10
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ns-10
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ns
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ns
       ref_id: NS-10
       name: Ensure Domain Name System (DNS) security
       description: "Ensure that Domain Name System (DNS) security configuration protects\
@@ -345,15 +345,15 @@ objects:
         \ Transfer Lock feature enabled in order to keep them secure.\n- he Sender\
         \ Policy Framework (SPF) is should be used to stop spammers from spoofing\
         \ your domain."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:im
+    - urn: urn:ciso:risk:req_node:mcsb-v1:im
       assessable: false
       depth: 1
       ref_id: IM
       name: Identity Management
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:im-1
+    - urn: urn:ciso:risk:req_node:mcsb-v1:im-1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:im
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:im
       ref_id: IM-1
       name: Use centralized identity and authentication system
       description: Use a centralized identity and authentication system to govern
@@ -382,10 +382,10 @@ objects:
         \ Sign-On which allows you to bridge your corporate's third party identities\
         \ (such as Windows Active Directory,  or other identity stores) with the AWS\
         \ identities to avoid creating duplicate accounts to access AWS resources."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:im-2
+    - urn: urn:ciso:risk:req_node:mcsb-v1:im-2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:im
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:im
       ref_id: IM-2
       name: Protect identity and authentication systems
       description: "Secure your identity and authentication system as a high priority\
@@ -419,10 +419,10 @@ objects:
         \ practices if you have other identity and authentication systems, e.g., follow\
         \ the Azure AD security baseline if you use Azure AD to manage AWS identity\
         \ and access."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:im-3
+    - urn: urn:ciso:risk:req_node:mcsb-v1:im-3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:im
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:im
       ref_id: IM-3
       name: Manage application identities securely and automatically
       description: Use managed application identities instead of creating human accounts
@@ -447,10 +447,10 @@ objects:
         \ the IAM roles. \n\nNote: For services that don't support IAM roles, use\
         \ access keys but follow the security best practice such as IM-8: Restrict\
         \ the exposure of credential and secrets to secure your keys."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:im-4
+    - urn: urn:ciso:risk:req_node:mcsb-v1:im-4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:im
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:im
       ref_id: IM-4
       name: Authenticate server and services
       description: "Authenticate remote servers and services from your client side\
@@ -474,10 +474,10 @@ objects:
         \ identity (by verifying the server\u2019s certificate issued by a trusted\
         \ certificate authority) in the handshake stage.\n\nNote: Services such as\
         \ API Gateway support TLS mutual authentication."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:im-5
+    - urn: urn:ciso:risk:req_node:mcsb-v1:im-5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:im
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:im
       ref_id: IM-5
       name: Use single sign-on (SSO) for application access
       description: Use single sign-on (SSO) to simplify the user experience for authenticating
@@ -499,10 +499,10 @@ objects:
         \ bridge corporate identities (such as identities from Azure Active Directory)\
         \ with  AWS identities, as well as external user identities from trusted third-party\
         \ and public users."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:im-6
+    - urn: urn:ciso:risk:req_node:mcsb-v1:im-6
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:im
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:im
       ref_id: IM-6
       name: Use strong authentication controls
       description: "Enforce strong authentication controls (strong passwordless authentication\
@@ -542,10 +542,10 @@ objects:
         \ AWS access.\n\nNote: For third-party applications and AWS services that\
         \ may have default IDs and passwords, you should disable or change them during\
         \ initial service setup."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:im-7
+    - urn: urn:ciso:risk:req_node:mcsb-v1:im-7
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:im
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:im
       ref_id: IM-7
       name: Restrict resource access based on  conditions
       description: Explicitly validate trusted signals to allow or deny user access
@@ -575,10 +575,10 @@ objects:
         \ logic. \n\nPolicies can be defined from six different dimensions: identity-based\
         \ policies, resource-based policies, permissions boundaries, AWS Organizations\
         \ service control policy (SCP) , Access Control Lists(ACL), and session policies."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:im-8
+    - urn: urn:ciso:risk:req_node:mcsb-v1:im-8
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:im
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:im
       ref_id: IM-8
       name: Restrict the exposure of credential and secrets
       description: "Ensure that application developers securely handle credentials\
@@ -612,10 +612,10 @@ objects:
         \ secrets rotation for supported services. For secrets which cannot be automatically\
         \ rotated, ensure they are manually rotated periodically and purged when no\
         \ longer in use."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:im-9
+    - urn: urn:ciso:risk:req_node:mcsb-v1:im-9
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:im
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:im
       ref_id: IM-9
       name: Secure user access to  existing applications
       description: "In a hybrid environment, where you have on-premises applications\
@@ -649,15 +649,15 @@ objects:
         \ SaaS applications. \n- Your existing third-party application delivery controllers\
         \ and networks.\n\nNote: VPNs are commonly used to access legacy applications\
         \ and often only have basic access control and limited session monitoring."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pa
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pa
       assessable: false
       depth: 1
       ref_id: PA
       name: Privileged Access
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pa-1
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pa-1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:pa
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:pa
       ref_id: PA-1
       name: Separate and limit highly privileged/administrative users
       description: Ensure you identify all high business impact accounts. Limit the
@@ -713,10 +713,10 @@ objects:
         \ and system management tools with agents installed on business critical systems.\
         \ Attackers who compromise these management and security systems can immediately\
         \ weaponize them to compromise business critical assets."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pa-2
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pa-2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:pa
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:pa
       ref_id: PA-2
       name: Avoid standing access for user accounts and permissions
       description: Instead of creating standing privileges, use just-in-time (JIT)
@@ -738,10 +738,10 @@ objects:
         - Temporary security credentials have a short-term life, from minutes to hours.\
         \ \n- Temporary security credentials are not stored with the user but are\
         \ generated dynamically and provided to the user when requested."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pa-3
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pa-3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:pa
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:pa
       ref_id: PA-3
       name: Manage lifecycle of identities and entitlements
       description: Use an automated process or technical control to manage the identity
@@ -759,10 +759,10 @@ objects:
         \ assignments, reviews, and deletions. \n\nNote: There are third-party solutions\
         \ available on AWS Marketplace for managing the lifecycle of identities and\
         \ entitlements."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pa-4
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pa-4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:pa
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:pa
       ref_id: PA-4
       name: Review and reconcile user access regularly
       description: Conduct regular review of privileged account entitlements. Ensure
@@ -788,10 +788,10 @@ objects:
         \ are using Azure Active Directory (Azure AD) as the identity provider for\
         \ AWS, use Azure AD access review to review the privileged accounts and access\
         \ entitlements periodically."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pa-5
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pa-5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:pa
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:pa
       ref_id: PA-5
       name: Set up emergency access
       description: "Set up emergency access to ensure that you are not accidentally\
@@ -828,10 +828,10 @@ objects:
         \ the security of this process. \n\nYou should also monitor the sign-in and\
         \ audit logs in CloudTrail or EventBridge to ensure that root access accounts\
         \ are only used when authorized."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pa-6
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pa-6
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:pa
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:pa
       ref_id: PA-6
       name: Use privileged access workstations / channel for administrative tasks
       description: Secured, isolated workstations are critically important for the
@@ -854,10 +854,10 @@ objects:
         \ Microsoft Defender, and/or Microsoft Intune. The central management should\
         \ enforce secured configuration, including strong authentication, software\
         \ and hardware baselines, and restricted logical and network access."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pa-7
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pa-7
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:pa
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:pa
       ref_id: PA-7
       name: Follow just enough administration (least privilege) principle
       description: Follow the just enough administration (least privilege) principle
@@ -885,10 +885,10 @@ objects:
         \ not be assigned to the users.\n\nYou may also use AWS ABAC (attribute-based\
         \ access control) to assign permissions based on attributes (tags) attached\
         \ to IAM resources, including IAM entities (users or roles) and AWS resources."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pa-8
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pa-8
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:pa
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:pa
       ref_id: PA-8
       name: Determine access process for cloud provider support
       description: Establish an approval process and access path for requesting and
@@ -909,15 +909,15 @@ objects:
         an account in the AWS Support portal to request support. Review the available
         options such as providing read-only data access, or the screen sharing option
         for AWS support to access to your data.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:dp
+    - urn: urn:ciso:risk:req_node:mcsb-v1:dp
       assessable: false
       depth: 1
       ref_id: DP
       name: Data Protection
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:dp-1
+    - urn: urn:ciso:risk:req_node:mcsb-v1:dp-1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:dp
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:dp
       ref_id: DP-1
       name: Discover, classify, and label sensitive data
       description: Establish and maintain an inventory of the sensitive data, based
@@ -936,10 +936,10 @@ objects:
         \ to scan, classify and label the sensitive data residing in a S3 storage\
         \ bucket. \n\nNote: You can also use third-party enterprise solutions from\
         \ AWS marketplace for the purpose of data discovery classification and labeling"
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:dp-2
+    - urn: urn:ciso:risk:req_node:mcsb-v1:dp-2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:dp
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:dp
       ref_id: DP-2
       name: Monitor anomalies and threats targeting sensitive data
       description: Monitor for anomalies around sensitive data, such as unauthorized
@@ -964,10 +964,10 @@ objects:
         \ checks, container security, and endpoint security capabilities.\n\nNote:\
         \ If required for compliance of data loss prevention (DLP), you can use a\
         \ host-based DLP solution from AWS Marketplace."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:dp-3
+    - urn: urn:ciso:risk:req_node:mcsb-v1:dp-3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:dp
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:dp
       ref_id: DP-3
       name: Encrypt sensitive data in transit
       description: "Protect the data in transit against 'out of band' attacks (such\
@@ -1004,10 +1004,10 @@ objects:
         \ EC2 instance types. TLS v1.2 or later is enabled on most AWS services by\
         \ default. And some services such as AWS Load Balancer can enforce TLS v1.2\
         \ or later on the server side."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:dp-4
+    - urn: urn:ciso:risk:req_node:mcsb-v1:dp-4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:dp
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:dp
       ref_id: DP-4
       name: Enable data at rest encryption by default
       description: To complement access controls, data at rest should be protected
@@ -1027,10 +1027,10 @@ objects:
         \ technically feasible and not enabled by default, you can enable data at\
         \ rest encryption in the AWS services, or in your VMs at the storage level,\
         \ file level, or database level"
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:dp-5
+    - urn: urn:ciso:risk:req_node:mcsb-v1:dp-5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:dp
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:dp
       ref_id: DP-5
       name: Use customer-managed key option in data at rest encryption when required
       description: If required for regulatory compliance, define the use case and
@@ -1052,10 +1052,10 @@ objects:
         \ your own keys. \n\nHowever, using the customer-managed key option requires\
         \ additional operational efforts to manage the key lifecycle. This may include\
         \ encryption key generation, rotation, revoke, and access control, etc."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:dp-6
+    - urn: urn:ciso:risk:req_node:mcsb-v1:dp-6
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:dp
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:dp
       ref_id: DP-6
       name: Use a secure key management process
       description: Document and implement an enterprise cryptographic key management
@@ -1106,10 +1106,10 @@ objects:
         \ 3 (for certain services)  validated\n- AWS CloudHSM: FIPS 140-2 Level 3\
         \  validated\n\nNote: For secrets management(credentials, password, API keys\
         \ etc.), use AWS Secrets Manager."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:dp-7
+    - urn: urn:ciso:risk:req_node:mcsb-v1:dp-7
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:dp
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:dp
       ref_id: DP-7
       name: Use a secure certificate management process
       description: 'Document and implement an enterprise certificate management standard,
@@ -1154,10 +1154,10 @@ objects:
         \ certificate authority (CA) to sign the private certificates. \n\nNote: Use\
         \ only an approved CA and ensure that known bad CA root/intermediate certificates\
         \ issued by these CAs are disabled."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:dp-8
+    - urn: urn:ciso:risk:req_node:mcsb-v1:dp-8
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:dp
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:dp
       ref_id: DP-8
       name: Ensure security of key and certificate repository
       description: Ensure the security of the key vault service used for the cryptographic
@@ -1217,15 +1217,15 @@ objects:
         \ and alert you on critical actions. \n- Follow the KMS security guidance\
         \ to secure your private key (generated for certificate request) used for\
         \ service certificate integration."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:am
+    - urn: urn:ciso:risk:req_node:mcsb-v1:am
       assessable: false
       depth: 1
       ref_id: AM
       name: Asset Management
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:am-1
+    - urn: urn:ciso:risk:req_node:mcsb-v1:am-1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:am
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:am
       ref_id: AM-1
       name: Track asset inventory and their risks
       description: 'Track your asset inventory by query and discover all your cloud
@@ -1262,10 +1262,10 @@ objects:
         \ organization's potential exposure to emerging risks, and as an input for\
         \ continuous security improvements.\n\nNote: Additional permissions might\
         \ be required to get visibility into workloads and services."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:am-2
+    - urn: urn:ciso:risk:req_node:mcsb-v1:am-2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:am
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:am
       ref_id: AM-2
       name: Use only approved services
       description: Ensure that only approved cloud services can be used, by auditing
@@ -1286,10 +1286,10 @@ objects:
         your environment. Use AWS Resource Groups to query for and discover resources
         within their accounts. You can also use CloudWatch and/or AWS Config to create
         rules to trigger alerts when a non-approved service is detected.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:am-3
+    - urn: urn:ciso:risk:req_node:mcsb-v1:am-3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:am
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:am
       ref_id: AM-3
       name: Ensure security of asset lifecycle management
       description: Ensure security attributes or configurations of the assets are
@@ -1316,10 +1316,10 @@ objects:
 
 
         Identify and remove AWS resources when they are no longer needed.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:am-4
+    - urn: urn:ciso:risk:req_node:mcsb-v1:am-4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:am
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:am
       ref_id: AM-4
       name: Limit access to asset management
       description: Limit users' access to asset management features, to avoid accidental
@@ -1353,10 +1353,10 @@ objects:
         resource-based policies, tag-based authorization, temporary credentials, or
         service-linked roles to have a fine-grain control access control for your
         resources.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:am-5
+    - urn: urn:ciso:risk:req_node:mcsb-v1:am-5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:am
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:am
       ref_id: AM-5
       name: Use only approved applications in virtual machine
       description: Ensure that only authorized software executes by creating an allow
@@ -1379,15 +1379,15 @@ objects:
         \ rules to ensure that non-authorized software is blocked from executing on\
         \ EC2 instances. \n\nYou can also use a third-party solution to discover and\
         \ identify unapproved software."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:lt
+    - urn: urn:ciso:risk:req_node:mcsb-v1:lt
       assessable: false
       depth: 1
       ref_id: LT
       name: Logging and threat detection
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:lt-1
+    - urn: urn:ciso:risk:req_node:mcsb-v1:lt-1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:lt
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:lt
       ref_id: LT-1
       name: Enable threat detection capabilities
       description: To support threat detection scenarios, monitor all known resource
@@ -1426,10 +1426,10 @@ objects:
         \ Control System (ICS) or Supervisory Control and Data Acquisition (SCADA)\
         \ resources, use Microsoft Defender for IoT to inventory assets and detect\
         \ threats and vulnerabilities."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:lt-2
+    - urn: urn:ciso:risk:req_node:mcsb-v1:lt-2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:lt
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:lt
       ref_id: LT-2
       name: Enable threat detection for  identity and access management
       description: Detect threats for identities and access management by monitoring
@@ -1490,10 +1490,10 @@ objects:
         \ API was invoked from a known malicious IP address.\n- An API was invoked\
         \ from an IP address on a custom threat list.\n- An API was invoked from a\
         \ Tor exit node IP address."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:lt-3
+    - urn: urn:ciso:risk:req_node:mcsb-v1:lt-3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:lt
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:lt
       ref_id: LT-3
       name: Enable logging for security investigation
       description: Enable logging for your cloud resources to meet the requirements
@@ -1534,10 +1534,10 @@ objects:
         \ CloudWatch Logs, some AWS services can publish logs directly to AmazonS3\
         \ or Amazon Kinesis Data Firehose where you can use different logging storage\
         \ and retention policies."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:lt-4
+    - urn: urn:ciso:risk:req_node:mcsb-v1:lt-4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:lt
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:lt
       ref_id: LT-4
       name: Enable network logging for security investigation
       description: Enable logging for your network services to support network-related
@@ -1566,10 +1566,10 @@ objects:
         and security alert generation. The logs can be exported to CloudWatch for
         monitoring or an S3 storage bucket for ingesting into the Microsoft Sentinel
         solution for centralized analytics.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:lt-5
+    - urn: urn:ciso:risk:req_node:mcsb-v1:lt-5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:lt
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:lt
       ref_id: LT-5
       name: Centralize security log management and analysis
       description: 'Centralize logging storage and analysis to enable correlation
@@ -1606,10 +1606,10 @@ objects:
         In addition, you can aggregate the logs in a S3 storage bucket and onboard
         the log data to Microsoft Sentinel which provides security information event
         management (SIEM) and security orchestration automated response (SOAR) capabilities.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:lt-6
+    - urn: urn:ciso:risk:req_node:mcsb-v1:lt-6
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:lt
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:lt
       ref_id: LT-6
       name: Configure log storage retention
       description: Plan your log retention strategy according to your compliance,
@@ -1636,10 +1636,10 @@ objects:
         \ management and archival policy to the bucket. You can use Azure Storage\
         \ for central log archival by transferring the files from Amazon S3 to Azure\
         \ Storage."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:lt-7
+    - urn: urn:ciso:risk:req_node:mcsb-v1:lt-7
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:lt
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:lt
       ref_id: LT-7
       name: Use approved time synchronization sources
       description: Use approved time synchronization sources for your logging time
@@ -1670,15 +1670,15 @@ objects:
 
         All logs generated by resources within AWS provide time stamps with the time
         zone specified by default.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ir
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ir
       assessable: false
       depth: 1
       ref_id: IR
       name: Incident Response
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ir-1
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ir-1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ir
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ir
       ref_id: IR-1
       name: Preparation - update incident response plan and handling process
       description: 'Ensure your organization follows industry best practice to develop
@@ -1712,10 +1712,10 @@ objects:
         and your application nature, follow the AWS Security Incident Response Guide
         to customize the incident response plan and playbook to ensure they can be
         used to respond to the incident in the cloud environment.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ir-2
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ir-2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ir
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ir
       ref_id: IR-2
       name: Preparation - setup incident contact information
       description: Ensure the security alerts and incident notification from the cloud
@@ -1742,10 +1742,10 @@ objects:
         engagement plan and escalation plan to describe how and when the  Incident
         Manager engages the contact and to escalate if the contact(s) does not response
         to an incident.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ir-3
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ir-3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ir
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ir
       ref_id: IR-3
       name: Detection and analysis - create incidents based on high-quality alerts
       description: 'Ensure you have a process to create high-quality alerts and measure
@@ -1783,10 +1783,10 @@ objects:
         If you use Microsoft Defender for Cloud to monitor your AWS accounts, you
         can also use Microsoft Sentinel to monitor and alert the incidents identified
         by Microsoft Defender for Cloud on AWS resources.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ir-4
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ir-4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ir
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ir
       ref_id: IR-4
       name: Detection and analysis - investigate an incident
       description: 'Ensure the security operation team can query and use diverse data
@@ -1876,10 +1876,10 @@ objects:
         is adequate security in place to protect the data from unauthorized alteration,
         such as disabling logging or removing logs, which can be performed by the
         attackers during an in-flight data breach activity.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ir-5
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ir-5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ir
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ir
       ref_id: IR-5
       name: Detection and analysis - prioritize incidents
       description: "Provide context to security operations teams to help them determine\
@@ -1915,10 +1915,10 @@ objects:
         For each incident created in the Incident Manager, assign an impact level
         based on your organization''s defined criteria, such as a measure of the severity
         of the incident and criticality level of the assets impacted.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ir-6
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ir-6
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ir
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ir
       ref_id: IR-6
       name: Containment, eradication and recovery - automate the incident handling
       description: Automate the manual, repetitive tasks to speed up response time
@@ -1948,10 +1948,10 @@ objects:
         trigger actions defined in the incident response plan, including notifying
         the contacts and/or running a runbook to respond to alerts, such as disabling
         accounts, and isolating problematic networks.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ir-7
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ir-7
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ir
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ir
       ref_id: IR-7
       name: Post-incident activity - conduct lesson learned and retain evidence
       description: "Conduct lessons learned in your organization periodically and/or\
@@ -1990,15 +1990,15 @@ objects:
         an incident step" such as system logs, network traffic dumps and running system
         snapshot in storage such as an Amazon S3 bucket or Azure Storage account for
         immutable retention.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pv
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pv
       assessable: false
       depth: 1
       ref_id: PV
       name: Posture and Vulnerability Management
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pv-1
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pv-1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:pv
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:pv
       ref_id: PV-1
       name: Define and establish secure configurations
       description: Define the security configuration baselines for different resource
@@ -2021,10 +2021,10 @@ objects:
         \ AWS resources.\n\nUse AWS CloudFormation templates and AWS Config rules\
         \ in the AWS landing zone definition to automate deployment and configuration\
         \ of services and application environments."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pv-2
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pv-2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:pv
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:pv
       ref_id: PV-2
       name: Audit and enforce secure configurations
       description: Continuously monitor and alert when there is a deviation from the
@@ -2048,10 +2048,10 @@ objects:
         \ the configuration audit and enforcement. \n\nYou can also centrally monitor\
         \ your configuration drifting by onboarding your AWS account to Microsoft\
         \ Defender for Cloud."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pv-3
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pv-3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:pv
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:pv
       ref_id: PV-3
       name: Define and establish secure configurations for compute resources
       description: Define the secure configuration baselines for your compute resources,
@@ -2075,10 +2075,10 @@ objects:
         \ running within your EC2 instances, AWS Lambda or containers environment,\
         \ you may use AWS System Manager AppConfig to establish the desired configuration\
         \ baseline."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pv-4
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pv-4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:pv
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:pv
       ref_id: PV-4
       name: Audit and enforce secure configurations for compute resources
       description: Continuously monitor and alert when there is a deviation from the
@@ -2115,10 +2115,10 @@ objects:
         \ to audit and enforce the desired configuration baseline.\n\nNote: AMIs published\
         \ by Amazon Web Services in AWS Marketplace are managed and maintained by\
         \ Amazon Web Services."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pv-5
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pv-5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:pv
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:pv
       ref_id: PV-5
       name: Perform vulnerability assessments
       description: 'Perform vulnerabilities assessment for your cloud resources at
@@ -2167,10 +2167,10 @@ objects:
         \ implementing a temporary provisioning methodology for the scan account.\
         \ Credentials for the scan account should be protected, monitored, and used\
         \ only for vulnerability scanning."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pv-6
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pv-6
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:pv
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:pv
       ref_id: PV-6
       name: Rapidly and automatically remediate vulnerabilities
       description: "Rapidly and automatically deploy patches and updates to remediate\
@@ -2196,10 +2196,10 @@ objects:
         \ EC2 Windows and Linux instances. \n\nFor third-party software, use a third-party\
         \ patch management solution or Microsoft System Center Updates Publisher for\
         \ Configuration Manager."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:pv-7
+    - urn: urn:ciso:risk:req_node:mcsb-v1:pv-7
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:pv
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:pv
       ref_id: PV-7
       name: Conduct regular red team operations
       description: "Simulate real-world attacks to provide a more complete view of\
@@ -2231,15 +2231,15 @@ objects:
 
         Follow the AWS Customer Support Policy for Penetration Testing to ensure your
         penetration tests are not in violation of AWS policies.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:es
+    - urn: urn:ciso:risk:req_node:mcsb-v1:es
       assessable: false
       depth: 1
       ref_id: ES
       name: Endpoint security
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:es-1
+    - urn: urn:ciso:risk:req_node:mcsb-v1:es-1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:es
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:es
       ref_id: ES-1
       name: Use Endpoint Detection and Response (EDR)
       description: Enable Endpoint Detection and Response (EDR) capabilities for VMs
@@ -2261,10 +2261,10 @@ objects:
         \ protocols, outbound instance communication with a known malicious IP, temporary\
         \ Amazon EC2 credentials use by an external IP address, and data exfiltration\
         \ using DNS."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:es-2
+    - urn: urn:ciso:risk:req_node:mcsb-v1:es-2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:es
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:es
       ref_id: ES-2
       name: Use modern anti-malware software
       description: Use anti-malware solutions (also known as endpoint protection)
@@ -2294,10 +2294,10 @@ objects:
         \ the health status of the anti-malware solution. \n\nNote: Microsoft Defender\
         \ Cloud also supports certain third-party endpoint protection products for\
         \ the discovery and health status assessment."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:es-3
+    - urn: urn:ciso:risk:req_node:mcsb-v1:es-3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:es
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:es
       ref_id: ES-3
       name: Ensure anti-malware software and signatures are updated
       description: Ensure anti-malware signatures are updated rapidly and consistently
@@ -2314,15 +2314,15 @@ objects:
         \ for Endpoint (for Linux) will automatically install the latest signatures\
         \ and engine updates by default. \n\nFor third-party solutions, ensure the\
         \ signatures are updated in the third-party anti-malware solution."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:br
+    - urn: urn:ciso:risk:req_node:mcsb-v1:br
       assessable: false
       depth: 1
       ref_id: BR
       name: Backup and recovery
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:br-1
+    - urn: urn:ciso:risk:req_node:mcsb-v1:br-1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:br
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:br
       ref_id: BR-1
       name: Ensure regular automated backups
       description: Ensure backup of business-critical resources, either during resource
@@ -2352,10 +2352,10 @@ objects:
         \ for your storage backet which will allow you to preserve, retrieve, and\
         \ restore every version of every object stored in your S3 bucket. \n- Service\
         \ configuration settings can usually be exported to CloudFormation templates."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:br-2
+    - urn: urn:ciso:risk:req_node:mcsb-v1:br-2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:br
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:br
       ref_id: BR-2
       name: Protect backup and recovery data
       description: Ensure backup data and operations are protected from data exfiltration,
@@ -2396,10 +2396,10 @@ objects:
         \ Backup service.\n- Use AWS Backup Vault Lock for immutable storage of critical\
         \ data. \n- Secure S3 buckets through access policy, disabling public access,\
         \ enforcing data at-rest encryption, and versioning control."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:br-3
+    - urn: urn:ciso:risk:req_node:mcsb-v1:br-3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:br
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:br
       ref_id: BR-3
       name: Monitor backups
       description: Ensure all business-critical protectable resources are compliant
@@ -2422,10 +2422,10 @@ objects:
         \ EventBridge to view and monitor AWS Backup events.\n- Use Amazon Simple\
         \ Notification Service (Amazon SNS) to subscribe to AWS Backup-related topics\
         \ such as backup, restore, and copy events."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:br-4
+    - urn: urn:ciso:risk:req_node:mcsb-v1:br-4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:br
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:br
       ref_id: BR-4
       name: Regularly test backup
       description: Periodically perform data recovery tests of your backup to verify
@@ -2456,15 +2456,15 @@ objects:
         You may need to define your backup recovery test strategy, including the test
         scope, frequency and method as performing the full recovery test each time
         can be difficult.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ds
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ds
       assessable: false
       depth: 1
       ref_id: DS
       name: DevOps Security
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ds-1
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ds-1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ds
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ds
       ref_id: DS-1
       name: Conduct threat modeling
       description: 'Perform threat modeling to identify the potential threats and
@@ -2533,10 +2533,10 @@ objects:
         Ensure the threat modeling or analysis results are recorded and updated when
         there is a major security-impact change in your application or in the threat
         landscape.'
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ds-2
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ds-2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ds
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ds
       ref_id: DS-2
       name: Ensure software supply chain security
       description: "Ensure your enterprise\u2019s SDLC (Software Development Lifecycle)\
@@ -2590,10 +2590,10 @@ objects:
         \ when sourcing the code externally.\n- If applicable, use Microsoft Defender\
         \ for Cloud to integrate vulnerability assessment for your container image\
         \ in the CI/CD workflow."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ds-3
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ds-3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ds
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ds
       ref_id: DS-3
       name: Secure DevOps infrastructure
       description: 'Ensure the DevOps infrastructure and pipeline follow security
@@ -2659,10 +2659,10 @@ objects:
         \ and Vulnerability Management sections to use services such as AWS CloudTrail,\
         \ CloudWatch and Microsoft Sentinel to enable governance, compliance, operational\
         \ auditing, and risk auditing for your DevOps infrastructure."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ds-4
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ds-4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ds
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ds
       ref_id: DS-4
       name: Integrate static application security testing into DevOps pipeline
       description: Ensure static application security testing (SAST) fuzzy testing,
@@ -2687,10 +2687,10 @@ objects:
         \ BinSkim Binary Analyzer for Windows and *nix binary analysis.\n- GitHub\
         \ native secret scanning for credential scan in the source code. \n- AWS CodeGuru\
         \ Reviewer for Python and Java source code analysis."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ds-5
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ds-5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ds
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ds
       ref_id: DS-5
       name: Integrate dynamic application security testing into DevOps pipeline
       description: Ensure dynamic application security testing (DAST) are part of
@@ -2708,10 +2708,10 @@ objects:
         \ assisted validation) should also be part of the DAST. \n\nAWS CodePipeline\
         \ or GitHub supports integration of third-party DAST tools into the CI/CD\
         \ workflow."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ds-6
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ds-6
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ds
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ds
       ref_id: DS-6
       name: Enforce security of workload throughout DevOps lifecycle
       description: "Ensure the workload is secured throughout the entire lifecycle\
@@ -2756,10 +2756,10 @@ objects:
         \ manipulation. \n\nFor AWS serverless services, use AWS CodePipeline in conjunction\
         \ with AWS AppConfig to adopt similar controls to ensure security controls\
         \ \"shift left\" to the stage prior to deployment."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:ds-7
+    - urn: urn:ciso:risk:req_node:mcsb-v1:ds-7
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:ds
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:ds
       ref_id: DS-7
       name: Enable logging and monitoring in DevOps
       description: "Ensure your logging and monitoring scope includes non-production\
@@ -2788,74 +2788,74 @@ objects:
         \ anomalous results.\n\nIngest the above logs and events into AWS CloudWatch,\
         \ Microsoft Sentinel or other SIEM tools through a logging stream or API to\
         \ ensure the security incidents are properly monitored and triaged for handling."
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:gs
+    - urn: urn:ciso:risk:req_node:mcsb-v1:gs
       assessable: false
       depth: 1
       ref_id: GS
       name: Governance and Strategy
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:gs-1
+    - urn: urn:ciso:risk:req_node:mcsb-v1:gs-1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:gs
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:gs
       ref_id: GS-1
       name: Align organization roles, responsibilities and accountabilities
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:gs-2
+    - urn: urn:ciso:risk:req_node:mcsb-v1:gs-2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:gs
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:gs
       ref_id: GS-2
       name: Define and implement enterprise segmentation/separation of duties strategy
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:gs-3
+    - urn: urn:ciso:risk:req_node:mcsb-v1:gs-3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:gs
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:gs
       ref_id: GS-3
       name: Define and implement data protection strategy
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:gs-4
+    - urn: urn:ciso:risk:req_node:mcsb-v1:gs-4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:gs
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:gs
       ref_id: GS-4
       name: Define and implement network security strategy
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:gs-5
+    - urn: urn:ciso:risk:req_node:mcsb-v1:gs-5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:gs
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:gs
       ref_id: GS-5
       name: Define and implement security posture management strategy
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:gs-6
+    - urn: urn:ciso:risk:req_node:mcsb-v1:gs-6
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:gs
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:gs
       ref_id: GS-6
       name: Define and implement identity and privileged access strategy
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:gs-7
+    - urn: urn:ciso:risk:req_node:mcsb-v1:gs-7
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:gs
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:gs
       ref_id: GS-7
       name: Define and implement logging, threat detection and incident response strategy
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:gs-8
+    - urn: urn:ciso:risk:req_node:mcsb-v1:gs-8
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:gs
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:gs
       ref_id: GS-8
       name: Define and implement backup and recovery strategy
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:gs-9
+    - urn: urn:ciso:risk:req_node:mcsb-v1:gs-9
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:gs
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:gs
       ref_id: GS-9
       name: Define and implement endpoint security strategy
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:gs-10
+    - urn: urn:ciso:risk:req_node:mcsb-v1:gs-10
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:gs
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:gs
       ref_id: GS-10
       name: Define and implement DevOps security strategy
-    - urn: urn:intuitem:risk:req_node:mcsb-v1:gs-11
+    - urn: urn:ciso:risk:req_node:mcsb-v1:gs-11
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:mcsb-v1:gs
+      parent_urn: urn:ciso:risk:req_node:mcsb-v1:gs
       ref_id: GS-11
       name: Define and implement multi-cloud security strategy

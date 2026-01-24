@@ -1,4 +1,4 @@
-urn: urn:intuitem:risk:library:anssi-maturite-gestion-crise-1.0.2
+urn: urn:ciso:risk:library:anssi-maturite-gestion-crise-1.0.2
 locale: fr
 ref_id: ANSSI-MATURITE-GESTION-CRISE
 name: "ANSSI: auto\xE9valuation de gestion de crise cyber"
@@ -8,10 +8,10 @@ copyright: anssi
 version: 1
 publication_date: 2024-05-18
 provider: ANSSI
-packager: intuitem
+packager: ciso-assistant
 objects:
   framework:
-    urn: urn:intuitem:risk:framework:anssi-maturite-gestion-crise-1.0.2
+    urn: urn:ciso:risk:framework:anssi-maturite-gestion-crise-1.0.2
     ref_id: ANSSI-MATURITE-GESTION-CRISE
     name: "ANSSI: auto\xE9valuation de gestion de crise cyber"
     description: "Bas\xE9 sur l'outil ANSSI (Excel) d\u2019auto\xE9valuation de gestion\
@@ -39,14 +39,14 @@ objects:
       name: OPERATIONNEL CYBER ET IT
       description: null
     requirement_nodes:
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
       assessable: false
       depth: 1
       name: "Gouvernance et interactions entre \xE9quipes mobilis\xE9es"
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:1.1
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:1.1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
       ref_id: '1.1'
       description: "Les fonctions d\xE9cisionnelles de l'organisation sont-elles sensibilis\xE9\
         es aux enjeux cyber ?\nNiveau 0 : Les fonctions d\xE9cisionnelles de l'organisation\
@@ -61,10 +61,10 @@ objects:
         sent\xE9es dans la gouvernance de crise (cyber et hors cyber)."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:1.2
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:1.2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
       ref_id: '1.2'
       description: "Quelle est la strat\xE9gie d'entra\xEEnement de gestion de crise\
         \ au niveau strat\xE9gique ?\nNiveau 0 : Aucun entra\xEEnement \xE0 la gestion\
@@ -86,10 +86,10 @@ objects:
         e en comp\xE9tence sur les savoir-faire li\xE9s \xE0 la gestion de crise cyber. "
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:1.3
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:1.3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
       ref_id: '1.3'
       description: "Quelle est la strat\xE9gie d'entra\xEEnement de gestion de crise\
         \ au niveau op\xE9rationnel ?\nNiveau 0 : Aucun entra\xEEnement \xE0 la gestion\
@@ -105,10 +105,10 @@ objects:
         \ \xE9quipes d\u2019investigation (type entra\xEEnement sur Cyber Range)."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.1
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
       ref_id: '2.1'
       description: "L'ensemble du dispositif de crise est-il formalis\xE9 dans un\
         \ r\xE9f\xE9rentiel de management (politique globale) ?\nNiveau 0 : Il n'existe\
@@ -126,10 +126,10 @@ objects:
         . Il est li\xE9 aux autres dispositifs de crise existant."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.2
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
       ref_id: '2.2'
       description: "Comment le processus de gestion de crise pr\xE9voit-il l'organisation\
         \ des \xE9quipes cyber ? \nNiveau 0 : La gestion des \xE9quipes est identique\
@@ -155,10 +155,10 @@ objects:
         \ r\xE9pondre \xE0 plusieurs objectifs dans un d\xE9lai r\xE9duit."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.3
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
       ref_id: '2.3'
       description: "Comment est form\xE9e la cellule de crise strat\xE9gique ?\nNiveau\
         \ 0 : Les membres de la cellule de crise ne sont pas identifi\xE9s.\nNiveau\
@@ -175,10 +175,10 @@ objects:
         gr\xE9s aux formations et aux exercices."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.4
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
       ref_id: '2.4'
       description: "Comment s'organisent les \xE9quipes op\xE9rationnelles en cas\
         \ de crise ?\nNiveau 0 : Les membres de la cellule de crise op\xE9rationnelle\
@@ -203,10 +203,10 @@ objects:
         diation et de reconstruction."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.5
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
       ref_id: '2.5'
       description: "Quelles sont les expertises identifi\xE9es au niveau strat\xE9\
         gique?\nNiveau 0 : Aucune expertise en mati\xE8re de crise n'a \xE9t\xE9 pr\xE9\
@@ -224,10 +224,10 @@ objects:
         \ sollicit\xE9s."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.6
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.6
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
       ref_id: '2.6'
       description: "Quelles sont les expertises identifi\xE9es au niveau op\xE9rationnel?\n\
         Niveau 0 : Aucune expertise en mati\xE8re de crise n'a \xE9t\xE9 pr\xE9-identifi\xE9\
@@ -253,10 +253,10 @@ objects:
         \ et des p\xE9rim\xE8tres clairement d\xE9finis."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.7
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.7
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
       ref_id: '2.7'
       description: "Comment la cellule de crise strat\xE9gique communique-t-elle avec\
         \ les \xE9quipes op\xE9rationnelles cyber et IT ?\nNiveau 0 : Les diff\xE9\
@@ -274,10 +274,10 @@ objects:
         \ de l'information."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.8
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.8
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
       ref_id: '2.8'
       description: "Comment sont anticip\xE9es les interactions entre les \xE9quipes\
         \ techniques et les cellules op\xE9rationnelles ? \nNiveau 0 : Il n'y a pas\
@@ -296,10 +296,10 @@ objects:
         \ participer \xE0 la r\xE9daction des communications internes ou externes."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.9
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.9
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
       ref_id: '2.9'
       description: "Comment sont prises en compte les probl\xE9matiques internationales\
         \ ? (si non applicable, ne pas r\xE9pondre)\nNiveau 0 : Les probl\xE9matiques\
@@ -314,10 +314,10 @@ objects:
         \ jour r\xE9guli\xE8rement."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.10
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.10
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
       ref_id: '2.10'
       description: "Comment l'anticipation est-elle int\xE9gr\xE9e \xE0 la cellule\
         \ de crise strat\xE9gique?\nNiveau 0 : L'anticipation n'est pas int\xE9gr\xE9\
@@ -336,10 +336,10 @@ objects:
         cise son r\xF4le."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.11
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:2.11
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
       ref_id: '2.11'
       description: "Comment l'anticipation et la connaissance de la menace est-elle\
         \ int\xE9gr\xE9e au niveau op\xE9rationnel?\nNiveau 0 : Les \xE9quipes cyber\
@@ -356,10 +356,10 @@ objects:
         \ les actions de durcissement et de rem\xE9diation \xE0 mettre en place."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:3.1
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:3.1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node2
       ref_id: '3.1'
       description: "Comment est organis\xE9 la phase de RETEX de crise?\nNiveau 0\
         \ : Aucun processus n'est mis en place pour le RETEX.\nNiveau 1 : L'\xE9quipe\
@@ -380,14 +380,14 @@ objects:
         \ sp\xE9cifique."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
       assessable: false
       depth: 1
       name: Processus et outillage
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:4.1
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:4.1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
       ref_id: '4.1'
       description: "Un dispositif d'astreinte est-il existant?\nNiveau 0 : Aucun moyen\
         \ d'astreinte n'existe pour la gestion de crise cyber.\nNiveau 1 : Des personnes\
@@ -402,10 +402,10 @@ objects:
         \ an."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:4.2
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:4.2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
       ref_id: '4.2'
       description: "La cellule de crise dispose-t-elle d'outils num\xE9riques d\xE9\
         di\xE9s \xE0 la gestion de crise?\nNiveau 0 : La cellule de crise ne poss\xE8\
@@ -418,10 +418,10 @@ objects:
         s et test\xE9s lors d'exercices de crise."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:4.3
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:4.3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
       ref_id: '4.3'
       description: "Comment circule l'information au sein de la cellule de crise ?\n\
         Niveau 0 : La cellule de crise ne dispose pas de moyens (outils) pour faire\
@@ -434,10 +434,10 @@ objects:
         \ fournir de la visibilit\xE9 sur l'\xE9volution de la situation. "
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:4.4
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:4.4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
       ref_id: '4.4'
       description: "Les crit\xE8res d'activation de la cellule strat\xE9gique sont-ils\
         \ formalis\xE9s ?\nNiveau 0 : Les crit\xE8res d'activation de la cellule strat\xE9\
@@ -454,10 +454,10 @@ objects:
         \ les besoins de notification d'incidents vers les autorit\xE9s."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:4.5
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:4.5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
       ref_id: '4.5'
       description: "Comment sont d\xE9finis les crit\xE8res d'activation et de d\xE9\
         sactivation du dispositif op\xE9rationnel ?\nNiveau 0 : Les crit\xE8res d'activation\
@@ -485,10 +485,10 @@ objects:
         ."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:5.1
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:5.1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
       ref_id: '5.1'
       description: "Comment le processus de gestion de crise pr\xE9voit-il le premier\
         \ \xE9tat des lieux de la situation ?\nNiveau 0 : Il n'existe aucun document\
@@ -507,10 +507,10 @@ objects:
         \ etc.). "
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:5.2
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:5.2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
       ref_id: '5.2'
       description: "Un suivi de crise est-il mis en place ?\nNiveau 0 : Les d\xE9\
         cisions prises pendant la crise ne font pas l'objet d'un suivi.\nNiveau 1\
@@ -522,10 +522,10 @@ objects:
         \ des clients, des partenaires et des autorit\xE9s. "
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:5.3
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:5.3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
       ref_id: '5.3'
       description: "Les conditions de sortie de crise sont-elles pr\xE9 d\xE9finies\
         \ et \xE9valu\xE9es durant la crise ?\nNiveau 0 : Aucun processus d'\xE9valuation\
@@ -539,10 +539,10 @@ objects:
         mes affect\xE9s."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:5.4
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:5.4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
       ref_id: '5.4'
       description: "Quels sont les moyens logistiques pr\xE9vus pour une gestion de\
         \ crise cyber ?\nNiveau 0 : La logistique de crise n'a pas \xE9t\xE9 formalis\xE9\
@@ -564,10 +564,10 @@ objects:
         s."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:5.5
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:5.5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node18
       ref_id: '5.5'
       description: "Les besoins en assurance en cas de crise cyber sont-ils correctement\
         \ couverts ?\nNiveau 0 : Les besoins d'assurance en cas de crise cyber ne\
@@ -598,14 +598,14 @@ objects:
         \ retour d\u2019exp\xE9rience apr\xE8s chaque activation."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
       assessable: false
       depth: 1
       name: Communication de crise et relations externes
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:5.6
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:5.6
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
       ref_id: '5.6'
       description: "Comment est activ\xE9e l'assurance cyber ?\nNiveau 0 : Il n'existe\
         \ pas de processus pour activer l'assurance cyber.\nNiveau 1 : L\u2019assurance\
@@ -618,10 +618,10 @@ objects:
         assureur."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:6.1
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:6.1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
       ref_id: '6.1'
       description: "Les parties prenantes \xE0 contacter ou tenir inform\xE9es en\
         \ cas de crise sont-elles identifi\xE9es ?\nNiveau 0 : La liste des parties\
@@ -642,10 +642,10 @@ objects:
         - partenaires techniques (CSIRT, etc.)"
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:6.2
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:6.2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
       ref_id: '6.2'
       description: "L'organisation dispose-t-elle de moyens de communication alternatifs\
         \ ?\nNiveau 0 : L'organisation ne poss\xE8de pas de moyens de communication\
@@ -658,10 +658,10 @@ objects:
         curit\xE9, et test\xE9es une fois par an."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:7.1
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:7.1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
       ref_id: '7.1'
       description: "La strat\xE9gie de communication cyber est-elle formalis\xE9e\
         \ ?\nNiveau 0 : La strat\xE9gie de communication de crise en cas d'incident\
@@ -684,10 +684,10 @@ objects:
         -identifi\xE9."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:7.2
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:7.2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
       ref_id: '7.2'
       description: "Comment est r\xE9alis\xE9e l'analyse de risque communicationnelle\
         \  (pour identifier les risques provenant de communications de m\xE9dias,\
@@ -703,10 +703,10 @@ objects:
         thode d'analyse de risque communicationnelle est disponible."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:7.3
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:7.3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
       ref_id: '7.3'
       description: "Comment est pr\xE9par\xE9e l'\xE9quipe juridique \xE0 une crise\
         \ cyber ?\nNiveau 0 : L'\xE9quipe juridique n'est pas mobilis\xE9e dans la\
@@ -726,10 +726,10 @@ objects:
         \ \xE0 transmettre sont pr\xE9vus dans tous les contrats critiques. "
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:7.4
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:7.4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
       ref_id: '7.4'
       description: "Comment sont anticip\xE9es les actions de d\xE9claration d'incident\
         \ ?\nNiveau 0 : Les d\xE9clarations obligatoires ne sont pas pr\xE9vues.\n\
@@ -751,10 +751,10 @@ objects:
         . "
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:7.5
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:7.5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node29
       ref_id: '7.5'
       description: "Quelle est la proc\xE9dure de d\xE9claration d'incident ?\nNiveau\
         \ 0 : Aucun processus de d\xE9claration d'incident cyber n'est mis en place.\n\
@@ -775,14 +775,14 @@ objects:
         \ est sollicit\xE9 pour \xE9tablir le constat. "
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
       assessable: false
       depth: 1
       name: "D\xE9tection et r\xE9ponse \xE0 incidents"
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:8.1
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:8.1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
       ref_id: '8.1'
       description: "Les modalit\xE9s d'escalade d'une alerte vers la cellule strat\xE9\
         gique sont-elles formalis\xE9es ?\nNiveau 0 : Les modalit\xE9s d\u2019escalade\
@@ -798,10 +798,10 @@ objects:
         \ est test\xE9e r\xE9guli\xE8rement lors d'exercices de crise."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:8.2
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:8.2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
       ref_id: '8.2'
       description: "Un processus d'alerte, de gestion et de r\xE9ponse d\xE9di\xE9\
         \ aux incidents cyber est-il formalis\xE9 ?\nNiveau 0 : Il n'existe pas de\
@@ -823,10 +823,10 @@ objects:
         \ pour acc\xE9l\xE9rer la r\xE9ponse \xE0 incident."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:9.1
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:9.1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
       ref_id: '9.1'
       description: "Comment sont men\xE9es les actions de d\xE9tection et d'investigation?\n\
         Niveau 0 : L'organisation ne poss\xE8de pas d'outils de d\xE9tection, d'investigation\
@@ -841,10 +841,10 @@ objects:
         \ \xE9quipes sont form\xE9es \xE0 l'utilisation de ces outils."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:9.2
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:9.2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
       ref_id: '9.2'
       description: "Comment sont formalis\xE9es les proc\xE9dure de confinement en\
         \ amont de la crise ?\nNiveau 0 : Les proc\xE9dures de confinement ne sont\
@@ -863,10 +863,10 @@ objects:
         es, etc.)."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:9.3
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:9.3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
       ref_id: '9.3'
       description: "Des m\xE9mos techniques sont-ils \xE0 disposition des \xE9quipes\
         \ ?\nNiveau 0 : Des m\xE9mos techniques ne sont pas formalis\xE9s. \nNiveau\
@@ -887,10 +887,10 @@ objects:
         \ etc.)."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:9.4
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:9.4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
       ref_id: '9.4'
       description: "Comment est d\xE9fini le plan de durcissement durant la crise\
         \ ? Comment les investigations sont-elles int\xE9gr\xE9s dans le travail de\
@@ -911,10 +911,10 @@ objects:
         \ ceux \nidentifi\xE9s comme pr\xE9c\xE9demment compromis par l\u2019investigation."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:9.5
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:9.5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
       ref_id: '9.5'
       description: "Quelle gouvernance est mise en place dans le cadre du durcissement\
         \ et de la rem\xE9diation des SI?\nNiveau 0 : Aucune gouvernance n'est d\xE9\
@@ -936,10 +936,10 @@ objects:
         \ dans les pratiques d'utilisation ou d'administration des syst\xE8mes."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:9.6
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:9.6
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node38
       ref_id: '9.6'
       description: "Comment les mesures conservatoires et de rem\xE9diation sont-elles\
         \ valid\xE9es par la cellule strat\xE9gique durant la crise ?\nNiveau 0 :\
@@ -961,14 +961,14 @@ objects:
         \ mesures, et des exercices sur tables testent leur prise de d\xE9cision."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       assessable: false
       depth: 1
       name: "Continuit\xE9 d'activit\xE9 et reconstruction"
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.1
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       ref_id: '10.1'
       description: "Comment est \xE9tablie et prioris\xE9e la liste des services critiques\
         \ ?\nNiveau 0 : Les services critiques et applications associ\xE9s ne sont\
@@ -983,10 +983,10 @@ objects:
         \ la criticit\xE9 des services."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.2
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       ref_id: '10.2'
       description: "Comment sont cartographi\xE9s les actifs technologiques ?\nNiveau\
         \ 0 : Les principaux actifs technologiques ne sont pas list\xE9s.\nNiveau\
@@ -998,10 +998,10 @@ objects:
         \ les ans."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.3
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       ref_id: '10.3'
       description: "Comment sont cartographi\xE9s les services num\xE9riques externalis\xE9\
         s ?\nNiveau 0 : Les interconnexions avec les services externalis\xE9s ne sont\
@@ -1013,10 +1013,10 @@ objects:
         \ prestataires est \xE9galement formalis\xE9e et disponible-hors ligne. "
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.4
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       ref_id: '10.4'
       description: "Quelles informations sont inclues dans le plan de continuit\xE9\
         \ d'activit\xE9 ?\nNiveau 0 : Il n'existe pas de PCA couvrant les risques\
@@ -1043,10 +1043,10 @@ objects:
         organisation. Les dispositifs sont test\xE9s."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.5
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       ref_id: '10.5'
       description: "Comment sont consult\xE9s les m\xE9tiers pour l'int\xE9gration\
         \ des aspects cyber dans les PCA \"M\xE9tiers\"?\nNiveau 0 : Les m\xE9tiers\
@@ -1065,10 +1065,10 @@ objects:
         guli\xE8rement, avec les m\xE9tiers, l'analyse et le traitement des risques."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.6
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.6
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       ref_id: '10.6'
       description: "Comment l'activit\xE9 des prestataires de services num\xE9riques\
         \ (h\xE9bergement, nuagique, administration/maintenance, etc.) est inclue\
@@ -1085,10 +1085,10 @@ objects:
         \ hors-ligne."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.7
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.7
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       ref_id: '10.7'
       description: "Comment est envisag\xE9e l'indisponibilit\xE9 des services num\xE9\
         riques dans le PCA ?\nNiveau 0 : Les PCA m\xE9tiers ne pr\xE9voit pas l'indisponibilit\xE9\
@@ -1102,10 +1102,10 @@ objects:
         es et mises \xE0 jour r\xE9guli\xE8rement."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.8
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.8
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       ref_id: '10.8'
       description: "Comment est d\xE9finie les m\xE9triques de continuit\xE9 (TAMT,\
         \ DMIA, PDMA, TRD) ?\nNiveau 0 : Les m\xE9triques de continuit\xE9 d'activit\xE9\
@@ -1117,10 +1117,10 @@ objects:
         \ long, li\xE9 au sc\xE9nario de risque cyber."
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.9
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:10.9
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       ref_id: '10.9'
       description: "Comment est surveill\xE9 l'\xE9volution de l'\xE9tat de la menace\
         \ cyber ?\nNiveau 0 : L'\xE9tat de la menace cyber n'est pas surveill\xE9\
@@ -1133,10 +1133,10 @@ objects:
         ."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:11.1
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:11.1
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       ref_id: '11.1'
       description: "Comment sont prioris\xE9es les actions \xE0 mener pour relancer\
         \ les services num\xE9riques et l'activit\xE9 des m\xE9tiers ?\nNiveau 0 :\
@@ -1151,10 +1151,10 @@ objects:
         \ critique. "
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:11.2
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:11.2
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       ref_id: '11.2'
       description: "Comment est d\xE9fini le plan de sauvegarde des donn\xE9es ?\n\
         Niveau 0 : Aucun plan de sauvegarde des donn\xE9es n'a \xE9t\xE9 d\xE9fini.\
@@ -1173,10 +1173,10 @@ objects:
         \ en compte. "
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:11.3
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:11.3
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       ref_id: '11.3'
       description: "Les proc\xE9dures de basculement sur un r\xE9seau SI de secours\
         \ sont-elles formalis\xE9es ?\nNiveau 0 : L'organisation ne poss\xE8de pas\
@@ -1188,10 +1188,10 @@ objects:
         \ valid\xE9es et test\xE9es au moins une fois par an."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:11.4
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:11.4
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       ref_id: '11.4'
       description: "Les processus de restauration des donn\xE9es et de r\xE9installation\
         \ des SI sont-ils formalis\xE9s ?\nNiveau 0 : Il n'existe pas de processus\
@@ -1209,10 +1209,10 @@ objects:
         \ supporter un processus m\xE9tier)."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:11.5
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:11.5
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       ref_id: '11.5'
       description: "Quelles gouvernance est mise en place dans le cadre de la reconstruction\
         \ des SI?\nNiveau 0 : La reconstruction des SI n'est pas formellement suivie.\n\
@@ -1234,10 +1234,10 @@ objects:
         \ des \navanc\xE9es de l'\u2019investigation et de rem\xE9diation. "
       implementation_groups:
       - S
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:11.6
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:11.6
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       ref_id: '11.6'
       description: "Comment l'industrialisation de la reconstruction est-elle effectu\xE9\
         e?\nNiveau 0 : La reconstruction des syst\xE8mes d'information n'est pas industrialis\xE9\
@@ -1257,10 +1257,10 @@ objects:
         \ tests utilisateurs avant la remise en production des applications."
       implementation_groups:
       - O
-    - urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:11.7
+    - urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:11.7
       assessable: true
       depth: 2
-      parent_urn: urn:intuitem:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
+      parent_urn: urn:ciso:risk:req_node:anssi-maturite-gestion-crise-1.0.2:node47
       ref_id: '11.7'
       description: "Comment les travaux de reconstruction et d'industrialisation sont-ils\
         \ v\xE9rifi\xE9s et s\xE9curis\xE9s?\nNiveau 0 : Aucune v\xE9rification de\

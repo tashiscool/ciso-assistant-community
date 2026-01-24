@@ -28,12 +28,12 @@ THREATS_ENDPOINT = "threats-list"
 USERS_ENDPOINT = "users-list"
 
 # Common URN used primarily inside tests
-TEST_FRAMEWORK_URN = "urn:intuitem:risk:library:nist-csf-1.1"
-TEST_FRAMEWORK2_URN = "urn:intuitem:risk:library:iso27001-2022"
-TEST_DOCUMENTS_URN = "urn:intuitem:risk:library:doc-pol"
-TEST_RISK_MATRIX_URN = "urn:intuitem:risk:library:critical_risk_matrix_3x3"
-TEST_RISK_MATRIX2_URN = "urn:intuitem:risk:library:critical_risk_matrix_5x5"
-TEST_REQUIREMENT_NODE_URN = "urn:intuitem:risk:req_node:nist-csf-1.1:rs.an-1"
+TEST_FRAMEWORK_URN = "urn:ciso:risk:library:nist-csf-1.1"
+TEST_FRAMEWORK2_URN = "urn:ciso:risk:library:iso27001-2022"
+TEST_DOCUMENTS_URN = "urn:ciso:risk:library:doc-pol"
+TEST_RISK_MATRIX_URN = "urn:ciso:risk:library:critical_risk_matrix_3x3"
+TEST_RISK_MATRIX2_URN = "urn:ciso:risk:library:critical_risk_matrix_5x5"
+TEST_REQUIREMENT_NODE_URN = "urn:ciso:risk:req_node:nist-csf-1.1:rs.an-1"
 
 TEST_USER_EMAIL = "user@tests.com"
 GROUPS_PERMISSIONS = {

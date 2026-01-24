@@ -8,9 +8,9 @@ module.exports = {
 		'plugin:storybook/recommended'
 	],
 	parser: '@typescript-eslint/parser',
-	plugins: ['@typescript-eslint', 'eslint-plugin-intuitem-sveltekit'],
+	plugins: ['@typescript-eslint', 'eslint-plugin-ciso-sveltekit'],
 	rules: {
-		'eslint-plugin-intuitem-sveltekit/secure-redirect': 'error'
+		'eslint-plugin-ciso-sveltekit/secure-redirect': 'error'
 	},
 	parserOptions: {
 		sourceType: 'module',

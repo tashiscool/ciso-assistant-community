@@ -10,6 +10,11 @@ This module provides the core domain models for a GRC platform:
 - Risk: Risk scenarios, assessments, treatments
 - Compliance: Requirements, audits, evidence
 - Assets: Asset inventory and classification
+- Incidents: Incident management and response
+- Campaigns: Assessment campaigns
+- Metadata: Labels and terminology
+- Library: Reference controls and requirement nodes
+- Assessments: Compliance, findings, risk acceptance
 """
 
 from .organization import (
@@ -43,6 +48,7 @@ from .compliance import (
     Audit,
     Finding,
     Evidence,
+    EvidenceRevision,
     ComplianceException,
 )
 
@@ -51,6 +57,36 @@ from .assets import (
     AssetCategory,
     AssetClassification,
     AssetRelationship,
+)
+
+from .incident import (
+    Incident,
+    TimelineEntry,
+)
+
+from .campaign import (
+    Campaign,
+)
+
+from .metadata import (
+    FilteringLabel,
+    Terminology,
+)
+
+from .library import (
+    ReferenceControl,
+    RequirementNode,
+    RequirementMappingSet,
+    RequirementMapping,
+)
+
+from .assessments import (
+    ComplianceAssessment,
+    FindingsAssessment,
+    RiskAcceptance,
+    OrganisationIssue,
+    OrganisationObjective,
+    Team,
 )
 
 __all__ = [
@@ -79,10 +115,31 @@ __all__ = [
     'Audit',
     'Finding',
     'Evidence',
+    'EvidenceRevision',
     'ComplianceException',
     # Assets
     'Asset',
     'AssetCategory',
     'AssetClassification',
     'AssetRelationship',
+    # Incidents
+    'Incident',
+    'TimelineEntry',
+    # Campaigns
+    'Campaign',
+    # Metadata
+    'FilteringLabel',
+    'Terminology',
+    # Library
+    'ReferenceControl',
+    'RequirementNode',
+    'RequirementMappingSet',
+    'RequirementMapping',
+    # Assessments
+    'ComplianceAssessment',
+    'FindingsAssessment',
+    'RiskAcceptance',
+    'OrganisationIssue',
+    'OrganisationObjective',
+    'Team',
 ]
