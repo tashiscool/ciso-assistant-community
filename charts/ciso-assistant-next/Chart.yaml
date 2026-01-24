@@ -4,10 +4,9 @@ description: A Helm chart for CISO Assistant k8s's deployment
 type: application
 version: 0.7.6
 appVersion: "v3.10.2"
-icon: https://intuitem.com/ciso-assistant.svg
-home: https://intuitem.com
+home: https://github.com/tashiscool/ciso-assistant-community
 sources:
-  - https://github.com/intuitem/ciso-assistant-community
+  - https://github.com/tashiscool/ciso-assistant-community
 dependencies:
   - name: postgresql
     version: "16.6.3"

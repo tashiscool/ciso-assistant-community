@@ -1,6 +1,6 @@
 [Unit]
 Description=CISO Assistant Backend API (Django/Gunicorn)
-Documentation=https://github.com/intuitem/ciso-assistant-community
+Documentation=https://github.com/tashiscool/ciso-assistant-community
 After=network.target
 
 [Service]

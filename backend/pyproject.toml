@@ -2,7 +2,7 @@
 name = "ciso-assistant-community"
 version = "0.1.0"
 description = ""
-authors = ["intuitem <contact@intuitem.com>"]
+authors = ["tash"]
 readme = "README.md"
 package-mode = false
 

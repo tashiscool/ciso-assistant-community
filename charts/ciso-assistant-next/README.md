@@ -4,11 +4,9 @@
 
 A Helm chart for CISO Assistant k8s's deployment
 
-**Homepage:** <https://intuitem.com>
-
 ## Source Code
 
-* <https://github.com/intuitem/ciso-assistant-community>
+* <https://github.com/tashiscool/ciso-assistant-community>
 
 ## Requirements
 

@@ -381,9 +381,9 @@ server {
 
 ## Support
 
-- **GitHub**: https://github.com/intuitem/ciso-assistant-community
-- **Issues**: https://github.com/intuitem/ciso-assistant-community/issues
-- **Documentation**: https://github.com/intuitem/ciso-assistant-community/wiki
+- **GitHub**: https://github.com/tashiscool/ciso-assistant-community
+- **Issues**: https://github.com/tashiscool/ciso-assistant-community/issues
+- **Documentation**: https://github.com/tashiscool/ciso-assistant-community/wiki
 
 ## License
 

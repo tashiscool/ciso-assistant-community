@@ -14,7 +14,7 @@
 
 ## Do you have an idea or feature request?
 
-- Use the discussion space above or reach out through email: contact[at]intuitem.com to see how we can help each other in an optimal way.
+- Use the [GitHub Discussions](https://github.com/tashiscool/ciso-assistant-community/discussions) to share ideas and feature requests.
 
 ## Do you want to contribute to the code?
 

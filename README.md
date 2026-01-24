@@ -9,18 +9,15 @@
 </p>
 
 <p align="center">
-  <a href="#quick-start-">Quick Start</a> &bull;
+  <a href="#quick-start">Quick Start</a> &bull;
   <a href="#core-capabilities">Capabilities</a> &bull;
-  <a href="#supported-frameworks-">Frameworks</a> &bull;
-  <a href="https://intuitem.gitbook.io/ciso-assistant">Documentation</a> &bull;
-  <a href="https://discord.gg/qvkaMdQ8da">Discord</a>
+  <a href="#supported-frameworks">Frameworks</a> &bull;
+  <a href="#development-setup">Development</a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/v/release/intuitem/ciso-assistant-community?style=flat-square" alt="Release"/>
-  <img src="https://img.shields.io/github/stars/intuitem/ciso-assistant-community?style=flat-square" alt="Stars"/>
-  <img src="https://img.shields.io/discord/1155083727932764190?style=flat-square&label=Discord" alt="Discord"/>
-  <a href="https://www.codefactor.io/repository/github/intuitem/ciso-assistant-community"><img src="https://www.codefactor.io/repository/github/intuitem/ciso-assistant-community/badge" alt="CodeFactor"/></a>
+  <img src="https://img.shields.io/github/v/release/tashiscool/ciso-assistant-community?style=flat-square" alt="Release"/>
+  <img src="https://img.shields.io/github/stars/tashiscool/ciso-assistant-community?style=flat-square" alt="Stars"/>
 </p>
 
 ---
@@ -42,16 +39,12 @@ CISO Assistant is a comprehensive **Governance, Risk, and Compliance (GRC)** pla
 ### Docker (Recommended)
 
 ```bash
-git clone https://github.com/intuitem/ciso-assistant-community.git
+git clone https://github.com/tashiscool/ciso-assistant-community.git
 cd ciso-assistant-community
 ./docker-compose.sh
 ```
 
 Access the application at [https://localhost:8443](https://localhost:8443)
-
-### Cloud Trial
-
-The fastest way to get started: [Free Cloud Trial](https://intuitem.com/trial)
 
 ---
 
@@ -242,7 +235,7 @@ Interactive API documentation (Swagger) is available at `/api/schema/swagger/` w
 # Get token
 curl -X POST http://localhost:8000/api/iam/login/ \
   -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com", "password": "password"}'
+  -d '{"email": "admin@localhost", "password": "your-password"}'
 
 # Use token
 curl http://localhost:8000/api/applied-controls/ \
@@ -279,7 +272,7 @@ See [deployment documentation](deployment/docs/DEPLOYMENT_GUIDE.md) for complete
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ### Pre-commit Hooks
 
@@ -299,14 +292,6 @@ cd frontend && ./tests/e2e-tests.sh
 
 ---
 
-## Community
-
-- **Discord**: [Join our community](https://discord.gg/qvkaMdQ8da)
-- **GitHub Issues**: [Report bugs or request features](https://github.com/intuitem/ciso-assistant-community/issues)
-- **Documentation**: [GitBook](https://intuitem.gitbook.io/ciso-assistant)
-
----
-
 ## License
 
 - **Community Edition**: [AGPL v3](LICENSE-AGPL.txt)
@@ -318,16 +303,10 @@ Files in the `enterprise/` directory are commercially licensed. All other files 
 
 ## Acknowledgments
 
-Built with:
-
-- [Django](https://www.djangoproject.com/) - Backend framework
-- [SvelteKit](https://kit.svelte.dev/) - Frontend framework
-- [Tailwind CSS](https://tailwindcss.com/) - Styling
-- [eCharts](https://echarts.apache.org/) - Visualization
-- [compliance-trestle](https://ibm.github.io/compliance-trestle/) - OSCAL automation
+Built with [Django](https://www.djangoproject.com/), [SvelteKit](https://kit.svelte.dev/), [Tailwind CSS](https://tailwindcss.com/), [eCharts](https://echarts.apache.org/), and [compliance-trestle](https://ibm.github.io/compliance-trestle/).
 
 ---
 
 <p align="center">
-  Made with care by <a href="https://intuitem.com">intuitem</a>
+  Maintained by <strong>tash</strong>
 </p>

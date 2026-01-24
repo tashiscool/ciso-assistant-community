@@ -14,7 +14,7 @@ The **CISO Assistant Dispatcher** is a command-line tool that bridges event-driv
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/intuitem/ciso-assistant-community.git
+   git clone https://github.com/tashiscool/ciso-assistant-community.git
    cd ciso-assistant-community/dispatcher
    ```
 
@@ -52,7 +52,7 @@ The **CISO Assistant Dispatcher** is a command-line tool that bridges event-driv
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/intuitem/ciso-assistant-community.git
+   git clone https://github.com/tashiscool/ciso-assistant-community.git
    cd ciso-assistant-community/dispatcher
    ```
 

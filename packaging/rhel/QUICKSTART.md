@@ -151,5 +151,5 @@ sudo chown -R ciso-assistant:ciso-assistant /var/lib/ciso-assistant
 ## Support
 
 - Documentation: See `README.md` in this directory
-- GitHub: https://github.com/intuitem/ciso-assistant-community
+- GitHub: https://github.com/tashiscool/ciso-assistant-community
 - Issues: Report at GitHub Issues

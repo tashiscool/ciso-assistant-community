@@ -7,7 +7,7 @@ Version:        %{_version}
 Release:        1%{?dist}
 Summary:        CISO Assistant - Cybersecurity GRC Platform
 License:        AGPLv3
-URL:            https://github.com/intuitem/ciso-assistant-community
+URL:            https://github.com/tashiscool/ciso-assistant-community
 BuildArch:      x86_64
 
 Requires:       systemd
@@ -148,7 +148,7 @@ fi
 %config(noreplace) /etc/ciso-assistant/frontend.env
 
 %changelog
-* 2025-11-27 CISO Assistant Team <hello@intuitem.com>
+* 2025-11-27 CISO Assistant Team
 - Initial RPM package for air-gapped deployment
 - Includes bundled Python 3.12, Node.js 22, and all dependencies
 - SQLite database for simplified deployment

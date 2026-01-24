@@ -1,6 +1,6 @@
 ## Why
 
-Based on the established documentation around [Conventional Commits](https://www.conventionalcommits.org) and the recommendations made in [#1334](https://github.com/intuitem/ciso-assistant-community/issues/1334), we have decided to adopt this principle using the following guidelines:
+Based on the established documentation around [Conventional Commits](https://www.conventionalcommits.org), we have decided to adopt this principle using the following guidelines:
 
 - Since v2, we have exclusively used squash merges, which has been beneficial so far. Therefore, we will continue to use this as the foundation for our workflow.
 - Semantic versioning is **mandatory** for Pull Requests, particularly the use of `!` for breaking changes.

@@ -31,7 +31,7 @@ You'll use an **online workstation** to download dependencies and build the appl
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/intuitem/ciso-assistant-community.git
+git clone https://github.com/tashiscool/ciso-assistant-community.git
 cd ciso-assistant-community
 ```
 

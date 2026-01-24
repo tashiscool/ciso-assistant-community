@@ -123,10 +123,10 @@
 							><i class="fa-solid fa-circle-info mr-2"></i>{m.aboutCiso()}</button
 						>
 						<a
-							href="https://intuitem.gitbook.io/ciso-assistant"
+							href="https://github.com/tashiscool/ciso-assistant-community"
 							target="_blank"
 							class="unstyled cursor-pointer flex items-center gap-2 w-full px-4 py-2.5 text-left text-sm hover:bg-gray-100 disabled:text-gray-500 text-gray-800"
-							data-testid="docs-button"><i class="fa-solid fa-book mr-2"></i>{m.onlineDocs()}</a
+							data-testid="docs-button"><i class="fa-brands fa-github mr-2"></i>{m.onlineDocs()}</a
 						>
 						<form action="/logout" method="POST">
 							<button class="w-full" type="submit" data-testid="logout-button">

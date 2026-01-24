@@ -59,8 +59,8 @@ representative at an online or offline event.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement at
-contact@intuitem.com or our [Discord](https://discord.gg/qvkaMdQ8da).
+reported to the community leaders responsible for enforcement via
+[GitHub Issues](https://github.com/tashiscool/ciso-assistant-community/issues).
 All complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the

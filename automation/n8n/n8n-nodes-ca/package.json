@@ -3,14 +3,13 @@
   "version": "1.0.0",
   "description": "Custom n8n node to interact with CISO Assistant API",
   "license": "AGPL",
-  "homepage": "https://github.com/intuitem/ciso-assistant-community",
+  "homepage": "https://github.com/tashiscool/ciso-assistant-community",
   "author": {
-    "name": "intuitem",
-    "email": "contact@intuitem.com"
+    "name": "tash"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/intuitem/ciso-assistant-community.git"
+    "url": "git+https://github.com/tashiscool/ciso-assistant-community.git"
   },
   "keywords": [
     "n8n",
