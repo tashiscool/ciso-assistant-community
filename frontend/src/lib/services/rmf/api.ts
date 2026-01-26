@@ -494,12 +494,12 @@ export const nessusApi = {
   },
 
   async exportSummaryXlsx(systemGroupId: string): Promise<Blob> {
-    const response = await fetch(`/api/v1/rmf/nessus/export/${systemGroupId}/summary/`);
+    const response = await fetch(`/api/rmf/nessus/export/${systemGroupId}/summary/`);
     return response.blob();
   },
 
   async exportByHostXlsx(systemGroupId: string): Promise<Blob> {
-    const response = await fetch(`/api/v1/rmf/nessus/export/${systemGroupId}/by-host/`);
+    const response = await fetch(`/api/rmf/nessus/export/${systemGroupId}/by-host/`);
     return response.blob();
   }
 };
@@ -540,7 +540,7 @@ export const complianceApi = {
   },
 
   async exportXlsx(systemGroupId: string): Promise<Blob> {
-    const response = await fetch(`/api/v1/rmf/compliance/export/${systemGroupId}/`);
+    const response = await fetch(`/api/rmf/compliance/export/${systemGroupId}/`);
     return response.blob();
   }
 };
@@ -673,7 +673,7 @@ export const reportsApi = {
 
   async exportReport(reportType: string, params: ReportParams): Promise<Blob> {
     const queryParams = new URLSearchParams(params as Record<string, string>);
-    const response = await fetch(`/api/v1/rmf/reports/${reportType}/export/?${queryParams}`);
+    const response = await fetch(`/api/rmf/reports/${reportType}/export/?${queryParams}`);
     return response.blob();
   }
 };
@@ -706,38 +706,38 @@ export const cciApi = {
 export const exportApi = {
   async downloadSystemCkl(systemGroupId: string, filters?: Record<string, any>): Promise<void> {
     const queryParams = new URLSearchParams(filters as Record<string, string>);
-    const response = await fetch(`/api/v1/rmf/system-groups/${systemGroupId}/download/ckl/?${queryParams}`);
+    const response = await fetch(`/api/rmf/system-groups/${systemGroupId}/download/ckl/?${queryParams}`);
     const blob = await response.blob();
     downloadBlob(blob, 'checklists.zip');
   },
 
   async downloadSystemXlsx(systemGroupId: string, filters?: Record<string, any>): Promise<void> {
     const queryParams = new URLSearchParams(filters as Record<string, string>);
-    const response = await fetch(`/api/v1/rmf/system-groups/${systemGroupId}/export/xlsx/?${queryParams}`);
+    const response = await fetch(`/api/rmf/system-groups/${systemGroupId}/export/xlsx/?${queryParams}`);
     const blob = await response.blob();
     downloadBlob(blob, 'checklists.xlsx');
   },
 
   async downloadChecklistCkl(checklistId: string): Promise<void> {
-    const response = await fetch(`/api/v1/rmf/checklists/${checklistId}/download/ckl/`);
+    const response = await fetch(`/api/rmf/checklists/${checklistId}/download/ckl/`);
     const blob = await response.blob();
     downloadBlob(blob, 'checklist.ckl');
   },
 
   async downloadChecklistXlsx(checklistId: string): Promise<void> {
-    const response = await fetch(`/api/v1/rmf/checklists/${checklistId}/export/xlsx/`);
+    const response = await fetch(`/api/rmf/checklists/${checklistId}/export/xlsx/`);
     const blob = await response.blob();
     downloadBlob(blob, 'checklist.xlsx');
   },
 
   async downloadTestPlan(systemGroupId: string): Promise<void> {
-    const response = await fetch(`/api/v1/rmf/system-groups/${systemGroupId}/export/test-plan/`);
+    const response = await fetch(`/api/rmf/system-groups/${systemGroupId}/export/test-plan/`);
     const blob = await response.blob();
     downloadBlob(blob, 'test-plan.xlsx');
   },
 
   async downloadPoam(systemGroupId: string): Promise<void> {
-    const response = await fetch(`/api/v1/rmf/system-groups/${systemGroupId}/export/poam/`);
+    const response = await fetch(`/api/rmf/system-groups/${systemGroupId}/export/poam/`);
     const blob = await response.blob();
     downloadBlob(blob, 'poam.xlsx');
   }
