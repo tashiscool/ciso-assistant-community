@@ -134,6 +134,9 @@ ATTACHMENT_MAX_SIZE_MB = os.environ.get("ATTACHMENT_MAX_SIZE_MB", 25)
 
 USE_S3 = os.getenv("USE_S3", "False") == "True"
 
+# S3 authentication mode: "iam" for IAM roles, "credentials" for static credentials
+AWS_AUTH_MODE = os.getenv("AWS_AUTH_MODE", "credentials")
+
 if USE_S3:
     STORAGES = {
         "default": {
@@ -144,26 +147,39 @@ if USE_S3:
         },
     }
 
-    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
     AWS_STORAGE_BUCKET_NAME = os.getenv(
         "AWS_STORAGE_BUCKET_NAME", "ciso-assistant-bucket"
     )
+    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", os.getenv("AWS_REGION", "us-east-1"))
     AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
+    AWS_DEFAULT_ACL = os.getenv("AWS_DEFAULT_ACL", "private")
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_QUERYSTRING_AUTH = True  # Generate signed URLs for private files
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
 
-    if not AWS_ACCESS_KEY_ID:
-        logger.error("AWS_ACCESS_KEY_ID must be set")
-    if not AWS_SECRET_ACCESS_KEY:
-        logger.error("AWS_SECRET_ACCESS_KEY must be set")
-    if not AWS_S3_ENDPOINT_URL:
-        logger.error("AWS_S3_ENDPOINT_URL must be set")
-    if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY or not AWS_S3_ENDPOINT_URL:
-        exit(1)
+    if AWS_AUTH_MODE == "iam":
+        # Use IAM role-based authentication (EC2 instance role, ECS task role, etc.)
+        # boto3 will automatically use the IAM role credentials
+        logger.info("Using IAM role-based authentication for S3")
+        AWS_ACCESS_KEY_ID = None
+        AWS_SECRET_ACCESS_KEY = None
+    else:
+        # Use static credentials
+        AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+        AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+
+        if not AWS_ACCESS_KEY_ID:
+            logger.error("AWS_ACCESS_KEY_ID must be set when using credentials mode")
+        if not AWS_SECRET_ACCESS_KEY:
+            logger.error("AWS_SECRET_ACCESS_KEY must be set when using credentials mode")
+        if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
+            exit(1)
 
     logger.info("AWS_STORAGE_BUCKET_NAME: %s", AWS_STORAGE_BUCKET_NAME)
-    logger.info("AWS_S3_ENDPOINT_URL: %s", AWS_S3_ENDPOINT_URL)
-
-    AWS_S3_FILE_OVERWRITE = False
+    logger.info("AWS_S3_REGION_NAME: %s", AWS_S3_REGION_NAME)
+    logger.info("AWS_AUTH_MODE: %s", AWS_AUTH_MODE)
+    if AWS_S3_ENDPOINT_URL:
+        logger.info("AWS_S3_ENDPOINT_URL: %s", AWS_S3_ENDPOINT_URL)
 
 else:
     MEDIA_ROOT = LOCAL_STORAGE_DIRECTORY
@@ -429,18 +445,50 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SQLITE_FILE = os.environ.get("SQLITE_FILE", BASE_DIR / "db/ciso-assistant.sqlite3")
 LIBRARIES_PATH = library_path = BASE_DIR / "library/libraries"
 
+# RDS IAM Authentication mode
+RDS_IAM_AUTH = os.environ.get("RDS_IAM_AUTH", "False") == "True"
+
 if "POSTGRES_NAME" in os.environ:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql_psycopg2",
-            "NAME": os.environ["POSTGRES_NAME"],
-            "USER": os.environ["POSTGRES_USER"],
-            "PASSWORD": os.environ["POSTGRES_PASSWORD"],
-            "HOST": os.environ["DB_HOST"],
-            "PORT": os.environ.get("DB_PORT", "5432"),
-            "CONN_MAX_AGE": os.environ.get("CONN_MAX_AGE", 300),
-        }
+    # Base PostgreSQL configuration
+    db_config = {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": os.environ["POSTGRES_NAME"],
+        "USER": os.environ["POSTGRES_USER"],
+        "HOST": os.environ["DB_HOST"],
+        "PORT": os.environ.get("DB_PORT", "5432"),
     }
+
+    if RDS_IAM_AUTH:
+        # IAM RDS Authentication
+        # Tokens expire after 15 minutes, so we need to refresh connections
+        # CONN_MAX_AGE should be less than token lifetime (900 seconds)
+        # We use 840 seconds (14 minutes) to ensure refresh before expiry
+        db_config["ENGINE"] = "ciso_assistant.database.backends.postgresql_iam"
+        db_config["CONN_MAX_AGE"] = int(os.environ.get("CONN_MAX_AGE", 840))  # 14 minutes
+        db_config["CONN_HEALTH_CHECKS"] = True  # Enable health checks for stale connections
+        db_config["OPTIONS"] = {
+            "connect_timeout": 10,
+            "sslmode": os.environ.get("DB_SSL_MODE", "require"),
+            # Connection pool settings for IAM auth
+            "keepalives": 1,
+            "keepalives_idle": 30,
+            "keepalives_interval": 10,
+            "keepalives_count": 5,
+        }
+        # AWS Region for generating IAM auth token
+        db_config["AWS_REGION"] = os.environ.get("AWS_REGION", "us-east-1")
+        logger.info("Using RDS IAM Authentication")
+        logger.info("AWS_REGION: %s", db_config["AWS_REGION"])
+        logger.info("CONN_MAX_AGE: %s seconds", db_config["CONN_MAX_AGE"])
+    else:
+        # Static password authentication
+        db_config["PASSWORD"] = os.environ["POSTGRES_PASSWORD"]
+        db_config["CONN_MAX_AGE"] = int(os.environ.get("CONN_MAX_AGE", 300))
+        db_config["OPTIONS"] = {
+            "sslmode": os.environ.get("DB_SSL_MODE", "prefer"),
+        }
+
+    DATABASES = {"default": db_config}
 else:
     DATABASES = {
         "default": {

@@ -8,9 +8,14 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from django.core.exceptions import ValidationError
+from django.http import HttpResponse
 import uuid
+import logging
 
 from core.permissions import RBACPermissions
+from .services.rmf_export_service import RMFExportService
+
+logger = logging.getLogger(__name__)
 from .aggregates.system_group import SystemGroup
 from .aggregates.stig_checklist import StigChecklist
 from .aggregates.vulnerability_finding import VulnerabilityFinding
@@ -161,6 +166,74 @@ class SystemGroupViewSet(viewsets.ModelViewSet):
             'results': serializer.data
         })
 
+    @action(detail=True, methods=['get'], url_path='download/ckl')
+    def download_ckl(self, request, pk=None):
+        """Download all checklists for this system as a ZIP of CKL files"""
+        try:
+            system = self.get_object()
+            checklists = StigChecklist.objects.filter(systemGroupId=system.id)
+
+            export_service = RMFExportService()
+            return export_service.export_system_checklists_zip(system, checklists)
+        except Exception as e:
+            logger.error(f"Error exporting CKL files: {e}")
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=True, methods=['get'], url_path='export/xlsx')
+    def export_xlsx(self, request, pk=None):
+        """Export system group data to Excel format"""
+        try:
+            system = self.get_object()
+            checklists = list(StigChecklist.objects.filter(systemGroupId=system.id))
+
+            # Get scores for each checklist
+            repo = ChecklistScoreRepository()
+            scores = [repo.find_by_checklist(cl.id) for cl in checklists]
+
+            export_service = RMFExportService()
+            return export_service.export_system_xlsx(system, checklists, scores)
+        except Exception as e:
+            logger.error(f"Error exporting system XLSX: {e}")
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=True, methods=['get'], url_path='export/poam')
+    def export_poam(self, request, pk=None):
+        """Export POAM (Plan of Action and Milestones) to Excel format"""
+        try:
+            system = self.get_object()
+            checklists = list(StigChecklist.objects.filter(systemGroupId=system.id))
+
+            export_service = RMFExportService()
+            return export_service.export_poam_xlsx(system, checklists)
+        except Exception as e:
+            logger.error(f"Error exporting POAM: {e}")
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=True, methods=['get'], url_path='export/test-plan')
+    def export_test_plan(self, request, pk=None):
+        """Export Security Test Plan to Excel format"""
+        try:
+            system = self.get_object()
+            checklists = list(StigChecklist.objects.filter(systemGroupId=system.id))
+
+            export_service = RMFExportService()
+            return export_service.export_test_plan_xlsx(system, checklists)
+        except Exception as e:
+            logger.error(f"Error exporting test plan: {e}")
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
 
 class StigChecklistViewSet(viewsets.ModelViewSet):
     """ViewSet for StigChecklist aggregates"""
@@ -256,6 +329,34 @@ class StigChecklistViewSet(viewsets.ModelViewSet):
             return Response(
                 {'error': 'Score not found for this checklist'},
                 status=status.HTTP_404_NOT_FOUND
+            )
+
+    @action(detail=True, methods=['get'], url_path='download/ckl')
+    def download_ckl(self, request, pk=None):
+        """Download checklist as CKL file"""
+        try:
+            checklist = self.get_object()
+            export_service = RMFExportService()
+            return export_service.export_checklist_ckl(checklist)
+        except Exception as e:
+            logger.error(f"Error exporting CKL: {e}")
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=True, methods=['get'], url_path='export/xlsx')
+    def export_xlsx(self, request, pk=None):
+        """Export checklist to Excel format"""
+        try:
+            checklist = self.get_object()
+            export_service = RMFExportService()
+            return export_service.export_checklist_xlsx(checklist)
+        except Exception as e:
+            logger.error(f"Error exporting checklist XLSX: {e}")
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
@@ -502,6 +603,27 @@ class NessusScanViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(scans, many=True)
             return Response(serializer.data)
         except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(methods=['get'], detail=False, url_path='export/(?P<system_group_id>[^/.]+)/summary')
+    def export_summary(self, request, system_group_id=None):
+        """Export Nessus scan summary for a system group to Excel"""
+        try:
+            system_group = SystemGroup.objects.get(id=system_group_id)
+            scans = list(NessusScan.objects.filter(systemGroupId=system_group_id))
+
+            export_service = RMFExportService()
+            return export_service.export_nessus_summary_xlsx(system_group, scans)
+        except SystemGroup.DoesNotExist:
+            return Response(
+                {'error': 'System group not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            logger.error(f"Error exporting Nessus summary: {e}")
             return Response(
                 {'error': str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
