@@ -166,11 +166,14 @@ USE_S3=True
 AWS_AUTH_MODE=iam
 AWS_STORAGE_BUCKET_NAME=your-bucket-name
 
-# ElastiCache (Optional)
+# ElastiCache Redis (Optional - for caching and task queue)
 USE_REDIS=True
 REDIS_HOST=your-redis.xxx.cache.amazonaws.com
 REDIS_PORT=6379
 REDIS_SSL=True
+# REDIS_PASSWORD=  # Optional, if AUTH enabled
+# REDIS_DB=0       # Redis database number
+# HUEY_WORKERS=4   # Number of task queue workers
 
 # Admin
 CISO_ASSISTANT_SUPERUSER_EMAIL=admin@your-domain.gov
@@ -182,7 +185,7 @@ LOG_FORMAT=json
 
 ### ElastiCache Configuration
 
-If using ElastiCache Redis:
+If using ElastiCache Redis for caching and task queue:
 
 1. Create ElastiCache Redis cluster in same VPC
 2. Configure security group to allow port 6379 from EC2
@@ -193,7 +196,62 @@ If using ElastiCache Redis:
    REDIS_HOST=your-cluster.xxx.cache.amazonaws.com
    REDIS_PORT=6379
    REDIS_SSL=True
+   HUEY_WORKERS=4  # Adjust based on workload
    ```
+
+**Benefits of ElastiCache:**
+- Faster caching compared to local memory cache
+- Session persistence across application restarts
+- Distributed task queue for background jobs
+- Supports multiple application instances (horizontal scaling)
+
+### AWS SQS Configuration (Alternative to Redis)
+
+If using AWS SQS for task queue management (fully managed, serverless-friendly):
+
+1. Create SQS queue in same region:
+   ```bash
+   aws sqs create-queue --queue-name ciso-assistant-tasks --region us-gov-west-1
+   ```
+
+2. Add SQS permissions to EC2 IAM role:
+   ```json
+   {
+       "Sid": "SQSAccess",
+       "Effect": "Allow",
+       "Action": [
+           "sqs:SendMessage",
+           "sqs:ReceiveMessage",
+           "sqs:DeleteMessage",
+           "sqs:GetQueueAttributes",
+           "sqs:GetQueueUrl"
+       ],
+       "Resource": "arn:aws-us-gov:sqs:us-gov-west-1:ACCOUNT_ID:ciso-assistant-tasks"
+   }
+   ```
+
+3. Set environment variables:
+   ```bash
+   TASK_QUEUE_BACKEND=celery
+   USE_SQS=True
+   AWS_SQS_REGION=us-gov-west-1
+   SQS_QUEUE_NAME=ciso-assistant-tasks
+   # Optionally, use Redis for result backend (caching)
+   USE_REDIS=True
+   REDIS_HOST=your-cluster.xxx.cache.amazonaws.com
+   ```
+
+4. Start Celery worker instead of Huey:
+   ```bash
+   celery -A ciso_assistant worker -l info -Q ciso-assistant-tasks
+   ```
+
+**Benefits of SQS:**
+- Fully managed, no infrastructure to maintain
+- Auto-scaling built-in
+- Pay-per-use pricing
+- High availability across AZs
+- Native AWS integration with IAM
 
 ## Service Management
 

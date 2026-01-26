@@ -261,6 +261,21 @@ USE_S3=True
 AWS_AUTH_MODE=iam
 AWS_STORAGE_BUCKET_NAME=your-bucket-name
 
+# Task Queue Backend (huey or celery)
+TASK_QUEUE_BACKEND=huey
+
+# Redis/ElastiCache (optional - for caching and task queue)
+# USE_REDIS=True
+# REDIS_HOST=your-redis.cache.amazonaws.com
+# REDIS_PORT=6379
+# REDIS_SSL=True
+# HUEY_WORKERS=4
+
+# AWS SQS (alternative to Redis for task queue, requires TASK_QUEUE_BACKEND=celery)
+# USE_SQS=True
+# SQS_QUEUE_NAME=ciso-assistant-tasks
+# CELERY_WORKERS=4
+
 # Admin User
 CISO_ASSISTANT_SUPERUSER_EMAIL=admin@example.gov
 
@@ -360,10 +375,44 @@ StandardError=append:${LOG_DIR}/frontend-error.log
 WantedBy=multi-user.target
 EOF
 
-    # Huey worker service (background tasks)
+    # Worker wrapper script (supports both Huey and Celery)
+    cat > "${APP_DIR}/run-worker.sh" << 'WORKER_SCRIPT'
+#!/bin/bash
+# CISO Assistant Worker Script
+# Supports both Huey and Celery backends
+
+set -euo pipefail
+
+APP_DIR="/opt/ciso-assistant"
+VENV_DIR="${APP_DIR}/venv"
+
+cd "${APP_DIR}/app/backend"
+source "${VENV_DIR}/bin/activate"
+
+BACKEND="${TASK_QUEUE_BACKEND:-huey}"
+WORKERS="${HUEY_WORKERS:-${CELERY_WORKERS:-4}}"
+QUEUE="${SQS_QUEUE_NAME:-ciso-assistant-tasks}"
+
+if [ "$BACKEND" = "celery" ]; then
+    echo "Starting Celery worker..."
+    if [ "${USE_SQS:-False}" = "True" ]; then
+        exec celery -A ciso_assistant worker -l info -Q "$QUEUE" -c "$WORKERS"
+    else
+        exec celery -A ciso_assistant worker -l info -c "$WORKERS"
+    fi
+else
+    echo "Starting Huey worker..."
+    exec python manage.py run_huey
+fi
+WORKER_SCRIPT
+
+    chmod +x "${APP_DIR}/run-worker.sh"
+    chown "${APP_USER}:${APP_USER}" "${APP_DIR}/run-worker.sh"
+
+    # Worker service (background tasks - supports Huey and Celery)
     cat > /etc/systemd/system/ciso-assistant-worker.service << EOF
 [Unit]
-Description=CISO Assistant Background Worker (Huey)
+Description=CISO Assistant Background Worker (Huey/Celery)
 After=network.target ciso-assistant-backend.service
 
 [Service]
@@ -372,7 +421,7 @@ User=${APP_USER}
 Group=${APP_USER}
 WorkingDirectory=${APP_DIR}/app/backend
 EnvironmentFile=${CONFIG_DIR}/env
-ExecStart=${VENV_DIR}/bin/python manage.py run_huey
+ExecStart=${APP_DIR}/run-worker.sh
 Restart=always
 RestartSec=5
 StandardOutput=append:${LOG_DIR}/worker.log
@@ -609,6 +658,11 @@ print_summary() {
     echo ""
     echo "6. Test RDS IAM connection:"
     echo "   sudo -u ${APP_USER} ${VENV_DIR}/bin/python ${APP_DIR}/app/backend/manage.py test_rds_iam"
+    echo ""
+    echo "7. (Optional) For AWS SQS task queue:"
+    echo "   - Install Celery extras: cd ${APP_DIR}/app/backend && poetry install --extras celery"
+    echo "   - Set TASK_QUEUE_BACKEND=celery and USE_SQS=True in ${CONFIG_DIR}/env"
+    echo "   - Restart worker: sudo systemctl restart ciso-assistant-worker"
     echo ""
     echo "Service status:"
     echo "   sudo systemctl status ciso-assistant-backend"

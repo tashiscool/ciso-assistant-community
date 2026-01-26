@@ -603,34 +603,100 @@ else:
         }
     }
 
+## Task Queue Configuration
+# Supported backends: "huey" (default), "celery"
+# Huey supports: SQLite (default), Redis
+# Celery supports: Redis, SQS
+TASK_QUEUE_BACKEND = os.environ.get("TASK_QUEUE_BACKEND", "huey")
+
+## AWS SQS Configuration (for Celery with SQS)
+USE_SQS = os.environ.get("USE_SQS", "False") == "True"
+AWS_SQS_REGION = os.environ.get("AWS_SQS_REGION", os.environ.get("AWS_REGION", "us-gov-west-1"))
+SQS_QUEUE_NAME = os.environ.get("SQS_QUEUE_NAME", "ciso-assistant-tasks")
+SQS_QUEUE_URL = os.environ.get("SQS_QUEUE_URL", "")  # Optional: full queue URL
+
 ## Huey settings
 HUEY_FILE_PATH = os.environ.get("HUEY_FILE_PATH", BASE_DIR / "db" / "huey.db")
 
-if USE_REDIS:
-    # Use Redis for Huey task queue (recommended for production)
-    HUEY = {
-        "huey_class": "huey.RedisHuey",
-        "name": "ciso_assistant",
-        "utc": True,
-        "url": REDIS_URL,
-        "results": True,
-        "immediate": False,
-        "consumer": {
-            "workers": int(os.environ.get("HUEY_WORKERS", 4)),
-            "worker_type": "thread",
-        },
-    }
-    logger.info("Using Redis for Huey task queue")
-else:
-    # Default to SQLite Huey (suitable for single-server deployments)
-    HUEY = {
-        "huey_class": "huey.SqliteHuey",
-        "name": "ciso_assistant",
-        "utc": True,
-        "filename": HUEY_FILE_PATH,
-        "results": True,
-        "immediate": False,
-    }
+if TASK_QUEUE_BACKEND == "huey":
+    if USE_REDIS:
+        # Use Redis for Huey task queue (recommended for production with ElastiCache)
+        HUEY = {
+            "huey_class": "huey.RedisHuey",
+            "name": "ciso_assistant",
+            "utc": True,
+            "url": REDIS_URL,
+            "results": True,
+            "immediate": False,
+            "consumer": {
+                "workers": int(os.environ.get("HUEY_WORKERS", 4)),
+                "worker_type": "thread",
+            },
+        }
+        logger.info("Using Redis for Huey task queue")
+    else:
+        # Default to SQLite Huey (suitable for single-server deployments)
+        HUEY = {
+            "huey_class": "huey.SqliteHuey",
+            "name": "ciso_assistant",
+            "utc": True,
+            "filename": HUEY_FILE_PATH,
+            "results": True,
+            "immediate": False,
+        }
+        logger.info("Using SQLite for Huey task queue")
+
+elif TASK_QUEUE_BACKEND == "celery":
+    # Celery configuration
+    # Remove huey from installed apps and add celery
+    if "huey.contrib.djhuey" in INSTALLED_APPS:
+        INSTALLED_APPS.remove("huey.contrib.djhuey")
+
+    if USE_SQS:
+        # AWS SQS as Celery broker (fully managed, serverless-friendly)
+        # Requires: pip install celery[sqs]
+        CELERY_BROKER_URL = f"sqs://"
+        CELERY_BROKER_TRANSPORT_OPTIONS = {
+            "region": AWS_SQS_REGION,
+            "predefined_queues": {
+                SQS_QUEUE_NAME: {
+                    "url": SQS_QUEUE_URL if SQS_QUEUE_URL else None,
+                }
+            },
+            "polling_interval": 1,
+            "visibility_timeout": 3600,  # 1 hour
+            "wait_time_seconds": 20,  # Long polling
+        }
+        # SQS doesn't support result backend, use Redis or database
+        if USE_REDIS:
+            CELERY_RESULT_BACKEND = REDIS_URL
+        else:
+            CELERY_RESULT_BACKEND = "django-db"
+
+        logger.info("Using AWS SQS for Celery task queue")
+        logger.info("AWS_SQS_REGION: %s", AWS_SQS_REGION)
+        logger.info("SQS_QUEUE_NAME: %s", SQS_QUEUE_NAME)
+
+    elif USE_REDIS:
+        # Redis as Celery broker (ElastiCache)
+        CELERY_BROKER_URL = REDIS_URL
+        CELERY_RESULT_BACKEND = REDIS_URL
+        logger.info("Using Redis for Celery task queue")
+    else:
+        logger.error("Celery requires either USE_SQS=True or USE_REDIS=True")
+        raise ValueError("Celery requires either SQS or Redis backend")
+
+    # Common Celery settings
+    CELERY_TASK_SERIALIZER = "json"
+    CELERY_RESULT_SERIALIZER = "json"
+    CELERY_ACCEPT_CONTENT = ["json"]
+    CELERY_TIMEZONE = "UTC"
+    CELERY_TASK_TRACK_STARTED = True
+    CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
+    CELERY_WORKER_CONCURRENCY = int(os.environ.get("CELERY_WORKERS", 4))
+
+    # Task routing (optional)
+    CELERY_TASK_DEFAULT_QUEUE = SQS_QUEUE_NAME if USE_SQS else "celery"
 
 AUDITLOG_RETENTION_DAYS = int(os.environ.get("AUDITLOG_RETENTION_DAYS", 90))
 AUDITLOG_MAX_RECORDS = int(os.environ.get("AUDITLOG_MAX_RECORDS", 50000))
