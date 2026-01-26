@@ -150,7 +150,7 @@ if USE_S3:
     AWS_STORAGE_BUCKET_NAME = os.getenv(
         "AWS_STORAGE_BUCKET_NAME", "ciso-assistant-bucket"
     )
-    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", os.getenv("AWS_REGION", "us-east-1"))
+    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", os.getenv("AWS_REGION", "us-gov-west-1"))
     AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
     AWS_DEFAULT_ACL = os.getenv("AWS_DEFAULT_ACL", "private")
     AWS_S3_FILE_OVERWRITE = False
@@ -475,8 +475,8 @@ if "POSTGRES_NAME" in os.environ:
             "keepalives_interval": 10,
             "keepalives_count": 5,
         }
-        # AWS Region for generating IAM auth token
-        db_config["AWS_REGION"] = os.environ.get("AWS_REGION", "us-east-1")
+        # AWS Region for generating IAM auth token (defaults to GovCloud)
+        db_config["AWS_REGION"] = os.environ.get("AWS_REGION", "us-gov-west-1")
         logger.info("Using RDS IAM Authentication")
         logger.info("AWS_REGION: %s", db_config["AWS_REGION"])
         logger.info("CONN_MAX_AGE: %s seconds", db_config["CONN_MAX_AGE"])
