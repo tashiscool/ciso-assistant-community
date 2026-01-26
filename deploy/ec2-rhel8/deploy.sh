@@ -1080,12 +1080,65 @@ run_initial_setup() {
     set +a
 
     log_info "Running migrations..."
-    sudo -u "$APP_USER" "${VENV_DIR}/bin/python" manage.py migrate --noinput
+    sudo -u "$APP_USER" -E "${VENV_DIR}/bin/python" manage.py migrate --noinput
 
     log_info "Collecting static files..."
-    sudo -u "$APP_USER" "${VENV_DIR}/bin/python" manage.py collectstatic --noinput
+    sudo -u "$APP_USER" -E "${VENV_DIR}/bin/python" manage.py collectstatic --noinput
+
+    log_info "Creating cache table..."
+    sudo -u "$APP_USER" -E "${VENV_DIR}/bin/python" manage.py createcachetable 2>/dev/null || true
 
     log_info "Initial setup complete!"
+}
+
+run_migrations_standalone() {
+    # This function can be called directly via --run-migrations flag
+    log_info "Running database migrations..."
+
+    if [[ ! -f "${CONFIG_DIR}/env" ]]; then
+        log_error "Configuration not found at ${CONFIG_DIR}/env"
+        log_error "Run deployment first or create configuration manually"
+        exit 1
+    fi
+
+    if [[ ! -d "${VENV_DIR}" ]]; then
+        log_error "Virtual environment not found at ${VENV_DIR}"
+        log_error "Run deployment first"
+        exit 1
+    fi
+
+    source "${VENV_DIR}/bin/activate"
+    cd "${APP_DIR}/app/backend"
+
+    set -a
+    source "${CONFIG_DIR}/env"
+    set +a
+
+    # Test database connection first
+    log_info "Testing database connection..."
+    if ! sudo -u "$APP_USER" -E "${VENV_DIR}/bin/python" manage.py check --database default 2>/dev/null; then
+        log_error "Database connection failed!"
+        log_error "Check your configuration in ${CONFIG_DIR}/env"
+        log_error "Run 'sudo ciso-assistant db' to diagnose"
+        exit 1
+    fi
+    log_info "Database connection OK"
+
+    # Run migrations
+    log_info "Applying migrations..."
+    sudo -u "$APP_USER" -E "${VENV_DIR}/bin/python" manage.py migrate --noinput
+
+    log_info "Collecting static files..."
+    sudo -u "$APP_USER" -E "${VENV_DIR}/bin/python" manage.py collectstatic --noinput
+
+    log_info "Creating cache table..."
+    sudo -u "$APP_USER" -E "${VENV_DIR}/bin/python" manage.py createcachetable 2>/dev/null || true
+
+    log_info "Migrations completed successfully!"
+    echo ""
+    echo "Next steps:"
+    echo "  - Create admin user: sudo ciso-assistant admin --create"
+    echo "  - Start services: sudo ciso-assistant start"
 }
 
 create_admin_user() {
@@ -1348,6 +1401,7 @@ main() {
 # Parse command line arguments
 INTERACTIVE=true
 SKIP_CONFIG=false
+RUN_MIGRATIONS_ONLY=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -1359,6 +1413,10 @@ while [[ $# -gt 0 ]]; do
             SKIP_CONFIG=true
             shift
             ;;
+        --run-migrations|--migrate)
+            RUN_MIGRATIONS_ONLY=true
+            shift
+            ;;
         --help|-h)
             echo "CISO Assistant Deployment Script"
             echo ""
@@ -1367,7 +1425,12 @@ while [[ $# -gt 0 ]]; do
             echo "Options:"
             echo "  --non-interactive, -n   Run without interactive prompts (use defaults)"
             echo "  --skip-config           Skip configuration wizard (use existing env file)"
+            echo "  --run-migrations        Run migrations only (post-deployment)"
             echo "  --help, -h              Show this help message"
+            echo ""
+            echo "Post-deployment commands:"
+            echo "  sudo $0 --run-migrations    Run database migrations"
+            echo "  sudo ciso-assistant         Management console"
             exit 0
             ;;
         *)
@@ -1378,5 +1441,10 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Run main function
-main
+# Run appropriate function
+if [[ "$RUN_MIGRATIONS_ONLY" == "true" ]]; then
+    check_root
+    run_migrations_standalone
+else
+    main
+fi
