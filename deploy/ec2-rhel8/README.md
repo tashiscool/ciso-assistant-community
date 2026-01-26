@@ -253,29 +253,80 @@ If using AWS SQS for task queue management (fully managed, serverless-friendly):
 - High availability across AZs
 - Native AWS integration with IAM
 
-## Service Management
+## Management Console
+
+After deployment, use the management console for all administrative tasks:
 
 ```bash
-# View status
-sudo systemctl status ciso-assistant-backend
-sudo systemctl status ciso-assistant-frontend
-sudo systemctl status ciso-assistant-worker
+# Launch interactive management menu
+sudo ciso-assistant
 
-# Restart services
-sudo systemctl restart ciso-assistant-backend
-sudo systemctl restart ciso-assistant-frontend
-sudo systemctl restart ciso-assistant-worker
+# Or use direct commands:
+sudo ciso-assistant status    # Show service status
+sudo ciso-assistant start     # Start all services
+sudo ciso-assistant stop      # Stop all services
+sudo ciso-assistant restart   # Restart all services
+sudo ciso-assistant logs      # View logs
+sudo ciso-assistant health    # Run health checks
+```
 
-# View logs
-sudo journalctl -u ciso-assistant-backend -f
-sudo journalctl -u ciso-assistant-frontend -f
-tail -f /var/log/ciso-assistant/*.log
+## Helper Scripts
+
+Helper scripts are installed to `/opt/ciso-assistant/scripts/`:
+
+### SSL Certificate Setup
+```bash
+sudo /opt/ciso-assistant/scripts/setup-ssl.sh
+
+# Or with options:
+sudo ciso-assistant ssl --letsencrypt    # Use Let's Encrypt (recommended)
+sudo ciso-assistant ssl --check          # Check certificate status
+```
+
+### Database Testing
+```bash
+sudo /opt/ciso-assistant/scripts/test-db.sh
+
+# Or:
+sudo ciso-assistant db --verbose    # Detailed connection test
+```
+
+### Database Migrations
+```bash
+sudo /opt/ciso-assistant/scripts/run-migrations.sh
+
+# Or:
+sudo ciso-assistant migrate --full   # Full setup with static files
+sudo ciso-assistant migrate --check  # Check migration status
+```
+
+### Admin User Management
+```bash
+sudo /opt/ciso-assistant/scripts/create-admin.sh
+
+# Or:
+sudo ciso-assistant admin --create           # Create new admin
+sudo ciso-assistant admin --list             # List admin users
+sudo ciso-assistant admin --reset EMAIL      # Reset password
+```
+
+### Service Management
+```bash
+sudo /opt/ciso-assistant/scripts/manage-services.sh
+
+# Or:
+sudo ciso-assistant status           # Show all service status
+sudo ciso-assistant restart backend  # Restart specific service
+sudo ciso-assistant follow           # Follow all logs real-time
 ```
 
 ## Updating
 
 ```bash
 sudo /opt/ciso-assistant/update.sh
+
+# Or:
+sudo ciso-assistant update
 ```
 
 ## Troubleshooting
@@ -283,8 +334,9 @@ sudo /opt/ciso-assistant/update.sh
 ### Test RDS IAM Connection
 
 ```bash
-sudo -u ciso-assistant /opt/ciso-assistant/venv/bin/python \
-    /opt/ciso-assistant/app/backend/manage.py test_rds_iam --json
+sudo ciso-assistant db --verbose
+# Or:
+sudo /opt/ciso-assistant/scripts/test-db.sh --verbose
 ```
 
 ### Test Redis Connection

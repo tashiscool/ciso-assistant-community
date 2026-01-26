@@ -1004,6 +1004,39 @@ EOF
     log_info "Update script created at ${APP_DIR}/update.sh"
 }
 
+install_helper_scripts() {
+    log_info "Installing helper scripts..."
+
+    local scripts_dir="${APP_DIR}/scripts"
+    mkdir -p "$scripts_dir"
+
+    # Download helper scripts from repository
+    local repo_scripts_dir="${APP_DIR}/app/deploy/ec2-rhel8/scripts"
+
+    if [[ -d "$repo_scripts_dir" ]]; then
+        # Copy from local repo
+        cp -r "$repo_scripts_dir"/* "$scripts_dir/"
+    else
+        # Download from GitHub
+        local base_url="https://raw.githubusercontent.com/tashiscool/ciso-assistant-community/main/deploy/ec2-rhel8/scripts"
+        local scripts=("ciso-assistant.sh" "setup-ssl.sh" "test-db.sh" "run-migrations.sh" "create-admin.sh" "manage-services.sh")
+
+        for script in "${scripts[@]}"; do
+            curl -sL "${base_url}/${script}" -o "${scripts_dir}/${script}" || log_warn "Failed to download $script"
+        done
+    fi
+
+    # Make scripts executable
+    chmod +x "${scripts_dir}"/*.sh 2>/dev/null || true
+    chown -R root:root "$scripts_dir"
+
+    # Create symlink for easy access
+    ln -sf "${scripts_dir}/ciso-assistant.sh" /usr/local/bin/ciso-assistant
+
+    log_info "Helper scripts installed to ${scripts_dir}"
+    log_info "Run 'sudo ciso-assistant' for the management console"
+}
+
 test_database_connection() {
     log_info "Testing database connection..."
 
@@ -1212,12 +1245,23 @@ print_summary() {
     echo "Application directory: ${APP_DIR}"
     echo "Log directory: ${LOG_DIR}"
     echo ""
-    echo "Useful commands:"
-    echo "  View logs:          journalctl -u ciso-assistant-backend -f"
-    echo "  Restart backend:    systemctl restart ciso-assistant-backend"
-    echo "  Restart frontend:   systemctl restart ciso-assistant-frontend"
-    echo "  Restart worker:     systemctl restart ciso-assistant-worker"
-    echo "  Update application: ${APP_DIR}/update.sh"
+    echo "Management Console:"
+    echo "  ${GREEN}sudo ciso-assistant${NC}         - Interactive management menu"
+    echo ""
+    echo "Quick Commands:"
+    echo "  sudo ciso-assistant status   - Show service status"
+    echo "  sudo ciso-assistant restart  - Restart all services"
+    echo "  sudo ciso-assistant logs     - View logs"
+    echo "  sudo ciso-assistant ssl      - Setup SSL certificates"
+    echo "  sudo ciso-assistant admin    - Manage admin users"
+    echo "  sudo ciso-assistant health   - Run health checks"
+    echo ""
+    echo "Helper Scripts (${APP_DIR}/scripts/):"
+    echo "  setup-ssl.sh        - SSL certificate management"
+    echo "  test-db.sh          - Database connection testing"
+    echo "  run-migrations.sh   - Database migrations"
+    echo "  create-admin.sh     - Admin user management"
+    echo "  manage-services.sh  - Service management"
     echo ""
     echo "Access the application at: ${CONFIG_URL:-https://localhost}"
     echo ""
@@ -1290,6 +1334,7 @@ main() {
     configure_selinux
     configure_firewall
     create_update_script
+    install_helper_scripts
 
     # Phase 5: Post-installation setup
     interactive_post_install
