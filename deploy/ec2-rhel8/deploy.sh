@@ -225,63 +225,346 @@ setup_frontend() {
     log_info "Frontend setup complete"
 }
 
-create_env_file() {
-    log_info "Creating environment configuration..."
+prompt_value() {
+    local prompt="$1"
+    local default="$2"
+    local var_name="$3"
+    local is_secret="${4:-false}"
+    local value
 
-    if [[ -f "${CONFIG_DIR}/env" ]]; then
-        log_warn "Environment file already exists. Skipping..."
+    # In non-interactive mode, use default
+    if [[ "${INTERACTIVE:-true}" != "true" ]]; then
+        eval "$var_name=\"$default\""
         return
     fi
 
-    cat > "${CONFIG_DIR}/env" << 'EOF'
+    if [[ "$is_secret" == "true" ]]; then
+        read -sp "$prompt [$default]: " value
+        echo ""
+    else
+        read -p "$prompt [$default]: " value
+    fi
+
+    if [[ -z "$value" ]]; then
+        value="$default"
+    fi
+
+    eval "$var_name=\"$value\""
+}
+
+prompt_yes_no() {
+    local prompt="$1"
+    local default="$2"
+    local var_name="$3"
+    local response
+
+    # In non-interactive mode, use default
+    if [[ "${INTERACTIVE:-true}" != "true" ]]; then
+        case "$default" in
+            [Yy]* ) eval "$var_name=true"; return;;
+            [Nn]* ) eval "$var_name=false"; return;;
+        esac
+        return
+    fi
+
+    while true; do
+        read -p "$prompt (y/n) [$default]: " response
+        response="${response:-$default}"
+        case "$response" in
+            [Yy]* ) eval "$var_name=true"; return;;
+            [Nn]* ) eval "$var_name=false"; return;;
+            * ) echo "Please answer y or n.";;
+        esac
+    done
+}
+
+prompt_choice() {
+    local prompt="$1"
+    local options="$2"
+    local default="$3"
+    local var_name="$4"
+    local choice
+
+    # In non-interactive mode, use default
+    if [[ "${INTERACTIVE:-true}" != "true" ]]; then
+        eval "$var_name=\"$default\""
+        return
+    fi
+
+    echo "$prompt"
+    echo "$options"
+    read -p "Enter choice [$default]: " choice
+    choice="${choice:-$default}"
+    eval "$var_name=\"$choice\""
+}
+
+interactive_config() {
+    log_info "Starting interactive configuration..."
+    echo ""
+    echo "========================================"
+    echo "  CISO Assistant Configuration Wizard"
+    echo "========================================"
+    echo ""
+    echo "This wizard will help you configure CISO Assistant."
+    echo "Press Enter to accept default values shown in brackets."
+    echo ""
+
+    # Generate a random secret key
+    local default_secret_key=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))")
+
+    # ===== BASIC SETTINGS =====
+    echo ""
+    echo "${YELLOW}=== Basic Settings ===${NC}"
+    echo ""
+
+    prompt_value "Application URL (e.g., https://ciso.example.gov)" "https://localhost" CONFIG_URL
+    prompt_value "Allowed hosts (comma-separated)" "localhost,127.0.0.1" CONFIG_ALLOWED_HOSTS
+    prompt_value "Admin email address" "admin@example.gov" CONFIG_ADMIN_EMAIL
+    prompt_value "Django secret key" "$default_secret_key" CONFIG_SECRET_KEY true
+
+    # ===== AWS REGION =====
+    echo ""
+    echo "${YELLOW}=== AWS Configuration ===${NC}"
+    echo ""
+
+    prompt_choice "Select AWS region:" "  1) us-gov-west-1 (GovCloud West)
+  2) us-gov-east-1 (GovCloud East)
+  3) us-east-1 (N. Virginia)
+  4) us-west-2 (Oregon)
+  5) Other (enter manually)" "1" region_choice
+
+    case "$region_choice" in
+        1) CONFIG_AWS_REGION="us-gov-west-1" ;;
+        2) CONFIG_AWS_REGION="us-gov-east-1" ;;
+        3) CONFIG_AWS_REGION="us-east-1" ;;
+        4) CONFIG_AWS_REGION="us-west-2" ;;
+        5) prompt_value "Enter AWS region" "us-east-1" CONFIG_AWS_REGION ;;
+        *) CONFIG_AWS_REGION="us-gov-west-1" ;;
+    esac
+
+    # ===== DATABASE =====
+    echo ""
+    echo "${YELLOW}=== Database Configuration (RDS PostgreSQL) ===${NC}"
+    echo ""
+
+    prompt_value "RDS endpoint (e.g., mydb.xxx.rds.amazonaws.com)" "" CONFIG_DB_HOST
+    prompt_value "Database name" "ciso_assistant" CONFIG_DB_NAME
+    prompt_value "Database user" "ciso_app" CONFIG_DB_USER
+    prompt_value "Database port" "5432" CONFIG_DB_PORT
+
+    prompt_yes_no "Use IAM authentication for RDS?" "y" CONFIG_USE_IAM_AUTH
+
+    if [[ "$CONFIG_USE_IAM_AUTH" != "true" ]]; then
+        prompt_value "Database password" "" CONFIG_DB_PASSWORD true
+    fi
+
+    # ===== S3 STORAGE =====
+    echo ""
+    echo "${YELLOW}=== S3 Storage Configuration ===${NC}"
+    echo ""
+
+    prompt_yes_no "Use S3 for file storage?" "y" CONFIG_USE_S3
+
+    if [[ "$CONFIG_USE_S3" == "true" ]]; then
+        prompt_value "S3 bucket name" "ciso-assistant-files" CONFIG_S3_BUCKET
+
+        prompt_choice "S3 authentication method:" "  1) IAM role (recommended for EC2)
+  2) Static credentials" "1" s3_auth_choice
+
+        case "$s3_auth_choice" in
+            1) CONFIG_S3_AUTH_MODE="iam" ;;
+            2)
+                CONFIG_S3_AUTH_MODE="credentials"
+                prompt_value "AWS Access Key ID" "" CONFIG_AWS_ACCESS_KEY
+                prompt_value "AWS Secret Access Key" "" CONFIG_AWS_SECRET_KEY true
+                ;;
+            *) CONFIG_S3_AUTH_MODE="iam" ;;
+        esac
+    fi
+
+    # ===== TASK QUEUE =====
+    echo ""
+    echo "${YELLOW}=== Task Queue Configuration ===${NC}"
+    echo ""
+
+    prompt_choice "Select task queue backend:" "  1) Huey with SQLite (simple, single-server)
+  2) Huey with Redis/ElastiCache (recommended for production)
+  3) Celery with AWS SQS (fully managed, serverless)" "1" queue_choice
+
+    case "$queue_choice" in
+        1)
+            CONFIG_TASK_BACKEND="huey"
+            CONFIG_USE_REDIS="false"
+            CONFIG_USE_SQS="false"
+            ;;
+        2)
+            CONFIG_TASK_BACKEND="huey"
+            CONFIG_USE_REDIS="true"
+            CONFIG_USE_SQS="false"
+            echo ""
+            prompt_value "ElastiCache/Redis endpoint" "" CONFIG_REDIS_HOST
+            prompt_value "Redis port" "6379" CONFIG_REDIS_PORT
+            prompt_yes_no "Enable Redis SSL/TLS?" "y" CONFIG_REDIS_SSL
+            prompt_value "Number of workers" "4" CONFIG_WORKERS
+            ;;
+        3)
+            CONFIG_TASK_BACKEND="celery"
+            CONFIG_USE_REDIS="false"
+            CONFIG_USE_SQS="true"
+            echo ""
+            prompt_value "SQS queue name" "ciso-assistant-tasks" CONFIG_SQS_QUEUE
+            prompt_value "Number of workers" "4" CONFIG_WORKERS
+
+            prompt_yes_no "Also use Redis/ElastiCache for caching?" "n" CONFIG_USE_REDIS
+            if [[ "$CONFIG_USE_REDIS" == "true" ]]; then
+                prompt_value "ElastiCache/Redis endpoint" "" CONFIG_REDIS_HOST
+                prompt_value "Redis port" "6379" CONFIG_REDIS_PORT
+                prompt_yes_no "Enable Redis SSL/TLS?" "y" CONFIG_REDIS_SSL
+            fi
+            ;;
+        *)
+            CONFIG_TASK_BACKEND="huey"
+            CONFIG_USE_REDIS="false"
+            CONFIG_USE_SQS="false"
+            ;;
+    esac
+
+    # ===== LOGGING =====
+    echo ""
+    echo "${YELLOW}=== Logging Configuration ===${NC}"
+    echo ""
+
+    prompt_choice "Log level:" "  1) INFO (recommended)
+  2) DEBUG (verbose)
+  3) WARNING
+  4) ERROR" "1" log_choice
+
+    case "$log_choice" in
+        1) CONFIG_LOG_LEVEL="INFO" ;;
+        2) CONFIG_LOG_LEVEL="DEBUG" ;;
+        3) CONFIG_LOG_LEVEL="WARNING" ;;
+        4) CONFIG_LOG_LEVEL="ERROR" ;;
+        *) CONFIG_LOG_LEVEL="INFO" ;;
+    esac
+
+    prompt_choice "Log format:" "  1) JSON (recommended for production)
+  2) Plain text (easier to read)" "1" log_format_choice
+
+    case "$log_format_choice" in
+        1) CONFIG_LOG_FORMAT="json" ;;
+        2) CONFIG_LOG_FORMAT="plain" ;;
+        *) CONFIG_LOG_FORMAT="json" ;;
+    esac
+}
+
+write_env_file() {
+    log_info "Writing environment configuration..."
+
+    cat > "${CONFIG_DIR}/env" << EOF
 # CISO Assistant Configuration
-# Edit this file with your settings
+# Generated by deployment wizard on $(date)
 
 # Django Settings
-DJANGO_SECRET_KEY=CHANGE_ME_GENERATE_A_SECURE_KEY
+DJANGO_SECRET_KEY=${CONFIG_SECRET_KEY}
 DJANGO_DEBUG=False
-ALLOWED_HOSTS=localhost,127.0.0.1
+ALLOWED_HOSTS=${CONFIG_ALLOWED_HOSTS}
 
-# Application URL (change to your domain)
-CISO_ASSISTANT_URL=https://ciso.example.gov
+# Application URL
+CISO_ASSISTANT_URL=${CONFIG_URL}
 
-# Database Configuration (RDS with IAM Auth)
-POSTGRES_NAME=ciso_assistant
-POSTGRES_USER=ciso_app
-DB_HOST=your-rds-endpoint.us-gov-west-1.rds.amazonaws.com
-DB_PORT=5432
+# Database Configuration (RDS PostgreSQL)
+POSTGRES_NAME=${CONFIG_DB_NAME}
+POSTGRES_USER=${CONFIG_DB_USER}
+DB_HOST=${CONFIG_DB_HOST}
+DB_PORT=${CONFIG_DB_PORT}
+EOF
+
+    if [[ "$CONFIG_USE_IAM_AUTH" == "true" ]]; then
+        cat >> "${CONFIG_DIR}/env" << EOF
 RDS_IAM_AUTH=True
 DB_SSL_MODE=require
+EOF
+    else
+        cat >> "${CONFIG_DIR}/env" << EOF
+POSTGRES_PASSWORD=${CONFIG_DB_PASSWORD}
+RDS_IAM_AUTH=False
+DB_SSL_MODE=prefer
+EOF
+    fi
+
+    cat >> "${CONFIG_DIR}/env" << EOF
 
 # AWS Configuration
-AWS_REGION=us-gov-west-1
+AWS_REGION=${CONFIG_AWS_REGION}
+EOF
+
+    if [[ "$CONFIG_USE_S3" == "true" ]]; then
+        cat >> "${CONFIG_DIR}/env" << EOF
 
 # S3 Storage
 USE_S3=True
-AWS_AUTH_MODE=iam
-AWS_STORAGE_BUCKET_NAME=your-bucket-name
+AWS_AUTH_MODE=${CONFIG_S3_AUTH_MODE}
+AWS_STORAGE_BUCKET_NAME=${CONFIG_S3_BUCKET}
+EOF
+        if [[ "$CONFIG_S3_AUTH_MODE" == "credentials" ]]; then
+            cat >> "${CONFIG_DIR}/env" << EOF
+AWS_ACCESS_KEY_ID=${CONFIG_AWS_ACCESS_KEY}
+AWS_SECRET_ACCESS_KEY=${CONFIG_AWS_SECRET_KEY}
+EOF
+        fi
+    else
+        cat >> "${CONFIG_DIR}/env" << EOF
 
-# Task Queue Backend (huey or celery)
-TASK_QUEUE_BACKEND=huey
+# S3 Storage (disabled - using local storage)
+USE_S3=False
+EOF
+    fi
 
-# Redis/ElastiCache (optional - for caching and task queue)
-# USE_REDIS=True
-# REDIS_HOST=your-redis.cache.amazonaws.com
-# REDIS_PORT=6379
-# REDIS_SSL=True
-# HUEY_WORKERS=4
+    cat >> "${CONFIG_DIR}/env" << EOF
 
-# AWS SQS (alternative to Redis for task queue, requires TASK_QUEUE_BACKEND=celery)
-# USE_SQS=True
-# SQS_QUEUE_NAME=ciso-assistant-tasks
-# CELERY_WORKERS=4
+# Task Queue Configuration
+TASK_QUEUE_BACKEND=${CONFIG_TASK_BACKEND}
+EOF
+
+    if [[ "$CONFIG_USE_REDIS" == "true" ]]; then
+        cat >> "${CONFIG_DIR}/env" << EOF
+
+# Redis/ElastiCache
+USE_REDIS=True
+REDIS_HOST=${CONFIG_REDIS_HOST}
+REDIS_PORT=${CONFIG_REDIS_PORT}
+REDIS_SSL=${CONFIG_REDIS_SSL^}
+EOF
+        if [[ -n "${CONFIG_WORKERS:-}" ]]; then
+            cat >> "${CONFIG_DIR}/env" << EOF
+HUEY_WORKERS=${CONFIG_WORKERS}
+EOF
+        fi
+    fi
+
+    if [[ "$CONFIG_USE_SQS" == "true" ]]; then
+        cat >> "${CONFIG_DIR}/env" << EOF
+
+# AWS SQS
+USE_SQS=True
+SQS_QUEUE_NAME=${CONFIG_SQS_QUEUE}
+AWS_SQS_REGION=${CONFIG_AWS_REGION}
+EOF
+        if [[ -n "${CONFIG_WORKERS:-}" ]]; then
+            cat >> "${CONFIG_DIR}/env" << EOF
+CELERY_WORKERS=${CONFIG_WORKERS}
+EOF
+        fi
+    fi
+
+    cat >> "${CONFIG_DIR}/env" << EOF
 
 # Admin User
-CISO_ASSISTANT_SUPERUSER_EMAIL=admin@example.gov
+CISO_ASSISTANT_SUPERUSER_EMAIL=${CONFIG_ADMIN_EMAIL}
 
 # Logging
-LOG_LEVEL=INFO
-LOG_FORMAT=json
+LOG_LEVEL=${CONFIG_LOG_LEVEL}
+LOG_FORMAT=${CONFIG_LOG_FORMAT}
 
 # Connection Pool (for IAM auth, keep under 15 min)
 CONN_MAX_AGE=840
@@ -290,8 +573,100 @@ EOF
     chmod 640 "${CONFIG_DIR}/env"
     chown root:$APP_USER "${CONFIG_DIR}/env"
 
-    log_warn "Please edit ${CONFIG_DIR}/env with your configuration!"
-    log_info "Environment file created"
+    log_info "Environment file created at ${CONFIG_DIR}/env"
+}
+
+create_default_env_file() {
+    # Create a basic env file with placeholders for non-interactive mode
+    local default_secret_key=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))")
+
+    cat > "${CONFIG_DIR}/env" << EOF
+# CISO Assistant Configuration
+# Generated by deployment script on $(date)
+# IMPORTANT: Edit this file with your actual values!
+
+# Django Settings
+DJANGO_SECRET_KEY=${default_secret_key}
+DJANGO_DEBUG=False
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+# Application URL (CHANGE THIS)
+CISO_ASSISTANT_URL=https://localhost
+
+# Database Configuration (CHANGE THESE)
+POSTGRES_NAME=ciso_assistant
+POSTGRES_USER=ciso_app
+DB_HOST=YOUR_RDS_ENDPOINT_HERE
+DB_PORT=5432
+RDS_IAM_AUTH=True
+DB_SSL_MODE=require
+
+# AWS Configuration
+AWS_REGION=us-gov-west-1
+
+# S3 Storage (CHANGE BUCKET NAME)
+USE_S3=True
+AWS_AUTH_MODE=iam
+AWS_STORAGE_BUCKET_NAME=YOUR_S3_BUCKET_HERE
+
+# Task Queue
+TASK_QUEUE_BACKEND=huey
+
+# Admin User (CHANGE THIS)
+CISO_ASSISTANT_SUPERUSER_EMAIL=admin@example.gov
+
+# Logging
+LOG_LEVEL=INFO
+LOG_FORMAT=json
+
+# Connection Pool
+CONN_MAX_AGE=840
+EOF
+
+    chmod 640 "${CONFIG_DIR}/env"
+    chown root:$APP_USER "${CONFIG_DIR}/env"
+
+    log_warn "Default configuration created. IMPORTANT: Edit ${CONFIG_DIR}/env with your values!"
+}
+
+create_env_file() {
+    log_info "Setting up environment configuration..."
+
+    # Check if skip-config flag is set
+    if [[ "${SKIP_CONFIG:-false}" == "true" ]]; then
+        if [[ -f "${CONFIG_DIR}/env" ]]; then
+            log_info "Using existing configuration (--skip-config)"
+            return
+        else
+            log_warn "No existing config found. Creating default..."
+            create_default_env_file
+            return
+        fi
+    fi
+
+    if [[ -f "${CONFIG_DIR}/env" ]]; then
+        echo ""
+        log_warn "Environment file already exists at ${CONFIG_DIR}/env"
+        prompt_yes_no "Do you want to reconfigure?" "n" do_reconfig
+
+        if [[ "$do_reconfig" != "true" ]]; then
+            log_info "Keeping existing configuration."
+            return
+        fi
+
+        # Backup existing config
+        cp "${CONFIG_DIR}/env" "${CONFIG_DIR}/env.backup.$(date +%Y%m%d_%H%M%S)"
+        log_info "Existing config backed up."
+    fi
+
+    # In non-interactive mode, create default env file
+    if [[ "${INTERACTIVE:-true}" != "true" ]]; then
+        create_default_env_file
+        return
+    fi
+
+    interactive_config
+    write_env_file
 }
 
 run_migrations() {
@@ -629,84 +1004,334 @@ EOF
     log_info "Update script created at ${APP_DIR}/update.sh"
 }
 
+test_database_connection() {
+    log_info "Testing database connection..."
+
+    source "${VENV_DIR}/bin/activate"
+    cd "${APP_DIR}/app/backend"
+
+    # Load environment
+    set -a
+    source "${CONFIG_DIR}/env"
+    set +a
+
+    if [[ "${RDS_IAM_AUTH:-False}" == "True" ]]; then
+        if sudo -u "$APP_USER" "${VENV_DIR}/bin/python" manage.py test_rds_iam --json 2>/dev/null; then
+            log_info "Database connection successful!"
+            return 0
+        else
+            log_error "Database connection failed. Please check your configuration."
+            return 1
+        fi
+    else
+        # Try a simple database check for non-IAM auth
+        if sudo -u "$APP_USER" "${VENV_DIR}/bin/python" manage.py check --database default 2>/dev/null; then
+            log_info "Database connection successful!"
+            return 0
+        else
+            log_error "Database connection failed. Please check your configuration."
+            return 1
+        fi
+    fi
+}
+
+run_initial_setup() {
+    log_info "Running initial database setup..."
+
+    source "${VENV_DIR}/bin/activate"
+    cd "${APP_DIR}/app/backend"
+
+    # Load environment
+    set -a
+    source "${CONFIG_DIR}/env"
+    set +a
+
+    log_info "Running migrations..."
+    sudo -u "$APP_USER" "${VENV_DIR}/bin/python" manage.py migrate --noinput
+
+    log_info "Collecting static files..."
+    sudo -u "$APP_USER" "${VENV_DIR}/bin/python" manage.py collectstatic --noinput
+
+    log_info "Initial setup complete!"
+}
+
+create_admin_user() {
+    log_info "Creating admin user..."
+
+    source "${VENV_DIR}/bin/activate"
+    cd "${APP_DIR}/app/backend"
+
+    # Load environment
+    set -a
+    source "${CONFIG_DIR}/env"
+    set +a
+
+    echo ""
+    echo "Please enter credentials for the admin user:"
+    sudo -u "$APP_USER" "${VENV_DIR}/bin/python" manage.py createsuperuser
+}
+
+interactive_post_install() {
+    echo ""
+    echo "========================================"
+    echo "  Post-Installation Setup"
+    echo "========================================"
+    echo ""
+
+    # SSL Certificate setup
+    echo "${YELLOW}=== SSL Certificates ===${NC}"
+    echo ""
+    echo "SSL certificates are required for HTTPS."
+    echo "Location: /etc/pki/tls/certs/server.crt"
+    echo "          /etc/pki/tls/private/server.key"
+    echo ""
+
+    prompt_choice "SSL certificate option:" "  1) Generate self-signed certificate (for testing)
+  2) I'll add certificates manually later
+  3) Use Let's Encrypt (requires public DNS)" "1" ssl_choice
+
+    case "$ssl_choice" in
+        1)
+            log_info "Generating self-signed certificate..."
+            openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+                -keyout /etc/pki/tls/private/server.key \
+                -out /etc/pki/tls/certs/server.crt \
+                -subj "/CN=localhost/O=CISO Assistant/C=US" 2>/dev/null
+            chmod 600 /etc/pki/tls/private/server.key
+            log_info "Self-signed certificate created."
+            log_warn "Replace with a proper certificate for production!"
+            ;;
+        3)
+            if command -v certbot &> /dev/null; then
+                prompt_value "Enter your domain name" "" CERTBOT_DOMAIN
+                certbot --nginx -d "$CERTBOT_DOMAIN" --non-interactive --agree-tos --register-unsafely-without-email || {
+                    log_error "Certbot failed. You may need to configure DNS first."
+                    log_warn "Generating self-signed certificate as fallback..."
+                    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+                        -keyout /etc/pki/tls/private/server.key \
+                        -out /etc/pki/tls/certs/server.crt \
+                        -subj "/CN=localhost/O=CISO Assistant/C=US" 2>/dev/null
+                }
+            else
+                log_warn "Certbot not installed. Installing..."
+                dnf install -y certbot python3-certbot-nginx
+                prompt_value "Enter your domain name" "" CERTBOT_DOMAIN
+                certbot --nginx -d "$CERTBOT_DOMAIN" --non-interactive --agree-tos --register-unsafely-without-email || {
+                    log_error "Certbot failed. Generating self-signed certificate..."
+                    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+                        -keyout /etc/pki/tls/private/server.key \
+                        -out /etc/pki/tls/certs/server.crt \
+                        -subj "/CN=localhost/O=CISO Assistant/C=US" 2>/dev/null
+                }
+            fi
+            ;;
+        *)
+            log_warn "Remember to add SSL certificates before starting services!"
+            # Create placeholder certificates so nginx can start
+            if [[ ! -f /etc/pki/tls/certs/server.crt ]]; then
+                openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
+                    -keyout /etc/pki/tls/private/server.key \
+                    -out /etc/pki/tls/certs/server.crt \
+                    -subj "/CN=localhost/O=CISO Assistant/C=US" 2>/dev/null
+            fi
+            ;;
+    esac
+
+    # Test database connection
+    echo ""
+    echo "${YELLOW}=== Database Connection ===${NC}"
+    echo ""
+    prompt_yes_no "Test database connection now?" "y" do_test_db
+
+    if [[ "$do_test_db" == "true" ]]; then
+        if test_database_connection; then
+            echo ""
+            prompt_yes_no "Run database migrations now?" "y" do_migrate
+
+            if [[ "$do_migrate" == "true" ]]; then
+                run_initial_setup
+            fi
+        else
+            echo ""
+            log_warn "Please fix database configuration in ${CONFIG_DIR}/env"
+            log_warn "Then run: sudo -u ${APP_USER} ${VENV_DIR}/bin/python ${APP_DIR}/app/backend/manage.py migrate"
+        fi
+    fi
+
+    # Create admin user
+    echo ""
+    echo "${YELLOW}=== Admin User ===${NC}"
+    echo ""
+    prompt_yes_no "Create admin user now?" "y" do_create_admin
+
+    if [[ "$do_create_admin" == "true" ]]; then
+        create_admin_user
+    fi
+
+    # Install Celery extras if using SQS
+    if grep -q "TASK_QUEUE_BACKEND=celery" "${CONFIG_DIR}/env" 2>/dev/null; then
+        echo ""
+        echo "${YELLOW}=== Installing Celery Dependencies ===${NC}"
+        echo ""
+        log_info "Installing Celery extras for SQS support..."
+        source "${VENV_DIR}/bin/activate"
+        cd "${APP_DIR}/app/backend"
+        poetry install --extras celery || pip install "celery[sqs]" django-celery-results pycurl
+        log_info "Celery dependencies installed."
+    fi
+
+    # Start services
+    echo ""
+    echo "${YELLOW}=== Start Services ===${NC}"
+    echo ""
+    prompt_yes_no "Start all services now?" "y" do_start_services
+
+    if [[ "$do_start_services" == "true" ]]; then
+        enable_services
+        echo ""
+        log_info "All services started!"
+
+        # Show status
+        echo ""
+        echo "Service Status:"
+        echo "---------------"
+        systemctl is-active --quiet nginx && echo -e "  nginx:                    ${GREEN}running${NC}" || echo -e "  nginx:                    ${RED}stopped${NC}"
+        systemctl is-active --quiet ciso-assistant-backend && echo -e "  ciso-assistant-backend:   ${GREEN}running${NC}" || echo -e "  ciso-assistant-backend:   ${RED}stopped${NC}"
+        systemctl is-active --quiet ciso-assistant-frontend && echo -e "  ciso-assistant-frontend:  ${GREEN}running${NC}" || echo -e "  ciso-assistant-frontend:  ${RED}stopped${NC}"
+        systemctl is-active --quiet ciso-assistant-worker && echo -e "  ciso-assistant-worker:    ${GREEN}running${NC}" || echo -e "  ciso-assistant-worker:    ${RED}stopped${NC}"
+    fi
+}
+
 print_summary() {
     echo ""
     echo "========================================"
-    echo "  CISO Assistant Deployment Complete"
+    echo "  CISO Assistant Deployment Complete!"
     echo "========================================"
     echo ""
-    echo "Next steps:"
+    echo "Configuration file: ${CONFIG_DIR}/env"
+    echo "Application directory: ${APP_DIR}"
+    echo "Log directory: ${LOG_DIR}"
     echo ""
-    echo "1. Edit the configuration file:"
-    echo "   sudo vi ${CONFIG_DIR}/env"
+    echo "Useful commands:"
+    echo "  View logs:          journalctl -u ciso-assistant-backend -f"
+    echo "  Restart backend:    systemctl restart ciso-assistant-backend"
+    echo "  Restart frontend:   systemctl restart ciso-assistant-frontend"
+    echo "  Restart worker:     systemctl restart ciso-assistant-worker"
+    echo "  Update application: ${APP_DIR}/update.sh"
     echo ""
-    echo "2. Add your SSL certificates:"
-    echo "   /etc/pki/tls/certs/server.crt"
-    echo "   /etc/pki/tls/private/server.key"
-    echo ""
-    echo "3. Run database migrations:"
-    echo "   sudo -u ${APP_USER} ${VENV_DIR}/bin/python ${APP_DIR}/app/backend/manage.py migrate"
-    echo ""
-    echo "4. Create superuser:"
-    echo "   sudo -u ${APP_USER} ${VENV_DIR}/bin/python ${APP_DIR}/app/backend/manage.py createsuperuser"
-    echo ""
-    echo "5. Restart services:"
-    echo "   sudo systemctl restart ciso-assistant-backend"
-    echo "   sudo systemctl restart ciso-assistant-frontend"
-    echo "   sudo systemctl restart ciso-assistant-worker"
-    echo "   sudo systemctl restart nginx"
-    echo ""
-    echo "6. Test RDS IAM connection:"
-    echo "   sudo -u ${APP_USER} ${VENV_DIR}/bin/python ${APP_DIR}/app/backend/manage.py test_rds_iam"
-    echo ""
-    echo "7. (Optional) For AWS SQS task queue:"
-    echo "   - Install Celery extras: cd ${APP_DIR}/app/backend && poetry install --extras celery"
-    echo "   - Set TASK_QUEUE_BACKEND=celery and USE_SQS=True in ${CONFIG_DIR}/env"
-    echo "   - Restart worker: sudo systemctl restart ciso-assistant-worker"
-    echo ""
-    echo "Service status:"
-    echo "   sudo systemctl status ciso-assistant-backend"
-    echo "   sudo systemctl status ciso-assistant-frontend"
-    echo "   sudo systemctl status ciso-assistant-worker"
-    echo ""
-    echo "Logs:"
-    echo "   ${LOG_DIR}/"
-    echo "   /var/log/nginx/"
-    echo ""
-    echo "Update script:"
-    echo "   sudo ${APP_DIR}/update.sh"
+    echo "Access the application at: ${CONFIG_URL:-https://localhost}"
     echo ""
 }
 
+show_welcome() {
+    if [[ "${INTERACTIVE:-true}" == "true" ]]; then
+        clear
+    fi
+    echo ""
+    echo "========================================"
+    echo "  CISO Assistant Deployment Script"
+    echo "  for RHEL 8 / EC2"
+    echo "========================================"
+    echo ""
+    echo "This script will install and configure CISO Assistant with:"
+    echo "  - PostgreSQL RDS (with optional IAM authentication)"
+    echo "  - S3 for file storage (with IAM roles)"
+    echo "  - Redis/ElastiCache or SQS for task queue"
+    echo "  - Nginx reverse proxy with SSL"
+    echo "  - Systemd services"
+    echo ""
+    echo "Prerequisites:"
+    echo "  - RHEL 8 EC2 instance with IAM role attached"
+    echo "  - RDS PostgreSQL instance"
+    echo "  - S3 bucket (optional)"
+    echo "  - ElastiCache Redis or SQS queue (optional)"
+    echo ""
+
+    if [[ "${INTERACTIVE:-true}" == "true" ]]; then
+        read -p "Press Enter to continue or Ctrl+C to cancel..."
+    fi
+}
+
 main() {
+    show_welcome
+
     log_info "Starting CISO Assistant deployment on RHEL 8..."
 
     check_root
     check_rhel8
 
+    # Phase 1: Install dependencies
+    echo ""
+    echo "${YELLOW}=== Phase 1: Installing System Dependencies ===${NC}"
     install_system_packages
     install_python
     install_nodejs
 
+    # Phase 2: Setup application
+    echo ""
+    echo "${YELLOW}=== Phase 2: Setting Up Application ===${NC}"
     create_app_user
     create_directories
     clone_repository
 
     setup_backend
     setup_frontend
+
+    # Phase 3: Interactive configuration
+    echo ""
+    echo "${YELLOW}=== Phase 3: Configuration ===${NC}"
     create_env_file
 
+    # Phase 4: System configuration
+    echo ""
+    echo "${YELLOW}=== Phase 4: System Configuration ===${NC}"
     create_systemd_services
     configure_nginx
     configure_selinux
     configure_firewall
-
     create_update_script
 
+    # Phase 5: Post-installation setup
+    interactive_post_install
+
+    # Final summary
     print_summary
 
     log_info "Deployment complete!"
 }
 
+# Parse command line arguments
+INTERACTIVE=true
+SKIP_CONFIG=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --non-interactive|-n)
+            INTERACTIVE=false
+            shift
+            ;;
+        --skip-config)
+            SKIP_CONFIG=true
+            shift
+            ;;
+        --help|-h)
+            echo "CISO Assistant Deployment Script"
+            echo ""
+            echo "Usage: $0 [options]"
+            echo ""
+            echo "Options:"
+            echo "  --non-interactive, -n   Run without interactive prompts (use defaults)"
+            echo "  --skip-config           Skip configuration wizard (use existing env file)"
+            echo "  --help, -h              Show this help message"
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Use --help for usage information"
+            exit 1
+            ;;
+    esac
+done
+
 # Run main function
-main "$@"
+main
