@@ -557,17 +557,80 @@ if MAIL_DEBUG:
     DEFAULT_FROM_EMAIL = "noreply@ciso.assistant"
 
 
+## Redis / ElastiCache configuration
+# Enable Redis for caching and task queue (recommended for production with ElastiCache)
+USE_REDIS = os.environ.get("USE_REDIS", "False") == "True"
+REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
+REDIS_DB = int(os.environ.get("REDIS_DB", 0))
+REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD", None)
+REDIS_SSL = os.environ.get("REDIS_SSL", "False") == "True"
+
+if USE_REDIS:
+    # Build Redis connection URL
+    redis_scheme = "rediss" if REDIS_SSL else "redis"
+    if REDIS_PASSWORD:
+        REDIS_URL = f"{redis_scheme}://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
+    else:
+        REDIS_URL = f"{redis_scheme}://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
+
+    # Django cache configuration with Redis
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": REDIS_URL,
+            "OPTIONS": {
+                "socket_connect_timeout": 5,
+                "socket_timeout": 5,
+            }
+        }
+    }
+
+    # Session backend can use cache for better performance
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    SESSION_CACHE_ALIAS = "default"
+
+    logger.info("Using Redis for caching")
+    logger.info("REDIS_HOST: %s", REDIS_HOST)
+    logger.info("REDIS_PORT: %s", REDIS_PORT)
+    logger.info("REDIS_SSL: %s", REDIS_SSL)
+else:
+    # Default to local memory cache
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "ciso-assistant-cache",
+        }
+    }
+
 ## Huey settings
 HUEY_FILE_PATH = os.environ.get("HUEY_FILE_PATH", BASE_DIR / "db" / "huey.db")
 
-HUEY = {
-    "huey_class": "huey.SqliteHuey",
-    "name": "ciso_assistant",
-    "utc": True,
-    "filename": HUEY_FILE_PATH,
-    "results": True,  # would be interesting for debug
-    "immediate": False,  # set to False to run in "live" mode regardless of DEBUG, otherwise it will follow
-}
+if USE_REDIS:
+    # Use Redis for Huey task queue (recommended for production)
+    HUEY = {
+        "huey_class": "huey.RedisHuey",
+        "name": "ciso_assistant",
+        "utc": True,
+        "url": REDIS_URL,
+        "results": True,
+        "immediate": False,
+        "consumer": {
+            "workers": int(os.environ.get("HUEY_WORKERS", 4)),
+            "worker_type": "thread",
+        },
+    }
+    logger.info("Using Redis for Huey task queue")
+else:
+    # Default to SQLite Huey (suitable for single-server deployments)
+    HUEY = {
+        "huey_class": "huey.SqliteHuey",
+        "name": "ciso_assistant",
+        "utc": True,
+        "filename": HUEY_FILE_PATH,
+        "results": True,
+        "immediate": False,
+    }
 
 AUDITLOG_RETENTION_DAYS = int(os.environ.get("AUDITLOG_RETENTION_DAYS", 90))
 AUDITLOG_MAX_RECORDS = int(os.environ.get("AUDITLOG_MAX_RECORDS", 50000))
