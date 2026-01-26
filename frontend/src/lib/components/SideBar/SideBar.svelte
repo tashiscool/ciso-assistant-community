@@ -38,6 +38,7 @@
 	// this is not great, but couldn't find a way for i18n while separating the file.
 	// NOTE: .svelte.ts files might help here https://svelte.dev/docs/svelte/svelte-js-files
 	const steps = [
+		// Welcome
 		{
 			id: 1,
 			element: 'none',
@@ -53,6 +54,7 @@
 				description: m.tourHelpButtonDescription()
 			}
 		},
+		// Organization
 		{
 			id: 3,
 			element: 'button[type="button"][id$="organization"]',
@@ -70,42 +72,29 @@
 		},
 		{
 			id: 5,
-			element: '#add-button',
-			popover: {
-				description: m.tourDomainAddDescription()
-			}
-		},
-		{
-			id: 6,
 			element: '#perimeters',
 			popover: {
 				description: m.tourPerimetersDescription()
 			}
 		},
 		{
-			id: 7,
-			element: '#add-button',
+			id: 6,
+			element: '#users',
 			popover: {
-				description: m.tourPerimeterAddDescription()
+				description: m.tourUsersDescription()
 			}
 		},
+		// Catalog
 		{
-			id: 8,
-			element: 'catalog-step',
+			id: 7,
+			element: 'button[type="button"][id$="catalog"]',
 			popover: {
 				title: m.tourCatalogTitle(),
 				description: m.tourCatalogDescription()
 			}
 		},
 		{
-			id: 9,
-			element: 'button[type="button"][id$="catalog"]',
-			popover: {
-				description: m.tourCatalogBrowseDescription()
-			}
-		},
-		{
-			id: 10,
+			id: 8,
 			element: '#frameworks',
 			popover: {
 				title: m.tourFrameworksTitle(),
@@ -113,51 +102,108 @@
 			}
 		},
 		{
-			id: 11,
-			element: '#add-button',
-			popover: {
-				description: m.tourFrameworkAddDescription()
-			}
-		},
-		{
-			id: 12,
+			id: 9,
 			element: '#riskMatrices',
 			popover: {
 				title: m.tourRiskMatricesTitle(),
 				description: m.tourRiskMatricesDescription()
 			}
 		},
+		// Assets Management
+		{
+			id: 10,
+			element: 'button[type="button"][id$="assets-management"]',
+			popover: {
+				title: m.tourAssetsManagementTitle(),
+				description: m.tourAssetsManagementDescription()
+			}
+		},
+		{
+			id: 11,
+			element: '#assets',
+			popover: {
+				description: m.tourAssetsDescription()
+			}
+		},
+		{
+			id: 12,
+			element: '#businessImpactAnalysis',
+			popover: {
+				description: m.tourBIADescription()
+			}
+		},
+		// Operations
 		{
 			id: 13,
-			element: '#add-button',
+			element: 'button[type="button"][id$="operations"]',
 			popover: {
-				description: m.tourMatricesAddDescription()
+				title: m.tourOperationsTitle(),
+				description: m.tourOperationsDescription()
 			}
 		},
 		{
 			id: 14,
-			element: 'button[type="button"][id$="compliance"]',
+			element: '#appliedControls',
 			popover: {
-				description: m.tourComplianceDescription()
+				description: m.tourAppliedControlsDescription()
 			}
 		},
 		{
 			id: 15,
-			element: '#complianceAssessments',
+			element: '#aiAssistant',
 			popover: {
-				title: m.tourAuditsTitle(),
-				description: m.tourAuditsDescription()
+				title: m.tourAIAssistantTitle(),
+				description: m.tourAIAssistantDescription()
 			}
 		},
 		{
 			id: 16,
+			element: '#incidents',
+			popover: {
+				description: m.tourIncidentsDescription()
+			}
+		},
+		// Governance
+		{
+			id: 17,
+			element: 'button[type="button"][id$="governance"]',
+			popover: {
+				title: m.tourGovernanceTitle(),
+				description: m.tourGovernanceDescription()
+			}
+		},
+		{
+			id: 18,
+			element: '#libraries',
+			popover: {
+				description: m.tourLibrariesDescription()
+			}
+		},
+		{
+			id: 19,
+			element: '#policies',
+			popover: {
+				description: m.tourPoliciesDescription()
+			}
+		},
+		{
+			id: 20,
+			element: '#riskAcceptances',
+			popover: {
+				description: m.tourRiskAcceptancesDescription()
+			}
+		},
+		// Risk
+		{
+			id: 21,
 			element: 'button[type="button"][id$="risk"]',
 			popover: {
+				title: m.tourRiskTitle(),
 				description: m.tourRiskDescription()
 			}
 		},
 		{
-			id: 17,
+			id: 22,
 			element: '#riskAssessments',
 			popover: {
 				title: m.tourRiskAssessmentTitle(),
@@ -165,7 +211,200 @@
 			}
 		},
 		{
-			id: 18,
+			id: 23,
+			element: '#securityGraph',
+			popover: {
+				title: m.tourSecurityGraphTitle(),
+				description: m.tourSecurityGraphDescription()
+			}
+		},
+		{
+			id: 24,
+			element: '#ebiosRM',
+			popover: {
+				description: m.tourEbiosRMDescription()
+			}
+		},
+		{
+			id: 25,
+			element: '#quantitativeRiskStudies',
+			popover: {
+				title: m.tourCRQTitle(),
+				description: m.tourCRQDescription()
+			}
+		},
+		// Compliance
+		{
+			id: 26,
+			element: 'button[type="button"][id$="compliance"]',
+			popover: {
+				title: m.tourComplianceTitle(),
+				description: m.tourComplianceDescription()
+			}
+		},
+		{
+			id: 27,
+			element: '#complianceAssessments',
+			popover: {
+				title: m.tourAuditsTitle(),
+				description: m.tourAuditsDescription()
+			}
+		},
+		{
+			id: 28,
+			element: '#evidences',
+			popover: {
+				description: m.tourEvidencesDescription()
+			}
+		},
+		// Continuous Monitoring
+		{
+			id: 29,
+			element: 'button[type="button"][id$="continuous-monitoring"]',
+			popover: {
+				title: m.tourContinuousMonitoringTitle(),
+				description: m.tourContinuousMonitoringDescription()
+			}
+		},
+		{
+			id: 30,
+			element: '#conmonDashboard',
+			popover: {
+				description: m.tourConmonDashboardDescription()
+			}
+		},
+		{
+			id: 31,
+			element: '#conmonProfiles',
+			popover: {
+				description: m.tourConmonProfilesDescription()
+			}
+		},
+		// Metrology
+		{
+			id: 32,
+			element: 'button[type="button"][id$="metrology"]',
+			popover: {
+				title: m.tourMetrologyTitle(),
+				description: m.tourMetrologyDescription()
+			}
+		},
+		{
+			id: 33,
+			element: '#metricDefinitions',
+			popover: {
+				description: m.tourMetricDefinitionsDescription()
+			}
+		},
+		{
+			id: 34,
+			element: '#dashboards',
+			popover: {
+				description: m.tourCustomDashboardsDescription()
+			}
+		},
+		// Third Party / TPRM
+		{
+			id: 35,
+			element: 'button[type="button"][id$="third-party-category"]',
+			popover: {
+				title: m.tourTPRMTitle(),
+				description: m.tourTPRMDescription()
+			}
+		},
+		{
+			id: 36,
+			element: '#entities',
+			popover: {
+				description: m.tourEntitiesDescription()
+			}
+		},
+		{
+			id: 37,
+			element: '#entityAssessments',
+			popover: {
+				description: m.tourEntityAssessmentsDescription()
+			}
+		},
+		// Privacy / GDPR
+		{
+			id: 38,
+			element: 'button[type="button"][id$="privacy"]',
+			popover: {
+				title: m.tourPrivacyTitle(),
+				description: m.tourPrivacyDescription()
+			}
+		},
+		{
+			id: 39,
+			element: '#processingsRegister',
+			popover: {
+				description: m.tourProcessingsDescription()
+			}
+		},
+		{
+			id: 40,
+			element: '#dataBreaches',
+			popover: {
+				description: m.tourDataBreachesDescription()
+			}
+		},
+		// RMF / FedRAMP
+		{
+			id: 41,
+			element: 'button[type="button"][id$="rmf"]',
+			popover: {
+				title: m.tourRMFTitle(),
+				description: m.tourRMFDescription()
+			}
+		},
+		{
+			id: 42,
+			element: '#fedramp20x',
+			popover: {
+				description: m.tourFedRAMPDescription()
+			}
+		},
+		{
+			id: 43,
+			element: '#systemGroups',
+			popover: {
+				description: m.tourSystemGroupsDescription()
+			}
+		},
+		{
+			id: 44,
+			element: '#stigChecklists',
+			popover: {
+				description: m.tourSTIGDescription()
+			}
+		},
+		// Automation
+		{
+			id: 45,
+			element: 'button[type="button"][id$="automation"]',
+			popover: {
+				title: m.tourAutomationTitle(),
+				description: m.tourAutomationDescription()
+			}
+		},
+		{
+			id: 46,
+			element: '#connectors',
+			popover: {
+				description: m.tourConnectorsDescription()
+			}
+		},
+		{
+			id: 47,
+			element: '#workflows',
+			popover: {
+				description: m.tourWorkflowsDescription()
+			}
+		},
+		// Overview / Analytics
+		{
+			id: 48,
 			element: 'button[type="button"][id$="overview"]',
 			popover: {
 				title: m.tourAnalyticsTitle(),
@@ -173,21 +412,45 @@
 			}
 		},
 		{
-			id: 19,
+			id: 49,
 			element: '#analytics',
 			popover: {
 				description: m.tourAnalyticsViewDescription()
 			}
 		},
 		{
-			id: 20,
+			id: 50,
 			element: '#myAssignments',
 			popover: {
 				description: m.tourAssignmentsDescription()
 			}
 		},
+		// Extra / Settings
 		{
-			id: 21,
+			id: 51,
+			element: 'button[type="button"][id$="extra"]',
+			popover: {
+				title: m.tourExtraTitle(),
+				description: m.tourExtraDescription()
+			}
+		},
+		{
+			id: 52,
+			element: '#settings',
+			popover: {
+				description: m.tourSettingsDescription()
+			}
+		},
+		{
+			id: 53,
+			element: '#backupRestore',
+			popover: {
+				description: m.tourBackupRestoreDescription()
+			}
+		},
+		// Final
+		{
+			id: 54,
 			element: '#sidebar-more-btn',
 			popover: {
 				title: m.tourHelpFinalTitle(),
