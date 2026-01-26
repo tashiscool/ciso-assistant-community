@@ -407,6 +407,18 @@ export const navData = {
 					permissions: ['view_personaldata']
 				},
 				{
+					name: 'dataAssets',
+					fa_icon: 'fa-solid fa-database',
+					href: '/privacy/data-assets',
+					permissions: ['view_processing']
+				},
+				{
+					name: 'consentRecords',
+					fa_icon: 'fa-solid fa-check-double',
+					href: '/privacy/consent-records',
+					permissions: ['view_processing']
+				},
+				{
 					name: 'purposes',
 					fa_icon: 'fa-solid fa-diamond',
 					href: '/purposes',
@@ -423,6 +435,17 @@ export const navData = {
 					fa_icon: 'fa-solid fa-triangle-exclamation',
 					href: '/data-breaches',
 					permissions: ['view_databreach']
+				}
+			]
+		},
+		{
+			name: 'businessContinuity',
+			items: [
+				{
+					name: 'bcpOverview',
+					fa_icon: 'fa-solid fa-gauge',
+					href: '/business-continuity',
+					permissions: ['view_appliedcontrol']
 				}
 			]
 		},
@@ -456,6 +479,12 @@ export const navData = {
 					name: 'fedramp20x',
 					fa_icon: 'fa-solid fa-flag-usa',
 					href: '/rmf/fedramp-20x',
+					permissions: ['view_systemgroup']
+				},
+				{
+					name: 'sspGenerator',
+					fa_icon: 'fa-solid fa-file-lines',
+					href: '/rmf/ssp-generator',
 					permissions: ['view_systemgroup']
 				},
 				{
@@ -542,6 +571,12 @@ export const navData = {
 					permissions: ['view_appliedcontrol']
 				},
 				{
+					name: 'evidenceAutomation',
+					fa_icon: 'fa-solid fa-robot',
+					href: '/evidence-automation',
+					permissions: ['view_appliedcontrol']
+				},
+				{
 					name: 'workflows',
 					fa_icon: 'fa-solid fa-diagram-project',
 					href: '/workflows',
@@ -553,6 +588,12 @@ export const navData = {
 			name: 'extra',
 			items: [
 				{
+					name: 'oscalImportExport',
+					fa_icon: 'fa-solid fa-file-code',
+					href: '/oscal',
+					permissions: ['view_framework', 'add_framework']
+				},
+				{
 					name: 'labels',
 					fa_icon: 'fa-solid fa-tag',
 					href: '/filtering-labels',
@@ -563,6 +604,12 @@ export const navData = {
 					fa_icon: 'fa-solid fa-language',
 					href: '/terminologies',
 					permissions: ['view_terminology']
+				},
+				{
+					name: 'webhooks',
+					fa_icon: 'fa-solid fa-paper-plane',
+					href: '/webhooks',
+					permissions: ['change_globalsettings']
 				},
 				{
 					name: 'settings',

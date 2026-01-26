@@ -107,8 +107,9 @@
 
 		<div class="grid grid-cols-2 gap-4 mb-4">
 			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-1">Security Control</label>
+				<label for="roi-control-select" class="block text-sm font-medium text-gray-700 mb-1">Security Control</label>
 				<select
+					id="roi-control-select"
 					class="w-full rounded-md border-gray-300 shadow-sm"
 					bind:value={controlId}
 				>
@@ -120,8 +121,9 @@
 			</div>
 
 			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-1">Risk Scenario</label>
+				<label for="roi-scenario-select" class="block text-sm font-medium text-gray-700 mb-1">Risk Scenario</label>
 				<select
+					id="roi-scenario-select"
 					class="w-full rounded-md border-gray-300 shadow-sm"
 					bind:value={scenarioId}
 				>
@@ -133,8 +135,9 @@
 			</div>
 
 			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-1">Time Horizon (Years)</label>
+				<label for="roi-time-horizon" class="block text-sm font-medium text-gray-700 mb-1">Time Horizon (Years)</label>
 				<input
+					id="roi-time-horizon"
 					type="number"
 					min="1"
 					max="10"
@@ -144,8 +147,8 @@
 			</div>
 
 			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-1">Discount Rate</label>
-				<select class="w-full rounded-md border-gray-300 shadow-sm" bind:value={discountRate}>
+				<label for="roi-discount-rate" class="block text-sm font-medium text-gray-700 mb-1">Discount Rate</label>
+				<select id="roi-discount-rate" class="w-full rounded-md border-gray-300 shadow-sm" bind:value={discountRate}>
 					<option value={0.05}>5%</option>
 					<option value={0.08}>8%</option>
 					<option value={0.10}>10%</option>

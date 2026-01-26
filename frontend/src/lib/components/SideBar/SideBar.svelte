@@ -24,6 +24,8 @@
 		type ModalComponent,
 		type ModalSettings
 	} from '$lib/components/Modals/stores';
+	import { navData } from '$lib/components/SideBar/navData';
+	import { URL_MODEL_MAP } from '$lib/utils/crud';
 
 	interface Props {
 		open: boolean;
@@ -34,430 +36,148 @@
 
 	const user = $page.data?.user;
 
-	// id is not needed, just to help us with authoring
-	// this is not great, but couldn't find a way for i18n while separating the file.
-	// NOTE: .svelte.ts files might help here https://svelte.dev/docs/svelte/svelte-js-files
-	const steps = [
-		// Welcome
-		{
-			id: 1,
-			element: 'none',
-			popover: {
-				title: m.tourWelcomeTitle(),
-				description: m.tourWelcomeDescription()
+	// Helper to check if a nav item is visible based on user permissions
+	function isNavItemVisible(itemName: string, categoryName?: string): boolean {
+		// Always show generic tour steps (welcome, help button, final)
+		if (!itemName) return true;
+
+		// Check sideBarVisibleItems first
+		if (sideBarVisibleItems && sideBarVisibleItems[itemName] === false) {
+			return false;
+		}
+
+		// Find the nav item in navData
+		for (const category of navData.items) {
+			// If checking a category, verify it has visible items
+			if (categoryName && category.name === categoryName) {
+				const hasVisibleItems = category.items.some((subItem) => isSubItemVisible(subItem));
+				return hasVisibleItems;
 			}
-		},
-		{
-			id: 2,
-			element: '#sidebar-more-btn',
-			popover: {
-				description: m.tourHelpButtonDescription()
-			}
-		},
-		// Organization
-		{
-			id: 3,
-			element: 'button[type="button"][id$="organization"]',
-			popover: {
-				title: m.tourOrganizationTitle(),
-				description: m.tourOrganizationDescription()
-			}
-		},
-		{
-			id: 4,
-			element: '#domains',
-			popover: {
-				description: m.tourDomainsDescription()
-			}
-		},
-		{
-			id: 5,
-			element: '#perimeters',
-			popover: {
-				description: m.tourPerimetersDescription()
-			}
-		},
-		{
-			id: 6,
-			element: '#users',
-			popover: {
-				description: m.tourUsersDescription()
-			}
-		},
-		// Catalog
-		{
-			id: 7,
-			element: 'button[type="button"][id$="catalog"]',
-			popover: {
-				title: m.tourCatalogTitle(),
-				description: m.tourCatalogDescription()
-			}
-		},
-		{
-			id: 8,
-			element: '#frameworks',
-			popover: {
-				title: m.tourFrameworksTitle(),
-				description: m.tourFrameworksDescription()
-			}
-		},
-		{
-			id: 9,
-			element: '#riskMatrices',
-			popover: {
-				title: m.tourRiskMatricesTitle(),
-				description: m.tourRiskMatricesDescription()
-			}
-		},
-		// Assets Management
-		{
-			id: 10,
-			element: 'button[type="button"][id$="assets-management"]',
-			popover: {
-				title: m.tourAssetsManagementTitle(),
-				description: m.tourAssetsManagementDescription()
-			}
-		},
-		{
-			id: 11,
-			element: '#assets',
-			popover: {
-				description: m.tourAssetsDescription()
-			}
-		},
-		{
-			id: 12,
-			element: '#businessImpactAnalysis',
-			popover: {
-				description: m.tourBIADescription()
-			}
-		},
-		// Operations
-		{
-			id: 13,
-			element: 'button[type="button"][id$="operations"]',
-			popover: {
-				title: m.tourOperationsTitle(),
-				description: m.tourOperationsDescription()
-			}
-		},
-		{
-			id: 14,
-			element: '#appliedControls',
-			popover: {
-				description: m.tourAppliedControlsDescription()
-			}
-		},
-		{
-			id: 15,
-			element: '#aiAssistant',
-			popover: {
-				title: m.tourAIAssistantTitle(),
-				description: m.tourAIAssistantDescription()
-			}
-		},
-		{
-			id: 16,
-			element: '#incidents',
-			popover: {
-				description: m.tourIncidentsDescription()
-			}
-		},
-		// Governance
-		{
-			id: 17,
-			element: 'button[type="button"][id$="governance"]',
-			popover: {
-				title: m.tourGovernanceTitle(),
-				description: m.tourGovernanceDescription()
-			}
-		},
-		{
-			id: 18,
-			element: '#libraries',
-			popover: {
-				description: m.tourLibrariesDescription()
-			}
-		},
-		{
-			id: 19,
-			element: '#policies',
-			popover: {
-				description: m.tourPoliciesDescription()
-			}
-		},
-		{
-			id: 20,
-			element: '#riskAcceptances',
-			popover: {
-				description: m.tourRiskAcceptancesDescription()
-			}
-		},
-		// Risk
-		{
-			id: 21,
-			element: 'button[type="button"][id$="risk"]',
-			popover: {
-				title: m.tourRiskTitle(),
-				description: m.tourRiskDescription()
-			}
-		},
-		{
-			id: 22,
-			element: '#riskAssessments',
-			popover: {
-				title: m.tourRiskAssessmentTitle(),
-				description: m.tourRiskAssessmentDescription()
-			}
-		},
-		{
-			id: 23,
-			element: '#securityGraph',
-			popover: {
-				title: m.tourSecurityGraphTitle(),
-				description: m.tourSecurityGraphDescription()
-			}
-		},
-		{
-			id: 24,
-			element: '#ebiosRM',
-			popover: {
-				description: m.tourEbiosRMDescription()
-			}
-		},
-		{
-			id: 25,
-			element: '#quantitativeRiskStudies',
-			popover: {
-				title: m.tourCRQTitle(),
-				description: m.tourCRQDescription()
-			}
-		},
-		// Compliance
-		{
-			id: 26,
-			element: 'button[type="button"][id$="compliance"]',
-			popover: {
-				title: m.tourComplianceTitle(),
-				description: m.tourComplianceDescription()
-			}
-		},
-		{
-			id: 27,
-			element: '#complianceAssessments',
-			popover: {
-				title: m.tourAuditsTitle(),
-				description: m.tourAuditsDescription()
-			}
-		},
-		{
-			id: 28,
-			element: '#evidences',
-			popover: {
-				description: m.tourEvidencesDescription()
-			}
-		},
-		// Continuous Monitoring
-		{
-			id: 29,
-			element: 'button[type="button"][id$="continuous-monitoring"]',
-			popover: {
-				title: m.tourContinuousMonitoringTitle(),
-				description: m.tourContinuousMonitoringDescription()
-			}
-		},
-		{
-			id: 30,
-			element: '#conmonDashboard',
-			popover: {
-				description: m.tourConmonDashboardDescription()
-			}
-		},
-		{
-			id: 31,
-			element: '#conmonProfiles',
-			popover: {
-				description: m.tourConmonProfilesDescription()
-			}
-		},
-		// Metrology
-		{
-			id: 32,
-			element: 'button[type="button"][id$="metrology"]',
-			popover: {
-				title: m.tourMetrologyTitle(),
-				description: m.tourMetrologyDescription()
-			}
-		},
-		{
-			id: 33,
-			element: '#metricDefinitions',
-			popover: {
-				description: m.tourMetricDefinitionsDescription()
-			}
-		},
-		{
-			id: 34,
-			element: '#dashboards',
-			popover: {
-				description: m.tourCustomDashboardsDescription()
-			}
-		},
-		// Third Party / TPRM
-		{
-			id: 35,
-			element: 'button[type="button"][id$="third-party-category"]',
-			popover: {
-				title: m.tourTPRMTitle(),
-				description: m.tourTPRMDescription()
-			}
-		},
-		{
-			id: 36,
-			element: '#entities',
-			popover: {
-				description: m.tourEntitiesDescription()
-			}
-		},
-		{
-			id: 37,
-			element: '#entityAssessments',
-			popover: {
-				description: m.tourEntityAssessmentsDescription()
-			}
-		},
-		// Privacy / GDPR
-		{
-			id: 38,
-			element: 'button[type="button"][id$="privacy"]',
-			popover: {
-				title: m.tourPrivacyTitle(),
-				description: m.tourPrivacyDescription()
-			}
-		},
-		{
-			id: 39,
-			element: '#processingsRegister',
-			popover: {
-				description: m.tourProcessingsDescription()
-			}
-		},
-		{
-			id: 40,
-			element: '#dataBreaches',
-			popover: {
-				description: m.tourDataBreachesDescription()
-			}
-		},
-		// RMF / FedRAMP
-		{
-			id: 41,
-			element: 'button[type="button"][id$="rmf"]',
-			popover: {
-				title: m.tourRMFTitle(),
-				description: m.tourRMFDescription()
-			}
-		},
-		{
-			id: 42,
-			element: '#fedramp20x',
-			popover: {
-				description: m.tourFedRAMPDescription()
-			}
-		},
-		{
-			id: 43,
-			element: '#systemGroups',
-			popover: {
-				description: m.tourSystemGroupsDescription()
-			}
-		},
-		{
-			id: 44,
-			element: '#stigChecklists',
-			popover: {
-				description: m.tourSTIGDescription()
-			}
-		},
-		// Automation
-		{
-			id: 45,
-			element: 'button[type="button"][id$="automation"]',
-			popover: {
-				title: m.tourAutomationTitle(),
-				description: m.tourAutomationDescription()
-			}
-		},
-		{
-			id: 46,
-			element: '#connectors',
-			popover: {
-				description: m.tourConnectorsDescription()
-			}
-		},
-		{
-			id: 47,
-			element: '#workflows',
-			popover: {
-				description: m.tourWorkflowsDescription()
-			}
-		},
-		// Overview / Analytics
-		{
-			id: 48,
-			element: 'button[type="button"][id$="overview"]',
-			popover: {
-				title: m.tourAnalyticsTitle(),
-				description: m.tourAnalyticsDescription()
-			}
-		},
-		{
-			id: 49,
-			element: '#analytics',
-			popover: {
-				description: m.tourAnalyticsViewDescription()
-			}
-		},
-		{
-			id: 50,
-			element: '#myAssignments',
-			popover: {
-				description: m.tourAssignmentsDescription()
-			}
-		},
-		// Extra / Settings
-		{
-			id: 51,
-			element: 'button[type="button"][id$="extra"]',
-			popover: {
-				title: m.tourExtraTitle(),
-				description: m.tourExtraDescription()
-			}
-		},
-		{
-			id: 52,
-			element: '#settings',
-			popover: {
-				description: m.tourSettingsDescription()
-			}
-		},
-		{
-			id: 53,
-			element: '#backupRestore',
-			popover: {
-				description: m.tourBackupRestoreDescription()
-			}
-		},
-		// Final
-		{
-			id: 54,
-			element: '#sidebar-more-btn',
-			popover: {
-				title: m.tourHelpFinalTitle(),
-				description: m.tourHelpFinalDescription()
+
+			// Check sub-items
+			for (const subItem of category.items) {
+				if (subItem.name === itemName) {
+					return isSubItemVisible(subItem);
+				}
 			}
 		}
+
+		return true; // Default to visible if not found in navData
+	}
+
+	function isSubItemVisible(subItem: any): boolean {
+		if (subItem.exclude) {
+			return subItem.exclude.some((role: string) => user?.roles && !user.roles.includes(role));
+		} else if (subItem.permissions) {
+			return subItem.permissions?.some(
+				(permission: string) => user?.permissions && Object.hasOwn(user.permissions, permission)
+			);
+		} else if (Object.hasOwn(URL_MODEL_MAP, subItem.href.split('/')[1])) {
+			const model = URL_MODEL_MAP[subItem.href.split('/')[1]];
+			const canViewObject =
+				user?.permissions && Object.hasOwn(user.permissions, `view_${model.name}`);
+			return canViewObject;
+		}
+		return false;
+	}
+
+	// Tour steps with navItem metadata for permission-based filtering
+	// navItem: the name of the nav item this step targets (for permission checking)
+	// category: the category name if this is a category header step
+	const allSteps = [
+		// Welcome - always shown
+		{ element: 'none', popover: { title: m.tourWelcomeTitle(), description: m.tourWelcomeDescription() } },
+		{ element: '#sidebar-more-btn', popover: { description: m.tourHelpButtonDescription() } },
+		// Organization
+		{ element: 'button[type="button"][id$="organization"]', category: 'organization', popover: { title: m.tourOrganizationTitle(), description: m.tourOrganizationDescription() } },
+		{ element: '#domains', navItem: 'domains', popover: { description: m.tourDomainsDescription() } },
+		{ element: '#perimeters', navItem: 'perimeters', popover: { description: m.tourPerimetersDescription() } },
+		{ element: '#users', navItem: 'users', popover: { description: m.tourUsersDescription() } },
+		// Catalog
+		{ element: 'button[type="button"][id$="catalog"]', category: 'catalog', popover: { title: m.tourCatalogTitle(), description: m.tourCatalogDescription() } },
+		{ element: '#frameworks', navItem: 'frameworks', popover: { title: m.tourFrameworksTitle(), description: m.tourFrameworksDescription() } },
+		{ element: '#riskMatrices', navItem: 'riskMatrices', popover: { title: m.tourRiskMatricesTitle(), description: m.tourRiskMatricesDescription() } },
+		// Assets Management
+		{ element: 'button[type="button"][id$="assets-management"]', category: 'assetsManagement', popover: { title: m.tourAssetsManagementTitle(), description: m.tourAssetsManagementDescription() } },
+		{ element: '#assets', navItem: 'assets', popover: { description: m.tourAssetsDescription() } },
+		{ element: '#businessImpactAnalysis', navItem: 'businessImpactAnalysis', popover: { description: m.tourBIADescription() } },
+		// Operations
+		{ element: 'button[type="button"][id$="operations"]', category: 'operations', popover: { title: m.tourOperationsTitle(), description: m.tourOperationsDescription() } },
+		{ element: '#appliedControls', navItem: 'appliedControls', popover: { description: m.tourAppliedControlsDescription() } },
+		{ element: '#aiAssistant', navItem: 'aiAssistant', popover: { title: m.tourAIAssistantTitle(), description: m.tourAIAssistantDescription() } },
+		{ element: '#incidents', navItem: 'incidents', popover: { description: m.tourIncidentsDescription() } },
+		// Governance
+		{ element: 'button[type="button"][id$="governance"]', category: 'governance', popover: { title: m.tourGovernanceTitle(), description: m.tourGovernanceDescription() } },
+		{ element: '#libraries', navItem: 'libraries', popover: { description: m.tourLibrariesDescription() } },
+		{ element: '#policies', navItem: 'policies', popover: { description: m.tourPoliciesDescription() } },
+		{ element: '#riskAcceptances', navItem: 'riskAcceptances', popover: { description: m.tourRiskAcceptancesDescription() } },
+		// Risk
+		{ element: 'button[type="button"][id$="risk"]', category: 'risk', popover: { title: m.tourRiskTitle(), description: m.tourRiskDescription() } },
+		{ element: '#riskAssessments', navItem: 'riskAssessments', popover: { title: m.tourRiskAssessmentTitle(), description: m.tourRiskAssessmentDescription() } },
+		{ element: '#securityGraph', navItem: 'securityGraph', popover: { title: m.tourSecurityGraphTitle(), description: m.tourSecurityGraphDescription() } },
+		{ element: '#ebiosRM', navItem: 'ebiosRM', popover: { description: m.tourEbiosRMDescription() } },
+		{ element: '#quantitativeRiskStudies', navItem: 'quantitativeRiskStudies', popover: { title: m.tourCRQTitle(), description: m.tourCRQDescription() } },
+		// Compliance
+		{ element: 'button[type="button"][id$="compliance"]', category: 'compliance', popover: { title: m.tourComplianceTitle(), description: m.tourComplianceDescription() } },
+		{ element: '#complianceAssessments', navItem: 'complianceAssessments', popover: { title: m.tourAuditsTitle(), description: m.tourAuditsDescription() } },
+		{ element: '#evidences', navItem: 'evidences', popover: { description: m.tourEvidencesDescription() } },
+		// Continuous Monitoring
+		{ element: 'button[type="button"][id$="continuous-monitoring"]', category: 'continuousMonitoring', popover: { title: m.tourContinuousMonitoringTitle(), description: m.tourContinuousMonitoringDescription() } },
+		{ element: '#conmonDashboard', navItem: 'conmonDashboard', popover: { description: m.tourConmonDashboardDescription() } },
+		{ element: '#conmonProfiles', navItem: 'conmonProfiles', popover: { description: m.tourConmonProfilesDescription() } },
+		// Metrology
+		{ element: 'button[type="button"][id$="metrology"]', category: 'metrology', popover: { title: m.tourMetrologyTitle(), description: m.tourMetrologyDescription() } },
+		{ element: '#metricDefinitions', navItem: 'metricDefinitions', popover: { description: m.tourMetricDefinitionsDescription() } },
+		{ element: '#dashboards', navItem: 'dashboards', popover: { description: m.tourCustomDashboardsDescription() } },
+		// Third Party / TPRM
+		{ element: 'button[type="button"][id$="third-party-category"]', category: 'thirdPartyCategory', popover: { title: m.tourTPRMTitle(), description: m.tourTPRMDescription() } },
+		{ element: '#entities', navItem: 'entities', popover: { description: m.tourEntitiesDescription() } },
+		{ element: '#entityAssessments', navItem: 'entityAssessments', popover: { description: m.tourEntityAssessmentsDescription() } },
+		// Privacy / GDPR
+		{ element: 'button[type="button"][id$="privacy"]', category: 'privacy', popover: { title: m.tourPrivacyTitle(), description: m.tourPrivacyDescription() } },
+		{ element: '#processingsRegister', navItem: 'processingsRegister', popover: { description: m.tourProcessingsDescription() } },
+		{ element: '#dataBreaches', navItem: 'dataBreaches', popover: { description: m.tourDataBreachesDescription() } },
+		// RMF / FedRAMP
+		{ element: 'button[type="button"][id$="rmf"]', category: 'rmf', popover: { title: m.tourRMFTitle(), description: m.tourRMFDescription() } },
+		{ element: '#fedramp20x', navItem: 'fedramp20x', popover: { description: m.tourFedRAMPDescription() } },
+		{ element: '#systemGroups', navItem: 'systemGroups', popover: { description: m.tourSystemGroupsDescription() } },
+		{ element: '#stigChecklists', navItem: 'stigChecklists', popover: { description: m.tourSTIGDescription() } },
+		// Automation
+		{ element: 'button[type="button"][id$="automation"]', category: 'automation', popover: { title: m.tourAutomationTitle(), description: m.tourAutomationDescription() } },
+		{ element: '#connectors', navItem: 'connectors', popover: { description: m.tourConnectorsDescription() } },
+		{ element: '#workflows', navItem: 'workflows', popover: { description: m.tourWorkflowsDescription() } },
+		// Overview / Analytics
+		{ element: 'button[type="button"][id$="overview"]', category: 'overview', popover: { title: m.tourAnalyticsTitle(), description: m.tourAnalyticsDescription() } },
+		{ element: '#analytics', navItem: 'analytics', popover: { description: m.tourAnalyticsViewDescription() } },
+		{ element: '#myAssignments', navItem: 'myAssignments', popover: { description: m.tourAssignmentsDescription() } },
+		// Extra / Settings
+		{ element: 'button[type="button"][id$="extra"]', category: 'extra', popover: { title: m.tourExtraTitle(), description: m.tourExtraDescription() } },
+		{ element: '#oscalImportExport', navItem: 'oscalImportExport', popover: { title: m.tourOSCALTitle(), description: m.tourOSCALDescription() } },
+		{ element: '#settings', navItem: 'settings', popover: { description: m.tourSettingsDescription() } },
+		{ element: '#backupRestore', navItem: 'backupRestore', popover: { description: m.tourBackupRestoreDescription() } },
+		// Final - always shown
+		{ element: '#sidebar-more-btn', popover: { title: m.tourHelpFinalTitle(), description: m.tourHelpFinalDescription() } }
 	];
+
+	// Filter steps based on user permissions
+	function getFilteredSteps() {
+		return allSteps.filter((step) => {
+			// Steps without navItem or category are always shown (welcome, final)
+			if (!step.navItem && !step.category) return true;
+
+			// Check category visibility (has at least one visible item)
+			if (step.category) {
+				return isNavItemVisible('', step.category);
+			}
+
+			// Check individual nav item visibility
+			if (step.navItem) {
+				return isNavItemVisible(step.navItem);
+			}
+
+			return true;
+		});
+	}
 
 	const modalStore = getModalStore();
 	const flash = getFlash(page);
@@ -525,10 +245,10 @@
 	}
 
 	function triggerVisit() {
-		const translatedSteps = steps;
+		const filteredSteps = getFilteredSteps();
 		const driverObj = driver({
 			showProgress: true,
-			steps: translatedSteps,
+			steps: filteredSteps,
 			popoverClass: 'custom-driver-theme'
 		});
 		$driverInstance = driverObj;

@@ -102,8 +102,9 @@
 
 		<div class="grid grid-cols-3 gap-4 mb-4">
 			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-1">Folder/Domain</label>
+				<label for="critical-nodes-folder" class="block text-sm font-medium text-gray-700 mb-1">Folder/Domain</label>
 				<select
+					id="critical-nodes-folder"
 					class="w-full rounded-md border-gray-300 shadow-sm"
 					bind:value={folderId}
 				>
@@ -115,8 +116,9 @@
 			</div>
 
 			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-1">Number of Nodes</label>
+				<label for="critical-nodes-top-n" class="block text-sm font-medium text-gray-700 mb-1">Number of Nodes</label>
 				<input
+					id="critical-nodes-top-n"
 					type="number"
 					min="1"
 					max="50"
@@ -233,7 +235,7 @@
 									View Details
 								</a>
 							{/if}
-							<button class="text-sm text-gray-500 hover:text-gray-700">
+							<button class="text-sm text-gray-500 hover:text-gray-700" aria-label="Analyze blast radius for this node">
 								<i class="fa-solid fa-burst mr-1"></i>
 								Analyze Blast Radius
 							</button>

@@ -165,24 +165,28 @@
 	<div class="p-3 border-b bg-gray-50">
 		<div class="flex items-center space-x-2">
 			<div class="relative flex-1">
+				<label for="graph-search-nodes" class="sr-only">Search nodes</label>
 				<input
+					id="graph-search-nodes"
 					type="text"
 					class="w-full rounded-md border-gray-300 shadow-sm pl-10 pr-4 py-2 text-sm"
 					placeholder="Search nodes..."
 					bind:value={searchQuery}
 					onkeydown={handleKeyDown}
 				/>
-				<i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+				<i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true"></i>
 			</div>
 			<button
 				class="px-3 py-2 text-sm bg-primary-600 text-white rounded-md hover:bg-primary-700"
 				onclick={() => searchNodes(searchQuery)}
+				aria-label="Search nodes in graph"
 			>
 				Search
 			</button>
 			<button
 				class="px-3 py-2 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
 				onclick={clearHighlight}
+				aria-label="Clear search highlights"
 			>
 				Clear
 			</button>

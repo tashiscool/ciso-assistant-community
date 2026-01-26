@@ -81,8 +81,9 @@
 
 		<div class="grid grid-cols-3 gap-4 mb-4">
 			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-1">Source Node</label>
+				<label for="blast-source-node" class="block text-sm font-medium text-gray-700 mb-1">Source Node</label>
 				<select
+					id="blast-source-node"
 					class="w-full rounded-md border-gray-300 shadow-sm"
 					bind:value={sourceNodeId}
 				>
@@ -94,8 +95,9 @@
 			</div>
 
 			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-1">Max Hops</label>
+				<label for="blast-max-hops" class="block text-sm font-medium text-gray-700 mb-1">Max Hops</label>
 				<input
+					id="blast-max-hops"
 					type="number"
 					min="1"
 					max="10"
@@ -105,8 +107,9 @@
 			</div>
 
 			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-1">Propagation Threshold</label>
+				<label for="blast-threshold" class="block text-sm font-medium text-gray-700 mb-1">Propagation Threshold</label>
 				<input
+					id="blast-threshold"
 					type="number"
 					min="0"
 					max="1"

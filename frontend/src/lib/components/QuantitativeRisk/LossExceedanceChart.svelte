@@ -273,8 +273,9 @@
 
 		<div class="grid grid-cols-3 gap-4 mb-4">
 			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-1">Quantitative Risk Study</label>
+				<label for="lec-study-select" class="block text-sm font-medium text-gray-700 mb-1">Quantitative Risk Study</label>
 				<select
+					id="lec-study-select"
 					class="w-full rounded-md border-gray-300 shadow-sm"
 					bind:value={studyId}
 				>
@@ -286,8 +287,8 @@
 			</div>
 
 			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-1">Monte Carlo Iterations</label>
-				<select class="w-full rounded-md border-gray-300 shadow-sm" bind:value={iterations}>
+				<label for="lec-iterations-select" class="block text-sm font-medium text-gray-700 mb-1">Monte Carlo Iterations</label>
+				<select id="lec-iterations-select" class="w-full rounded-md border-gray-300 shadow-sm" bind:value={iterations}>
 					<option value={1000}>1,000 (Fast)</option>
 					<option value={10000}>10,000 (Standard)</option>
 					<option value={50000}>50,000 (Detailed)</option>

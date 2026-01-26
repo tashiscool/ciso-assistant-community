@@ -178,6 +178,7 @@
 							<button
 								class="text-gray-400 hover:text-gray-600"
 								onclick={() => (selectedNode = null)}
+								aria-label="Close details panel"
 							>
 								<i class="fa-solid fa-times"></i>
 							</button>
@@ -185,18 +186,18 @@
 
 						<div class="space-y-4">
 							<div>
-								<label class="text-xs font-medium text-gray-500 uppercase">Name</label>
+								<span class="text-xs font-medium text-gray-500 uppercase block">Name</span>
 								<p class="text-sm text-gray-900">{selectedNode.name}</p>
 							</div>
 
 							<div>
-								<label class="text-xs font-medium text-gray-500 uppercase">Type</label>
+								<span class="text-xs font-medium text-gray-500 uppercase block">Type</span>
 								<p class="text-sm text-gray-900 capitalize">{selectedNode.value?.replace(/_/g, ' ')}</p>
 							</div>
 
 							{#if selectedNode.criticality}
 								<div>
-									<label class="text-xs font-medium text-gray-500 uppercase">Criticality</label>
+									<span class="text-xs font-medium text-gray-500 uppercase block">Criticality</span>
 									<p class="text-sm">
 										<span
 											class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
@@ -216,7 +217,7 @@
 
 							{#if selectedNode.riskScore}
 								<div>
-									<label class="text-xs font-medium text-gray-500 uppercase">Risk Score</label>
+									<span class="text-xs font-medium text-gray-500 uppercase block">Risk Score</span>
 									<p class="text-sm text-gray-900">{selectedNode.riskScore.toFixed(2)}</p>
 								</div>
 							{/if}
@@ -250,8 +251,8 @@
 
 					<div class="grid grid-cols-2 gap-4 mb-6">
 						<div>
-							<label class="block text-sm font-medium text-gray-700 mb-1">Entry Point (Threat)</label>
-							<select class="w-full rounded-md border-gray-300 shadow-sm">
+							<label for="entry-point-select" class="block text-sm font-medium text-gray-700 mb-1">Entry Point (Threat)</label>
+							<select id="entry-point-select" class="w-full rounded-md border-gray-300 shadow-sm">
 								<option value="">Select entry point...</option>
 								{#each (graphData.nodes || []).filter((n: any) => n.group === 'threat' || n.group === 'third_party') as node}
 									<option value={node.id}>{node.label || node.name}</option>
@@ -260,8 +261,8 @@
 						</div>
 
 						<div>
-							<label class="block text-sm font-medium text-gray-700 mb-1">Target (Critical Asset)</label>
-							<select class="w-full rounded-md border-gray-300 shadow-sm">
+							<label for="target-select" class="block text-sm font-medium text-gray-700 mb-1">Target (Critical Asset)</label>
+							<select id="target-select" class="w-full rounded-md border-gray-300 shadow-sm">
 								<option value="">Select target...</option>
 								{#each (graphData.nodes || []).filter((n: any) => n.group === 'asset' && n.criticality === 'critical') as node}
 									<option value={node.id}>{node.label || node.name}</option>
