@@ -44,7 +44,7 @@
 		result = null;
 
 		try {
-			const response = await fetch(`${BASE_API_URL}/crq/analytics/roi/`, {
+			const response = await fetch(`${BASE_API_URL}/crq/analytics/roi/calculate/`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'

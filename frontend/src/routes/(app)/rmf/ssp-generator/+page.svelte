@@ -56,7 +56,7 @@
 
 		try {
 			const response = await fetch(
-				`${BASE_API_URL}/fedramp/generate-ssp/${selectedAssessment}/validate_for_generation/?baseline=${selectedBaseline}`,
+				`${BASE_API_URL}/oscal/fedramp/generate-ssp/${selectedAssessment}/validate_for_generation/?baseline=${selectedBaseline}`,
 				{ credentials: 'include' }
 			);
 
@@ -81,7 +81,7 @@
 
 		try {
 			const response = await fetch(
-				`${BASE_API_URL}/fedramp/generate-ssp/${selectedAssessment}/preview_content/?baseline=${selectedBaseline}`,
+				`${BASE_API_URL}/oscal/fedramp/generate-ssp/${selectedAssessment}/preview_content/?baseline=${selectedBaseline}`,
 				{ credentials: 'include' }
 			);
 
@@ -106,7 +106,7 @@
 
 		try {
 			const response = await fetch(
-				`${BASE_API_URL}/fedramp/generate-ssp/${selectedAssessment}/generate_appendix_a/`,
+				`${BASE_API_URL}/oscal/fedramp/generate-ssp/${selectedAssessment}/generate_appendix_a/`,
 				{
 					credentials: 'include',
 					method: 'POST',

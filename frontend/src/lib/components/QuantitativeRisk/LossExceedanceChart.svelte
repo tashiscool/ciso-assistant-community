@@ -36,7 +36,7 @@
 		result = null;
 
 		try {
-			const response = await fetch(`${BASE_API_URL}/crq/analytics/portfolio/`, {
+			const response = await fetch(`${BASE_API_URL}/crq/analytics/portfolio/analyze/`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
