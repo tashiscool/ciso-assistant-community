@@ -24,15 +24,15 @@ ssp_router = routers.SimpleRouter()
 ssp_router.register(r'generate-ssp', SSPGenerationViewSet, basename='ssp-generation')
 
 urlpatterns = [
-    # OSCAL Import endpoints
-    path('oscal/', include(import_router.urls)),
+    # OSCAL Import endpoints (at /api/oscal/import/...)
+    path('', include(import_router.urls)),
 
-    # OSCAL Export endpoints
-    path('oscal/', include(export_router.urls)),
+    # OSCAL Export endpoints (at /api/oscal/export/...)
+    path('', include(export_router.urls)),
 
-    # FedRAMP Validation endpoints
+    # FedRAMP Validation endpoints (at /api/oscal/fedramp/validate/...)
     path('fedramp/', include(fedramp_router.urls)),
 
-    # SSP Generation endpoints
+    # SSP Generation endpoints (at /api/oscal/fedramp/generate-ssp/...)
     path('fedramp/', include(ssp_router.urls)),
 ]

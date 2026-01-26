@@ -169,7 +169,7 @@
 			formData.append('file', validateFile);
 			formData.append('baseline', fedrampBaseline);
 
-			const response = await fetch(`${BASE_API_URL}/fedramp/validate/validate_ssp/`, {
+			const response = await fetch(`${BASE_API_URL}/oscal/fedramp/validate/validate_ssp/`, {
 				method: 'POST',
 				body: formData
 			});
