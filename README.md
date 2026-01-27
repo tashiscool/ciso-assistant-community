@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="#quick-start">Quick Start</a> &bull;
+  <a href="#deployment">Deployment</a> &bull;
   <a href="#core-capabilities">Capabilities</a> &bull;
   <a href="#supported-frameworks">Frameworks</a> &bull;
   <a href="#development-setup">Development</a>
@@ -35,9 +35,9 @@ CISO Assistant is a comprehensive **Governance, Risk, and Compliance (GRC)** pla
 
 ---
 
-## Quick Start
+## Deployment
 
-### Docker (Recommended)
+### Quick Start (Docker)
 
 ```bash
 git clone https://github.com/tashiscool/ciso-assistant-community.git
@@ -46,6 +46,187 @@ cd ciso-assistant-community
 ```
 
 Access the application at [https://localhost:8443](https://localhost:8443)
+
+### Production Deployment Options
+
+CISO Assistant provides two production deployment scripts with interactive setup wizards, AWS GovCloud support, and full management tooling.
+
+| Deployment | OS | FIPS | Best For |
+|------------|-----|------|----------|
+| [EC2 RHEL 8](#ec2--rhel-8) | RHEL 8 | No | Standard AWS/GovCloud deployments |
+| [Ubuntu FIPS](#ubuntu-fips) | Ubuntu 20.04/22.04 | Yes | Federal/government FIPS compliance |
+
+Both deployments include:
+- **Interactive configuration wizard** - walks through every setting
+- **RDS PostgreSQL** with IAM authentication (15-min token refresh)
+- **S3 file storage** with IAM role-based access
+- **Task queue options** - Huey/SQLite, Huey/Redis (ElastiCache), or Celery/SQS
+- **Nginx reverse proxy** with TLS 1.2/1.3
+- **Systemd services** with auto-restart
+- **Management console** (`sudo ciso-assistant`) with helper scripts
+
+---
+
+### EC2 / RHEL 8
+
+Deploy on AWS EC2 with RHEL 8, RDS PostgreSQL, and S3:
+
+```bash
+# SSH to your EC2 instance
+ssh ec2-user@your-instance
+
+# Download and run
+curl -O https://raw.githubusercontent.com/tashiscool/ciso-assistant-community/main/deploy/ec2-rhel8/deploy.sh
+chmod +x deploy.sh
+sudo ./deploy.sh
+```
+
+The script walks through 5 phases:
+
+| Phase | What Happens |
+|-------|--------------|
+| 1. System Packages | Installs Python 3.11, Node.js 20 |
+| 2. Application | Clones repo, sets up backend (Poetry/Gunicorn) and frontend (npm/SvelteKit) |
+| 3. Configuration | Interactive wizard for DB, S3, task queue, logging |
+| 4. System Config | Creates systemd services, configures nginx, SELinux, firewall |
+| 5. Post-Install | SSL setup, database test, migrations, admin user, starts services |
+
+**AWS prerequisites**: EC2 with IAM role, RDS PostgreSQL 14+, S3 bucket. Optional: ElastiCache Redis or SQS queue.
+
+See [deploy/ec2-rhel8/README.md](deploy/ec2-rhel8/README.md) for full documentation including IAM policies and RDS setup.
+
+---
+
+### Ubuntu FIPS
+
+Deploy on Ubuntu 20.04/22.04 with **FIPS 140-2/140-3 validated cryptography**:
+
+```bash
+# SSH to your instance
+ssh ubuntu@your-instance
+
+# Download and run
+curl -O https://raw.githubusercontent.com/tashiscool/ciso-assistant-community/main/deploy/ubuntu-fips/deploy.sh
+chmod +x deploy.sh
+sudo ./deploy.sh
+```
+
+In addition to the standard 5 phases, this deployment adds:
+
+- **Ubuntu Pro FIPS** package enablement with automatic reboot handling
+- **FIPS compliance verification** via `sudo ciso-assistant fips`
+- **System OpenSSL** linked into Python virtualenv for FIPS crypto
+- **FIPS-compliant TLS** cipher configuration in nginx
+
+**Prerequisites**: Ubuntu Pro subscription (for FIPS packages), EC2 with IAM role, RDS PostgreSQL 14+, S3 bucket.
+
+See [deploy/ubuntu-fips/README.md](deploy/ubuntu-fips/README.md) for full documentation.
+
+---
+
+### Management Console
+
+After deployment, all management is handled through the `ciso-assistant` console:
+
+```bash
+# Interactive management menu
+sudo ciso-assistant
+```
+
+```
+========================================
+  CISO Assistant Management Console
+========================================
+
+Quick Status:
+  FIPS Mode: ENABLED            # (Ubuntu FIPS only)
+  Services: 4/4 running
+  URL: https://ciso.example.gov
+
+ 1) Show service status          6) Setup SSL certificate
+ 2) Start all services           7) Test database connection
+ 3) Stop all services            8) Run migrations
+ 4) Restart all services         9) Manage admin users
+ 5) View logs                   10) Check FIPS compliance
+```
+
+**Direct commands:**
+
+```bash
+sudo ciso-assistant status           # Service status with uptime
+sudo ciso-assistant restart          # Restart all services
+sudo ciso-assistant restart backend  # Restart specific service
+sudo ciso-assistant logs             # View recent logs
+sudo ciso-assistant follow           # Follow logs real-time
+sudo ciso-assistant health           # HTTP endpoint + disk + memory checks
+
+sudo ciso-assistant ssl              # SSL certificate setup (Let's Encrypt)
+sudo ciso-assistant db               # Database connection diagnostic
+sudo ciso-assistant migrate          # Run database migrations
+sudo ciso-assistant admin            # Admin user management
+sudo ciso-assistant fips             # FIPS compliance check (Ubuntu)
+
+sudo ciso-assistant config           # Edit configuration + restart
+sudo ciso-assistant update           # Pull latest code and update
+```
+
+### Helper Scripts
+
+Located in `/opt/ciso-assistant/scripts/`:
+
+| Script | Purpose | Key Commands |
+|--------|---------|--------------|
+| `setup-ssl.sh` | SSL certificate management | `--letsencrypt`, `--check`, `--self-signed` |
+| `test-db.sh` | Database connection testing | `--verbose`, `--env-only`, `--network-only` |
+| `run-migrations.sh` | Database migrations | `--full`, `--check`, `--plan` |
+| `create-admin.sh` | Admin user management | `--create`, `--list`, `--reset EMAIL` |
+| `manage-services.sh` | Service management | `start`, `stop`, `restart`, `health` |
+| `check-fips.sh` | FIPS compliance (Ubuntu) | `--verbose`, `--json` |
+
+### Post-Deployment Migrations
+
+If the initial deployment uses placeholder database values, run migrations after editing the config:
+
+```bash
+# Edit configuration with real values
+sudo vi /etc/ciso-assistant/env
+
+# Run migrations
+sudo ./deploy.sh --run-migrations
+
+# Or use the management console
+sudo ciso-assistant migrate --full
+```
+
+### Task Queue Options
+
+| Backend | Config | Use Case |
+|---------|--------|----------|
+| Huey + SQLite | `TASK_QUEUE_BACKEND=huey` (default) | Single-server, simple |
+| Huey + Redis | `TASK_QUEUE_BACKEND=huey` + `USE_REDIS=True` | ElastiCache, multi-server |
+| Celery + SQS | `TASK_QUEUE_BACKEND=celery` + `USE_SQS=True` | AWS managed, serverless |
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DJANGO_SECRET_KEY` | Secret key for sessions | Auto-generated |
+| `CISO_ASSISTANT_URL` | Public URL | `http://localhost:5173` |
+| `POSTGRES_NAME` | Database name | SQLite if unset |
+| `POSTGRES_USER` | Database user | - |
+| `DB_HOST` | RDS endpoint | - |
+| `RDS_IAM_AUTH` | Enable IAM auth | `False` |
+| `AWS_REGION` | AWS region | `us-gov-west-1` |
+| `USE_S3` | Enable S3 storage | `False` |
+| `AWS_AUTH_MODE` | `iam` or `credentials` | `credentials` |
+| `USE_REDIS` | Enable Redis caching | `False` |
+| `TASK_QUEUE_BACKEND` | `huey` or `celery` | `huey` |
+| `USE_SQS` | Enable SQS queue | `False` |
+| `FIPS_MODE` | FIPS indicator | `False` |
+
+### Kubernetes
+
+Helm charts are available in the `charts/` directory.
 
 ---
 
@@ -141,8 +322,8 @@ backend/core/bounded_contexts/
 
 - **Backend**: Django 5.x, Django REST Framework, PostgreSQL
 - **Frontend**: SvelteKit 2.x, Svelte 5, Tailwind CSS
-- **Task Queue**: Huey (Redis-backed)
-- **Deployment**: Docker, Kubernetes, Caddy/Nginx
+- **Task Queue**: Huey (SQLite/Redis) or Celery (Redis/SQS)
+- **Deployment**: Docker, EC2 (RHEL 8 / Ubuntu FIPS), Kubernetes
 
 ---
 
@@ -242,32 +423,6 @@ curl -X POST http://localhost:8000/api/iam/login/ \
 curl http://localhost:8000/api/applied-controls/ \
   -H "Authorization: Token <your-token>"
 ```
-
----
-
-## Deployment
-
-### Docker Compose (Production)
-
-```bash
-./docker-compose.sh
-```
-
-### Kubernetes
-
-Helm charts are available in the `charts/` directory.
-
-### Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DJANGO_DEBUG` | Enable debug mode | `False` |
-| `DJANGO_SECRET_KEY` | Secret key for sessions | Auto-generated |
-| `CISO_ASSISTANT_URL` | Public URL | `http://localhost:5173` |
-| `POSTGRES_*` | Database configuration | SQLite |
-| `EMAIL_*` | SMTP configuration | None |
-
-See [deployment documentation](deployment/docs/DEPLOYMENT_GUIDE.md) for complete configuration.
 
 ---
 
@@ -406,17 +561,17 @@ CISO Assistant provides feature parity with commercial GRC platforms:
 
 | Feature | CISO Assistant | Paramify | RegScale |
 |---------|----------------|----------|----------|
-| OSCAL SSP Generation | ✅ | ✅ | ✅ |
-| FedRAMP Automation | ✅ | ✅ | ✅ |
-| Multi-Framework Support | ✅ 90+ | ✅ | ✅ |
-| Continuous Monitoring | ✅ | ✅ | ✅ |
-| Evidence Automation | ✅ | ✅ | ✅ |
-| AI-Powered Assistance | ✅ | ❌ | ❌ |
-| Risk Quantification (CRQ) | ✅ | ❌ | ❌ |
-| Security Graph | ✅ | ❌ | ❌ |
-| Open Source | ✅ | ❌ | ❌ |
-| Self-Hosted | ✅ | ❌ | ✅ |
-| MIT Licensed | ✅ | ❌ | ❌ |
+| OSCAL SSP Generation | Yes | Yes | Yes |
+| FedRAMP Automation | Yes | Yes | Yes |
+| Multi-Framework Support | Yes (90+) | Yes | Yes |
+| Continuous Monitoring | Yes | Yes | Yes |
+| Evidence Automation | Yes | Yes | Yes |
+| AI-Powered Assistance | Yes | No | No |
+| Risk Quantification (CRQ) | Yes | No | No |
+| Security Graph | Yes | No | No |
+| Open Source | Yes | No | No |
+| Self-Hosted | Yes | No | Yes |
+| MIT Licensed | Yes | No | No |
 
 ---
 
@@ -441,11 +596,11 @@ copies or substantial portions of the Software.
 ```
 
 This means you can:
-- ✅ Use commercially
-- ✅ Modify freely
-- ✅ Distribute copies
-- ✅ Use privately
-- ✅ Sublicense
+- Use commercially
+- Modify freely
+- Distribute copies
+- Use privately
+- Sublicense
 
 See [LICENSE](LICENSE) for the full license text.
 
