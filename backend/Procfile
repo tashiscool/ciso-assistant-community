@@ -1,0 +1,1 @@
+web: gunicorn ciso_assistant.wsgi:application --bind 0.0.0.0:8000 --workers ${GUNICORN_WORKERS:-3} --timeout ${GUNICORN_TIMEOUT:-100} --keep-alive ${GUNICORN_KEEPALIVE:-30} --limit-request-line ${GUNICORN_LIMIT_REQUEST_LINE:-5120}

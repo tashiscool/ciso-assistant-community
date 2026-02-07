@@ -3,19 +3,19 @@ Description: CISO Assistant on AWS Elastic Beanstalk with ALB, RDS PostgreSQL, E
 
 # Deployment Prerequisites
 # ========================
-# Backend application bundle:
+# Backend application bundle (all files are checked in under backend/):
 #   - requirements.txt  (poetry export -f requirements.txt -o requirements.txt)
-#   - Procfile: web: gunicorn ciso_assistant.wsgi:application --bind 0.0.0.0:8000 --workers $GUNICORN_WORKERS --timeout $GUNICORN_TIMEOUT
-#   - .ebextensions/01_packages.config:
-#       packages:
-#         yum: { pango, cairo, cairo-devel, libffi-devel, python3-devel, postgresql15-devel }
-#   - .platform/hooks/postdeploy/01_migrate.sh:
-#       source /var/app/venv/*/bin/activate && cd /var/app/current
-#       python manage.py collectstatic --noinput && python manage.py migrate --noinput
+#   - Procfile  (gunicorn with env-var-driven workers/timeout/keepalive)
+#   - .ebextensions/01_packages.config  (AL2023 yum packages):
+#       pango, cairo, gdk-pixbuf2, fontconfig, liberation-sans-fonts,
+#       libxml2-devel, libxslt-devel, xmlsec1, xmlsec1-openssl-devel,
+#       libffi-devel, python3-devel, postgresql15-devel, libyaml-devel,
+#       pkgconfig, zlib-devel, gettext, glibc-langpack-{en,ar,fr,...}
+#   - .platform/hooks/postdeploy/01_migrate.sh  (migrate + storelibraries + createsuperuser)
 #
 # Frontend application bundle:
 #   - Build output from: npm run build  (SvelteKit adapter-node)
-#   - Procfile: web: node build/index.js
+#   - Procfile: web: node build/index.js  (checked in under frontend/)
 #   - package.json must remain in the bundle root
 #
 # Huey Background Worker (optional):

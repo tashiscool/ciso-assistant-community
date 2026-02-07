@@ -1,6 +1,12 @@
 # ===========================================================================
 # CISO Assistant — Elastic Beanstalk on AWS
 # Terraform 0.12 compatible
+#
+# Deployment Prerequisites (checked into the repo):
+#   backend/  — Procfile, .ebextensions/01_packages.config,
+#               .platform/hooks/postdeploy/01_migrate.sh,
+#               requirements.txt (poetry export -f requirements.txt -o requirements.txt)
+#   frontend/ — Procfile, build output from "npm run build"
 # ===========================================================================
 
 provider "aws" {

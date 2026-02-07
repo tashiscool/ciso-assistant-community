@@ -107,6 +107,23 @@ install_system_packages() {
         gdk-pixbuf2-devel \
         fontconfig \
         liberation-sans-fonts \
+        libyaml-devel \
+        gettext \
+        glibc-langpack-en \
+        glibc-langpack-ar \
+        glibc-langpack-fr \
+        glibc-langpack-pt \
+        glibc-langpack-es \
+        glibc-langpack-de \
+        glibc-langpack-nl \
+        glibc-langpack-it \
+        glibc-langpack-pl \
+        glibc-langpack-ro \
+        glibc-langpack-hi \
+        glibc-langpack-ur \
+        glibc-langpack-cs \
+        glibc-langpack-sv \
+        glibc-langpack-id \
         nginx \
         curl \
         wget \

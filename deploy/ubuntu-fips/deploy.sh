@@ -330,6 +330,9 @@ install_system_packages() {
         libgdk-pixbuf2.0-dev \
         fontconfig \
         fonts-freefont-ttf \
+        libyaml-dev \
+        gettext \
+        locales \
         pkg-config \
         nginx \
         curl \
@@ -341,6 +344,23 @@ install_system_packages() {
         lsb-release \
         software-properties-common \
         ufw
+
+    # Generate locales for supported languages (matches Dockerfile)
+    locale-gen en_US.UTF-8
+    locale-gen ar_SA.UTF-8
+    locale-gen fr_FR.UTF-8
+    locale-gen pt_PT.UTF-8
+    locale-gen es_ES.UTF-8
+    locale-gen de_DE.UTF-8
+    locale-gen nl_NL.UTF-8
+    locale-gen it_IT.UTF-8
+    locale-gen pl_PL.UTF-8
+    locale-gen ro_RO.UTF-8
+    locale-gen hi_IN.UTF-8
+    locale-gen ur_PK.UTF-8
+    locale-gen cs_CZ.UTF-8
+    locale-gen sv_SE.UTF-8
+    locale-gen id_ID.UTF-8
 
     log_info "System packages installed"
 }
