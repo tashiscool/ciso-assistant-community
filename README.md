@@ -29,8 +29,10 @@ CISO Assistant is a comprehensive **Governance, Risk, and Compliance (GRC)** pla
 
 - **Unified Platform**: Connect compliance, risk management, security operations, and third-party risk in one place
 - **90+ Frameworks**: Built-in support for ISO 27001, NIST CSF, SOC 2, FedRAMP, CMMC, GDPR, and more
-- **AI-Powered**: Intelligent assistance for control mapping, gap analysis, and documentation
-- **API-First**: Full REST API for automation and integration with your security stack
+- **AI-Powered**: 6 intelligent AI services for control authoring, auditing, extraction, explanation, vendor scoring, and suggestions
+- **30+ Connectors**: Pre-built integrations for AWS, GCP, CrowdStrike, Nessus, Snyk, ServiceNow, Jira, and more
+- **API-First**: Full REST API with 200+ endpoints for automation and integration with your security stack
+- **MCP Server**: Model Context Protocol server for AI tool integration with LLMs
 - **MIT Licensed**: Fully open source under the permissive MIT license - use freely in commercial projects
 
 ---
@@ -237,8 +239,9 @@ Helm charts are available in the `charts/` directory.
 | Feature | Description |
 |---------|-------------|
 | **Multi-Framework Assessment** | Assess against multiple frameworks simultaneously with automatic control mapping |
-| **Continuous Monitoring** | Pre-built ConMon profiles for FedRAMP, ISO 27001, SOC 2, NIST CSF, and CMMC |
-| **OSCAL Integration** | Bi-directional OSCAL support with SSP generation and FedRAMP validation |
+| **Continuous Monitoring** | Real-time ConMon with signal-driven control validation, deviation tracking, and automated POA&M generation |
+| **OSCAL Integration** | Full OSCAL support: SSP, SAP, SAR, POA&M generation in DOCX/PDF/XLSX/JSON/YAML formats |
+| **Document Generation** | Multi-format export engine for compliance documents with FedRAMP Appendix A support |
 | **Audit Management** | Complete audit lifecycle with evidence collection and finding tracking |
 
 ### Risk Management
@@ -249,6 +252,17 @@ Helm charts are available in the `charts/` directory.
 | **Quantitative Risk (CRQ)** | Monte Carlo simulation, Loss Exceedance Curves, and ROI analysis |
 | **Security Graph** | Visual relationship mapping with blast radius and attack path analysis |
 | **EBIOS-RM** | Full implementation of the French ANSSI risk methodology |
+
+### Plan of Action & Milestones (POA&M)
+
+| Feature | Description |
+|---------|-------------|
+| **POA&M Lifecycle** | Full lifecycle management: create, submit, approve, remediate, close |
+| **FedRAMP Export** | Appendix A Excel export with all 26 required columns |
+| **Deviation Requests** | Track false positives, vendor dependencies, risk adjustments, compensating controls |
+| **AI POA&M Generation** | Auto-generate POA&M items from vulnerability scan findings |
+| **Milestone Tracking** | Schedule milestones with progress monitoring and overdue alerts |
+| **OSCAL POA&M** | Export in OSCAL-compliant JSON format |
 
 ### FedRAMP & RMF Operations
 
@@ -261,67 +275,115 @@ Helm charts are available in the `charts/` directory.
 | **Trust Center** | Public-facing compliance portal for customers and stakeholders |
 | **Ongoing Authorization** | Automated OAR generation with POA&M tracking |
 
-### AI Assistant
+### AI Assistant (6 Services)
 
-| Capability | Description |
-|------------|-------------|
-| **AI Auditor** | Automated compliance gap detection and remediation suggestions |
-| **AI Author** | Generate policies, procedures, and control documentation |
-| **AI Explainer** | Role-specific explanations (executive, auditor, technical) |
-| **AI Extractor** | Extract structured data from policy documents and SOC reports |
+| Service | Description |
+|---------|-------------|
+| **AI Author** | Draft control implementations, policies, procedures, and SSP narratives across 8 frameworks |
+| **AI Auditor** | Evaluate control effectiveness, perform gap analysis, assess compliance, review evidence |
+| **AI Explainer** | Translate controls, risks, and concepts for 4 audience levels (executive, manager, technical, end user) |
+| **AI Extractor** | Extract controls, requirements, and policies from uploaded documents (PDF, DOCX, XLSX, TXT, JSON) |
+| **AI Vendor Scorer** | Score vendor assessments across 8 categories with risk ratings and recommendations |
+| **Suggestion Engine** | Generate suggestions for requirements, risks, controls, evidence, and compliance gaps |
+| **Batch Operations** | Bulk control drafting for large framework implementations |
+
+### Third-Party Risk Management (TPRM)
+
+| Feature | Description |
+|---------|-------------|
+| **Entity Assessments** | Assess vendor security posture with structured questionnaires |
+| **Vendor Portal** | Token-authenticated portal for vendors to complete questionnaires and upload evidence |
+| **Questionnaire Templates** | Pre-built templates: SOC 2 Type II (27q), ISO 27001 (26q), NIST CSF 2.0 (30q), SIG Lite (30q) |
+| **Requirements Flowdown** | Map organizational compliance requirements to vendors with criticality assessment |
+| **Gap Reports** | Generate vendor compliance gap reports with remediation recommendations |
+| **AI Vendor Scoring** | AI-powered vendor risk scoring across security, data protection, access control, and more |
+
+### Continuous Monitoring & Notifications
+
+| Feature | Description |
+|---------|-------------|
+| **ConMon Reporter** | Generate continuous monitoring reports with multi-source data aggregation |
+| **Django Signals** | Auto-validate controls on evidence upload, route critical findings, auto-generate POA&M items |
+| **WebSocket Notifications** | Real-time notification delivery for evidence uploads, critical findings, and POA&M creation |
+| **Control Validation** | Automated control effectiveness validation via evidence correlation |
 
 ### Integration & Automation
 
 | Feature | Description |
 |---------|-------------|
-| **Connector Framework** | 20+ pre-built connectors for security tools and cloud platforms |
+| **Connector Framework** | 31+ pre-built connectors for security tools and cloud platforms |
+| **Connector Management API** | Full CRUD with test_connection, sync, history, and available_types endpoints |
 | **Evidence Automation** | Scheduled evidence collection with validation and freshness tracking |
 | **Workflow Engine** | Visual workflow builder for custom GRC processes |
+| **MCP Server** | Model Context Protocol server with tools for vendor status, ConMon reports, and requirements flowdown |
 | **OCSF Support** | Security event normalization with OSCAL mapping |
+
+### Reporting
+
+| Report | Description |
+|--------|-------------|
+| **Compliance Summary** | Assessment overview with framework status table |
+| **Risk Register** | Risk scenarios with treatment breakdown and severity distribution |
+| **POA&M Status** | POA&M items with overdue tracking and progress visualization |
+| **ConMon Monthly** | Continuous monitoring dashboard with multi-source data |
+| **Vendor Assessment** | Vendor assessment summary with conclusion badges |
 
 ---
 
-## Connector Integrations
+## Connector Integrations (31+)
 
 | Category | Integrations |
 |----------|--------------|
-| **Cloud Security** | Wiz, Prisma Cloud, Aqua |
-| **SAST/DAST** | Snyk, Veracode, SonarCloud, Burp Suite, IBM AppScan |
-| **Vulnerability** | Rapid7 InsightVM, Nessus, Qualys |
-| **Container** | Trivy |
+| **Cloud Security** | Wiz, Prisma Cloud, Aqua, **AWS Security Hub**, **AWS GuardDuty**, **AWS Config**, **GCP Security Command Center** |
+| **SAST/DAST** | Snyk, Veracode, SonarCloud, Burp Suite, IBM AppScan, **Checkmarx** |
+| **Vulnerability** | Rapid7 InsightVM, Nessus, Qualys, **CrowdStrike Spotlight** |
+| **Container** | Trivy, **Grype** |
+| **Format Importers** | **SARIF 2.1.0** (universal SAST/DAST), **SCAP/XCCDF** (compliance benchmarks) |
+| **ITIL / Service Mgmt** | **ServiceNow**, **Jira** |
 | **CI/CD** | GitLab Security, GitHub Advanced Security, JFrog Xray |
 | **Identity** | Active Directory, Okta, Microsoft Intune |
 | **Endpoint** | Microsoft Defender |
-| **CRM** | Salesforce, HubSpot |
+| **CRM** | Salesforce |
 
 ---
 
 ## Architecture
 
-CISO Assistant is built on a **Domain-Driven Design (DDD)** architecture with 15 bounded contexts:
+CISO Assistant is built on a **Domain-Driven Design (DDD)** architecture with 15+ bounded contexts:
 
 ```
-backend/core/bounded_contexts/
-├── organization/           # Org units, users, groups, roles
-├── asset_and_service/      # Asset management, classifications
-├── control_library/        # Controls, policies, evidence
-├── risk_registers/         # Risk management workflows
-├── compliance/             # Frameworks, assessments, audits
-├── privacy/                # Data assets, flows, PIAs
-├── security_operations/    # Incidents, awareness programs
-├── third_party_management/ # Vendor risk assessments
-├── business_continuity/    # BCP, disaster recovery
-├── rmf_operations/         # STIG, vulnerability mgmt, RMF
-├── security_graph/         # Relationship visualization
-├── workflow_engine/        # Custom process automation
-├── assessment_engine/      # Dynamic questionnaires
-└── version_history/        # Audit trail, change tracking
+backend/
+├── core/bounded_contexts/
+│   ├── organization/           # Org units, users, groups, roles
+│   ├── asset_and_service/      # Asset management, classifications
+│   ├── control_library/        # Controls, policies, evidence
+│   ├── risk_registers/         # Risk management workflows
+│   ├── compliance/             # Frameworks, assessments, audits
+│   ├── privacy/                # Data assets, flows, PIAs
+│   ├── security_operations/    # Incidents, awareness programs
+│   ├── third_party_management/ # Vendor risk assessments
+│   ├── business_continuity/    # BCP, disaster recovery
+│   ├── rmf_operations/         # STIG, vulnerability mgmt, RMF
+│   ├── security_graph/         # Relationship visualization
+│   ├── workflow_engine/        # Custom process automation
+│   ├── conmon/                 # Continuous monitoring reporter
+│   └── version_history/        # Audit trail, change tracking
+├── ai_assistant/               # 6 AI services + 30+ API endpoints
+├── connectors/                 # 31+ scanner/tool integrations
+├── poam/                       # POA&M lifecycle management
+├── vendor_portal/              # Token-authenticated vendor access
+├── questionnaires/             # Assessment questionnaire engine
+├── oscal_integration/          # OSCAL import/export/generation
+├── mcp_server/                 # MCP server for AI tool integration
+├── tprm/                       # Third-party risk management
+└── core/notifications/         # WebSocket notification system
 ```
 
 ### Tech Stack
 
 - **Backend**: Django 5.x, Django REST Framework, PostgreSQL
 - **Frontend**: SvelteKit 2.x, Svelte 5, Tailwind CSS
+- **AI**: Pluggable LLM client (OpenAI, Anthropic, Azure OpenAI, local models)
 - **Task Queue**: Huey (SQLite/Redis) or Celery (Redis/SQS)
 - **Deployment**: Docker, EC2 (RHEL 8 / Ubuntu FIPS), Kubernetes
 
@@ -372,7 +434,7 @@ CISO Assistant includes **90+ compliance frameworks** out of the box:
 | ITAR | Defense |
 | ENS | Government (ES) |
 
-[View all 90+ frameworks →](backend/library/libraries/)
+[View all 90+ frameworks](backend/library/libraries/)
 
 ---
 
@@ -411,6 +473,19 @@ Access the dev server at [http://localhost:5173](http://localhost:5173)
 
 Interactive API documentation (Swagger) is available at `/api/schema/swagger/` when `DJANGO_DEBUG=True`.
 
+### API Endpoints Overview
+
+| Module | Endpoint Prefix | Endpoints | Description |
+|--------|----------------|-----------|-------------|
+| **Core GRC** | `/api/` | 40+ | Frameworks, controls, risks, evidence, incidents |
+| **AI Assistant** | `/api/ai/` | 29 | Author, auditor, explainer, extractor, vendor scoring, POA&M generation |
+| **POA&M** | `/api/poam/` | 17 | Lifecycle actions, exports (FedRAMP/CSV/OSCAL), deviations |
+| **Connectors** | `/api/connectors/` | 8 | Instance management, test, sync, history, available types |
+| **Vendor Portal** | `/api/vendor-portal/` | 5 | Token-based questionnaire access, evidence upload, status |
+| **OSCAL** | `/api/oscal/` | 8 | SSP/SAP/SAR/POA&M generation, document export, preview |
+| **TPRM** | `/api/` | 6 | Entity assessments, requirements flowdown |
+| **ConMon** | `/api/conmon/` | 4 | Continuous monitoring reports and status |
+
 ### Authentication
 
 ```bash
@@ -422,6 +497,20 @@ curl -X POST http://localhost:8000/api/iam/login/ \
 # Use token
 curl http://localhost:8000/api/applied-controls/ \
   -H "Authorization: Token <your-token>"
+```
+
+### MCP Server
+
+CISO Assistant includes an MCP (Model Context Protocol) server for AI tool integration:
+
+```bash
+# Run MCP server (stdio transport)
+python -m backend.mcp_server
+
+# Available tools:
+# - get_vendor_portal_status: Check vendor questionnaire completion
+# - get_conmon_report: Generate continuous monitoring reports
+# - get_requirements_flowdown: View vendor compliance matrix
 ```
 
 ---
@@ -439,8 +528,11 @@ pre-commit install
 ### Running Tests
 
 ```bash
-# Backend
-cd backend && poetry run pytest
+# Backend unit tests (fast, no DB required)
+cd backend && poetry run pytest poam/tests/ oscal_integration/tests/ ai_assistant/tests/
+
+# Backend integration tests (requires DB)
+cd backend && poetry run pytest app_tests/
 
 # Frontend E2E
 cd frontend && ./tests/e2e-tests.sh
@@ -452,28 +544,37 @@ cd frontend && ./tests/e2e-tests.sh
 
 CISO Assistant maintains comprehensive test coverage across all critical modules:
 
-| Module | Tests | Coverage Focus |
-|--------|-------|----------------|
-| **AI Assistant** | 264 | Auditor, Author, Explainer, Extractor, Context Builder |
-| **OSCAL Integration** | 77 | SSP generation, FedRAMP validation, OSCAL import/export |
-| **Evidence Automation** | 48 | AWS, Azure, GitHub, API connectors |
-| **POA&M Services** | 23 | FedRAMP exports, OSCAL POA&M, deviation reports |
-| **Risk Management** | 54 | CVSS calculation, risk assessment, dashboards, KPIs |
-| **Privacy Services** | 49 | PIA, consent management, data subject rights |
-| **Compliance Services** | 36 | Assessment workflows, evidence collection, reporting |
-| **Questionnaire Engine** | 39 | Conditional logic, scoring, progress tracking |
-| **Bounded Contexts** | 100+ | FedRAMP 20x, Trust Center, Privacy, Third-Party |
-| **Continuous Monitoring** | 50+ | ConMon profiles, KSI tracking, alerts |
-| **MIT Modules** | 424 | All core GRC models, IAM, privacy, risk, integrations |
+### Unit Tests (422 tests, ~0.5s)
 
-**Total**: 1,300+ backend tests ensuring enterprise-grade reliability.
+| Module | Tests | Coverage Focus |
+|--------|------:|----------------|
+| **AI Services** | 98 | Author, auditor, explainer, extractor service logic |
+| **AI Additional** | 66 | Vendor scorer, suggestion engine, batch operations |
+| **LLM Client** | 58 | OpenAI, Anthropic, Azure, local LLM clients |
+| **AI Auditor** | 37 | Control evaluation, gap analysis, compliance assessment |
+| **AI Assistant** | 33 | Integration tests across all AI service endpoints |
+| **AI Explainer** | 30 | Control/risk explanation for multiple audiences |
+| **OSCAL Integration** | 77 | SSP generation, FedRAMP validation, OSCAL import/export, SAP/SAR generators |
+| **POA&M Services** | 23 | FedRAMP XLSX export, CSV export, OSCAL POA&M, deviation reports, milestone reports |
+
+### Integration Tests (524+ tests, ~2-3min)
+
+| Suite | Tests | Coverage Focus |
+|-------|------:|----------------|
+| **Applied Controls API** | 102 | CRUD, permissions, filtering, pagination |
+| **Core API** | 200+ | Frameworks, assessments, evidence, risk scenarios |
+| **IAM** | 50+ | Authentication, RBAC, folder permissions |
+| **TPRM** | 30+ | Entity assessments, vendor management |
+| **Privacy** | 40+ | PIA, consent management, data subject rights |
+| **Additional Modules** | 100+ | EBIOS RM, resilience, metrology, webhooks |
 
 ### Quality Assurance
 
 - **Domain-Driven Design**: Each bounded context has isolated unit tests
-- **Service Layer Testing**: All business logic services are comprehensively tested
-- **Mock-Based Testing**: No database dependencies for unit tests
-- **Edge Case Coverage**: Boundary conditions and error handling tested
+- **Service Layer Testing**: All business logic services comprehensively tested
+- **Mock-Based Testing**: Unit tests run without database dependencies (~0.5s for 422 tests)
+- **Edge Case Coverage**: Boundary conditions, empty inputs, and error handling tested
+- **Django Integration**: Full migration testing with SQLite test database
 
 ---
 
@@ -485,73 +586,24 @@ CISO Assistant provides a complete set of GRC modules:
 |--------|--------|-------|-------------|
 | **iam_mit** | 10 | 868 | Folder-based hierarchical RBAC |
 | **core/models_mit** | 42 | 4,018 | Complete GRC domain models |
-| **core/utils_mit** | - | 412 | String, date, hash utilities |
-| **core/helpers_mit** | - | 448 | Status, scoring, statistics helpers |
 | **privacy_mit** | 9 | 1,041 | GDPR/data protection compliance |
 | **resilience_mit** | 3 | 636 | Business continuity management |
 | **ebios_rm_mit** | 12 | 944 | EBIOS RM methodology |
 | **tprm_mit** | 5 | 658 | Third-party risk management |
-| **library_mit** | 2 | 221 | Framework library management |
-| **cal_mit** | 2 | 438 | Calendar and event scheduling |
-| **global_settings_mit** | 2 | 377 | Application settings & feature flags |
+| **ai_assistant** | 6 svc | 4,589 | AI author, auditor, explainer, extractor, vendor scorer, suggestions |
+| **poam** | 2 | 1,800+ | POA&M items, deviation requests, exports |
+| **connectors** | 2 | 8,000+ | 31+ scanner integrations with base framework |
+| **vendor_portal** | 1 | 1,300+ | Token auth, questionnaire, evidence upload |
+| **questionnaires** | 3 | 2,200+ | Templates, questions, runs |
+| **oscal_integration** | - | 3,400+ | SSP/SAP/SAR generators, export builder |
+| **mcp_server** | - | 1,880+ | MCP tools, resources, server |
+| **conmon** | - | 788 | Continuous monitoring reporter |
+| **notifications** | - | 91 | WebSocket notification consumer |
 | **metrology_mit** | 6 | 809 | Metrics and dashboards |
 | **webhooks_mit** | 3 | 461 | Webhook notifications |
 | **integrations_mit** | 4 | 553 | External tool integrations |
 | **pmbok_mit** | 2 | 385 | Portfolio management |
 | **data_wizard_mit** | - | 976 | Excel import/export (EBIOS, ARM) |
-
-### Key Features
-
-**IAM Module** - Complete folder-based RBAC:
-- Hierarchical folders (ROOT/DOMAIN/ENCLAVE)
-- FolderMixin for multi-tenant scoping
-- Role assignments with perimeter folders
-- Recursive permission checking
-
-**Core Module** - Full GRC domain:
-- Organization, Domain, Perimeter
-- Framework, Control, Policy, AppliedControl
-- RiskMatrix, RiskScenario, RiskAssessment
-- Evidence, Incident, Campaign, Audit
-
-**Privacy Module** - GDPR compliance:
-- Processing activities (ROPA)
-- Data subject rights (DSAR)
-- Data breach management
-- Cross-border transfers
-
-**EBIOS RM Module** - French ANSSI methodology:
-- 5-workshop structure
-- RoTo (Risk Origin/Target Objective)
-- Attack paths and kill chains
-- Stakeholder criticality
-
-**Metrology Module** - Metrics and dashboards:
-- Custom and builtin metrics
-- Configurable dashboards
-- Time-series tracking
-
-**Integrations Module** - External tools:
-- Provider registry
-- Bi-directional sync
-- Webhook delivery
-
-**Data Wizard Module** - Excel import/export:
-- EBIOS RM study import/export
-- ARM format support (French/English)
-- Configurable sheet mapping
-- Header normalization
-
-### Usage
-
-Modules can be imported independently:
-
-```python
-# Use models in your project
-from iam_mit import Folder, Role, RoleAssignment
-from privacy_mit import Processing, DataBreach, RightRequest
-from ebios_rm_mit import EbiosRMStudy, FearedEvent, RoTo
-```
 
 ---
 
@@ -560,18 +612,24 @@ from ebios_rm_mit import EbiosRMStudy, FearedEvent, RoTo
 CISO Assistant provides feature parity with commercial GRC platforms:
 
 | Feature | CISO Assistant | Paramify | RegScale |
-|---------|----------------|----------|----------|
-| OSCAL SSP Generation | Yes | Yes | Yes |
+|---------|:-:|:-:|:-:|
+| OSCAL SSP/SAP/SAR Generation | Yes | Yes | Yes |
 | FedRAMP Automation | Yes | Yes | Yes |
-| Multi-Framework Support | Yes (90+) | Yes | Yes |
+| Multi-Framework Support (90+) | Yes | Yes | Yes |
 | Continuous Monitoring | Yes | Yes | Yes |
 | Evidence Automation | Yes | Yes | Yes |
-| AI-Powered Assistance | Yes | No | No |
+| POA&M Management | Yes | Yes | Yes |
+| AI-Powered Assistance (6 services) | Yes | No | No |
+| AI Vendor Scoring | Yes | No | No |
+| Vendor Portal (questionnaires) | Yes | No | Yes |
 | Risk Quantification (CRQ) | Yes | No | No |
 | Security Graph | Yes | No | No |
-| Open Source | Yes | No | No |
+| MCP Server (LLM Integration) | Yes | Yes | No |
+| 30+ Scanner Connectors | Yes | No | Yes |
+| SARIF/SCAP Import | Yes | No | No |
+| ServiceNow/Jira Integration | Yes | No | Yes |
+| Open Source (MIT License) | Yes | No | No |
 | Self-Hosted | Yes | No | Yes |
-| MIT Licensed | Yes | No | No |
 
 ---
 
