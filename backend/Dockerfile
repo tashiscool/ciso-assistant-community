@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     pango-1.0 \
     libcairo2 \
+    libgdk-pixbuf-2.0-0 \
     locales \
     tzdata \
     gettext \

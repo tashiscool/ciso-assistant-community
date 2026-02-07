@@ -97,6 +97,10 @@ install_system_packages() {
         pango-devel \
         cairo \
         cairo-devel \
+        gdk-pixbuf2 \
+        gdk-pixbuf2-devel \
+        fontconfig \
+        liberation-sans-fonts \
         nginx \
         curl \
         wget \

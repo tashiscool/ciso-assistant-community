@@ -328,6 +328,8 @@ install_system_packages() {
         libcairo2-dev \
         libgdk-pixbuf-2.0-0 \
         libgdk-pixbuf2.0-dev \
+        fontconfig \
+        fonts-freefont-ttf \
         pkg-config \
         nginx \
         curl \
