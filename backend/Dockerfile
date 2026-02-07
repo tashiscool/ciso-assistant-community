@@ -10,12 +10,17 @@ ENV PYTHONUNBUFFERED=1 \
 WORKDIR /code
 
 RUN apt-get update && apt-get install -y \
-    libyaml-cpp-dev \
+    libyaml-dev \
     libffi-dev \
     libglib2.0-0 \
     pango-1.0 \
     libcairo2 \
     libgdk-pixbuf-2.0-0 \
+    libxml2-dev \
+    libxslt1-dev \
+    libxmlsec1-dev \
+    libxmlsec1-openssl \
+    pkg-config \
     locales \
     tzdata \
     gettext \

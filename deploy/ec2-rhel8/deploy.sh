@@ -93,6 +93,12 @@ install_system_packages() {
         readline-devel \
         sqlite-devel \
         postgresql-devel \
+        libxml2-devel \
+        libxslt-devel \
+        xmlsec1 \
+        xmlsec1-devel \
+        xmlsec1-openssl-devel \
+        pkgconfig \
         pango \
         pango-devel \
         cairo \
