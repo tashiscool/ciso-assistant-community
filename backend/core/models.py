@@ -7285,6 +7285,306 @@ class RiskAcceptance(NameDescriptionMixin, FolderMixin, PublishInRootFolderMixin
         self.save()
 
 
+########################### Signal models #########################
+
+
+class AccessReview(NameDescriptionMixin, FolderMixin):
+    """Periodic attestation signal -- tracks whether access rights are current."""
+
+    class ReviewType(models.TextChoices):
+        USER_ACCESS = "user_access", _("User access")
+        SERVICE_ACCOUNT = "service_account", _("Service account")
+        PRIVILEGED = "privileged", _("Privileged access")
+        VENDOR = "vendor", _("Vendor access")
+
+    class Status(models.TextChoices):
+        PLANNED = "planned", _("Planned")
+        IN_PROGRESS = "in_progress", _("In progress")
+        COMPLETED = "completed", _("Completed")
+        OVERDUE = "overdue", _("Overdue")
+
+    class Result(models.TextChoices):
+        UNDEFINED = "--", _("Undefined")
+        COMPLIANT = "compliant", _("Compliant")
+        NON_COMPLIANT = "non_compliant", _("Non-compliant")
+        PARTIAL = "partial", _("Partial")
+
+    reviewer = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_("Reviewer"),
+        related_name="access_reviews",
+    )
+    review_type = models.CharField(
+        max_length=30,
+        choices=ReviewType.choices,
+        default=ReviewType.USER_ACCESS,
+        verbose_name=_("Review type"),
+    )
+    scope_assets = models.ManyToManyField(
+        "Asset",
+        blank=True,
+        verbose_name=_("Assets in scope"),
+        related_name="access_reviews",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PLANNED,
+        verbose_name=_("Status"),
+    )
+    due_date = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name=_("Due date"),
+    )
+    completed_date = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name=_("Completed date"),
+    )
+    findings_count = models.IntegerField(
+        default=0,
+        verbose_name=_("Findings count"),
+        help_text=_("Number of accounts needing action"),
+    )
+    result = models.CharField(
+        max_length=20,
+        choices=Result.choices,
+        default=Result.UNDEFINED,
+        verbose_name=_("Result"),
+    )
+    evidences = models.ManyToManyField(
+        "Evidence",
+        blank=True,
+        verbose_name=_("Evidences"),
+        related_name="access_reviews",
+    )
+    applied_controls = models.ManyToManyField(
+        AppliedControl,
+        blank=True,
+        verbose_name=_("Applied controls"),
+        related_name="access_reviews",
+    )
+
+    fields_to_check = ["name"]
+
+    class Meta:
+        verbose_name = _("Access review")
+        verbose_name_plural = _("Access reviews")
+
+
+class CryptoAsset(NameDescriptionMixin, FolderMixin):
+    """Crypto inventory item -- certificate, key, or secret with expiration tracking."""
+
+    class CryptoType(models.TextChoices):
+        TLS_CERTIFICATE = "tls_certificate", _("TLS certificate")
+        SSH_KEY = "ssh_key", _("SSH key")
+        API_KEY = "api_key", _("API key")
+        SIGNING_KEY = "signing_key", _("Signing key")
+        ENCRYPTION_KEY = "encryption_key", _("Encryption key")
+        SECRET = "secret", _("Secret")
+        OTHER = "other", _("Other")
+
+    class Status(models.TextChoices):
+        ACTIVE = "active", _("Active")
+        EXPIRING_SOON = "expiring_soon", _("Expiring soon")
+        EXPIRED = "expired", _("Expired")
+        REVOKED = "revoked", _("Revoked")
+        RETIRED = "retired", _("Retired")
+
+    crypto_type = models.CharField(
+        max_length=30,
+        choices=CryptoType.choices,
+        default=CryptoType.TLS_CERTIFICATE,
+        verbose_name=_("Crypto type"),
+    )
+    algorithm = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name=_("Algorithm"),
+        help_text=_("e.g. RSA-2048, AES-256, Ed25519"),
+    )
+    key_size = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("Key size"),
+    )
+    issuer = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name=_("Issuer"),
+    )
+    subject = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name=_("Subject"),
+    )
+    serial_number = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name=_("Serial number"),
+    )
+    not_before = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("Not before"),
+    )
+    not_after = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("Expiration date"),
+    )
+    rotation_policy_days = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_("Rotation policy (days)"),
+        help_text=_("Expected rotation interval in days"),
+    )
+    last_rotated = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("Last rotated"),
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.ACTIVE,
+        verbose_name=_("Status"),
+    )
+    assets = models.ManyToManyField(
+        "Asset",
+        blank=True,
+        verbose_name=_("Assets"),
+        related_name="crypto_assets",
+    )
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_("Owner"),
+        related_name="crypto_assets",
+    )
+    applied_controls = models.ManyToManyField(
+        AppliedControl,
+        blank=True,
+        verbose_name=_("Applied controls"),
+        related_name="crypto_assets",
+    )
+    evidences = models.ManyToManyField(
+        "Evidence",
+        blank=True,
+        verbose_name=_("Evidences"),
+        related_name="crypto_assets",
+    )
+
+    fields_to_check = ["name"]
+
+    class Meta:
+        verbose_name = _("Crypto asset")
+        verbose_name_plural = _("Crypto assets")
+
+
+class DetectionRule(NameDescriptionMixin, FolderMixin):
+    """Detection coverage item -- tracks whether an asset/control has working detection."""
+
+    class RuleType(models.TextChoices):
+        SIEM_RULE = "siem_rule", _("SIEM rule")
+        IDS_SIGNATURE = "ids_signature", _("IDS signature")
+        EDR_POLICY = "edr_policy", _("EDR policy")
+        WAF_RULE = "waf_rule", _("WAF rule")
+        CUSTOM_ALERT = "custom_alert", _("Custom alert")
+        LOG_MONITOR = "log_monitor", _("Log monitor")
+        OTHER = "other", _("Other")
+
+    class Status(models.TextChoices):
+        ACTIVE = "active", _("Active")
+        DEGRADED = "degraded", _("Degraded")
+        DISABLED = "disabled", _("Disabled")
+        UNTESTED = "untested", _("Untested")
+
+    class FalsePositiveRate(models.TextChoices):
+        LOW = "low", _("Low")
+        MEDIUM = "medium", _("Medium")
+        HIGH = "high", _("High")
+        UNKNOWN = "unknown", _("Unknown")
+
+    rule_type = models.CharField(
+        max_length=30,
+        choices=RuleType.choices,
+        default=RuleType.SIEM_RULE,
+        verbose_name=_("Rule type"),
+    )
+    data_source = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name=_("Data source"),
+        help_text=_("e.g. CloudTrail, Syslog, Windows Event Log"),
+    )
+    detection_target = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name=_("Detection target"),
+        help_text=_("What this rule detects"),
+    )
+    assets = models.ManyToManyField(
+        "Asset",
+        blank=True,
+        verbose_name=_("Assets"),
+        related_name="detection_rules",
+    )
+    applied_controls = models.ManyToManyField(
+        AppliedControl,
+        blank=True,
+        verbose_name=_("Applied controls"),
+        related_name="detection_rules",
+        help_text=_("Controls this detection supports"),
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.UNTESTED,
+        verbose_name=_("Status"),
+    )
+    last_validated = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("Last validated"),
+    )
+    last_triggered = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("Last triggered"),
+        help_text=_("Last time this rule fired (proves it works)"),
+    )
+    false_positive_rate = models.CharField(
+        max_length=20,
+        choices=FalsePositiveRate.choices,
+        default=FalsePositiveRate.UNKNOWN,
+        verbose_name=_("False positive rate"),
+    )
+    coverage_gaps = models.TextField(
+        blank=True,
+        verbose_name=_("Coverage gaps"),
+        help_text=_("Known blind spots"),
+    )
+    evidences = models.ManyToManyField(
+        "Evidence",
+        blank=True,
+        verbose_name=_("Evidences"),
+        related_name="detection_rules",
+    )
+
+    fields_to_check = ["name"]
+
+    class Meta:
+        verbose_name = _("Detection rule")
+        verbose_name_plural = _("Detection rules")
+
+
 # tasks management
 class TaskTemplateManager(models.Manager):
     def create_task_template(self, **kwargs):
@@ -7973,6 +8273,18 @@ auditlog.register(
 )
 auditlog.register(
     TaskTemplate,
+    exclude_fields=common_exclude,
+)
+auditlog.register(
+    AccessReview,
+    exclude_fields=common_exclude,
+)
+auditlog.register(
+    CryptoAsset,
+    exclude_fields=common_exclude,
+)
+auditlog.register(
+    DetectionRule,
     exclude_fields=common_exclude,
 )
 # actions - 0: create, 1: update, 2: delete

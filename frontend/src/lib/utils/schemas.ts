@@ -1945,6 +1945,60 @@ export const ConMonMetricSchema = z.object({
 	breakdown: jsonSchema.optional()
 });
 
+// Signal models
+export const AccessReviewSchema = z.object({
+	...NameDescriptionMixin,
+	folder: z.string(),
+	reviewer: z.string().uuid().optional().nullable(),
+	review_type: z.string().default('user_access'),
+	scope_assets: z.string().uuid().optional().array().optional(),
+	status: z.string().default('planned'),
+	due_date: z.union([z.literal('').transform(() => null), z.string().date()]).nullish(),
+	completed_date: z
+		.union([z.literal('').transform(() => null), z.string().date()])
+		.nullish(),
+	findings_count: z.number().int().min(0).default(0),
+	result: z.string().default('--'),
+	evidences: z.string().uuid().optional().array().optional(),
+	applied_controls: z.string().uuid().optional().array().optional()
+});
+
+export const CryptoAssetSchema = z.object({
+	...NameDescriptionMixin,
+	folder: z.string(),
+	crypto_type: z.string().default('tls_certificate'),
+	algorithm: z.string().optional().default(''),
+	key_size: z.number().int().optional().nullable(),
+	issuer: z.string().optional().default(''),
+	subject: z.string().optional().default(''),
+	serial_number: z.string().optional().default(''),
+	not_before: z.string().datetime({ offset: true }).optional().nullable(),
+	not_after: z.string().datetime({ offset: true }).optional().nullable(),
+	rotation_policy_days: z.number().int().optional().nullable(),
+	last_rotated: z.string().datetime({ offset: true }).optional().nullable(),
+	status: z.string().default('active'),
+	assets: z.string().uuid().optional().array().optional(),
+	owner: z.string().uuid().optional().nullable(),
+	applied_controls: z.string().uuid().optional().array().optional(),
+	evidences: z.string().uuid().optional().array().optional()
+});
+
+export const DetectionRuleSchema = z.object({
+	...NameDescriptionMixin,
+	folder: z.string(),
+	rule_type: z.string().default('siem_rule'),
+	data_source: z.string().optional().default(''),
+	detection_target: z.string().optional().default(''),
+	assets: z.string().uuid().optional().array().optional(),
+	applied_controls: z.string().uuid().optional().array().optional(),
+	status: z.string().default('untested'),
+	last_validated: z.string().datetime({ offset: true }).optional().nullable(),
+	last_triggered: z.string().datetime({ offset: true }).optional().nullable(),
+	false_positive_rate: z.string().default('unknown'),
+	coverage_gaps: z.string().optional().default(''),
+	evidences: z.string().uuid().optional().array().optional()
+});
+
 const SCHEMA_MAP: Record<string, AnyZodObject> = {
 	folders: FolderSchema,
 	'folders-import': FolderImportSchema,
@@ -2043,7 +2097,11 @@ const SCHEMA_MAP: Record<string, AnyZodObject> = {
 	'conmon-profiles': ConMonProfileSchema,
 	'conmon-activities': ConMonActivityConfigSchema,
 	'conmon-executions': ConMonExecutionSchema,
-	'conmon-metrics': ConMonMetricSchema
+	'conmon-metrics': ConMonMetricSchema,
+	// Signal models
+	'access-reviews': AccessReviewSchema,
+	'crypto-assets': CryptoAssetSchema,
+	'detection-rules': DetectionRuleSchema
 };
 
 export const modelSchema = (model: string) => {

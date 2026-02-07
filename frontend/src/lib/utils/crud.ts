@@ -2519,6 +2519,81 @@ export const URL_MODEL_MAP: ModelMap = {
 			{ field: 'updated_at', type: 'datetime' }
 		],
 		filters: [{ field: 'folder' }, { field: 'profile' }, { field: 'metric_type' }]
+	},
+	// Signal models
+	'access-reviews': {
+		name: 'accessreview',
+		localName: 'accessReview',
+		localNamePlural: 'accessReviews',
+		verboseName: 'Access review',
+		verboseNamePlural: 'Access reviews',
+		foreignKeyFields: [
+			{ field: 'folder', urlModel: 'folders', urlParams: 'content_type=DO&content_type=GL' },
+			{ field: 'reviewer', urlModel: 'users' },
+			{ field: 'scope_assets', urlModel: 'assets' },
+			{ field: 'applied_controls', urlModel: 'applied-controls' },
+			{ field: 'evidences', urlModel: 'evidences' }
+		],
+		selectFields: [
+			{ field: 'review_type' },
+			{ field: 'status' },
+			{ field: 'result' }
+		],
+		filters: [
+			{ field: 'folder' },
+			{ field: 'reviewer' },
+			{ field: 'review_type' },
+			{ field: 'status' },
+			{ field: 'result' }
+		]
+	},
+	'crypto-assets': {
+		name: 'cryptoasset',
+		localName: 'cryptoAsset',
+		localNamePlural: 'cryptoAssets',
+		verboseName: 'Crypto asset',
+		verboseNamePlural: 'Crypto assets',
+		foreignKeyFields: [
+			{ field: 'folder', urlModel: 'folders', urlParams: 'content_type=DO&content_type=GL' },
+			{ field: 'owner', urlModel: 'users' },
+			{ field: 'assets', urlModel: 'assets' },
+			{ field: 'applied_controls', urlModel: 'applied-controls' },
+			{ field: 'evidences', urlModel: 'evidences' }
+		],
+		selectFields: [
+			{ field: 'crypto_type' },
+			{ field: 'status' }
+		],
+		filters: [
+			{ field: 'folder' },
+			{ field: 'crypto_type' },
+			{ field: 'status' },
+			{ field: 'owner' }
+		]
+	},
+	'detection-rules': {
+		name: 'detectionrule',
+		localName: 'detectionRule',
+		localNamePlural: 'detectionRules',
+		verboseName: 'Detection rule',
+		verboseNamePlural: 'Detection rules',
+		foreignKeyFields: [
+			{ field: 'folder', urlModel: 'folders', urlParams: 'content_type=DO&content_type=GL' },
+			{ field: 'assets', urlModel: 'assets' },
+			{ field: 'applied_controls', urlModel: 'applied-controls' },
+			{ field: 'evidences', urlModel: 'evidences' }
+		],
+		selectFields: [
+			{ field: 'rule_type' },
+			{ field: 'status' },
+			{ field: 'false_positive_rate' }
+		],
+		filters: [
+			{ field: 'folder' },
+			{ field: 'rule_type' },
+			{ field: 'status' },
+			{ field: 'false_positive_rate' }
+		]
 	}
 };
 

@@ -26,6 +26,9 @@ APPLIED_CONTROLS_ENDPOINT = "applied-controls-list"
 POLICIES_ENDPOINT = "policies-list"
 THREATS_ENDPOINT = "threats-list"
 USERS_ENDPOINT = "users-list"
+ACCESS_REVIEWS_ENDPOINT = "access-reviews-list"
+CRYPTO_ASSETS_ENDPOINT = "crypto-assets-list"
+DETECTION_RULES_ENDPOINT = "detection-rules-list"
 
 # Common URN used primarily inside tests
 TEST_FRAMEWORK_URN = "urn:ciso:risk:library:nist-csf-1.1"

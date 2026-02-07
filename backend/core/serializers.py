@@ -245,6 +245,70 @@ class RiskAcceptanceReadSerializer(BaseModelSerializer):
         fields = "__all__"
 
 
+class AccessReviewReadSerializer(BaseModelSerializer):
+    path = PathField(read_only=True)
+    folder = FieldsRelatedField()
+    reviewer = FieldsRelatedField(["id", "first_name", "last_name"])
+    scope_assets = FieldsRelatedField(many=True)
+    applied_controls = FieldsRelatedField(many=True)
+    evidences = FieldsRelatedField(many=True)
+    review_type = serializers.CharField(source="get_review_type_display")
+    status = serializers.CharField(source="get_status_display")
+    result = serializers.CharField(source="get_result_display")
+
+    class Meta:
+        model = AccessReview
+        exclude = ["created_at", "updated_at"]
+
+
+class AccessReviewWriteSerializer(BaseModelSerializer):
+    class Meta:
+        model = AccessReview
+        exclude = ["created_at", "updated_at"]
+
+
+class CryptoAssetReadSerializer(BaseModelSerializer):
+    path = PathField(read_only=True)
+    folder = FieldsRelatedField()
+    owner = FieldsRelatedField(["id", "first_name", "last_name"])
+    assets = FieldsRelatedField(many=True)
+    applied_controls = FieldsRelatedField(many=True)
+    evidences = FieldsRelatedField(many=True)
+    crypto_type = serializers.CharField(source="get_crypto_type_display")
+    status = serializers.CharField(source="get_status_display")
+
+    class Meta:
+        model = CryptoAsset
+        exclude = ["created_at", "updated_at"]
+
+
+class CryptoAssetWriteSerializer(BaseModelSerializer):
+    class Meta:
+        model = CryptoAsset
+        exclude = ["created_at", "updated_at"]
+
+
+class DetectionRuleReadSerializer(BaseModelSerializer):
+    path = PathField(read_only=True)
+    folder = FieldsRelatedField()
+    assets = FieldsRelatedField(many=True)
+    applied_controls = FieldsRelatedField(many=True)
+    evidences = FieldsRelatedField(many=True)
+    rule_type = serializers.CharField(source="get_rule_type_display")
+    status = serializers.CharField(source="get_status_display")
+    false_positive_rate = serializers.CharField(source="get_false_positive_rate_display")
+
+    class Meta:
+        model = DetectionRule
+        exclude = ["created_at", "updated_at"]
+
+
+class DetectionRuleWriteSerializer(BaseModelSerializer):
+    class Meta:
+        model = DetectionRule
+        exclude = ["created_at", "updated_at"]
+
+
 class PerimeterWriteSerializer(BaseModelSerializer):
     def validate_name(self, value):
         """

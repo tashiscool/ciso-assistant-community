@@ -118,6 +118,9 @@ router.register(r"timeline-entries", TimelineEntryViewSet, basename="timeline-en
 router.register(r"task-templates", TaskTemplateViewSet, basename="task-templates")
 router.register(r"task-nodes", TaskNodeViewSet, basename="task-nodes")
 router.register(r"terminologies", TerminologyViewSet, basename="terminologies")
+router.register(r"access-reviews", AccessReviewViewSet, basename="access-reviews")
+router.register(r"crypto-assets", CryptoAssetViewSet, basename="crypto-assets")
+router.register(r"detection-rules", DetectionRuleViewSet, basename="detection-rules")
 
 ROUTES = settings.ROUTES
 MODULES = settings.MODULES.values()

@@ -12224,3 +12224,89 @@ class TerminologyViewSet(BaseModelViewSet):
     @action(detail=False, name="Get class name choices")
     def field_path(self, request):
         return Response(dict(Terminology.FieldPath.choices))
+
+
+class AccessReviewViewSet(BaseModelViewSet):
+    """API endpoint that allows access reviews to be viewed or edited."""
+
+    model = AccessReview
+    filterset_fields = [
+        "folder",
+        "reviewer",
+        "review_type",
+        "status",
+        "result",
+        "scope_assets",
+        "applied_controls",
+    ]
+    search_fields = ["name", "description"]
+
+    @method_decorator(cache_page(60 * LONG_CACHE_TTL))
+    @action(detail=False, name="Get review type choices")
+    def review_type(self, request):
+        return Response(dict(AccessReview.ReviewType.choices))
+
+    @method_decorator(cache_page(60 * LONG_CACHE_TTL))
+    @action(detail=False, name="Get status choices")
+    def status(self, request):
+        return Response(dict(AccessReview.Status.choices))
+
+    @method_decorator(cache_page(60 * LONG_CACHE_TTL))
+    @action(detail=False, name="Get result choices")
+    def result(self, request):
+        return Response(dict(AccessReview.Result.choices))
+
+
+class CryptoAssetViewSet(BaseModelViewSet):
+    """API endpoint that allows crypto assets to be viewed or edited."""
+
+    model = CryptoAsset
+    filterset_fields = [
+        "folder",
+        "crypto_type",
+        "status",
+        "owner",
+        "assets",
+        "applied_controls",
+    ]
+    search_fields = ["name", "description", "issuer", "subject", "serial_number"]
+
+    @method_decorator(cache_page(60 * LONG_CACHE_TTL))
+    @action(detail=False, name="Get crypto type choices")
+    def crypto_type(self, request):
+        return Response(dict(CryptoAsset.CryptoType.choices))
+
+    @method_decorator(cache_page(60 * LONG_CACHE_TTL))
+    @action(detail=False, name="Get status choices")
+    def status(self, request):
+        return Response(dict(CryptoAsset.Status.choices))
+
+
+class DetectionRuleViewSet(BaseModelViewSet):
+    """API endpoint that allows detection rules to be viewed or edited."""
+
+    model = DetectionRule
+    filterset_fields = [
+        "folder",
+        "rule_type",
+        "status",
+        "false_positive_rate",
+        "assets",
+        "applied_controls",
+    ]
+    search_fields = ["name", "description", "data_source", "detection_target"]
+
+    @method_decorator(cache_page(60 * LONG_CACHE_TTL))
+    @action(detail=False, name="Get rule type choices")
+    def rule_type(self, request):
+        return Response(dict(DetectionRule.RuleType.choices))
+
+    @method_decorator(cache_page(60 * LONG_CACHE_TTL))
+    @action(detail=False, name="Get status choices")
+    def status(self, request):
+        return Response(dict(DetectionRule.Status.choices))
+
+    @method_decorator(cache_page(60 * LONG_CACHE_TTL))
+    @action(detail=False, name="Get false positive rate choices")
+    def false_positive_rate(self, request):
+        return Response(dict(DetectionRule.FalsePositiveRate.choices))

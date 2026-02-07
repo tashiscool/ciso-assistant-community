@@ -160,7 +160,11 @@ export const URL_MODEL = [
 	'conmon-profiles',
 	'conmon-activities',
 	'conmon-executions',
-	'conmon-metrics'
+	'conmon-metrics',
+	// signal models
+	'access-reviews',
+	'crypto-assets',
+	'detection-rules'
 ] as const;
 
 export const THIRD_PARTY_URL_MODEL = [
