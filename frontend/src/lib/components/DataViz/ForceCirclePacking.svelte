@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type * as echarts from 'echarts';
+	import { getToastStore } from '$lib/components/Toast/stores';
+
+	const toastStore = getToastStore();
 	const symbolSizeOffset = 10;
 	interface Props {
 		width?: string;
@@ -163,7 +166,7 @@
 				dataIndex: node.id
 			});
 		} else {
-			alert('No matching nodes found');
+			toastStore.trigger({ message: 'No matching nodes found' });
 		}
 	};
 

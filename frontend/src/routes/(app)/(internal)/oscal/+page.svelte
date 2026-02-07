@@ -2,6 +2,9 @@
 	import { BASE_API_URL } from '$lib/utils/constants';
 	import * as m from '$paraglide/messages';
 	import OscalEditor from '$lib/components/OscalEditor/OscalEditor.svelte';
+	import { getToastStore } from '$lib/components/Toast/stores';
+
+	const toastStore = getToastStore();
 
 	interface Props {
 		data: {
@@ -621,7 +624,7 @@
 												const content = event.target?.result as string;
 												editorDocument = JSON.parse(content);
 											} catch {
-												alert('Invalid JSON file');
+												toastStore.trigger({ message: 'Invalid JSON file' });
 											}
 										};
 										reader.readAsText(target.files[0]);

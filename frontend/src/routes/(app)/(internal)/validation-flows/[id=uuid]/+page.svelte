@@ -10,6 +10,9 @@
 	import MarkdownRenderer from '$lib/components/MarkdownRenderer.svelte';
 	import { canPerformAction } from '$lib/utils/access-control';
 	import { invalidateAll } from '$app/navigation';
+	import { getToastStore } from '$lib/components/Toast/stores';
+
+	const toastStore = getToastStore();
 
 	interface Props {
 		data: PageData;
@@ -79,11 +82,11 @@
 			} else {
 				const errorData = await response.text();
 				console.error('Action failed:', response.status, errorData);
-				alert(`Error: ${response.status} - ${errorData}`);
+				toastStore.trigger({ message: `Error: ${response.status} - ${errorData}` });
 			}
 		} catch (error) {
 			console.error('Error submitting action:', error);
-			alert('An error occurred while submitting the action.');
+			toastStore.trigger({ message: 'An error occurred while submitting the action.' });
 		} finally {
 			isSubmitting = false;
 		}

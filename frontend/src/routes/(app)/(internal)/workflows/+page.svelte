@@ -3,6 +3,9 @@
 	import * as m from '$paraglide/messages';
 	import { base } from '$app/paths';
 	import { BASE_API_URL } from '$lib/utils/constants';
+	import { getToastStore } from '$lib/components/Toast/stores';
+
+	const toastStore = getToastStore();
 	import { goto } from '$app/navigation';
 	import Breadcrumbs from '$lib/components/Breadcrumbs/Breadcrumbs.svelte';
 	import WorkflowBuilder from '$lib/components/WorkflowBuilder/WorkflowBuilder.svelte';
@@ -149,7 +152,7 @@
 			const res = await fetch(`${BASE_API_URL}/workflows/${id}/execute/`, { method: 'POST' });
 			if (res.ok) {
 				const result = await res.json();
-				alert(`Workflow started. Execution ID: ${result.execution_id}`);
+				toastStore.trigger({ message: `Workflow started. Execution ID: ${result.execution_id}` });
 			}
 		} catch (e) {
 			console.error('Failed to execute workflow:', e);

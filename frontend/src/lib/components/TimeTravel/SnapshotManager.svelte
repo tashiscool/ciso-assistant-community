@@ -2,6 +2,9 @@
 	import { createEventDispatcher } from 'svelte';
 	import type { Snapshot } from './index';
 	import { formatVersionDate } from './index';
+	import { getToastStore } from '$lib/components/Toast/stores';
+
+	const toastStore = getToastStore();
 
 	// Props
 	export let snapshots: Snapshot[] = [];
@@ -57,7 +60,7 @@
 
 	function deleteSnapshot(snapshot: Snapshot) {
 		if (snapshot.isProtected) {
-			alert('This snapshot is protected and cannot be deleted.');
+			toastStore.trigger({ message: 'This snapshot is protected and cannot be deleted.' });
 			return;
 		}
 

@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { getToastStore } from '$lib/components/Toast/stores';
+
+	const toastStore = getToastStore();
 	import { KanbanBoard, KSI_STATUS_MAPPING, transformToKanbanColumns } from '$lib/components/Kanban';
 	import { WayfinderWorkflow, createFedRAMP20xWorkflow } from '$lib/components/Wayfinder';
 	import DonutChart from '$lib/components/Chart/DonutChart.svelte';
@@ -124,7 +127,7 @@
 	async function downloadPackage(type: string) {
 		const csoId = new URLSearchParams(window.location.search).get('cso_id');
 		if (!csoId) {
-			alert('Please select a Cloud Service Offering first');
+			toastStore.trigger({ message: 'Please select a Cloud Service Offering first' });
 			return;
 		}
 
