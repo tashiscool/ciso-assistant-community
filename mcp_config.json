@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "ciso-assistant": {
+            "command": "python",
+            "args": ["-m", "backend.mcp_server.server"],
+            "env": {
+                "DJANGO_SETTINGS_MODULE": "ciso_assistant.settings"
+            }
+        }
+    }
+}

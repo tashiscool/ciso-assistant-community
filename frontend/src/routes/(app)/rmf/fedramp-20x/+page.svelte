@@ -47,6 +47,14 @@
 	let activeTab = $state<'overview' | 'kanban' | 'workflow' | 'export'>('overview');
 	let selectedImpactLevel = $state<'low' | 'moderate'>('moderate');
 
+	// KSI detail modal state
+	let showKSIDetailModal = $state(false);
+	let selectedKSI = $state<KSIEntry | null>(null);
+	let ksiEditStatus = $state('');
+	let ksiEditComplianceStatus = $state('');
+	let ksiDetailSubmitting = $state(false);
+	let ksiDetailError = $state<string | null>(null);
+
 	// Workflow state
 	let workflowProgress = $state<Record<string, boolean>>({});
 	const workflow = $derived(createFedRAMP20xWorkflow(workflowProgress));
@@ -124,14 +132,67 @@
 		window.open(url, '_blank');
 	}
 
-	function handleKSIMove(itemId: string, fromColumn: string, toColumn: string) {
-		console.log(`KSI ${itemId} moved from ${fromColumn} to ${toColumn}`);
-		// TODO: Update KSI status via API
+	async function handleKSIMove(itemId: string, fromColumn: string, toColumn: string) {
+		try {
+			const res = await fetch(`/api/rmf/fedramp-20x/ksi/${itemId}/`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ implementation_status: toColumn })
+			});
+			if (!res.ok) {
+				const errData = await res.json().catch(() => null);
+				console.error('Failed to update KSI status:', errData?.message || res.status);
+			}
+			await loadDashboard();
+		} catch (e) {
+			console.error('Error updating KSI status:', e);
+			await loadDashboard();
+		}
 	}
 
 	function handleKSIClick(item: any) {
-		console.log('KSI clicked:', item);
-		// TODO: Open KSI detail modal
+		const entry = dashboardData?.ksi_entries.find(
+			(e) => e.ksi_ref_id === item.id || e.id === item.id
+		);
+		if (entry) {
+			selectedKSI = entry;
+			ksiEditStatus = entry.implementation_status;
+			ksiEditComplianceStatus = entry.compliance_status;
+			ksiDetailError = null;
+			showKSIDetailModal = true;
+		}
+	}
+
+	function handleKSIDetailClose() {
+		showKSIDetailModal = false;
+		selectedKSI = null;
+	}
+
+	async function handleKSIDetailSave() {
+		if (!selectedKSI) return;
+		ksiDetailSubmitting = true;
+		ksiDetailError = null;
+		try {
+			const res = await fetch(`/api/rmf/fedramp-20x/ksi/${selectedKSI.ksi_ref_id}/`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					implementation_status: ksiEditStatus,
+					compliance_status: ksiEditComplianceStatus
+				})
+			});
+			if (!res.ok) {
+				const errData = await res.json().catch(() => null);
+				throw new Error(errData?.message || `Request failed (${res.status})`);
+			}
+			showKSIDetailModal = false;
+			selectedKSI = null;
+			await loadDashboard();
+		} catch (e) {
+			ksiDetailError = e instanceof Error ? e.message : 'Failed to update KSI';
+		} finally {
+			ksiDetailSubmitting = false;
+		}
 	}
 
 	function handleWorkflowStepComplete(stepId: string) {
@@ -429,6 +490,118 @@
 		{/if}
 	</div>
 </div>
+
+<!-- KSI Detail Modal -->
+{#if showKSIDetailModal && selectedKSI}
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+		role="dialog"
+		aria-modal="true"
+		aria-label="KSI Details"
+	>
+		<div class="bg-white dark:bg-surface-800 rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+			<div class="px-6 py-4 border-b border-gray-200 dark:border-surface-700">
+				<h2 class="text-xl font-semibold text-gray-900 dark:text-white">KSI Details</h2>
+			</div>
+
+			<div class="px-6 py-4 space-y-4">
+				{#if ksiDetailError}
+					<div class="p-3 rounded bg-red-50 text-red-700 text-sm">{ksiDetailError}</div>
+				{/if}
+
+				<!-- Read-only details -->
+				<div class="grid grid-cols-2 gap-4">
+					<div>
+						<div class="text-xs font-medium text-gray-500 uppercase">Ref ID</div>
+						<div class="text-sm font-mono font-semibold">{selectedKSI.ksi_ref_id}</div>
+					</div>
+					<div>
+						<div class="text-xs font-medium text-gray-500 uppercase">Category</div>
+						<div class="text-sm">{selectedKSI.category}</div>
+					</div>
+				</div>
+
+				<div>
+					<div class="text-xs font-medium text-gray-500 uppercase">Name</div>
+					<div class="text-sm">{selectedKSI.ksi_name}</div>
+				</div>
+
+				<div class="grid grid-cols-2 gap-4">
+					<div>
+						<div class="text-xs font-medium text-gray-500 uppercase">Validation Type</div>
+						<div class="text-sm">{selectedKSI.validation_type}</div>
+					</div>
+					<div>
+						<div class="text-xs font-medium text-gray-500 uppercase">Automation</div>
+						<div class="text-sm">{selectedKSI.automation_percentage}%</div>
+					</div>
+				</div>
+
+				<div>
+					<div class="text-xs font-medium text-gray-500 uppercase">Last Validation Date</div>
+					<div class="text-sm">
+						{selectedKSI.last_validation_date
+							? new Date(selectedKSI.last_validation_date).toLocaleString()
+							: 'Not yet validated'}
+					</div>
+				</div>
+
+				<hr class="border-gray-200 dark:border-surface-700" />
+
+				<!-- Editable fields -->
+				<div>
+					<label for="ksi-impl-status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Implementation Status</label>
+					<select
+						id="ksi-impl-status"
+						bind:value={ksiEditStatus}
+						class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+					>
+						<option value="not_started">Not Started</option>
+						<option value="in_progress">In Progress</option>
+						<option value="implemented">Implemented</option>
+						<option value="validated">Validated</option>
+						<option value="not_applicable">Not Applicable</option>
+					</select>
+				</div>
+
+				<div>
+					<label for="ksi-comp-status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Compliance Status</label>
+					<select
+						id="ksi-comp-status"
+						bind:value={ksiEditComplianceStatus}
+						class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+					>
+						<option value="compliant">Compliant</option>
+						<option value="non_compliant">Non-Compliant</option>
+						<option value="pending">Pending</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="px-6 py-4 border-t border-gray-200 dark:border-surface-700 flex justify-end gap-3">
+				<button
+					type="button"
+					onclick={handleKSIDetailClose}
+					class="btn variant-ghost-surface"
+					disabled={ksiDetailSubmitting}
+				>
+					Close
+				</button>
+				<button
+					type="button"
+					onclick={handleKSIDetailSave}
+					class="btn variant-filled-primary"
+					disabled={ksiDetailSubmitting}
+				>
+					{#if ksiDetailSubmitting}
+						<span class="animate-spin mr-1"><RefreshCw class="w-4 h-4" /></span>
+					{/if}
+					Save Changes
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style>
 	.fedramp-20x-page {

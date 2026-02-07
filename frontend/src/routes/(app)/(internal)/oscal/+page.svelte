@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { BASE_API_URL } from '$lib/utils/constants';
-	import * as m from '$lib/paraglide/messages';
+	import * as m from '$paraglide/messages';
 	import OscalEditor from '$lib/components/OscalEditor/OscalEditor.svelte';
 
 	interface Props {

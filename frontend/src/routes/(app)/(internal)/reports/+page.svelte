@@ -31,16 +31,62 @@
 			category: 'compliance',
 			href: '/reports/dora-roi',
 			tags: ['DORA', 'Regulation', 'Entities', 'Beta']
+		},
+		{
+			id: 'compliance-summary',
+			title: 'Compliance Summary Report',
+			description:
+				'Generate a comprehensive overview of compliance posture across all frameworks, including assessment statuses, coverage metrics, and gap analysis',
+			icon: 'fa-solid fa-certificate',
+			category: 'compliance',
+			href: '/reports/compliance-summary',
+			tags: ['Compliance', 'Summary', 'PDF']
+		},
+		{
+			id: 'risk-register',
+			title: 'Risk Register Report',
+			description:
+				'Export the full risk register with risk scenarios, current ratings, treatment plans, and residual risk levels for management review',
+			icon: 'fa-solid fa-magnifying-glass-chart',
+			category: 'risk',
+			href: '/reports/risk-register',
+			tags: ['Risk', 'Register', 'PDF', 'Excel']
+		},
+		{
+			id: 'poam-status',
+			title: 'POA&M Status Report',
+			description:
+				'Generate a Plan of Action & Milestones report showing open findings, remediation progress, scheduled milestones, and overdue items',
+			icon: 'fa-solid fa-list-check',
+			category: 'compliance',
+			href: '/reports/poam-status',
+			tags: ['POA&M', 'Remediation', 'PDF', 'Excel']
+		},
+		{
+			id: 'conmon-monthly',
+			title: 'ConMon Monthly Report',
+			description:
+				'Produce a continuous monitoring monthly summary with control effectiveness trends, scan results, and security posture changes',
+			icon: 'fa-solid fa-calendar-days',
+			category: 'operations',
+			href: '/reports/conmon-monthly',
+			tags: ['ConMon', 'Monthly', 'PDF']
+		},
+		{
+			id: 'vendor-assessment',
+			title: 'Vendor Assessment Summary',
+			description:
+				'Compile third-party risk assessment results including vendor risk ratings, questionnaire completion status, and outstanding findings',
+			icon: 'fa-solid fa-building',
+			category: 'risk',
+			href: '/reports/vendor-assessment',
+			tags: ['TPRM', 'Vendors', 'PDF', 'Excel']
 		}
 	];
 
 	function handleTileClick(tile: ReportTileData): void {
 		if (tile.onClick) {
 			tile.onClick();
-		} else {
-			// Default action - will be implemented with backend
-			console.log(`Report tile clicked: ${tile.id}`);
-			// TODO: Navigate to report generation page or trigger report generation
 		}
 	}
 </script>

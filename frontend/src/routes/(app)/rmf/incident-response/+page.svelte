@@ -56,6 +56,20 @@
 	let csoId = $state<string | null>(data.csoId);
 	let showOpenOnly = $state(data.openOnly !== false);
 
+	// Create modal state
+	let showCreateModal = $state(false);
+	let incidentForm = $state({
+		title: '',
+		category: 'unauthorized_access',
+		severity: 'moderate',
+		description: '',
+		detected_at: '',
+		affected_systems: '',
+		initial_containment_actions: ''
+	});
+	let incidentSubmitting = $state(false);
+	let incidentCreateError = $state<string | null>(null);
+
 	// Status mapping
 	const INCIDENT_STATUS_MAPPING = {
 		detected: { title: 'Detected', color: 'bg-red-100', order: 1 },
@@ -288,8 +302,47 @@
 	}
 
 	function handleNewIncident() {
-		// TODO: Open create modal
-		alert('Create incident modal - TODO');
+		incidentForm = {
+			title: '',
+			category: 'unauthorized_access',
+			severity: 'moderate',
+			description: '',
+			detected_at: '',
+			affected_systems: '',
+			initial_containment_actions: ''
+		};
+		incidentCreateError = null;
+		showCreateModal = true;
+	}
+
+	function handleIncidentCancel() {
+		showCreateModal = false;
+	}
+
+	async function handleIncidentSubmit() {
+		incidentSubmitting = true;
+		incidentCreateError = null;
+		try {
+			const body: Record<string, string | null> = { ...incidentForm };
+			if (csoId) body.cso_id = csoId;
+			// Convert empty detected_at to null
+			if (!body.detected_at) body.detected_at = null;
+			const res = await fetch(`${BASE_API_URL}/rmf/incident-response/`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(body)
+			});
+			if (!res.ok) {
+				const errData = await res.json().catch(() => null);
+				throw new Error(errData?.message || `Request failed (${res.status})`);
+			}
+			showCreateModal = false;
+			await loadDashboard();
+		} catch (e) {
+			incidentCreateError = e instanceof Error ? e.message : 'Failed to report incident';
+		} finally {
+			incidentSubmitting = false;
+		}
 	}
 
 	function formatDuration(hours: number | null): string {
@@ -652,3 +705,133 @@
 		{/if}
 	{/if}
 </div>
+
+<!-- Report Incident Modal -->
+{#if showCreateModal}
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+		role="dialog"
+		aria-modal="true"
+		aria-label="Report Incident"
+	>
+		<div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+			<div class="px-6 py-4 border-b border-gray-200">
+				<h2 class="text-xl font-semibold text-gray-900">Report Incident</h2>
+			</div>
+			<form onsubmit={(e) => { e.preventDefault(); handleIncidentSubmit(); }}>
+				<div class="px-6 py-4 space-y-4">
+					{#if incidentCreateError}
+						<div class="p-3 rounded bg-red-50 text-red-700 text-sm">{incidentCreateError}</div>
+					{/if}
+
+					<div>
+						<label for="inc-title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+						<input
+							id="inc-title"
+							type="text"
+							bind:value={incidentForm.title}
+							required
+							class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+							placeholder="Brief incident title"
+						/>
+					</div>
+
+					<div>
+						<label for="inc-category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+						<select
+							id="inc-category"
+							bind:value={incidentForm.category}
+							required
+							class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+						>
+							{#each Object.entries(CATEGORY_LABELS) as [value, label]}
+								<option {value}>{label}</option>
+							{/each}
+						</select>
+					</div>
+
+					<div>
+						<label for="inc-severity" class="block text-sm font-medium text-gray-700 mb-1">Severity</label>
+						<select
+							id="inc-severity"
+							bind:value={incidentForm.severity}
+							required
+							class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+						>
+							<option value="critical">Critical</option>
+							<option value="high">High</option>
+							<option value="moderate">Moderate</option>
+							<option value="low">Low</option>
+							<option value="informational">Informational</option>
+						</select>
+					</div>
+
+					<div>
+						<label for="inc-description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+						<textarea
+							id="inc-description"
+							bind:value={incidentForm.description}
+							required
+							rows="3"
+							class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+							placeholder="Describe what happened"
+						></textarea>
+					</div>
+
+					<div>
+						<label for="inc-detected" class="block text-sm font-medium text-gray-700 mb-1">Detected At</label>
+						<input
+							id="inc-detected"
+							type="datetime-local"
+							bind:value={incidentForm.detected_at}
+							class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+						/>
+					</div>
+
+					<div>
+						<label for="inc-systems" class="block text-sm font-medium text-gray-700 mb-1">Affected Systems</label>
+						<input
+							id="inc-systems"
+							type="text"
+							bind:value={incidentForm.affected_systems}
+							class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+							placeholder="e.g., Web server, Database cluster"
+						/>
+					</div>
+
+					<div>
+						<label for="inc-containment" class="block text-sm font-medium text-gray-700 mb-1">Initial Containment Actions</label>
+						<textarea
+							id="inc-containment"
+							bind:value={incidentForm.initial_containment_actions}
+							rows="3"
+							class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+							placeholder="Actions taken or planned to contain the incident"
+						></textarea>
+					</div>
+				</div>
+
+				<div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+					<button
+						type="button"
+						onclick={handleIncidentCancel}
+						class="btn variant-ghost-surface"
+						disabled={incidentSubmitting}
+					>
+						Cancel
+					</button>
+					<button
+						type="submit"
+						class="btn variant-filled-error"
+						disabled={incidentSubmitting}
+					>
+						{#if incidentSubmitting}
+							<i class="fa-solid fa-spinner fa-spin mr-1"></i>
+						{/if}
+						Report Incident
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+{/if}

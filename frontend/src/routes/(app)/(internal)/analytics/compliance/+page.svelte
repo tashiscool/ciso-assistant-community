@@ -249,7 +249,7 @@
 									</span>
 								{/if}
 								<a
-									href={`${base}/compliance/assessments/${assessment.id}`}
+									href={`${base}/compliance-assessments/${assessment.id}`}
 									class="text-blue-600 hover:text-blue-500 text-sm font-medium"
 								>
 									View Details →
@@ -272,7 +272,7 @@
 		<div class="p-6">
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 				<a
-					href={`${base}/compliance/assessments/new`}
+					href={`${base}/compliance-assessments`}
 					class="flex items-center p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
 				>
 					<div class="flex-shrink-0">
@@ -287,7 +287,7 @@
 				</a>
 
 				<a
-					href={`${base}/compliance/frameworks`}
+					href={`${base}/frameworks`}
 					class="flex items-center p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
 				>
 					<div class="flex-shrink-0">
@@ -302,7 +302,7 @@
 				</a>
 
 				<a
-					href={`${base}/reports/compliance`}
+					href={`${base}/reports`}
 					class="flex items-center p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
 				>
 					<div class="flex-shrink-0">

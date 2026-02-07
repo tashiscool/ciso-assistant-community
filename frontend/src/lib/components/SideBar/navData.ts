@@ -185,6 +185,12 @@ export const navData = {
 					permissions: ['add_threat', 'add_riskmatrix', 'add_referencecontrol', 'add_framework']
 				},
 				{
+					name: 'documentHub',
+					fa_icon: 'fa-solid fa-folder-open',
+					href: '/documents',
+					permissions: ['view_appliedcontrol']
+				},
+				{
 					name: 'policies',
 					fa_icon: 'fa-solid fa-file-alt',
 					href: '/policies',
@@ -290,6 +296,12 @@ export const navData = {
 					href: '/evidences'
 				},
 				{
+					name: 'poamManagement',
+					fa_icon: 'fa-solid fa-tasks',
+					href: '/poam',
+					permissions: ['view_appliedcontrol']
+				},
+				{
 					name: 'recap',
 					fa_icon: 'fa-solid fa-clipboard-list',
 					href: '/recap',
@@ -382,6 +394,12 @@ export const navData = {
 					name: 'entityAssessments',
 					fa_icon: 'fa-solid fa-clipboard-list',
 					href: '/entity-assessments'
+				},
+				{
+					name: 'vendorPortal',
+					fa_icon: 'fa-solid fa-paper-plane',
+					href: '/entity-assessments/questionnaire',
+					permissions: ['view_entityassessment']
 				}
 			]
 		},

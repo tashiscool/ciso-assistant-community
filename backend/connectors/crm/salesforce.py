@@ -17,9 +17,7 @@ from ..base.registry import ConnectorRegistry
 logger = logging.getLogger(__name__)
 
 
-class ConnectorCategoryCRM(ConnectorCategory):
-    """Extended category for CRM."""
-    CRM_GRC = "crm_grc"
+CRM_GRC = "crm_grc"
 
 
 @dataclass

@@ -1382,3 +1382,454 @@ class AIExplainerTranslateView(APIView):
                 'success': False,
                 'error': str(e),
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# =============================================================================
+# AI Vendor Scoring Views
+# =============================================================================
+
+class AIVendorScoringView(APIView):
+    """Score vendor assessment using AI."""
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Score vendor assessment",
+        description="Uses AI to score a vendor entity assessment based on questionnaire responses.",
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'questionnaire_responses': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'object',
+                            'properties': {
+                                'question': {'type': 'string'},
+                                'answer': {'type': 'string'},
+                                'category': {'type': 'string'},
+                                'weight': {'type': 'number'},
+                            },
+                            'required': ['question', 'answer'],
+                        },
+                    },
+                },
+            }
+        },
+        responses={200: dict},
+        tags=['AI Vendor Scoring'],
+    )
+    def post(self, request, pk=None):
+        """Score a vendor entity assessment."""
+        from ..services.ai_vendor_scorer import get_ai_vendor_scorer_service
+
+        assessment_id = str(pk) if pk else request.data.get('assessment_id')
+        questionnaire_responses = request.data.get('questionnaire_responses')
+
+        if not assessment_id:
+            return Response({
+                'success': False,
+                'error': 'assessment_id is required (via URL or request body)',
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            service = get_ai_vendor_scorer_service()
+            result = service.score_vendor_assessment(
+                entity_assessment_id=assessment_id,
+                questionnaire_responses=questionnaire_responses,
+            )
+
+            return Response({
+                'success': True,
+                'data': result.to_dict(),
+            })
+
+        except Exception as e:
+            return Response({
+                'success': False,
+                'error': str(e),
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class AIVendorRiskSummaryView(APIView):
+    """Generate executive risk summary for a vendor."""
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Generate vendor risk summary",
+        description="Uses AI to generate an executive risk summary for a scored vendor.",
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'vendor_name': {'type': 'string'},
+                    'score_data': {'type': 'object'},
+                },
+                'required': ['vendor_name', 'score_data'],
+            }
+        },
+        responses={200: dict},
+        tags=['AI Vendor Scoring'],
+    )
+    def post(self, request):
+        """Generate vendor risk summary."""
+        from ..services.ai_vendor_scorer import (
+            VendorScoreResult,
+            get_ai_vendor_scorer_service,
+        )
+
+        vendor_name = request.data.get('vendor_name')
+        score_data = request.data.get('score_data', {})
+
+        if not vendor_name or not score_data:
+            return Response({
+                'success': False,
+                'error': 'vendor_name and score_data are required',
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            score_result = VendorScoreResult(
+                overall_score=score_data.get('overall_score', 0),
+                risk_rating=score_data.get('risk_rating', 'medium'),
+                category_scores=score_data.get('category_scores', {}),
+                strengths=score_data.get('strengths', []),
+                weaknesses=score_data.get('weaknesses', []),
+                recommendations=score_data.get('recommendations', []),
+                answer_evaluations=score_data.get('answer_evaluations', []),
+            )
+
+            service = get_ai_vendor_scorer_service()
+            summary = service.generate_vendor_risk_summary(
+                score_result=score_result,
+                vendor_name=vendor_name,
+            )
+
+            return Response({
+                'success': True,
+                'data': {
+                    'vendor_name': vendor_name,
+                    'summary': summary,
+                },
+            })
+
+        except Exception as e:
+            return Response({
+                'success': False,
+                'error': str(e),
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# =============================================================================
+# AI POA&M Generation Views
+# =============================================================================
+
+class AIPOAMGenerateView(APIView):
+    """Generate POA&M items from findings using AI."""
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Generate POA&M items from findings",
+        description=(
+            "Uses AI to generate Plan of Action and Milestones items from "
+            "selected vulnerability or compliance findings."
+        ),
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'finding_ids': {
+                        'type': 'array',
+                        'items': {'type': 'string'},
+                    },
+                    'auto_create': {'type': 'boolean'},
+                    'system_group_id': {'type': 'string'},
+                },
+                'required': ['finding_ids'],
+            }
+        },
+        responses={200: dict},
+        tags=['AI POA&M'],
+    )
+    def post(self, request):
+        """Generate POA&M items from selected findings."""
+        from poam.services.ai_poam_generator import get_ai_poam_generator
+
+        finding_ids = request.data.get('finding_ids', [])
+        auto_create = request.data.get('auto_create', False)
+        system_group_id = request.data.get('system_group_id')
+
+        if not finding_ids:
+            return Response({
+                'success': False,
+                'error': 'finding_ids is required and must not be empty',
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            generator = get_ai_poam_generator()
+            generated_items = generator.generate_from_findings(finding_ids)
+
+            result = {
+                'generated_items': [item.to_dict() for item in generated_items],
+                'count': len(generated_items),
+            }
+
+            if auto_create and generated_items:
+                created_ids = generator.bulk_create_poam_items(
+                    generated_items,
+                    system_group_id=system_group_id,
+                )
+                result['created_ids'] = created_ids
+                result['created_count'] = len(created_ids)
+
+            return Response({
+                'success': True,
+                'data': result,
+            })
+
+        except Exception as e:
+            return Response({
+                'success': False,
+                'error': str(e),
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class AIPOAMGenerateFromScanView(APIView):
+    """Generate POA&M items from scan results using AI."""
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Generate POA&M items from scan results",
+        description=(
+            "Uses AI to generate POA&M items from the latest scan results "
+            "of a specified connector."
+        ),
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'connector_id': {'type': 'string'},
+                    'auto_create': {'type': 'boolean'},
+                    'system_group_id': {'type': 'string'},
+                },
+                'required': ['connector_id'],
+            }
+        },
+        responses={200: dict},
+        tags=['AI POA&M'],
+    )
+    def post(self, request):
+        """Generate POA&M items from scan results."""
+        from poam.services.ai_poam_generator import get_ai_poam_generator
+
+        connector_id = request.data.get('connector_id')
+        auto_create = request.data.get('auto_create', False)
+        system_group_id = request.data.get('system_group_id')
+
+        if not connector_id:
+            return Response({
+                'success': False,
+                'error': 'connector_id is required',
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            generator = get_ai_poam_generator()
+            generated_items = generator.generate_from_scan_results(connector_id)
+
+            result = {
+                'generated_items': [item.to_dict() for item in generated_items],
+                'count': len(generated_items),
+            }
+
+            if auto_create and generated_items:
+                created_ids = generator.bulk_create_poam_items(
+                    generated_items,
+                    system_group_id=system_group_id,
+                )
+                result['created_ids'] = created_ids
+                result['created_count'] = len(created_ids)
+
+            return Response({
+                'success': True,
+                'data': result,
+            })
+
+        except Exception as e:
+            return Response({
+                'success': False,
+                'error': str(e),
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# =============================================================================
+# AI Batch Control Drafting Views
+# =============================================================================
+
+class AIBatchControlDraftView(APIView):
+    """Batch draft control implementations for an assessment."""
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Batch draft control implementations",
+        description=(
+            "Uses AI to draft implementation statements for all controls "
+            "in a compliance assessment. Processes each requirement and "
+            "returns drafts for review."
+        ),
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'assessment_id': {'type': 'string'},
+                    'framework': {'type': 'string'},
+                    'context': {'type': 'object'},
+                    'control_ids': {
+                        'type': 'array',
+                        'items': {'type': 'string'},
+                        'description': 'Optional subset of control IDs to draft. If empty, drafts all.',
+                    },
+                },
+                'required': ['assessment_id'],
+            }
+        },
+        responses={200: dict},
+        tags=['AI Author'],
+    )
+    def post(self, request):
+        """Draft all (or selected) control implementations for an assessment."""
+        from ..services.ai_author import get_ai_author_service
+
+        assessment_id = request.data.get('assessment_id')
+        framework = request.data.get('framework', 'nist_800_53')
+        context = request.data.get('context', {})
+        control_ids_filter = request.data.get('control_ids', [])
+
+        if not assessment_id:
+            return Response({
+                'success': False,
+                'error': 'assessment_id is required',
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Load requirements for this assessment
+            requirements = self._load_requirements(
+                assessment_id, control_ids_filter
+            )
+
+            if not requirements:
+                return Response({
+                    'success': False,
+                    'error': 'No requirements found for the given assessment',
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            service = get_ai_author_service()
+            drafts = []
+            errors = []
+
+            for req in requirements:
+                try:
+                    draft = service.draft_control_implementation(
+                        control_id=req['control_id'],
+                        requirement_text=req['requirement_text'],
+                        framework=framework,
+                        context=context,
+                        existing_implementation=req.get(
+                            'existing_implementation'
+                        ),
+                    )
+                    drafts.append(draft.to_dict())
+                except Exception as e:
+                    errors.append({
+                        'control_id': req['control_id'],
+                        'error': str(e),
+                    })
+
+            return Response({
+                'success': True,
+                'data': {
+                    'drafts': drafts,
+                    'count': len(drafts),
+                    'errors': errors,
+                    'error_count': len(errors),
+                    'assessment_id': assessment_id,
+                    'framework': framework,
+                },
+            })
+
+        except Exception as e:
+            return Response({
+                'success': False,
+                'error': str(e),
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @staticmethod
+    def _load_requirements(
+        assessment_id: str, control_ids_filter: list = None
+    ) -> list:
+        """
+        Load requirement assessments from the database.
+
+        Tries the bounded-context compliance models first, then falls back
+        to the core models.
+        """
+        import logging as _logging
+        _logger = _logging.getLogger(__name__)
+        requirements = []
+
+        try:
+            from compliance.models.requirement_assessment import (
+                RequirementAssessment,
+            )
+
+            qs = RequirementAssessment.objects.filter(
+                compliance_assessment_id=assessment_id
+            )
+            if control_ids_filter:
+                qs = qs.filter(requirement_id__in=control_ids_filter)
+
+            for ra in qs:
+                requirements.append({
+                    'control_id': ra.requirement_id,
+                    'requirement_text': (
+                        f"{ra.requirement_title}\n\n{ra.requirement_description}"
+                    ),
+                    'existing_implementation': getattr(
+                        ra, 'observation', None
+                    ),
+                })
+            return requirements
+
+        except ImportError:
+            pass
+
+        # Fallback to core models
+        try:
+            from core.models import RequirementAssessment as CoreRA
+
+            qs = CoreRA.objects.filter(
+                compliance_assessment_id=assessment_id
+            )
+            if control_ids_filter:
+                qs = qs.filter(requirement__ref_id__in=control_ids_filter)
+
+            for ra in qs:
+                req = ra.requirement if hasattr(ra, 'requirement') else None
+                requirements.append({
+                    'control_id': (
+                        req.ref_id if req and hasattr(req, 'ref_id') else str(ra.id)
+                    ),
+                    'requirement_text': (
+                        str(req) if req else 'No requirement text available'
+                    ),
+                    'existing_implementation': getattr(
+                        ra, 'observation', None
+                    ),
+                })
+            return requirements
+
+        except Exception as e:
+            _logger.error(f"Error loading requirements: {e}")
+            return []

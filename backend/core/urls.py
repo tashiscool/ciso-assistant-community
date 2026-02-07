@@ -5,6 +5,7 @@ from tprm.views import (
     SolutionViewSet,
     EntityAssessmentViewSet,
     ContractViewSet,
+    RequirementsFlowdownView,
 )
 from library.views import (
     MappingLibrariesList,
@@ -149,6 +150,8 @@ urlpatterns = [
     path("workflows/", include("core.bounded_contexts.workflow_engine.urls")),  # Workflow Engine bounded context API
     path("security-graph/", include("core.bounded_contexts.security_graph.urls")),  # Security Graph bounded context API
     path("connectors/", include("connectors.urls")),  # Connectors API
+    path("poam/", include("poam.api.urls")),  # POA&M API
+    path("vendor-portal/", include("vendor_portal.urls")),  # Vendor Portal API
     # Note: privacy/, security/, third-party/, business-continuity/ routes are handled by bounded contexts above
     path("oscal/", include("oscal_integration.api.urls")),  # OSCAL Integration API
     path("serdes/", include("serdes.urls")),
@@ -228,6 +231,16 @@ urlpatterns = [
     ),
     path("quick-start/", QuickStartView.as_view(), name="quick-start"),
     path("content-types/", ContentTypeListView.as_view(), name="content-types-list"),
+    path(
+        "requirements-flowdown/",
+        RequirementsFlowdownView.as_view(),
+        name="requirements-flowdown-matrix",
+    ),
+    path(
+        "requirements-flowdown/<uuid:entity_id>/",
+        RequirementsFlowdownView.as_view(),
+        name="requirements-flowdown-vendor",
+    ),
     path(
         "task-nodes/<uuid:pk>/evidences/",
         TaskNodeEvidenceList.as_view(),

@@ -35,4 +35,7 @@ urlpatterns = [
 
     # SSP Generation endpoints (at /api/oscal/fedramp/generate-ssp/...)
     path('fedramp/', include(ssp_router.urls)),
+
+    # Document generation & export endpoints (at /api/oscal/documents/...)
+    path('documents/', include('oscal_integration.api.export_urls')),
 ]

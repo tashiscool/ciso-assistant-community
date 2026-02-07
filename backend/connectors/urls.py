@@ -1,21 +1,14 @@
-"""
-URL routing for Connectors module
-"""
+"""URL routing for connector management API."""
 
 from django.urls import path, include
-from rest_framework import routers
+from rest_framework.routers import DefaultRouter
 
-from .api import (
-    ConnectorRegistryView,
-    ConnectorConfigViewSet,
-    ConnectorSyncHistoryViewSet,
-)
+from .views import ConnectorInstanceViewSet, SyncExecutionViewSet
 
-router = routers.DefaultRouter()
-router.register(r'configs', ConnectorConfigViewSet, basename='connector-configs')
-router.register(r'sync-history', ConnectorSyncHistoryViewSet, basename='connector-sync-history')
+router = DefaultRouter()
+router.register(r"instances", ConnectorInstanceViewSet, basename="connector-instance")
+router.register(r"sync-history", SyncExecutionViewSet, basename="sync-execution")
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('registry/', ConnectorRegistryView.as_view(), name='connector-registry'),
+    path("", include(router.urls)),
 ]

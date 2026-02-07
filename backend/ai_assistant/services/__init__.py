@@ -55,6 +55,11 @@ from .ai_explainer import (
     ExplanationFormat,
     get_ai_explainer_service,
 )
+from .ai_vendor_scorer import (
+    AIVendorScorerService,
+    VendorScoreResult,
+    get_ai_vendor_scorer_service,
+)
 
 __all__ = [
     'SuggestionEngine',
@@ -108,4 +113,8 @@ __all__ = [
     'Audience',
     'ExplanationFormat',
     'get_ai_explainer_service',
+    # AI Vendor Scorer
+    'AIVendorScorerService',
+    'VendorScoreResult',
+    'get_ai_vendor_scorer_service',
 ]

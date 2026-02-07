@@ -51,6 +51,18 @@
 	let activeTab = $state<'overview' | 'list' | 'kanban' | 'workflow'>('overview');
 	let csoId = $state<string | null>(data.csoId);
 
+	// Create modal state
+	let showCreateModal = $state(false);
+	let createForm = $state({
+		title: '',
+		change_type: 'boundary',
+		description: '',
+		impact_level: 'low',
+		justification: ''
+	});
+	let createSubmitting = $state(false);
+	let createError = $state<string | null>(null);
+
 	// Status mapping for Kanban
 	const CHANGE_STATUS_MAPPING = {
 		draft: { title: 'Draft', color: 'bg-gray-100', order: 1 },
@@ -252,8 +264,43 @@
 	}
 
 	function handleNewChange() {
-		// TODO: Open create modal
-		alert('Create change request modal - TODO');
+		createForm = {
+			title: '',
+			change_type: 'boundary',
+			description: '',
+			impact_level: 'low',
+			justification: ''
+		};
+		createError = null;
+		showCreateModal = true;
+	}
+
+	function handleCreateCancel() {
+		showCreateModal = false;
+	}
+
+	async function handleCreateSubmit() {
+		createSubmitting = true;
+		createError = null;
+		try {
+			const body: Record<string, string | null> = { ...createForm };
+			if (csoId) body.cso_id = csoId;
+			const res = await fetch(`${BASE_API_URL}/rmf/change-control/`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(body)
+			});
+			if (!res.ok) {
+				const errData = await res.json().catch(() => null);
+				throw new Error(errData?.message || `Request failed (${res.status})`);
+			}
+			showCreateModal = false;
+			await loadDashboard();
+		} catch (e) {
+			createError = e instanceof Error ? e.message : 'Failed to create change request';
+		} finally {
+			createSubmitting = false;
+		}
 	}
 
 	// Lifecycle - data is loaded server-side, onMount only needed for URL params
@@ -505,3 +552,112 @@
 		{/if}
 	{/if}
 </div>
+
+<!-- Create Change Request Modal -->
+{#if showCreateModal}
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+		role="dialog"
+		aria-modal="true"
+		aria-label="Create Change Request"
+	>
+		<div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+			<div class="px-6 py-4 border-b border-gray-200">
+				<h2 class="text-xl font-semibold text-gray-900">Create Change Request</h2>
+			</div>
+			<form onsubmit={(e) => { e.preventDefault(); handleCreateSubmit(); }}>
+				<div class="px-6 py-4 space-y-4">
+					{#if createError}
+						<div class="p-3 rounded bg-red-50 text-red-700 text-sm">{createError}</div>
+					{/if}
+
+					<div>
+						<label for="cr-title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+						<input
+							id="cr-title"
+							type="text"
+							bind:value={createForm.title}
+							required
+							class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+							placeholder="Brief description of the change"
+						/>
+					</div>
+
+					<div>
+						<label for="cr-change-type" class="block text-sm font-medium text-gray-700 mb-1">Change Type</label>
+						<select
+							id="cr-change-type"
+							bind:value={createForm.change_type}
+							required
+							class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+						>
+							{#each Object.entries(CHANGE_TYPE_LABELS) as [value, label]}
+								<option {value}>{label}</option>
+							{/each}
+						</select>
+					</div>
+
+					<div>
+						<label for="cr-description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+						<textarea
+							id="cr-description"
+							bind:value={createForm.description}
+							required
+							rows="3"
+							class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+							placeholder="Detailed description of the proposed change"
+						></textarea>
+					</div>
+
+					<div>
+						<label for="cr-impact" class="block text-sm font-medium text-gray-700 mb-1">Impact Level</label>
+						<select
+							id="cr-impact"
+							bind:value={createForm.impact_level}
+							required
+							class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+						>
+							<option value="low">Low</option>
+							<option value="moderate">Moderate</option>
+							<option value="high">High</option>
+							<option value="critical">Critical</option>
+						</select>
+					</div>
+
+					<div>
+						<label for="cr-justification" class="block text-sm font-medium text-gray-700 mb-1">Justification</label>
+						<textarea
+							id="cr-justification"
+							bind:value={createForm.justification}
+							required
+							rows="3"
+							class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+							placeholder="Business or security justification for this change"
+						></textarea>
+					</div>
+				</div>
+
+				<div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+					<button
+						type="button"
+						onclick={handleCreateCancel}
+						class="btn variant-ghost-surface"
+						disabled={createSubmitting}
+					>
+						Cancel
+					</button>
+					<button
+						type="submit"
+						class="btn variant-filled-primary"
+						disabled={createSubmitting}
+					>
+						{#if createSubmitting}
+							<i class="fa-solid fa-spinner fa-spin mr-1"></i>
+						{/if}
+						Create Change Request
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+{/if}

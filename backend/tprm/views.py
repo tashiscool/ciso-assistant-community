@@ -1,4 +1,7 @@
+from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from iam.models import Folder, RoleAssignment, UserGroup
 from core.views import BaseModelViewSet as AbstractBaseModelViewSet
 from core.models import Asset
@@ -929,3 +932,38 @@ class ContractViewSet(BaseModelViewSet):
     @action(detail=False, name="Get governing law country choices")
     def governing_law_country(self, request):
         return Response(dict(COUNTRY_CHOICES))
+
+
+class RequirementsFlowdownView(APIView):
+    """API endpoints for requirements flowdown analysis."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, entity_id=None):
+        """Get requirements flowdown matrix or vendor-specific compliance."""
+        from .services.requirements_flowdown import RequirementsFlowdownService
+
+        service = RequirementsFlowdownService()
+
+        if entity_id:
+            # Get compliance status for a specific vendor
+            compliance = service.get_vendor_compliance_status(entity_id)
+            return Response(compliance)
+
+        # Get full flowdown matrix
+        matrix = service.get_flowdown_matrix()
+        return Response(matrix)
+
+    def post(self, request, entity_id=None):
+        """Generate gap report for a vendor."""
+        from .services.requirements_flowdown import RequirementsFlowdownService
+
+        if not entity_id:
+            return Response(
+                {"error": "entity_id is required for gap analysis"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        service = RequirementsFlowdownService()
+        gap_report = service.generate_gap_report(entity_id)
+        return Response(gap_report)

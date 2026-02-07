@@ -216,6 +216,10 @@ INSTALLED_APPS = [
     "ai_assistant",  # AI-powered suggestions for GRC
     "evidence_automation",  # Automated evidence collection
     "continuous_monitoring",  # Continuous monitoring operations and tracking
+    "poam",  # Plan of Action & Milestones management
+    "connectors",  # Security tool connector integrations
+    "vendor_portal",  # Token-authenticated vendor portal
+    "questionnaires",  # Vendor assessment questionnaire templates
     # Bounded contexts within core
     "core.bounded_contexts.asset_and_service",
     "core.bounded_contexts.organization",

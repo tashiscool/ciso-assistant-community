@@ -174,3 +174,59 @@ class POAMItemViewSet(viewsets.ModelViewSet):
         )
         serializer = self.get_serializer(overdue_items, many=True)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def export_fedramp(self, request):
+        """Export POA&M items as FedRAMP Appendix A Excel"""
+        from ..services.poam_export import POAMExportService
+        from django.http import HttpResponse
+
+        items = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(items, many=True)
+        system_info = {
+            'name': request.query_params.get('system_name', 'System'),
+            'id': request.query_params.get('system_id', ''),
+        }
+        service = POAMExportService()
+        result = service.export_fedramp_xlsx(serializer.data, system_info)
+        if not result.success:
+            return Response({'errors': result.errors}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        response = HttpResponse(result.content, content_type=result.content_type)
+        response['Content-Disposition'] = f'attachment; filename="{result.filename}"'
+        return response
+
+    @action(detail=False, methods=['get'])
+    def export_csv(self, request):
+        """Export POA&M items as CSV"""
+        from ..services.poam_export import POAMExportService
+        from django.http import HttpResponse
+
+        items = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(items, many=True)
+        service = POAMExportService()
+        result = service.export_csv(serializer.data)
+        if not result.success:
+            return Response({'errors': result.errors}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        response = HttpResponse(result.content, content_type=result.content_type)
+        response['Content-Disposition'] = f'attachment; filename="{result.filename}"'
+        return response
+
+    @action(detail=False, methods=['get'])
+    def export_oscal(self, request):
+        """Export POA&M items as OSCAL JSON"""
+        from ..services.poam_export import POAMExportService
+        from django.http import HttpResponse
+
+        items = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(items, many=True)
+        system_info = {
+            'name': request.query_params.get('system_name', 'System'),
+            'id': request.query_params.get('system_id', ''),
+        }
+        service = POAMExportService()
+        result = service.export_oscal_poam(serializer.data, system_info)
+        if not result.success:
+            return Response({'errors': result.errors}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        response = HttpResponse(result.content, content_type=result.content_type)
+        response['Content-Disposition'] = f'attachment; filename="{result.filename}"'
+        return response

@@ -133,18 +133,25 @@ def discover_connectors():
         "connectors.cloud_security.wiz",
         "connectors.cloud_security.prisma",
         "connectors.cloud_security.aqua",
+        "connectors.cloud_security.aws_security_hub",
+        "connectors.cloud_security.aws_guardduty",
+        "connectors.cloud_security.aws_config",
+        "connectors.cloud_security.gcp_scc",
         # SAST/DAST
         "connectors.sast_dast.snyk",
         "connectors.sast_dast.veracode",
         "connectors.sast_dast.sonarcloud",
         "connectors.sast_dast.burp",
         "connectors.sast_dast.appscan",
+        "connectors.sast_dast.checkmarx",
         # Container Security
         "connectors.container.trivy",
+        "connectors.container.grype",
         # Vulnerability Scanners
         "connectors.vulnerability.rapid7",
         "connectors.vulnerability.nessus",
         "connectors.vulnerability.qualys",
+        "connectors.vulnerability.crowdstrike",
         # CI/CD Security
         "connectors.cicd.gitlab",
         "connectors.cicd.xray",
@@ -157,11 +164,17 @@ def discover_connectors():
         "connectors.endpoint.defender",
         # CRM/GRC
         "connectors.crm.salesforce",
+        # Format Importers
+        "connectors.formats.sarif_importer",
+        "connectors.formats.scap_importer",
+        # ITIL / Service Management
+        "connectors.itil.servicenow",
+        "connectors.itil.jira",
     ]
 
     for module_name in connector_modules:
         try:
             import_module(module_name)
             logger.debug(f"Loaded connector module: {module_name}")
-        except ImportError as e:
+        except Exception as e:
             logger.debug(f"Could not load connector module {module_name}: {e}")

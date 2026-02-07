@@ -32,6 +32,14 @@ from .views import (
     AIExplainerConceptView,
     AIExplainerExecutiveSummaryView,
     AIExplainerTranslateView,
+    # AI Vendor Scoring
+    AIVendorScoringView,
+    AIVendorRiskSummaryView,
+    # AI POA&M Generation
+    AIPOAMGenerateView,
+    AIPOAMGenerateFromScanView,
+    # AI Batch Control Drafting
+    AIBatchControlDraftView,
 )
 
 app_name = 'ai_assistant'
@@ -165,5 +173,36 @@ urlpatterns = [
         'explainer/translate/',
         AIExplainerTranslateView.as_view(),
         name='explainer-translate',
+    ),
+
+    # AI Vendor Scoring endpoints
+    path(
+        'vendor-scoring/<uuid:pk>/',
+        AIVendorScoringView.as_view(),
+        name='vendor-scoring',
+    ),
+    path(
+        'vendor-scoring/risk-summary/',
+        AIVendorRiskSummaryView.as_view(),
+        name='vendor-risk-summary',
+    ),
+
+    # AI POA&M Generation endpoints
+    path(
+        'generate-poam/',
+        AIPOAMGenerateView.as_view(),
+        name='generate-poam',
+    ),
+    path(
+        'generate-poam/from-scan/',
+        AIPOAMGenerateFromScanView.as_view(),
+        name='generate-poam-from-scan',
+    ),
+
+    # AI Batch Control Drafting endpoint
+    path(
+        'batch-control-draft/',
+        AIBatchControlDraftView.as_view(),
+        name='batch-control-draft',
     ),
 ]

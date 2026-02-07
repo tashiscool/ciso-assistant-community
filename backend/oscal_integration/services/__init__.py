@@ -6,6 +6,9 @@ This module provides services for OSCAL document manipulation:
 - OSCALExporter: Export data to OSCAL format
 - SSPGenerator: Generate System Security Plans
 - SSPImporter: Import existing SSPs
+- SARGenerator: Generate Security Assessment Reports
+- SAPGenerator: Generate Security Assessment Plans
+- ExportBuilder: Central document generation engine
 - FedRAMPValidator: Validate FedRAMP compliance
 - TrestleService: OSCAL operations (split/merge, profile resolution, format conversion)
 - FedRAMPEnhancedService: Enhanced FedRAMP features (control origination, responsible roles)
@@ -27,6 +30,15 @@ def __getattr__(name):
     elif name == 'SSPImporter':
         from oscal_integration.services.ssp_importer import SSPImporter
         return SSPImporter
+    elif name == 'SARGenerator':
+        from oscal_integration.services.sar_generator import SARGenerator
+        return SARGenerator
+    elif name == 'SAPGenerator':
+        from oscal_integration.services.sap_generator import SAPGenerator
+        return SAPGenerator
+    elif name == 'ExportBuilder':
+        from oscal_integration.services.export_builder import ExportBuilder
+        return ExportBuilder
     elif name == 'FedRAMPValidator':
         from oscal_integration.services.fedramp_validator import FedRAMPValidator
         return FedRAMPValidator
@@ -47,6 +59,9 @@ __all__ = [
     'OSCALExporter',
     'SSPGenerator',
     'SSPImporter',
+    'SARGenerator',
+    'SAPGenerator',
+    'ExportBuilder',
     'FedRAMPValidator',
     'TrestleService',
     'FedRAMPEnhancedService',

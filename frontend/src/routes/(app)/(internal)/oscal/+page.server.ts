@@ -1,6 +1,6 @@
 import { BASE_API_URL } from '$lib/utils/constants';
 import type { PageServerLoad } from './$types';
-import * as m from '$lib/paraglide/messages';
+import * as m from '$paraglide/messages';
 
 export const load: PageServerLoad = async ({ fetch }) => {
 	// Load available compliance assessments for export
