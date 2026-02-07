@@ -1,0 +1,1100 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CISO Assistant on AWS Elastic Beanstalk with ALB, RDS PostgreSQL, ElastiCache Redis, and S3.
+
+# Deployment Prerequisites
+# ========================
+# Backend application bundle:
+#   - requirements.txt  (poetry export -f requirements.txt -o requirements.txt)
+#   - Procfile: web: gunicorn ciso_assistant.wsgi:application --bind 0.0.0.0:8000 --workers $GUNICORN_WORKERS --timeout $GUNICORN_TIMEOUT
+#   - .ebextensions/01_packages.config:
+#       packages:
+#         yum: { pango, cairo, cairo-devel, libffi-devel, python3-devel, postgresql15-devel }
+#   - .platform/hooks/postdeploy/01_migrate.sh:
+#       source /var/app/venv/*/bin/activate && cd /var/app/current
+#       python manage.py collectstatic --noinput && python manage.py migrate --noinput
+#
+# Frontend application bundle:
+#   - Build output from: npm run build  (SvelteKit adapter-node)
+#   - Procfile: web: node build/index.js
+#   - package.json must remain in the bundle root
+#
+# Huey Background Worker (optional):
+#   Add .ebextensions/02_huey.config with supervisord program block
+#   to run: python manage.py run_huey --workers 2
+
+# ---------------------------------------------------------------------------
+# Parameters
+# ---------------------------------------------------------------------------
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label: { default: Network }
+        Parameters:
+          - VpcCIDR
+          - PublicSubnet1CIDR
+          - PublicSubnet2CIDR
+          - PrivateSubnet1CIDR
+          - PrivateSubnet2CIDR
+      - Label: { default: Certificate }
+        Parameters:
+          - ACMCertificateArn
+      - Label: { default: Application }
+        Parameters:
+          - CISOAssistantURL
+          - EnvironmentName
+          - LogLevel
+      - Label: { default: Database }
+        Parameters:
+          - DBInstanceClass
+          - DBName
+          - DBMasterUsername
+          - DBMasterPassword
+          - DBAllocatedStorage
+          - UseRDSIAMAuth
+      - Label: { default: Redis }
+        Parameters:
+          - RedisNodeType
+      - Label: { default: S3 }
+        Parameters:
+          - S3BucketName
+      - Label: { default: Backend }
+        Parameters:
+          - BackendInstanceType
+          - BackendMinInstances
+          - BackendMaxInstances
+          - GunicornWorkers
+          - GunicornTimeout
+      - Label: { default: Frontend }
+        Parameters:
+          - FrontendInstanceType
+          - FrontendMinInstances
+          - FrontendMaxInstances
+      - Label: { default: Secrets }
+        Parameters:
+          - DjangoSecretKey
+          - DjangoSuperuserEmail
+      - Label: { default: Access }
+        Parameters:
+          - KeyPairName
+
+Parameters:
+  # -- Network --
+  VpcCIDR:
+    Type: String
+    Default: '10.0.0.0/16'
+    Description: CIDR block for the VPC
+  PublicSubnet1CIDR:
+    Type: String
+    Default: '10.0.1.0/24'
+    Description: Public subnet 1 (AZ-a)
+  PublicSubnet2CIDR:
+    Type: String
+    Default: '10.0.2.0/24'
+    Description: Public subnet 2 (AZ-b)
+  PrivateSubnet1CIDR:
+    Type: String
+    Default: '10.0.10.0/24'
+    Description: Private subnet 1 (AZ-a)
+  PrivateSubnet2CIDR:
+    Type: String
+    Default: '10.0.11.0/24'
+    Description: Private subnet 2 (AZ-b)
+
+  # -- Certificate --
+  ACMCertificateArn:
+    Type: String
+    Description: ARN of an ACM certificate for HTTPS on the ALB
+
+  # -- Application --
+  CISOAssistantURL:
+    Type: String
+    Default: ''
+    Description: Public URL of the application (e.g. https://grc.example.com). Leave blank to use the ALB DNS name.
+  EnvironmentName:
+    Type: String
+    Default: production
+    AllowedValues: [production, staging, development]
+    Description: Deployment environment name
+  LogLevel:
+    Type: String
+    Default: INFO
+    AllowedValues: [DEBUG, INFO, WARNING, ERROR, CRITICAL]
+    Description: Application log level
+
+  # -- Database --
+  DBInstanceClass:
+    Type: String
+    Default: db.t3.medium
+    Description: RDS instance class
+  DBName:
+    Type: String
+    Default: ciso_assistant
+    Description: PostgreSQL database name
+    AllowedPattern: '[a-zA-Z_][a-zA-Z0-9_]*'
+    ConstraintDescription: Must begin with a letter or underscore and contain only alphanumeric and underscores
+  DBMasterUsername:
+    Type: String
+    Default: ciso_admin
+    Description: RDS master username
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9_]*'
+    MinLength: '1'
+    MaxLength: '63'
+  DBMasterPassword:
+    Type: String
+    NoEcho: true
+    MinLength: '12'
+    MaxLength: '128'
+    Description: RDS master password (min 12 characters)
+  DBAllocatedStorage:
+    Type: Number
+    Default: 50
+    MinValue: 20
+    MaxValue: 1000
+    Description: Allocated storage in GB
+  UseRDSIAMAuth:
+    Type: String
+    Default: 'false'
+    AllowedValues: ['true', 'false']
+    Description: Enable IAM authentication for RDS
+
+  # -- Redis --
+  RedisNodeType:
+    Type: String
+    Default: cache.t3.small
+    Description: ElastiCache node type
+
+  # -- S3 --
+  S3BucketName:
+    Type: String
+    Default: ''
+    Description: S3 bucket name for attachments. Leave blank for auto-generated name.
+
+  # -- Backend --
+  BackendInstanceType:
+    Type: String
+    Default: t3.medium
+    Description: EC2 instance type for backend
+  BackendMinInstances:
+    Type: Number
+    Default: 2
+    MinValue: 1
+    MaxValue: 10
+  BackendMaxInstances:
+    Type: Number
+    Default: 6
+    MinValue: 1
+    MaxValue: 20
+  GunicornWorkers:
+    Type: Number
+    Default: 3
+    MinValue: 1
+    MaxValue: 12
+    Description: Number of Gunicorn worker processes
+  GunicornTimeout:
+    Type: Number
+    Default: 120
+    MinValue: 30
+    MaxValue: 600
+    Description: Gunicorn request timeout in seconds
+
+  # -- Frontend --
+  FrontendInstanceType:
+    Type: String
+    Default: t3.small
+    Description: EC2 instance type for frontend
+  FrontendMinInstances:
+    Type: Number
+    Default: 2
+    MinValue: 1
+    MaxValue: 10
+  FrontendMaxInstances:
+    Type: Number
+    Default: 4
+    MinValue: 1
+    MaxValue: 20
+
+  # -- Secrets --
+  DjangoSecretKey:
+    Type: String
+    NoEcho: true
+    MinLength: '32'
+    Description: Django SECRET_KEY (min 32 characters)
+  DjangoSuperuserEmail:
+    Type: String
+    Description: Email address for the initial Django superuser
+
+  # -- Access --
+  KeyPairName:
+    Type: String
+    Default: ''
+    Description: EC2 key pair name for SSH access. Leave blank to disable SSH.
+
+# ---------------------------------------------------------------------------
+# Conditions
+# ---------------------------------------------------------------------------
+Conditions:
+  UseIAMAuth: !Equals [!Ref UseRDSIAMAuth, 'true']
+  HasKeyPair: !Not [!Equals [!Ref KeyPairName, '']]
+  HasS3BucketName: !Not [!Equals [!Ref S3BucketName, '']]
+  HasCustomURL: !Not [!Equals [!Ref CISOAssistantURL, '']]
+
+# ---------------------------------------------------------------------------
+# Resources
+# ---------------------------------------------------------------------------
+Resources:
+
+  # ==========================================================================
+  # Tier 1 — Networking
+  # ==========================================================================
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-vpc'
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-igw'
+
+  IGWAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PublicSubnet1CIDR
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-public-1'
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PublicSubnet2CIDR
+      AvailabilityZone: !Select [1, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-public-2'
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnet1CIDR
+      AvailabilityZone: !Select [0, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-private-1'
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnet2CIDR
+      AvailabilityZone: !Select [1, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-private-2'
+
+  NATGatewayEIP:
+    Type: AWS::EC2::EIP
+    DependsOn: IGWAttachment
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-nat-eip'
+
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NATGatewayEIP.AllocationId
+      SubnetId: !Ref PublicSubnet1
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-nat'
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-public-rt'
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: IGWAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnet1RTAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnet2RTAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-private-rt'
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref NATGateway
+
+  PrivateSubnet1RTAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateSubnet2RTAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref PrivateRouteTable
+
+  # ==========================================================================
+  # Tier 2 — Security Groups
+  # ==========================================================================
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ALB - allow HTTP/HTTPS from internet
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: '0.0.0.0/0'
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: '0.0.0.0/0'
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-alb-sg'
+
+  BackendSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Backend instances - allow 8000 from ALB
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 8000
+          ToPort: 8000
+          SourceSecurityGroupId: !Ref ALBSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-backend-sg'
+
+  FrontendSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Frontend instances - allow 3000 from ALB
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          SourceSecurityGroupId: !Ref ALBSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-frontend-sg'
+
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: RDS - allow 5432 from backend only
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref BackendSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-rds-sg'
+
+  RedisSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Redis - allow 6379 from backend only
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 6379
+          ToPort: 6379
+          SourceSecurityGroupId: !Ref BackendSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-redis-sg'
+
+  # ==========================================================================
+  # Tier 3 — Data Tier
+  # ==========================================================================
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Private subnets for RDS
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-db-subnet-group'
+
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Snapshot
+    UpdateReplacePolicy: Snapshot
+    Properties:
+      DBInstanceIdentifier: !Sub '${AWS::StackName}-postgres'
+      Engine: postgres
+      EngineVersion: '16.6'
+      DBInstanceClass: !Ref DBInstanceClass
+      AllocatedStorage: !Ref DBAllocatedStorage
+      StorageType: gp3
+      StorageEncrypted: true
+      DBName: !Ref DBName
+      MasterUsername: !Ref DBMasterUsername
+      MasterUserPassword: !Ref DBMasterPassword
+      EnableIAMDatabaseAuthentication: !If [UseIAMAuth, true, false]
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VPCSecurityGroups:
+        - !Ref RDSSecurityGroup
+      MultiAZ: false
+      BackupRetentionPeriod: 7
+      PreferredBackupWindow: '03:00-04:00'
+      PreferredMaintenanceWindow: 'sun:04:30-sun:05:30'
+      DeletionProtection: true
+      CopyTagsToSnapshot: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-rds'
+
+  RedisSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: Private subnets for Redis
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+
+  RedisCluster:
+    Type: AWS::ElastiCache::CacheCluster
+    Properties:
+      ClusterName: !Sub '${AWS::StackName}-redis'
+      Engine: redis
+      EngineVersion: '7.1'
+      CacheNodeType: !Ref RedisNodeType
+      NumCacheNodes: 1
+      CacheSubnetGroupName: !Ref RedisSubnetGroup
+      VpcSecurityGroupIds:
+        - !Ref RedisSecurityGroup
+      TransitEncryptionEnabled: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-redis'
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !If [HasS3BucketName, !Ref S3BucketName, !Ref 'AWS::NoValue']
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-attachments'
+
+  # ==========================================================================
+  # Tier 4 — IAM
+  # ==========================================================================
+  BackendRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-backend-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier
+      Policies:
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                Resource:
+                  - !GetAtt S3Bucket.Arn
+                  - !Sub '${S3Bucket.Arn}/*'
+        - PolicyName: CloudWatchLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogStreams
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/elasticbeanstalk/*'
+        - !If
+          - UseIAMAuth
+          - PolicyName: RDSIAMConnect
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action: rds-db:connect
+                  Resource: !Sub 'arn:aws:rds-db:${AWS::Region}:${AWS::AccountId}:dbuser:${RDSInstance.DbiResourceId}/${DBMasterUsername}'
+          - !Ref 'AWS::NoValue'
+
+  BackendInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub '${AWS::StackName}-backend-ip'
+      Roles:
+        - !Ref BackendRole
+
+  FrontendRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-frontend-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier
+      Policies:
+        - PolicyName: CloudWatchLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogStreams
+                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/elasticbeanstalk/*'
+
+  FrontendInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub '${AWS::StackName}-frontend-ip'
+      Roles:
+        - !Ref FrontendRole
+
+  EBServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-eb-service-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: elasticbeanstalk.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkEnhancedHealth
+        - arn:aws:iam::aws:policy/AWSElasticBeanstalkManagedUpdatesCustomerRolePolicy
+
+  # ==========================================================================
+  # Tier 5 — Application Load Balancer
+  # ==========================================================================
+  ALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub '${AWS::StackName}-alb'
+      Scheme: internet-facing
+      Type: application
+      SecurityGroups:
+        - !Ref ALBSecurityGroup
+      Subnets:
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-alb'
+
+  BackendTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub '${AWS::StackName}-backend-tg'
+      Port: 8000
+      Protocol: HTTP
+      VpcId: !Ref VPC
+      TargetType: instance
+      HealthCheckPath: /api/health/
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 3
+      Matcher:
+        HttpCode: '200'
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-backend-tg'
+
+  FrontendTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub '${AWS::StackName}-frontend-tg'
+      Port: 3000
+      Protocol: HTTP
+      VpcId: !Ref VPC
+      TargetType: instance
+      HealthCheckPath: /
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 3
+      Matcher:
+        HttpCode: '200'
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-frontend-tg'
+
+  HTTPSListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ALB
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref ACMCertificateArn
+      SslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref FrontendTargetGroup
+
+  APIListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref HTTPSListener
+      Priority: 10
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - '/api/*'
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref BackendTargetGroup
+
+  HTTPListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ALB
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: redirect
+          RedirectConfig:
+            Protocol: HTTPS
+            Port: '443'
+            StatusCode: HTTP_301
+
+  # ==========================================================================
+  # Tier 6 — Elastic Beanstalk
+  # ==========================================================================
+  EBApplication:
+    Type: AWS::ElasticBeanstalk::Application
+    Properties:
+      ApplicationName: !Sub '${AWS::StackName}-app'
+      Description: CISO Assistant GRC Platform
+
+  BackendEnvironment:
+    Type: AWS::ElasticBeanstalk::Environment
+    Properties:
+      ApplicationName: !Ref EBApplication
+      EnvironmentName: !Sub '${AWS::StackName}-backend'
+      SolutionStackName: '64bit Amazon Linux 2023 v4.3.0 running Python 3.11'
+      Tier:
+        Name: WebServer
+        Type: Standard
+      OptionSettings:
+        # -- Instance --
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: InstanceType
+          Value: !Ref BackendInstanceType
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: IamInstanceProfile
+          Value: !Ref BackendInstanceProfile
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: SecurityGroups
+          Value: !Ref BackendSecurityGroup
+        - !If
+          - HasKeyPair
+          - Namespace: aws:autoscaling:launchconfiguration
+            OptionName: EC2KeyName
+            Value: !Ref KeyPairName
+          - !Ref 'AWS::NoValue'
+
+        # -- Auto Scaling --
+        - Namespace: aws:autoscaling:asg
+          OptionName: MinSize
+          Value: !Ref BackendMinInstances
+        - Namespace: aws:autoscaling:asg
+          OptionName: MaxSize
+          Value: !Ref BackendMaxInstances
+
+        # -- VPC / Subnets --
+        - Namespace: aws:ec2:vpc
+          OptionName: VPCId
+          Value: !Ref VPC
+        - Namespace: aws:ec2:vpc
+          OptionName: Subnets
+          Value: !Join [',', [!Ref PrivateSubnet1, !Ref PrivateSubnet2]]
+        - Namespace: aws:ec2:vpc
+          OptionName: ELBSubnets
+          Value: !Join [',', [!Ref PublicSubnet1, !Ref PublicSubnet2]]
+        - Namespace: aws:ec2:vpc
+          OptionName: AssociatePublicIpAddress
+          Value: 'false'
+
+        # -- Load Balancer (shared ALB) --
+        - Namespace: aws:elasticbeanstalk:environment
+          OptionName: LoadBalancerType
+          Value: application
+        - Namespace: aws:elasticbeanstalk:environment
+          OptionName: LoadBalancerIsShared
+          Value: 'true'
+        - Namespace: aws:elbv2:loadbalancer
+          OptionName: SharedLoadBalancer
+          Value: !Ref ALB
+        - Namespace: aws:elbv2:listener:default
+          OptionName: ListenerEnabled
+          Value: 'false'
+
+        # -- Process (health check) --
+        - Namespace: aws:elasticbeanstalk:environment:process:default
+          OptionName: Port
+          Value: '8000'
+        - Namespace: aws:elasticbeanstalk:environment:process:default
+          OptionName: Protocol
+          Value: HTTP
+        - Namespace: aws:elasticbeanstalk:environment:process:default
+          OptionName: HealthCheckPath
+          Value: /api/health/
+
+        # -- Enhanced Health --
+        - Namespace: aws:elasticbeanstalk:healthreporting:system
+          OptionName: SystemType
+          Value: enhanced
+        - Namespace: aws:elasticbeanstalk:environment
+          OptionName: ServiceRole
+          Value: !Ref EBServiceRole
+
+        # -- Managed Updates --
+        - Namespace: aws:elasticbeanstalk:managedactions
+          OptionName: ManagedActionsEnabled
+          Value: 'true'
+        - Namespace: aws:elasticbeanstalk:managedactions
+          OptionName: PreferredStartTime
+          Value: 'Sun:06:00'
+        - Namespace: aws:elasticbeanstalk:managedactions:platformupdate
+          OptionName: UpdateLevel
+          Value: minor
+
+        # -- Environment Variables --
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: DJANGO_SETTINGS_MODULE
+          Value: ciso_assistant.settings
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: DJANGO_SECRET_KEY
+          Value: !Ref DjangoSecretKey
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: DJANGO_DEBUG
+          Value: 'False'
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: ALLOWED_HOSTS
+          Value: !If
+            - HasCustomURL
+            - !Ref CISOAssistantURL
+            - !GetAtt ALB.DNSName
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: CISO_ASSISTANT_URL
+          Value: !If
+            - HasCustomURL
+            - !Ref CISOAssistantURL
+            - !Sub 'https://${ALB.DNSName}'
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: DB_HOST
+          Value: !GetAtt RDSInstance.Endpoint.Address
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: DB_PORT
+          Value: !GetAtt RDSInstance.Endpoint.Port
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: DB_NAME
+          Value: !Ref DBName
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: POSTGRES_USER
+          Value: !Ref DBMasterUsername
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: POSTGRES_PASSWORD
+          Value: !Ref DBMasterPassword
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: REDIS_HOST
+          Value: !GetAtt RedisCluster.RedisEndpoint.Address
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: REDIS_PORT
+          Value: !GetAtt RedisCluster.RedisEndpoint.Port
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: USE_REDIS
+          Value: 'True'
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: REDIS_SSL
+          Value: 'True'
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: AWS_STORAGE_BUCKET_NAME
+          Value: !Ref S3Bucket
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: USE_S3
+          Value: 'True'
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: AWS_AUTH_MODE
+          Value: iam
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: GUNICORN_WORKERS
+          Value: !Ref GunicornWorkers
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: GUNICORN_TIMEOUT
+          Value: !Ref GunicornTimeout
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: LOG_LEVEL
+          Value: !Ref LogLevel
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: DJANGO_SUPERUSER_EMAIL
+          Value: !Ref DjangoSuperuserEmail
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: ENVIRONMENT
+          Value: !Ref EnvironmentName
+
+  FrontendEnvironment:
+    Type: AWS::ElasticBeanstalk::Environment
+    DependsOn:
+      - BackendEnvironment
+    Properties:
+      ApplicationName: !Ref EBApplication
+      EnvironmentName: !Sub '${AWS::StackName}-frontend'
+      SolutionStackName: '64bit Amazon Linux 2023 v6.4.0 running Node.js 20'
+      Tier:
+        Name: WebServer
+        Type: Standard
+      OptionSettings:
+        # -- Instance --
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: InstanceType
+          Value: !Ref FrontendInstanceType
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: IamInstanceProfile
+          Value: !Ref FrontendInstanceProfile
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: SecurityGroups
+          Value: !Ref FrontendSecurityGroup
+        - !If
+          - HasKeyPair
+          - Namespace: aws:autoscaling:launchconfiguration
+            OptionName: EC2KeyName
+            Value: !Ref KeyPairName
+          - !Ref 'AWS::NoValue'
+
+        # -- Auto Scaling --
+        - Namespace: aws:autoscaling:asg
+          OptionName: MinSize
+          Value: !Ref FrontendMinInstances
+        - Namespace: aws:autoscaling:asg
+          OptionName: MaxSize
+          Value: !Ref FrontendMaxInstances
+
+        # -- VPC / Subnets --
+        - Namespace: aws:ec2:vpc
+          OptionName: VPCId
+          Value: !Ref VPC
+        - Namespace: aws:ec2:vpc
+          OptionName: Subnets
+          Value: !Join [',', [!Ref PrivateSubnet1, !Ref PrivateSubnet2]]
+        - Namespace: aws:ec2:vpc
+          OptionName: ELBSubnets
+          Value: !Join [',', [!Ref PublicSubnet1, !Ref PublicSubnet2]]
+        - Namespace: aws:ec2:vpc
+          OptionName: AssociatePublicIpAddress
+          Value: 'false'
+
+        # -- Load Balancer (shared ALB) --
+        - Namespace: aws:elasticbeanstalk:environment
+          OptionName: LoadBalancerType
+          Value: application
+        - Namespace: aws:elasticbeanstalk:environment
+          OptionName: LoadBalancerIsShared
+          Value: 'true'
+        - Namespace: aws:elbv2:loadbalancer
+          OptionName: SharedLoadBalancer
+          Value: !Ref ALB
+        - Namespace: aws:elbv2:listener:default
+          OptionName: ListenerEnabled
+          Value: 'false'
+
+        # -- Process (health check) --
+        - Namespace: aws:elasticbeanstalk:environment:process:default
+          OptionName: Port
+          Value: '3000'
+        - Namespace: aws:elasticbeanstalk:environment:process:default
+          OptionName: Protocol
+          Value: HTTP
+        - Namespace: aws:elasticbeanstalk:environment:process:default
+          OptionName: HealthCheckPath
+          Value: /
+
+        # -- Enhanced Health --
+        - Namespace: aws:elasticbeanstalk:healthreporting:system
+          OptionName: SystemType
+          Value: enhanced
+        - Namespace: aws:elasticbeanstalk:environment
+          OptionName: ServiceRole
+          Value: !Ref EBServiceRole
+
+        # -- Managed Updates --
+        - Namespace: aws:elasticbeanstalk:managedactions
+          OptionName: ManagedActionsEnabled
+          Value: 'true'
+        - Namespace: aws:elasticbeanstalk:managedactions
+          OptionName: PreferredStartTime
+          Value: 'Sun:06:00'
+        - Namespace: aws:elasticbeanstalk:managedactions:platformupdate
+          OptionName: UpdateLevel
+          Value: minor
+
+        # -- Environment Variables --
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: PUBLIC_BACKEND_API_URL
+          Value: !If
+            - HasCustomURL
+            - !Sub '${CISOAssistantURL}/api'
+            - !Sub 'https://${ALB.DNSName}/api'
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: BODY_SIZE_LIMIT
+          Value: '25000000'
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: PROTOCOL_HEADER
+          Value: x-forwarded-proto
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: HOST_HEADER
+          Value: x-forwarded-host
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: ORIGIN
+          Value: !If
+            - HasCustomURL
+            - !Ref CISOAssistantURL
+            - !Sub 'https://${ALB.DNSName}'
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: NODE_ENV
+          Value: production
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: PORT
+          Value: '3000'
+
+# ---------------------------------------------------------------------------
+# Outputs
+# ---------------------------------------------------------------------------
+Outputs:
+  ApplicationURL:
+    Description: Application URL
+    Value: !If
+      - HasCustomURL
+      - !Ref CISOAssistantURL
+      - !Sub 'https://${ALB.DNSName}'
+
+  ALBDNSName:
+    Description: ALB DNS name — point your CNAME or alias record here
+    Value: !GetAtt ALB.DNSName
+    Export:
+      Name: !Sub '${AWS::StackName}-ALBDNSName'
+
+  BackendHealthCheck:
+    Description: Backend health check URL
+    Value: !Sub 'https://${ALB.DNSName}/api/health/'
+
+  RDSEndpoint:
+    Description: PostgreSQL endpoint
+    Value: !GetAtt RDSInstance.Endpoint.Address
+
+  RedisEndpoint:
+    Description: Redis endpoint
+    Value: !GetAtt RedisCluster.RedisEndpoint.Address
+
+  S3BucketName:
+    Description: S3 bucket for attachments
+    Value: !Ref S3Bucket
+
+  BackendEnvironmentName:
+    Description: Backend EB environment name
+    Value: !Ref BackendEnvironment
+
+  FrontendEnvironmentName:
+    Description: Frontend EB environment name
+    Value: !Ref FrontendEnvironment
+
+  VPCId:
+    Description: VPC ID
+    Value: !Ref VPC
+    Export:
+      Name: !Sub '${AWS::StackName}-VPCId'
