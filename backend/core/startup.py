@@ -96,6 +96,10 @@ READER_PERMISSIONS_LIST = [
     "view_dashboardwidget",
     # integrations
     "view_syncmapping",
+    # signal models
+    "view_accessreview",
+    "view_cryptoasset",
+    "view_detectionrule",
 ]
 
 APPROVER_PERMISSIONS_LIST = [
@@ -174,6 +178,10 @@ APPROVER_PERMISSIONS_LIST = [
     "view_accreditation",
     # integrations
     "view_syncmapping",
+    # signal models
+    "view_accessreview",
+    "view_cryptoasset",
+    "view_detectionrule",
 ]
 
 ANALYST_PERMISSIONS_LIST = [
@@ -437,6 +445,19 @@ ANALYST_PERMISSIONS_LIST = [
     "view_syncmapping",
     "change_syncmapping",
     "delete_syncmapping",
+    # signal models
+    "add_accessreview",
+    "view_accessreview",
+    "change_accessreview",
+    "delete_accessreview",
+    "add_cryptoasset",
+    "view_cryptoasset",
+    "change_cryptoasset",
+    "delete_cryptoasset",
+    "add_detectionrule",
+    "view_detectionrule",
+    "change_detectionrule",
+    "delete_detectionrule",
 ]
 
 DOMAIN_MANAGER_PERMISSIONS_LIST = [
@@ -732,6 +753,19 @@ DOMAIN_MANAGER_PERMISSIONS_LIST = [
     "view_syncmapping",
     "change_syncmapping",
     "delete_syncmapping",
+    # signal models
+    "add_accessreview",
+    "view_accessreview",
+    "change_accessreview",
+    "delete_accessreview",
+    "add_cryptoasset",
+    "view_cryptoasset",
+    "change_cryptoasset",
+    "delete_cryptoasset",
+    "add_detectionrule",
+    "view_detectionrule",
+    "change_detectionrule",
+    "delete_detectionrule",
 ]
 
 ADMINISTRATOR_PERMISSIONS_LIST = [
@@ -1076,6 +1110,19 @@ ADMINISTRATOR_PERMISSIONS_LIST = [
     "view_webhookendpoint",
     "change_webhookendpoint",
     "delete_webhookendpoint",
+    # signal models
+    "add_accessreview",
+    "view_accessreview",
+    "change_accessreview",
+    "delete_accessreview",
+    "add_cryptoasset",
+    "view_cryptoasset",
+    "change_cryptoasset",
+    "delete_cryptoasset",
+    "add_detectionrule",
+    "view_detectionrule",
+    "change_detectionrule",
+    "delete_detectionrule",
 ]
 
 THIRD_PARTY_RESPONDENT_PERMISSIONS_LIST = [

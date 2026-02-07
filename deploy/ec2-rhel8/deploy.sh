@@ -93,6 +93,10 @@ install_system_packages() {
         readline-devel \
         sqlite-devel \
         postgresql-devel \
+        pango \
+        pango-devel \
+        cairo \
+        cairo-devel \
         nginx \
         curl \
         wget \

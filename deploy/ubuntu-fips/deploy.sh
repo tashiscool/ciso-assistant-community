@@ -322,6 +322,12 @@ install_system_packages() {
         libxslt1-dev \
         libxmlsec1-dev \
         libxmlsec1-openssl \
+        libpango-1.0-0 \
+        libpango1.0-dev \
+        libcairo2 \
+        libcairo2-dev \
+        libgdk-pixbuf-2.0-0 \
+        libgdk-pixbuf2.0-dev \
         pkg-config \
         nginx \
         curl \
