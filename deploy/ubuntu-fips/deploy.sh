@@ -47,8 +47,6 @@ SKIP_CONFIG=false
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
 NC='\033[0m'
 
 log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
@@ -98,10 +96,10 @@ prompt_value() {
     fi
 
     if [[ "$is_secret" == "true" ]]; then
-        read -sp "$prompt [$default]: " value
+        read -rsp "$prompt [$default]: " value
         echo ""
     else
-        read -p "$prompt [$default]: " value
+        read -rp "$prompt [$default]: " value
     fi
 
     value="${value:-$default}"
@@ -122,7 +120,7 @@ prompt_yes_no() {
     fi
 
     while true; do
-        read -p "$prompt (y/n) [$default]: " response
+        read -rp "$prompt (y/n) [$default]: " response
         response="${response:-$default}"
         case "$response" in
             [Yy]* ) eval "$var_name=true"; return ;;
@@ -145,7 +143,7 @@ prompt_choice() {
 
     echo "$prompt"
     echo "$options"
-    read -p "Enter choice [$default]: " choice
+    read -rp "Enter choice [$default]: " choice
     choice="${choice:-$default}"
     eval "$var_name=\"$choice\""
 }
@@ -158,7 +156,8 @@ check_fips_status() {
     log_info "Checking FIPS status..."
 
     if [[ -f /proc/sys/crypto/fips_enabled ]]; then
-        local fips_enabled=$(cat /proc/sys/crypto/fips_enabled)
+        local fips_enabled
+        fips_enabled=$(cat /proc/sys/crypto/fips_enabled)
         if [[ "$fips_enabled" == "1" ]]; then
             log_info "FIPS mode is ENABLED"
             return 0
@@ -184,6 +183,10 @@ check_ubuntu_pro() {
 }
 
 enable_fips() {
+    local do_attach="false"
+    local skip_fips="false"
+    local do_reboot="false"
+
     if [[ "$SKIP_FIPS" == "true" ]]; then
         log_warn "Skipping FIPS enablement (--skip-fips flag)"
         return 0
@@ -217,7 +220,7 @@ enable_fips() {
             prompt_yes_no "Do you have an Ubuntu Pro token to attach now?" "n" do_attach
 
             if [[ "$do_attach" == "true" ]]; then
-                read -p "Enter Ubuntu Pro token: " pro_token
+                read -rp "Enter Ubuntu Pro token: " pro_token
                 pro attach "$pro_token" || {
                     log_error "Failed to attach Ubuntu Pro"
                     exit 1
@@ -468,7 +471,14 @@ interactive_config() {
     echo "Press Enter to accept default values in brackets."
     echo ""
 
-    local default_secret_key=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))")
+    local default_secret_key
+    default_secret_key=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))")
+
+    # Variables below are set via eval in prompt_choice/prompt_value helpers
+    local region_choice="1"
+    local s3_auth_choice="1"
+    local queue_choice="1"
+    local log_choice="1"
 
     # Basic Settings
     echo ""
@@ -722,7 +732,8 @@ EOF
 }
 
 create_default_env_file() {
-    local default_secret_key=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))")
+    local default_secret_key
+    default_secret_key=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))")
 
     cat > "${CONFIG_DIR}/env" << EOF
 # CISO Assistant Configuration
@@ -777,6 +788,8 @@ EOF
 }
 
 create_env_file() {
+    local do_reconfig="false"
+
     log_info "Setting up configuration..."
 
     if [[ "$SKIP_CONFIG" == "true" ]]; then
@@ -1196,6 +1209,12 @@ enable_services() {
 }
 
 interactive_post_install() {
+    local ssl_choice="3"
+    local do_test_db="false"
+    local do_migrate="false"
+    local do_admin="false"
+    local do_start="false"
+
     echo ""
     echo "========================================"
     echo "  Post-Installation Setup"
@@ -1211,8 +1230,9 @@ interactive_post_install() {
     case "$ssl_choice" in
         1)
             if command -v certbot &>/dev/null || apt-get install -y certbot python3-certbot-nginx; then
-                local domain=$(grep "^CISO_ASSISTANT_URL=" "${CONFIG_DIR}/env" 2>/dev/null | cut -d'=' -f2 | sed 's|https://||' | cut -d'/' -f1)
-                [[ "$domain" == "localhost" ]] && read -p "Enter domain: " domain
+                local domain
+                domain=$(grep "^CISO_ASSISTANT_URL=" "${CONFIG_DIR}/env" 2>/dev/null | cut -d'=' -f2 | sed 's|https://||' | cut -d'/' -f1)
+                [[ "$domain" == "localhost" ]] && read -rp "Enter domain: " domain
                 certbot --nginx -d "$domain" --non-interactive --agree-tos --register-unsafely-without-email || \
                     log_warn "Certbot failed - configure SSL manually"
             fi
@@ -1330,7 +1350,7 @@ show_welcome() {
     echo "  - RDS PostgreSQL with IAM auth"
     echo "  - S3 storage with IAM roles"
     echo ""
-    [[ "$INTERACTIVE" == "true" ]] && read -p "Press Enter to continue..."
+    [[ "$INTERACTIVE" == "true" ]] && read -rp "Press Enter to continue..."
 }
 
 show_help() {

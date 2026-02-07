@@ -18,7 +18,6 @@ CONFIG_DIR="/etc/ciso-assistant"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
@@ -38,7 +37,7 @@ show_banner() {
 check_root() {
     if [[ $EUID -ne 0 ]]; then
         echo -e "${RED}Error: Run as root${NC}"
-        echo "Try: sudo $0 $*"
+        echo "Try: sudo $0"
         exit 1
     fi
 }
@@ -74,7 +73,8 @@ show_quick_status() {
 
     # URL
     if [[ -f "${CONFIG_DIR}/env" ]]; then
-        local url=$(grep "^CISO_ASSISTANT_URL=" "${CONFIG_DIR}/env" 2>/dev/null | cut -d'=' -f2 | tr -d '"')
+        local url
+        url=$(grep "^CISO_ASSISTANT_URL=" "${CONFIG_DIR}/env" 2>/dev/null | cut -d'=' -f2 | tr -d '"')
         echo "  URL: ${url:-not configured}"
     fi
     echo ""
@@ -115,7 +115,7 @@ interactive_menu() {
     echo ""
     echo "  ${RED}0)${NC} Exit"
     echo ""
-    read -p "Enter choice: " choice
+    read -rp "Enter choice: " choice
 
     case "$choice" in
         1)  run_script "manage-services.sh" status ;;
@@ -130,7 +130,7 @@ interactive_menu() {
         10) run_script "check-fips.sh" ;;
         11)
             ${EDITOR:-vi} "${CONFIG_DIR}/env"
-            read -p "Restart services? (y/n) [y]: " restart
+            read -rp "Restart services? (y/n) [y]: " restart
             [[ "${restart:-y}" =~ ^[Yy] ]] && run_script "manage-services.sh" restart
             ;;
         12)
@@ -185,7 +185,7 @@ case "${1:-}" in
     fips)     run_script "check-fips.sh" "${@:2}" ;;
     config)
         ${EDITOR:-vi} "${CONFIG_DIR}/env"
-        read -p "Restart services? (y/n) [y]: " restart
+        read -rp "Restart services? (y/n) [y]: " restart
         [[ "${restart:-y}" =~ ^[Yy] ]] && run_script "manage-services.sh" restart
         ;;
     update)

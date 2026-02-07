@@ -48,7 +48,7 @@ tar -xf "$BUILD_DIR/Python-${PYTHON_VERSION}.tar.xz" -C "$PYTHON_BUILD_DIR" --st
 echo "[2/8] Building Python $PYTHON_VERSION (this may take a while)..."
 cd "$PYTHON_BUILD_DIR"
 ./configure --prefix="$SOURCES_DIR/venv" --enable-optimizations --with-ensurepip=install
-make -j$(nproc)
+make -j"$(nproc)"
 make install
 
 # Clean up Python build

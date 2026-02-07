@@ -36,13 +36,11 @@ SERVICES=(
     "ciso-assistant-worker"
 )
 LOG_DIR="/var/log/ciso-assistant"
-CONFIG_DIR="/etc/ciso-assistant"
 
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
@@ -90,15 +88,18 @@ print_status_header() {
 
 get_uptime() {
     local service="$1"
-    local uptime=$(systemctl show "$service" --property=ActiveEnterTimestamp --value 2>/dev/null)
+    local uptime
+    uptime=$(systemctl show "$service" --property=ActiveEnterTimestamp --value 2>/dev/null)
 
     if [[ -z "$uptime" ]] || [[ "$uptime" == "n/a" ]]; then
         echo "-"
         return
     fi
 
-    local start_epoch=$(date -d "$uptime" +%s 2>/dev/null || echo "0")
-    local now_epoch=$(date +%s)
+    local start_epoch
+    start_epoch=$(date -d "$uptime" +%s 2>/dev/null || echo "0")
+    local now_epoch
+    now_epoch=$(date +%s)
     local diff=$((now_epoch - start_epoch))
 
     if [[ $diff -lt 60 ]]; then
@@ -173,7 +174,8 @@ stop_services() {
     echo ""
 
     # Stop in reverse order
-    local services=($(get_services "$target"))
+    local services=()
+    read -ra services <<< "$(get_services "$target")"
     for ((i=${#services[@]}-1; i>=0; i--)); do
         local service="${services[i]}"
         echo -n "  Stopping $service... "
@@ -276,7 +278,8 @@ follow_logs() {
     if [[ "$target" == "all" ]]; then
         journalctl -u "ciso-assistant-*" -u nginx -f
     else
-        local service=$(get_service_name "$target")
+        local service
+        service=$(get_service_name "$target")
         journalctl -u "$service" -f
     fi
 }
@@ -360,7 +363,8 @@ run_health_checks() {
     }'
 
     if [[ -d "$LOG_DIR" ]]; then
-        local log_size=$(du -sh "$LOG_DIR" 2>/dev/null | cut -f1)
+        local log_size
+        log_size=$(du -sh "$LOG_DIR" 2>/dev/null | cut -f1)
         echo "  Log directory: $log_size"
     fi
 
@@ -407,7 +411,7 @@ interactive_mode() {
     echo "  7) Manage specific service"
     echo "  8) Exit"
     echo ""
-    read -p "Enter choice [1]: " choice
+    read -rp "Enter choice [1]: " choice
     choice="${choice:-1}"
 
     case "$choice" in
@@ -424,7 +428,7 @@ interactive_mode() {
             echo "  2) frontend"
             echo "  3) worker"
             echo "  4) nginx"
-            read -p "Enter choice: " svc_choice
+            read -rp "Enter choice: " svc_choice
             case "$svc_choice" in
                 1) service="backend" ;;
                 2) service="frontend" ;;
@@ -438,7 +442,7 @@ interactive_mode() {
             echo "  2) Stop"
             echo "  3) Restart"
             echo "  4) View logs"
-            read -p "Enter choice: " action
+            read -rp "Enter choice: " action
             case "$action" in
                 1) start_services "$service" ;;
                 2) stop_services "$service" ;;

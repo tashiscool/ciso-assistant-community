@@ -44,7 +44,8 @@ check_root() {
 
 get_domain() {
     if [[ -f "${CONFIG_DIR}/env" ]]; then
-        local url=$(grep "^CISO_ASSISTANT_URL=" "${CONFIG_DIR}/env" | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+        local url
+        url=$(grep "^CISO_ASSISTANT_URL=" "${CONFIG_DIR}/env" | cut -d'=' -f2 | tr -d '"' | tr -d "'")
         # Extract domain from URL
         echo "$url" | sed -E 's|^https?://||' | cut -d'/' -f1 | cut -d':' -f1
     else
@@ -73,9 +74,12 @@ check_certificate() {
 
         # Check expiration
         echo ""
-        local expiry=$(openssl x509 -in "$CERT_PATH" -noout -enddate 2>/dev/null | cut -d'=' -f2)
-        local expiry_epoch=$(date -d "$expiry" +%s 2>/dev/null || date -j -f "%b %d %T %Y %Z" "$expiry" +%s 2>/dev/null)
-        local now_epoch=$(date +%s)
+        local expiry
+        expiry=$(openssl x509 -in "$CERT_PATH" -noout -enddate 2>/dev/null | cut -d'=' -f2)
+        local expiry_epoch
+        expiry_epoch=$(date -d "$expiry" +%s 2>/dev/null || date -j -f "%b %d %T %Y %Z" "$expiry" +%s 2>/dev/null)
+        local now_epoch
+        now_epoch=$(date +%s)
         local days_left=$(( (expiry_epoch - now_epoch) / 86400 ))
 
         if [[ $days_left -lt 0 ]]; then
@@ -87,8 +91,10 @@ check_certificate() {
         fi
 
         # Check if self-signed
-        local subject=$(openssl x509 -in "$CERT_PATH" -noout -subject 2>/dev/null)
-        local issuer=$(openssl x509 -in "$CERT_PATH" -noout -issuer 2>/dev/null)
+        local subject
+        subject=$(openssl x509 -in "$CERT_PATH" -noout -subject 2>/dev/null)
+        local issuer
+        issuer=$(openssl x509 -in "$CERT_PATH" -noout -issuer 2>/dev/null)
         if [[ "$subject" == "$issuer" ]]; then
             echo ""
             log_warn "This is a self-signed certificate (not trusted by browsers)"
@@ -170,7 +176,7 @@ setup_letsencrypt() {
         if [[ "$domain" == "localhost" ]]; then
             log_error "Let's Encrypt requires a public domain name"
             echo ""
-            read -p "Enter your domain name: " domain
+            read -rp "Enter your domain name: " domain
         fi
     fi
 
@@ -183,7 +189,7 @@ setup_letsencrypt() {
         log_warn "DNS lookup failed for $domain"
         log_warn "Make sure your domain points to this server's IP address"
         echo ""
-        read -p "Continue anyway? (y/n) [n]: " continue_anyway
+        read -rp "Continue anyway? (y/n) [n]: " continue_anyway
         if [[ ! "$continue_anyway" =~ ^[Yy] ]]; then
             exit 1
         fi
@@ -196,7 +202,7 @@ setup_letsencrypt() {
     fi
 
     if [[ -z "$email" ]]; then
-        read -p "Enter email for certificate notifications: " email
+        read -rp "Enter email for certificate notifications: " email
     fi
 
     log_info "Running certbot..."
@@ -272,17 +278,18 @@ interactive_mode() {
     echo "  4) Check current certificate status"
     echo "  5) Exit"
     echo ""
-    read -p "Enter choice [1]: " choice
+    read -rp "Enter choice [1]: " choice
     choice="${choice:-1}"
 
     case "$choice" in
         1)
-            local domain=$(get_domain)
+            local domain
+            domain=$(get_domain)
             if [[ "$domain" != "localhost" ]]; then
-                read -p "Domain name [$domain]: " input_domain
+                read -rp "Domain name [$domain]: " input_domain
                 domain="${input_domain:-$domain}"
             else
-                read -p "Domain name: " domain
+                read -rp "Domain name: " domain
             fi
             setup_letsencrypt "$domain"
             ;;
@@ -290,17 +297,18 @@ interactive_mode() {
             log_warn "Self-signed certificates are NOT recommended for production!"
             log_warn "Consider using Let's Encrypt instead (option 1)"
             echo ""
-            read -p "Continue with self-signed? (y/n) [n]: " confirm
+            read -rp "Continue with self-signed? (y/n) [n]: " confirm
             if [[ ! "$confirm" =~ ^[Yy] ]]; then
                 interactive_mode
                 return
             fi
 
-            local domain=$(get_domain)
-            read -p "Domain name [$domain]: " input_domain
+            local domain
+            domain=$(get_domain)
+            read -rp "Domain name [$domain]: " input_domain
             domain="${input_domain:-$domain}"
 
-            read -p "Certificate validity in days [365]: " days
+            read -rp "Certificate validity in days [365]: " days
             days="${days:-365}"
 
             generate_self_signed "$domain" "$days"

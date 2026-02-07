@@ -120,7 +120,7 @@ install_python() {
         tar xzf Python-3.11.7.tgz
         cd Python-3.11.7
         ./configure --enable-optimizations --prefix=/usr/local
-        make -j$(nproc)
+        make -j"$(nproc)"
         make altinstall
         cd /
         rm -rf /tmp/Python-3.11.7*
@@ -239,10 +239,10 @@ prompt_value() {
     fi
 
     if [[ "$is_secret" == "true" ]]; then
-        read -sp "$prompt [$default]: " value
+        read -rsp "$prompt [$default]: " value
         echo ""
     else
-        read -p "$prompt [$default]: " value
+        read -rp "$prompt [$default]: " value
     fi
 
     if [[ -z "$value" ]]; then
@@ -268,7 +268,7 @@ prompt_yes_no() {
     fi
 
     while true; do
-        read -p "$prompt (y/n) [$default]: " response
+        read -rp "$prompt (y/n) [$default]: " response
         response="${response:-$default}"
         case "$response" in
             [Yy]* ) eval "$var_name=true"; return;;
@@ -293,7 +293,7 @@ prompt_choice() {
 
     echo "$prompt"
     echo "$options"
-    read -p "Enter choice [$default]: " choice
+    read -rp "Enter choice [$default]: " choice
     choice="${choice:-$default}"
     eval "$var_name=\"$choice\""
 }
@@ -310,7 +310,15 @@ interactive_config() {
     echo ""
 
     # Generate a random secret key
-    local default_secret_key=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))")
+    local default_secret_key
+    default_secret_key=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))")
+
+    # Variables below are set via eval in prompt_choice/prompt_value helpers
+    local region_choice="1"
+    local s3_auth_choice="1"
+    local queue_choice="1"
+    local log_choice="1"
+    local log_format_choice="1"
 
     # ===== BASIC SETTINGS =====
     echo ""
@@ -578,7 +586,8 @@ EOF
 
 create_default_env_file() {
     # Create a basic env file with placeholders for non-interactive mode
-    local default_secret_key=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))")
+    local default_secret_key
+    default_secret_key=$(python3 -c "import secrets; print(secrets.token_urlsafe(50))")
 
     cat > "${CONFIG_DIR}/env" << EOF
 # CISO Assistant Configuration
@@ -647,6 +656,7 @@ create_env_file() {
     if [[ -f "${CONFIG_DIR}/env" ]]; then
         echo ""
         log_warn "Environment file already exists at ${CONFIG_DIR}/env"
+        local do_reconfig="${do_reconfig:-false}"
         prompt_yes_no "Do you want to reconfigure?" "n" do_reconfig
 
         if [[ "$do_reconfig" != "true" ]]; then
@@ -1172,6 +1182,7 @@ interactive_post_install() {
     echo "          /etc/pki/tls/private/server.key"
     echo ""
 
+    local ssl_choice="${ssl_choice:-1}"
     prompt_choice "SSL certificate option:" "  1) Generate self-signed certificate (for testing)
   2) I'll add certificates manually later
   3) Use Let's Encrypt (requires public DNS)" "1" ssl_choice
@@ -1227,11 +1238,13 @@ interactive_post_install() {
     echo ""
     echo "${YELLOW}=== Database Connection ===${NC}"
     echo ""
+    local do_test_db="${do_test_db:-false}"
     prompt_yes_no "Test database connection now?" "y" do_test_db
 
     if [[ "$do_test_db" == "true" ]]; then
         if test_database_connection; then
             echo ""
+            local do_migrate="${do_migrate:-false}"
             prompt_yes_no "Run database migrations now?" "y" do_migrate
 
             if [[ "$do_migrate" == "true" ]]; then
@@ -1248,6 +1261,7 @@ interactive_post_install() {
     echo ""
     echo "${YELLOW}=== Admin User ===${NC}"
     echo ""
+    local do_create_admin="${do_create_admin:-false}"
     prompt_yes_no "Create admin user now?" "y" do_create_admin
 
     if [[ "$do_create_admin" == "true" ]]; then
@@ -1270,6 +1284,7 @@ interactive_post_install() {
     echo ""
     echo "${YELLOW}=== Start Services ===${NC}"
     echo ""
+    local do_start_services="${do_start_services:-false}"
     prompt_yes_no "Start all services now?" "y" do_start_services
 
     if [[ "$do_start_services" == "true" ]]; then
@@ -1345,7 +1360,7 @@ show_welcome() {
     echo ""
 
     if [[ "${INTERACTIVE:-true}" == "true" ]]; then
-        read -p "Press Enter to continue or Ctrl+C to cancel..."
+        read -rp "Press Enter to continue or Ctrl+C to cancel..."
     fi
 }
 

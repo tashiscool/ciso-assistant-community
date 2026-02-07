@@ -20,7 +20,6 @@ set -euo pipefail
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
 NC='\033[0m'
 
 VERBOSE=false
@@ -41,7 +40,8 @@ check_kernel_fips() {
     echo ""
 
     if [[ -f /proc/sys/crypto/fips_enabled ]]; then
-        local fips_enabled=$(cat /proc/sys/crypto/fips_enabled)
+        local fips_enabled
+        fips_enabled=$(cat /proc/sys/crypto/fips_enabled)
         if [[ "$fips_enabled" == "1" ]]; then
             log_pass "Kernel FIPS mode: ENABLED"
             RESULTS["kernel_fips"]="enabled"
@@ -79,8 +79,10 @@ check_ubuntu_pro() {
         RESULTS["ubuntu_pro"]="attached"
 
         # Check FIPS service status
-        local fips_status=$(pro status --format json 2>/dev/null | grep -A5 '"name": "fips"' | grep '"status"' | head -1 | cut -d'"' -f4)
-        local fips_updates_status=$(pro status --format json 2>/dev/null | grep -A5 '"name": "fips-updates"' | grep '"status"' | head -1 | cut -d'"' -f4)
+        local fips_status
+        fips_status=$(pro status --format json 2>/dev/null | grep -A5 '"name": "fips"' | grep '"status"' | head -1 | cut -d'"' -f4)
+        local fips_updates_status
+        fips_updates_status=$(pro status --format json 2>/dev/null | grep -A5 '"name": "fips-updates"' | grep '"status"' | head -1 | cut -d'"' -f4)
 
         if [[ "$fips_status" == "enabled" ]] || [[ "$fips_updates_status" == "enabled" ]]; then
             log_pass "FIPS packages: Enabled"
@@ -107,7 +109,8 @@ check_openssl_fips() {
     echo "=== OpenSSL FIPS ==="
     echo ""
 
-    local openssl_version=$(openssl version 2>&1)
+    local openssl_version
+    openssl_version=$(openssl version 2>&1)
     echo "OpenSSL version: $openssl_version"
 
     # Check if FIPS provider is available
@@ -140,7 +143,6 @@ check_crypto_algorithms() {
     fi
 
     # Count FIPS-approved algorithms
-    local total=$(grep -c "^name" /proc/crypto 2>/dev/null || echo "0")
     local fips_approved=0
 
     # Common FIPS-approved algorithms
@@ -172,7 +174,8 @@ check_libssl() {
     echo ""
 
     # Check libssl version
-    local libssl=$(dpkg -l 2>/dev/null | grep -E "libssl[0-9]" | head -1)
+    local libssl
+    libssl=$(dpkg -l 2>/dev/null | grep -E "libssl[0-9]" | head -1)
     if [[ -n "$libssl" ]]; then
         echo "Installed: $libssl"
         if echo "$libssl" | grep -qi fips; then
@@ -185,7 +188,8 @@ check_libssl() {
     fi
 
     # Check libgcrypt
-    local libgcrypt=$(dpkg -l 2>/dev/null | grep libgcrypt | head -1)
+    local libgcrypt
+    libgcrypt=$(dpkg -l 2>/dev/null | grep libgcrypt | head -1)
     if [[ -n "$libgcrypt" ]]; then
         echo "Installed: $libgcrypt"
     fi
@@ -202,11 +206,13 @@ check_python_crypto() {
         echo "Checking CISO Assistant Python environment..."
 
         # Check cryptography library
-        local crypto_version=$("$venv_python" -c "import cryptography; print(cryptography.__version__)" 2>/dev/null || echo "not installed")
+        local crypto_version
+        crypto_version=$("$venv_python" -c "import cryptography; print(cryptography.__version__)" 2>/dev/null || echo "not installed")
         echo "  cryptography: $crypto_version"
 
         # Check if using system OpenSSL
-        local openssl_backend=$("$venv_python" -c "from cryptography.hazmat.backends.openssl import backend; print(backend.openssl_version_text())" 2>/dev/null || echo "unknown")
+        local openssl_backend
+        openssl_backend=$("$venv_python" -c "from cryptography.hazmat.backends.openssl import backend; print(backend.openssl_version_text())" 2>/dev/null || echo "unknown")
         echo "  OpenSSL backend: $openssl_backend"
 
         if echo "$openssl_backend" | grep -qi fips; then
@@ -233,7 +239,8 @@ check_nginx_ssl() {
     fi
 
     # Check nginx SSL module
-    local nginx_ssl=$(nginx -V 2>&1 | grep -o "with-openssl=[^ ]*" || echo "")
+    local nginx_ssl
+    nginx_ssl=$(nginx -V 2>&1 | grep -o "with-openssl=[^ ]*" || echo "")
     if [[ -n "$nginx_ssl" ]]; then
         echo "Nginx compiled $nginx_ssl"
     fi

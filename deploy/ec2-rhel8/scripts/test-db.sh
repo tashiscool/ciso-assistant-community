@@ -124,7 +124,8 @@ check_network_connectivity() {
     # DNS resolution
     log_info "Checking DNS resolution for $host..."
     if host "$host" &>/dev/null; then
-        local ip=$(host "$host" | grep "has address" | head -1 | awk '{print $NF}')
+        local ip
+        ip=$(host "$host" | grep "has address" | head -1 | awk '{print $NF}')
         log_info "DNS resolved: $host -> $ip"
     else
         log_error "DNS resolution failed for $host"
@@ -162,12 +163,15 @@ check_iam_credentials() {
     # Check if we can get instance metadata
     log_info "Checking EC2 instance metadata..."
     if curl -s --max-time 2 http://169.254.169.254/latest/meta-data/iam/security-credentials/ &>/dev/null; then
-        local role=$(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/iam/security-credentials/)
+        local role
+        role=$(curl -s --max-time 2 http://169.254.169.254/latest/meta-data/iam/security-credentials/)
         log_info "IAM role attached: $role"
 
         # Get credentials info
-        local creds=$(curl -s --max-time 2 "http://169.254.169.254/latest/meta-data/iam/security-credentials/$role")
-        local expiration=$(echo "$creds" | grep -o '"Expiration" : "[^"]*"' | cut -d'"' -f4)
+        local creds
+        creds=$(curl -s --max-time 2 "http://169.254.169.254/latest/meta-data/iam/security-credentials/$role")
+        local expiration
+        expiration=$(echo "$creds" | grep -o '"Expiration" : "[^"]*"' | cut -d'"' -f4)
         log_info "Credentials expiration: $expiration"
     else
         log_warn "Cannot access instance metadata"

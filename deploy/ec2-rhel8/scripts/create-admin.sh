@@ -28,7 +28,6 @@ BACKEND_DIR="${APP_DIR}/app/backend"
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
 NC='\033[0m'
 
 log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
@@ -105,7 +104,7 @@ create_admin_interactive() {
     # Get default email from config
     local default_email="${CISO_ASSISTANT_SUPERUSER_EMAIL:-admin@example.gov}"
 
-    read -p "Email address [$default_email]: " email
+    read -rp "Email address [$default_email]: " email
     email="${email:-$default_email}"
 
     # Validate email format
@@ -115,14 +114,15 @@ create_admin_interactive() {
     fi
 
     # Check if user already exists
-    local exists=$(run_django_python "
+    local exists
+    exists=$(run_django_python "
 from iam.models import User
 print('yes' if User.objects.filter(email='$email').exists() else 'no')
 " 2>/dev/null)
 
     if [[ "$exists" == "yes" ]]; then
         log_warn "User with email $email already exists"
-        read -p "Reset their password instead? (y/n) [n]: " reset
+        read -rp "Reset their password instead? (y/n) [n]: " reset
         if [[ "$reset" =~ ^[Yy] ]]; then
             reset_password "$email"
             return
@@ -159,7 +159,8 @@ create_admin_noninteractive() {
     fi
 
     # Check if user already exists
-    local exists=$(run_django_python "
+    local exists
+    exists=$(run_django_python "
 from iam.models import User
 print('yes' if User.objects.filter(email='$email').exists() else 'no')
 " 2>/dev/null)
@@ -189,7 +190,8 @@ reset_password() {
     echo ""
 
     # Check if user exists
-    local exists=$(run_django_python "
+    local exists
+    exists=$(run_django_python "
 from iam.models import User
 print('yes' if User.objects.filter(email='$email').exists() else 'no')
 " 2>/dev/null)
@@ -204,9 +206,9 @@ print('yes' if User.objects.filter(email='$email').exists() else 'no')
 
     # Get new password
     while true; do
-        read -sp "Enter new password: " password1
+        read -rsp "Enter new password: " password1
         echo ""
-        read -sp "Confirm password: " password2
+        read -rsp "Confirm password: " password2
         echo ""
 
         if [[ "$password1" != "$password2" ]]; then
@@ -288,22 +290,22 @@ interactive_mode() {
     echo "  5) Activate admin user"
     echo "  6) Exit"
     echo ""
-    read -p "Enter choice [1]: " choice
+    read -rp "Enter choice [1]: " choice
     choice="${choice:-1}"
 
     case "$choice" in
         1) create_admin_interactive ;;
         2) list_admins ;;
         3)
-            read -p "Enter admin email: " email
+            read -rp "Enter admin email: " email
             reset_password "$email"
             ;;
         4)
-            read -p "Enter admin email to deactivate: " email
+            read -rp "Enter admin email to deactivate: " email
             deactivate_admin "$email"
             ;;
         5)
-            read -p "Enter admin email to activate: " email
+            read -rp "Enter admin email to activate: " email
             activate_admin "$email"
             ;;
         6) exit 0 ;;

@@ -53,7 +53,7 @@ show_banner() {
 check_root() {
     if [[ $EUID -ne 0 ]]; then
         echo -e "${RED}Error: This script must be run as root${NC}"
-        echo "Try: sudo $0 $*"
+        echo "Try: sudo $0"
         exit 1
     fi
 }
@@ -90,7 +90,8 @@ show_quick_status() {
 
     # URL
     if [[ -f "${CONFIG_DIR}/env" ]]; then
-        local url=$(grep "^CISO_ASSISTANT_URL=" "${CONFIG_DIR}/env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+        local url
+        url=$(grep "^CISO_ASSISTANT_URL=" "${CONFIG_DIR}/env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' | tr -d "'")
         echo "  URL: ${url:-not configured}"
     fi
 
@@ -120,7 +121,7 @@ interactive_menu() {
     echo ""
     echo "  ${RED}0)${NC} Exit"
     echo ""
-    read -p "Enter choice: " choice
+    read -rp "Enter choice: " choice
 
     case "$choice" in
         1)  run_script "manage-services.sh" status ;;
@@ -137,7 +138,7 @@ interactive_menu() {
             echo "Opening configuration file..."
             ${EDITOR:-vi} "${CONFIG_DIR}/env"
             echo ""
-            read -p "Restart services to apply changes? (y/n) [y]: " restart
+            read -rp "Restart services to apply changes? (y/n) [y]: " restart
             if [[ "${restart:-y}" =~ ^[Yy] ]]; then
                 run_script "manage-services.sh" restart
             fi
@@ -229,7 +230,7 @@ case "${1:-}" in
     config)
         ${EDITOR:-vi} "${CONFIG_DIR}/env"
         echo ""
-        read -p "Restart services to apply changes? (y/n) [y]: " restart
+        read -rp "Restart services to apply changes? (y/n) [y]: " restart
         if [[ "${restart:-y}" =~ ^[Yy] ]]; then
             run_script "manage-services.sh" restart
         fi
