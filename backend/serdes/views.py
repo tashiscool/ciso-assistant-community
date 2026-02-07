@@ -2,7 +2,6 @@ import gzip
 import io
 import json
 import struct
-import sys
 from datetime import datetime
 
 import structlog
@@ -19,6 +18,7 @@ from ciso_assistant.settings import SCHEMA_VERSION, VERSION
 from core.models import EvidenceRevision
 from core.utils import compare_schema_versions
 from serdes.serializers import LoadBackupSerializer
+from serdes.restore_service import UpsertRestoreService
 
 from auditlog.models import LogEntry
 from django.db.models.signals import post_save
@@ -80,87 +80,14 @@ class LoadBackupView(APIView):
         # Temporarily disconnect the problematic signal
         post_save.disconnect(add_user_info_to_log_entry, sender=LogEntry)
 
-        backup_buffer = io.StringIO()
-        try:
-            management.call_command(
-                "dumpdata",
-                stdout=backup_buffer,
-                format="json",
-                verbosity=0,
-                exclude=[
-                    "contenttypes",
-                    "sessions.session",
-                    "iam.ssosettings",
-                    "knox.authtoken",
-                ],
-            )
-        except Exception as e:
-            logger.error("Error dumping current DB state", exc_info=e)
-            return Response(
-                {"error": "BackupDumpFailed"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-        current_backup = backup_buffer.getvalue()
-
-        # Prepare to load the uploaded backup.
-        # Reset sys.stdin so loaddata reads from our provided backup data.
-        sys.stdin = io.StringIO(decompressed_data)
         request.session.flush()
 
         try:
-            last_model = None
-
-            def fixture_callback(sender, **kwargs):
-                nonlocal last_model
-                if "instance" in kwargs:
-                    instance = kwargs["instance"]
-                    last_model = (
-                        f"{instance._meta.app_label}.{instance._meta.model_name}"
-                    )
-                    logger.debug(f"Loaded: {last_model} with pk={instance.pk}")
-
-            # Connect to the post_save signal
-            post_save.connect(fixture_callback)
             with disable_auditlog():
-                management.call_command("flush", interactive=False)
-                management.call_command(
-                    "loaddata",
-                    "-",
-                    format="json",
-                    verbosity=2,
-                    exclude=[
-                        "contenttypes",
-                        "auth.permission",
-                        "sessions.session",
-                        "iam.personalaccesstoken",
-                        "iam.ssosettings",
-                        "knox.authtoken",
-                        "auditlog.logentry",
-                    ],
-                )
+                restore_stats = UpsertRestoreService().restore(decompressed_data)
+            logger.info("Backup restored successfully", **restore_stats)
         except Exception as e:
             logger.error("Error while loading backup", exc_info=e)
-            logger.error(
-                f"Error while loading backup. Last successful model: {last_model}",
-                exc_info=e,
-            )
-            # On failure, restore the original data.
-            try:
-                sys.stdin = io.StringIO(current_backup)
-                management.call_command("flush", interactive=False)
-                management.call_command(
-                    "loaddata",
-                    "-",
-                    format="json",
-                    verbosity=0,
-                )
-            except Exception as restore_error:
-                logger.error("Error restoring original backup", exc_info=restore_error)
-                return Response(
-                    {"error": "RestoreFailed"},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                )
-
             if backup_version != current_version:
                 logger.error("Backup version different than current version")
                 return Response(
@@ -168,7 +95,6 @@ class LoadBackupView(APIView):
                 )
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
         finally:
-            post_save.disconnect(fixture_callback)
             post_save.connect(add_user_info_to_log_entry, sender=LogEntry)
         return Response({}, status=status.HTTP_200_OK)
 

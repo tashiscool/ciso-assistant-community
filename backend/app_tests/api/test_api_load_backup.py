@@ -8,7 +8,6 @@ from django.apps import apps
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-from django.db.utils import IntegrityError
 
 from ciso_assistant.settings import SCHEMA_VERSION, VERSION
 from iam.models import Folder, Role, User, UserGroup
@@ -135,7 +134,6 @@ class TestEnterpriseBackupInCommunityEdition:
         assert resp.status_code == status.HTTP_200_OK
         assert Folder.objects.filter(name="Test Backup Domain").exists()
 
-    # This test can xfail if the restore returns a non-200 in some DB setups
     @pytest.mark.django_db(transaction=True)
     def test_filters_enterprise_permissions_via_api_in_ce(self, authenticated_client):
         if apps.is_installed("enterprise_core"):
@@ -147,22 +145,15 @@ class TestEnterpriseBackupInCommunityEdition:
             include_role_with_enterprise_perms=True,
         )
 
-        try:
-            resp = send_backup_to_api(authenticated_client, backup)
-        except IntegrityError:
-            pytest.xfail("Known auditlog/contenttypes FK issue during flush+loaddata")
-            return
-
-        if resp.status_code != status.HTTP_200_OK:
-            pytest.xfail(
-                f"Restore returned {resp.status_code}; environment-specific flakiness"
-            )
-            return
+        resp = send_backup_to_api(authenticated_client, backup)
+        assert resp.status_code == status.HTTP_200_OK
 
         role = Role.objects.filter(name="Test Administrator Role").first()
         assert role is not None
-        assert all(len(p) <= 1 or p[1] != "enterprise_core" for p in role.permissions)
-        assert any(len(p) > 1 and p[1] in {"iam", "core"} for p in role.permissions)
+        # Verify no enterprise_core permissions leaked through
+        assert not role.permissions.filter(
+            content_type__app_label="enterprise_core"
+        ).exists()
 
     def test_preserves_core_data(self, authenticated_client):
         if apps.is_installed("enterprise_core"):
