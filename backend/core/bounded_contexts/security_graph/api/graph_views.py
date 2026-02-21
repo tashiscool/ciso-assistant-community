@@ -279,10 +279,18 @@ class AttackPathsView(APIView):
             if folder_id:
                 graph = builder.build_from_folder(UUID(folder_id))
             else:
-                return Response(
-                    {'error': 'folder_id required for attack path analysis'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                # Build global graph from all accessible folders
+                from iam.models import Folder
+                folders = Folder.objects.filter(
+                    content_type=Folder.ContentType.DOMAIN
+                ).values_list('id', flat=True)
+                graph = SecurityGraph()
+                for fid in folders[:5]:
+                    fg = builder.build_from_folder(fid)
+                    for node in fg.nodes.values():
+                        graph.add_node(node)
+                    for edge in fg.edges.values():
+                        graph.add_edge(edge)
 
             # Find attack paths
             analyzer = get_blast_radius_analyzer()

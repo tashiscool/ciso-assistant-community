@@ -24,13 +24,14 @@ class ConnectorRegistryView(APIView):
         registry = get_registry()
         connectors = []
 
-        for connector_type, metadata in registry.get_metadata().items():
+        for metadata in registry.get_metadata():
+            connector_type = metadata.get('connector_type', '')
             connectors.append({
                 'type': connector_type,
-                'name': metadata.get('name', connector_type),
+                'name': metadata.get('display_name', connector_type),
                 'category': metadata.get('category', 'unknown'),
                 'description': metadata.get('description', ''),
-                'auth_methods': metadata.get('auth_methods', ['api_key']),
+                'auth_methods': metadata.get('supported_auth_types', ['api_key']),
                 'icon': metadata.get('icon', 'fa-plug'),
             })
 
@@ -62,7 +63,8 @@ class ConnectorConfigViewSet(viewsets.ViewSet):
         registry = get_registry()
         connector_type = data.get('connector_type')
 
-        if connector_type not in registry.get_metadata():
+        valid_types = {m['connector_type'] for m in registry.get_metadata()}
+        if connector_type not in valid_types:
             return Response({
                 'error': f'Unknown connector type: {connector_type}'
             }, status=status.HTTP_400_BAD_REQUEST)

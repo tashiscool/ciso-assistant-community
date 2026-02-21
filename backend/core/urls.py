@@ -153,6 +153,8 @@ urlpatterns = [
     path("workflows/", include("core.bounded_contexts.workflow_engine.urls")),  # Workflow Engine bounded context API
     path("security-graph/", include("core.bounded_contexts.security_graph.urls")),  # Security Graph bounded context API
     path("connectors/", include("connectors.urls")),  # Connectors API
+    path("assessments/", include("core.bounded_contexts.assessment_engine.urls")),  # Lightning Assessment API
+    path("version-history/", include("core.bounded_contexts.version_history.urls")),  # Version History API
     path("poam/", include("poam.api.urls")),  # POA&M API
     path("vendor-portal/", include("vendor_portal.urls")),  # Vendor Portal API
     # Note: privacy/, security/, third-party/, business-continuity/ routes are handled by bounded contexts above

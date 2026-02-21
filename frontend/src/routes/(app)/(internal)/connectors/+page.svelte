@@ -39,6 +39,11 @@
 	let searchQuery = $state('');
 	let showAddModal = $state(false);
 	let selectedConnectorType = $state<AvailableConnector | null>(null);
+	let newConnectorName = $state('');
+	let newConnectorAuthMethod = $state('');
+	let newConnectorApiKey = $state('');
+	let addingConnector = $state(false);
+	let addConnectorError = $state('');
 
 	const breadcrumbs = $derived([
 		{ label: m.connectors?.() || 'Connectors', href: `${base}/connectors` }
@@ -126,7 +131,49 @@
 
 	function openAddModal(connectorType: AvailableConnector) {
 		selectedConnectorType = connectorType;
+		newConnectorName = '';
+		newConnectorAuthMethod = connectorType.auth_methods[0] || '';
+		newConnectorApiKey = '';
+		addConnectorError = '';
 		showAddModal = true;
+	}
+
+	async function saveConnector() {
+		if (!selectedConnectorType) return;
+		if (!newConnectorName.trim()) {
+			addConnectorError = 'Connection name is required.';
+			return;
+		}
+		if (!newConnectorApiKey.trim()) {
+			addConnectorError = 'API key / token is required.';
+			return;
+		}
+		addingConnector = true;
+		addConnectorError = '';
+		try {
+			const res = await fetch(`${BASE_API_URL}/connectors/instances/`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					name: newConnectorName.trim(),
+					connector_type: selectedConnectorType.type,
+					auth_method: newConnectorAuthMethod,
+					credentials: { api_key: newConnectorApiKey.trim() }
+				})
+			});
+			if (res.ok) {
+				showAddModal = false;
+				await loadConnectors();
+				activeTab = 'configured';
+			} else {
+				const err = await res.json();
+				addConnectorError = err.error || err.detail || 'Failed to save connector.';
+			}
+		} catch {
+			addConnectorError = 'Network error. Please try again.';
+		} finally {
+			addingConnector = false;
+		}
 	}
 
 	function formatDate(dateStr: string | null): string {
@@ -356,14 +403,15 @@
 				<p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
 					{selectedConnectorType.description}
 				</p>
-				<form class="space-y-4">
+				<form class="space-y-4" onsubmit={(e) => { e.preventDefault(); saveConnector(); }}>
 					<div>
 						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-							Connection Name
+							Connection Name *
 						</label>
 						<input
 							type="text"
-							class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600"
+							bind:value={newConnectorName}
+							class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
 							placeholder="My {selectedConnectorType.name} Integration"
 						/>
 					</div>
@@ -371,23 +419,29 @@
 						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
 							Authentication Method
 						</label>
-						<select class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600">
+						<select
+							bind:value={newConnectorAuthMethod}
+							class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+						>
 							{#each selectedConnectorType.auth_methods as method}
 								<option value={method}>{method}</option>
 							{/each}
 						</select>
 					</div>
-					<!-- Credential fields would be dynamically generated based on auth method -->
 					<div>
 						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-							API Key / Token
+							API Key / Token *
 						</label>
 						<input
 							type="password"
-							class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600"
-							placeholder="Enter your API key"
+							bind:value={newConnectorApiKey}
+							class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+							placeholder="Enter your API key or token"
 						/>
 					</div>
+					{#if addConnectorError}
+						<p class="text-sm text-red-600">{addConnectorError}</p>
+					{/if}
 				</form>
 			</div>
 			<div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end gap-3">
@@ -398,8 +452,13 @@
 					Cancel
 				</button>
 				<button
-					class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700"
+					class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 disabled:opacity-50"
+					onclick={saveConnector}
+					disabled={addingConnector}
 				>
+					{#if addingConnector}
+						<i class="fa-solid fa-spinner fa-spin mr-1"></i>
+					{/if}
 					Test & Save
 				</button>
 			</div>

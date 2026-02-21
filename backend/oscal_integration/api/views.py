@@ -80,9 +80,11 @@ class OSCALImportViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['post'])
     def validate(self, request):
-        """Validate OSCAL content"""
+        """Validate OSCAL content (accepts JSON {content: ...} or multipart file upload)"""
         try:
             content = request.data.get('content')
+            if not content and 'file' in request.FILES:
+                content = request.FILES['file'].read().decode('utf-8')
             if not content:
                 return Response(
                     {'error': 'No content provided'},
