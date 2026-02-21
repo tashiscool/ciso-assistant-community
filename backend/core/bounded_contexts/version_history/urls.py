@@ -7,9 +7,12 @@ from .api import (
 )
 
 router = DefaultRouter()
-router.register("", VersionHistoryViewSet, basename="version-history")
+# Register specific prefixes BEFORE the empty-prefix history viewset.
+# An empty-prefix router creates a catch-all detail route (?P<pk>[^/.]+)/
+# that would otherwise match "snapshots/", "diff/", "audit/" first.
 router.register("snapshots", VersionSnapshotViewSet, basename="version-snapshot")
 router.register("diff", VersionDiffViewSet, basename="version-diff")
 router.register("audit", AuditViewSet, basename="version-audit")
+router.register("", VersionHistoryViewSet, basename="version-history")
 
 urlpatterns = router.urls

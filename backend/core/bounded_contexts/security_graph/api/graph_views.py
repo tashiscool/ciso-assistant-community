@@ -279,13 +279,23 @@ class AttackPathsView(APIView):
             if folder_id:
                 graph = builder.build_from_folder(UUID(folder_id))
             else:
-                # Build global graph from all accessible folders
-                from iam.models import Folder
-                folders = Folder.objects.filter(
-                    content_type=Folder.ContentType.DOMAIN
-                ).values_list('id', flat=True)
+                # Build graph from the user's accessible domain folders.
+                # Uses the same IAM scoping as SecurityGraphView.
+                from iam.models import Folder, RoleAssignment
+                root_folder = Folder.get_root_folder()
+                folder_ids = RoleAssignment.get_accessible_folder_ids(
+                    root_folder, request.user, Folder.ContentType.DOMAIN
+                ) if root_folder else []
+                # Fall back to all domain folders when IAM state is unavailable
+                # (e.g. fresh database with no role assignments).
+                if not folder_ids:
+                    folder_ids = list(
+                        Folder.objects.filter(
+                            content_type=Folder.ContentType.DOMAIN
+                        ).values_list('id', flat=True)[:5]
+                    )
                 graph = SecurityGraph()
-                for fid in folders[:5]:
+                for fid in list(folder_ids)[:5]:
                     fg = builder.build_from_folder(fid)
                     for node in fg.nodes.values():
                         graph.add_node(node)

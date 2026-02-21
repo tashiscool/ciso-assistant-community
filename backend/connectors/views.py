@@ -19,18 +19,39 @@ from .base.connector import ConnectorConfig
 logger = logging.getLogger(__name__)
 
 
+# ConnectorConfig fields that have dedicated dataclass slots and must not
+# be lumped into `credentials`.
+_CONNECTOR_CONFIG_FIELDS = frozenset({
+    "base_url", "timeout_seconds", "max_retries",
+    "sync_on_startup", "field_mappings", "include_filters", "exclude_filters",
+})
+
+
 def _build_config(instance: ConnectorInstance) -> ConnectorConfig:
     """
     Build a ConnectorConfig dataclass from a ConnectorInstance model.
-    The model stores auth fields inside the `config` JSON field as:
-      { "auth_method": "api_key", "api_key": "..." }
+
+    The model's `config` JSON field stores a flat dict that may contain:
+      - "auth_method"   → ConnectorConfig.auth_type
+      - known slots     → passed as keyword args (base_url, timeout_seconds, …)
+      - everything else → ConnectorConfig.credentials (api_key, token, …)
+
+    sync_interval_minutes is taken from the model field (not from JSON) so that
+    scheduler changes made via the API are reflected correctly.
     """
     cfg = instance.config or {}
+    known_kwargs = {k: cfg[k] for k in _CONNECTOR_CONFIG_FIELDS if k in cfg}
+    credentials = {
+        k: v for k, v in cfg.items()
+        if k not in _CONNECTOR_CONFIG_FIELDS and k != "auth_method"
+    }
     return ConnectorConfig(
         connector_type=instance.connector_type,
         name=instance.name,
         auth_type=cfg.get("auth_method", "api_key"),
-        credentials={k: v for k, v in cfg.items() if k != "auth_method"},
+        credentials=credentials,
+        sync_interval_minutes=instance.sync_interval_minutes or 60,
+        **known_kwargs,
     )
 
 
