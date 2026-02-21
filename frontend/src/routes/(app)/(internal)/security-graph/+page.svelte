@@ -2,6 +2,7 @@
 	import type { PageData } from './$types';
 	import { pageTitle } from '$lib/utils/stores';
 	import { onMount } from 'svelte';
+	import { BASE_API_URL } from '$lib/utils/constants';
 	import GraphViewer from '$lib/components/SecurityGraph/GraphViewer.svelte';
 	import BlastRadiusPanel from '$lib/components/SecurityGraph/BlastRadiusPanel.svelte';
 	import CriticalNodesPanel from '$lib/components/SecurityGraph/CriticalNodesPanel.svelte';
@@ -18,6 +19,47 @@
 	let showCriticalNodes = $state(false);
 	let graphData = $state(data.graphData || { nodes: [], edges: [] });
 	let activeTab = $state<'graph' | 'blast-radius' | 'critical-nodes' | 'attack-paths'>('graph');
+
+	// Attack paths state
+	let attackPathEntryPoint = $state('');
+	let attackPathTarget = $state('');
+	let attackPaths = $state<any[]>([]);
+	let attackPathsLoading = $state(false);
+	let attackPathsError = $state('');
+
+	async function findAttackPaths() {
+		if (!attackPathEntryPoint || !attackPathTarget) {
+			attackPathsError = 'Please select both an entry point and a target.';
+			return;
+		}
+		attackPathsLoading = true;
+		attackPathsError = '';
+		attackPaths = [];
+		try {
+			const res = await fetch(`${BASE_API_URL}/security-graph/attack-paths/`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					entry_point_id: attackPathEntryPoint,
+					target_id: attackPathTarget,
+					max_paths: 5
+				})
+			});
+			if (res.ok) {
+				const data = await res.json();
+				attackPaths = data.paths || [];
+				if (attackPaths.length === 0) {
+					attackPathsError = 'No attack paths found between the selected nodes.';
+				}
+			} else {
+				attackPathsError = 'Failed to find attack paths. Please try again.';
+			}
+		} catch {
+			attackPathsError = 'Error connecting to the server.';
+		} finally {
+			attackPathsLoading = false;
+		}
+	}
 
 	// Transform data for the graph viewer
 	const transformedData = $derived(() => {
@@ -242,7 +284,7 @@
 		{:else if activeTab === 'critical-nodes'}
 			<CriticalNodesPanel />
 		{:else if activeTab === 'attack-paths'}
-			<div class="flex-1 p-6">
+			<div class="flex-1 p-6 overflow-y-auto">
 				<div class="bg-white rounded-lg shadow p-6">
 					<h2 class="text-lg font-semibold mb-4">Attack Path Analysis</h2>
 					<p class="text-gray-600 mb-4">
@@ -252,7 +294,11 @@
 					<div class="grid grid-cols-2 gap-4 mb-6">
 						<div>
 							<label for="entry-point-select" class="block text-sm font-medium text-gray-700 mb-1">Entry Point (Threat)</label>
-							<select id="entry-point-select" class="w-full rounded-md border-gray-300 shadow-sm">
+							<select
+								id="entry-point-select"
+								bind:value={attackPathEntryPoint}
+								class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+							>
 								<option value="">Select entry point...</option>
 								{#each (graphData.nodes || []).filter((n: any) => n.group === 'threat' || n.group === 'third_party') as node}
 									<option value={node.id}>{node.label || node.name}</option>
@@ -262,7 +308,11 @@
 
 						<div>
 							<label for="target-select" class="block text-sm font-medium text-gray-700 mb-1">Target (Critical Asset)</label>
-							<select id="target-select" class="w-full rounded-md border-gray-300 shadow-sm">
+							<select
+								id="target-select"
+								bind:value={attackPathTarget}
+								class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+							>
 								<option value="">Select target...</option>
 								{#each (graphData.nodes || []).filter((n: any) => n.group === 'asset' && n.criticality === 'critical') as node}
 									<option value={node.id}>{node.label || node.name}</option>
@@ -271,16 +321,66 @@
 						</div>
 					</div>
 
-					<button class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">
-						<i class="fa-solid fa-search mr-2"></i>
-						Find Attack Paths
+					<button
+						class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+						onclick={findAttackPaths}
+						disabled={attackPathsLoading || !attackPathEntryPoint || !attackPathTarget}
+					>
+						{#if attackPathsLoading}
+							<i class="fa-solid fa-spinner fa-spin mr-2"></i>
+							Searching...
+						{:else}
+							<i class="fa-solid fa-search mr-2"></i>
+							Find Attack Paths
+						{/if}
 					</button>
 
-					<div class="mt-6 p-4 bg-gray-50 rounded-lg">
-						<p class="text-sm text-gray-500 text-center">
-							Select an entry point and target to discover potential attack paths.
-						</p>
-					</div>
+					{#if attackPathsError}
+						<div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-md">
+							<p class="text-sm text-amber-800">{attackPathsError}</p>
+						</div>
+					{/if}
+
+					{#if attackPaths.length > 0}
+						<div class="mt-6">
+							<h3 class="text-sm font-semibold text-gray-700 mb-3">
+								{attackPaths.length} Attack Path{attackPaths.length > 1 ? 's' : ''} Found
+							</h3>
+							<div class="space-y-4">
+								{#each attackPaths as path, i}
+									<div class="border border-red-200 rounded-lg p-4 bg-red-50">
+										<div class="flex items-center justify-between mb-2">
+											<span class="text-sm font-medium text-red-800">Path {i + 1}</span>
+											{#if path.risk_score !== undefined}
+												<span class="text-xs px-2 py-1 rounded bg-red-100 text-red-700">
+													Risk: {typeof path.risk_score === 'number' ? path.risk_score.toFixed(2) : path.risk_score}
+												</span>
+											{/if}
+										</div>
+										{#if path.nodes}
+											<div class="flex flex-wrap items-center gap-1 text-xs text-gray-600">
+												{#each path.nodes as step, j}
+													<span class="px-2 py-0.5 bg-white border rounded">{step.name || step.label || step.id}</span>
+													{#if j < path.nodes.length - 1}
+														<i class="fa-solid fa-arrow-right text-red-400"></i>
+													{/if}
+												{/each}
+											</div>
+										{/if}
+										{#if path.description}
+											<p class="mt-2 text-xs text-gray-500">{path.description}</p>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						</div>
+					{:else if !attackPathsLoading && !attackPathsError}
+						<div class="mt-6 p-4 bg-gray-50 rounded-lg">
+							<p class="text-sm text-gray-500 text-center">
+								Select an entry point and target to discover potential attack paths.
+							</p>
+						</div>
+					{/if}
 				</div>
 			</div>
 		{/if}

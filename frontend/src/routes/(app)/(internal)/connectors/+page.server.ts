@@ -4,7 +4,7 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ fetch }) => {
 	try {
 		const [connectorsRes, registryRes] = await Promise.all([
-			fetch(`${BASE_API_URL}/connectors/`),
+			fetch(`${BASE_API_URL}/connectors/instances/`),
 			fetch(`${BASE_API_URL}/connectors/registry/`)
 		]);
 

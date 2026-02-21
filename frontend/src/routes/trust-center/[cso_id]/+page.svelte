@@ -73,18 +73,18 @@
 			]);
 
 			if (csoRes.ok) {
-				cso = await csoRes.json();
+				cso = (await csoRes.json()).data;
 			} else {
 				throw new Error('CSO not found');
 			}
 
 			if (complianceRes.ok) {
-				compliance = await complianceRes.json();
+				compliance = (await complianceRes.json()).data;
 			}
 
 			if (historyRes.ok) {
 				const data = await historyRes.json();
-				oarHistory = data.results || data || [];
+				oarHistory = data.data?.oar_history || data.results || [];
 			}
 		} catch (e: any) {
 			error = e.message || 'Failed to load CSO data';
@@ -101,7 +101,7 @@
 		try {
 			const response = await fetch(`${BASE_API_URL}/rmf/trust-center/csos/${csoId}/oscal/`);
 			if (response.ok) {
-				oscalData = await response.json();
+				oscalData = (await response.json()).data;
 			}
 		} catch (e) {
 			console.error('Failed to load OSCAL data:', e);

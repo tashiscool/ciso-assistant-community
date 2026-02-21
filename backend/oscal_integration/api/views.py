@@ -232,12 +232,15 @@ class FedRAMPValidationViewSet(viewsets.ViewSet):
     def validate_ssp(self, request):
         """Validate OSCAL SSP against FedRAMP baseline"""
         try:
+            # Accept either JSON payload (ssp_content) or FormData file upload
             ssp_content = request.data.get('ssp_content')
+            if not ssp_content and 'file' in request.FILES:
+                ssp_content = request.FILES['file'].read().decode('utf-8')
             baseline = request.data.get('baseline', 'moderate')
 
             if not ssp_content:
                 return Response(
-                    {'error': 'SSP content is required'},
+                    {'error': 'SSP content or file is required'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 

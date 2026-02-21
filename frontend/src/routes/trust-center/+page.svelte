@@ -46,12 +46,12 @@
 			]);
 
 			if (summaryRes.ok) {
-				summary = await summaryRes.json();
+				summary = (await summaryRes.json()).data;
 			}
 
 			if (csosRes.ok) {
 				const data = await csosRes.json();
-				csos = data.results || data || [];
+				csos = data.data?.csos || data.results || [];
 			}
 		} catch (e: any) {
 			error = 'Failed to load trust center data. Please try again later.';

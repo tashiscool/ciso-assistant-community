@@ -91,7 +91,7 @@
 	async function syncConnector(id: string) {
 		loading = true;
 		try {
-			const res = await fetch(`${BASE_API_URL}/connectors/${id}/sync/`, { method: 'POST' });
+			const res = await fetch(`${BASE_API_URL}/connectors/instances/${id}/sync/`, { method: 'POST' });
 			if (res.ok) {
 				await loadConnectors();
 			}
@@ -103,7 +103,7 @@
 	async function deleteConnector(id: string) {
 		if (!confirm('Are you sure you want to delete this connector?')) return;
 		try {
-			const res = await fetch(`${BASE_API_URL}/connectors/${id}/`, { method: 'DELETE' });
+			const res = await fetch(`${BASE_API_URL}/connectors/instances/${id}/`, { method: 'DELETE' });
 			if (res.ok) {
 				connectors = connectors.filter(c => c.id !== id);
 			}
@@ -114,7 +114,7 @@
 
 	async function loadConnectors() {
 		try {
-			const res = await fetch(`${BASE_API_URL}/connectors/`);
+			const res = await fetch(`${BASE_API_URL}/connectors/instances/`);
 			if (res.ok) {
 				const data = await res.json();
 				connectors = data.results || data || [];
