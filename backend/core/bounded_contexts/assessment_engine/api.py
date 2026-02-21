@@ -232,6 +232,32 @@ class LightningAssessmentViewSet(viewsets.ModelViewSet):
         return Response(self.get_serializer_data(assessment))
 
     @action(detail=True, methods=['post'])
+    def pause(self, request, pk=None):
+        """Pause an in-progress assessment."""
+        assessment = get_object_or_404(LightningAssessment, pk=pk)
+        if assessment.status != 'in_progress':
+            return Response(
+                {'error': 'Assessment must be in_progress to pause'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        assessment.status = 'paused'
+        assessment.save()
+        return Response(self.get_serializer_data(assessment))
+
+    @action(detail=True, methods=['post'])
+    def resume(self, request, pk=None):
+        """Resume a paused assessment."""
+        assessment = get_object_or_404(LightningAssessment, pk=pk)
+        if assessment.status != 'paused':
+            return Response(
+                {'error': 'Assessment must be paused to resume'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        assessment.status = 'in_progress'
+        assessment.save()
+        return Response(self.get_serializer_data(assessment))
+
+    @action(detail=True, methods=['post'])
     def record_result(self, request, pk=None):
         """Record a test result for a specific test case."""
         assessment = get_object_or_404(LightningAssessment, pk=pk)

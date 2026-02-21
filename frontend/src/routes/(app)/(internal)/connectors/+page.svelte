@@ -157,8 +157,10 @@
 				body: JSON.stringify({
 					name: newConnectorName.trim(),
 					connector_type: selectedConnectorType.type,
-					auth_method: newConnectorAuthMethod,
-					credentials: { api_key: newConnectorApiKey.trim() }
+					config: {
+						auth_method: newConnectorAuthMethod,
+						api_key: newConnectorApiKey.trim()
+					}
 				})
 			});
 			if (res.ok) {
