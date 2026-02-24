@@ -167,6 +167,86 @@ def test_attack_paths_rejects_invalid_folder_id():
 
 
 # feature:security_graph
+def test_attack_paths_without_folder_id_uses_full_iam_scope():
+    request = SimpleNamespace(
+        data={
+            "entry_point_id": str(uuid4()),
+            "target_id": str(uuid4()),
+        },
+        user=SimpleNamespace(is_authenticated=True),
+    )
+
+    class FakeCombinedGraph:
+        def __init__(self):
+            self.nodes = []
+            self.edges = []
+
+        def add_node(self, node):
+            self.nodes.append(node)
+
+        def add_edge(self, edge):
+            self.edges.append(edge)
+
+    folder_graph = SimpleNamespace(
+        nodes={"n1": object()},
+        edges={"e1": object()},
+    )
+    builder = SimpleNamespace(build_from_folder=lambda _fid: folder_graph)
+    analyzer = SimpleNamespace(find_attack_paths=lambda *_args, **_kwargs: [])
+
+    with (
+        patch(
+            "core.bounded_contexts.security_graph.api.graph_views._get_accessible_domain_folder_ids",
+            return_value=[uuid4(), uuid4()],
+        ) as scoped_ids,
+        patch(
+            "core.bounded_contexts.security_graph.api.graph_views.SecurityGraph",
+            FakeCombinedGraph,
+        ),
+        patch(
+            "core.bounded_contexts.security_graph.api.graph_views.get_graph_builder",
+            return_value=builder,
+        ) as get_builder,
+        patch(
+            "core.bounded_contexts.security_graph.api.graph_views.get_blast_radius_analyzer",
+            return_value=analyzer,
+        ),
+    ):
+        response = AttackPathsView().post(request)
+
+    assert response.status_code == 200
+    assert response.data["paths"] == []
+    assert response.data["total_paths"] == 0
+    scoped_ids.assert_called_once_with(request.user, limit=None)
+    get_builder.assert_called_once()
+
+
+# feature:security_graph
+def test_attack_paths_without_folder_id_rejects_when_user_scope_is_empty():
+    request = SimpleNamespace(
+        data={
+            "entry_point_id": str(uuid4()),
+            "target_id": str(uuid4()),
+        },
+        user=SimpleNamespace(is_authenticated=True),
+    )
+
+    with (
+        patch(
+            "core.bounded_contexts.security_graph.api.graph_views._get_accessible_domain_folder_ids",
+            return_value=[],
+        ) as scoped_ids,
+        patch("core.bounded_contexts.security_graph.api.graph_views.get_graph_builder") as builder,
+    ):
+        response = AttackPathsView().post(request)
+
+    assert response.status_code == 403
+    assert response.data["error"] == "No accessible domain folders found"
+    scoped_ids.assert_called_once_with(request.user, limit=None)
+    builder.assert_not_called()
+
+
+# feature:security_graph
 def test_security_graph_folder_endpoint_rejects_folder_outside_user_scope():
     request = SimpleNamespace(
         query_params={},

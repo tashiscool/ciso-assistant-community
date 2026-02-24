@@ -20,7 +20,7 @@ from ..services import (
 logger = logging.getLogger(__name__)
 
 
-def _get_accessible_domain_folder_ids(user, limit=5):
+def _get_accessible_domain_folder_ids(user, limit=None):
     """
     Resolve domain folders visible to the requesting user.
 
@@ -39,9 +39,9 @@ def _get_accessible_domain_folder_ids(user, limit=5):
             Folder.ContentType.DOMAIN,
         )
     )
-    if limit is None:
-        return folder_ids
-    return folder_ids[:limit]
+    if limit is not None:
+        return folder_ids[:limit]
+    return folder_ids
 
 
 def _user_can_access_domain_folder(user, folder_id):
@@ -76,7 +76,7 @@ class SecurityGraphView(APIView):
             builder = get_graph_builder()
 
             # Build graph from user's accessible folders
-            folder_ids = _get_accessible_domain_folder_ids(request.user)
+            folder_ids = _get_accessible_domain_folder_ids(request.user, limit=None)
             if not folder_ids:
                 empty_graph = SecurityGraph()
                 if output_format == 'vis':
@@ -359,7 +359,7 @@ class AttackPathsView(APIView):
                 graph = builder.build_from_folder(folder_uuid)
             else:
                 # Build graph from the requesting user's IAM-scoped folders only.
-                folder_ids = _get_accessible_domain_folder_ids(request.user)
+                folder_ids = _get_accessible_domain_folder_ids(request.user, limit=None)
                 if not folder_ids:
                     return Response(
                         {'error': 'No accessible domain folders found'},

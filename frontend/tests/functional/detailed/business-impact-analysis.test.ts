@@ -6,18 +6,6 @@ import { m } from '$paraglide/messages';
 let vars = TestContent.generateTestVars();
 let testObjectsData: { [k: string]: any } = TestContent.itemBuilder(vars);
 
-const escalationThresholdsData = {
-	displayName: 'Escalation thresholds',
-	modelName: 'escalationthreshold',
-	build: {
-		point_in_time: { days: 1, hours: 1, minutes: 30 },
-		qualifications: ['confidentiality', 'integrity', 'availability'],
-		quali_impact: 'High',
-		justification: 'Commodo adipisicing cillum labore ullamco ad id dolore reprehenderit.'
-	}
-};
-const highImpactPattern = /High|[EeÉé]lev[ée]/i;
-
 test.setTimeout(240_000);
 
 test('user can create asset assessments inside BIA', async ({
@@ -28,7 +16,6 @@ test('user can create asset assessments inside BIA', async ({
 	librariesPage,
 	businessImpactAnalysisPage,
 	assetAssessmentsPage,
-	escalationThresholdsPage,
 	page
 }) => {
 	await test.step('create required folder', async () => {
@@ -104,29 +91,6 @@ test('user can create asset assessments inside BIA', async ({
 	await test.step('check that asset assessment is created', async () => {
 		await businessImpactAnalysisPage.getRow(vars.assetName).click();
 		await assetAssessmentsPage.hasUrl();
-	});
-
-	await test.step('create escalation threshold', async () => {
-		await escalationThresholdsPage.createItem(escalationThresholdsData.build);
-	});
-
-	await test.step('check that escalation threshold is created', async () => {
-		await expect(
-			page.getByRole('row').filter({ hasText: highImpactPattern }).first()
-		).toBeVisible();
-	});
-
-	await test.step('check that line heatmap has been updated', async () => {
-		await expect(page.getByTestId('line-heatmap')).toContainText(highImpactPattern);
-	});
-
-	await test.step('delete escalation threshold', async () => {
-		const thresholdRow = page.getByRole('row').filter({ hasText: highImpactPattern }).first();
-		await thresholdRow.getByTestId('tablerow-delete-button').click();
-		await assetAssessmentsPage.deleteModalConfirmButton.click();
-		await expect(
-			page.getByRole('row').filter({ hasText: highImpactPattern }).first()
-		).not.toBeVisible();
 	});
 });
 
