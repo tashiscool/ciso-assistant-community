@@ -1,13 +1,22 @@
 import type { PlaywrightTestConfig } from '@playwright/test';
 import { devices } from '@playwright/test';
 
+const composeMode = !!process.env.COMPOSE_TEST;
+const useDevServer = process.env.PLAYWRIGHT_DEV_SERVER === 'true';
+const previewPort = Number(
+	process.env.PLAYWRIGHT_PORT || (composeMode ? 3000 : 4174)
+);
+const baseURL = process.env.ORIGIN || `http://127.0.0.1:${previewPort}`;
+
 const config: PlaywrightTestConfig = {
 	webServer: {
-		command: process.env.COMPOSE_TEST
+		command: composeMode
 			? 'echo "The docker compose frontend server didn\'t start correctly"'
-			: 'pnpm run preview',
-		port: process.env.COMPOSE_TEST ? 3000 : 4173,
-		timeout: 120 * 1000,
+			: useDevServer
+				? `pnpm exec vite dev --host 127.0.0.1 --port ${previewPort}`
+				: `pnpm exec vite preview --port ${previewPort}`,
+		url: baseURL,
+		timeout: 180 * 1000,
 		reuseExistingServer: !process.env.CI
 	},
 	testDir: 'tests',
@@ -33,6 +42,7 @@ const config: PlaywrightTestConfig = {
 		]
 	],
 	use: {
+		baseURL,
 		screenshot: 'only-on-failure',
 		video: process.env.CI ? 'retain-on-failure' : 'on',
 		trace: process.env.CI ? 'retain-on-failure' : 'on',

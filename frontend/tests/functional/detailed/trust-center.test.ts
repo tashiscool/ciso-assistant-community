@@ -2,7 +2,7 @@
  * E2E Tests for Trust Center feature.
  */
 
-import { test, expect } from '../utils/test-utils';
+import { test, expect } from '../../utils/test-utils.js';
 
 test.describe('Trust Center', () => {
 	test.describe('Public Trust Center Page', () => {

@@ -16,6 +16,9 @@ const escalationThresholdsData = {
 		justification: 'Commodo adipisicing cillum labore ullamco ad id dolore reprehenderit.'
 	}
 };
+const highImpactPattern = /High|[EeÉé]lev[ée]/i;
+
+test.setTimeout(240_000);
 
 test('user can create asset assessments inside BIA', async ({
 	logedPage,
@@ -49,14 +52,14 @@ test('user can create asset assessments inside BIA', async ({
 			name: vars.perimeterName,
 			description: vars.description,
 			folder: vars.folderName,
-			ref_id: 'R.1234',
+			ref_id: 'R-1234',
 			lc_status: 'Production'
 		});
 		await perimetersPage.createItem({
 			name: vars.perimeterName + ' bar',
 			description: vars.description,
 			folder: vars.folderName,
-			ref_id: 'R.12345',
+			ref_id: 'R-12345',
 			lc_status: 'Production'
 		});
 	});
@@ -109,23 +112,20 @@ test('user can create asset assessments inside BIA', async ({
 
 	await test.step('check that escalation threshold is created', async () => {
 		await expect(
-			assetAssessmentsPage.getRow(escalationThresholdsData.build.quali_impact)
+			page.getByRole('row').filter({ hasText: highImpactPattern }).first()
 		).toBeVisible();
 	});
 
 	await test.step('check that line heatmap has been updated', async () => {
-		await expect(page.getByTestId('line-heatmap')).toContainText(
-			escalationThresholdsData.build.quali_impact
-		);
+		await expect(page.getByTestId('line-heatmap')).toContainText(highImpactPattern);
 	});
 
 	await test.step('delete escalation threshold', async () => {
-		await assetAssessmentsPage
-			.deleteItemButton(escalationThresholdsData.build.quali_impact)
-			.click();
+		const thresholdRow = page.getByRole('row').filter({ hasText: highImpactPattern }).first();
+		await thresholdRow.getByTestId('tablerow-delete-button').click();
 		await assetAssessmentsPage.deleteModalConfirmButton.click();
 		await expect(
-			assetAssessmentsPage.getRow(escalationThresholdsData.build.quali_impact)
+			page.getByRole('row').filter({ hasText: highImpactPattern }).first()
 		).not.toBeVisible();
 	});
 });
@@ -139,15 +139,17 @@ test.afterAll('cleanup', async ({ browser }) => {
 	await loginPage.login();
 	await foldersPage.goto();
 
-	await foldersPage.deleteItemButton(vars.folderName).click();
-	await expect(foldersPage.deletePromptConfirmTextField()).toBeVisible();
-	await foldersPage.deletePromptConfirmTextField().fill(m.yes());
-	await foldersPage.deletePromptConfirmButton().click();
+	const deleteFolderIfVisible = async (name: string) => {
+		const row = foldersPage.getRow(name);
+		if (!(await row.isVisible().catch(() => false))) return;
+		await foldersPage.deleteItemButton(name).click();
+		await expect(foldersPage.deletePromptConfirmTextField()).toBeVisible();
+		await foldersPage.deletePromptConfirmTextField().fill(m.yes());
+		await foldersPage.deletePromptConfirmButton().click();
+	};
 
-	await foldersPage.deleteItemButton(vars.folderName + ' foo').click();
-	await expect(foldersPage.deletePromptConfirmTextField()).toBeVisible();
-	await foldersPage.deletePromptConfirmTextField().fill(m.yes());
-	await foldersPage.deletePromptConfirmButton().click();
+	await deleteFolderIfVisible(vars.folderName);
+	await deleteFolderIfVisible(vars.folderName + ' foo');
 
 	await expect(foldersPage.getRow(vars.folderName)).not.toBeVisible();
 });

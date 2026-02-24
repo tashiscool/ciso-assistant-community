@@ -513,7 +513,7 @@ class TestResult(models.Model):
         return f"{self.test_case.control_name}: {self.result}"
 
 
-class AssessmentRun(models.Model):
+class LightningAssessmentRun(models.Model):
     """
     A single execution run of an assessment.
 

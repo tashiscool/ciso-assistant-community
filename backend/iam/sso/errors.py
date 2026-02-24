@@ -1,6 +1,19 @@
-from allauth.socialaccount.providers.saml.views import (  # type: ignore[import-untyped]
-    AuthError as AllauthAuthError,
-)
+from structlog import get_logger
+
+logger = get_logger(__name__)
+
+try:
+    from allauth.socialaccount.providers.saml.views import (  # type: ignore[import-untyped]
+        AuthError as AllauthAuthError,
+    )
+except Exception as exc:  # pragma: no cover - env dependent
+    logger.warning(
+        "SAML AuthError unavailable; using local fallback",
+        error=str(exc),
+    )
+
+    class AllauthAuthError(Exception):
+        pass
 
 
 class AuthError(AllauthAuthError):

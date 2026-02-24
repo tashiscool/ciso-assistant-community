@@ -21,6 +21,7 @@
 		formDataCache = $bindable({}),
 		initialData = {}
 	}: Props = $props();
+
 </script>
 
 <AutocompleteSelect
@@ -31,7 +32,7 @@
 	cacheLock={cacheLocks['folder']}
 	bind:cachedValue={formDataCache['folder']}
 	label={m.domain()}
-	hidden={initialData.folder}
+	hidden={false}
 />
 <TextField
 	{form}

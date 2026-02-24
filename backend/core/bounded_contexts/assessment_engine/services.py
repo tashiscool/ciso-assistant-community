@@ -16,7 +16,7 @@ from .models import (
     ControlGroup,
     TestCase,
     TestResult,
-    AssessmentRun,
+    LightningAssessmentRun,
 )
 
 
@@ -99,13 +99,79 @@ class LightningAssessmentService:
         return assessment
 
     @classmethod
+    def create_assessment(
+        cls,
+        name: str,
+        description: str = '',
+        scope: Optional[Dict] = None,
+        scoring_method: str = 'pass_fail',
+        template_id: Optional[str] = None,
+        created_by=None,
+    ) -> LightningAssessment:
+        """
+        API-facing creation method used by the viewset.
+
+        Supports:
+        - template-based creation when template_id is provided
+        - quick creation from scope.control_ids
+        - empty assessment creation when no control_ids are provided
+        """
+        scope = scope or {}
+
+        if template_id:
+            assessment = cls.create_from_template(
+                template_id=template_id,
+                name=name,
+                scope=scope,
+                user=created_by,
+            )
+            # Allow request payload to override template defaults when provided.
+            updates = []
+            if description and assessment.description != description:
+                assessment.description = description
+                updates.append('description')
+            if scoring_method and assessment.scoring_method != scoring_method:
+                assessment.scoring_method = scoring_method
+                updates.append('scoring_method')
+            if updates:
+                assessment.save(update_fields=updates + ['updated_at'])
+            return assessment
+
+        control_ids = scope.get('control_ids') or []
+        if control_ids:
+            assessment = cls.create_quick(
+                name=name,
+                control_ids=control_ids,
+                scoring_method=scoring_method,
+                user=created_by,
+            )
+            updates = []
+            if description:
+                assessment.description = description
+                updates.append('description')
+            if scope:
+                assessment.scope = scope
+                updates.append('scope')
+            if updates:
+                assessment.save(update_fields=updates + ['updated_at'])
+            return assessment
+
+        return LightningAssessment.objects.create(
+            name=name,
+            description=description,
+            scope=scope,
+            scoring_method=scoring_method,
+            created_by=created_by,
+        )
+
+    @classmethod
     def start_assessment(cls, assessment_id: str) -> LightningAssessment:
         """Start a lightning assessment."""
         assessment = LightningAssessment.objects.get(id=assessment_id)
         assessment.start()
 
         # Create initial run
-        AssessmentRun.objects.create(
+        LightningAssessmentRun.objects.create(
             lightning_assessment=assessment,
             run_number=1,
             run_type='initial',
@@ -238,6 +304,28 @@ class LightningAssessmentService:
             'by_status': results_by_status,
         }
 
+    @classmethod
+    def export_results(
+        cls,
+        assessment: LightningAssessment,
+        export_format: str = 'json',
+    ) -> Dict:
+        """Export assessment results in a normalized payload."""
+        if export_format not in {'json'}:
+            raise ValueError(f"Unsupported export format: {export_format}")
+
+        return {
+            'assessment': {
+                'id': str(assessment.id),
+                'name': assessment.name,
+                'status': assessment.status,
+                'scoring_method': assessment.scoring_method,
+                'started_at': assessment.started_at.isoformat() if assessment.started_at else None,
+                'completed_at': assessment.completed_at.isoformat() if assessment.completed_at else None,
+            },
+            'summary': cls.get_progress(str(assessment.id)),
+        }
+
 
 class MasterAssessmentService:
     """
@@ -264,6 +352,29 @@ class MasterAssessmentService:
         )
 
         return assessment
+
+    @classmethod
+    def create_assessment(
+        cls,
+        name: str,
+        description: str = '',
+        framework_ids: Optional[List[str]] = None,
+        perimeter_ids: Optional[List[str]] = None,
+        grouping_method: str = 'family',
+        enable_inheritance: bool = True,
+        created_by=None,
+    ) -> MasterAssessment:
+        """API-facing creation method used by the viewset."""
+        return MasterAssessment.objects.create(
+            name=name,
+            description=description,
+            framework_ids=framework_ids or [],
+            perimeter_ids=perimeter_ids or [],
+            grouping_method=grouping_method,
+            enable_inheritance=enable_inheritance,
+            created_by=created_by,
+            lead_assessor=created_by,
+        )
 
     @classmethod
     def generate_control_groups(
@@ -443,12 +554,12 @@ class AssessmentExecutionService:
         assessment_id: str,
         run_type: str = 'initial',
         user=None,
-    ) -> AssessmentRun:
+    ) -> LightningAssessmentRun:
         """Create a new assessment run."""
         if assessment_type == 'lightning':
             assessment = LightningAssessment.objects.get(id=assessment_id)
-            existing_runs = AssessmentRun.objects.filter(lightning_assessment=assessment)
-            run = AssessmentRun.objects.create(
+            existing_runs = LightningAssessmentRun.objects.filter(lightning_assessment=assessment)
+            run = LightningAssessmentRun.objects.create(
                 lightning_assessment=assessment,
                 run_number=existing_runs.count() + 1,
                 run_type=run_type,
@@ -456,8 +567,8 @@ class AssessmentExecutionService:
             )
         else:
             assessment = MasterAssessment.objects.get(id=assessment_id)
-            existing_runs = AssessmentRun.objects.filter(master_assessment=assessment)
-            run = AssessmentRun.objects.create(
+            existing_runs = LightningAssessmentRun.objects.filter(master_assessment=assessment)
+            run = LightningAssessmentRun.objects.create(
                 master_assessment=assessment,
                 run_number=existing_runs.count() + 1,
                 run_type=run_type,
@@ -467,9 +578,9 @@ class AssessmentExecutionService:
         return run
 
     @classmethod
-    def start_run(cls, run_id: str) -> AssessmentRun:
+    def start_run(cls, run_id: str) -> LightningAssessmentRun:
         """Start an assessment run."""
-        run = AssessmentRun.objects.get(id=run_id)
+        run = LightningAssessmentRun.objects.get(id=run_id)
         run.status = 'running'
         run.actual_start = timezone.now()
         run.save()
@@ -477,18 +588,18 @@ class AssessmentExecutionService:
         return run
 
     @classmethod
-    def pause_run(cls, run_id: str) -> AssessmentRun:
+    def pause_run(cls, run_id: str) -> LightningAssessmentRun:
         """Pause an assessment run."""
-        run = AssessmentRun.objects.get(id=run_id)
+        run = LightningAssessmentRun.objects.get(id=run_id)
         run.status = 'paused'
         run.save()
 
         return run
 
     @classmethod
-    def complete_run(cls, run_id: str) -> AssessmentRun:
+    def complete_run(cls, run_id: str) -> LightningAssessmentRun:
         """Complete an assessment run."""
-        run = AssessmentRun.objects.get(id=run_id)
+        run = LightningAssessmentRun.objects.get(id=run_id)
         run.status = 'completed'
         run.actual_end = timezone.now()
 
@@ -503,6 +614,42 @@ class AssessmentExecutionService:
         run.save()
 
         return run
+
+    @classmethod
+    def record_test_result(
+        cls,
+        assessment: LightningAssessment,
+        test_case_id: str,
+        result: str,
+        actual_result: str = '',
+        notes: str = '',
+        findings: str = '',
+        recommendations: str = '',
+        tested_by=None,
+    ) -> TestResult:
+        """Record or update a test result for a lightning assessment test case."""
+        test_case = TestCase.objects.filter(
+            id=test_case_id,
+            lightning_assessment=assessment,
+        ).first()
+        if not test_case:
+            raise ValueError("Test case not found for this assessment")
+
+        test_result, _ = TestResult.objects.update_or_create(
+            test_case=test_case,
+            defaults={
+                'result': result,
+                'actual_result': actual_result,
+                'notes': notes,
+                'findings': findings,
+                'recommendations': recommendations,
+                'tested_by': tested_by,
+                'tested_at': timezone.now(),
+            },
+        )
+
+        LightningAssessmentService._update_progress(assessment)
+        return test_result
 
 
 class BulkOperationService:
@@ -591,3 +738,45 @@ class BulkOperationService:
                         copied += 1
 
         return copied
+
+    @classmethod
+    def bulk_update_results(
+        cls,
+        assessment: LightningAssessment,
+        test_case_ids: List[str],
+        result: str,
+        notes: str = '',
+        user=None,
+    ) -> List[TestResult]:
+        """
+        API-facing bulk update for lightning assessment results.
+
+        Only updates test cases that belong to the provided assessment.
+        """
+        if not test_case_ids:
+            return []
+
+        updated_results: List[TestResult] = []
+        valid_ids = {
+            str(tc_id)
+            for tc_id in assessment.test_cases.filter(id__in=test_case_ids).values_list('id', flat=True)
+        }
+        now = timezone.now()
+
+        with transaction.atomic():
+            for tc_id in test_case_ids:
+                if str(tc_id) not in valid_ids:
+                    continue
+                tr, _ = TestResult.objects.update_or_create(
+                    test_case_id=tc_id,
+                    defaults={
+                        'result': result,
+                        'notes': notes,
+                        'tested_by': user,
+                        'tested_at': now,
+                    },
+                )
+                updated_results.append(tr)
+
+        LightningAssessmentService._update_progress(assessment)
+        return updated_results

@@ -410,6 +410,7 @@
 						</thead>
 						<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
 							{#each availableFindings as finding}
+								{@const riskLevel = getRiskLevelFromSeverity(finding.severity || finding.risk_level || 'moderate')}
 								<tr class="hover:bg-gray-50 dark:hover:bg-gray-750">
 									<td class="px-4 py-3">
 										<input
@@ -425,7 +426,6 @@
 										</span>
 									</td>
 									<td class="px-4 py-3">
-										{@const riskLevel = getRiskLevelFromSeverity(finding.severity || finding.risk_level || 'moderate')}
 										<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {getRiskColor(riskLevel)}">
 											{formatLabel(riskLevel)}
 										</span>

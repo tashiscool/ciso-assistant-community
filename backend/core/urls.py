@@ -1,4 +1,5 @@
 from .views import *
+import logging
 from tprm.views import (
     EntityViewSet,
     RepresentativeViewSet,
@@ -20,6 +21,8 @@ from rest_framework import routers
 
 from ciso_assistant.settings import DEBUG
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 router = routers.DefaultRouter()
 router.register(r"folders", FolderViewSet, basename="folders")
@@ -198,14 +201,6 @@ urlpatterns = [
     path("composer_data/", get_composer_data, name="get_composer_data"),
     path("i18n/", include("django.conf.urls.i18n")),
     path(
-        "accounts/oidc/", include("iam.sso.oidc.urls")
-    ),  # NOTE: This has to be placed before the allauth urls, otherwise our OIDC login implementation will not be used
-    path(
-        "accounts/saml/", include("iam.sso.saml.urls")
-    ),  # NOTE: This has to be placed before the allauth urls, otherwise our ACS implementation will not be used
-    path("accounts/", include("allauth.urls")),
-    path("_allauth/", include("allauth.headless.urls")),
-    path(
         "requirement-assessments/<uuid:pk>/suggestions/applied-controls/",
         RequirementAssessmentViewSet.create_suggested_applied_controls,
     ),
@@ -255,6 +250,30 @@ urlpatterns = [
 # Additional modules take precedence over the default modules
 for index, module in enumerate(MODULES):
     urlpatterns.insert(index, (path(module["path"], include(module["module"]))))
+
+optional_auth_routes = [
+    (
+        "accounts/oidc/",
+        "iam.sso.oidc.urls",
+    ),  # NOTE: Keep before allauth fallback routes.
+    (
+        "accounts/saml/",
+        "iam.sso.saml.urls",
+    ),  # NOTE: Keep before allauth fallback routes.
+    ("accounts/", "allauth.urls"),
+    ("_allauth/", "allauth.headless.urls"),
+]
+
+for route, module_path in optional_auth_routes:
+    try:
+        urlpatterns.append(path(route, include(module_path)))
+    except Exception as exc:  # pragma: no cover - depends on optional native deps
+        logger.warning(
+            "Skipping optional auth route due import failure: route=%s module=%s error=%s",
+            route,
+            module_path,
+            exc,
+        )
 
 if DEBUG:
     # Browsable API is only available in DEBUG mode

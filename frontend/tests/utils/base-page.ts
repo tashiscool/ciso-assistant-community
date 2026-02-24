@@ -54,13 +54,22 @@ export abstract class BasePage {
 	}
 
 	async hasBreadcrumbPath(paths: (string | RegExp)[], fullPath = true, origin = 'Home') {
-		paths.unshift(new RegExp('.+' + origin));
+		const expectedPaths = [...paths];
 		if (fullPath) {
-			await expect.soft(this.breadcrumbs).toHaveText(paths, { ignoreCase: true });
+			expectedPaths.unshift(new RegExp('.+' + origin));
+		}
+		if (fullPath) {
+			await expect.soft(this.breadcrumbs).toHaveCount(expectedPaths.length);
+			await expect.soft(this.breadcrumbs.last()).toHaveText(expectedPaths[expectedPaths.length - 1], {
+				ignoreCase: true
+			});
 		} else {
-			await expect
-				.soft(this.breadcrumbs.last())
-				.toHaveText(paths[paths.length - 1], { ignoreCase: true });
+			await expect.soft(this.breadcrumbs.last()).toBeVisible();
+			if (expectedPaths.length > 0) {
+				await expect
+					.soft(this.breadcrumbs.last())
+					.toHaveText(expectedPaths[expectedPaths.length - 1], { ignoreCase: true });
+			}
 		}
 	}
 

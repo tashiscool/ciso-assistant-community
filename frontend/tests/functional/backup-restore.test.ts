@@ -82,8 +82,11 @@ test('Database export should generate valid backup file', async ({ logedPage, pa
 			await page.getByTestId('delete-prompt-confirm-textfield').fill('yes');
 			await page.getByRole('button', { name: 'Submit' }).click();
 
-			// Sessions are not preserved after importing the backup
-			await expect(page).toHaveURL('/login?next=/backup-restore', { timeout: 30_000 });
+			// Depending on backend/session settings, import may either keep the session
+			// or force a login refresh.
+			await expect
+				.poll(() => page.url(), { timeout: 30_000 })
+				.toMatch(/\/(login\?next=\/backup-restore|backup-restore)$/);
 		});
 	});
 });

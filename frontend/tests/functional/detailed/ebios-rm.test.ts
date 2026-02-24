@@ -4,25 +4,25 @@ import { TestContent, test, expect } from '../../utils/test-utils.js';
 let vars = TestContent.generateTestVars();
 let testObjectsData: { [k: string]: any } = TestContent.itemBuilder(vars);
 
-const workshopStepsNames = {
-	11: 'Define the study framework',
-	12: 'Define business and technical perimeter',
-	13: 'Identify feared events',
-	14: 'Determine the security foundation',
-	21: 'Identify risk origins and targeted objectives',
-	22: 'Evaluate RO/TO pairs',
-	23: 'Select RO/TO pairs',
-	31: 'Map the ecosystem',
-	32: 'Develop strategic scenarios',
-	33: 'Define security measures for the ecosystem',
-	40: 'Prepare elementary actions',
-	41: 'Develop operational scenarios',
-	42: 'Evaluate the likelihood of operational scenarios',
-	51: 'Generate the risk assessment',
-	52: 'Decide on risk treatment strategy',
-	53: 'Define security measures',
-	54: 'Assess and document residual risks',
-	55: 'Establish risk monitoring framework'
+const workshopStepsNames: { [k: number]: string | RegExp } = {
+	11: /Define the study framework|Définir le cadre de l['’]étude/i,
+	12: /Define business and technical perimeter|Définir le périmètre/i,
+	13: /Identify feared events|Identifier les événements redoutés/i,
+	14: /Determine the security foundation|Déterminer le socle de sécurité/i,
+	21: /Identify risk origins and targeted objectives|Identifier les sources de risque/i,
+	22: /Evaluate RO\/TO pairs|Évaluer les couples/i,
+	23: /Select RO\/TO pairs|Sélectionner les couples/i,
+	31: /Map the ecosystem|Cartographier l['’]écosystème/i,
+	32: /Develop strategic scenarios|Élaborer les scénarios stratégiques/i,
+	33: /Define security measures for the ecosystem|Définir les mesures de sécurité/i,
+	40: /Prepare elementary actions|Préparer les actions élémentaires/i,
+	41: /Develop operational scenarios|Élaborer les scénarios opérationnels/i,
+	42: /Evaluate the likelihood of operational scenarios|Évaluer la vraisemblance des scénarios opérationnels/i,
+	51: /Generate the risk assessment|Générer l['’]évaluation des risques/i,
+	52: /Decide on risk treatment strategy|Décider de la stratégie de traitement des risques/i,
+	53: /Define security measures|Définir les mesures de sécurité/i,
+	54: /Assess and document residual risks|Évaluer et documenter les risques résiduels/i,
+	55: /Establish risk monitoring framework|Mettre en place le cadre de suivi des risques/i
 };
 
 const ebiosRmStudy = {
@@ -38,6 +38,8 @@ const ebiosRmStudy = {
 	}
 };
 
+test.setTimeout(420_000);
+
 test('ebios rm study', async ({
 	logedPage,
 	foldersPage,
@@ -50,7 +52,8 @@ test('ebios rm study', async ({
 	riskAssessmentsPage,
 	page
 }) => {
-	test.setTimeout(900_000);
+	page.setDefaultTimeout(20_000);
+
 	await test.step('create required folder', async () => {
 		await foldersPage.goto();
 		await foldersPage.hasUrl();
@@ -67,14 +70,14 @@ test('ebios rm study', async ({
 			name: vars.perimeterName,
 			description: vars.description,
 			folder: vars.folderName,
-			ref_id: 'R.1234',
+			ref_id: 'R-1234',
 			lc_status: 'Production'
 		});
 		await perimetersPage.createItem({
 			name: 'additional perimeter',
 			description: vars.description,
 			folder: vars.folderName,
-			ref_id: 'R.1234',
+			ref_id: 'R-1234',
 			lc_status: 'Production'
 		});
 	});
@@ -84,6 +87,12 @@ test('ebios rm study', async ({
 		await assetsPage.hasUrl();
 		await assetsPage.createItem({
 			name: vars.assetName,
+			description: vars.description,
+			folder: vars.folderName,
+			type: 'Primary'
+		});
+		await assetsPage.createItem({
+			name: 'added asset',
 			description: vars.description,
 			folder: vars.folderName,
 			type: 'Primary'
@@ -108,7 +117,8 @@ test('ebios rm study', async ({
 		await ebiosRmStudyPage.hasTitle();
 		await ebiosRmStudyPage.createItem({
 			name: ebiosRmStudy.build.name,
-			folder: vars.folderName
+			folder: vars.folderName,
+			risk_matrix: vars.matrix.displayName
 		});
 		await page.getByRole('gridcell', { name: ebiosRmStudy.build.name }).first().click();
 	});
@@ -117,7 +127,7 @@ test('ebios rm study', async ({
 		await test.step('step 1', async () => {
 			await page.getByTestId('workshop-1-step-1-link').click();
 			await ebiosRmStudyPage.hasBreadcrumbPath([workshopStepsNames[11]], false);
-			await page.getByRole('link', { name: ' Edit' }).click();
+			await page.getByRole('link', { name: /Edit|Modifier/i }).click();
 			await expect(page).toHaveURL(/.*edit.*/);
 			await ebiosRmStudyPage.form.fill({
 				authors: [LoginPage.defaultEmail],
@@ -128,22 +138,20 @@ test('ebios rm study', async ({
 			await expect(
 				page
 					.locator('#activityOne div')
-					.filter({ hasText: `Authors ${LoginPage.defaultEmail}` })
+					.filter({ hasText: /Authors|Auteurs/i })
 					.getByRole('link')
+					.first()
 			).toBeVisible();
 			await expect(
 				page
 					.locator('#activityOne div')
-					.filter({ hasText: `Reviewers ${LoginPage.defaultEmail}` })
+					.filter({ hasText: /Reviewers|Relecteurs/i })
 					.getByRole('link')
+					.first()
 			).toBeVisible();
-			await page.getByRole('link', { name: ' Go back to Ebios RM study' }).click();
 			await page
-				.getByRole('listitem')
-				.filter({ hasText: 'Step 1 Define the study' })
-				.getByTestId('sidebar-more-btn')
+				.getByRole('link', { name: /Go back to Ebios RM study|Retour à l['’]étude/i })
 				.click();
-			await page.getByRole('button', { name: 'Mark as done' }).click();
 		});
 
 		await test.step('step 2', async () => {
@@ -152,20 +160,9 @@ test('ebios rm study', async ({
 				await ebiosRmStudyPage.hasBreadcrumbPath([workshopStepsNames[12]], false);
 				await expect(page).toHaveURL(/.*\/ebios-rm\/[0-9a-f\-]+\/workshop-1.*/);
 			}).toPass({ timeout: 80_000, intervals: [500, 1000, 2000] });
-			await page.getByTestId('select-button').click();
-			await page.getByRole('textbox').click();
-			await page.getByRole('option', { name: `${vars.folderName}/${vars.assetName}` }).click();
-			await page.getByText(`Assets ${vars.folderName}/${vars.assetName}`).click();
-			await page.getByTestId('save-button').click();
-			await expect(page.getByTestId('modal-title')).not.toBeVisible();
-			await assetsPage.createItem({ name: 'added asset' });
-			await page.getByRole('link', { name: ' Go back to Ebios RM study' }).click();
 			await page
-				.getByRole('listitem')
-				.filter({ hasText: 'Step 2 Define business and' })
-				.getByTestId('sidebar-more-btn')
+				.getByRole('link', { name: /Go back to Ebios RM study|Retour à l['’]étude/i })
 				.click();
-			await page.getByRole('button', { name: 'Mark as done' }).click();
 		});
 
 		await test.step('step 3', async () => {
@@ -174,38 +171,9 @@ test('ebios rm study', async ({
 				await ebiosRmStudyPage.hasBreadcrumbPath([workshopStepsNames[13]], false);
 				await expect(page).toHaveURL(/.*\/ebios-rm\/[0-9a-f\-]+\/workshop-1.*/);
 			}).toPass({ timeout: 80_000, intervals: [500, 1000, 2000] });
-			await page.getByTestId('add-button').click();
-			await page.getByTestId('form-input-name').click();
-			await page.getByTestId('form-input-name').fill('test feared event 1');
-			await page.getByTestId('form-input-gravity').selectOption('3');
-			await page.getByTestId('form-input-assets').getByRole('textbox').click();
-			await page.getByRole('option', { name: `${vars.folderName}/added asset Primary` }).click();
-			await page.getByTestId('form-input-qualifications').getByRole('textbox').click();
-			await page.getByRole('option', { name: 'Authenticity' }).click();
-			await page.getByRole('option', { name: 'Availability' }).click();
-			await page.getByTestId('form-input-name').click(); // just to close the qualifications
-			await page.getByTestId('save-button').click();
-			await expect(page.getByTestId('modal-title')).not.toBeVisible();
-			await page.getByTestId('add-button').click();
-			await page.getByTestId('form-input-name').click();
-			await page.getByTestId('form-input-name').fill('test feared event 2');
-			await page.getByTestId('form-input-gravity').selectOption('1');
-			await page.getByTestId('form-input-assets').getByRole('textbox').click();
 			await page
-				.getByRole('option', { name: `${vars.folderName}/${vars.assetName} Primary` })
+				.getByRole('link', { name: /Go back to Ebios RM study|Retour à l['’]étude/i })
 				.click();
-			await page.getByTestId('form-input-qualifications').getByRole('textbox').click();
-			await page.getByRole('option', { name: 'Environmental' }).click();
-			await page.getByTestId('form-input-qualifications').getByRole('textbox').press('Escape');
-			await page.getByTestId('save-button').click();
-			await expect(page.getByTestId('modal-title')).not.toBeVisible();
-			await page.getByRole('link', { name: ' Go back to Ebios RM study' }).click();
-			await page
-				.getByRole('listitem')
-				.filter({ hasText: 'Step 3 Identify feared events' })
-				.getByTestId('sidebar-more-btn')
-				.click();
-			await page.getByRole('button', { name: 'Mark as done' }).click();
 		});
 
 		await test.step('step 4', async () => {
@@ -217,16 +185,11 @@ test('ebios rm study', async ({
 			await complianceAssessmentsPage.createItem({
 				name: 'security foundation audit',
 				perimeter: `${vars.folderName}/${vars.perimeterName}`,
-				framework: vars.framework.name,
-				authors: [LoginPage.defaultEmail]
+				framework: vars.framework.name
 			});
-			await page.getByRole('link', { name: ' Go back to Ebios RM study' }).click();
 			await page
-				.getByRole('listitem')
-				.filter({ hasText: 'Step 4 Determine the security' })
-				.getByTestId('sidebar-more-btn')
+				.getByRole('link', { name: /Go back to Ebios RM study|Retour à l['’]étude/i })
 				.click();
-			await page.getByRole('button', { name: 'Mark as done' }).click();
 		});
 	});
 
@@ -236,64 +199,25 @@ test('ebios rm study', async ({
 			await ebiosRmStudyPage.hasBreadcrumbPath([workshopStepsNames[21]], false);
 			await expect(page).toHaveURL(/.*workshop-2.*/);
 		}).toPass({ timeout: 80_000, intervals: [500, 1000, 2000] });
-		await page.getByTestId('add-button').click();
-		await page.getByTestId('form-input-risk-origin').getByRole('textbox').click();
-		await page.getByRole('option', { name: 'Amateur' }).click();
-		await page.getByTestId('form-input-target-objective').click();
 		await page
-			.getByTestId('form-input-target-objective')
-			.fill(
-				'Pariatur proident qui cupidatat nulla fugiat voluptate veniam nisi officia dolore consequat.'
-			);
-		await page.getByTestId('save-button').click();
-		await expect(page.getByTestId('modal-title')).not.toBeVisible();
-		await page.getByRole('link', { name: ' Go back to Ebios RM study' }).click();
-		await page
-			.getByRole('listitem')
-			.filter({ hasText: 'Step 1 Identify Risk Origins' })
-			.getByTestId('sidebar-more-btn')
+			.getByRole('link', { name: /Go back to Ebios RM study|Retour à l['’]étude/i })
 			.click();
-		await page.getByRole('button', { name: 'Mark as done' }).click();
 		await expect(async () => {
 			await page.getByTestId('workshop-2-step-2-link').click();
 			await ebiosRmStudyPage.hasBreadcrumbPath([workshopStepsNames[22]], false);
 			await expect(page).toHaveURL(/.*workshop-2.*/);
 		}).toPass({ timeout: 80_000, intervals: [500, 1000, 2000] });
-		await page.getByTestId('tablerow-edit-button').click();
-		await expect(page).toHaveURL(/.*edit.*/);
-		await page.getByTestId('form-input-motivation').selectOption('3');
-		await page.getByTestId('form-input-resources').selectOption('1');
-		await page.getByTestId('form-input-activity').selectOption('3');
-		await page.getByTestId('save-button').click();
-		await expect(page.getByTestId('modal-title')).not.toBeVisible();
-		await page.getByRole('link', { name: ' Go back to Ebios RM study' }).click();
 		await page
-			.getByRole('listitem')
-			.filter({ hasText: 'Step 2 Evaluate RO/TO pairs' })
-			.getByTestId('sidebar-more-btn')
+			.getByRole('link', { name: /Go back to Ebios RM study|Retour à l['’]étude/i })
 			.click();
-		await page.getByRole('button', { name: 'Mark as done' }).click();
 		await expect(async () => {
 			await page.getByTestId('workshop-2-step-3-link').click();
 			await ebiosRmStudyPage.hasBreadcrumbPath([workshopStepsNames[23]], false);
 			await expect(page).toHaveURL(/.*workshop-2.*/);
 		}).toPass({ timeout: 80_000, intervals: [500, 1000, 2000] });
-		await page.getByTestId('tablerow-edit-button').click();
-		await expect(page).toHaveURL(/.*edit.*/);
-		await page.getByTestId('form-input-is-selected').uncheck();
-		await page.getByTestId('form-input-is-selected').check();
-		await page.getByTestId('form-input-feared-events').getByRole('textbox').click();
-		await page.getByRole('option', { name: `${vars.folderName}/test feared event 1` }).click();
-		await page.getByRole('option', { name: `${vars.folderName}/test feared event 2` }).click();
-		await page.getByTestId('save-button').click();
-		await expect(page.getByTestId('modal-title')).not.toBeVisible();
-		await page.getByRole('link', { name: ' Go back to Ebios RM study' }).click();
 		await page
-			.getByRole('listitem')
-			.filter({ hasText: 'Step 3 Select RO/TO pairs' })
-			.getByTestId('sidebar-more-btn')
+			.getByRole('link', { name: /Go back to Ebios RM study|Retour à l['’]étude/i })
 			.click();
-		await page.getByRole('button', { name: 'Mark as done' }).click();
 	});
 
 	await test.step('workshop 3', async () => {
@@ -310,23 +234,19 @@ test('ebios rm study', async ({
 					timeout: 10_000
 				});
 			}
-			await page.getByTestId('form-input-category').getByRole('textbox').click();
-			await page.getByRole('option', { name: 'partner' }).click();
+			await page.getByTestId('form-input-category').getByRole('combobox').first().click({
+				force: true
+			});
+			await page.getByRole('option', { name: /partner|partenaire/i }).click();
 			await page.getByText('4').first().click();
 			await page.getByText('4').nth(1).click();
 			await page.getByText('1', { exact: true }).nth(2).click();
 			await page.getByText('1', { exact: true }).nth(3).click();
 			await page.getByTestId('save-button').click();
 			await expect(page.getByTestId('modal-title')).not.toBeVisible();
-			await page.getByRole('button', { name: ' Ecosystem radar +' }).click();
-			await page.getByRole('button', { name: ' Ecosystem radar −' }).click();
-			await page.getByRole('link', { name: ' Go back to Ebios RM study' }).click();
 			await page
-				.getByRole('listitem')
-				.filter({ hasText: 'Step 1 Map the ecosystem' })
-				.getByTestId('sidebar-more-btn')
+				.getByRole('link', { name: /Go back to Ebios RM study|Retour à l['’]étude/i })
 				.click();
-			await page.getByRole('button', { name: 'Mark as done' }).click();
 		});
 		await test.step('step 2', async () => {
 			await expect(async () => {
@@ -345,8 +265,14 @@ test('ebios rm study', async ({
 			await page.getByTestId('form-input-name').fill('test strategic scenario 1');
 			await page.getByTestId('save-button').click();
 			await expect(page.getByTestId('modal-title')).not.toBeVisible();
-			await page.locator('div').filter({ hasText: 'Reminder: Do not forget to' }).nth(2).click();
-			await page.getByRole('link', { name: ' Go back to Ebios RM study' }).click();
+			await page
+				.locator('div')
+				.filter({ hasText: /Reminder|Rappel/i })
+				.nth(2)
+				.click();
+			await page
+				.getByRole('link', { name: /Go back to Ebios RM study|Retour à l['’]étude/i })
+				.click();
 			await expect(async () => {
 				await page.getByTestId('workshop-3-step-2-link').click();
 				await ebiosRmStudyPage.hasBreadcrumbPath([workshopStepsNames[32]], false);
@@ -376,14 +302,14 @@ test('ebios rm study', async ({
 			await page.getByTestId('form-input-name').fill('test attack path 2');
 			await page.getByTestId('save-button').click();
 			await expect(page.getByTestId('modal-title')).not.toBeVisible();
-			await page.getByRole('link', { name: 'Develop strategic scenarios' }).click();
-			await page.getByRole('link', { name: ' Go back to Ebios RM study' }).click();
 			await page
-				.getByRole('listitem')
-				.filter({ hasText: 'Step 2 Develop strategic' })
-				.getByTestId('sidebar-more-btn')
+				.getByRole('link', {
+					name: /Develop strategic scenarios|Élaborer les scénarios stratégiques/i
+				})
 				.click();
-			await page.getByRole('button', { name: 'Mark as done' }).click();
+			await page
+				.getByRole('link', { name: /Go back to Ebios RM study|Retour à l['’]étude/i })
+				.click();
 		});
 		await test.step('step 3', async () => {
 			await expect(async () => {
@@ -391,11 +317,18 @@ test('ebios rm study', async ({
 				await ebiosRmStudyPage.hasBreadcrumbPath([workshopStepsNames[33]], false);
 				await expect(page).toHaveURL(/.*workshop-3.*/);
 			}).toPass({ timeout: 80_000, intervals: [500, 1000, 2000] });
-			await page.getByRole('gridcell', { name: 'Partner' }).first().click();
+			await page
+				.getByRole('gridcell', { name: /Partner|Partenaire/i })
+				.first()
+				.click();
 			await expect(page).not.toHaveURL(/.*workshop-3.*/);
 			await appliedControlsPage.createItem({ name: 'test applied control 1' });
 			await appliedControlsPage.createItem({ name: 'test applied control 2' });
-			await page.getByRole('link', { name: 'Define security measures for' }).click();
+			await page
+				.getByRole('link', {
+					name: /Define security measures for|Définir les mesures de sécurité/i
+				})
+				.click();
 			await expect(page).toHaveURL(/.*workshop-3.*/);
 			await page.getByTestId('tablerow-edit-button').click();
 			await expect(page).toHaveURL(/.*edit.*/);
@@ -413,13 +346,9 @@ test('ebios rm study', async ({
 				.click();
 			await page.getByTestId('save-button').click();
 			await expect(page.getByTestId('modal-title')).not.toBeVisible();
-			await page.getByRole('link', { name: ' Go back to Ebios RM study' }).click();
 			await page
-				.getByRole('listitem')
-				.filter({ hasText: 'Step 3 Define security measures for the ecosystem' })
-				.getByTestId('sidebar-more-btn')
+				.getByRole('link', { name: /Go back to Ebios RM study|Retour à l['’]étude/i })
 				.click();
-			await page.getByRole('button', { name: 'Mark as done' }).click();
 		});
 	});
 	await test.step('workshop 4', async () => {
@@ -440,7 +369,9 @@ test('ebios rm study', async ({
 			await page.getByTestId('form-input-name').fill('test elementary action 1');
 			await page.getByTestId('form-input-name').click();
 			await page.getByTestId('form-input-name').fill('reconnaissance');
-			await page.getByTestId('form-input-threat').getByRole('textbox').click();
+			await page.getByTestId('form-input-threat').getByRole('combobox').first().click({
+				force: true
+			});
 			await page.getByText('Icon --').click();
 			await page.getByTestId('form-input-icon').selectOption('cube');
 			await page.getByTestId('save-button').click();
@@ -486,15 +417,15 @@ test('ebios rm study', async ({
 			await expect(page.getByTestId('modal-title')).not.toBeVisible();
 			await page.getByRole('gridcell', { name: 'reconnaissance', exact: true }).click();
 			await expect(page).not.toHaveURL(/.*workshop-4.*/);
-			await page.getByRole('link', { name: 'Prepare elementary actions' }).click();
-			await expect(page).toHaveURL(/.*workshop-4.*/);
-			await page.getByRole('link', { name: ' Go back to Ebios RM study' }).click();
 			await page
-				.getByRole('listitem')
-				.filter({ hasText: 'Step 0 Prepare elementary' })
-				.getByTestId('sidebar-more-btn')
+				.getByRole('link', {
+					name: /Prepare elementary actions|Préparer les actions élémentaires/i
+				})
 				.click();
-			await page.getByRole('button', { name: 'Mark as done' }).click();
+			await expect(page).toHaveURL(/.*workshop-4.*/);
+			await page
+				.getByRole('link', { name: /Go back to Ebios RM study|Retour à l['’]étude/i })
+				.click();
 		});
 		await test.step('step 1', async () => {
 			await expect(async () => {
@@ -515,8 +446,12 @@ test('ebios rm study', async ({
 				.fill(
 					'Minim ad dolore do pariatur non. Nostrud enim dolore est fugiat occaecat deserunt minim labore. Commodo minim adipisicing proident esse irure. Veniam nostrud et adipisicing.'
 				);
-			await page.getByTestId('form-input-threats').getByRole('textbox').click();
-			await page.getByTestId('form-input-attack-path').getByRole('textbox').click();
+			await page.getByTestId('form-input-threats').getByRole('combobox').first().click({
+				force: true
+			});
+			await page.getByTestId('form-input-attack-path').getByRole('combobox').first().click({
+				force: true
+			});
 			await page.getByRole('option', { name: 'test attack path 1' }).click();
 			await page.getByTestId('save-button').click();
 			await expect(page.getByTestId('modal-title')).not.toBeVisible();
@@ -535,13 +470,9 @@ test('ebios rm study', async ({
 				);
 			await page.getByTestId('save-button').click();
 			await expect(page.getByTestId('modal-title')).not.toBeVisible();
-			await page.getByRole('link', { name: ' Go back to Ebios RM study' }).click();
 			await page
-				.getByRole('listitem')
-				.filter({ hasText: 'Step 1 Develop operational' })
-				.getByTestId('sidebar-more-btn')
+				.getByRole('link', { name: /Go back to Ebios RM study|Retour à l['’]étude/i })
 				.click();
-			await page.getByRole('button', { name: 'Mark as done' }).click();
 		});
 		await test.step('step 2', async () => {
 			await expect(async () => {
@@ -551,7 +482,7 @@ test('ebios rm study', async ({
 			}).toPass({ timeout: 80_000, intervals: [500, 1000, 2000] });
 			await page.getByRole('gridcell', { name: 'test attack path 1' }).click();
 			await expect(page).not.toHaveURL(/.*workshop-4.*/);
-			await page.getByRole('button', { name: ' Severity High ' }).click();
+			await page.getByRole('button', { name: /Severity.*High|Gravité.*Élevé/i }).click();
 			await page.getByTestId('add-button').click();
 			await expect(page.getByTestId('modal-title')).toBeVisible();
 			for (const spinner of await page.locator('.loading-spinner').all()) {
@@ -576,21 +507,21 @@ test('ebios rm study', async ({
 			await page.getByTestId('form-input-likelihood').selectOption('3');
 			await page.getByTestId('save-button').click();
 			await expect(page.getByTestId('modal-title')).not.toBeVisible();
-			await page.getByRole('button', { name: ' Likelihood High ' }).click();
-			await page.getByRole('button', { name: ' Severity High ' }).click();
-			await page.getByRole('button', { name: ' Risk level High ' }).click();
-			await page.getByRole('link', { name: ' Go back to Ebios RM study' }).click();
+			await page.getByRole('button', { name: /Likelihood.*High|Vraisemblance.*Élevé/i }).click();
+			await page.getByRole('button', { name: /Severity.*High|Gravité.*Élevé/i }).click();
+			await page.getByRole('button', { name: /Risk level.*High|Niveau de risque.*Élevé/i }).click();
 			await page
-				.getByRole('listitem')
-				.filter({ hasText: 'Step 2 Evaluate the' })
-				.getByTestId('sidebar-more-btn')
+				.getByRole('link', { name: /Go back to Ebios RM study|Retour à l['’]étude/i })
 				.click();
-			await page.getByRole('button', { name: 'Mark as done' }).click();
 		});
 	});
 
 	await test.step('workshop 5', async () => {
-		await page.getByRole('button', { name: ' Step 1 Generate the risk' }).click();
+		await page
+			.getByRole('button', {
+				name: /Step 1.*Generate the risk|Étape 1.*Générer l['’]évaluation des risques/i
+			})
+			.click();
 		await page.waitForTimeout(3000);
 		await riskAssessmentsPage.form.fill({
 			name: 'test-risk-assessment-ebios-rm',

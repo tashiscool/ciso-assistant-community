@@ -103,7 +103,10 @@ jobs:
         run: pnpm run build
       - name: Run tests
         working-directory: ${{ env.frontend-directory }}
-        run: pnpm exec playwright test tests/functional/startup.test.ts
+        run: |
+          pnpm exec playwright test \
+            tests/functional/startup.test.ts \
+            tests/functional/critical-feature-smoke.test.ts
       - name: Set current date as env variable
         if: ${{ !cancelled() }}
         run: echo "NOW=$(date +'%Y-%m-%dT%H-%M-%S')" >> $GITHUB_ENV

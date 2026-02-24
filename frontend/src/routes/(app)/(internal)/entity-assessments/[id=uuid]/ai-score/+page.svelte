@@ -183,10 +183,12 @@
 			<div class="card bg-white shadow-lg p-6">
 				<h2 class="text-lg font-semibold mb-4">Risk Rating</h2>
 				<div class="flex flex-col items-center justify-center h-48">
-					{@const style = getRatingStyle(scoreData.risk_rating)}
 					<span
 						class="inline-flex items-center px-8 py-4 rounded-full text-2xl font-bold
-							   {style.bg} {style.text} border-2 {style.border}"
+							   {getRatingStyle(scoreData.risk_rating).bg}
+							   {getRatingStyle(scoreData.risk_rating).text}
+							   border-2
+							   {getRatingStyle(scoreData.risk_rating).border}"
 					>
 						{scoreData.risk_rating.toUpperCase()}
 					</span>

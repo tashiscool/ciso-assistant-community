@@ -337,7 +337,7 @@ export const test = base.extend<Fixtures>({
 	},
 
 	ebiosRmStudyPage: async ({ page }, use) => {
-		const bPage = new PageContent(page, '/ebios-rm', /Ebios RM stud(ies|y)/, [
+		const bPage = new PageContent(page, '/ebios-rm', /(Ebios RM stud(ies|y)|Études EBIOS RM)/i, [
 			{ name: 'name', type: type.TEXT },
 			{ name: 'description', type: type.TEXT },
 			{ name: 'folder', type: type.SELECT_AUTOCOMPLETE },
@@ -868,9 +868,7 @@ export class TestContent {
 export function setHttpResponsesListener(page: Page) {
 	page.on('response', (response) => {
 		if (response.status() >= 400) {
-			console.error(
-				`[http] ${response.status()} ${response.request().method()} ${response.url()}`
-			);
+			console.error(`[http] ${response.status()} ${response.request().method()} ${response.url()}`);
 		}
 		expect.soft(response.status()).toBeOneofValues([100, 399]);
 	});

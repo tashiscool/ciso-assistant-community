@@ -60,14 +60,14 @@ test('setup', async ({ page, logedPage, foldersPage, perimetersPage }) => {
 			name: vars.perimeterName,
 			description: vars.description,
 			folder: vars.folderName,
-			ref_id: 'R.1234',
+			ref_id: 'R-1234',
 			lc_status: 'Production'
 		});
 		await perimetersPage.createItem({
 			name: vars.perimeterName + PERIMETER_WORKAROUND_SUFFIX,
 			description: vars.description,
 			folder: vars.folderName,
-			ref_id: 'R.12345',
+			ref_id: 'R-12345',
 			lc_status: 'Production'
 		});
 	});

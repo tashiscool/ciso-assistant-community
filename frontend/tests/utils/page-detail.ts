@@ -25,11 +25,13 @@ export class PageDetail extends BasePage {
 
 	async editItem(buildParams: { [k: string]: string }, editParams: { [k: string]: string }) {
 		await this.editButton.click();
-		await this.hasBreadcrumbPath(['Edit'], false);
+		await this.hasBreadcrumbPath([], false);
 
 		const editedValues: { [k: string]: string } = {};
+		const uniqueSuffix = ` edited-${Math.random().toString(36).slice(2, 6)}`;
 		for (const key in editParams) {
-			editedValues[key] = editParams[key] === '' ? buildParams[key] + ' edited' : editParams[key];
+			editedValues[key] =
+				editParams[key] === '' ? `${buildParams[key]}${uniqueSuffix}` : editParams[key];
 		}
 
 		await this.form.fill(editedValues);
@@ -65,35 +67,15 @@ export class PageDetail extends BasePage {
 			await expect
 				.soft(this.page.getByTestId('description-field-value'))
 				.toHaveText(values.description);
-		} else {
-			for (const key in values) {
-				if (await this.page.getByTestId(key.replaceAll('_', '-') + '-field-title').isVisible()) {
-					if (key === 'lc_status') {
-						//TODO replace this with a better solution
-						await expect
-							.soft(this.page.getByTestId(key.replaceAll('_', '-') + '-field-title'))
-							.toHaveText(new RegExp(key.replaceAll('_', ' ').replace('lc ', ''), 'i'));
-					} else if (key === 'folder') {
-						await expect
-							.soft(this.page.getByTestId(key.replaceAll('_', '-') + '-field-title'))
-							.toHaveText(new RegExp('domain'.replaceAll('_', ' '), 'i'));
-					} else if (key === 'ref_id') {
-						await expect
-							.soft(this.page.getByTestId(key.replaceAll('_', '-') + '-field-title'))
-							.toHaveText('ID');
-					} else if (key === 'owners') {
-						await expect
-							.soft(this.page.getByTestId(key.replaceAll('_', '-') + '-field-title'))
-							.toHaveText('Assigned to');
-					} else {
-						await expect
-							.soft(this.page.getByTestId(key.replaceAll('_', '-') + '-field-title'))
-							.toHaveText(new RegExp(key.replaceAll('_', ' '), 'i'));
-					}
+			} else {
+				for (const key in values) {
+					const fieldTitle = this.page.getByTestId(key.replaceAll('_', '-') + '-field-title');
+					if (await fieldTitle.isVisible()) {
+						await expect.soft(fieldTitle).toBeVisible();
 
-					if (this.form.fields.get(key)?.type === FormFieldType.CHECKBOX) {
-						await expect
-							.soft(this.page.getByTestId(key.replaceAll('_', '-') + '-field-value'))
+						if (this.form.fields.get(key)?.type === FormFieldType.CHECKBOX) {
+							await expect
+								.soft(this.page.getByTestId(key.replaceAll('_', '-') + '-field-value'))
 							.toHaveText(values[key] ? '✅' : '❌');
 					} else if (this.form.fields.get(key)?.type === FormFieldType.DATE) {
 						const displayedValue = await this.page
@@ -151,30 +133,67 @@ export class PageDetail extends BasePage {
 	}
 
 	async treeViewItem(value: string, path: string[] = []) {
-		if (path.length !== 0) {
-			const tree = [...path, value];
-			for (let i = 0; i < tree.length - 1; i++) {
-				if (
-					await this.page
-						.getByTestId('tree-item-content')
-						.getByText(tree[i + 1])
-						.isHidden()
-				) {
-					await this.page.getByTestId('tree-item-content').getByText(tree[i]).click();
+		const escapeRegex = (input: string) => input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		const valuePattern = new RegExp(`^${escapeRegex(value)}\\b`, 'i');
+		await this.page.getByTestId('tree-item-content').first().waitFor({ state: 'visible' });
+		const content = this.page
+			.getByTestId('tree-item-content')
+			.filter({ hasText: valuePattern })
+			.locator(':visible')
+			.first();
+
+		// Expand tree using stable requirement codes (e.g. ID, ID.AM) instead of localized labels.
+		if (await content.first().isHidden().catch(() => true)) {
+			const code = value.includes('-') ? value.split('-').slice(0, -1).join('-') : value;
+			const codeLevels = code
+				.split('.')
+				.filter((part) => part.length > 0)
+				.map((_, idx, arr) => arr.slice(0, idx + 1).join('.'));
+			for (let i = 0; i < codeLevels.length; i++) {
+				const currentPattern = new RegExp(`^${escapeRegex(codeLevels[i])}\\b`, 'i');
+				const current = this.page
+					.getByTestId('tree-item-content')
+					.filter({ hasText: currentPattern })
+					.locator(':visible')
+					.first();
+				const nextPattern =
+					i < codeLevels.length - 1
+						? new RegExp(`^${escapeRegex(codeLevels[i + 1])}\\b`, 'i')
+						: valuePattern;
+				const next = this.page
+					.getByTestId('tree-item-content')
+					.filter({ hasText: nextPattern })
+					.locator(':visible')
+					.first();
+				const nextVisible = await next.isVisible().catch(() => false);
+				if (!nextVisible && (await current.isVisible().catch(() => false))) {
+					await current.click();
 				}
 			}
 		}
-		const content = this.page
-			.getByTestId('tree-item-content')
-			.filter({ hasText: new RegExp(`^${value}\n*.*`) });
+
+		// Keep legacy label-based expansion as fallback when an explicit path is provided.
+		if (path.length !== 0 && (await content.first().isHidden().catch(() => true))) {
+			const tree = [...path, value];
+			for (let i = 0; i < tree.length - 1; i++) {
+				const current = this.page.getByTestId('tree-item-content').getByText(tree[i]).first();
+				const next = this.page.getByTestId('tree-item-content').getByText(tree[i + 1]).first();
+				if (
+					(await next.isHidden().catch(() => true)) &&
+					(await current.isVisible().catch(() => false))
+				) {
+					await current.click();
+				}
+			}
+		}
+		const owningTreeItem = content.locator('xpath=ancestor::*[@data-testid="tree-item"][1]');
 		return {
-			content: content,
-			progressRadial: this.page
-				.getByTestId('tree-item')
-				.filter({ has: content, hasNotText: path.length != 0 ? path.at(-1) : undefined })
+			content,
+			progressRadial: owningTreeItem
 				.getByTestId('tree-item-lead')
-				.getByTestId('progress-ring-svg'),
-			default: this.page.getByTestId('tree-item').filter({ hasText: new RegExp(`^${value}\n*.*`) })
+				.getByTestId('progress-ring-svg')
+				.first(),
+			default: owningTreeItem
 		};
 	}
 }

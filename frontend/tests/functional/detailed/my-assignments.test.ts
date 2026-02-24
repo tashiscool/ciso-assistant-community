@@ -68,7 +68,7 @@ test('My assignments full flow - creation, validation, negative case and cleanup
 			name: vars.riskScenarioName,
 			risk_assessment: vars.riskAssessmentName,
 			description: 'Hi from ciso-assistant dev',
-			ref_id: 'R.1234'
+			ref_id: 'R-1234'
 		});
 		await riskScenariosPage.goto();
 

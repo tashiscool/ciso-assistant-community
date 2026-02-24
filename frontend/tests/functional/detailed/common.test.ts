@@ -22,13 +22,16 @@ const testPages = Object.keys(items);
 
 test.describe.configure({ mode: 'serial' });
 for (const key of testPages) {
-	test.describe(`Tests on ${items[key].displayName.toLowerCase()} item`, () => {
-		test.beforeAll(async ({}, testInfo) => {
-			setFilePath(testInfo.project.name, testInfo.retry);
-			existsSync(file_path)
-				? (history = JSON.parse(readFileSync(file_path, 'utf8')))
-				: writeFileSync(file_path, JSON.stringify(history));
-		});
+		test.describe(`Tests on ${items[key].displayName.toLowerCase()} item`, () => {
+			test.beforeAll(async ({}, testInfo) => {
+				setFilePath(testInfo.project.name, testInfo.retry);
+				if (testInfo.retry > 0 && existsSync(file_path)) {
+					history = JSON.parse(readFileSync(file_path, 'utf8'));
+				} else {
+					history = {};
+					writeFileSync(file_path, JSON.stringify(history));
+				}
+			});
 
 		test.describe(`Tests on ${items[key].displayName.toLowerCase()} item details`, () => {
 			test.beforeEach(async ({ logedPage, pages, page }, testInfo) => {

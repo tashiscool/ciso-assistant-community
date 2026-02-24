@@ -18,7 +18,7 @@ from .models import (
     ControlGroup,
     TestCase,
     TestResult,
-    AssessmentRun,
+    LightningAssessmentRun,
 )
 from .services import (
     LightningAssessmentService,
@@ -631,7 +631,7 @@ class AssessmentRunViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return AssessmentRun.objects.all().order_by('-created_at')
+        return LightningAssessmentRun.objects.all().order_by('-created_at')
 
     def get_serializer_data(self, instance):
         return {
@@ -666,5 +666,5 @@ class AssessmentRunViewSet(viewsets.ModelViewSet):
         return Response(data)
 
     def retrieve(self, request, pk=None):
-        run = get_object_or_404(AssessmentRun, pk=pk)
+        run = get_object_or_404(LightningAssessmentRun, pk=pk)
         return Response(self.get_serializer_data(run))

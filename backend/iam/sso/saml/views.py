@@ -28,18 +28,92 @@ from allauth.socialaccount.internal.flows.login import (
 )
 from allauth.socialaccount.models import PermissionDenied, SocialLogin
 from allauth.socialaccount.providers.saml.provider import SAMLProvider
-from allauth.socialaccount.providers.saml.views import (
-    AuthProcess,
-    LoginSession,
-    OneLogin_Saml2_Error,
-    SAMLViewMixin,
-    binascii,
-    build_auth,
-    decode_relay_state,
-    httpkit,
-    render_authentication_error,
-)
 from allauth.utils import ValidationError
+
+try:
+    from allauth.socialaccount.providers.saml.views import (
+        AuthProcess,
+        LoginSession,
+        OneLogin_Saml2_Error,
+        SAMLViewMixin,
+        binascii,
+        build_auth,
+        decode_relay_state,
+        httpkit,
+        render_authentication_error,
+    )
+except Exception as exc:  # pragma: no cover - env dependent
+    structlog.get_logger(__name__).warning(
+        "SAML views unavailable; using fallback stubs",
+        error=str(exc),
+    )
+
+    class _AuthProcess:
+        LOGIN = "login"
+
+    AuthProcess = _AuthProcess
+
+    class OneLogin_Saml2_Error(Exception):
+        pass
+
+    class LoginSession:
+        def __init__(self, *_args, **_kwargs):
+            self.store = {}
+
+        def save(self, *_args, **_kwargs):
+            return None
+
+        def delete(self):
+            self.store = {}
+
+    class SAMLViewMixin:
+        def get_provider(self, *_args, **_kwargs):
+            raise ValidationError("SAML support is unavailable in this environment")
+
+    class _HttpKit:
+        @staticmethod
+        def serialize_request(request):
+            return {}
+
+        @staticmethod
+        def deserialize_request(_data, request):
+            return request
+
+        @staticmethod
+        def add_query_params(url, _params):
+            return url
+
+    class _Binascii:
+        Error = ValueError
+
+    httpkit = _HttpKit()
+    binascii = _Binascii()
+
+    def build_auth(*_args, **_kwargs):
+        raise ValidationError("SAML support is unavailable in this environment")
+
+    def decode_relay_state(value):
+        return value
+
+    def render_authentication_error(
+        _request,
+        provider=None,
+        error=None,
+        extra_context=None,
+        exception=None,
+    ):
+        provider_id = getattr(provider, "id", provider)
+        detail = "SAML support is unavailable in this environment"
+        if exception is not None:
+            detail = str(exception)
+        payload = {
+            "error": error or "sso_unavailable",
+            "detail": detail,
+            "provider": provider_id,
+        }
+        if extra_context:
+            payload["extra"] = extra_context
+        return Response(payload, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
 # === Application-specific imports ===
 from core.permissions import IsAdministrator  # ou une permission plus adaptée

@@ -43,8 +43,10 @@ export class LoginPage extends BasePage {
 	) {
 		this.email = email;
 		this.password = password;
-		// try avoiding race condition
-		await this.page.waitForLoadState('networkidle');
+		// Avoid waiting on long-lived background requests; wait for interactive form controls instead.
+		await this.page.waitForLoadState('domcontentloaded').catch(() => null);
+		await this.usernameInput.waitFor({ state: 'visible', timeout: 20_000 });
+		await this.passwordInput.waitFor({ state: 'visible', timeout: 20_000 });
 		await this.usernameInput.fill(email);
 		await this.passwordInput.fill(password);
 		if (

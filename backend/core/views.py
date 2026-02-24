@@ -110,7 +110,13 @@ from rest_framework.views import APIView
 from rest_framework.exceptions import NotFound, PermissionDenied
 
 
-from weasyprint import HTML
+try:
+    from weasyprint import HTML as WeasyHTML
+except Exception as weasyprint_import_error:  # pragma: no cover - environment dependent
+    WeasyHTML = None
+    WEASYPRINT_IMPORT_ERROR = weasyprint_import_error
+else:
+    WEASYPRINT_IMPORT_ERROR = None
 
 from core.helpers import *
 from core.models import (
@@ -174,6 +180,15 @@ MAPPING_MAX_DEPTH = 3
 
 SETTINGS_MODULE = __import__(os.environ.get("DJANGO_SETTINGS_MODULE"))
 MODULE_PATHS = SETTINGS_MODULE.settings.MODULE_PATHS
+
+
+def _render_pdf_bytes(html: str) -> bytes:
+    """Render PDF bytes, with a clear runtime error when weasyprint native deps are absent."""
+    if WeasyHTML is None:
+        raise RuntimeError(
+            f"PDF rendering is unavailable because weasyprint failed to load: {WEASYPRINT_IMPORT_ERROR}"
+        )
+    return WeasyHTML(string=html).write_pdf()
 
 
 class NullableChoiceFilter(df.MultipleChoiceFilter):
@@ -3347,7 +3362,7 @@ class RiskAssessmentViewSet(BaseModelViewSet):
                 "feature_flags": feature_flags,
             }
             html = render_to_string("core/ra_pdf.html", data)
-            pdf_file = HTML(string=html).write_pdf()
+            pdf_file = _render_pdf_bytes(html)
             response = HttpResponse(pdf_file, content_type="application/pdf")
             return response
         else:
@@ -3394,7 +3409,7 @@ class RiskAssessmentViewSet(BaseModelViewSet):
                 "risk_assessment": risk_assessment_object,
             }
             html = render_to_string("core/risk_action_plan_pdf.html", data)
-            pdf_file = HTML(string=html).write_pdf()
+            pdf_file = _render_pdf_bytes(html)
             response = HttpResponse(pdf_file, content_type="application/pdf")
             return response
         else:
@@ -8476,7 +8491,7 @@ class ComplianceAssessmentViewSet(BaseModelViewSet):
                 "compliance_assessment": compliance_assessment_object,
             }
             html = render_to_string("core/action_plan_pdf.html", data)
-            pdf_file = HTML(string=html).write_pdf()
+            pdf_file = _render_pdf_bytes(html)
             response = HttpResponse(pdf_file, content_type="application/pdf")
             return response
         else:
@@ -10626,7 +10641,7 @@ class FindingsAssessmentViewSet(BaseModelViewSet):
         }
 
         html = render_to_string("core/findings_assessment_pdf.html", context)
-        pdf_file = HTML(string=html).write_pdf()
+        pdf_file = _render_pdf_bytes(html)
         response = HttpResponse(pdf_file, content_type="application/pdf")
         safe_name = slugify(findings_assessment.name) or "findings_assessment"
         response["Content-Disposition"] = (
@@ -11009,7 +11024,7 @@ class IncidentViewSet(ExportMixin, BaseModelViewSet):
         }
 
         html = render_to_string("core/incident_pdf.html", context)
-        pdf_file = HTML(string=html).write_pdf()
+        pdf_file = _render_pdf_bytes(html)
         response = HttpResponse(pdf_file, content_type="application/pdf")
         safe_name = slugify(incident.name) or "incident"
         response["Content-Disposition"] = (

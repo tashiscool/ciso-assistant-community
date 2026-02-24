@@ -3,7 +3,7 @@ import { BasePage } from './base-page.js';
 
 export class AnalyticsPage extends BasePage {
 	constructor(public readonly page: Page) {
-		super(page, '/analytics', 'Analytics');
+		super(page, '/analytics', /Analytics/i);
 		// this.page.goto('/analytics');
 	}
 }

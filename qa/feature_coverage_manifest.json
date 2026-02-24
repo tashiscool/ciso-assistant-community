@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "features": [
+    {
+      "id": "connectors",
+      "name": "Connector Management",
+      "frontend_routes": ["/connectors"],
+      "backend_endpoints": ["/api/connectors/instances/", "/api/connectors/registry/"],
+      "required_frontend_tag": "feature:connectors",
+      "required_backend_tag": "feature:connectors"
+    },
+    {
+      "id": "assessments_lightning",
+      "name": "Lightning Assessments",
+      "frontend_routes": ["/assessments/lightning"],
+      "backend_endpoints": ["/api/assessments/lightning/"],
+      "required_frontend_tag": "feature:assessments_lightning",
+      "required_backend_tag": "feature:assessments_lightning"
+    },
+    {
+      "id": "version_history",
+      "name": "Version History",
+      "frontend_routes": ["/version-history"],
+      "backend_endpoints": [
+        "/api/version-history/",
+        "/api/version-history/snapshots/",
+        "/api/version-history/diff/",
+        "/api/version-history/audit/"
+      ],
+      "required_frontend_tag": "feature:version_history",
+      "required_backend_tag": "feature:version_history"
+    },
+    {
+      "id": "security_graph",
+      "name": "Security Graph",
+      "frontend_routes": ["/security-graph"],
+      "backend_endpoints": ["/api/security-graph/", "/api/security-graph/attack-paths/"],
+      "required_frontend_tag": "feature:security_graph",
+      "required_backend_tag": "feature:security_graph"
+    },
+    {
+      "id": "evidence_automation",
+      "name": "Evidence Automation",
+      "frontend_routes": ["/evidence-automation"],
+      "backend_endpoints": ["/api/evidence-automation/sources/", "/api/evidence-automation/source-types/"],
+      "required_frontend_tag": "feature:evidence_automation",
+      "required_backend_tag": "feature:evidence_automation"
+    },
+    {
+      "id": "workflows",
+      "name": "Workflow Automation",
+      "frontend_routes": ["/workflows"],
+      "backend_endpoints": ["/api/workflows/"],
+      "required_frontend_tag": "feature:workflows",
+      "required_backend_tag": "feature:workflows"
+    },
+    {
+      "id": "oscal",
+      "name": "OSCAL Import/Export",
+      "frontend_routes": ["/oscal"],
+      "backend_endpoints": ["/api/oscal/import/validate/", "/api/oscal/export/"],
+      "required_frontend_tag": "feature:oscal",
+      "required_backend_tag": "feature:oscal"
+    }
+  ]
+}

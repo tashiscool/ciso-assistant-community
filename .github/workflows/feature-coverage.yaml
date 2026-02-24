@@ -1,0 +1,27 @@
+name: Feature Coverage Guard
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    branches: [main, develop]
+    types: [opened, synchronize]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "qa/feature_coverage_manifest.json"
+      - "scripts/check_feature_coverage.py"
+      - ".github/workflows/feature-coverage.yaml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  feature-coverage:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate feature coverage manifest and test traceability
+        run: python3 scripts/check_feature_coverage.py

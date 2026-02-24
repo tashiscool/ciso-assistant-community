@@ -1,7 +1,6 @@
 from allauth.headless.base.views import APIView
 from allauth.headless.socialaccount.forms import RedirectToProviderForm
 from allauth.socialaccount import providers
-from allauth.socialaccount.providers.saml.views import render_authentication_error
 from django.core.exceptions import ValidationError
 from core.views import BaseModelViewSet as AbstractBaseModelViewSet
 from rest_framework.decorators import action
@@ -14,6 +13,32 @@ from .serializers import SSOSettingsWriteSerializer
 
 logger = get_logger(__name__)
 
+try:
+    from allauth.socialaccount.providers.saml.views import (
+        render_authentication_error as _render_authentication_error,
+    )
+except Exception as exc:  # pragma: no cover - env dependent
+    logger.warning(
+        "SAML authentication renderer unavailable; using fallback error response",
+        error=str(exc),
+    )
+
+    def _render_authentication_error(request, provider=None, exception=None, error=None):
+        provider_id = getattr(provider, "id", provider)
+        detail = "SSO provider integration is unavailable in this environment."
+        if exception is not None:
+            detail = str(exception)
+        if error:
+            detail = f"{detail} ({error})"
+        return Response(
+            {
+                "error": "sso_unavailable",
+                "detail": detail,
+                "provider": provider_id,
+            },
+            status=503,
+        )
+
 
 class RedirectToProviderView(APIView):
     handle_json_input = False
@@ -21,7 +46,7 @@ class RedirectToProviderView(APIView):
     def post(self, request, *args, **kwargs):
         form = RedirectToProviderForm(request.POST)
         if not form.is_valid():
-            return render_authentication_error(
+            return _render_authentication_error(
                 request,
                 provider=request.POST.get("provider"),
                 exception=ValidationError(form.errors),
@@ -38,7 +63,7 @@ class RedirectToProviderView(APIView):
             )
         except Exception as e:
             logger.error("SSO redirection failed", provider=provider.id, exc_info=e)
-            return render_authentication_error(request, provider, error="failedSSO")
+            return _render_authentication_error(request, provider, error="failedSSO")
 
 
 class BaseModelViewSet(AbstractBaseModelViewSet):

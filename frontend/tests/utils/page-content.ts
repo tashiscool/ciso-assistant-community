@@ -23,6 +23,7 @@ export class PageContent extends BasePage {
 	readonly deleteModalCancelButton: Locator;
 	readonly deleteModalPromptConfirmButton: Locator;
 	readonly deleteModalPromptConfirmText: Locator;
+	private lastCreatedItemId: string | null;
 
 	constructor(
 		public readonly page: Page,
@@ -48,6 +49,7 @@ export class PageContent extends BasePage {
 		this.deleteModalCancelButton = this.page.getByTestId('delete-cancel-button');
 		this.deleteModalPromptConfirmButton = this.page.getByTestId('delete-prompt-confirm-button');
 		this.deleteModalPromptConfirmText = this.page.getByTestId('delete-prompt-confirm-text');
+		this.lastCreatedItemId = null;
 	}
 
 	async createItem(
@@ -56,6 +58,7 @@ export class PageContent extends BasePage {
 		page?: Page,
 		addButtonValue?: string
 	) {
+		this.lastCreatedItemId = null;
 		if (dependency) {
 			await this.page.goto('/libraries');
 			await this.page.waitForURL('/libraries');
@@ -64,12 +67,35 @@ export class PageContent extends BasePage {
 			await this.goto();
 		}
 
-		// Default to the first add button if no value is provided
-		// addButtonValue is useful when there is multiple tabs with add buttons
-		if (addButtonValue === undefined) {
-			await this.addButton.first().click();
-		} else {
-			await this.addButton.filter({ hasText: addButtonValue }).click();
+		// Open creation modal with retries to absorb transient UI overlays/animation timing.
+		let opened = false;
+		for (let attempt = 0; attempt < 3; attempt++) {
+			const addButtonLocator =
+				addButtonValue === undefined
+					? this.page.locator('[data-testid="add-button"]:visible').first()
+					: this.page
+							.locator('[data-testid="add-button"]:visible')
+							.filter({ hasText: addButtonValue })
+							.first();
+			await expect(addButtonLocator).toBeVisible({ timeout: 10_000 });
+			await addButtonLocator.click({ timeout: 10_000 });
+			opened = await this.form.formTitle
+				.waitFor({ state: 'visible', timeout: 5_000 })
+				.then(() => true)
+				.catch(() => false);
+			if (!opened) {
+				await this.page.keyboard.press('c').catch(() => null);
+				opened = await this.form.formTitle
+					.waitFor({ state: 'visible', timeout: 2_000 })
+					.then(() => true)
+					.catch(() => false);
+			}
+			if (opened) break;
+			await this.page.locator('body').press('Escape').catch(() => null);
+			await this.page.waitForTimeout(400);
+		}
+		if (!opened) {
+			throw new Error(`Could not open create modal on ${this.url}`);
 		}
 		await this.form.hasTitle();
 		if (page) {
@@ -77,6 +103,68 @@ export class PageContent extends BasePage {
 		}
 
 		await this.form.fill(values);
+
+		// Ensure required folder selection is set for forms where autocomplete can stay empty.
+		const folderField = this.page.getByTestId('form-input-folder');
+		if (await folderField.isVisible({ timeout: 1_000 }).catch(() => false)) {
+			const hasFolderSelection = await folderField
+				.evaluate((container) => {
+					const hiddenFolderValues = Array.from(
+						container.querySelectorAll('input[type="hidden"][name="folder"]')
+					)
+						.map((input) => (input as HTMLInputElement).value?.trim())
+						.filter((value) => Boolean(value));
+					if (hiddenFolderValues.length > 0) return true;
+
+					const selectedList = container.querySelector('[aria-label="selected options"]');
+					if (!selectedList) return false;
+					const selectedLabels = Array.from(selectedList.children)
+						.filter((child) => child instanceof HTMLElement)
+						.filter((child) => !child.querySelector('[role="combobox"], input, textarea'))
+						.map((child) => child.textContent?.trim() ?? '')
+						.filter((value) => value.length > 0);
+					return selectedLabels.length > 0;
+				})
+				.catch(() => false);
+			if (!hasFolderSelection) {
+				await folderField.click();
+				const desiredFolder =
+					typeof values.folder === 'string'
+						? values.folder
+						: typeof values.folder === 'object' &&
+							  values.folder &&
+							  'value' in values.folder &&
+							  typeof values.folder.value === 'string'
+							? values.folder.value
+							: '';
+				const escapedDesiredFolder = desiredFolder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+				const desiredOption = desiredFolder
+					? this.page.getByRole('option', { name: new RegExp(escapedDesiredFolder, 'i') }).first()
+					: this.page.getByRole('option').first();
+					if (await desiredOption.isVisible({ timeout: 2_000 }).catch(() => false)) {
+						await desiredOption.click();
+					} else {
+						const firstOption = this.page.getByRole('option').first();
+						if (await firstOption.isVisible({ timeout: 2_000 }).catch(() => false)) {
+							await firstOption.click();
+						}
+					}
+
+					const hasFolderSelectionAfterFallback = await folderField
+						.evaluate((container) => {
+							const hiddenFolderValues = Array.from(
+								container.querySelectorAll('input[type="hidden"][name="folder"]')
+							)
+								.map((input) => (input as HTMLInputElement).value?.trim())
+								.filter((value) => Boolean(value));
+							return hiddenFolderValues.length > 0;
+						})
+						.catch(() => false);
+					if (!hasFolderSelectionAfterFallback) {
+						throw new Error('Folder autocomplete remained empty after fallback selection');
+					}
+				}
+			}
 
 		// If parent_folder field is visible and enabled (enterprise edition) and not already provided, fill it with 'Global'
 		const parentFolderField = this.page.getByTestId('form-input-parent-folder');
@@ -95,7 +183,24 @@ export class PageContent extends BasePage {
 			}
 		}
 
+		const createActionResponsePromise = this.page
+			.waitForResponse(
+				(response) =>
+					response.request().method() === 'POST' && response.url().includes(`${this.url}?/create`),
+				{ timeout: 20_000 }
+			)
+			.catch(() => null);
+
 		await this.form.saveButton.click();
+
+		const createActionResponse = await createActionResponsePromise;
+		if (createActionResponse && createActionResponse.ok()) {
+			const body = await createActionResponse.text().catch(() => '');
+			const createdItemId = this.extractCreatedItemId(body);
+			if (createdItemId) {
+				this.lastCreatedItemId = createdItemId;
+			}
+		}
 		await expect(this.form.formTitle).not.toBeVisible();
 		const modelSpecificToastPattern =
 			typeof this.name == 'string'
@@ -140,13 +245,85 @@ export class PageContent extends BasePage {
 
 	async viewItemDetail(value?: string) {
 		if (value) {
-			await this.getRow(value).getByTestId('tablerow-detail-button').click();
-			this.itemDetail.setItem(value);
+			const rowByValue = this.getRow(value, [
+				{ has: this.page.getByTestId('tablerow-detail-button').first() }
+			]);
+			if (await rowByValue.isHidden().catch(() => true)) {
+				await this.searchInput.fill(value);
+				await this.searchInput.press('Enter').catch(() => null);
+				await this.page.waitForTimeout(1200);
+			}
+
+			const rowVisibleAfterSearch = await rowByValue
+				.isVisible({ timeout: 2000 })
+				.catch(() => false);
+			if (rowVisibleAfterSearch) {
+				await rowByValue.getByTestId('tablerow-detail-button').click();
+				this.itemDetail.setItem(value);
+			} else {
+				const itemId = this.lastCreatedItemId ?? (await this.findItemIdByName(value));
+				if (!itemId) {
+					throw new Error(
+						`Could not find "${value}" in table rows or via list API lookup on ${this.url}`
+					);
+				}
+				await this.page.goto(`${this.url}/${itemId}`);
+				this.itemDetail.setItem(value);
+			}
 		} else {
 			await this.getRow().getByTestId('tablerow-detail-button').click();
 			this.itemDetail.setItem(await this.getRow().innerText());
 		}
 		await this.page.waitForURL(new RegExp('^.*\\' + this.url + '/.+'));
+	}
+
+	private async findItemIdByName(value: string): Promise<string | null> {
+		return this.page.evaluate(
+			async ({ url, itemName }) => {
+				const normalizedValue = itemName.toLowerCase();
+				const limit = 100;
+				const matches = (item: Record<string, any>) => {
+					const candidates: unknown[] = [
+						item?.name,
+						item?.str,
+						item?.display_name,
+						item?.title,
+						item?.ref_id,
+						item?.perimeter?.str,
+						item?.folder?.str
+					];
+					return candidates.some(
+						(candidate) =>
+							typeof candidate === 'string' &&
+							candidate.toLowerCase().includes(normalizedValue)
+					);
+				};
+
+				for (let offset = 0; offset < 10_000; offset += limit) {
+					const response = await fetch(`${url}?offset=${offset}&limit=${limit}`, {
+						headers: { accept: 'application/json' }
+					}).catch(() => null);
+					if (!response || !response.ok) return null;
+
+					const payload = await response.json().catch(() => null);
+					const results = Array.isArray(payload?.results) ? payload.results : [];
+					const match = results.find((row) => matches(row));
+					if (match?.id && typeof match.id === 'string') return match.id;
+
+					const count = Number(payload?.count ?? 0);
+					if (!Number.isFinite(count) || count <= 0 || offset + limit >= count) break;
+				}
+				return null;
+			},
+			{ url: this.url, itemName: value }
+		);
+	}
+
+	private extractCreatedItemId(actionResponseBody: string): string | null {
+		if (!actionResponseBody) return null;
+		const escapedURL = this.url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		const match = actionResponseBody.match(new RegExp(`${escapedURL}/([0-9a-fA-F-]{36})`));
+		return match?.[1] ?? null;
 	}
 
 	/**
