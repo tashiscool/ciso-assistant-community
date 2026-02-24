@@ -38,7 +38,7 @@
 		nullable?: boolean;
 		mandatory?: boolean;
 		disabled?: boolean;
-		hidden?: boolean;
+		hidden?: boolean | unknown[] | Record<string, unknown> | null;
 		translateOptions?: boolean;
 		options?: Option[];
 		optionsEndpoint?: string;
@@ -120,6 +120,16 @@
 		optionSnippet = undefined,
 		placeholder = ''
 	}: Props = $props();
+
+	const isFieldHidden = $derived.by(() => {
+		if (Array.isArray(hidden)) {
+			return hidden.length > 0;
+		}
+		if (hidden && typeof hidden === 'object') {
+			return Object.keys(hidden).length > 0;
+		}
+		return Boolean(hidden);
+	});
 
 	if (translateOptions) {
 		options = options.map((option) => {
@@ -414,7 +424,7 @@
 	};
 </script>
 
-<div class={baseClass} {hidden}>
+<div class={baseClass} hidden={isFieldHidden}>
 	{#if label !== undefined}
 		{#if $constraints?.required || mandatory}
 			<label class="text-sm font-semibold" for={field}

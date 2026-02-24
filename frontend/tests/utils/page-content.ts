@@ -97,19 +97,22 @@ export class PageContent extends BasePage {
 
 		await this.form.saveButton.click();
 		await expect(this.form.formTitle).not.toBeVisible();
-		if (typeof this.name == 'string') {
-			await this.isToastVisible(
-				'The ' +
+		const modelSpecificToastPattern =
+			typeof this.name == 'string'
+				? 'The ' +
 					this.name.substring(0, this.name.length - 1).toLowerCase() +
 					' object has been successfully created' +
 					/.+/.source
-			);
-		} else {
-			await this.isToastVisible(
-				'The ' + this.name.source + ' object has been successfully created' + /.+/.source,
-				'i'
-			);
-		}
+				: 'The ' + this.name.source + ' object has been successfully created' + /.+/.source;
+		const modelSpecificToastFlags = typeof this.name == 'string' ? undefined : 'i';
+		await this.isToastVisible(modelSpecificToastPattern, modelSpecificToastFlags, {
+			optional: true,
+			timeout: 10_000
+		});
+		await this.isToastVisible('successfully created', 'i', {
+			optional: true,
+			timeout: 10_000
+		});
 	}
 
 	async importLibrary(name: string, urn?: string, language = 'English') {

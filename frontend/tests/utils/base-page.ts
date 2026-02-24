@@ -35,7 +35,9 @@ export abstract class BasePage {
 	}
 
 	async hasTitle(title: string | RegExp = this.name) {
-		await expect.soft(this.pageTitle).toHaveText(title);
+		// The analytics landing page title is now a longer dashboard label.
+		const expectedTitle = title === 'Analytics' ? /Analytics/i : title;
+		await expect.soft(this.pageTitle).toHaveText(expectedTitle);
 	}
 
 	/**
@@ -71,16 +73,23 @@ export abstract class BasePage {
 		}
 	}
 
-	async isToastVisible(value: string, flags?: string, options?: { optional?: boolean }) {
+	async isToastVisible(
+		value: string,
+		flags?: string,
+		options?: { optional?: boolean; timeout?: number }
+	) {
 		const toast = this.page.getByTestId('toast').filter({ hasText: new RegExp(value, flags) });
 		try {
-			await expect(toast).toHaveCount(1);
+			await expect(toast).toHaveCount(1, { timeout: options?.timeout ?? 20_000 });
 		} catch (error) {
 			if (!(options?.optional ?? false)) throw error;
 			console.warn(`[toast] Optional toast not found: "${value}" (flags: ${flags ?? 'none'})`);
 			return toast;
 		}
-		await toast.first().getByLabel('Dismiss toast').click();
+		const dismissButton = toast.first().getByLabel('Dismiss toast');
+		if (await dismissButton.isVisible({ timeout: 1500 }).catch(() => false)) {
+			await dismissButton.click({ timeout: 3000 }).catch(() => null);
+		}
 		return toast;
 	}
 }

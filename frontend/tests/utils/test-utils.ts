@@ -183,7 +183,8 @@ export const test = base.extend<Fixtures>({
 			{ name: 'description', type: type.TEXT },
 			{ name: 'folder', type: type.SELECT_AUTOCOMPLETE },
 			{ name: 'ref_id', type: type.TEXT },
-			{ name: 'lc_status', type: type.SELECT }
+			{ name: 'lc_status', type: type.SELECT },
+			{ name: 'default_assignee', type: type.SELECT_AUTOCOMPLETE }
 		]);
 		await use(pPage);
 	},
@@ -555,7 +556,7 @@ export class TestContent {
 					name: vars.perimeterName,
 					description: vars.description,
 					folder: vars.folderName,
-					ref_id: 'R.1234',
+					ref_id: 'R-1234',
 					lc_status: 'Production'
 				},
 				editParams: {
@@ -755,7 +756,7 @@ export class TestContent {
 				build: {
 					name: vars.riskAcceptanceName,
 					description: vars.description,
-					expiry_date: '2025-01-01',
+					expiry_date: '2100-01-01',
 					folder: vars.folderName,
 					approver: LoginPage.defaultEmail,
 					risk_scenarios: [
@@ -765,7 +766,7 @@ export class TestContent {
 				editParams: {
 					name: '',
 					description: '',
-					expiry_date: '2025-12-31'
+					expiry_date: '2100-12-31'
 					//TODO add approver & risk_scenarios
 				}
 			},
@@ -866,6 +867,11 @@ export class TestContent {
 
 export function setHttpResponsesListener(page: Page) {
 	page.on('response', (response) => {
+		if (response.status() >= 400) {
+			console.error(
+				`[http] ${response.status()} ${response.request().method()} ${response.url()}`
+			);
+		}
 		expect.soft(response.status()).toBeOneofValues([100, 399]);
 	});
 }

@@ -57,7 +57,7 @@ test('user usual routine actions are working correctly', async ({
 			name: vars.perimeterName,
 			description: vars.description,
 			folder: vars.folderName,
-			ref_id: 'R.1234',
+			ref_id: 'R-1234',
 			lc_status: 'Production'
 		});
 
@@ -257,7 +257,7 @@ test('user usual routine actions are working correctly', async ({
 		await pages.riskAcceptancesPage.createItem({
 			name: vars.riskAcceptanceName,
 			description: vars.description,
-			expiry_date: '2025-01-01',
+			expiry_date: '2100-01-01',
 			folder: vars.folderName,
 			approver: LoginPage.defaultEmail,
 			risk_scenarios: [
