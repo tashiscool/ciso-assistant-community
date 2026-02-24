@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import * as m from '$paraglide/messages';
 	import { base } from '$app/paths';
-	import { BASE_API_URL } from '$lib/utils/constants';
 	import { getToastStore } from '$lib/components/Toast/stores';
 
 	const toastStore = getToastStore();
@@ -84,7 +83,7 @@
 
 		loading = true;
 		try {
-			const res = await fetch(`${BASE_API_URL}/workflows/`, {
+			const res = await fetch('/workflows/api/', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -115,7 +114,9 @@
 		if (!confirm('Are you sure you want to delete this workflow?')) return;
 
 		try {
-			const res = await fetch(`${BASE_API_URL}/workflows/${id}/`, { method: 'DELETE' });
+			const res = await fetch(`/workflows/api/${id}/`, {
+				method: 'DELETE',
+			});
 			if (res.ok) {
 				workflows = workflows.filter(w => w.id !== id);
 			}
@@ -126,7 +127,9 @@
 
 	async function activateWorkflow(id: string) {
 		try {
-			const res = await fetch(`${BASE_API_URL}/workflows/${id}/activate/`, { method: 'POST' });
+			const res = await fetch(`/workflows/api/${id}/activate/`, {
+				method: 'POST',
+			});
 			if (res.ok) {
 				const updated = await res.json();
 				workflows = workflows.map(w => w.id === id ? { ...w, status: 'active' } : w);
@@ -138,7 +141,9 @@
 
 	async function deactivateWorkflow(id: string) {
 		try {
-			const res = await fetch(`${BASE_API_URL}/workflows/${id}/deactivate/`, { method: 'POST' });
+			const res = await fetch(`/workflows/api/${id}/deactivate/`, {
+				method: 'POST',
+			});
 			if (res.ok) {
 				workflows = workflows.map(w => w.id === id ? { ...w, status: 'inactive' } : w);
 			}
@@ -149,7 +154,9 @@
 
 	async function executeWorkflow(id: string) {
 		try {
-			const res = await fetch(`${BASE_API_URL}/workflows/${id}/execute/`, { method: 'POST' });
+			const res = await fetch(`/workflows/api/${id}/execute/`, {
+				method: 'POST',
+			});
 			if (res.ok) {
 				const result = await res.json();
 				toastStore.trigger({ message: `Workflow started. Execution ID: ${result.execution_id}` });

@@ -2,21 +2,32 @@
  * E2E Tests for Workflow Automation feature.
  */
 
-import { test, expect, setHttpResponsesRecordMode } from '../utils/test-utils';
+import { test, expect, setHttpResponsesRecordMode } from '../../utils/test-utils.js';
 
 test.describe('Workflow Automation', () => {
+	const openCreateWorkflowModal = async (page: import('@playwright/test').Page) => {
+		const createButton = page.getByRole('button', { name: /create workflow/i }).first();
+		await createButton.click();
+
+		const modal = page.locator('div.fixed.inset-0.z-50').last();
+		await expect(modal).toBeVisible();
+		return modal;
+	};
+
 	test.beforeEach(async ({ page, sideBar, loginPage }) => {
+		await loginPage.goto();
 		await loginPage.login();
+		await loginPage.skipWelcome();
 	});
 
 	test.describe('Workflow List', () => {
 		test('should display workflow list page', async ({ page, sideBar }) => {
-			await sideBar.click('Workflows', 'Automation');
+			await sideBar.click('automation', '/workflows');
 			await expect(page).toHaveURL(/\/workflows/);
 		});
 
 		test('should show empty state when no workflows exist', async ({ page, sideBar }) => {
-			await sideBar.click('Workflows', 'Automation');
+			await sideBar.click('automation', '/workflows');
 
 			const emptyState = page.locator('[data-testid="no-workflows"]');
 			const workflowCards = page.locator('[data-testid="workflow-card"]');
@@ -29,14 +40,14 @@ test.describe('Workflow Automation', () => {
 		});
 
 		test('should have create workflow button', async ({ page, sideBar }) => {
-			await sideBar.click('Workflows', 'Automation');
+			await sideBar.click('automation', '/workflows');
 
-			const createButton = page.locator('button:has-text("Create Workflow")');
+			const createButton = page.getByRole('button', { name: /create workflow/i }).first();
 			await expect(createButton).toBeVisible();
 		});
 
 		test('should filter workflows by status', async ({ page, sideBar }) => {
-			await sideBar.click('Workflows', 'Automation');
+			await sideBar.click('automation', '/workflows');
 
 			const statusFilter = page.locator('select:has-text("All Statuses")');
 			await expect(statusFilter).toBeVisible();
@@ -47,7 +58,7 @@ test.describe('Workflow Automation', () => {
 		});
 
 		test('should search workflows', async ({ page, sideBar }) => {
-			await sideBar.click('Workflows', 'Automation');
+			await sideBar.click('automation', '/workflows');
 
 			const searchInput = page.locator('input[placeholder*="Search"]');
 			await expect(searchInput).toBeVisible();
@@ -59,55 +70,39 @@ test.describe('Workflow Automation', () => {
 
 	test.describe('Create Workflow', () => {
 		test('should open create workflow modal', async ({ page, sideBar }) => {
-			await sideBar.click('Workflows', 'Automation');
+			await sideBar.click('automation', '/workflows');
 
-			const createButton = page.locator('button:has-text("Create Workflow")');
-			await createButton.click();
-
-			// Modal should appear
-			const modal = page.locator('[data-testid="create-workflow-modal"]');
-			await expect(modal).toBeVisible().catch(() => {
-				// Modal may have different test id
-			});
+			await openCreateWorkflowModal(page);
 		});
 
 		test('should require workflow name', async ({ page, sideBar }) => {
-			await sideBar.click('Workflows', 'Automation');
+			await sideBar.click('automation', '/workflows');
 
-			const createButton = page.locator('button:has-text("Create Workflow")');
-			await createButton.click();
-
-			// Find the form submit button
-			const submitButton = page.locator('button:has-text("Create")').last();
-			await submitButton.click();
-
-			// Should show validation error or remain in modal
+			const modal = await openCreateWorkflowModal(page);
+			const submitButton = modal.getByRole('button', { name: /create\s*&\s*open builder/i });
+			await expect(submitButton).toBeDisabled();
 		});
 
 		test('should create workflow with valid data', async ({ page, sideBar }) => {
-			await sideBar.click('Workflows', 'Automation');
+			await sideBar.click('automation', '/workflows');
 
-			const createButton = page.locator('button:has-text("Create Workflow")');
-			await createButton.click();
-
-			// Fill form
-			const nameInput = page.locator('input[placeholder*="Workflow"]');
+			const modal = await openCreateWorkflowModal(page);
+			const nameInput = modal.locator('input[type="text"]').first();
 			await nameInput.fill('Test Automation Workflow');
 
-			const descriptionInput = page.locator('textarea');
+			const descriptionInput = modal.locator('textarea').first();
 			await descriptionInput.fill('This is a test workflow');
 
-			// Submit
-			const submitButton = page.locator('button:has-text("Create")').last();
+			const submitButton = modal.getByRole('button', { name: /create\s*&\s*open builder/i });
 			await submitButton.click();
 
-			// Should redirect to builder or show success
+			await expect(page.getByRole('button', { name: /back to list/i })).toBeVisible();
 		});
 	});
 
 	test.describe('Workflow Builder', () => {
 		test('should display workflow builder interface', async ({ page, sideBar }) => {
-			await sideBar.click('Workflows', 'Automation');
+			await sideBar.click('automation', '/workflows');
 
 			// Click on a workflow to open builder (if any exist)
 			const editButton = page.locator('button:has-text("Edit")').first();
@@ -125,29 +120,23 @@ test.describe('Workflow Automation', () => {
 		});
 
 		test('should have back to list button', async ({ page, sideBar }) => {
-			await sideBar.click('Workflows', 'Automation');
+			await sideBar.click('automation', '/workflows');
 
-			// Create a workflow first to enter builder mode
-			const createButton = page.locator('button:has-text("Create Workflow")');
-			await createButton.click();
-
-			const nameInput = page.locator('input[placeholder*="Workflow"]');
+			const modal = await openCreateWorkflowModal(page);
+			const nameInput = modal.locator('input[type="text"]').first();
 			await nameInput.fill('Test Builder Workflow');
 
-			const submitButton = page.locator('button:has-text("Create")').last();
+			const submitButton = modal.getByRole('button', { name: /create\s*&\s*open builder/i });
 			await submitButton.click();
 
-			// Look for back button
-			const backButton = page.locator('button:has-text("Back")');
-			if ((await backButton.count()) > 0) {
-				await expect(backButton).toBeVisible();
-			}
+			const backButton = page.getByRole('button', { name: /back to list/i });
+			await expect(backButton).toBeVisible();
 		});
 	});
 
 	test.describe('Workflow Actions', () => {
 		test('should allow activating a workflow', async ({ page, sideBar }) => {
-			await sideBar.click('Workflows', 'Automation');
+			await sideBar.click('automation', '/workflows');
 
 			const activateButton = page.locator('button[title="Activate"]').first();
 			if ((await activateButton.count()) > 0) {
@@ -156,7 +145,7 @@ test.describe('Workflow Automation', () => {
 		});
 
 		test('should allow deactivating a workflow', async ({ page, sideBar }) => {
-			await sideBar.click('Workflows', 'Automation');
+			await sideBar.click('automation', '/workflows');
 
 			const deactivateButton = page.locator('button[title="Deactivate"]').first();
 			if ((await deactivateButton.count()) > 0) {
@@ -165,7 +154,7 @@ test.describe('Workflow Automation', () => {
 		});
 
 		test('should allow executing a workflow manually', async ({ page, sideBar }) => {
-			await sideBar.click('Workflows', 'Automation');
+			await sideBar.click('automation', '/workflows');
 
 			const runButton = page.locator('button[title="Run now"]').first();
 			if ((await runButton.count()) > 0) {
@@ -174,7 +163,7 @@ test.describe('Workflow Automation', () => {
 		});
 
 		test('should confirm before deleting workflow', async ({ page, sideBar }) => {
-			await sideBar.click('Workflows', 'Automation');
+			await sideBar.click('automation', '/workflows');
 
 			const deleteButton = page.locator('button[title="Delete"]').first();
 			if ((await deleteButton.count()) > 0) {

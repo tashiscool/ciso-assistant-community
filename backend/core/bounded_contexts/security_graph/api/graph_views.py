@@ -20,6 +20,43 @@ from ..services import (
 logger = logging.getLogger(__name__)
 
 
+def _get_accessible_domain_folder_ids(user, limit=5):
+    """
+    Resolve domain folders visible to the requesting user.
+
+    Returns an empty list when no IAM scope is available.
+    """
+    from iam.models import Folder, RoleAssignment
+
+    root_folder = Folder.get_root_folder()
+    if not root_folder:
+        return []
+
+    folder_ids = list(
+        RoleAssignment.get_accessible_folder_ids(
+            root_folder,
+            user,
+            Folder.ContentType.DOMAIN,
+        )
+    )
+    if limit is None:
+        return folder_ids
+    return folder_ids[:limit]
+
+
+def _user_can_access_domain_folder(user, folder_id):
+    """Return True when a domain folder is inside the user's IAM scope."""
+    return folder_id in set(_get_accessible_domain_folder_ids(user, limit=None))
+
+
+def _parse_folder_uuid(folder_id):
+    """Parse a folder identifier and return None when invalid."""
+    try:
+        return UUID(str(folder_id))
+    except (TypeError, ValueError):
+        return None
+
+
 class SecurityGraphView(APIView):
     """Get the complete security graph."""
     permission_classes = [IsAuthenticated]
@@ -39,14 +76,16 @@ class SecurityGraphView(APIView):
             builder = get_graph_builder()
 
             # Build graph from user's accessible folders
-            from iam.models import Folder
-            folders = Folder.objects.filter(
-                content_type=Folder.ContentType.DOMAIN
-            ).values_list('id', flat=True)
+            folder_ids = _get_accessible_domain_folder_ids(request.user)
+            if not folder_ids:
+                empty_graph = SecurityGraph()
+                if output_format == 'vis':
+                    return Response(empty_graph.to_vis_format())
+                return Response(empty_graph.to_dict())
 
             # Build combined graph from all accessible folders
             combined_graph = SecurityGraph()
-            for folder_id in folders[:5]:  # Limit to prevent performance issues
+            for folder_id in folder_ids:
                 folder_graph = builder.build_from_folder(folder_id)
                 for node in folder_graph.nodes.values():
                     combined_graph.add_node(node)
@@ -83,9 +122,21 @@ class SecurityGraphFromFolderView(APIView):
         """
         try:
             output_format = request.query_params.get('format', 'full')
+            folder_uuid = _parse_folder_uuid(folder_id)
+            if folder_uuid is None:
+                return Response(
+                    {'error': 'Invalid folder_id'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if not _user_can_access_domain_folder(request.user, folder_uuid):
+                return Response(
+                    {'error': 'Access denied for requested folder'},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
 
             builder = get_graph_builder()
-            graph = builder.build_from_folder(UUID(folder_id))
+            graph = builder.build_from_folder(folder_uuid)
 
             # Compute metrics
             graph.compute_degrees()
@@ -211,14 +262,31 @@ class BlastRadiusView(APIView):
                 )
 
             # Build graph context
-            builder = get_graph_builder()
             if folder_id:
-                graph = builder.build_from_folder(UUID(folder_id))
+                folder_uuid = _parse_folder_uuid(folder_id)
+                if folder_uuid is None:
+                    return Response(
+                        {'error': 'Invalid folder_id'},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+                if not _user_can_access_domain_folder(request.user, folder_uuid):
+                    return Response(
+                        {'error': 'Access denied for requested folder'},
+                        status=status.HTTP_403_FORBIDDEN,
+                    )
+                builder = get_graph_builder()
+                graph = builder.build_from_folder(folder_uuid)
             else:
                 # Try to determine context from node
                 from core.models import Asset
                 try:
                     asset = Asset.objects.get(id=source_node_id)
+                    if not _user_can_access_domain_folder(request.user, asset.folder_id):
+                        return Response(
+                            {'error': 'Access denied for requested folder'},
+                            status=status.HTTP_403_FORBIDDEN,
+                        )
+                    builder = get_graph_builder()
                     graph = builder.build_from_folder(asset.folder_id)
                 except Asset.DoesNotExist:
                     return Response(
@@ -275,27 +343,31 @@ class AttackPathsView(APIView):
                 )
 
             # Build graph
-            builder = get_graph_builder()
             if folder_id:
-                graph = builder.build_from_folder(UUID(folder_id))
-            else:
-                # Build graph from the user's accessible domain folders.
-                # Uses the same IAM scoping as SecurityGraphView.
-                from iam.models import Folder, RoleAssignment
-                root_folder = Folder.get_root_folder()
-                folder_ids = RoleAssignment.get_accessible_folder_ids(
-                    root_folder, request.user, Folder.ContentType.DOMAIN
-                ) if root_folder else []
-                # Fall back to all domain folders when IAM state is unavailable
-                # (e.g. fresh database with no role assignments).
-                if not folder_ids:
-                    folder_ids = list(
-                        Folder.objects.filter(
-                            content_type=Folder.ContentType.DOMAIN
-                        ).values_list('id', flat=True)[:5]
+                folder_uuid = _parse_folder_uuid(folder_id)
+                if folder_uuid is None:
+                    return Response(
+                        {'error': 'Invalid folder_id'},
+                        status=status.HTTP_400_BAD_REQUEST,
                     )
+                if not _user_can_access_domain_folder(request.user, folder_uuid):
+                    return Response(
+                        {'error': 'Access denied for requested folder'},
+                        status=status.HTTP_403_FORBIDDEN,
+                    )
+                builder = get_graph_builder()
+                graph = builder.build_from_folder(folder_uuid)
+            else:
+                # Build graph from the requesting user's IAM-scoped folders only.
+                folder_ids = _get_accessible_domain_folder_ids(request.user)
+                if not folder_ids:
+                    return Response(
+                        {'error': 'No accessible domain folders found'},
+                        status=status.HTTP_403_FORBIDDEN,
+                    )
+                builder = get_graph_builder()
                 graph = SecurityGraph()
-                for fid in list(folder_ids)[:5]:
+                for fid in folder_ids:
                     fg = builder.build_from_folder(fid)
                     for node in fg.nodes.values():
                         graph.add_node(node)
@@ -335,8 +407,20 @@ class CriticalPathsView(APIView):
         Focuses on paths from threats/external systems to critical assets.
         """
         try:
+            folder_uuid = _parse_folder_uuid(folder_id)
+            if folder_uuid is None:
+                return Response(
+                    {'error': 'Invalid folder_id'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if not _user_can_access_domain_folder(request.user, folder_uuid):
+                return Response(
+                    {'error': 'Access denied for requested folder'},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
             builder = get_graph_builder()
-            graph = builder.build_from_folder(UUID(folder_id))
+            graph = builder.build_from_folder(folder_uuid)
 
             # Compute metrics needed for analysis
             graph.compute_degrees()
@@ -373,9 +457,21 @@ class CriticalNodesView(APIView):
         try:
             top_n = int(request.query_params.get('top_n', 10))
             include_blast_radius = request.query_params.get('include_blast_radius', 'true') == 'true'
+            folder_uuid = _parse_folder_uuid(folder_id)
+            if folder_uuid is None:
+                return Response(
+                    {'error': 'Invalid folder_id'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if not _user_can_access_domain_folder(request.user, folder_uuid):
+                return Response(
+                    {'error': 'Access denied for requested folder'},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
 
             builder = get_graph_builder()
-            graph = builder.build_from_folder(UUID(folder_id))
+            graph = builder.build_from_folder(folder_uuid)
 
             # Compute all metrics
             graph.compute_degrees()
@@ -431,8 +527,20 @@ class ImpactSummaryView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
+            folder_uuid = _parse_folder_uuid(folder_id)
+            if folder_uuid is None:
+                return Response(
+                    {'error': 'Invalid folder_id'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if not _user_can_access_domain_folder(request.user, folder_uuid):
+                return Response(
+                    {'error': 'Access denied for requested folder'},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
             builder = get_graph_builder()
-            graph = builder.build_from_folder(UUID(folder_id))
+            graph = builder.build_from_folder(folder_uuid)
 
             analyzer = get_blast_radius_analyzer()
             summary = analyzer.get_impact_summary(
@@ -459,8 +567,20 @@ class GraphStatisticsView(APIView):
         Get detailed statistics about a folder's security graph.
         """
         try:
+            folder_uuid = _parse_folder_uuid(folder_id)
+            if folder_uuid is None:
+                return Response(
+                    {'error': 'Invalid folder_id'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if not _user_can_access_domain_folder(request.user, folder_uuid):
+                return Response(
+                    {'error': 'Access denied for requested folder'},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
             builder = get_graph_builder()
-            graph = builder.build_from_folder(UUID(folder_id))
+            graph = builder.build_from_folder(folder_uuid)
 
             # Compute all metrics
             graph.compute_degrees()
