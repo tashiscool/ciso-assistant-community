@@ -168,8 +168,17 @@ export const handleFetch: HandleFetch = async ({ request, fetch, event }) => {
 	const unsafeMethods = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 	const currentLang = event.locals.user?.preferences?.lang || DEFAULT_LANGUAGE;
 	if (isBackendApiRequest(request.url)) {
-		// Preserve upstream body content types (e.g. multipart/form-data for file uploads).
-		if (!request.headers.has('Content-Type')) {
+		const method = request.method.toUpperCase();
+		const incomingContentType = request.headers.get('Content-Type') || '';
+		const isMultipartRequest = incomingContentType.startsWith('multipart/form-data');
+		const shouldForceJsonContentType =
+			unsafeMethods.has(method) &&
+			!isMultipartRequest &&
+			(!incomingContentType || incomingContentType.startsWith('text/plain'));
+
+		// Some form helpers serialize JSON bodies without explicitly setting content type.
+		// Normalize those requests so DRF JSON parser is used instead of rejecting text/plain.
+		if (shouldForceJsonContentType) {
 			request.headers.set('Content-Type', 'application/json');
 		}
 		request.headers.set('Accept-Language', currentLang);
@@ -181,7 +190,7 @@ export const handleFetch: HandleFetch = async ({ request, fetch, event }) => {
 			request.headers.set('Authorization', `Token ${token}`);
 		}
 
-		if (unsafeMethods.has(request.method) && csrfToken) {
+		if (unsafeMethods.has(method) && csrfToken) {
 			request.headers.set('X-CSRFToken', csrfToken);
 			const existingCookieHeader = request.headers.get('Cookie') || '';
 			if (!existingCookieHeader.includes('csrftoken=')) {

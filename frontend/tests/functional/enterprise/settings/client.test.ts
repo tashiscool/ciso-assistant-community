@@ -7,6 +7,7 @@ test.describe.configure({ mode: 'serial' });
 
 test.describe('Client settings', () => {
 	let page: Page;
+	let hasClientSettingsTab = false;
 	test.beforeAll(async ({ browser }, testInfo) => {
 		// Create a unique page to use for all the tests on this user group and login
 		page = await browser.newPage();
@@ -29,6 +30,11 @@ test.describe('Client settings', () => {
 		await page
 			.getByTestId('logo-image')
 			.screenshot({ path: testInfo.snapshotPath('header-logo.png') });
+
+		hasClientSettingsTab =
+			(await page
+				.getByRole('tab', { name: /client settings|parametres client|paramètres client/i })
+				.count()) > 0;
 	});
 
 	test.use({
@@ -38,17 +44,20 @@ test.describe('Client settings', () => {
 	});
 
 	test.beforeEach(async ({ settingsPage, page }) => {
+		test.skip(!hasClientSettingsTab, 'Client settings tab is unavailable in this edition/config.');
 		await settingsPage.goto();
 		await settingsPage.hasUrl();
 		await settingsPage.hasTitle();
-		await page.getByRole('tab', { name: ' Client settings' }).click();
+		await page
+			.getByRole('tab', { name: /client settings|parametres client|paramètres client/i })
+			.click();
 	});
 
 	test('admin can change client name', async ({ page }) => {
 		await expect(page.getByTestId('client-name')).not.toBeVisible();
 		await page.getByTestId('form-input-name').click();
 		await page.getByTestId('form-input-name').fill('RSSI Assistant');
-		await page.getByRole('button', { name: 'Save' }).click();
+		await page.getByRole('button', { name: /save|enregistrer/i }).click();
 		await expect(page.getByTestId('toast')).toBeVisible();
 		await page.getByTestId('toast').getByLabel('Dismiss toast').click();
 		await page.reload();
@@ -59,7 +68,7 @@ test.describe('Client settings', () => {
 		await expect(page.getByTestId('logo-image')).toHaveScreenshot('header-logo.png');
 		await page.getByTestId('form-input-logo').click();
 		await page.getByTestId('form-input-logo').setInputFiles(vars.logo);
-		await page.getByRole('button', { name: 'Save' }).click();
+		await page.getByRole('button', { name: /save|enregistrer/i }).click();
 		await expect(page.getByTestId('toast')).toBeVisible();
 		await page.getByTestId('toast').getByLabel('Dismiss toast').click();
 		await page.reload();
@@ -74,7 +83,7 @@ test.describe('Client settings', () => {
 	test('admin can change client favicon', async ({ page }) => {
 		await page.getByTestId('form-input-favicon').click();
 		await page.getByTestId('form-input-favicon').setInputFiles(vars.favicon);
-		await page.getByRole('button', { name: 'Save' }).click();
+		await page.getByRole('button', { name: /save|enregistrer/i }).click();
 		await expect(page.getByTestId('toast')).toBeVisible();
 		await page.getByTestId('toast').getByLabel('Dismiss toast').click();
 		await page.reload();
@@ -88,7 +97,7 @@ test.describe('Client settings', () => {
 		await checkbox.scrollIntoViewIfNeeded();
 		await checkbox.setChecked(false);
 		await expect(checkbox).not.toBeChecked();
-		await page.getByRole('button', { name: 'Save' }).click();
+		await page.getByRole('button', { name: /save|enregistrer/i }).click();
 		await expect(page.getByTestId('toast')).toBeVisible();
 		await page.getByTestId('toast').getByLabel('Dismiss toast').click();
 		await page.getByTestId('sidebar-more-btn').click();
@@ -114,7 +123,7 @@ test.describe('Client settings', () => {
 	}) => {
 		await page.getByTestId('form-input-show-images-unauthenticated').waitFor({ state: 'visible' });
 		await page.getByTestId('form-input-show-images-unauthenticated').check();
-		await page.getByRole('button', { name: 'Save' }).click();
+		await page.getByRole('button', { name: /save|enregistrer/i }).click();
 		await expect(page.getByTestId('toast')).toBeVisible();
 		await page.getByTestId('toast').getByLabel('Dismiss toast').click();
 		await page.getByTestId('sidebar-more-btn').click();

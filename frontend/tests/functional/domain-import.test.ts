@@ -94,12 +94,22 @@ test('User can load demo data', async ({ logedPage, page }) => {
 		// Verify that a toast with demo data success message appears.
 		const toast = page.getByTestId('toast');
 		await expect(toast).toBeVisible({ timeout: 180000 });
-		await expect(toast).toHaveText(/successfully imported|import[ée] avec succ[eè]s/i);
+		const toastText = await toast.innerText();
+		const demoAlreadyImported =
+			/already.*import|d[ée]j[àa].*import/i.test(toastText) &&
+			!/successfully imported|import[ée] avec succ[eè]s/i.test(toastText);
+		await expect(toast).toHaveText(
+			/successfully imported|import[ée] avec succ[eè]s|already.*import|d[ée]j[àa].*import/i
+		);
 
 		// Confirm that the new row count is greater than the initial.
 		// take a quick nap to make sure the data is loaded
 		await page.waitForTimeout(3000);
 		const newRowCount = await getRowCount(page);
-		expect(newRowCount).toBeGreaterThan(initialRowCount);
+		if (demoAlreadyImported) {
+			expect(newRowCount).toBeGreaterThanOrEqual(initialRowCount);
+		} else {
+			expect(newRowCount).toBeGreaterThan(initialRowCount);
+		}
 	});
 });

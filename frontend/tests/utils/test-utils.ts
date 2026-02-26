@@ -804,7 +804,7 @@ export class TestContent {
 				displayName: 'Entities',
 				modelName: 'entity',
 				build: {
-					name: 'Test Entity',
+					name: vars.entityName,
 					description: 'Test description',
 					folder: vars.folderName
 				},

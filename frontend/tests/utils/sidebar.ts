@@ -77,14 +77,45 @@ export class SideBar {
 		}).toPass({ timeout: 10000, intervals: [500, 1000, 3000] });
 	}
 
-	async click(parent: string, tab: string, waitForURL = true) {
-		if (!(await this.page.getByTestId('accordion-item-' + tab.substring(1)).isVisible())) {
-			await this.page
-				.getByTestId('accordion-item-' + parent.toLowerCase().replace(' ', '-'))
-				.click();
+	async click(parent: string, tab: string, waitForURL = true, allowMissing = false) {
+		const tabId = tab.substring(1);
+		const parentAccordion = this.page.getByTestId(
+			'accordion-item-' + parent.toLowerCase().replace(' ', '-')
+		);
+		const candidateLocators = [
+			this.page
+				.locator(`[data-testid="accordion-item-${tabId}"][href="${tab}"]`)
+				.first(),
+			this.page
+				.locator(`[data-testid="accordion-item-${tabId.replaceAll('-', '')}"][href="${tab}"]`)
+				.first(),
+			this.page.locator(`a[href="${tab}"]`).first()
+		];
+
+		let target = await this.resolveVisibleLocator(candidateLocators);
+		if (!target && (await parentAccordion.isVisible({ timeout: 1_000 }).catch(() => false))) {
+			await parentAccordion.click();
+			target = await this.resolveVisibleLocator(candidateLocators);
 		}
-		await expect(this.page.getByTestId('accordion-item-' + tab.substring(1))).toBeVisible();
-		await this.page.getByTestId('accordion-item-' + tab.substring(1)).click();
+
+		if (!target) {
+			if (allowMissing) {
+				return false;
+			}
+			throw new Error(`Sidebar item not found for tab "${tab}"`);
+		}
+
+		await target.click();
 		waitForURL ? await this.page.waitForURL(tab) : null;
+		return true;
+	}
+
+	private async resolveVisibleLocator(candidates: Locator[]): Promise<Locator | null> {
+		for (const locator of candidates) {
+			if (await locator.isVisible({ timeout: 1_000 }).catch(() => false)) {
+				return locator;
+			}
+		}
+		return null;
 	}
 }

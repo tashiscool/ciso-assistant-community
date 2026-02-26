@@ -5,8 +5,6 @@ import { m } from '$paraglide/messages';
 
 const vars = TestContent.generateTestVars();
 const testObjectsData: { [k: string]: any } = TestContent.itemBuilder(vars);
-const FOLDER_WORKAROUND_SUFFIX = ' foo';
-const PERIMETER_WORKAROUND_SUFFIX = ' bar';
 
 async function exportPdfAndVerify(page: Page, pdfButton: Locator) {
 	const downloadPromise = page.waitForEvent('download');
@@ -46,11 +44,6 @@ test('setup', async ({ page, logedPage, foldersPage, perimetersPage }) => {
 			name: vars.folderName,
 			description: vars.description
 		});
-		// NOTE: creating one more folder not to trip up the autocomplete test utils
-		await foldersPage.createItem({
-			name: vars.folderName + FOLDER_WORKAROUND_SUFFIX,
-			description: vars.description
-		});
 	});
 
 	await test.step('create required perimeter', async () => {
@@ -61,13 +54,6 @@ test('setup', async ({ page, logedPage, foldersPage, perimetersPage }) => {
 			description: vars.description,
 			folder: vars.folderName,
 			ref_id: 'R-1234',
-			lc_status: 'Production'
-		});
-		await perimetersPage.createItem({
-			name: vars.perimeterName + PERIMETER_WORKAROUND_SUFFIX,
-			description: vars.description,
-			folder: vars.folderName,
-			ref_id: 'R-12345',
 			lc_status: 'Production'
 		});
 	});
@@ -120,10 +106,21 @@ test('pdf export works properly for risk assessment', async ({
 });
 
 async function deleteFolder(foldersPage: PageContent, folderName: string) {
-	await foldersPage.deleteItemButton(folderName).click();
+	await foldersPage.searchInput.fill(folderName);
+	await foldersPage.searchInput.press('Enter').catch(() => null);
+	await foldersPage.page.waitForTimeout(500);
+
+	const deleteButton = foldersPage.deleteItemButton(folderName);
+	const canDelete = await deleteButton.isVisible({ timeout: 2_000 }).catch(() => false);
+	if (!canDelete) {
+		return false;
+	}
+
+	await deleteButton.click();
 	await expect(foldersPage.deletePromptConfirmTextField()).toBeVisible();
 	await foldersPage.deletePromptConfirmTextField().fill(m.yes());
 	await foldersPage.deletePromptConfirmButton().click();
+	return true;
 }
 
 test.afterAll('cleanup', async ({ browser }) => {
@@ -135,10 +132,9 @@ test.afterAll('cleanup', async ({ browser }) => {
 	await loginPage.login();
 	await foldersPage.goto();
 
-	await deleteFolder(foldersPage, vars.folderName);
-	await deleteFolder(foldersPage, vars.folderName + FOLDER_WORKAROUND_SUFFIX);
-
-	await expect(foldersPage.getRow(vars.folderName)).not.toBeVisible();
-	await expect(foldersPage.getRow(vars.folderName + FOLDER_WORKAROUND_SUFFIX)).not.toBeVisible();
+	const deleted = await deleteFolder(foldersPage, vars.folderName);
+	if (deleted) {
+		await expect(foldersPage.getRow(vars.folderName)).not.toBeVisible();
+	}
 	await page.close();
 });

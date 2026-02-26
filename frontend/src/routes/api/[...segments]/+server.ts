@@ -24,6 +24,19 @@ const proxy: RequestHandler = async ({ fetch, params, request, url, cookies }) =
 	}
 
 	const method = request.method.toUpperCase();
+	const incomingContentType = headers.get('content-type') || '';
+	const hasRequestBody = method !== 'GET' && method !== 'HEAD';
+	const isMultipartRequest = incomingContentType.startsWith('multipart/form-data');
+	const shouldForceJsonContentType =
+		hasRequestBody &&
+		!isMultipartRequest &&
+		(!incomingContentType || incomingContentType.startsWith('text/plain'));
+
+	// Some client-side create flows send JSON strings without explicitly setting content type.
+	// Normalize those requests so DRF parsers don't reject them as text/plain.
+	if (shouldForceJsonContentType) {
+		headers.set('content-type', 'application/json');
+	}
 	if (UNSAFE_METHODS.has(method) && csrfToken) {
 		if (!headers.has('x-csrftoken')) {
 			headers.set('x-csrftoken', csrfToken);
@@ -39,8 +52,7 @@ const proxy: RequestHandler = async ({ fetch, params, request, url, cookies }) =
 		}
 	}
 
-	const body =
-		method === 'GET' || method === 'HEAD' ? undefined : await request.arrayBuffer();
+	const body = hasRequestBody ? await request.arrayBuffer() : undefined;
 
 	const response = await fetch(targetUrl, {
 		method,

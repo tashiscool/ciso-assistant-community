@@ -78,6 +78,7 @@ from django.core.cache import cache
 
 from django.apps import apps
 from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
 from django.core.files.storage import default_storage
@@ -6420,6 +6421,10 @@ class FolderViewSet(BaseModelViewSet):
                 raise ValidationError({"error": "invalidSchemaVersionFormat"})
             compare_schema_versions(schema_version_int, import_version)
 
+            # Older backups can still reference the legacy URN namespace.
+            # Normalize before validation/import so library resolution keeps working.
+            json_dump = self._normalize_legacy_urns(json_dump)
+
             if "attachments" in directories:
                 attachments = {
                     f for f in infolist if Path(f.filename).parent.name == "attachments"
@@ -6452,6 +6457,28 @@ class FolderViewSet(BaseModelViewSet):
         """Build a map of model names to model classes."""
         model_names = {obj["model"] for obj in objects}
         return {name: apps.get_model(name) for name in model_names}
+
+    def _normalize_legacy_urn_value(self, value):
+        """Normalize legacy URN prefixes used by older exported backups."""
+        if not isinstance(value, str):
+            return value
+
+        legacy_prefix = "urn:intuitem:risk:"
+        if value.lower().startswith(legacy_prefix):
+            return "urn:ciso:risk:" + value[len(legacy_prefix) :]
+        return value
+
+    def _normalize_legacy_urns(self, payload):
+        """Recursively normalize legacy URN strings across an imported payload."""
+        if isinstance(payload, dict):
+            return {
+                key: self._normalize_legacy_urns(value) for key, value in payload.items()
+            }
+        if isinstance(payload, list):
+            return [self._normalize_legacy_urns(item) for item in payload]
+        if isinstance(payload, str):
+            return self._normalize_legacy_urn_value(payload)
+        return payload
 
     def _resolve_dependencies(self, all_models):
         """Resolve model dependencies and detect cycles."""
@@ -6497,11 +6524,13 @@ class FolderViewSet(BaseModelViewSet):
             for model in filter(
                 lambda x: x not in [RequirementAssessment], models_map.values()
             ):
-                if not RoleAssignment.is_access_allowed(
+                add_permission = Permission.objects.filter(
+                    codename=f"add_{model._meta.model_name}",
+                    content_type=ContentType.objects.get_for_model(model),
+                ).first()
+                if not add_permission or not RoleAssignment.is_access_allowed(
                     user=user,
-                    perm=Permission.objects.get(
-                        codename=f"add_{model._meta.model_name}"
-                    ),
+                    perm=add_permission,
                     folder=Folder.get_root_folder(),
                 ):
                     error_dict[model._meta.model_name] = "permission_denied"

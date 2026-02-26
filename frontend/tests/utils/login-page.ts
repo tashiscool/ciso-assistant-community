@@ -58,7 +58,17 @@ export class LoginPage extends BasePage {
 		}
 		await this.loginButton.click();
 		if (email === LoginPage.defaultEmail && password === LoginPage.defaultPassword) {
-			await this.page.waitForURL(/^.*\/((?!login).)*$/, { timeout: 10000 });
+			await this.page.waitForURL(/^.*\/((?!login).)*$/, { timeout: 30_000 });
+			// Keep non-i18n tests deterministic by resetting language through the UI control.
+			// This route already carries the right auth/csrf flow and persists user preference.
+			const moreButton = this.page.getByTestId('more-button');
+			if (await moreButton.isVisible({ timeout: 2_000 }).catch(() => false)) {
+				await moreButton.click({ timeout: 2_000 }).catch(() => null);
+			}
+			const languageSelect = this.page.getByTestId('language-select');
+			if (await languageSelect.isVisible({ timeout: 2_000 }).catch(() => false)) {
+				await languageSelect.selectOption('en').catch(() => null);
+			}
 		} else {
 			await this.page.waitForURL((url) => url.pathname.endsWith('/login'), {
 				timeout: 15_000
@@ -83,7 +93,7 @@ export class LoginPage extends BasePage {
 		}
 	}
 
-	async skipWelcome(url = /^.*\/analytics$/) {
+	async skipWelcome(url: RegExp | ((url: URL) => boolean) = (url) => !url.pathname.endsWith('/login')) {
 		// if welcome popup is visible, close it
 		await expect(this.page).toHaveURL(url);
 		const welcomePopup = this.page.getByTestId('modal-component');

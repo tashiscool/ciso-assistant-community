@@ -12,8 +12,15 @@ function escapeRegex(string: string): string {
 
 function toLooseTextMatcher(value: string | RegExp): string | RegExp {
 	if (value instanceof RegExp) return value;
+	const normalizedValue = value.trim();
+	// Support camelCase/kebab/snake labels rendered as spaced titles in the UI.
+	const tokens = normalizedValue
+		.split(/[\s_-]+|(?<=[a-z0-9])(?=[A-Z])/g)
+		.filter((token) => token.length > 0)
+		.map((token) => escapeRegex(token));
+	const joinedTokens = tokens.length > 0 ? tokens.join('[\\s_-]*') : escapeRegex(normalizedValue);
 	// Some create/edit flows add a short dedupe suffix (e.g. "-ab12") when names collide.
-	return new RegExp(`^\\s*${escapeRegex(value)}(?:-[a-z0-9]{3,12})?\\s*$`, 'i');
+	return new RegExp(`^\\s*${joinedTokens}(?:-[a-z0-9]{3,12})?\\s*$`, 'i');
 }
 
 export abstract class BasePage {
@@ -36,7 +43,7 @@ export abstract class BasePage {
 	}
 
 	async goto() {
-		await this.page.goto(this.url, { waitUntil: 'domcontentloaded' });
+		await this.page.goto(this.url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
 		await this.page.waitForURL((url) => url.pathname.startsWith(this.url), {
 			timeout: 30_000
 		});

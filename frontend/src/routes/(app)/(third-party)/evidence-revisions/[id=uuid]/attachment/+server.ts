@@ -26,47 +26,16 @@ export const GET: RequestHandler = async ({ fetch, setHeaders, params }) => {
 			throw new Error('Invalid filename in Content-Disposition');
 		}
 
-		if (!attachmentResponse.body) {
-			throw new Error('No response body');
-		}
-
-		const reader = attachmentResponse.body.getReader();
-
-		const stream = new ReadableStream({
-			start(controller) {
-				function push() {
-					reader
-						.read()
-						.then(({ done, value }) => {
-							if (done) {
-								controller.close();
-								return;
-							}
-							controller.enqueue(value);
-							push();
-						})
-						.catch((err) => {
-							console.error('Stream reading error:', err);
-							controller.error(err);
-						});
-				}
-				push();
-			},
-			cancel() {
-				reader.cancel().catch(() => {});
-			}
-		});
-
 		setHeaders({
 			'Content-Type': contentType,
 			'Content-Disposition': `attachment; filename="${fileName}"`
 		});
 
-		return new Response(stream, {
+		return new Response(attachmentResponse.body, {
 			status: attachmentResponse.status
 		});
 	} catch (err) {
 		console.error('Attachment fetch error:', err);
-		return error(500, 'Failed to fetch attachment');
+		throw error(500, 'Failed to fetch attachment');
 	}
 };

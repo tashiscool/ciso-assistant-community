@@ -7,6 +7,8 @@ import { m } from '$paraglide/messages.js';
 const runSuffix = Math.random().toString(36).slice(2, 8);
 const incidentsFolderName = `incidents-folder-${runSuffix}`;
 const incidentName = `incidents-test-${runSuffix}`;
+const evidenceNameOne = `incidents-evidence-1-${runSuffix}`;
+const evidenceNameTwo = `incidents-evidence-2-${runSuffix}`;
 
 function escapeRegExp(value: string) {
 	return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -300,7 +302,7 @@ test('Incidents full flow - creation, validation and cleanup', async ({
 		await expect(page.getByTestId('toast')).not.toBeVisible();
 
 		await page.getByRole('button', { name: /Add evidence|Ajouter une preuve/i }).click();
-		await page.getByTestId('form-input-name').fill('incidents-evidence-1');
+		await page.getByTestId('form-input-name').fill(evidenceNameOne);
 		await page.getByTestId('save-button').click();
 		await expect(page.getByTestId('modal-title')).not.toBeVisible();
 		await expect(page.getByTestId('toast')).toBeVisible();
@@ -338,7 +340,7 @@ test('Incidents full flow - creation, validation and cleanup', async ({
 		await page.getByTestId('form-input-entry').fill('entry 3');
 
 		await page.getByTestId('add-button-evidence').click();
-		await page.getByTestId('form-input-name').fill('incidents-evidence-2');
+		await page.getByTestId('form-input-name').fill(evidenceNameTwo);
 		await page.getByTestId('save-button').click();
 		await expect(page.getByTestId('modal-title')).not.toBeVisible();
 		await expect(page.getByTestId('toast')).toBeVisible();
