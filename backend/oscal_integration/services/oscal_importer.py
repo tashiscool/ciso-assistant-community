@@ -89,29 +89,40 @@ class OSCALImporter:
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-
-            format_type = format_hint or self.detect_format(content)
-            if not format_type:
-                raise ValueError("Unable to detect OSCAL format")
-
-            if format_type == 'system-security-plan':
-                return self._import_ssp(content)
-            elif format_type == 'catalog':
-                return self._import_catalog(content)
-            elif format_type == 'profile':
-                return self._import_profile(content)
-            elif format_type == 'assessment-plan':
-                return self._import_assessment_plan(content)
-            elif format_type == 'assessment-results':
-                return self._import_assessment_results(content)
-            elif format_type == 'plan-of-action-and-milestones':
-                return self._import_poam(content)
-            else:
-                raise ValueError(f"Unsupported OSCAL format: {format_type}")
-
+            return self.import_content(content, format_hint=format_hint)
         except Exception as e:
             logger.error(f"Error importing OSCAL file {file_path}: {e}")
             raise
+
+    def import_content(self, content: str, format_hint: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Import OSCAL from raw content.
+
+        Args:
+            content: OSCAL JSON content as text
+            format_hint: Optional format hint
+
+        Returns:
+            Dict with import results and metadata
+        """
+        format_type = format_hint or self.detect_format(content)
+        if not format_type:
+            raise ValueError("Unable to detect OSCAL format")
+
+        if format_type == 'system-security-plan':
+            return self._import_ssp(content)
+        elif format_type == 'catalog':
+            return self._import_catalog(content)
+        elif format_type == 'profile':
+            return self._import_profile(content)
+        elif format_type == 'assessment-plan':
+            return self._import_assessment_plan(content)
+        elif format_type == 'assessment-results':
+            return self._import_assessment_results(content)
+        elif format_type == 'plan-of-action-and-milestones':
+            return self._import_poam(content)
+        else:
+            raise ValueError(f"Unsupported OSCAL format: {format_type}")
 
     def _import_ssp(self, content: str) -> Dict[str, Any]:
         """Import System Security Plan"""

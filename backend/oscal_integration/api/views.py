@@ -58,8 +58,8 @@ class OSCALImportViewSet(viewsets.ViewSet):
                     'validation_errors': validation['errors']
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            # Import the file
-            import_result = self.importer.import_file(file_content, format_type)
+            # Import the file content
+            import_result = self.importer.import_content(file_content, format_type)
 
             # Convert to CISO Assistant entities
             entities = self.importer.convert_to_ciso_assistant_entities(import_result)

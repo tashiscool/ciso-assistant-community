@@ -25,6 +25,11 @@ interface AuthenticationFlow {
 	types: 'totp' | 'recovery_codes';
 }
 
+function useSecureCookies(url: URL): boolean {
+	const isLocalHttpHost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+	return url.protocol === 'https:' && !isLocalHttpHost;
+}
+
 export const load: PageServerLoad = async ({ fetch, request, locals }) => {
 	// redirect user if already logged in
 	if (locals.user) {
@@ -33,7 +38,14 @@ export const load: PageServerLoad = async ({ fetch, request, locals }) => {
 
 	const form = await superValidate(request, zod(loginSchema));
 
-	const SSOInfo = await fetch(`${BASE_API_URL}/settings/sso/info/`).then((res) => res.json());
+	let SSOInfo: Record<string, unknown> = { is_enabled: false };
+	try {
+		const ssoResponse = await fetch(`${BASE_API_URL}/settings/sso/info/`);
+		const raw = await ssoResponse.text();
+		SSOInfo = raw ? JSON.parse(raw) : { is_enabled: false };
+	} catch {
+		SSOInfo = { is_enabled: false };
+	}
 
 	const mfaAuthenticateForm = await superValidate(request, zod(mfaAuthenticateSchema));
 
@@ -47,6 +59,7 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
+		const secureCookie = useSecureCookies(url);
 		const email = form.data.username;
 		const password = form.data.password;
 
@@ -83,7 +96,7 @@ export const actions: Actions = {
 							httpOnly: true,
 							sameSite: 'lax',
 							path: '/',
-							secure: true
+							secure: secureCookie
 						});
 					}
 
@@ -103,21 +116,21 @@ export const actions: Actions = {
 			httpOnly: true,
 			sameSite: 'lax',
 			path: '/',
-			secure: true
+			secure: secureCookie
 		});
 
 		cookies.set('allauth_session_token', res.meta.session_token, {
 			httpOnly: true,
 			sameSite: 'lax',
 			path: '/',
-			secure: true
+			secure: secureCookie
 		});
 
 		cookies.set('show_first_login_modal', 'true', {
 			httpOnly: false,
 			sameSite: 'lax',
 			path: '/',
-			secure: true
+			secure: secureCookie
 		});
 		const next = url.searchParams.get('next');
 		const secureNext = getSecureRedirect(next) || '/';
@@ -148,18 +161,19 @@ export const actions: Actions = {
 			return fail(response.status, { form });
 		}
 
+		const secureCookie = useSecureCookies(event.url);
 		event.cookies.set('token', response.meta.access_token, {
 			httpOnly: true,
 			sameSite: 'lax',
 			path: '/',
-			secure: true
+			secure: secureCookie
 		});
 
 		event.cookies.set('allauth_session_token', response.meta.session_token, {
 			httpOnly: true,
 			sameSite: 'lax',
 			path: '/',
-			secure: true
+			secure: secureCookie
 		});
 
 		return { form };

@@ -41,21 +41,58 @@
 	// Editor state
 	let editorDocument = $state<any>(null);
 	let editorDocumentType = $state<string>('ssp');
+	const apiBaseUrl = typeof window === 'undefined' ? BASE_API_URL : '/api';
+
+	function getCookieValue(name: string): string {
+		if (typeof document === 'undefined') return '';
+		const prefix = `${name}=`;
+		const item = document.cookie.split('; ').find((entry) => entry.startsWith(prefix));
+		return item ? decodeURIComponent(item.slice(prefix.length)) : '';
+	}
+
+	function getAuthHeaders(includeJson = false, includeCsrf = false): Record<string, string> {
+		const headers: Record<string, string> = {};
+		const token = getCookieValue('token');
+		if (token) {
+			headers.Authorization = `Token ${token}`;
+		}
+		if (includeJson) {
+			headers['Content-Type'] = 'application/json';
+		}
+		if (includeCsrf) {
+			const csrfToken = getCookieValue('csrftoken');
+			if (csrfToken) {
+				headers['X-CSRFToken'] = csrfToken;
+			}
+		}
+		return headers;
+	}
 
 	function handleImportFileChange(event: Event) {
 		const target = event.target as HTMLInputElement;
-		if (target.files && target.files[0]) {
-			importFile = target.files[0];
-			importError = '';
-			importResult = null;
+		importFile = target.files?.[0] || null;
+		importError = '';
+		importResult = null;
+	}
+
+	function getSelectedImportFile(): File | null {
+		if (importFile) {
+			return importFile;
 		}
+		if (typeof document !== 'undefined') {
+			const input = document.getElementById('import-file') as HTMLInputElement | null;
+			return input?.files?.[0] || null;
+		}
+		return null;
 	}
 
 	async function handleImport() {
-		if (!importFile) {
+		const selectedFile = getSelectedImportFile();
+		if (!selectedFile) {
 			importError = 'Please select a file to import';
 			return;
 		}
+		importFile = selectedFile;
 
 		importLoading = true;
 		importError = '';
@@ -63,10 +100,12 @@
 
 		try {
 			const formData = new FormData();
-			formData.append('file', importFile);
+			formData.append('file', selectedFile);
 
-			const response = await fetch(`${BASE_API_URL}/oscal/import/import_file/`, {
+			const response = await fetch(`${apiBaseUrl}/oscal/import/import_file/`, {
 				method: 'POST',
+				headers: getAuthHeaders(false, true),
+				credentials: 'include',
 				body: formData
 			});
 
@@ -84,20 +123,24 @@
 	}
 
 	async function handleValidateFile() {
-		if (!importFile) {
+		const selectedFile = getSelectedImportFile();
+		if (!selectedFile) {
 			importError = 'Please select a file to validate';
 			return;
 		}
+		importFile = selectedFile;
 
 		importLoading = true;
 		importError = '';
 
 		try {
 			const formData = new FormData();
-			formData.append('file', importFile);
+			formData.append('file', selectedFile);
 
-			const response = await fetch(`${BASE_API_URL}/oscal/import/validate/`, {
+			const response = await fetch(`${apiBaseUrl}/oscal/import/validate/`, {
 				method: 'POST',
+				headers: getAuthHeaders(false, true),
+				credentials: 'include',
 				body: formData
 			});
 
@@ -125,7 +168,11 @@
 
 		try {
 			const response = await fetch(
-				`${BASE_API_URL}/oscal/export/${selectedExportId}/${exportType}/?format=${exportFormat}`
+				`${apiBaseUrl}/oscal/export/${selectedExportId}/${exportType}/?format=${exportFormat}`,
+				{
+					headers: getAuthHeaders(),
+					credentials: 'include'
+				}
 			);
 
 			if (!response.ok) {
@@ -172,8 +219,10 @@
 			formData.append('file', validateFile);
 			formData.append('baseline', fedrampBaseline);
 
-			const response = await fetch(`${BASE_API_URL}/oscal/fedramp/validate/validate_ssp/`, {
+			const response = await fetch(`${apiBaseUrl}/oscal/fedramp/validate/validate_ssp/`, {
 				method: 'POST',
+				headers: getAuthHeaders(false, true),
+				credentials: 'include',
 				body: formData
 			});
 
@@ -280,13 +329,15 @@
 							>
 							<input
 								id="import-file"
+								data-testid="oscal-import-file-input"
 								type="file"
 								accept=".json,.yaml,.yml,.xml"
 								class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
 								onchange={handleImportFileChange}
+								oninput={handleImportFileChange}
 							/>
 							{#if importFile}
-								<p class="mt-2 text-sm text-gray-500">
+								<p class="mt-2 text-sm text-gray-500" data-testid="oscal-import-selected-file">
 									Selected: {importFile.name} ({(importFile.size / 1024).toFixed(1)} KB)
 								</p>
 							{/if}
@@ -294,9 +345,10 @@
 
 						<div class="flex items-end space-x-4">
 							<button
-								class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50"
-								onclick={handleValidateFile}
-								disabled={importLoading || !importFile}
+								data-testid="oscal-import-validate-button"
+									class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50"
+									onclick={handleValidateFile}
+									disabled={importLoading}
 							>
 								{#if importLoading}
 									<i class="fa-solid fa-spinner fa-spin mr-2"></i>
@@ -306,9 +358,10 @@
 								{m.oscalValidate()}
 							</button>
 							<button
-								class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50"
-								onclick={handleImport}
-								disabled={importLoading || !importFile}
+								data-testid="oscal-import-submit-button"
+									class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50"
+									onclick={handleImport}
+									disabled={importLoading}
 							>
 								{#if importLoading}
 									<i class="fa-solid fa-spinner fa-spin mr-2"></i>
@@ -367,6 +420,7 @@
 							>
 							<select
 								id="export-type"
+								data-testid="oscal-export-type-select"
 								class="w-full rounded-md border-gray-300 shadow-sm"
 								bind:value={exportType}
 							>
@@ -384,6 +438,7 @@
 							>
 							<select
 								id="export-document"
+								data-testid="oscal-export-document-select"
 								class="w-full rounded-md border-gray-300 shadow-sm"
 								bind:value={selectedExportId}
 							>
@@ -411,6 +466,7 @@
 
 					<div>
 						<button
+							data-testid="oscal-export-submit-button"
 							class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50"
 							onclick={handleExport}
 							disabled={exportLoading || !selectedExportId}

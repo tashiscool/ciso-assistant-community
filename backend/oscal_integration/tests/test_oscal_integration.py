@@ -195,6 +195,25 @@ class TestOSCALImporter:
         assert result['valid'] is True
         assert result['format_detected'] == 'system-security-plan'
 
+    def test_import_content_valid_ssp(self):
+        """Test importing valid SSP content directly from text."""
+        importer = OSCALImporter()
+        content = json.dumps({
+            'oscal-version': '1.1.2',
+            'metadata': {'title': 'Test SSP'},
+            'system-security-plan': {
+                'uuid': str(uuid.uuid4()),
+                'metadata': {'title': 'Test SSP'},
+                'system-characteristics': {'system-name': 'Test System'},
+                'control-implementation': {'implemented-requirements': []}
+            }
+        })
+
+        result = importer.import_content(content)
+
+        assert result['import_info']['format'] == 'system-security-plan'
+        assert result['import_info']['oscal_version'] == '1.1.2'
+
 
 # =============================================================================
 # FedRAMP Validator Tests

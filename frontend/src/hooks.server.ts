@@ -7,20 +7,68 @@ import { setFlash } from 'sveltekit-flash-message/server';
 import { loadFeatureFlags } from '$lib/feature-flags';
 import { paraglideMiddleware } from '$paraglide/server';
 
+const normalizedBaseApiUrl = BASE_API_URL.endsWith('/')
+	? BASE_API_URL.slice(0, -1)
+	: BASE_API_URL;
+
+function isFrontendProxyApiPath(pathname: string): boolean {
+	if (normalizedBaseApiUrl.startsWith('http://') || normalizedBaseApiUrl.startsWith('https://')) {
+		return false;
+	}
+	return pathname === normalizedBaseApiUrl || pathname.startsWith(`${normalizedBaseApiUrl}/`);
+}
+
+function isBackendApiRequest(requestUrl: string): boolean {
+	if (normalizedBaseApiUrl.startsWith('http://') || normalizedBaseApiUrl.startsWith('https://')) {
+		return requestUrl.startsWith(normalizedBaseApiUrl);
+	}
+	try {
+		return new URL(requestUrl).pathname.startsWith(normalizedBaseApiUrl);
+	} catch {
+		return requestUrl.startsWith(normalizedBaseApiUrl);
+	}
+}
+
+function isAllauthApiRequest(requestUrl: string): boolean {
+	const suffix = '/_allauth/app';
+	if (normalizedBaseApiUrl.startsWith('http://') || normalizedBaseApiUrl.startsWith('https://')) {
+		return requestUrl.startsWith(`${normalizedBaseApiUrl}${suffix}`);
+	}
+	try {
+		return new URL(requestUrl).pathname.startsWith(`${normalizedBaseApiUrl}${suffix}`);
+	} catch {
+		return requestUrl.startsWith(`${normalizedBaseApiUrl}${suffix}`);
+	}
+}
+
+function useSecureCookies(url: URL): boolean {
+	const isLocalHttpHost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+	return url.protocol === 'https:' && !isLocalHttpHost;
+}
+
 async function ensureCsrfToken(event: RequestEvent): Promise<string> {
 	let csrfToken = event.cookies.get('csrftoken') || '';
 	if (!csrfToken) {
-		const response = await fetch(`${BASE_API_URL}/csrf/`, {
+		const response = await event.fetch(`${BASE_API_URL}/csrf/`, {
 			credentials: 'include',
 			headers: { 'content-type': 'application/json' }
 		});
-		const data = await response.json();
-		csrfToken = data.csrfToken;
+		const rawBody = await response.text();
+		let data: { csrfToken?: string } = {};
+		try {
+			data = rawBody ? JSON.parse(rawBody) : {};
+		} catch {
+			data = {};
+		}
+		csrfToken = data.csrfToken || '';
+		if (!csrfToken) {
+			return '';
+		}
 		event.cookies.set('csrftoken', csrfToken, {
 			httpOnly: false,
 			sameSite: 'lax',
 			path: '/',
-			secure: true
+			secure: useSecureCookies(event.url)
 		});
 	}
 	return csrfToken;
@@ -44,7 +92,7 @@ async function validateUserSession(event: RequestEvent): Promise<User | null> {
 	const allauthSessionToken = event.cookies.get('allauth_session_token');
 	if (!allauthSessionToken) logoutUser(event);
 
-	const res = await fetch(`${BASE_API_URL}/iam/current-user/`, {
+	const res = await event.fetch(`${BASE_API_URL}/iam/current-user/`, {
 		credentials: 'include',
 		headers: {
 			'content-type': 'application/json',
@@ -62,6 +110,10 @@ export const handle: Handle = async ({ event, resolve }) =>
 		event.request = localizedRequest;
 
 		event.locals.featureFlags = loadFeatureFlags();
+
+		if (isFrontendProxyApiPath(event.url.pathname)) {
+			return resolve(event);
+		}
 
 		await ensureCsrfToken(event);
 
@@ -81,7 +133,7 @@ export const handle: Handle = async ({ event, resolve }) =>
 		const user = await validateUserSession(event);
 		if (user) {
 			event.locals.user = user;
-			const generalSettings = await fetch(`${BASE_API_URL}/settings/general/object/`, {
+			const generalSettings = await event.fetch(`${BASE_API_URL}/settings/general/object/`, {
 				credentials: 'include',
 				headers: {
 					'content-type': 'application/json',
@@ -90,7 +142,7 @@ export const handle: Handle = async ({ event, resolve }) =>
 			});
 			event.locals.settings = await generalSettings.json();
 
-			const featureFlagSettings = await fetch(`${BASE_API_URL}/settings/feature-flags/`, {
+			const featureFlagSettings = await event.fetch(`${BASE_API_URL}/settings/feature-flags/`, {
 				credentials: 'include',
 				headers: {
 					'content-type': 'application/json',
@@ -115,24 +167,35 @@ export const handle: Handle = async ({ event, resolve }) =>
 export const handleFetch: HandleFetch = async ({ request, fetch, event }) => {
 	const unsafeMethods = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 	const currentLang = event.locals.user?.preferences?.lang || DEFAULT_LANGUAGE;
-	if (request.url.startsWith(BASE_API_URL)) {
-		request.headers.set('Content-Type', 'application/json');
+	if (isBackendApiRequest(request.url)) {
+		// Preserve upstream body content types (e.g. multipart/form-data for file uploads).
+		if (!request.headers.has('Content-Type')) {
+			request.headers.set('Content-Type', 'application/json');
+		}
 		request.headers.set('Accept-Language', currentLang);
 
 		const token = event.cookies.get('token');
 		const csrfToken = event.cookies.get('csrftoken');
 
-		if (token) {
-			request.headers.append('Authorization', `Token ${token}`);
+		if (token && !request.headers.has('Authorization')) {
+			request.headers.set('Authorization', `Token ${token}`);
 		}
 
 		if (unsafeMethods.has(request.method) && csrfToken) {
-			request.headers.append('X-CSRFToken', csrfToken);
-			request.headers.append('Cookie', `csrftoken=${csrfToken}`);
+			request.headers.set('X-CSRFToken', csrfToken);
+			const existingCookieHeader = request.headers.get('Cookie') || '';
+			if (!existingCookieHeader.includes('csrftoken=')) {
+				request.headers.set(
+					'Cookie',
+					existingCookieHeader
+						? `${existingCookieHeader}; csrftoken=${csrfToken}`
+						: `csrftoken=${csrfToken}`
+				);
+			}
 		}
 	}
 
-	if (request.url.startsWith(`${BASE_API_URL}/_allauth/app`)) {
+	if (isAllauthApiRequest(request.url)) {
 		const allauthSessionToken = event.cookies.get('allauth_session_token');
 		if (allauthSessionToken) {
 			request.headers.append('X-Session-Token', allauthSessionToken);

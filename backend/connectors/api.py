@@ -22,9 +22,17 @@ class ConnectorRegistryView(APIView):
     def get(self, request):
         """Get all available connector types."""
         registry = get_registry()
+        metadata_entries = registry.get_metadata()
+        if not metadata_entries:
+            # Defensive fallback: ensure connectors are discovered even if app-ready hooks
+            # were skipped in the current runtime.
+            from .base.registry import discover_connectors
+
+            discover_connectors()
+            metadata_entries = registry.get_metadata()
         connectors = []
 
-        for metadata in registry.get_metadata():
+        for metadata in metadata_entries:
             connector_type = metadata.get('connector_type', '')
             connectors.append({
                 'type': connector_type,

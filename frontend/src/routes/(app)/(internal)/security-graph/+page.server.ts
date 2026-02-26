@@ -2,7 +2,7 @@ import { BASE_API_URL } from '$lib/utils/constants';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ fetch, params }) => {
-	const endpoint = `${BASE_API_URL}/security-graph/?format=vis`;
+	const endpoint = `${BASE_API_URL}/security-graph/`;
 
 	try {
 		const response = await fetch(endpoint);

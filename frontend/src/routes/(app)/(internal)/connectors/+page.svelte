@@ -44,6 +44,7 @@
 	let newConnectorApiKey = $state('');
 	let addingConnector = $state(false);
 	let addConnectorError = $state('');
+	const apiBaseUrl = typeof window === 'undefined' ? BASE_API_URL : '/api';
 
 	const breadcrumbs = $derived([
 		{ label: m.connectors?.() || 'Connectors', href: `${base}/connectors` }
@@ -92,11 +93,40 @@
 		return icons[category] || 'fa-plug';
 	}
 
+	function getCookieValue(name: string): string {
+		if (typeof document === 'undefined') return '';
+		const prefix = `${name}=`;
+		const item = document.cookie.split('; ').find((entry) => entry.startsWith(prefix));
+		return item ? decodeURIComponent(item.slice(prefix.length)) : '';
+	}
+
+	function getAuthHeaders(includeJson = false, includeCsrf = false): Record<string, string> {
+		const headers: Record<string, string> = {};
+		const token = getCookieValue('token');
+		if (token) {
+			headers.Authorization = `Token ${token}`;
+		}
+		if (includeJson) {
+			headers['Content-Type'] = 'application/json';
+		}
+		if (includeCsrf) {
+			const csrfToken = getCookieValue('csrftoken');
+			if (csrfToken) {
+				headers['X-CSRFToken'] = csrfToken;
+			}
+		}
+		return headers;
+	}
+
 	// Connector actions
 	async function syncConnector(id: string) {
 		loading = true;
 		try {
-			const res = await fetch(`${BASE_API_URL}/connectors/instances/${id}/sync/`, { method: 'POST' });
+			const res = await fetch(`${apiBaseUrl}/connectors/instances/${id}/sync/`, {
+				method: 'POST',
+				headers: getAuthHeaders(false, true),
+				credentials: 'include'
+			});
 			if (res.ok) {
 				await loadConnectors();
 			}
@@ -106,12 +136,21 @@
 	}
 
 	async function deleteConnector(id: string) {
-		if (!confirm('Are you sure you want to delete this connector?')) return;
+		const confirmed = typeof window === 'undefined'
+			? true
+			: window.confirm('Are you sure you want to delete this connector?');
+		if (!confirmed) return;
 		try {
-			const res = await fetch(`${BASE_API_URL}/connectors/instances/${id}/`, { method: 'DELETE' });
-			if (res.ok) {
-				connectors = connectors.filter(c => c.id !== id);
+			const res = await fetch(`${apiBaseUrl}/connectors/instances/${id}/`, {
+				method: 'DELETE',
+				headers: getAuthHeaders(false, true),
+				credentials: 'include'
+			});
+			if (!res.ok) {
+				const errorBody = await res.text();
+				throw new Error(errorBody || `Delete failed with status ${res.status}`);
 			}
+			await loadConnectors();
 		} catch (e) {
 			console.error('Failed to delete connector:', e);
 		}
@@ -119,7 +158,10 @@
 
 	async function loadConnectors() {
 		try {
-			const res = await fetch(`${BASE_API_URL}/connectors/instances/`);
+			const res = await fetch(`${apiBaseUrl}/connectors/instances/`, {
+				headers: getAuthHeaders(),
+				credentials: 'include'
+			});
 			if (res.ok) {
 				const data = await res.json();
 				connectors = data.results || data || [];
@@ -151,9 +193,10 @@
 		addingConnector = true;
 		addConnectorError = '';
 		try {
-			const res = await fetch(`${BASE_API_URL}/connectors/instances/`, {
+			const res = await fetch(`${apiBaseUrl}/connectors/instances/`, {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: getAuthHeaders(true, true),
+				credentials: 'include',
 				body: JSON.stringify({
 					name: newConnectorName.trim(),
 					connector_type: selectedConnectorType.type,
@@ -249,7 +292,7 @@
 		{:else}
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				{#each connectors as connector}
-					<div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+					<div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden" data-testid="configured-connector-card">
 						<div class="p-6">
 							<div class="flex items-start justify-between">
 								<div class="flex items-center">
@@ -297,6 +340,7 @@
 								class="text-sm text-indigo-600 hover:text-indigo-900 dark:text-indigo-400"
 								onclick={() => syncConnector(connector.id)}
 								disabled={loading || connector.status === 'syncing'}
+								data-testid="connector-sync-button"
 							>
 								<i class="fa-solid fa-sync mr-1" class:fa-spin={connector.status === 'syncing'}></i>
 								{m.syncNow?.() || 'Sync Now'}
@@ -311,6 +355,7 @@
 								<button
 									class="text-sm text-red-600 hover:text-red-900"
 									onclick={() => deleteConnector(connector.id)}
+									data-testid="connector-delete-button"
 								>
 									<i class="fa-solid fa-trash"></i>
 								</button>
@@ -378,6 +423,7 @@
 						<button
 							class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
 							onclick={() => openAddModal(connector)}
+							data-testid="connector-configure-button"
 						>
 							<i class="fa-solid fa-plus mr-2"></i>
 							{m.configure?.() || 'Configure'}
@@ -392,7 +438,7 @@
 <!-- Add Connector Modal -->
 {#if showAddModal && selectedConnectorType}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4" data-testid="connector-configure-modal">
 			<div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
 				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
 					Configure {selectedConnectorType.name}
@@ -415,6 +461,7 @@
 							bind:value={newConnectorName}
 							class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
 							placeholder="My {selectedConnectorType.name} Integration"
+							data-testid="connector-name-input"
 						/>
 					</div>
 					<div>
@@ -424,6 +471,7 @@
 						<select
 							bind:value={newConnectorAuthMethod}
 							class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+							data-testid="connector-auth-method-input"
 						>
 							{#each selectedConnectorType.auth_methods as method}
 								<option value={method}>{method}</option>
@@ -439,6 +487,7 @@
 							bind:value={newConnectorApiKey}
 							class="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
 							placeholder="Enter your API key or token"
+							data-testid="connector-api-key-input"
 						/>
 					</div>
 					{#if addConnectorError}
@@ -450,6 +499,7 @@
 				<button
 					class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500"
 					onclick={() => (showAddModal = false)}
+					data-testid="connector-cancel-button"
 				>
 					Cancel
 				</button>
@@ -457,6 +507,7 @@
 					class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 disabled:opacity-50"
 					onclick={saveConnector}
 					disabled={addingConnector}
+					data-testid="connector-save-button"
 				>
 					{#if addingConnector}
 						<i class="fa-solid fa-spinner fa-spin mr-1"></i>

@@ -26,6 +26,59 @@
 	let attackPaths = $state<any[]>([]);
 	let attackPathsLoading = $state(false);
 	let attackPathsError = $state('');
+	const apiBaseUrl = typeof window === 'undefined' ? BASE_API_URL : '/api';
+
+	const attackPathEntryCandidates = $derived.by(() => {
+		const nodes = graphData.nodes || [];
+		const preferred = nodes.filter((n: any) => {
+			const nodeType = (n.group || n.node_type || '').toLowerCase();
+			return nodeType === 'threat' || nodeType === 'third_party';
+		});
+		if (preferred.length === 0) {
+			return nodes;
+		}
+		const preferredIds = new Set(preferred.map((node: any) => String(node.id)));
+		const nonPreferred = nodes.filter((node: any) => !preferredIds.has(String(node.id)));
+		return [...preferred, ...nonPreferred];
+	});
+
+	const attackPathTargetCandidates = $derived.by(() => {
+		const nodes = graphData.nodes || [];
+		const criticalAssets = nodes.filter((n: any) => {
+			const nodeType = (n.group || n.node_type || '').toLowerCase();
+			return nodeType === 'asset' && n.criticality === 'critical';
+		});
+		if (criticalAssets.length > 0) {
+			return criticalAssets;
+		}
+		const assets = nodes.filter((n: any) => (n.group || n.node_type || '').toLowerCase() === 'asset');
+		return assets.length > 0 ? assets : nodes;
+	});
+
+	function getCookieValue(name: string): string {
+		if (typeof document === 'undefined') return '';
+		const prefix = `${name}=`;
+		const item = document.cookie.split('; ').find((entry) => entry.startsWith(prefix));
+		return item ? decodeURIComponent(item.slice(prefix.length)) : '';
+	}
+
+	function getAuthHeaders(includeJson = false, includeCsrf = false): Record<string, string> {
+		const headers: Record<string, string> = {};
+		const token = getCookieValue('token');
+		if (token) {
+			headers.Authorization = `Token ${token}`;
+		}
+		if (includeJson) {
+			headers['Content-Type'] = 'application/json';
+		}
+		if (includeCsrf) {
+			const csrfToken = getCookieValue('csrftoken');
+			if (csrfToken) {
+				headers['X-CSRFToken'] = csrfToken;
+			}
+		}
+		return headers;
+	}
 
 	async function findAttackPaths() {
 		if (!attackPathEntryPoint || !attackPathTarget) {
@@ -36,9 +89,10 @@
 		attackPathsError = '';
 		attackPaths = [];
 		try {
-			const res = await fetch(`${BASE_API_URL}/security-graph/attack-paths/`, {
+			const res = await fetch(`${apiBaseUrl}/security-graph/attack-paths/`, {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: getAuthHeaders(true, true),
+				credentials: 'include',
 				body: JSON.stringify({
 					entry_point_id: attackPathEntryPoint,
 					target_id: attackPathTarget,
@@ -83,7 +137,7 @@
 		const nodes = graphData.nodes.map((node: any, idx: number) => ({
 			id: idx,
 			pk: node.id,
-			name: node.label || node.name,
+			name: node.label || node.name || node.id,
 			value: node.group || node.node_type,
 			category: categoryIndex[node.group || node.node_type] || 0,
 			symbolSize: node.size || 20,
@@ -97,13 +151,13 @@
 		// Create node ID to index mapping
 		const nodeIdToIndex: Record<string, number> = {};
 		graphData.nodes.forEach((node: any, idx: number) => {
-			nodeIdToIndex[node.id] = idx;
+			nodeIdToIndex[String(node.id)] = idx;
 		});
 
 		// Transform edges
 		const links = (graphData.edges || []).map((edge: any) => ({
-			source: nodeIdToIndex[edge.from] ?? 0,
-			target: nodeIdToIndex[edge.to] ?? 0,
+			source: nodeIdToIndex[String(edge.from || edge.source || edge.source_id)] ?? 0,
+			target: nodeIdToIndex[String(edge.to || edge.target || edge.target_id)] ?? 0,
 			value: edge.label || edge.edge_type,
 			lineStyle: {
 				color: edge.color || '#999',
@@ -205,7 +259,7 @@
 		{#if activeTab === 'graph'}
 			<div class="flex-1">
 				<GraphViewer
-					data={transformedData()}
+					data={transformedData}
 					onNodeClick={handleNodeClick}
 					onNodeDoubleClick={handleNodeDoubleClick}
 				/>
@@ -293,28 +347,28 @@
 
 					<div class="grid grid-cols-2 gap-4 mb-6">
 						<div>
-							<label for="entry-point-select" class="block text-sm font-medium text-gray-700 mb-1">Entry Point (Threat)</label>
+							<label for="entry-point-select" class="block text-sm font-medium text-gray-700 mb-1">Entry Point</label>
 							<select
 								id="entry-point-select"
 								bind:value={attackPathEntryPoint}
 								class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
 							>
 								<option value="">Select entry point...</option>
-								{#each (graphData.nodes || []).filter((n: any) => n.group === 'threat' || n.group === 'third_party') as node}
+								{#each attackPathEntryCandidates as node}
 									<option value={node.id}>{node.label || node.name}</option>
 								{/each}
 							</select>
 						</div>
 
 						<div>
-							<label for="target-select" class="block text-sm font-medium text-gray-700 mb-1">Target (Critical Asset)</label>
+							<label for="target-select" class="block text-sm font-medium text-gray-700 mb-1">Target</label>
 							<select
 								id="target-select"
 								bind:value={attackPathTarget}
 								class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
 							>
 								<option value="">Select target...</option>
-								{#each (graphData.nodes || []).filter((n: any) => n.group === 'asset' && n.criticality === 'critical') as node}
+								{#each attackPathTargetCandidates as node}
 									<option value={node.id}>{node.label || node.name}</option>
 								{/each}
 							</select>
@@ -357,11 +411,11 @@
 												</span>
 											{/if}
 										</div>
-										{#if path.nodes}
+										{#if (path.nodes && path.nodes.length > 0) || (path.path_nodes && path.path_nodes.length > 0)}
 											<div class="flex flex-wrap items-center gap-1 text-xs text-gray-600">
-												{#each path.nodes as step, j}
-													<span class="px-2 py-0.5 bg-white border rounded">{step.name || step.label || step.id}</span>
-													{#if j < path.nodes.length - 1}
+												{#each (path.nodes || path.path_nodes || []) as step, j}
+													<span class="px-2 py-0.5 bg-white border rounded">{typeof step === 'string' ? step : step.name || step.label || step.id}</span>
+													{#if j < (path.nodes || path.path_nodes || []).length - 1}
 														<i class="fa-solid fa-arrow-right text-red-400"></i>
 													{/if}
 												{/each}

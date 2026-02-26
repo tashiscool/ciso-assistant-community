@@ -26,7 +26,15 @@
 	let chartContainer: HTMLElement;
 	let searchQuery = $state('');
 
+	const getNormalizedData = () => ({
+		nodes: Array.isArray(data?.nodes) ? data.nodes : [],
+		links: Array.isArray(data?.links) ? data.links : [],
+		categories: Array.isArray(data?.categories) ? data.categories : []
+	});
+
 	const getChartOptions = () => {
+		const normalizedData = getNormalizedData();
+
 		return {
 			tooltip: {
 				trigger: 'item',
@@ -36,8 +44,8 @@
 							Type: ${params.data.value || 'Unknown'}<br/>
 							${params.data.criticality ? `Criticality: ${params.data.criticality}` : ''}`;
 					} else if (params.dataType === 'edge') {
-						const sourceNode = data.nodes.find((n) => n.id === params.data.source);
-						const targetNode = data.nodes.find((n) => n.id === params.data.target);
+						const sourceNode = normalizedData.nodes.find((n) => n.id === params.data.source);
+						const targetNode = normalizedData.nodes.find((n) => n.id === params.data.target);
 						return `${sourceNode?.name || 'Source'} → ${targetNode?.name || 'Target'}<br/>
 							<em>${params.data.value || 'relates to'}</em>`;
 					}
@@ -45,7 +53,7 @@
 				}
 			},
 			legend: {
-				data: data.categories.map((c: any) => c.name),
+				data: normalizedData.categories.map((c: any) => c.name),
 				orient: 'vertical',
 				left: 10,
 				top: 'middle'
@@ -56,9 +64,9 @@
 					layout: 'force',
 					animation: true,
 					animationDuration: 1000,
-					data: data.nodes,
-					links: data.links,
-					categories: data.categories,
+					data: normalizedData.nodes,
+					links: normalizedData.links,
+					categories: normalizedData.categories,
 					roam: true,
 					draggable: true,
 					label: {
@@ -92,9 +100,10 @@
 
 	const searchNodes = (query: string) => {
 		if (!query.trim() || !chart) return;
+		const normalizedData = getNormalizedData();
 
 		const normalizedQuery = query.toLowerCase().trim();
-		const matchingNodes = data.nodes.filter((n) =>
+		const matchingNodes = normalizedData.nodes.filter((n) =>
 			n.name.toLowerCase().includes(normalizedQuery)
 		);
 
