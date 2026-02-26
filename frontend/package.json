@@ -14,6 +14,8 @@
 		"test:ui": "vitest --ui",
 		"test:e2e": "ARGS=\"$npm_config_args\" docker compose -f ./tests/docker-compose.e2e-tests.yml up --force-recreate --build -V",
 		"test:e2e:critical": "ARGS=\"tests/functional/critical-feature-smoke.test.ts\" docker compose -f ./tests/docker-compose.e2e-tests.yml up --force-recreate --build -V",
+		"test:e2e:parity": "ARGS=\"tests/functional/critical-feature-smoke.test.ts tests/functional/parity-feature-smoke.test.ts\" docker compose -f ./tests/docker-compose.e2e-tests.yml up --force-recreate --build -V",
+		"test:e2e:parity:local": "PLAYWRIGHT_DEV_SERVER=true pnpm playwright test tests/functional/critical-feature-smoke.test.ts tests/functional/parity-feature-smoke.test.ts --project=chromium",
 		"coverage": "vitest run --coverage",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",

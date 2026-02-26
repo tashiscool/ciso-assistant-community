@@ -24,6 +24,8 @@
 		object = {},
 		initialData = {}
 	}: Props = $props();
+
+	const formStore = form.form;
 </script>
 
 <TextField
@@ -67,17 +69,20 @@
 	label={m.approver()}
 	helpText={m.approverHelpText()}
 />
-<AutocompleteSelect
-	{form}
-	optionsEndpoint="risk-scenarios"
-	optionsExtraFields={[
-		['perimeter', 'str'],
-		['risk_assessment', 'str']
-	]}
-	field="risk_scenarios"
-	cacheLock={cacheLocks['risk_scenarios']}
-	bind:cachedValue={formDataCache['risk_scenarios']}
-	label={m.riskScenarios()}
-	helpText={m.riskAcceptanceRiskScenariosHelpText()}
-	multiple
-/>
+{#key $formStore?.folder}
+	<AutocompleteSelect
+		{form}
+		optionsEndpoint="risk-scenarios"
+		optionsDetailedUrlParameters={$formStore?.folder ? [['folder', $formStore.folder]] : []}
+		optionsExtraFields={[
+			['perimeter', 'str'],
+			['risk_assessment', 'str']
+		]}
+		field="risk_scenarios"
+		cacheLock={cacheLocks['risk_scenarios']}
+		bind:cachedValue={formDataCache['risk_scenarios']}
+		label={m.riskScenarios()}
+		helpText={m.riskAcceptanceRiskScenariosHelpText()}
+		multiple
+	/>
+{/key}

@@ -49,16 +49,30 @@ export class Mailer {
 	readonly url: string;
 	readonly emailContent: MailContent;
 	private readonly emails: Locator;
+	private reachable: boolean | null;
 
 	constructor(public readonly page: Page) {
 		this.url = 'http://localhost:' + (process.env.MAILER_WEB_SERVER_PORT || 8025);
 		this.emailContent = new MailContent(page);
 		this.emails = this.page.locator('.msglist-message');
+		this.reachable = null;
 	}
 
-	async goto() {
-		await this.page.goto(this.url);
-		await this.page.waitForURL(this.url);
+	async goto(): Promise<boolean> {
+		try {
+			await this.page.goto(this.url, { timeout: 5_000 });
+			await this.page.waitForURL(this.url, { timeout: 5_000 });
+			this.reachable = true;
+			return true;
+		} catch {
+			this.reachable = false;
+			return false;
+		}
+	}
+
+	async isAvailable(): Promise<boolean> {
+		if (this.reachable !== null) return this.reachable;
+		return await this.goto();
 	}
 
 	async hasUrl() {
@@ -66,6 +80,9 @@ export class Mailer {
 	}
 
 	async getEmails() {
+		if (!(await this.isAvailable())) {
+			throw new Error(`Mailer service is not reachable at ${this.url}`);
+		}
 		const emailElements = await this.emails.all();
 		const emails: Email[] = [];
 		emailElements.forEach((email) => {
@@ -76,6 +93,10 @@ export class Mailer {
 	}
 
 	async getLastEmail() {
+		if (!(await this.isAvailable())) {
+			throw new Error(`Mailer service is not reachable at ${this.url}`);
+		}
+		await expect(this.emails.first()).toBeVisible({ timeout: 15_000 });
 		return new Email(this.emails.first());
 	}
 }

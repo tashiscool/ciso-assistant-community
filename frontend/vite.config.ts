@@ -15,6 +15,15 @@ export default defineConfig({
 		tailwindcss(),
 		sveltekit()
 	],
+	server: {
+		watch: {
+			ignored: [
+				'**/tests/results/**',
+				'**/tests/reports/**',
+				'**/.playwright-artifacts-*/**'
+			]
+		}
+	},
 	test: {
 		include: ['{src}/**/*.{test,spec}.{js,ts}']
 	}

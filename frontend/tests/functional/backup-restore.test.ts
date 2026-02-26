@@ -7,6 +7,12 @@ const gunzipAsync = promisify(gunzip);
 test('Database export should generate valid backup file', async ({ logedPage, page }) => {
 	await page.waitForLoadState('networkidle');
 	const modalBackdrop = page.getByTestId('modal-backdrop');
+	const exportCard = page.locator('div.card').filter({
+		has: page.locator('h4 i.fa-download')
+	});
+	const importCard = page.locator('div.card').filter({
+		has: page.locator('h4 i.fa-upload')
+	});
 
 	await test.step('Dismiss any blocking modals', async () => {
 		if (await modalBackdrop.isVisible()) {
@@ -23,15 +29,15 @@ test('Database export should generate valid backup file', async ({ logedPage, pa
 	await page.locator('body').press('Escape');
 
 	await test.step('Navigate to backup/restore section', async () => {
-		await page.getByRole('button', { name: 'Extra' }).click();
+		await page.getByTestId('accordion-item-extra').click();
 		await page.getByTestId('accordion-item-backup-restore').click();
-		await expect(page).toHaveURL('/backup-restore');
-		await expect(page.getByRole('button', { name: 'Export database' })).toBeVisible();
+		await expect(page).toHaveURL(/\/backup-restore$/);
+		await expect(exportCard.locator('button').first()).toBeVisible();
 	});
 
 	await test.step('Initiate and verify database export', async () => {
 		const downloadPromise = page.waitForEvent('download');
-		await page.getByRole('button', { name: 'Export database' }).click();
+		await exportCard.locator('button').first().click();
 
 		const download = await downloadPromise;
 		const fileName = download.suggestedFilename();
@@ -77,10 +83,18 @@ test('Database export should generate valid backup file', async ({ logedPage, pa
 		await test.step('Check that export file can be imported back', async () => {
 			await page.locator('#file').click();
 			await page.locator('#file').setInputFiles(fileName);
-			await page.getByRole('button', { name: 'Upload' }).click();
-			await page.getByTestId('delete-prompt-confirm-textfield').click();
-			await page.getByTestId('delete-prompt-confirm-textfield').fill('yes');
-			await page.getByRole('button', { name: 'Submit' }).click();
+			await importCard.locator('button[type="button"]').first().click();
+			const modal = page.getByTestId('modal-component');
+			await expect(modal).toBeVisible();
+			const confirmInput = modal.getByTestId('delete-prompt-confirm-textfield');
+			const confirmButton = modal.locator('footer button').last();
+			await confirmInput.click();
+			await confirmInput.fill('yes');
+			if (await confirmButton.isDisabled()) {
+				await confirmInput.fill('oui');
+			}
+			await expect(confirmButton).toBeEnabled();
+			await confirmButton.click();
 
 			// Depending on backend/session settings, import may either keep the session
 			// or force a login refresh.

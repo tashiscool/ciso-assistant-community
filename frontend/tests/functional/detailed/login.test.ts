@@ -36,7 +36,13 @@ test('redirect to the right page after login', async ({ loginPage, page }) => {
 test('login invalid message is showing properly', async ({ loginPage, page }) => {
 	await loginPage.hasUrl();
 	await loginPage.login('invalid@tests.com', '123456');
-	await expect.soft(page.getByText('Unable to log in with provided credentials.')).toBeVisible();
+	await expect
+		.soft(
+			page.getByText(
+				/Unable to log in with provided credentials\.|The email address and\/or password you specified are not correct\./i
+			)
+		)
+		.toBeVisible();
 	await loginPage.hasUrl();
 });
 
@@ -47,6 +53,10 @@ test('forgot password process is working properly', async ({
 	mailer,
 	page
 }) => {
+	if (!(await mailer.isAvailable())) {
+		test.skip(true, `Mailer service is not reachable at ${mailer.url}`);
+	}
+
 	const email = getUniqueValue(testData.user.email);
 
 	await usersPage.goto();

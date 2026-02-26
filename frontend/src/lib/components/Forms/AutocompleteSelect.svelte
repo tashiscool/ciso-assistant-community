@@ -177,6 +177,19 @@
 			if (optionsEndpoint) {
 				let endpoint = `/${optionsEndpoint}`;
 				const urlParams = new URLSearchParams();
+				const normalizedParams = Array.isArray(optionsDetailedUrlParameters)
+					? optionsDetailedUrlParameters
+					: [];
+				const hasOffset = normalizedParams.some(([param]) => param === 'offset');
+				const hasLimit = normalizedParams.some(([param]) => param === 'limit');
+
+				if (!hasOffset) {
+					urlParams.append('offset', '0');
+				}
+				if (!hasLimit) {
+					// Load a broader option set so recent/long-tail objects remain selectable in autocomplete fields.
+					urlParams.append('limit', '200');
+				}
 
 				if (Array.isArray(optionsDetailedUrlParameters)) {
 					for (const [param, value] of optionsDetailedUrlParameters) {

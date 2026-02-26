@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "features": [
     {
       "id": "connectors",
@@ -56,11 +56,123 @@
     },
     {
       "id": "oscal",
-      "name": "OSCAL Import/Export",
+      "name": "OSCAL Import and Export",
       "frontend_routes": ["/oscal"],
       "backend_endpoints": ["/api/oscal/import/validate/", "/api/oscal/export/"],
       "required_frontend_tag": "feature:oscal",
       "required_backend_tag": "feature:oscal"
+    },
+    {
+      "id": "continuous_monitoring",
+      "name": "Continuous Monitoring",
+      "frontend_routes": ["/continuous-monitoring"],
+      "backend_endpoints": ["/api/conmon/dashboard/", "/api/conmon/profiles/"],
+      "required_frontend_tag": "feature:continuous_monitoring",
+      "required_backend_tag": "feature:continuous_monitoring"
+    },
+    {
+      "id": "poam_management",
+      "name": "POA&M Management",
+      "frontend_routes": ["/poam"],
+      "backend_endpoints": ["/api/poam/poam-items/", "/api/poam/poam-items/export_fedramp/"],
+      "required_frontend_tag": "feature:poam_management",
+      "required_backend_tag": "feature:poam_management"
+    },
+    {
+      "id": "ai_assistant",
+      "name": "AI Assistant",
+      "frontend_routes": ["/ai-assistant"],
+      "backend_endpoints": [
+        "/api/ai/author/draft-control/",
+        "/api/ai/extractor/upload/",
+        "/api/ai/auditor/gap-analysis/"
+      ],
+      "required_frontend_tag": "feature:ai_assistant",
+      "required_backend_tag": "feature:ai_assistant"
+    },
+    {
+      "id": "ai_vendor_scoring",
+      "name": "AI Vendor Scoring",
+      "frontend_routes": ["/scoring-assistant"],
+      "backend_endpoints": ["/api/ai/vendor-scoring/<uuid:pk>/", "/api/ai/vendor-scoring/risk-summary/"],
+      "required_frontend_tag": "feature:ai_vendor_scoring",
+      "required_backend_tag": "feature:ai_vendor_scoring"
+    },
+    {
+      "id": "vendor_questionnaires",
+      "name": "Vendor Portal Questionnaires",
+      "frontend_routes": ["/entity-assessments/questionnaire"],
+      "backend_endpoints": ["/api/vendor-portal/tokens/create/", "/api/vendor-portal/<token>/questionnaire/"],
+      "required_frontend_tag": "feature:vendor_questionnaires",
+      "required_backend_tag": "feature:vendor_questionnaires"
+    },
+    {
+      "id": "multi_framework_libraries",
+      "name": "Multi-framework Libraries",
+      "frontend_routes": ["/libraries"],
+      "backend_endpoints": ["/api/stored-libraries/", "/api/loaded-libraries/"],
+      "required_frontend_tag": "feature:multi_framework_libraries",
+      "required_backend_tag": "feature:multi_framework_libraries"
+    },
+    {
+      "id": "fedramp_automation",
+      "name": "FedRAMP Automation",
+      "frontend_routes": ["/reports/conmon-monthly"],
+      "backend_endpoints": [
+        "/api/rmf/fedramp-20x/ksi/",
+        "/api/rmf/fedramp-20x/oar/",
+        "/api/rmf/fedramp-20x/complete/"
+      ],
+      "required_frontend_tag": "feature:fedramp_automation",
+      "required_backend_tag": "feature:fedramp_automation"
+    },
+    {
+      "id": "quantitative_risk",
+      "name": "Quantitative Risk",
+      "frontend_routes": ["/experimental/loss-exceedance"],
+      "backend_endpoints": ["/api/crq/quantitative-risk-studies/", "/api/crq/analytics/portfolio/analyze/"],
+      "required_frontend_tag": "feature:quantitative_risk",
+      "required_backend_tag": "feature:quantitative_risk"
+    },
+    {
+      "id": "mapping_engine",
+      "name": "Framework Mapping Engine",
+      "frontend_routes": ["/experimental/mapping"],
+      "backend_endpoints": ["/api/requirement-mapping-sets/", "/api/mapping-libraries/"],
+      "required_frontend_tag": "feature:mapping_engine",
+      "required_backend_tag": "feature:mapping_engine"
+    },
+    {
+      "id": "scanner_connectors",
+      "name": "Scanner Connectors",
+      "frontend_routes": ["/connectors"],
+      "backend_endpoints": ["/api/connectors/registry/", "/api/connectors/instances/"],
+      "required_frontend_tag": "feature:scanner_connectors",
+      "required_backend_tag": "feature:scanner_connectors"
+    },
+    {
+      "id": "sarif_scap_import",
+      "name": "SARIF and SCAP Import",
+      "frontend_routes": ["/connectors"],
+      "backend_endpoints": ["/api/connectors/registry/"],
+      "required_frontend_tag": "feature:sarif_scap_import",
+      "required_backend_tag": "feature:sarif_scap_import"
+    },
+    {
+      "id": "servicenow_jira_integration",
+      "name": "ServiceNow and Jira Integration",
+      "frontend_routes": ["/connectors"],
+      "backend_endpoints": ["/api/integrations/providers/", "/api/integrations/test-connection/"],
+      "required_frontend_tag": "feature:servicenow_jira_integration",
+      "required_backend_tag": "feature:servicenow_jira_integration"
+    },
+    {
+      "id": "ocsf_oscal_translation",
+      "name": "OCSF to OSCAL Translation",
+      "frontend_routes": ["/oscal"],
+      "backend_endpoints": ["/api/integrations/ocsf/import/", "/api/integrations/ocsf/to-oscal/"],
+      "required_frontend_tag": "feature:ocsf_oscal_translation",
+      "required_backend_tag": "feature:ocsf_oscal_translation"
     }
   ]
 }

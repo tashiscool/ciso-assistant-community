@@ -60,23 +60,25 @@ export class LoginPage extends BasePage {
 		if (email === LoginPage.defaultEmail && password === LoginPage.defaultPassword) {
 			await this.page.waitForURL(/^.*\/((?!login).)*$/, { timeout: 10000 });
 		} else {
-			await this.page.waitForURL(/^.*\/login(\?next=\/.*)?$/);
+			await this.page.waitForURL((url) => url.pathname.endsWith('/login'), {
+				timeout: 15_000
+			});
 		}
 	}
 
 	async hasUrl(redirect: State = State.Unset) {
 		switch (redirect) {
 			case State.Unset:
-				// url can be /login or /login?next=/
-				await expect(this.page).toHaveURL(/^.*\/login(\?next=\/.*)?$/);
+				// URL can include variable query forms (e.g. /login?next=/ or /login?/login&next=/)
+				await expect(this.page).toHaveURL((url) => url.pathname.endsWith('/login'));
 				break;
 			case State.False:
-				// url must be /login
-				await expect(this.page).toHaveURL(/^.*\/login$/);
+				await expect(this.page).toHaveURL((url) => url.pathname.endsWith('/login'));
 				break;
 			case State.True:
-				//url must be /login?next=/
-				await expect(this.page).toHaveURL(/^.*\/login\?next=\/.*$/);
+				await expect(this.page).toHaveURL(
+					(url) => url.pathname.endsWith('/login') && url.search.includes('next=')
+				);
 				break;
 		}
 	}

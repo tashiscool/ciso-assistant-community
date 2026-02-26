@@ -3,6 +3,8 @@ import { devices } from '@playwright/test';
 
 const composeMode = !!process.env.COMPOSE_TEST;
 const useDevServer = process.env.PLAYWRIGHT_DEV_SERVER === 'true';
+const playwrightNodeOptions =
+	process.env.PLAYWRIGHT_NODE_OPTIONS || '--max-old-space-size=8192';
 const previewPort = Number(
 	process.env.PLAYWRIGHT_PORT || (composeMode ? 3000 : 4174)
 );
@@ -13,8 +15,8 @@ const config: PlaywrightTestConfig = {
 		command: composeMode
 			? 'echo "The docker compose frontend server didn\'t start correctly"'
 			: useDevServer
-				? `pnpm exec vite dev --host 127.0.0.1 --port ${previewPort}`
-				: `pnpm exec vite preview --port ${previewPort}`,
+				? `NODE_OPTIONS="${playwrightNodeOptions}" pnpm exec vite dev --host 127.0.0.1 --port ${previewPort}`
+				: `NODE_OPTIONS="${playwrightNodeOptions}" pnpm exec vite preview --host 127.0.0.1 --port ${previewPort}`,
 		url: baseURL,
 		timeout: 180 * 1000,
 		reuseExistingServer: !process.env.CI

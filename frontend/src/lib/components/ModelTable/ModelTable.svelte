@@ -285,13 +285,24 @@
 	});
 
 	const actionsURLModel = URLModel;
-	const preventDelete = (row: TableSource) =>
-		(actionsURLModel === 'stored-libraries' && (row?.meta?.builtin || row?.meta?.is_loaded)) ||
-		(!URLModel?.includes('libraries') && Object.hasOwn(row?.meta, 'urn') && row?.meta?.urn) ||
-		(URLModel?.includes('campaigns') && row?.meta?.compliance_assessments.length > 0) ||
-		(Object.hasOwn(row?.meta, 'reference_count') && row?.meta?.reference_count > 0) ||
-		['severity_changed', 'status_changed'].includes(row?.meta?.entry_type) ||
-		forcePreventDelete;
+	const preventDelete = (row: TableSource) => {
+		const meta = (row?.meta ?? {}) as Record<string, any>;
+		const hasUrn = !URLModel?.includes('libraries') && Object.hasOwn(meta, 'urn') && Boolean(meta.urn);
+		const hasCampaignAssessments =
+			URLModel?.includes('campaigns') &&
+			Array.isArray(meta.compliance_assessments) &&
+			meta.compliance_assessments.length > 0;
+		const hasReferences =
+			Object.hasOwn(meta, 'reference_count') && Number(meta.reference_count) > 0;
+		return (
+			(actionsURLModel === 'stored-libraries' && (meta.builtin || meta.is_loaded)) ||
+			hasUrn ||
+			hasCampaignAssessments ||
+			hasReferences ||
+			['severity_changed', 'status_changed'].includes(meta.entry_type) ||
+			forcePreventDelete
+		);
+	};
 	const preventEdit = (row: TableSource) => forcePreventEdit;
 
 	const tableURLModel = URLModel;

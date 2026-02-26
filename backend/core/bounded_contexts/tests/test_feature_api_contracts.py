@@ -8,7 +8,7 @@ catalog and wiring coverage.
 
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 import pytest
@@ -112,6 +112,22 @@ def test_accessible_domain_folder_helper_enforces_limit_and_scoped_lookup():
 
 
 # feature:security_graph
+def test_accessible_domain_folder_helper_returns_empty_when_root_folder_missing():
+    fake_user = object()
+
+    with (
+        patch("iam.models.Folder.get_root_folder", return_value=None),
+        patch(
+            "iam.models.RoleAssignment.get_accessible_folder_ids",
+        ) as scoped_lookup,
+    ):
+        result = _get_accessible_domain_folder_ids(fake_user, limit=None)
+
+    assert result == []
+    scoped_lookup.assert_not_called()
+
+
+# feature:security_graph
 def test_user_can_access_domain_folder_checks_full_scope():
     user = object()
     folder_id = uuid4()
@@ -168,6 +184,7 @@ def test_attack_paths_rejects_invalid_folder_id():
 
 # feature:security_graph
 def test_attack_paths_without_folder_id_uses_full_iam_scope():
+    folder_ids = [uuid4(), uuid4(), uuid4()]
     request = SimpleNamespace(
         data={
             "entry_point_id": str(uuid4()),
@@ -191,13 +208,13 @@ def test_attack_paths_without_folder_id_uses_full_iam_scope():
         nodes={"n1": object()},
         edges={"e1": object()},
     )
-    builder = SimpleNamespace(build_from_folder=lambda _fid: folder_graph)
+    builder = SimpleNamespace(build_from_folder=MagicMock(return_value=folder_graph))
     analyzer = SimpleNamespace(find_attack_paths=lambda *_args, **_kwargs: [])
 
     with (
         patch(
             "core.bounded_contexts.security_graph.api.graph_views._get_accessible_domain_folder_ids",
-            return_value=[uuid4(), uuid4()],
+            return_value=folder_ids,
         ) as scoped_ids,
         patch(
             "core.bounded_contexts.security_graph.api.graph_views.SecurityGraph",
@@ -219,6 +236,8 @@ def test_attack_paths_without_folder_id_uses_full_iam_scope():
     assert response.data["total_paths"] == 0
     scoped_ids.assert_called_once_with(request.user, limit=None)
     get_builder.assert_called_once()
+    assert builder.build_from_folder.call_count == len(folder_ids)
+    assert [call.args[0] for call in builder.build_from_folder.call_args_list] == folder_ids
 
 
 # feature:security_graph

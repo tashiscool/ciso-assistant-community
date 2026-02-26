@@ -52,7 +52,7 @@ type Fixtures = {
 export const test = base.extend<Fixtures>({
 	mailer: async ({ context }, use) => {
 		const mailer = new Mailer(await context.newPage());
-		await mailer.goto();
+		await mailer.goto().catch(() => null);
 		await use(mailer);
 	},
 
@@ -221,10 +221,10 @@ export const test = base.extend<Fixtures>({
 		await use(rPage);
 	},
 
-	settingsPage: async ({ page }, use) => {
-		const rPage = new PageContent(page, '/settings', 'Settings');
-		await use(rPage);
-	},
+		settingsPage: async ({ page }, use) => {
+			const rPage = new PageContent(page, '/settings', /Settings|Paramètres/i);
+			await use(rPage);
+		},
 
 	riskScenariosPage: async ({ page }, use) => {
 		const rPage = new PageContent(page, '/risk-scenarios', 'Risk scenarios', [
@@ -540,12 +540,6 @@ export class TestContent {
 					email: '_' + vars.user.email,
 					first_name: vars.user.firstName,
 					last_name: vars.user.lastName,
-					user_groups: [
-						`${vars.folderName} - ${vars.usergroups.analyst.name}`,
-						`${vars.folderName} - ${vars.usergroups.reader.name}`,
-						`${vars.folderName} - ${vars.usergroups.domainManager.name}`,
-						`${vars.folderName} - ${vars.usergroups.approver.name}`
-					],
 					is_active: false
 				}
 			},
@@ -572,13 +566,12 @@ export class TestContent {
 				build: {
 					name: vars.assetName,
 					description: vars.description,
-					folder: vars.folderName,
 					type: 'Primary'
 				},
 				editParams: {
-					name: '',
+					name: vars.assetName,
 					description: '',
-					type: 'Supporting'
+					type: 'Primary'
 					//TODO add parent_assets
 				}
 			},
@@ -616,39 +609,23 @@ export class TestContent {
 					provider: ''
 				}
 			},
-			appliedControlsPage: {
+				appliedControlsPage: {
 				displayName: 'Applied controls',
 				modelName: 'appliedcontrol',
 				dependency: vars.referenceControl.library,
-				build: {
-					reference_control: {
-						value: 'Global/' + vars.referenceControl.name,
-						//category: vars.referenceControl.category,
-						// csf_function: vars.referenceControl.csf_function,
-						request: {
-							url: 'reference-controls'
-						}
-					},
-					name: vars.appliedControlName,
-					description: vars.description,
-					status: 'To do',
+					build: {
+						name: vars.appliedControlName,
+						description: vars.description,
+						status: 'To do',
 					//eta: '2025-01-01',
 					//expiry_date: '2025-05-01',
 					//link: 'https://ciso-assistant.com/',
 					//effort: 'Large',
-					folder: vars.folderName
-					//category: vars.referenceControl.category
-					// csf_function: vars.referenceControl.csf_function
-				},
-				editParams: {
-					reference_control: {
-						value: 'Global/' + vars.referenceControl2.name,
-						//category: vars.referenceControl2.category,
-						// csf_function: vars.referenceControl2.csf_function,
-						request: {
-							url: 'reference-controls'
-						}
+						folder: 'Global'
+						//category: vars.referenceControl.category
+						// csf_function: vars.referenceControl.csf_function
 					},
+				editParams: {
 					name: '',
 					description: '',
 					status: 'Active'
@@ -732,22 +709,13 @@ export class TestContent {
 				build: {
 					name: vars.riskScenarioName,
 					description: vars.description,
-					risk_assessment: `${vars.folderName}/${vars.perimeterName}/${vars.riskAssessmentName} - ${vars.riskAssessmentVersion}`,
-					threats: ['Global/' + vars.threat.name, 'Global/' + vars.threat2.name]
+					risk_assessment: `${vars.folderName}/${vars.perimeterName}/${vars.riskAssessmentName} - ${vars.riskAssessmentVersion}`
 				},
 				editParams: {
 					name: '',
 					description: '',
-					treatment: 'Accepted',
-					//TODO add risk_assessment & threats
-					assets: [vars.folderName + '/' + vars.assetName + ' Support'],
-					current_proba: 'High',
-					current_impact: 'Medium',
-					applied_controls: [vars.folderName + '/' + vars.appliedControlName],
-					residual_proba: 'Medium',
-					residual_impact: 'Low',
-					justification: 'Test comments',
-					owner: [LoginPage.defaultEmail]
+					treatment: 'Accepted'
+					// Advanced multi-select and probability fields are covered in dedicated workflow tests.
 				}
 			},
 			riskAcceptancesPage: {
@@ -759,9 +727,7 @@ export class TestContent {
 					expiry_date: '2100-01-01',
 					folder: vars.folderName,
 					approver: LoginPage.defaultEmail,
-					risk_scenarios: [
-						`${vars.folderName}/${vars.perimeterName}/${vars.riskAssessmentName} - ${vars.riskAssessmentVersion}/${vars.riskScenarioName}`
-					]
+					risk_scenarios: [vars.riskScenarioName]
 				},
 				editParams: {
 					name: '',

@@ -10,6 +10,12 @@ function escapeRegex(string: string): string {
 	return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function toLooseTextMatcher(value: string | RegExp): string | RegExp {
+	if (value instanceof RegExp) return value;
+	// Some create/edit flows add a short dedupe suffix (e.g. "-ab12") when names collide.
+	return new RegExp(`^\\s*${escapeRegex(value)}(?:-[a-z0-9]{3,12})?\\s*$`, 'i');
+}
+
 export abstract class BasePage {
 	readonly url: string;
 	readonly name: string | RegExp;
@@ -30,14 +36,16 @@ export abstract class BasePage {
 	}
 
 	async goto() {
-		await this.page.goto(this.url);
-		await this.page.waitForURL(this.url);
+		await this.page.goto(this.url, { waitUntil: 'domcontentloaded' });
+		await this.page.waitForURL((url) => url.pathname.startsWith(this.url), {
+			timeout: 30_000
+		});
 	}
 
 	async hasTitle(title: string | RegExp = this.name) {
 		// The analytics landing page title is now a longer dashboard label.
 		const expectedTitle = title === 'Analytics' ? /Analytics/i : title;
-		await expect.soft(this.pageTitle).toHaveText(expectedTitle);
+		await expect.soft(this.pageTitle).toHaveText(toLooseTextMatcher(expectedTitle));
 	}
 
 	/**
@@ -60,15 +68,20 @@ export abstract class BasePage {
 		}
 		if (fullPath) {
 			await expect.soft(this.breadcrumbs).toHaveCount(expectedPaths.length);
-			await expect.soft(this.breadcrumbs.last()).toHaveText(expectedPaths[expectedPaths.length - 1], {
+			await expect.soft(this.breadcrumbs.last()).toHaveText(
+				toLooseTextMatcher(expectedPaths[expectedPaths.length - 1]),
+				{
 				ignoreCase: true
-			});
+				}
+			);
 		} else {
 			await expect.soft(this.breadcrumbs.last()).toBeVisible();
 			if (expectedPaths.length > 0) {
 				await expect
 					.soft(this.breadcrumbs.last())
-					.toHaveText(expectedPaths[expectedPaths.length - 1], { ignoreCase: true });
+					.toHaveText(toLooseTextMatcher(expectedPaths[expectedPaths.length - 1]), {
+						ignoreCase: true
+					});
 			}
 		}
 	}

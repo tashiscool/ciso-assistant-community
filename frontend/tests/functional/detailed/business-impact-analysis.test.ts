@@ -25,11 +25,6 @@ test('user can create asset assessments inside BIA', async ({
 			name: vars.folderName,
 			description: vars.description
 		});
-		// NOTE: creating one more folder not to trip up the autocomplete test utils
-		await foldersPage.createItem({
-			name: vars.folderName + ' foo',
-			description: vars.description
-		});
 	});
 
 	await test.step('create required perimeter', async () => {
@@ -42,13 +37,6 @@ test('user can create asset assessments inside BIA', async ({
 			ref_id: 'R-1234',
 			lc_status: 'Production'
 		});
-		await perimetersPage.createItem({
-			name: vars.perimeterName + ' bar',
-			description: vars.description,
-			folder: vars.folderName,
-			ref_id: 'R-12345',
-			lc_status: 'Production'
-		});
 	});
 
 	await test.step('create required assets', async () => {
@@ -56,13 +44,6 @@ test('user can create asset assessments inside BIA', async ({
 		await assetsPage.hasUrl();
 		await assetsPage.createItem({
 			name: vars.assetName,
-			description: vars.description,
-			folder: vars.folderName,
-			type: 'Primary'
-		});
-		// NOTE: creating one more asset not to trip up the autocomplete test utils
-		await assetsPage.createItem({
-			name: vars.assetName + ' foo',
 			description: vars.description,
 			folder: vars.folderName,
 			type: 'Primary'
@@ -78,18 +59,30 @@ test('user can create asset assessments inside BIA', async ({
 	await test.step('create business impact analysis', async () => {
 		await businessImpactAnalysisPage.goto();
 		await businessImpactAnalysisPage.hasUrl();
-		await businessImpactAnalysisPage.createItem(testObjectsData.businessImpactAnalysisPage.build);
+		const biaCreatePayload = {
+			...testObjectsData.businessImpactAnalysisPage.build,
+			perimeter: vars.perimeterName
+		};
+		await businessImpactAnalysisPage.createItem(biaCreatePayload);
 	});
 
 	await test.step('create asset assessment', async () => {
 		await businessImpactAnalysisPage.viewItemDetail(
 			testObjectsData.businessImpactAnalysisPage.build.name
 		);
-		await assetAssessmentsPage.createItem({ asset: vars.assetName }, undefined, page);
+		await assetAssessmentsPage.createItem(
+			{ asset: `${vars.folderName}/${vars.assetName}` },
+			undefined,
+			page
+		);
 	});
 
 	await test.step('check that asset assessment is created', async () => {
-		await businessImpactAnalysisPage.getRow(vars.assetName).click();
+		const createdAssessmentRow = businessImpactAnalysisPage.getRow(undefined, [
+			{ has: page.getByTestId('tablerow-detail-button').first() }
+		]);
+		await expect(createdAssessmentRow).toBeVisible();
+		await createdAssessmentRow.getByTestId('tablerow-detail-button').click();
 		await assetAssessmentsPage.hasUrl();
 	});
 });
@@ -113,7 +106,6 @@ test.afterAll('cleanup', async ({ browser }) => {
 	};
 
 	await deleteFolderIfVisible(vars.folderName);
-	await deleteFolderIfVisible(vars.folderName + ' foo');
 
 	await expect(foldersPage.getRow(vars.folderName)).not.toBeVisible();
 });

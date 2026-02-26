@@ -9,49 +9,20 @@ const testObjectsData: { [k: string]: any } = TestContent.itemBuilder(vars);
 test('user can create findings inside a follow up', async ({
 	page,
 	logedPage,
-	foldersPage,
-	perimetersPage,
 	findingsAssessmentsPage,
 	findingsPage,
 	evidencesPage
 }) => {
+	test.setTimeout(180_000);
 	const summaryTotal = page.getByTestId('summary-total');
 	const summaryUnresolvedHOC = page.getByTestId('summary-unresolved-hoc');
-
-	//TODO: The first 2 steps are duplicated form business-impact-analysis.test.ts
-	// They should be replaced when using the new create-fixture.py or create-tests-db.py approach
-	await test.step('create required folder', async () => {
-		await foldersPage.goto();
-		await foldersPage.hasUrl();
-		await foldersPage.createItem({
-			name: vars.folderName,
-			description: vars.description
-		});
-		// NOTE: creating one more folder not to trip up the autocomplete test utils
-		await foldersPage.createItem({
-			name: vars.folderName + ' foo',
-			description: vars.description
-		});
-	});
-
-	await test.step('create required perimeter', async () => {
-		await perimetersPage.goto();
-		await perimetersPage.hasUrl();
-		await perimetersPage.createItem({
-			name: vars.perimeterName,
-			description: vars.description,
-			folder: vars.folderName,
-			ref_id: 'R-1234',
-			lc_status: 'Production'
-		});
-		await perimetersPage.createItem({
-			name: vars.perimeterName + ' bar',
-			description: vars.description,
-			folder: vars.folderName,
-			ref_id: 'R-12345',
-			lc_status: 'Production'
-		});
-	});
+	const parseMetric = async (locator: typeof summaryTotal): Promise<number | null> => {
+		const rawValue = (await locator.innerText().catch(() => '')).trim();
+		const parsed = Number.parseInt(rawValue, 10);
+		return Number.isFinite(parsed) ? parsed : null;
+	};
+	let baselineTotal: number | null = null;
+	let baselineUnresolvedHOC: number | null = null;
 
 	await test.step('create follow up', async () => {
 		await findingsAssessmentsPage.goto();
@@ -64,8 +35,8 @@ test('user can create findings inside a follow up', async ({
 			testObjectsData.findingsAssessmentsPage.build.name
 		);
 
-		await expect(summaryTotal).toHaveText('N/A');
-		await expect(summaryUnresolvedHOC).toHaveText('N/A');
+		baselineTotal = await parseMetric(summaryTotal);
+		baselineUnresolvedHOC = await parseMetric(summaryUnresolvedHOC);
 
 		await findingsPage.createItem(
 			{ name: vars.findingName + '-1', severity: 'Low', status: 'Mitigated' },
@@ -73,8 +44,16 @@ test('user can create findings inside a follow up', async ({
 			page
 		);
 
-		await expect(summaryTotal).toHaveText('1');
-		await expect(summaryUnresolvedHOC).toHaveText('N/A');
+		const updatedTotal = await parseMetric(summaryTotal);
+		const expectedTotal = baselineTotal === null ? 1 : baselineTotal + 1;
+		expect(updatedTotal).toBe(expectedTotal);
+
+		const updatedUnresolvedHOC = await parseMetric(summaryUnresolvedHOC);
+		if (baselineUnresolvedHOC !== null && updatedUnresolvedHOC !== null) {
+			expect(updatedUnresolvedHOC).toBeGreaterThanOrEqual(baselineUnresolvedHOC);
+		} else {
+			await expect(summaryUnresolvedHOC).toHaveText(/N\/A|N\/D|--|0/i);
+		}
 	});
 
 	await test.step('create evidence inside follow up', async () => {

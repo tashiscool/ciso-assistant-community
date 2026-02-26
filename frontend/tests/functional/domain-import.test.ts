@@ -19,9 +19,8 @@ async function dismissBlockingModals(page: Page) {
 
 // Helper to navigate to the folders list page.
 async function navigateToFolders(page: Page) {
-	await page.getByRole('button', { name: 'Organization' }).click();
-	await page.getByTestId('accordion-item-folders').click();
-	await expect(page).toHaveURL('/folders');
+	await page.goto('/folders');
+	await expect(page).toHaveURL(/\/folders/);
 	await expect(page.getByTestId('import-button')).toBeVisible();
 }
 
@@ -63,7 +62,7 @@ test('User can import a domain from a .bak file', async ({ logedPage, page }) =>
 		// Verify that a success toast appears with expected text.
 		const toast = page.getByTestId('toast');
 		await expect(toast).toBeVisible({ timeout: 180000 });
-		await expect(toast).toHaveText(/successfully imported/i);
+		await expect(toast).toHaveText(/successfully imported|import[ée] avec succ[eè]s/i);
 
 		// Confirm that the number of rows has increased.
 		// take a quick nap to make sure the data is loaded
@@ -94,8 +93,8 @@ test('User can load demo data', async ({ logedPage, page }) => {
 
 		// Verify that a toast with demo data success message appears.
 		const toast = page.getByTestId('toast');
-		await expect(toast).toBeVisible({ timeout: 1800000 });
-		await expect(toast).toHaveText(/successfully imported/i);
+		await expect(toast).toBeVisible({ timeout: 180000 });
+		await expect(toast).toHaveText(/successfully imported|import[ée] avec succ[eè]s/i);
 
 		// Confirm that the new row count is greater than the initial.
 		// take a quick nap to make sure the data is loaded

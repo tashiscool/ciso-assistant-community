@@ -57,6 +57,31 @@ def _parse_folder_uuid(folder_id):
         return None
 
 
+def _build_combined_graph_from_folder_ids(builder, folder_ids):
+    """Build a merged graph from a sequence of domain folder IDs."""
+    combined_graph = SecurityGraph()
+    for folder_id in folder_ids:
+        folder_graph = builder.build_from_folder(folder_id)
+        for node in folder_graph.nodes.values():
+            combined_graph.add_node(node)
+        for edge in folder_graph.edges.values():
+            combined_graph.add_edge(edge)
+    return combined_graph
+
+
+def _build_user_scoped_graph_or_none(user, builder=None):
+    """
+    Build a combined graph from IAM-accessible domain folders.
+
+    Returns None when the user has no accessible domain folders.
+    """
+    folder_ids = _get_accessible_domain_folder_ids(user, limit=None)
+    if not folder_ids:
+        return None
+    graph_builder = builder or get_graph_builder()
+    return _build_combined_graph_from_folder_ids(graph_builder, folder_ids)
+
+
 class SecurityGraphView(APIView):
     """Get the complete security graph."""
     permission_classes = [IsAuthenticated]
@@ -73,24 +98,13 @@ class SecurityGraphView(APIView):
             output_format = request.query_params.get('format', 'full')
             include_metrics = request.query_params.get('include_metrics', 'true') == 'true'
 
-            builder = get_graph_builder()
-
-            # Build graph from user's accessible folders
-            folder_ids = _get_accessible_domain_folder_ids(request.user, limit=None)
-            if not folder_ids:
+            # Build graph from the requesting user's IAM-scoped folders only.
+            combined_graph = _build_user_scoped_graph_or_none(request.user)
+            if combined_graph is None:
                 empty_graph = SecurityGraph()
                 if output_format == 'vis':
                     return Response(empty_graph.to_vis_format())
                 return Response(empty_graph.to_dict())
-
-            # Build combined graph from all accessible folders
-            combined_graph = SecurityGraph()
-            for folder_id in folder_ids:
-                folder_graph = builder.build_from_folder(folder_id)
-                for node in folder_graph.nodes.values():
-                    combined_graph.add_node(node)
-                for edge in folder_graph.edges.values():
-                    combined_graph.add_edge(edge)
 
             if include_metrics:
                 combined_graph.compute_degrees()
@@ -359,20 +373,12 @@ class AttackPathsView(APIView):
                 graph = builder.build_from_folder(folder_uuid)
             else:
                 # Build graph from the requesting user's IAM-scoped folders only.
-                folder_ids = _get_accessible_domain_folder_ids(request.user, limit=None)
-                if not folder_ids:
+                graph = _build_user_scoped_graph_or_none(request.user)
+                if graph is None:
                     return Response(
                         {'error': 'No accessible domain folders found'},
                         status=status.HTTP_403_FORBIDDEN,
                     )
-                builder = get_graph_builder()
-                graph = SecurityGraph()
-                for fid in folder_ids:
-                    fg = builder.build_from_folder(fid)
-                    for node in fg.nodes.values():
-                        graph.add_node(node)
-                    for edge in fg.edges.values():
-                        graph.add_edge(edge)
 
             # Find attack paths
             analyzer = get_blast_radius_analyzer()
