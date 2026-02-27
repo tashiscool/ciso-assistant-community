@@ -1,6 +1,6 @@
 ## Real Browser E2E
 
-Run against a locally running backend and browser Playwright runner:
+Run against a locally running backend and Playwright runner:
 
 ```bash
 # backend must be reachable at http://127.0.0.1:8000
@@ -17,39 +17,48 @@ Single command entrypoints:
 # local browser runner (no docker)
 cd frontend && pnpm run test:e2e:parity:local
 
+# smoke-only local gate
+cd frontend && pnpm run test:e2e:parity:smoke:local
+
 # dockerized runner
 cd frontend && pnpm run test:e2e:parity
 ```
 
 ## Route journey coverage
 
-Route-level parity smoke coverage is split across:
+Route-level parity smoke coverage:
 
 - `frontend/tests/functional/critical-feature-smoke.test.ts`
 - `frontend/tests/functional/parity-feature-smoke.test.ts`
 
-## Use-case coverage
+## Workflow journey coverage
 
-Current high-value journey tests:
+Parity workflow journeys:
 
-- `frontend/tests/functional/detailed/workflows.test.ts`
-- `frontend/tests/functional/detailed/mappings.test.ts`
+- `frontend/tests/functional/detailed/parity-p1-connectors-oscal-security-graph.test.ts`
+- `frontend/tests/functional/detailed/parity-p2-expanded-workflows.test.ts`
 
-API contract and routing coverage:
+Coverage status:
+
+- `20/20` parity manifest features have tagged workflow E2E coverage.
+
+## API contract and parity manifest validation
 
 ```bash
 python3 scripts/check_feature_coverage.py
 cd backend && poetry run pytest core/bounded_contexts/tests/test_feature_api_contracts.py core/bounded_contexts/tests/test_parity_feature_api_contracts.py -q
 ```
 
-## Redis validation
+## Runtime dependency validation
+
+Redis:
 
 ```bash
 cd backend
 USE_REDIS=True REDIS_HOST=localhost REDIS_PORT=6379 poetry run python ../scripts/check_runtime_infra.py --require-redis
 ```
 
-## MinIO/S3 integration
+MinIO/S3:
 
 ```bash
 cd backend
@@ -61,9 +70,7 @@ USE_S3=True \
 poetry run python ../scripts/check_runtime_infra.py --require-s3
 ```
 
-## UI/UX automation coverage
-
-Core coverage should be run together:
+Combined gate:
 
 ```bash
 python3 scripts/check_feature_coverage.py

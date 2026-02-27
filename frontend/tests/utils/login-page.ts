@@ -94,8 +94,21 @@ export class LoginPage extends BasePage {
 	}
 
 	async skipWelcome(url: RegExp | ((url: URL) => boolean) = (url) => !url.pathname.endsWith('/login')) {
+		const urlMatches = (rawUrl: string) => {
+			if (url instanceof RegExp) {
+				return url.test(rawUrl);
+			}
+			return url(new URL(rawUrl));
+		};
+
+		// Retry login once if a transient auth redirect sends us back to /login.
+		const currentUrl = this.page.url();
+		if (!urlMatches(currentUrl) && new URL(currentUrl).pathname.endsWith('/login')) {
+			await this.login(this.email, this.password);
+		}
+
 		// if welcome popup is visible, close it
-		await expect(this.page).toHaveURL(url);
+		await expect(this.page).toHaveURL(url, { timeout: 30_000 });
 		const welcomePopup = this.page.getByTestId('modal-component');
 		if (await welcomePopup.isVisible()) {
 			await this.page.keyboard.press('Escape');

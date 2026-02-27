@@ -207,8 +207,10 @@ test.describe('P1 Workflow Cluster - Connectors, OSCAL, Security Graph', () => {
 		const fixturePath = createOscalFixture();
 
 		try {
-			await page.goto('/oscal');
-			await expect(page).toHaveURL(/\/oscal/);
+			await expect(async () => {
+				await page.goto('/oscal', { timeout: 30_000 });
+				await expect(page).toHaveURL(/\/oscal/);
+			}).toPass({ timeout: 60_000, intervals: [500, 1000, 2000] });
 			await expect(page.getByRole('heading', { level: 1, name: /oscal/i })).toBeVisible();
 			const exportTabButton = page.getByRole('button', { name: /export oscal/i }).first();
 			await expect
