@@ -1,4 +1,4 @@
-import { test as base, expect as baseExpect, type Page } from '@playwright/test';
+import { test as base, expect as baseExpect, type Page, type Response } from '@playwright/test';
 import { SideBar } from './sidebar.js';
 import { LoginPage } from './login-page.js';
 import { AnalyticsPage } from './analytics-page.js';
@@ -831,8 +831,32 @@ export class TestContent {
 	}
 }
 
-export function setHttpResponsesListener(page: Page) {
+type HttpResponseIgnoreRule = {
+	url: string | RegExp;
+	statuses?: number[];
+};
+
+function isIgnoredResponse(response: Response, ignoredRules: HttpResponseIgnoreRule[]) {
+	const responseStatus = response.status();
+	const responseUrl = response.url();
+	return ignoredRules.some((rule) => {
+		const urlMatches =
+			typeof rule.url === 'string' ? responseUrl.includes(rule.url) : rule.url.test(responseUrl);
+		if (!urlMatches) {
+			return false;
+		}
+		if (!rule.statuses || rule.statuses.length === 0) {
+			return true;
+		}
+		return rule.statuses.includes(responseStatus);
+	});
+}
+
+export function setHttpResponsesListener(page: Page, ignoredRules: HttpResponseIgnoreRule[] = []) {
 	page.on('response', (response) => {
+		if (isIgnoredResponse(response, ignoredRules)) {
+			return;
+		}
 		if (response.status() >= 400) {
 			console.error(`[http] ${response.status()} ${response.request().method()} ${response.url()}`);
 		}

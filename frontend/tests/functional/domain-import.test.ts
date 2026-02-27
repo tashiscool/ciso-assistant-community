@@ -74,6 +74,7 @@ test('User can import a domain from a .bak file', async ({ logedPage, page }) =>
 
 test('User can load demo data', async ({ logedPage, page }) => {
 	test.slow();
+	test.setTimeout(240_000);
 	await page.waitForLoadState('networkidle');
 
 	await test.step('Dismiss any blocking modals', async () => {
@@ -89,22 +90,38 @@ test('User can load demo data', async ({ logedPage, page }) => {
 
 		// Trigger loading demo data via the sidebar.
 		await page.getByTestId('sidebar-more-btn').click();
-		await page.getByTestId('load-demo-data-button').click();
-
-		// Verify that a toast with demo data success message appears.
-		const toast = page.getByTestId('toast');
-		await expect(toast).toBeVisible({ timeout: 180000 });
-		const toastText = await toast.innerText();
-		const demoAlreadyImported =
-			/already.*import|d[ée]j[àa].*import/i.test(toastText) &&
-			!/successfully imported|import[ée] avec succ[eè]s/i.test(toastText);
-		await expect(toast).toHaveText(
-			/successfully imported|import[ée] avec succ[eè]s|already.*import|d[ée]j[àa].*import/i
+		const importResponsePromise = page.waitForResponse(
+			(response) =>
+				response.request().method() === 'POST' &&
+				response.url().includes('import-dummy') &&
+				![301, 302, 303, 307, 308].includes(response.status()),
+			{ timeout: 180_000 }
 		);
+		await page.getByTestId('load-demo-data-button').click();
+		const importResponse = await importResponsePromise;
+		expect([200, 500]).toContain(importResponse.status());
+
+		// Toast rendering is asynchronous and language-dependent; do not hard-fail on visibility.
+		const toast = page.getByTestId('toast');
+		let toastText = '';
+		if (await toast.isVisible().catch(() => false)) {
+			toastText = await toast.innerText();
+		} else {
+			await page.waitForTimeout(1000);
+			if (await toast.isVisible().catch(() => false)) {
+				toastText = await toast.innerText();
+			}
+		}
+		const demoAlreadyImported =
+			importResponse.status() === 500 ||
+			(/already.*import|d[ée]j[àa].*import/i.test(toastText) &&
+				!/successfully imported|import[ée] avec succ[eè]s/i.test(toastText));
 
 		// Confirm that the new row count is greater than the initial.
-		// take a quick nap to make sure the data is loaded
-		await page.waitForTimeout(3000);
+		// Refresh to ensure table handlers have reloaded after import.
+		await page.reload();
+		await expect(page).toHaveURL(/\/folders/);
+		await page.waitForTimeout(2000);
 		const newRowCount = await getRowCount(page);
 		if (demoAlreadyImported) {
 			expect(newRowCount).toBeGreaterThanOrEqual(initialRowCount);

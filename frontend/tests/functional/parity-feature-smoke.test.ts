@@ -43,7 +43,7 @@ test.describe('RegScale + Paramify Parity Smoke Coverage', () => {
 	}) => {
 		await page.goto('/libraries');
 		await expect(page).toHaveURL(/\/libraries/);
-		await expect(page.locator('body')).toContainText(/libraries/i);
+		await expect(page.locator('table')).toBeVisible();
 	});
 
 	test('[feature:fedramp_automation] conmon monthly report route is reachable', async ({

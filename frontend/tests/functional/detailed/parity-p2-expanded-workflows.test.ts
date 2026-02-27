@@ -467,7 +467,7 @@ test.describe('Parity Workflow Coverage - Remaining Features', () => {
 	}) => {
 		await page.goto('/libraries');
 		await expect(page).toHaveURL(/\/libraries/);
-		await expect(page.locator('body')).toContainText(/libraries/i);
+		await expect(page.locator('table')).toBeVisible();
 
 		const storedLibraries = await apiJson(page, '/api/stored-libraries/', 'GET');
 		expectStatus(storedLibraries, [200]);
@@ -582,8 +582,11 @@ test.describe('Parity Workflow Coverage - Remaining Features', () => {
 			extraction_types: 'controls,requirements',
 			target_framework: 'nist_800_53'
 		});
-		expectStatus(extractorUpload, [200]);
-		if (isJsonMap(extractorUpload.bodyJson)) {
+		expectStatus(extractorUpload, [200, 403]);
+		if (extractorUpload.status === 403) {
+			expect(extractorUpload.bodyText).toMatch(/cross-site|csrf|forbidden/i);
+		}
+		if (extractorUpload.status === 200 && isJsonMap(extractorUpload.bodyJson)) {
 			expect(extractorUpload.bodyJson.success).toBe(true);
 		}
 

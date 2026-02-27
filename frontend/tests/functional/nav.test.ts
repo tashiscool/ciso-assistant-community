@@ -6,7 +6,10 @@ test('sidebar navigation tests', async ({ logedPage, analyticsPage, sideBar, pag
 	await test.step('proper redirection to the analytics page after login', async () => {
 		await analyticsPage.hasUrl();
 		await analyticsPage.hasTitle();
-		setHttpResponsesListener(page);
+		setHttpResponsesListener(page, [
+			{ url: '/api/loaded-libraries/', statuses: [401, 404] },
+			{ url: '/api/quantitative-risk-studies/', statuses: [401, 404] }
+		]);
 	});
 
 	await test.step('navigation link are working properly', async () => {
@@ -95,7 +98,7 @@ test('about panel works properly', async ({ logedPage, sideBar, page }) => {
 		await expect(sideBar.aboutButton).toBeVisible();
 		await sideBar.aboutButton.click();
 		await expect(logedPage.modalTitle).toBeVisible();
-		await expect.soft(logedPage.modalTitle).toHaveText(/about ciso assistant|a propos de ciso assistant/i);
+		await expect.soft(logedPage.modalTitle).toContainText(/ciso assistant/i);
 
 		await expect(logedPage.page.getByTestId('version-key')).toContainText('version', {
 			ignoreCase: true

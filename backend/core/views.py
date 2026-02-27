@@ -10,6 +10,7 @@ from django_filters.filterset import filterset_factory
 from django_filters.utils import try_dbfield
 import regex
 import os
+import sys
 import uuid
 import zipfile
 import tempfile
@@ -110,6 +111,36 @@ from rest_framework.utils.serializer_helpers import ReturnDict
 from rest_framework.views import APIView
 from rest_framework.exceptions import NotFound, PermissionDenied
 
+
+def _configure_weasyprint_library_path():
+    """
+    Ensure Homebrew library paths are visible to WeasyPrint on macOS.
+
+    WeasyPrint depends on native libraries (e.g. Pango/Cairo). On macOS,
+    they are often installed under /opt/homebrew/lib or /usr/local/lib and
+    need to be discoverable at import time.
+    """
+    if sys.platform != "darwin":
+        return
+
+    candidates = ["/opt/homebrew/lib", "/usr/local/lib"]
+    existing = [path for path in candidates if os.path.isdir(path)]
+    if not existing:
+        return
+
+    current = os.environ.get("DYLD_FALLBACK_LIBRARY_PATH", "")
+    current_parts = [part for part in current.split(":") if part]
+    changed = False
+    for path in existing:
+        if path not in current_parts:
+            current_parts.append(path)
+            changed = True
+
+    if changed:
+        os.environ["DYLD_FALLBACK_LIBRARY_PATH"] = ":".join(current_parts)
+
+
+_configure_weasyprint_library_path()
 
 try:
     from weasyprint import HTML as WeasyHTML

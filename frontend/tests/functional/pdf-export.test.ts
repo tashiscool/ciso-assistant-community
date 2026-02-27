@@ -7,27 +7,20 @@ const vars = TestContent.generateTestVars();
 const testObjectsData: { [k: string]: any } = TestContent.itemBuilder(vars);
 
 async function exportPdfAndVerify(page: Page, pdfButton: Locator) {
-	const downloadPromise = page.waitForEvent('download');
-	await pdfButton.click();
-
-	const download = await downloadPromise;
-	const fileName = download.suggestedFilename();
+	await expect(pdfButton).toBeVisible();
+	const pdfHref = await pdfButton.getAttribute('href');
+	expect(pdfHref).toBeTruthy();
+	const pdfUrl = new URL(pdfHref || '', page.url()).toString();
+	const response = await page.request.get(pdfUrl);
 
 	await test.step('verify file is PDF and has content', async () => {
-		expect(fileName.endsWith('.pdf')).toBeTruthy();
-		const failure = await download.failure();
-		expect(failure).toBeNull();
+		expect(response.ok()).toBeTruthy();
+		const contentType = response.headers()['content-type'] || '';
+		expect(contentType.toLowerCase()).toContain('pdf');
+		const contentDisposition = response.headers()['content-disposition'] || '';
+		expect(contentDisposition.toLowerCase()).toContain('.pdf');
 
-		const stream = await download.createReadStream();
-		if (!stream) {
-			throw new Error('Failed to obtain download stream');
-		}
-		// Collect chunks from the stream into a buffer
-		const chunks: Buffer[] = [];
-		for await (const chunk of stream) {
-			chunks.push(chunk as Buffer);
-		}
-		const buffer = Buffer.concat(chunks);
+		const buffer = Buffer.from(await response.body());
 		expect(buffer.length).toBeGreaterThan(0);
 
 		// Basic PDF magic header check
