@@ -595,6 +595,12 @@ export const navData = {
 					permissions: ['view_appliedcontrol']
 				},
 				{
+					name: 'assessmentArtifacts',
+					fa_icon: 'fa-solid fa-box-archive',
+					href: '/assessment-artifacts',
+					permissions: ['view_appliedcontrol']
+				},
+				{
 					name: 'workflows',
 					fa_icon: 'fa-solid fa-diagram-project',
 					href: '/workflows',

@@ -3658,6 +3658,7 @@
 	"bcpOverview": "BCP Overview",
 	"sspGenerator": "SSP Generator",
 	"evidenceAutomation": "Evidence Automation",
+	"assessmentArtifacts": "Assessment Artifacts",
 	"dataAssets": "Data Assets",
 	"consentRecords": "Consent Records",
 	"featureNotEnabled": "The {feature} feature is not enabled."

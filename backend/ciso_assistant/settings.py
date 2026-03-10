@@ -220,6 +220,7 @@ INSTALLED_APPS = [
     "connectors",  # Security tool connector integrations
     "vendor_portal",  # Token-authenticated vendor portal
     "questionnaires",  # Vendor assessment questionnaire templates
+    "assessment_artifacts",  # Assessment artifact packages and evidence schedules
     # Bounded contexts within core
     "core.bounded_contexts.asset_and_service",
     "core.bounded_contexts.organization",
