@@ -21,11 +21,25 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 	const objectEndpoint = `${BASE_API_URL}/${URLModel}/${params.id}/object/`;
 	const object = await fetch(objectEndpoint).then((res) => res.json());
 	const scenario = await fetch(baseEndpoint).then((res) => res.json());
+	scenario.owner = Array.isArray(scenario.owner) ? scenario.owner : [];
+	scenario.applied_controls = Array.isArray(scenario.applied_controls)
+		? scenario.applied_controls
+		: [];
+	scenario.perimeter = scenario.perimeter || scenario.risk_assessment?.perimeter;
+	scenario.risk_matrix = scenario.risk_matrix || scenario.risk_assessment?.risk_matrix;
 	const form = await superValidate(object, zod(schema), { errors: false });
 	const model = getModelInfo(URLModel);
 	const selectFields = model.selectFields;
 
-	const riskMatrix = await fetch(`${BASE_API_URL}/risk-matrices/${object.risk_matrix}/`)
+	const riskMatrixId =
+		typeof object.risk_matrix === 'string'
+			? object.risk_matrix
+			: scenario.risk_matrix?.id ||
+				(typeof scenario.risk_assessment?.risk_matrix === 'string'
+					? scenario.risk_assessment.risk_matrix
+					: scenario.risk_assessment?.risk_matrix?.id);
+
+	const riskMatrix = await fetch(`${BASE_API_URL}/risk-matrices/${riskMatrixId}/`)
 		.then((res) => res.json())
 		.then((res) => JSON.parse(res.json_definition));
 
@@ -114,7 +128,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 
 	const measureCreateSchema = modelSchema('applied-controls');
 	const initialData = {
-		folder: scenario.perimeter.folder.id
+		folder: scenario.perimeter?.folder?.id || scenario.risk_assessment?.folder?.id
 	};
 	const measureCreateForm = await superValidate(initialData, zod(measureCreateSchema), {
 		errors: false

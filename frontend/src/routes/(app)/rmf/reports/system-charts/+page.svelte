@@ -83,7 +83,7 @@
 </script>
 
 <svelte:head>
-  <title>System Charts - RMF Reports - CISO Assistant</title>
+  <title>System Charts - RMF Reports - Regovise</title>
 </svelte:head>
 
 <div class="system-charts min-h-screen bg-gray-50">

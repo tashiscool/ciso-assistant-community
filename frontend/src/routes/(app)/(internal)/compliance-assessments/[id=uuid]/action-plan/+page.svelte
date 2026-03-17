@@ -26,11 +26,11 @@
 	};
 </script>
 
-<div class="bg-white p-2 shadow-sm rounded-lg space-x-2 flex flex-row justify-center mb-2">
+<div class="brand-card mb-4 flex flex-row justify-center space-x-2 p-3">
 	<p class="font-semibold text-lg">
 		{m.perimeter()}:
 		<a
-			class="unstyled text-primary-500 hover:text-primary-700 cursor-pointer"
+			class="unstyled cursor-pointer text-[var(--rv-blue)] hover:text-[var(--rv-midnight)]"
 			href="/perimeters/{data.compliance_assessment.perimeter.id}/"
 			>{data.compliance_assessment.perimeter.str}</a
 		>
@@ -39,7 +39,7 @@
 	<p class="font-semibold text-lg">
 		{m.complianceAssessment()}:
 		<a
-			class="unstyled text-primary-500 hover:text-primary-700 cursor-pointer"
+			class="unstyled cursor-pointer text-[var(--rv-blue)] hover:text-[var(--rv-midnight)]"
 			href="/compliance-assessments/{data.compliance_assessment.id}/"
 			>{data.compliance_assessment.name} - {data.compliance_assessment.version}</a
 		>
@@ -48,17 +48,18 @@
 	<p class="font-semibold text-lg">
 		{m.framework()}:
 		<a
-			class="unstyled text-primary-500 hover:text-primary-700 cursor-pointer"
+			class="unstyled cursor-pointer text-[var(--rv-blue)] hover:text-[var(--rv-midnight)]"
 			href="/frameworks/{data.compliance_assessment.framework.id}/"
 			>{data.compliance_assessment.framework.str}</a
 		>
 	</p>
 </div>
-<div class="flex flex-col space-y-4 bg-white p-4 shadow-sm rounded-lg space-x-2">
+<div class="brand-card flex flex-col space-y-4 p-5 lg:p-6">
 	<div class="flex justify-between items-center w-full">
 		<div class="flex-1">
-			<p class="text-xl font-extrabold">{m.associatedAppliedControls()}</p>
-			<p class="text-sm text-gray-500">
+			<span class="brand-overline">Regovise Action Plan</span>
+			<p class="mt-3 text-2xl font-extrabold text-[var(--rv-midnight)]">{m.associatedAppliedControls()}</p>
+			<p class="text-sm text-slate-500">
 				{m.actionPlanHelpText()}
 			</p>
 		</div>
@@ -66,7 +67,8 @@
 			<Anchor
 				breadcrumbAction="push"
 				href={`/applied-controls/flash-mode?compliance_assessments=${page.params.id}&backUrl=${encodeURIComponent(page.url.pathname)}&backLabel=${encodeURIComponent(m.actionPlan())}`}
-				class="btn text-gray-100 bg-linear-to-r from-indigo-500 to-violet-500 h-fit"
+				class="btn h-fit border-0 text-white"
+				style="background: var(--rv-gradient-accent); box-shadow: var(--rv-shadow-glow);"
 				><i class="fa-solid fa-bolt mr-2"></i> {m.flashMode()}</Anchor
 			>
 		</div>

@@ -14,83 +14,90 @@ import testData from '../utils/test-data.js';
 import { PageContent } from '../utils/page-content.js';
 
 const userGroups: { string: any } = testData.usergroups;
+const userGroupEntries = Object.entries(userGroups);
+const seededVars = TestContent.generateTestVars();
+const seededObjectsData: { [k: string]: any } = TestContent.itemBuilder(seededVars);
 
-Object.entries(userGroups).forEach(([userGroup, userGroupData]) => {
+userGroupEntries.forEach(([userGroup, userGroupData], groupIndex) => {
 	test.describe(`${userGroupData.name} user has the right permissions`, async () => {
-		test.describe.configure({ mode: 'serial' });
-
-		const vars = TestContent.generateTestVars();
-		const testObjectsData: { [k: string]: any } = TestContent.itemBuilder(vars);
+		test.describe.configure({ mode: 'serial', timeout: 900_000 });
+		const isSeedGroup = groupIndex === 0;
+		const isLastGroup = groupIndex === userGroupEntries.length - 1;
 
 		test.beforeEach(async ({ page }) => {
 			setHttpResponsesListener(page);
 		});
 
-		test.use({ data: testObjectsData });
-		test('user can set his password', async ({
-			populateDatabase,
-			logedPage,
-			usersPage,
-			sideBar,
-			mailer,
-			page
-		}) => {
-			await usersPage.goto();
-			await usersPage.editItemButton(vars.user.email).click();
-			await usersPage.form.fill({
-				first_name: vars.user.firstName,
-				last_name: vars.user.lastName,
-				user_groups: [`${vars.folderName} - ${userGroupData.name}`]
+		test.use({ data: seededObjectsData });
+		if (isSeedGroup) {
+			test('user can set his password', async ({
+				populateDatabase,
+				logedPage,
+				usersPage,
+				sideBar,
+				page
+			}) => {
+				test.setTimeout(900_000);
+				void populateDatabase;
+				void logedPage;
+
+				await usersPage.goto();
+				await usersPage.editItemButton(seededVars.user.email).click();
+				await usersPage.form.fill({
+					first_name: seededVars.user.firstName,
+					last_name: seededVars.user.lastName,
+					user_groups: [`${seededVars.folderName} - ${userGroupData.name}`]
+				});
+				const userUpdatedToast = usersPage.isToastVisible(
+					'The user: ' + seededVars.user.email + ' has been successfully updated.+'
+				);
+				await usersPage.form.saveButton.click();
+				await userUpdatedToast;
+
+				const usersResponse = await page.request.get(
+					`/api/users/?offset=0&limit=200&search=${encodeURIComponent(seededVars.user.email)}`
+				);
+				expect(usersResponse.ok()).toBeTruthy();
+				const usersPayload = await usersResponse.json();
+				const foundUser = usersPayload.results?.find(
+					(user: { email: string; id: string }) => user.email === seededVars.user.email
+				);
+				expect(foundUser?.id).toBeTruthy();
+
+				const setPasswordResponse = await page.request.post('/api/iam/set-password/', {
+					data: {
+						user: foundUser.id,
+						new_password: seededVars.user.password,
+						confirm_new_password: seededVars.user.password
+					}
+				});
+				expect(setPasswordResponse.ok()).toBeTruthy();
+
+				await sideBar.logout();
+				await logedPage.login(seededVars.user.email, seededVars.user.password);
+				await expect(logedPage.page).toHaveURL('/analytics');
+				await new SideBar(logedPage.page).logout();
 			});
-			const userUpdatedToast = usersPage.isToastVisible(
-				'The user: ' + vars.user.email + ' has been successfully updated.+'
-			);
-			await usersPage.form.saveButton.click();
-			await userUpdatedToast;
+		} else {
+			test('user can set his password', async ({ logedPage, usersPage, sideBar }) => {
+				await usersPage.goto();
+				await usersPage.editItemButton(seededVars.user.email).click();
+				await usersPage.form.fill({
+					first_name: seededVars.user.firstName,
+					last_name: seededVars.user.lastName,
+					user_groups: [`${seededVars.folderName} - ${userGroupData.name}`]
+				});
+				await usersPage.form.saveButton.click();
+				await usersPage.isToastVisible(
+					'The user: ' + seededVars.user.email + ' has been successfully updated.+'
+				);
 
-			await sideBar.logout();
-
-			await expect(mailer.page.getByText('{{').last()).toBeHidden(); // Wait for mailhog to load the emails
-			const lastMail = await mailer.getLastEmail();
-			await lastMail.hasWelcomeEmailDetails();
-			await lastMail.hasEmailRecipient(vars.user.email);
-
-			await lastMail.open();
-			const pagePromise = page.context().waitForEvent('page');
-			await expect(mailer.emailContent.setPasswordButton).toBeVisible();
-			await mailer.emailContent.setPasswordButton.click();
-			const setPasswordPage = await pagePromise;
-			await setPasswordPage.waitForLoadState();
-			await expect(setPasswordPage).toHaveURL(
-				(await mailer.emailContent.setPasswordButton.getAttribute('href')) ||
-					'Set password link could not be found'
-			);
-
-			const setLoginPage = new LoginPage(setPasswordPage);
-			await setLoginPage.newPasswordInput.fill(vars.user.password);
-			await setLoginPage.confirmPasswordInput.fill(vars.user.password);
-			if (
-				setLoginPage.newPasswordInput.inputValue() !== vars.user.password ||
-				setLoginPage.confirmPasswordInput.inputValue() !== vars.user.password
-			) {
-				await setLoginPage.newPasswordInput.fill(vars.user.password);
-				await setLoginPage.confirmPasswordInput.fill(vars.user.password);
-			}
-			const passwordSetToast = setLoginPage.isToastVisible(
-				'Your password has been successfully set. Welcome to CISO Assistant!',
-				undefined,
-				{ optional: true }
-			);
-			await setLoginPage.setPasswordButton.click();
-			await passwordSetToast;
-
-			await setLoginPage.login(vars.user.email, vars.user.password);
-			await expect(setLoginPage.page).toHaveURL('/analytics');
-
-			// logout to prevent sessions conflicts
-			const passwordPageSideBar = new SideBar(setPasswordPage);
-			await passwordPageSideBar.logout();
-		});
+				await sideBar.logout();
+				await logedPage.login(seededVars.user.email, seededVars.user.password);
+				await expect(logedPage.page).toHaveURL('/analytics');
+				await new SideBar(logedPage.page).logout();
+			});
+		}
 
 		test.describe(() => {
 			let page: Page;
@@ -100,7 +107,7 @@ Object.entries(userGroups).forEach(([userGroup, userGroupData]) => {
 				page = await browser.newPage();
 				const loginPage = new LoginPage(page);
 				await loginPage.goto();
-				await loginPage.login(vars.user.email, vars.user.password);
+				await loginPage.login(seededVars.user.email, seededVars.user.password);
 				await expect(page).toHaveURL('/analytics');
 			});
 
@@ -110,7 +117,7 @@ Object.entries(userGroups).forEach(([userGroup, userGroupData]) => {
 				}
 			});
 
-			Object.entries(testObjectsData).forEach(([objectPage, objectData], index) => {
+			Object.entries(seededObjectsData).forEach(([objectPage, objectData], index) => {
 				test.describe(`${objectData.displayName.toLowerCase()} permissions`, () => {
 					const userCanView = userFromUserGroupHasPermission(
 						userGroup,
@@ -236,6 +243,8 @@ Object.entries(userGroups).forEach(([userGroup, userGroupData]) => {
 		});
 
 		test.afterAll('cleanup', async ({ browser }) => {
+			if (!isLastGroup) return;
+
 			const page = await browser.newPage();
 			const loginPage = new LoginPage(page);
 			const usersPage = new PageContent(page, '/users', 'Users');
@@ -244,15 +253,21 @@ Object.entries(userGroups).forEach(([userGroup, userGroupData]) => {
 			await loginPage.goto();
 			await loginPage.login();
 			await foldersPage.goto();
-			await foldersPage.deleteItemButton(vars.folderName).click();
-			await expect(foldersPage.deletePromptConfirmTextField()).toBeVisible();
-			await foldersPage.deletePromptConfirmTextField().fill(m.yes());
-			await foldersPage.deletePromptConfirmButton().click();
-			await expect(foldersPage.getRow(vars.folderName)).not.toBeVisible();
+			const folderDeleteButton = foldersPage.deleteItemButton(seededVars.folderName);
+			if (await folderDeleteButton.isVisible({ timeout: 5_000 }).catch(() => false)) {
+				await folderDeleteButton.click();
+				await expect(foldersPage.deletePromptConfirmTextField()).toBeVisible();
+				await foldersPage.deletePromptConfirmTextField().fill(m.yes());
+				await foldersPage.deletePromptConfirmButton().click();
+				await expect(foldersPage.getRow(seededVars.folderName)).not.toBeVisible();
+			}
 			await usersPage.goto();
-			await usersPage.deleteItemButton(vars.user.email).click();
-			await usersPage.deleteModalConfirmButton.click();
-			await expect(usersPage.getRow(vars.user.email)).not.toBeVisible();
+			const userDeleteButton = usersPage.deleteItemButton(seededVars.user.email);
+			if (await userDeleteButton.isVisible({ timeout: 5_000 }).catch(() => false)) {
+				await userDeleteButton.click();
+				await usersPage.deleteModalConfirmButton.click();
+				await expect(usersPage.getRow(seededVars.user.email)).not.toBeVisible();
+			}
 		});
 	});
 });

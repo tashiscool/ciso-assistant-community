@@ -312,26 +312,34 @@ test.describe('P1 Workflow Cluster - Connectors, OSCAL, Security Graph', () => {
 				{ timeout: 30_000 }
 			)
 			.toBeGreaterThan(0);
-		await expect(page.locator('#entry-point-select')).toBeVisible();
-		await expect(page.locator('#target-select')).toBeVisible();
+		await expect(page.getByTestId('attack-path-entry-select')).toBeVisible();
+		await expect(page.getByTestId('attack-path-target-select')).toBeVisible();
 
 		await expect
-			.poll(async () => await page.locator(`#entry-point-select option[value="${entryAssetId}"]`).count(), {
+			.poll(
+				async () =>
+					await page.getByTestId('attack-path-entry-select').locator(`option[value="${entryAssetId}"]`).count(),
+				{
 				timeout: 20_000
-			})
+				}
+			)
 			.toBeGreaterThan(0);
 		await expect
-			.poll(async () => await page.locator(`#target-select option[value="${targetAssetId}"]`).count(), {
+			.poll(
+				async () =>
+					await page.getByTestId('attack-path-target-select').locator(`option[value="${targetAssetId}"]`).count(),
+				{
 				timeout: 20_000
-			})
+				}
+			)
 			.toBeGreaterThan(0);
 
-		await page.selectOption('#entry-point-select', entryAssetId);
-		await page.selectOption('#target-select', targetAssetId);
+		await page.getByTestId('attack-path-entry-select').selectOption(entryAssetId);
+		await page.getByTestId('attack-path-target-select').selectOption(targetAssetId);
 
-		await page.getByRole('button', { name: /find attack paths/i }).click();
+		await page.getByTestId('attack-path-find-button').click();
 
-		const firstPathCard = page.locator('div.border.border-red-200').first();
+		const firstPathCard = page.getByTestId('attack-path-card').first();
 		await expect(firstPathCard).toBeVisible({ timeout: 15_000 });
 		await expect(firstPathCard).toContainText(entryAssetName);
 		await expect(firstPathCard).toContainText(targetAssetName);

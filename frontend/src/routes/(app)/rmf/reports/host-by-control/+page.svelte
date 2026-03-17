@@ -111,7 +111,7 @@
 </script>
 
 <svelte:head>
-  <title>Host by Control - RMF Reports - CISO Assistant</title>
+  <title>Host by Control - RMF Reports - Regovise</title>
 </svelte:head>
 
 <div class="host-by-control min-h-screen bg-gray-50">

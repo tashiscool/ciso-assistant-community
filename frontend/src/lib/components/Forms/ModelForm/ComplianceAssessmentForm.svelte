@@ -47,12 +47,17 @@
 				.then((r) => r.json())
 				.then((r) => {
 					is_dynamic = r['is_dynamic'] || false;
-					const implementation_groups = r['implementation_groups_definition'] || [];
+					const implementation_groups = Array.isArray(r['implementation_groups_definition'])
+						? r['implementation_groups_definition']
+						: [];
+					const reference_controls = Array.isArray(r['reference_controls'])
+						? r['reference_controls']
+						: [];
 					implementationGroupsChoices = implementation_groups.map((group) => ({
 						label: group.name,
 						value: group.ref_id
 					}));
-					suggestions = r['reference_controls'].length > 0;
+					suggestions = reference_controls.length > 0;
 
 					defaultImplementationGroups = implementation_groups
 						.filter((group) => group.default_selected)

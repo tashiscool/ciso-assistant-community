@@ -23,6 +23,7 @@
 	import { getFlash } from 'sveltekit-flash-message';
 	import { page } from '$app/stores';
 	import { clientSideToast } from '$lib/utils/stores';
+	import { BRAND_ASSETS, BRAND_COLORS, BRAND_DESCRIPTION, BRAND_NAME, BRAND_TAGLINE } from '$lib/brand';
 
 	initializeModalStore();
 	initializeToastStore();
@@ -92,7 +93,21 @@
 	});
 </script>
 
-<svelte:head><link rel="icon" href="/favicon.ico" /></svelte:head>
+<svelte:head>
+	<link rel="icon" type="image/png" href="/favicon.png" />
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+	<meta name="application-name" content={BRAND_NAME} />
+	<meta name="theme-color" content={BRAND_COLORS.midnight} />
+	<meta name="description" content={BRAND_DESCRIPTION} />
+	<meta property="og:site_name" content={BRAND_NAME} />
+	<meta property="og:title" content={`${BRAND_NAME} | ${BRAND_TAGLINE}`} />
+	<meta property="og:description" content={BRAND_DESCRIPTION} />
+	<meta property="og:image" content={BRAND_ASSETS.ogCard} />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content={`${BRAND_NAME} | ${BRAND_TAGLINE}`} />
+	<meta name="twitter:description" content={BRAND_DESCRIPTION} />
+	<meta name="twitter:image" content={BRAND_ASSETS.ogCard} />
+</svelte:head>
 <Modal components={modalRegistry} />
 <Toast />
 {@render children?.()}

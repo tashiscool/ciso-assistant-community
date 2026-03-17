@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project uses **Playwright** for end-to-end (E2E) tests that allow comprehensive testing of the CISO Assistant application by simulating real user interactions.
+This project uses **Playwright** for end-to-end (E2E) tests that allow comprehensive testing of the Regovise application by simulating real user interactions.
 
 Playwright Documentation: <https://playwright.dev/docs/intro>
 

@@ -30,6 +30,15 @@ type LegacyStateResponseItem = {
 
 const UNSAFE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 const PROXY_BACKEND_API_URL = privateEnv.BACKEND_API_URL || BASE_API_URL;
+const DEFAULT_EDGE_API_BASE = 'http://127.0.0.1:8787/api/v2';
+const EDGE_API_BASE_URL = (() => {
+	const raw =
+		privateEnv.CLOUDFLARE_EDGE_API_URL ||
+		privateEnv.CLOUDFLARE_API_URL ||
+		privateEnv.BACKEND_API_URL ||
+		DEFAULT_EDGE_API_BASE;
+	return raw.endsWith('/') ? raw.slice(0, -1) : raw;
+})();
 const RESERVED_FILTER_KEYS = new Set([
 	'tenant_id',
 	'limit',
@@ -83,56 +92,6 @@ const LOOKUP_ACTION_HINTS = new Set([
 	'type',
 	'types'
 ]);
-const CONNECTOR_REGISTRY: JsonRecord[] = [
-	{
-		type: 'nessus',
-		name: 'Tenable Nessus',
-		category: 'vulnerability',
-		description: 'Ingest vulnerability scan findings from Nessus.',
-		auth_methods: ['api_key'],
-		icon: 'fa-shield-halved'
-	},
-	{
-		type: 'qualys',
-		name: 'Qualys VMDR',
-		category: 'vulnerability',
-		description: 'Synchronize VMDR findings and asset metadata.',
-		auth_methods: ['api_key'],
-		icon: 'fa-shield-halved'
-	},
-	{
-		type: 'sarif-import',
-		name: 'SARIF Import',
-		category: 'sast_dast',
-		description: 'Import SARIF outputs from static and dynamic scanners.',
-		auth_methods: ['none'],
-		icon: 'fa-file-code'
-	},
-	{
-		type: 'scap-import',
-		name: 'SCAP Import',
-		category: 'vulnerability',
-		description: 'Import SCAP benchmark and results content.',
-		auth_methods: ['none'],
-		icon: 'fa-file-lines'
-	},
-	{
-		type: 'servicenow',
-		name: 'ServiceNow',
-		category: 'itsm',
-		description: 'Bi-directional issue and task synchronization.',
-		auth_methods: ['oauth2', 'api_key'],
-		icon: 'fa-briefcase'
-	},
-	{
-		type: 'jira',
-		name: 'Jira',
-		category: 'itsm',
-		description: 'Sync findings and remediation tasks to Jira projects.',
-		auth_methods: ['api_token', 'oauth2'],
-		icon: 'fa-ticket'
-	}
-];
 const DEFAULT_DOMAIN_ROWS: Record<string, JsonRecord[]> = {
 	'compliance-assessments': [
 		{
@@ -170,6 +129,15 @@ function json(data: unknown, status: number = 200): Response {
 		status,
 		headers: { 'content-type': 'application/json' }
 	});
+}
+
+function sanitizedProxyHeaders(source: Headers): Headers {
+	const headers = new Headers(source);
+	headers.delete('content-length');
+	headers.delete('content-encoding');
+	headers.delete('transfer-encoding');
+	headers.delete('connection');
+	return headers;
 }
 
 function cloneRows(rows: JsonRecord[]): JsonRecord[] {
@@ -210,6 +178,12 @@ function listMemoryStates(
 }
 
 const MEMORY_ASSESSMENT_PACKAGES = new Map<string, ArtifactPackageDetail>();
+const ASSESSMENT_ARTIFACT_DOMAIN = 'assessment-artifacts/packages';
+const ASSESSMENT_ARTIFACT_COMMAND_TYPE = 'assessment-artifacts.packages.upsert';
+const ASSESSMENT_ARTIFACT_MODEL_KEY = 'frontend.schemas.assessment-artifacts-package';
+const ASSESSMENT_ARTIFACT_PACKAGE_UPSERT_COMMAND = 'assessment-artifact.package.upsert';
+const ASSESSMENT_ARTIFACT_ITEM_UPSERT_COMMAND = 'assessment-artifact.item.upsert';
+const ASSESSMENT_ARTIFACT_SCHEDULE_UPSERT_COMMAND = 'assessment-artifact.schedule.upsert';
 
 const PERIODICITY_LABELS: Record<string, string> = {
 	on_demand: 'On Demand',
@@ -831,6 +805,334 @@ function findScheduleById(scheduleId: string):
 	return null;
 }
 
+function isRecordValue(value: unknown): value is JsonRecord {
+	return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function safeJsonClone<T>(value: T): T {
+	return JSON.parse(JSON.stringify(value)) as T;
+}
+
+function toAssessmentPackage(state: JsonRecord | null): ArtifactPackageDetail | null {
+	if (!state || !isRecordValue(state)) return null;
+	const status = typeof state.status === 'string' ? state.status.toLowerCase() : '';
+	if (status === 'deleted') return null;
+	const candidate = safeJsonClone(state) as JsonRecord;
+	delete candidate.model_key;
+	delete candidate.model_fields;
+	delete candidate.record_id;
+	delete candidate.entity_id;
+	delete candidate.domain;
+	delete candidate._command;
+
+	if (typeof candidate.id !== 'string' || !candidate.id) return null;
+	if (typeof candidate.name !== 'string' || !candidate.name) return null;
+	if (!Array.isArray(candidate.request_items) || !Array.isArray(candidate.evidence_schedules)) return null;
+
+	return candidate as unknown as ArtifactPackageDetail;
+}
+
+async function hydrateAssessmentPackagesFromLegacy(
+	fetchFn: typeof fetch,
+	tenantId: string
+): Promise<void> {
+	const states = await readLegacyStateList(fetchFn, tenantId, ASSESSMENT_ARTIFACT_DOMAIN, 500, 0);
+	const next = new Map<string, ArtifactPackageDetail>();
+	for (const state of states) {
+		const pkg = toAssessmentPackage(state);
+		if (pkg) {
+			next.set(pkg.id, pkg);
+		}
+	}
+	MEMORY_ASSESSMENT_PACKAGES.clear();
+	for (const [id, pkg] of next.entries()) {
+		MEMORY_ASSESSMENT_PACKAGES.set(id, pkg);
+	}
+}
+
+type AssessmentPackageSyncOptions = {
+	syncItems?: boolean;
+	syncSchedules?: boolean;
+	concurrency?: number;
+};
+
+type AssessmentCommandRequest = {
+	commandType: string;
+	payload: JsonRecord;
+	waitForCompletion?: boolean;
+};
+
+function buildAssessmentPackageCommandPayload(pkg: ArtifactPackageDetail): JsonRecord {
+	const templateKey =
+		typeof pkg.source_file === 'string' && pkg.source_file.startsWith('template:')
+			? pkg.source_file.slice('template:'.length)
+			: '';
+	const stats = isRecordValue(pkg.stats) ? safeJsonClone(pkg.stats) : {};
+	const qualityReport = isRecordValue(pkg.quality_report) ? safeJsonClone(pkg.quality_report) : {};
+	const indexes = isRecordValue(pkg.indexes) ? safeJsonClone(pkg.indexes) : {};
+	return {
+		package_id: pkg.id,
+		name: pkg.name,
+		description: pkg.description || '',
+		status: pkg.status || 'draft',
+		package_type: pkg.package_type || 'fedramp',
+		system_name: pkg.system_name || '',
+		platform_tags: Array.isArray(pkg.platform_tags) ? [...pkg.platform_tags] : [],
+		stats,
+		collection_playbooks: Array.isArray(pkg.collection_playbooks)
+			? safeJsonClone(pkg.collection_playbooks)
+			: [],
+		quality_report: qualityReport,
+		indexes,
+		source_file: pkg.source_file || '',
+		template_key: templateKey,
+		total_items:
+			typeof pkg.total_items === 'number' ? pkg.total_items : (pkg.request_items || []).length,
+		schedule_count:
+			typeof pkg.schedule_count === 'number'
+				? pkg.schedule_count
+				: (pkg.evidence_schedules || []).length,
+		quality_gate:
+			typeof pkg.quality_report?.quality_gate === 'string'
+				? pkg.quality_report.quality_gate
+				: 'pass',
+		periodicity_breakdown:
+			isRecordValue(pkg.stats?.periodicity_breakdown) ? pkg.stats.periodicity_breakdown : {}
+	};
+}
+
+function buildAssessmentItemCommandPayload(
+	packageId: string,
+	item: ArtifactRequestItem
+): JsonRecord {
+	return {
+		item_id: item.id,
+		package_id: packageId,
+		request_id: item.request_id,
+		source_line: item.source_line,
+		category: item.category || '',
+		artifact_request: item.artifact_request || '',
+		controls: Array.isArray(item.controls) ? [...item.controls] : [],
+		control_families: Array.isArray(item.control_families) ? [...item.control_families] : [],
+		control_domains: Array.isArray(item.control_domains) ? [...item.control_domains] : [],
+		workstreams: Array.isArray(item.workstreams) ? [...item.workstreams] : [],
+		primary_artifact_type: item.primary_artifact_type || 'generic_evidence',
+		artifact_types: Array.isArray(item.artifact_types) ? [...item.artifact_types] : [],
+		collection_channel: item.collection_channel || 'manual_collection',
+		platform_tags: Array.isArray(item.platform_tags) ? [...item.platform_tags] : [],
+		time_scopes: Array.isArray(item.time_scopes) ? [...item.time_scopes] : [],
+		periodicity: item.periodicity || 'on_demand',
+		commands: Array.isArray(item.commands) ? [...item.commands] : [],
+		config_paths: Array.isArray(item.config_paths) ? [...item.config_paths] : [],
+		bundle_hint: item.bundle_hint ? safeJsonClone(item.bundle_hint) : {}
+	};
+}
+
+function buildAssessmentScheduleCommandPayload(
+	packageId: string,
+	schedule: EvidenceSchedule
+): JsonRecord {
+	return {
+		schedule_id: schedule.id,
+		package_id: packageId,
+		name: schedule.name || '',
+		description: schedule.description || '',
+		frequency: schedule.frequency || 'monthly',
+		status: schedule.status || 'active',
+		cron_expression: schedule.cron_expression || '',
+		control_families: Array.isArray(schedule.control_families) ? [...schedule.control_families] : [],
+		controls: Array.isArray(schedule.controls) ? [...schedule.controls] : [],
+		evidence_types: Array.isArray(schedule.evidence_types) ? [...schedule.evidence_types] : [],
+		platform_tags: Array.isArray(schedule.platform_tags) ? [...schedule.platform_tags] : [],
+		collection_actions: Array.isArray(schedule.collection_actions)
+			? safeJsonClone(schedule.collection_actions)
+			: [],
+		items_count: typeof schedule.items_count === 'number' ? schedule.items_count : 0
+	};
+}
+
+async function dispatchAssessmentCommand(
+	fetchFn: typeof fetch,
+	tenantId: string,
+	request: AssessmentCommandRequest
+): Promise<string | null> {
+	const response = await fetchV2(
+		fetchFn,
+		tenantId,
+		`/commands/${encodeURIComponent(request.commandType)}`,
+		{
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({
+				idempotency_key: crypto.randomUUID(),
+				tenant_id: tenantId,
+				payload: request.payload
+			})
+		}
+	);
+	if (!response.ok) {
+		return await response.text();
+	}
+
+	if (!request.waitForCompletion) {
+		return null;
+	}
+
+	const accepted = (await response.json().catch(() => ({}))) as { job_id?: string };
+	if (typeof accepted.job_id === 'string' && accepted.job_id) {
+		const status = await waitForJobCompletion(fetchFn, tenantId, accepted.job_id);
+		if (status === 'failed') {
+			return `Cloudflare command failed: ${request.commandType}`;
+		}
+	}
+	return null;
+}
+
+async function dispatchAssessmentCommandBatch(
+	fetchFn: typeof fetch,
+	tenantId: string,
+	commands: AssessmentCommandRequest[],
+	concurrency: number
+): Promise<string | null> {
+	if (!commands.length) {
+		return null;
+	}
+	const boundedConcurrency = Math.max(1, Math.min(concurrency, 16));
+	let cursor = 0;
+	let firstError: string | null = null;
+	const workers = Array.from({ length: Math.min(boundedConcurrency, commands.length) }, async () => {
+		while (true) {
+			if (firstError) {
+				return;
+			}
+			const index = cursor;
+			cursor += 1;
+			if (index >= commands.length) {
+				return;
+			}
+			const command = commands[index];
+			if (!command) {
+				continue;
+			}
+			const error = await dispatchAssessmentCommand(fetchFn, tenantId, command);
+			if (error && !firstError) {
+				firstError = error;
+				return;
+			}
+		}
+	});
+	await Promise.all(workers);
+	return firstError;
+}
+
+async function syncAssessmentPackageRecords(
+	fetchFn: typeof fetch,
+	tenantId: string,
+	pkg: ArtifactPackageDetail,
+	options: AssessmentPackageSyncOptions = {}
+): Promise<string | null> {
+	const commands: AssessmentCommandRequest[] = [];
+	if (options.syncItems) {
+		for (const item of pkg.request_items || []) {
+			commands.push({
+				commandType: ASSESSMENT_ARTIFACT_ITEM_UPSERT_COMMAND,
+				payload: buildAssessmentItemCommandPayload(pkg.id, item)
+			});
+		}
+	}
+	if (options.syncSchedules) {
+		for (const schedule of pkg.evidence_schedules || []) {
+			commands.push({
+				commandType: ASSESSMENT_ARTIFACT_SCHEDULE_UPSERT_COMMAND,
+				payload: buildAssessmentScheduleCommandPayload(pkg.id, schedule)
+			});
+		}
+	}
+	return dispatchAssessmentCommandBatch(
+		fetchFn,
+		tenantId,
+		commands,
+		options.concurrency || 8
+	);
+}
+
+async function persistAssessmentPackage(
+	fetchFn: typeof fetch,
+	tenantId: string,
+	pkg: ArtifactPackageDetail,
+	options: AssessmentPackageSyncOptions = {}
+): Promise<string | null> {
+	const serializable = safeJsonClone(pkg) as JsonRecord;
+	const payload: JsonRecord = {
+		...serializable,
+		id: pkg.id,
+		entity_id: pkg.id,
+		domain: ASSESSMENT_ARTIFACT_DOMAIN,
+		status: pkg.status,
+		model_key: ASSESSMENT_ARTIFACT_MODEL_KEY
+	};
+	payload.model_fields = Object.keys(payload);
+
+	writeMemoryState(tenantId, ASSESSMENT_ARTIFACT_DOMAIN, pkg.id, payload);
+
+	const legacyPersistError = await dispatchAssessmentCommand(fetchFn, tenantId, {
+		commandType: ASSESSMENT_ARTIFACT_COMMAND_TYPE,
+		payload,
+		waitForCompletion: true
+	});
+	if (legacyPersistError) {
+		return legacyPersistError;
+	}
+
+	const packageUpsertError = await dispatchAssessmentCommand(fetchFn, tenantId, {
+		commandType: ASSESSMENT_ARTIFACT_PACKAGE_UPSERT_COMMAND,
+		payload: buildAssessmentPackageCommandPayload(pkg),
+		waitForCompletion: true
+	});
+	if (packageUpsertError) {
+		return packageUpsertError;
+	}
+
+	return syncAssessmentPackageRecords(fetchFn, tenantId, pkg, options);
+}
+
+async function markAssessmentPackageDeleted(
+	fetchFn: typeof fetch,
+	tenantId: string,
+	pkg: ArtifactPackageDetail
+): Promise<string | null> {
+	const payload: JsonRecord = {
+		id: pkg.id,
+		entity_id: pkg.id,
+		domain: ASSESSMENT_ARTIFACT_DOMAIN,
+		status: 'deleted',
+		model_key: ASSESSMENT_ARTIFACT_MODEL_KEY
+	};
+	payload.model_fields = Object.keys(payload);
+	writeMemoryState(tenantId, ASSESSMENT_ARTIFACT_DOMAIN, pkg.id, payload);
+
+	const legacyDeleteError = await dispatchAssessmentCommand(fetchFn, tenantId, {
+		commandType: ASSESSMENT_ARTIFACT_COMMAND_TYPE,
+		payload,
+		waitForCompletion: true
+	});
+	if (legacyDeleteError) {
+		return legacyDeleteError;
+	}
+
+	const archivedPackage: ArtifactPackageDetail = {
+		...pkg,
+		status: 'archived',
+		status_display: STATUS_LABELS.archived,
+		updated_at: nowIsoString()
+	};
+	return dispatchAssessmentCommand(fetchFn, tenantId, {
+		commandType: ASSESSMENT_ARTIFACT_PACKAGE_UPSERT_COMMAND,
+		payload: buildAssessmentPackageCommandPayload(archivedPackage),
+		waitForCompletion: true
+	});
+}
+
 function sanitizeDomainSegment(segment: string): string {
 	return segment.toLowerCase().replace(/[^a-z0-9_-]/g, '-');
 }
@@ -1102,7 +1404,10 @@ async function fetchV2(
 	if (!headers.has('x-tenant-id')) {
 		headers.set('x-tenant-id', tenantId);
 	}
-	return fetchFn(`/api/v2${path}`, {
+	const targetUrl = EDGE_API_BASE_URL.startsWith('http://') || EDGE_API_BASE_URL.startsWith('https://')
+		? `${EDGE_API_BASE_URL}${path}`
+		: `/api/v2${path}`;
+	return fetchFn(targetUrl, {
 		...init,
 		headers
 	});
@@ -1215,13 +1520,26 @@ async function readLegacyStateList(
 
 	const query = new URLSearchParams({
 		tenant_id: tenantId,
+		resource_path: domain,
 		domain,
 		limit: String(limit),
 		offset: String(offset),
 		include_state: 'true'
 	});
-	const response = await fetchV2(fetchFn, tenantId, `/legacy/state?${query.toString()}`, { method: 'GET' });
-	if (response.ok) {
+	const resourceResponse = await fetchV2(fetchFn, tenantId, `/resources?${query.toString()}`, {
+		method: 'GET'
+	});
+	if (resourceResponse.ok) {
+		const payload = (await resourceResponse.json()) as { items?: LegacyStateResponseItem[] };
+		for (const item of payload.items || []) {
+			indexed.set(item.entity_id, toLegacyResource(item.state, item.entity_id));
+		}
+	}
+	for (const path of [`/canonical/state?${query.toString()}`, `/legacy/state?${query.toString()}`]) {
+		const response = await fetchV2(fetchFn, tenantId, path, { method: 'GET' });
+		if (!response.ok) {
+			continue;
+		}
 		const payload = (await response.json()) as { items?: LegacyStateResponseItem[] };
 		for (const item of payload.items || []) {
 			indexed.set(item.entity_id, toLegacyResource(item.state, item.entity_id));
@@ -1255,57 +1573,50 @@ async function readLegacyStateById(
 
 	const query = new URLSearchParams({
 		tenant_id: tenantId,
+		resource_path: domain,
 		domain,
 		entity_id: entityId,
+		id: entityId,
 		include_state: 'true'
 	});
-	const response = await fetchV2(fetchFn, tenantId, `/legacy/state?${query.toString()}`, { method: 'GET' });
-	if (!response.ok) {
-		return null;
-	}
-	const payload = (await response.json()) as { item?: LegacyStateResponseItem };
-	if (!payload.item) {
-		return null;
-	}
-	const state = toLegacyResource(payload.item.state, payload.item.entity_id);
-	const mergedStatus =
-		(typeof state.status === 'string' && state.status) ||
-		(typeof payload.item.status === 'string' && payload.item.status) ||
-		'';
-	if (String(mergedStatus).toLowerCase() === 'deleted') {
-		return null;
-	}
-	return state;
-}
 
-function resolveCommandType(domainPath: string, action: string | null, method: string): string {
-	const domain = domainPath
-		.split('/')
-		.map((segment) => sanitizeDomainSegment(segment))
-		.filter(Boolean)
-		.join('.');
-	const namespace = domain || 'core';
-	if (method === 'DELETE') {
-		return `${namespace}.delete.requested`;
-	}
-	if (action && action !== 'object' && action !== 'upload') {
-		return `${namespace}.${sanitizeDomainSegment(action)}.requested`;
-	}
-	return `${namespace}.upsert`;
-}
-
-function resolveModelKey(resource: string): string {
-	return `frontend.schemas.${resource.replace(/[^a-zA-Z0-9._-]/g, '-')}`;
-}
-
-function withParityDefaults(payload: JsonRecord, expectedFields: string[]): JsonRecord {
-	const next: JsonRecord = { ...payload };
-	for (const field of expectedFields) {
-		if (!(field in next)) {
-			next[field] = null;
+	const resourceResponse = await fetchV2(fetchFn, tenantId, `/resources?${query.toString()}`, {
+		method: 'GET'
+	});
+	if (resourceResponse.ok) {
+		const payload = (await resourceResponse.json()) as { item?: LegacyStateResponseItem };
+		if (payload.item) {
+			const state = toLegacyResource(payload.item.state, payload.item.entity_id);
+			const mergedStatus =
+				(typeof state.status === 'string' && state.status) ||
+				(typeof payload.item.status === 'string' && payload.item.status) ||
+				'';
+			if (String(mergedStatus).toLowerCase() !== 'deleted') {
+				return state;
+			}
 		}
 	}
-	return next;
+
+	for (const path of [`/canonical/state?${query.toString()}`, `/legacy/state?${query.toString()}`]) {
+		const response = await fetchV2(fetchFn, tenantId, path, { method: 'GET' });
+		if (!response.ok) {
+			continue;
+		}
+		const payload = (await response.json()) as { item?: LegacyStateResponseItem };
+		if (!payload.item) {
+			continue;
+		}
+		const state = toLegacyResource(payload.item.state, payload.item.entity_id);
+		const mergedStatus =
+			(typeof state.status === 'string' && state.status) ||
+			(typeof payload.item.status === 'string' && payload.item.status) ||
+			'';
+		if (String(mergedStatus).toLowerCase() === 'deleted') {
+			return null;
+		}
+		return state;
+	}
+	return null;
 }
 
 async function waitForJobCompletion(
@@ -1349,6 +1660,438 @@ function parseFilenameFromDisposition(contentDisposition: string | null): string
 		return filename[1];
 	}
 	return `upload-${Date.now()}.bin`;
+}
+
+function searchParamsToObject(searchParams: URLSearchParams): Record<string, string | string[]> {
+	const query: Record<string, string | string[]> = {};
+	for (const key of new Set(searchParams.keys())) {
+		const values = searchParams.getAll(key);
+		if (values.length === 1) {
+			query[key] = values[0] || '';
+			continue;
+		}
+		query[key] = values;
+	}
+	return query;
+}
+
+function parseCookieHeader(cookieHeader: string | null): Record<string, string> {
+	const parsed: Record<string, string> = {};
+	for (const segment of (cookieHeader || '').split(';')) {
+		const [rawKey, ...rawValue] = segment.split('=');
+		const key = rawKey?.trim();
+		if (!key) {
+			continue;
+		}
+		parsed[key] = decodeURIComponent(rawValue.join('=').trim());
+	}
+	return parsed;
+}
+
+function buildDispatchHeaders(request: Request): Record<string, string> {
+	const headers: Record<string, string> = {};
+	const authorization = request.headers.get('authorization');
+	const sessionToken = request.headers.get('x-session-token');
+	if (authorization) {
+		headers.authorization = authorization;
+	}
+	if (sessionToken) {
+		headers['x-session-token'] = sessionToken;
+	}
+	const cookies = parseCookieHeader(request.headers.get('cookie'));
+	if (!headers.authorization && cookies.token) {
+		headers.authorization = `Token ${cookies.token}`;
+	}
+	if (!headers['x-session-token'] && cookies.allauth_session_token) {
+		headers['x-session-token'] = cookies.allauth_session_token;
+	}
+	return headers;
+}
+
+async function uploadFileToWorkerR2(args: {
+	fetchFn: typeof fetch;
+	tenantId: string;
+	file: File;
+	objectType: 'import' | 'evidence';
+	objectGroup: string;
+	objectId: string;
+}): Promise<{ object_key: string } | Response> {
+	const { fetchFn, tenantId, file, objectType, objectGroup, objectId } = args;
+	const issueUrlResponse = await fetchV2(fetchFn, tenantId, '/files/upload-url', {
+		method: 'POST',
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify({
+			object_type: objectType,
+			tenant_id: tenantId,
+			object_id: objectId,
+			object_group: objectGroup,
+			filename: file.name,
+			content_type: file.type || 'application/octet-stream'
+		})
+	});
+
+	if (!issueUrlResponse.ok) {
+		return new Response(await issueUrlResponse.text(), {
+			status: issueUrlResponse.status,
+			headers: {
+				'content-type': issueUrlResponse.headers.get('content-type') || 'application/json'
+			}
+		});
+	}
+
+	const signedUpload = (await issueUrlResponse.json()) as { object_key: string; upload_url: string };
+	const uploadResponse = await fetchFn(signedUpload.upload_url, {
+		method: 'PUT',
+		headers: { 'content-type': file.type || 'application/octet-stream' },
+		body: file
+	});
+
+	if (!uploadResponse.ok) {
+		return new Response(await uploadResponse.text(), {
+			status: uploadResponse.status,
+			headers: {
+				'content-type': uploadResponse.headers.get('content-type') || 'application/json'
+			}
+		});
+	}
+
+	return { object_key: signedUpload.object_key };
+}
+
+async function handleAiExtractorUploadCompat(args: {
+	fetchFn: typeof fetch;
+	request: Request;
+	tenantId: string;
+}): Promise<Response> {
+	const { fetchFn, request, tenantId } = args;
+	const formData = await request.formData();
+	const file = formData.get('file');
+	if (!(file instanceof File)) {
+		return json({ success: false, error: 'file is required' }, 400);
+	}
+	const uploaded = await uploadFileToWorkerR2({
+		fetchFn,
+		tenantId,
+		file,
+		objectType: 'import',
+		objectGroup: 'ai-extractor',
+		objectId: crypto.randomUUID()
+	});
+	if (uploaded instanceof Response) {
+		return uploaded;
+	}
+	const finalizeResponse = await fetchV2(fetchFn, tenantId, '/ai/extractor/upload', {
+		method: 'POST',
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify({
+			tenant_id: tenantId,
+			object_key: uploaded.object_key,
+			filename: file.name,
+			content_type: file.type || 'application/octet-stream',
+			size: file.size,
+			extraction_types: typeof formData.get('extraction_types') === 'string' ? formData.get('extraction_types') : '',
+			target_framework: typeof formData.get('target_framework') === 'string' ? formData.get('target_framework') : ''
+		})
+	});
+	return new Response(finalizeResponse.body, {
+		status: finalizeResponse.status,
+		headers: sanitizedProxyHeaders(finalizeResponse.headers)
+	});
+}
+
+async function handleVendorEvidenceUploadCompat(args: {
+	fetchFn: typeof fetch;
+	request: Request;
+	tenantId: string;
+	normalizedPath: string;
+}): Promise<Response> {
+	const { fetchFn, request, tenantId, normalizedPath } = args;
+	const tokenMatch = normalizedPath.match(/^vendor-portal\/([^/]+)\/evidence$/);
+	const token = tokenMatch?.[1] || '';
+	if (!token) {
+		return json({ error: 'Token is required' }, 400);
+	}
+	const formData = await request.formData();
+	const file = formData.get('file');
+	if (!(file instanceof File)) {
+		return json({ error: 'file is required' }, 400);
+	}
+	const questionId =
+		typeof formData.get('question_id') === 'string' ? String(formData.get('question_id')) : '';
+	const uploaded = await uploadFileToWorkerR2({
+		fetchFn,
+		tenantId,
+		file,
+		objectType: 'evidence',
+		objectGroup: 'vendor-portal',
+		objectId: questionId || token
+	});
+	if (uploaded instanceof Response) {
+		return uploaded;
+	}
+	const finalizeResponse = await fetchV2(fetchFn, tenantId, '/vendor-portal/evidence', {
+		method: 'POST',
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify({
+			tenant_id: tenantId,
+			token,
+			object_key: uploaded.object_key,
+			filename: file.name,
+			content_type: file.type || 'application/octet-stream',
+			size: file.size,
+			description:
+				typeof formData.get('description') === 'string' ? String(formData.get('description')) : '',
+			question_id: questionId
+		})
+	});
+	return new Response(finalizeResponse.body, {
+		status: finalizeResponse.status,
+		headers: sanitizedProxyHeaders(finalizeResponse.headers)
+	});
+}
+
+async function handleSerdesBackupUploadCompat(args: {
+	fetchFn: typeof fetch;
+	request: Request;
+	tenantId: string;
+	mode: 'load-backup' | 'full-restore';
+}): Promise<Response> {
+	const { fetchFn, request, tenantId, mode } = args;
+	const filename = parseFilenameFromDisposition(request.headers.get('content-disposition'));
+	const contentType = request.headers.get('content-type') || 'application/gzip';
+	const body = await request.arrayBuffer();
+	const file = new File([body], filename, { type: contentType });
+	const uploaded = await uploadFileToWorkerR2({
+		fetchFn,
+		tenantId,
+		file,
+		objectType: 'import',
+		objectGroup: 'serdes-backups',
+		objectId: crypto.randomUUID()
+	});
+	if (uploaded instanceof Response) {
+		return uploaded;
+	}
+	const finalizeResponse = await fetchV2(fetchFn, tenantId, `/serdes/${mode}`, {
+		method: 'POST',
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify({
+			tenant_id: tenantId,
+			object_key: uploaded.object_key,
+			filename,
+			content_type: contentType,
+			size: body.byteLength
+		})
+	});
+	return new Response(finalizeResponse.body, {
+		status: finalizeResponse.status,
+		headers: sanitizedProxyHeaders(finalizeResponse.headers)
+	});
+}
+
+async function handleFolderImportCompat(args: {
+	fetchFn: typeof fetch;
+	request: Request;
+	tenantId: string;
+	url: URL;
+}): Promise<Response> {
+	const { fetchFn, request, tenantId, url } = args;
+	const filename = parseFilenameFromDisposition(request.headers.get('content-disposition'));
+	const contentType = request.headers.get('content-type') || 'application/octet-stream';
+	const domainName = request.headers.get('x-cisoassistantdomainname') || '';
+	const loadMissingLibraries = url.searchParams.get('load_missing_libraries') === 'true';
+	const body = await request.arrayBuffer();
+	const file = new File([body], filename, { type: contentType });
+	const uploaded = await uploadFileToWorkerR2({
+		fetchFn,
+		tenantId,
+		file,
+		objectType: 'import',
+		objectGroup: 'folders-import',
+		objectId: crypto.randomUUID()
+	});
+	if (uploaded instanceof Response) {
+		return uploaded;
+	}
+	const finalizeResponse = await fetchV2(fetchFn, tenantId, '/folders/import', {
+		method: 'POST',
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify({
+			tenant_id: tenantId,
+			object_key: uploaded.object_key,
+			filename,
+			content_type: contentType,
+			size: body.byteLength,
+			domain_name: domainName,
+			load_missing_libraries: loadMissingLibraries
+		})
+	});
+	return new Response(finalizeResponse.body, {
+		status: finalizeResponse.status,
+		headers: sanitizedProxyHeaders(finalizeResponse.headers)
+	});
+}
+
+async function handleDataWizardLoadFileCompat(args: {
+	fetchFn: typeof fetch;
+	request: Request;
+	tenantId: string;
+	url: URL;
+	normalizedPath: string;
+}): Promise<Response> {
+	const { fetchFn, request, tenantId, url, normalizedPath } = args;
+	const contentType = request.headers.get('content-type') || '';
+
+	const dispatchPayload: {
+		tenant_id: string;
+		legacy_path: string;
+		method: string;
+		query: Record<string, string | string[]>;
+		headers?: Record<string, string>;
+		body?: JsonRecord;
+	} = {
+		tenant_id: tenantId,
+		legacy_path: normalizedPath,
+		method: 'POST',
+		query: searchParamsToObject(url.searchParams),
+		headers: buildDispatchHeaders(request),
+		body: {}
+	};
+
+	if (contentType.includes('multipart/form-data')) {
+		const formData = await request.formData();
+		const file = formData.get('file');
+		if (!(file instanceof File)) {
+			return json({ error: 'file is required' }, 400);
+		}
+		const uploaded = await uploadFileToWorkerR2({
+			fetchFn,
+			tenantId,
+			file,
+			objectType: 'import',
+			objectGroup: 'data-wizard',
+			objectId: crypto.randomUUID()
+		});
+		if (uploaded instanceof Response) {
+			return uploaded;
+		}
+
+		dispatchPayload.body = {
+			object_key: uploaded.object_key,
+			filename: file.name,
+			content_type: file.type || 'application/octet-stream',
+			size: file.size
+		};
+
+		for (const [key, value] of formData.entries()) {
+			if (key === 'file') {
+				continue;
+			}
+			if (value instanceof File) {
+				addFormValue(dispatchPayload.body, key, {
+					name: value.name,
+					size: value.size,
+					type: value.type || 'application/octet-stream'
+				});
+				continue;
+			}
+			addFormValue(dispatchPayload.body, key, value);
+		}
+	} else {
+		dispatchPayload.body = await parseRequestBody(request);
+	}
+
+	const headerToBody: Array<[string, string]> = [
+		['x-model-type', 'model_type'],
+		['x-folder-id', 'folder_id'],
+		['x-perimeter-id', 'perimeter_id'],
+		['x-framework-id', 'framework_id'],
+		['x-matrix-id', 'matrix_id']
+	];
+	for (const [headerName, bodyKey] of headerToBody) {
+		const value = request.headers.get(headerName);
+		if (value && dispatchPayload.body?.[bodyKey] === undefined) {
+			dispatchPayload.body[bodyKey] = value;
+		}
+	}
+
+	const dispatchResponse = await fetchV2(fetchFn, tenantId, '/legacy/dispatch', {
+		method: 'POST',
+		redirect: 'manual',
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify(dispatchPayload)
+	});
+
+	const responseHeaders = sanitizedProxyHeaders(dispatchResponse.headers);
+	responseHeaders.set('x-proxied-by', 'frontend-cloudflare-api-compat');
+	return new Response(dispatchResponse.body, {
+		status: dispatchResponse.status,
+		headers: responseHeaders
+	});
+}
+
+async function handleOcsfUploadCompat(args: {
+	fetchFn: typeof fetch;
+	request: Request;
+	tenantId: string;
+	url: URL;
+	normalizedPath: string;
+}): Promise<Response> {
+	const { fetchFn, request, tenantId, url, normalizedPath } = args;
+	const formData = await request.formData();
+	const file = formData.get('file');
+	if (!(file instanceof File)) {
+		return json({ error: 'No file uploaded' }, 400);
+	}
+
+	const dispatchPayload: {
+		tenant_id: string;
+		legacy_path: string;
+		method: string;
+		query: Record<string, string | string[]>;
+		headers?: Record<string, string>;
+		body?: JsonRecord;
+	} = {
+		tenant_id: tenantId,
+		legacy_path: normalizedPath,
+		method: 'POST',
+		query: searchParamsToObject(url.searchParams),
+		headers: buildDispatchHeaders(request),
+		body: {
+			filename: file.name,
+			content_type: file.type || 'application/json',
+			file_text: await file.text()
+		}
+	};
+
+	for (const [key, value] of formData.entries()) {
+		if (key === 'file') {
+			continue;
+		}
+		if (value instanceof File) {
+			addFormValue(dispatchPayload.body, key, {
+				name: value.name,
+				size: value.size,
+				type: value.type || 'application/octet-stream'
+			});
+			continue;
+		}
+		addFormValue(dispatchPayload.body, key, value);
+	}
+
+	const dispatchResponse = await fetchV2(fetchFn, tenantId, '/legacy/dispatch', {
+		method: 'POST',
+		redirect: 'manual',
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify(dispatchPayload)
+	});
+
+	const responseHeaders = sanitizedProxyHeaders(dispatchResponse.headers);
+	responseHeaders.set('x-proxied-by', 'frontend-cloudflare-api-compat');
+	return new Response(dispatchResponse.body, {
+		status: dispatchResponse.status,
+		headers: responseHeaders
+	});
 }
 
 async function handleLegacyUpload(
@@ -1403,17 +2146,21 @@ async function handleLegacyUpload(
 	});
 }
 
-async function handleAssessmentArtifactsCompat(
-	request: Request,
-	url: URL,
-	normalizedPath: string
-): Promise<Response | null> {
+async function handleAssessmentArtifactsCompat(args: {
+	fetchFn: typeof globalThis.fetch;
+	request: Request;
+	url: URL;
+	normalizedPath: string;
+	tenantId: string;
+}): Promise<Response | null> {
+	const { fetchFn, request, url, normalizedPath, tenantId } = args;
 	if (!normalizedPath.startsWith('assessment-artifacts')) {
 		return null;
 	}
 
 	const method = request.method.toUpperCase();
 	const subPath = normalizedPath.replace(/^assessment-artifacts\/?/, '').replace(/\/+$/, '');
+	await hydrateAssessmentPackagesFromLegacy(fetchFn, tenantId);
 
 	if (subPath === 'packages/templates' && method === 'GET') {
 		return json({ templates: [...ASSESSMENT_ARTIFACT_TEMPLATE_LIST] });
@@ -1448,6 +2195,13 @@ async function handleAssessmentArtifactsCompat(
 			qualityIssues: [],
 			generateSchedules
 		});
+		const persistError = await persistAssessmentPackage(fetchFn, tenantId, pkg, {
+			syncItems: true,
+			syncSchedules: generateSchedules
+		});
+		if (persistError) {
+			return json({ error: persistError }, 502);
+		}
 		MEMORY_ASSESSMENT_PACKAGES.set(pkg.id, pkg);
 		return json(pkg, 201);
 	}
@@ -1484,6 +2238,13 @@ async function handleAssessmentArtifactsCompat(
 			qualityIssues: parsed.quality_issues,
 			generateSchedules
 		});
+		const persistError = await persistAssessmentPackage(fetchFn, tenantId, pkg, {
+			syncItems: true,
+			syncSchedules: generateSchedules
+		});
+		if (persistError) {
+			return json({ error: persistError }, 502);
+		}
 		MEMORY_ASSESSMENT_PACKAGES.set(pkg.id, pkg);
 		return json(pkg, 201);
 	}
@@ -1559,6 +2320,10 @@ async function handleAssessmentArtifactsCompat(
 			created_at: createdAt,
 			updated_at: createdAt
 		};
+		const persistError = await persistAssessmentPackage(fetchFn, tenantId, pkg);
+		if (persistError) {
+			return json({ error: persistError }, 502);
+		}
 		MEMORY_ASSESSMENT_PACKAGES.set(pkg.id, pkg);
 		return json(pkg, 201);
 	}
@@ -1637,6 +2402,10 @@ async function handleAssessmentArtifactsCompat(
 			return json(pkg);
 		}
 		if (method === 'DELETE') {
+			const persistError = await markAssessmentPackageDeleted(fetchFn, tenantId, pkg);
+			if (persistError) {
+				return json({ error: persistError }, 502);
+			}
 			MEMORY_ASSESSMENT_PACKAGES.delete(packageId);
 			return new Response(null, { status: 204 });
 		}
@@ -1654,6 +2423,10 @@ async function handleAssessmentArtifactsCompat(
 				updated_at: nowIsoString()
 			};
 			updated.status_display = STATUS_LABELS[updated.status] || updated.status;
+			const persistError = await persistAssessmentPackage(fetchFn, tenantId, updated);
+			if (persistError) {
+				return json({ error: persistError }, 502);
+			}
 			MEMORY_ASSESSMENT_PACKAGES.set(packageId, updated);
 			return json(updated);
 		}
@@ -1673,6 +2446,12 @@ async function handleAssessmentArtifactsCompat(
 			schedule_count: regenerated.length,
 			updated_at: nowIsoString()
 		};
+		const persistError = await persistAssessmentPackage(fetchFn, tenantId, updated, {
+			syncSchedules: true
+		});
+		if (persistError) {
+			return json({ error: persistError }, 502);
+		}
 		MEMORY_ASSESSMENT_PACKAGES.set(packageId, updated);
 		return json(regenerated);
 	}
@@ -1779,6 +2558,12 @@ async function handleAssessmentArtifactsCompat(
 			evidence_schedules: nextSchedules,
 			updated_at: nowIsoString()
 		};
+		const persistError = await persistAssessmentPackage(fetchFn, tenantId, nextPackage, {
+			syncSchedules: true
+		});
+		if (persistError) {
+			return json({ error: persistError }, 502);
+		}
 		MEMORY_ASSESSMENT_PACKAGES.set(nextPackage.id, nextPackage);
 		return json(nextSchedule);
 	}
@@ -1801,11 +2586,13 @@ async function handleCloudflareApiCompat(args: {
 		return json({ detail: 'Not found' }, 404);
 	}
 
-	const assessmentArtifactsResponse = await handleAssessmentArtifactsCompat(
+	const assessmentArtifactsResponse = await handleAssessmentArtifactsCompat({
+		fetchFn: fetch,
 		request,
 		url,
-		normalizedPath
-	);
+		normalizedPath,
+		tenantId
+	});
 	if (assessmentArtifactsResponse) {
 		return assessmentArtifactsResponse;
 	}
@@ -1814,136 +2601,64 @@ async function handleCloudflareApiCompat(args: {
 		return json({ csrfToken: crypto.randomUUID() });
 	}
 
-	if (normalizedPath === 'iam/current-user' && method === 'GET') {
-		return json({
-			id: '00000000-0000-4000-8000-000000000001',
-			email: 'cloudflare-user@local',
-			first_name: 'Cloudflare',
-			last_name: 'User',
-			is_superuser: true,
-			root_folder_id: '00000000-0000-4000-8000-000000000000',
-			preferences: { lang: 'en' }
+	if (normalizedPath === 'ai/extractor/upload' && method === 'POST') {
+		return handleAiExtractorUploadCompat({ fetchFn: fetch, request, tenantId });
+	}
+
+	if (/^vendor-portal\/[^/]+\/evidence$/.test(normalizedPath) && method === 'POST') {
+		return handleVendorEvidenceUploadCompat({
+			fetchFn: fetch,
+			request,
+			tenantId,
+			normalizedPath
 		});
 	}
 
-	if (normalizedPath === 'iam/session-token' && method === 'POST') {
-		return json({ token: crypto.randomUUID() });
-	}
-
-	if (normalizedPath === 'settings/general/object' && method === 'GET') {
-		return json({
-			id: 'cloudflare-general-settings',
-			company_name: 'CISO Assistant',
-			default_language: 'en',
-			theme: 'cloudflare-spa'
+	if (normalizedPath === 'serdes/load-backup' && method === 'POST') {
+		return handleSerdesBackupUploadCompat({
+			fetchFn: fetch,
+			request,
+			tenantId,
+			mode: 'load-backup'
 		});
 	}
 
-	if (normalizedPath === 'settings/feature-flags' && method === 'GET') {
-		return json({});
-	}
-
-	if (normalizedPath === 'settings/sso/info' && method === 'GET') {
-		return json({ enabled: false, providers: [] });
-	}
-
-	if (normalizedPath === '_allauth/app/v1/auth/login' && method === 'POST') {
-		const credentials = await parseRequestBody(request);
-		const email =
-			(typeof credentials.email === 'string' && credentials.email) ||
-			(typeof credentials.username === 'string' && credentials.username) ||
-			'admin@tests.com';
-		const password = typeof credentials.password === 'string' ? credentials.password : '';
-		if (!password) {
-			return json({
-				status: 400,
-				errors: [{ param: 'password', code: 'required' }],
-				meta: { is_authenticated: false }
-			});
-		}
-		return json({
-			status: 200,
-			data: {
-				user: {
-					id: '00000000-0000-4000-8000-000000000001',
-					email
-				}
-			},
-			meta: {
-				is_authenticated: true,
-				access_token: crypto.randomUUID(),
-				session_token: crypto.randomUUID()
-			}
+	if (normalizedPath === 'serdes/full-restore' && method === 'POST') {
+		return handleSerdesBackupUploadCompat({
+			fetchFn: fetch,
+			request,
+			tenantId,
+			mode: 'full-restore'
 		});
 	}
 
-	if (normalizedPath === '_allauth/app/v1/auth/2fa/authenticate' && method === 'POST') {
-		return json({
-			status: 200,
-			meta: {
-				is_authenticated: true,
-				access_token: crypto.randomUUID(),
-				session_token: crypto.randomUUID()
-			}
+	if (normalizedPath === 'folders/import' && method === 'POST') {
+		return handleFolderImportCompat({
+			fetchFn: fetch,
+			request,
+			tenantId,
+			url
 		});
 	}
 
-	if (normalizedPath === '_allauth/app/v1/auth/session' && method === 'DELETE') {
-		return json({
-			status: 200,
-			meta: {
-				is_authenticated: false
-			}
+	if (normalizedPath === 'data-wizard/load-file' && method === 'POST') {
+		return handleDataWizardLoadFileCompat({
+			fetchFn: fetch,
+			request,
+			tenantId,
+			url,
+			normalizedPath
 		});
 	}
 
-	if (normalizedPath === '_allauth/app/v1/account/authenticators' && method === 'GET') {
-		return json({
-			status: 200,
-			data: []
+	if (normalizedPath === 'integrations/ocsf/upload' && method === 'POST') {
+		return handleOcsfUploadCompat({
+			fetchFn: fetch,
+			request,
+			tenantId,
+			url,
+			normalizedPath
 		});
-	}
-
-	if (normalizedPath === '_allauth/app/v1/account/authenticators/totp' && method === 'GET') {
-		return json({
-			status: 200,
-			meta: {
-				type: 'totp',
-				enabled: false
-			}
-		});
-	}
-
-	if (normalizedPath === '_allauth/app/v1/account/authenticators/totp' && method === 'POST') {
-		return json({
-			status: 200,
-			data: { activated: true }
-		});
-	}
-
-	if (normalizedPath === '_allauth/app/v1/account/authenticators/totp' && method === 'DELETE') {
-		return json({
-			status: 200,
-			data: { deactivated: true }
-		});
-	}
-
-	if (normalizedPath === '_allauth/app/v1/account/authenticators/recovery-codes' && method === 'GET') {
-		return json({
-			status: 200,
-			data: ['RC-000001', 'RC-000002', 'RC-000003']
-		});
-	}
-
-	if (normalizedPath === '_allauth/app/v1/account/authenticators/recovery-codes' && method === 'POST') {
-		return json({
-			status: 200,
-			data: ['RC-000004', 'RC-000005', 'RC-000006']
-		});
-	}
-
-	if (normalizedPath === 'connectors/registry' && method === 'GET') {
-		return json({ connectors: cloneRows(CONNECTOR_REGISTRY) });
 	}
 
 	if (normalizedPath === 'connectors/instances' && method === 'GET') {
@@ -2110,333 +2825,11 @@ async function handleCloudflareApiCompat(args: {
 		return json(rollup);
 	}
 
-	if (normalizedPath === 'integrations/providers' && method === 'GET') {
-		const providers = [
-			{ id: 'jira', name: 'Jira', slug: 'jira' },
-			{ id: 'servicenow', name: 'ServiceNow', slug: 'servicenow' }
-		];
-		return json({
-			count: providers.length,
-			results: providers,
-			providers
-		});
-	}
-
-	if (normalizedPath === 'integrations/test-connection' && method === 'POST') {
-		const payload = await parseRequestBody(request);
-		const provider = typeof payload.provider === 'string' ? payload.provider : '';
-		if (!provider) {
-			return json({ success: false, error: 'provider is required' }, 400);
-		}
-		return json({
-			success: true,
-			provider,
-			status: 'connected'
-		});
-	}
-
-	if (normalizedPath === 'security-graph' && method === 'GET') {
-		const assets = await readLegacyStateList(fetch, tenantId, 'assets', 500, 0);
-		const nodes = assets.map((asset) => {
-			const id = String(asset.id || asset.entity_id || crypto.randomUUID());
-			const name =
-				(typeof asset.name === 'string' && asset.name) ||
-				(typeof asset.title === 'string' && asset.title) ||
-				id;
-			return {
-				id,
-				label: name,
-				name,
-				group: 'asset',
-				node_type: 'asset',
-				criticality:
-					(typeof asset.criticality === 'string' && asset.criticality) ||
-					(typeof asset.risk_level === 'string' && asset.risk_level) ||
-					'medium'
-			};
-		});
-		const nodeById = new Map(nodes.map((node) => [String(node.id), node]));
-		const edges: JsonRecord[] = [];
-		for (const asset of assets) {
-			const sourceId = String(asset.id || asset.entity_id || '');
-			if (!sourceId) {
-				continue;
-			}
-			const parents = Array.isArray(asset.parent_assets)
-				? asset.parent_assets
-				: asset.parent_asset
-					? [asset.parent_asset]
-					: [];
-			for (const parent of parents) {
-				const targetId = String(parent || '');
-				if (!targetId || !nodeById.has(sourceId) || !nodeById.has(targetId)) {
-					continue;
-				}
-				edges.push({
-					id: `${sourceId}->${targetId}`,
-					from: sourceId,
-					to: targetId,
-					label: 'depends_on',
-					edge_type: 'depends_on'
-				});
-			}
-		}
-		return json({ nodes, edges });
-	}
-
-	if (normalizedPath === 'security-graph/attack-paths' && method === 'POST') {
-		const payload = await parseRequestBody(request);
-		const entryPointId =
-			(typeof payload.entry_point_id === 'string' && payload.entry_point_id) || '';
-		const targetId = (typeof payload.target_id === 'string' && payload.target_id) || '';
-		const assets = await readLegacyStateList(fetch, tenantId, 'assets', 500, 0);
-		const byId = new Map<string, JsonRecord>(
-			assets.map((asset) => [String(asset.id || asset.entity_id || ''), asset])
-		);
-		const entryAsset = byId.get(entryPointId);
-		const targetAsset = byId.get(targetId);
-		const entryName =
-			(typeof entryAsset?.name === 'string' && entryAsset.name) ||
-			(typeof entryAsset?.title === 'string' && entryAsset.title) ||
-			entryPointId;
-		const targetName =
-			(typeof targetAsset?.name === 'string' && targetAsset.name) ||
-			(typeof targetAsset?.title === 'string' && targetAsset.title) ||
-			targetId;
-		if (!entryPointId || !targetId) {
-			return json({ paths: [] });
-		}
-		return json({
-			paths: [
-				{
-					id: crypto.randomUUID(),
-					risk_score: 0.78,
-					description: `Potential attack path from ${entryName} to ${targetName}.`,
-					nodes: [
-						{ id: entryPointId, name: entryName },
-						{ id: targetId, name: targetName }
-					]
-				}
-			]
-		});
-	}
-
-	if (
-		method === 'GET' &&
-		(normalizedPath === 'compliance-assessments' ||
-			normalizedPath === 'frameworks' ||
-			normalizedPath === 'risk-assessments')
-	) {
-		const rows = cloneRows(DEFAULT_DOMAIN_ROWS[normalizedPath] || []);
-		return json({
-			count: rows.length,
-			next: null,
-			previous: null,
-			results: rows
-		});
-	}
-
-	if (normalizedPath.startsWith('oscal/export/') && method === 'GET') {
-		return new Response(
-			JSON.stringify({
-				status: 'success',
-				exported_at: new Date().toISOString()
-			}),
-			{
-				status: 200,
-				headers: { 'content-type': 'application/json' }
-			}
-		);
-	}
-
-	if (normalizedPath === 'vendor-portal/tokens/create' && method === 'POST') {
-		return json(
-			{
-				token: crypto.randomUUID(),
-				status: 'active',
-				expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-			},
-			201
-		);
-	}
-
-	if (/^vendor-portal\/[^/]+\/status$/.test(normalizedPath) && method === 'GET') {
-		return json({ status: 'active' });
-	}
-
-	if (/^vendor-portal\/[^/]+\/questionnaire$/.test(normalizedPath) && method === 'GET') {
-		return json({ detail: 'Not found' }, 404);
-	}
-
-	if (/^vendor-portal\/tokens\/[^/]+\/revoke$/.test(normalizedPath) && method === 'POST') {
-		return json({ status: 'revoked' });
-	}
-
-	if (normalizedPath === 'ai/author/draft-control' && method === 'POST') {
-		return json({
-			success: true,
-			data: {
-				draft: 'Generated control narrative for parity validation.'
-			}
-		});
-	}
-
-	if (normalizedPath === 'ai/auditor/gap-analysis' && method === 'POST') {
-		return json({
-			success: true,
-			data: {
-				gaps: [],
-				recommendations: ['Document stronger evidence collection cadence.']
-			}
-		});
-	}
-
-	if (normalizedPath === 'ai/extractor/upload' && method === 'POST') {
-		return json({
-			success: true,
-			data: {
-				extracted_items: []
-			}
-		});
-	}
-
-	if (/^ai\/vendor-scoring\/[^/]+$/.test(normalizedPath) && method === 'POST') {
-		return json({
-			success: true,
-			data: {
-				overall_score: 72,
-				risk_rating: 'medium',
-				category_scores: {
-					access_management: 74,
-					security_controls: 70
-				},
-				strengths: [],
-				weaknesses: [],
-				recommendations: [],
-				answer_evaluations: []
-			}
-		});
-	}
-
-	if (normalizedPath === 'ai/vendor-scoring/risk-summary' && method === 'POST') {
-		return json({
-			success: true,
-			summary: 'Risk profile is moderate with actionable remediation opportunities.'
-		});
-	}
-
-	if (normalizedPath === 'crq/analytics/portfolio/analyze' && method === 'POST') {
-		return json({
-			success: true,
-			data: {
-				expected_loss: 87500,
-				var_95: 145000
-			}
-		});
-	}
-
-	if (normalizedPath === 'integrations/ocsf/import' && method === 'POST') {
-		return json({
-			success: true,
-			status: 'success',
-			imported_events: 1
-		});
-	}
-
-	if (normalizedPath === 'integrations/ocsf/to-oscal' && method === 'POST') {
-		return json({
-			status: 'success',
-			output_format: 'assessment-results'
-		});
-	}
-
-	if (normalizedPath === 'rmf/fedramp-20x/complete' && method === 'GET') {
-		return json(
-			{
-				detail: 'system_id is required'
-			},
-			400
-		);
-	}
-
 	const parsedPath = parseLegacyPath(normalizedPath);
 	if (!parsedPath.resource) {
 		return json({ detail: 'Not found' }, 404);
 	}
-
 	const domain = parsedPath.domainPath || sanitizeDomainSegment(parsedPath.resource);
-
-	if (method === 'GET' && parsedPath.action && !parsedPath.entityId && parsedPath.pathTail.length === 0) {
-		const enumOptions = getEnumOptions(parsedPath.resource, parsedPath.action);
-		if (enumOptions.length > 0) {
-			const map = Object.fromEntries(enumOptions.map((value) => [value, value]));
-			return json(map);
-		}
-
-		const states = await readLegacyStateList(fetch, tenantId, domain, 500, 0);
-		const values = new Set<string>();
-		for (const state of states) {
-			const value = state[parsedPath.action];
-			if (Array.isArray(value)) {
-				for (const entry of value) {
-					values.add(String(entry));
-				}
-				continue;
-			}
-			if (value !== null && value !== undefined && value !== '') {
-				values.add(String(value));
-			}
-		}
-		return json(Object.fromEntries(Array.from(values).sort().map((value) => [value, value])));
-	}
-
-	if (method === 'GET' && parsedPath.entityId) {
-		const state = await readLegacyStateById(fetch, tenantId, domain, parsedPath.entityId);
-		if (!state) {
-			return json({ detail: 'Not found' }, 404);
-		}
-		if (!parsedPath.action || parsedPath.action === 'object') {
-			return json(state);
-		}
-		if (parsedPath.action === 'cascade-info') {
-			return json({});
-		}
-		return json({
-			id: parsedPath.entityId,
-			action: parsedPath.action,
-			status: 'accepted',
-			object: state
-		});
-	}
-
-	if (method === 'GET') {
-		const limit = Math.min(Math.max(Number(url.searchParams.get('limit') || '500'), 1), 500);
-		const offset = Math.max(Number(url.searchParams.get('offset') || '0'), 0);
-		const states = await readLegacyStateList(fetch, tenantId, domain, limit, offset);
-		const filtered = applyFilters(states, url.searchParams);
-
-		const hasPaginatedRequest =
-			url.searchParams.has('page') ||
-			url.searchParams.has('page_size') ||
-			url.searchParams.has('limit') ||
-			url.searchParams.has('offset');
-
-		if (hasPaginatedRequest) {
-			const page = Math.max(Number(url.searchParams.get('page') || '1'), 1);
-			const pageSize = Math.min(Math.max(Number(url.searchParams.get('page_size') || String(limit)), 1), 500);
-			const start = (page - 1) * pageSize;
-			const end = start + pageSize;
-			const results = filtered.slice(start, end);
-			return json({
-				count: filtered.length,
-				next: end < filtered.length ? page + 1 : null,
-				previous: page > 1 ? page - 1 : null,
-				results
-			});
-		}
-
-		return json(filtered);
-	}
 
 	if (
 		method === 'POST' &&
@@ -2447,104 +2840,37 @@ async function handleCloudflareApiCompat(args: {
 		return handleLegacyUpload(fetch, request, tenantId, domain, parsedPath.entityId);
 	}
 
+	const dispatchPayload: {
+		tenant_id: string;
+		legacy_path: string;
+		method: string;
+		query: Record<string, string | string[]>;
+		headers?: Record<string, string>;
+		body?: JsonRecord;
+	} = {
+		tenant_id: tenantId,
+		legacy_path: normalizedPath,
+		method,
+		query: searchParamsToObject(url.searchParams),
+		headers: buildDispatchHeaders(request)
+	};
 	if (UNSAFE_METHODS.has(method)) {
-		const incoming = await parseRequestBody(request);
-		const entityId =
-			parsedPath.entityId ||
-			(typeof incoming.id === 'string' && incoming.id) ||
-			(typeof incoming.entity_id === 'string' && incoming.entity_id) ||
-			crypto.randomUUID();
-
-		const existing = await readLegacyStateById(fetch, tenantId, domain, entityId);
-		const expectedFields = getSchemaFieldNames(parsedPath.resource);
-		const merged = withParityDefaults(
-			{
-				...(existing || {}),
-				...incoming,
-				id: entityId,
-				entity_id: entityId,
-				domain,
-				status:
-					method === 'DELETE'
-						? 'deleted'
-						: (typeof incoming.status === 'string' && incoming.status) ||
-							(method === 'POST' ? 'created' : 'updated')
-			},
-			expectedFields
-		);
-
-		const parityFields =
-			expectedFields.length > 0
-				? expectedFields
-				: Object.keys(merged).filter((field) => !['model_key', 'model_fields'].includes(field));
-
-		const payload: JsonRecord = {
-			...merged,
-			record_id: entityId,
-			model_key: resolveModelKey(parsedPath.resource),
-			model_fields: parityFields
-		};
-
-		if (parsedPath.action && parsedPath.action !== 'object' && parsedPath.action !== 'upload') {
-			payload.action = parsedPath.action;
-		}
-		if (parsedPath.pathTail.length > 0) {
-			payload.path_tail = parsedPath.pathTail;
-		}
-
-		const commandType = resolveCommandType(domain, parsedPath.action, method);
-		const commandResponse = await fetchV2(
-			fetch,
-			tenantId,
-			`/commands/${encodeURIComponent(commandType)}`,
-			{
-				method: 'POST',
-				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({
-					idempotency_key: crypto.randomUUID(),
-					tenant_id: tenantId,
-					payload
-				})
-			}
-		);
-
-		if (!commandResponse.ok) {
-			return new Response(await commandResponse.text(), {
-				status: commandResponse.status,
-				headers: {
-					'content-type': commandResponse.headers.get('content-type') || 'application/json'
-				}
-			});
-		}
-
-		const accepted = (await commandResponse.json()) as { job_id?: string };
-		if (accepted.job_id) {
-			await waitForJobCompletion(fetch, tenantId, accepted.job_id);
-		}
-
-		if (method === 'DELETE') {
-			writeMemoryState(tenantId, domain, entityId, {
-				...(existing || {}),
-				id: entityId,
-				entity_id: entityId,
-				domain,
-				status: 'deleted'
-			});
-			return new Response(null, { status: 204 });
-		}
-
-		writeMemoryState(tenantId, domain, entityId, merged);
-
-		return json(
-			{
-				...merged,
-				_command: accepted
-			},
-			200
-		);
+		dispatchPayload.body = await parseRequestBody(request);
 	}
 
-	return json({ detail: 'Unsupported legacy API operation' }, 405);
+	const dispatchResponse = await fetchV2(fetch, tenantId, '/legacy/dispatch', {
+		method: 'POST',
+		redirect: 'manual',
+		headers: { 'content-type': 'application/json' },
+		body: JSON.stringify(dispatchPayload)
+	});
+
+	const responseHeaders = sanitizedProxyHeaders(dispatchResponse.headers);
+	responseHeaders.set('x-proxied-by', 'frontend-cloudflare-api-compat');
+	return new Response(dispatchResponse.body, {
+		status: dispatchResponse.status,
+		headers: responseHeaders
+	});
 }
 
 const legacyProxy: RequestHandler = async ({ fetch, params, request, url, cookies }) => {
@@ -2594,7 +2920,7 @@ const legacyProxy: RequestHandler = async ({ fetch, params, request, url, cookie
 		body
 	});
 
-	const responseHeaders = new Headers(response.headers);
+	const responseHeaders = sanitizedProxyHeaders(response.headers);
 	responseHeaders.set('x-proxied-by', 'frontend-api-proxy');
 	return new Response(response.body, {
 		status: response.status,

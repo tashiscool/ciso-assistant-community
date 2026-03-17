@@ -84,16 +84,23 @@ export class FormContent {
 				});
 			if (FORM_DEBUG) console.log(`[form] spinner wait done: ${key}`);
 
-			await field.locator.scrollIntoViewIfNeeded({ timeout: 1_500 }).catch(() => null);
-			if (FORM_DEBUG) console.log(`[form] scrolled: ${key}`);
-			let fieldVisible = await field.locator.isVisible({ timeout: 750 }).catch(() => false);
-			if (FORM_DEBUG) console.log(`[form] visible=${fieldVisible}: ${key}`);
-			if (!fieldVisible) {
-				if (
-					(key === 'description' || key === 'observation' || key === 'justification') &&
-					field.type === FormFieldType.TEXT
-				) {
-					const markdownEditBtn = this.page.getByTestId(`markdown-edit-btn-${key}`);
+				await field.locator.scrollIntoViewIfNeeded({ timeout: 1_500 }).catch(() => null);
+				if (FORM_DEBUG) console.log(`[form] scrolled: ${key}`);
+				let fieldVisible = await field.locator.isVisible({ timeout: 750 }).catch(() => false);
+				if (FORM_DEBUG) console.log(`[form] visible=${fieldVisible}: ${key}`);
+				if (!fieldVisible) {
+					await this.page.waitForLoadState('domcontentloaded').catch(() => null);
+					await this.page.waitForTimeout(400);
+					await field.locator.scrollIntoViewIfNeeded({ timeout: 1_500 }).catch(() => null);
+					fieldVisible = await field.locator.isVisible({ timeout: 3_000 }).catch(() => false);
+					if (FORM_DEBUG) console.log(`[form] visible after retry=${fieldVisible}: ${key}`);
+				}
+				if (!fieldVisible) {
+					if (
+						(key === 'description' || key === 'observation' || key === 'justification') &&
+						field.type === FormFieldType.TEXT
+					) {
+						const markdownEditBtn = this.page.getByTestId(`markdown-edit-btn-${key}`);
 					if (await markdownEditBtn.isVisible({ timeout: 1_000 }).catch(() => false)) {
 						await markdownEditBtn.click();
 						fieldVisible = await field.locator.isVisible({ timeout: 2_000 }).catch(() => false);
@@ -431,7 +438,57 @@ export class FormContent {
 										: specificSegment
 									: specificSegment;
 							const searchbox = field.locator.getByRole('searchbox').first();
+							const textbox = field.locator.getByRole('textbox').first();
 							const combobox = field.locator.getByRole('combobox').first();
+
+							const typeIntoEditable = async (
+								target: Locator,
+								text: string,
+								timeout = 1_500
+							): Promise<boolean> => {
+								const isEditable = await target
+									.evaluate((el) => {
+										const tag = el.tagName.toLowerCase();
+										return tag === 'input' || tag === 'textarea' || el.isContentEditable;
+									})
+									.catch(() => false);
+								if (!isEditable) {
+									return false;
+								}
+
+								await target.click({ timeout }).catch(async () => {
+									await target.click({ force: true, timeout }).catch(() => null);
+								});
+								await target.press('ControlOrMeta+A').catch(() => null);
+								await target.fill('').catch(() => null);
+								await target.fill(text, { timeout }).catch(() => null);
+
+								const typedValue = await target
+									.evaluate((el) => {
+										if ('value' in el) {
+											return String((el as HTMLInputElement | HTMLTextAreaElement).value || '');
+										}
+										return (el.textContent || '').trim();
+									})
+									.catch(() => '');
+								if (typedValue.trim() === text.trim()) {
+									return true;
+								}
+
+								await target.press('ControlOrMeta+A').catch(() => null);
+								await target.press('Backspace').catch(() => null);
+								await this.page.keyboard.type(text, { delay: 25 }).catch(() => null);
+
+								const keyboardValue = await target
+									.evaluate((el) => {
+										if ('value' in el) {
+											return String((el as HTMLInputElement | HTMLTextAreaElement).value || '');
+										}
+										return (el.textContent || '').trim();
+									})
+									.catch(() => '');
+								return keyboardValue.trim().length > 0;
+							};
 
 						const textMatchesOption = (text: string) => {
 							const normalizedText = text
@@ -543,42 +600,23 @@ export class FormContent {
 
 						await field.locator.click({ force: true, timeout: 3_000 }).catch(() => null);
 
-						if (await combobox.isVisible({ timeout: 1_000 }).catch(() => false)) {
-								const canFillCombobox = await combobox
-									.evaluate((el) => {
-										const tag = el.tagName.toLowerCase();
-										return tag === 'input' || tag === 'textarea' || el.isContentEditable;
-									})
-									.catch(() => false);
-								if (canFillCombobox) {
-									await combobox
-										.click({ timeout: 2_000 })
-										.catch(async () =>
-											await combobox.click({ force: true, timeout: 2_000 }).catch(() => null)
-										);
-									await combobox.press('ControlOrMeta+A').catch(() => null);
-									await combobox.fill(typedOptionValue).catch(() => null);
-								}
+						if (await textbox.isVisible({ timeout: 1_000 }).catch(() => false)) {
+								await typeIntoEditable(textbox, typedOptionValue, 2_000).catch(() => null);
+							} else if (await combobox.isVisible({ timeout: 1_000 }).catch(() => false)) {
+								await typeIntoEditable(combobox, typedOptionValue, 2_000).catch(() => null);
 							}
 
 							if (await searchbox.isVisible().catch(() => false)) {
 								const searchboxIsDisabled = await searchbox
 									.evaluate((el) => el.classList.contains('disabled'))
 									.catch(() => false);
-								if (!searchboxIsDisabled) {
-								const canFillSearchbox = await searchbox
-									.evaluate((el) => {
-										const tag = el.tagName.toLowerCase();
-										return tag === 'input' || tag === 'textarea' || el.isContentEditable;
-									})
-									.catch(() => false);
-										if (canFillSearchbox) {
-											await searchbox.click({ timeout: 1_500 }).catch(() => null);
-											await searchbox.press('ControlOrMeta+A').catch(() => null);
-											await searchbox.fill(typedOptionValue, { timeout: 1_500 }).catch(() => null);
-										}
+								if (!searchboxIsDisabled && !(await hasExpectedSelection())) {
+									const nestedInput = searchbox.locator('input, textarea, [contenteditable="true"]').first();
+									if (await nestedInput.isVisible({ timeout: 1_000 }).catch(() => false)) {
+										await typeIntoEditable(nestedInput, typedOptionValue, 1_500).catch(() => null);
 									}
 								}
+							}
 
 							const optionVisibilityTimeout = key === 'folder' ? 1_500 : 8_000;
 							const fuzzyVisibilityTimeout = key === 'folder' ? 1_000 : 3_000;
@@ -1752,13 +1790,13 @@ export class FormContent {
 						const editableVisible = await editable.isVisible({ timeout: 1_000 }).catch(() => false);
 						if (!editableVisible) {
 							const editButton = field.locator.getByRole('button', { name: /edit/i }).first();
-							if (await editButton.isVisible({ timeout: 500 }).catch(() => false)) {
-								await editButton.click();
-							}
-							const markdownPlaceholder = field
-								.locator('button, div, p')
-								.filter({ hasText: /Double-click to add content/i })
-								.first();
+								if (await editButton.isVisible({ timeout: 500 }).catch(() => false)) {
+									await editButton.click();
+								}
+								const markdownPlaceholder = field.locator
+									.locator('button, div, p')
+									.filter({ hasText: /Double-click to add content/i })
+									.first();
 							if (await markdownPlaceholder.isVisible({ timeout: 1_000 }).catch(() => false)) {
 								await markdownPlaceholder.dblclick();
 							} else {

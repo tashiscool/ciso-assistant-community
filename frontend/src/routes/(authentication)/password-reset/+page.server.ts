@@ -1,5 +1,4 @@
 import { BASE_API_URL } from '$lib/utils/constants';
-import { csrfToken } from '$lib/utils/csrf';
 import { safeTranslate } from '$lib/utils/i18n';
 import { emailSchema } from '$lib/utils/schemas';
 import { m } from '$paraglide/messages';

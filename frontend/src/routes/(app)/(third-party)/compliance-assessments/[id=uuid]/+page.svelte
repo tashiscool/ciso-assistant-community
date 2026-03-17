@@ -31,6 +31,7 @@
 	import type { Node } from './types';
 
 	import { safeTranslate } from '$lib/utils/i18n';
+	import { hasPermission } from '$lib/utils/access-control';
 	import { m } from '$paraglide/messages';
 	import { formatDateOrDateTime } from '$lib/utils/datetime';
 	import { getLocale } from '$paraglide/runtime.js';
@@ -53,6 +54,16 @@
 	let { data, form }: Props = $props();
 
 	const compliance_assessment = $derived(data.compliance_assessment);
+	const frameworkReferenceControls = $derived(
+		Array.isArray(compliance_assessment.framework?.reference_controls)
+			? compliance_assessment.framework.reference_controls
+			: []
+	);
+	const frameworkImplementationGroups = $derived(
+		Array.isArray(compliance_assessment.framework?.implementation_groups_definition)
+			? compliance_assessment.framework.implementation_groups_definition
+			: []
+	);
 
 	const user = page.data.user;
 	const model = URL_MODEL_MAP['compliance-assessments'];
@@ -374,7 +385,7 @@
 			// Data
 			title: m.syncToAppliedControls(),
 			body: m.syncToAppliedControlsMessage({
-				count: data.compliance_assessment.framework.reference_controls.length //change this
+				count: frameworkReferenceControls.length
 			}),
 			response: (r: boolean) => {
 				syncingToActionsIsLoading = r;
@@ -395,7 +406,7 @@
 				formAction: action,
 				bodyComponent: List,
 				bodyProps: {
-					items: data.compliance_assessment.framework.reference_controls,
+					items: frameworkReferenceControls,
 					message: m.theFollowingControlsWillBeAddedColon()
 				}
 			}
@@ -406,7 +417,7 @@
 			// Data
 			title: m.suggestControls(),
 			body: m.createAppliedControlsFromSuggestionsConfirmMessage({
-				count: data.compliance_assessment.framework.reference_controls.length
+				count: frameworkReferenceControls.length
 			}),
 			response: (r: boolean) => {
 				createAppliedControlsLoading = r;
@@ -479,7 +490,7 @@
 					const fieldsToShow = ['ref_id', 'name', 'description', 'version', 'perimeter', 'framework', 'authors', 'reviewers', 'status', 'selected_implementation_groups', 'assets', 'evidences', 'campaign'];
 					if (!fieldsToShow.includes(key)) return false;
 					// Hide selected_implementation_groups if framework doesn't support implementation groups
-					if (key === 'selected_implementation_groups' && (!data.compliance_assessment.framework.implementation_groups_definition || !Array.isArray(data.compliance_assessment.framework.implementation_groups_definition) || data.compliance_assessment.framework.implementation_groups_definition.length === 0)) return false;
+					if (key === 'selected_implementation_groups' && frameworkImplementationGroups.length === 0) return false;
 					return true;
 				}) as [key, value]}
 					<div class="flex flex-col">
@@ -797,7 +808,7 @@
 					</button>
 				{/if}
 
-				{#if Object.hasOwn(page.data.user.permissions, 'add_appliedcontrol') && data.compliance_assessment.framework.reference_controls.length > 0 && !data.compliance_assessment.is_locked}
+				{#if hasPermission(page.data.user, 'add_appliedcontrol') && frameworkReferenceControls.length > 0 && !data.compliance_assessment.is_locked}
 					<button
 						class="btn text-gray-100 bg-linear-to-r from-purple-500 to-fuchsia-500 h-fit"
 						onclick={() => {

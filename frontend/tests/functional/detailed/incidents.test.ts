@@ -241,19 +241,19 @@ test('Incidents full flow - creation, validation and cleanup', async ({
 		await page.getByTestId('toast').getByLabel('Dismiss toast').click();
 		await expect(page.getByTestId('toast')).not.toBeVisible();
 
-		await page
-			.getByRole('gridcell', { name: /New|Nouveau/i })
-			.getByTestId('model-table-td-array-elem')
-			.waitFor({ state: 'visible' });
-		await page
-			.getByRole('gridcell', { name: /Minor|Mineur/i })
-			.getByTestId('model-table-td-array-elem')
-			.waitFor({ state: 'visible' });
-		await page
-			.getByRole('gridcell', { name: /Internal|Interne/i })
-			.getByTestId('model-table-td-array-elem')
-			.waitFor({ state: 'visible' });
-	});
+			const incidentRow = page
+				.getByRole('row', {
+					name: new RegExp(
+						`${escapeRegExp(incidentName)}.*${escapeRegExp(incidentsFolderName)}`,
+						'i'
+					)
+				})
+				.first();
+			await expect(incidentRow).toBeVisible();
+			await expect(incidentRow).toContainText(/New|Nouveau/i);
+			await expect(incidentRow).toContainText(/Minor|Mineur/i);
+			await expect(incidentRow).toContainText(/Internal|Interne/i);
+		});
 
 	await test.step('Incidents detail view & second edit creating 1st incident', async () => {
 		await page.getByText(incidentName).click();

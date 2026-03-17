@@ -163,6 +163,7 @@ urlpatterns = [
     path("vendor-portal/", include("vendor_portal.urls")),  # Vendor Portal API
     # Note: privacy/, security/, third-party/, business-continuity/ routes are handled by bounded contexts above
     path("oscal/", include("oscal_integration.api.urls")),  # OSCAL Integration API
+    path("governance/", include("core.api.assessment_workflow_urls")),  # Control Origination & Assessment Workflow API
     path("serdes/", include("serdes.urls")),
     path("data-wizard/", include("data_wizard.urls")),
     path("settings/", include("global_settings.urls")),

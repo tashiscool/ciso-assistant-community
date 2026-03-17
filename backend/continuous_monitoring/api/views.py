@@ -29,7 +29,11 @@ from continuous_monitoring.api.serializers import (
     ConMonSetupSerializer,
     ConMonSetupResponseSerializer,
 )
-from continuous_monitoring.services import ConMonService, ConMonTaskGenerator
+from continuous_monitoring.services import (
+    ConMonService,
+    ConMonTaskGenerator,
+    ConMonOperationalRollupService,
+)
 
 
 class BaseModelViewSet(AbstractBaseModelViewSet):
@@ -99,6 +103,25 @@ class ConMonProfileViewSet(BaseModelViewSet):
         results = generator.generate_tasks_from_profile(profile)
 
         return Response(results)
+
+    @action(detail=True, methods=['get'])
+    def operational_rollup(self, request, pk=None):
+        """
+        Return cadence and operationally grouped views for this profile.
+
+        This endpoint is designed to answer practical operations questions such as:
+        - What is due weekly/monthly/quarterly/yearly?
+        - Which alert triage activities are active?
+        - Which change activities are processed/audited/approved?
+        """
+        profile = self.get_object()
+        include_disabled = str(
+            request.query_params.get('include_disabled', 'false')
+        ).lower() in {'1', 'true', 'yes'}
+
+        service = ConMonOperationalRollupService(profile_id=str(profile.id))
+        payload = service.build(include_disabled=include_disabled)
+        return Response(payload)
 
     @action(detail=False, methods=['post'])
     def setup(self, request):
@@ -264,8 +287,13 @@ class ConMonExecutionViewSet(BaseModelViewSet):
         today = timezone.localdate()
         days = int(request.query_params.get('days', 14))
         upcoming_date = today + timedelta(days=days)
+        profile_id = request.query_params.get('profile')
 
-        executions = self.filter_queryset(self.get_queryset()).filter(
+        executions = self.filter_queryset(self.get_queryset())
+        if profile_id:
+            executions = executions.filter(activity_config__profile_id=profile_id)
+
+        executions = executions.filter(
             status='pending',
             due_date__gte=today,
             due_date__lte=upcoming_date
@@ -280,8 +308,13 @@ class ConMonExecutionViewSet(BaseModelViewSet):
         from django.utils import timezone
 
         today = timezone.localdate()
+        profile_id = request.query_params.get('profile')
 
-        executions = self.filter_queryset(self.get_queryset()).filter(
+        executions = self.filter_queryset(self.get_queryset())
+        if profile_id:
+            executions = executions.filter(activity_config__profile_id=profile_id)
+
+        executions = executions.filter(
             status__in=['pending', 'in_progress'],
             due_date__lt=today
         ).order_by('due_date')[:20]

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { BRAND_DOCS_URL } from '$lib/brand';
 	import { LOCALE_MAP, language, defaultLangLabels } from '$lib/utils/locales';
 	import { m } from '$paraglide/messages';
 	import { getLocale, locales, setLocale } from '$paraglide/runtime';
@@ -41,21 +42,26 @@
 	});
 
 	let openState = $state(false);
+
+	const menuItemClass =
+		'brand-menu-link cursor-pointer flex items-center gap-2 w-full rounded-[14px] px-4 py-2.5 text-left text-sm disabled:text-slate-400';
+	const selectClass =
+		'brand-menu-link w-full rounded-[14px] border-transparent bg-transparent px-4 py-2.5 text-sm focus:border-transparent focus:ring-0';
 </script>
 
-<div class="border-t pt-2.5">
+<div class="mt-4 border-t border-white/10 pt-4">
 	<div class="flex flex-row items-center justify-between">
 		<div class="flex flex-col w-3/4">
 			{#if page.data.user}
 				<span
-					class="text-gray-900 text-sm whitespace-nowrap overflow-hidden truncate w-full"
+					class="w-full overflow-hidden truncate whitespace-nowrap text-sm font-medium text-white"
 					data-testid="sidebar-user-name-display"
 				>
 					{page.data.user.first_name}
 					{page.data.user.last_name}
 				</span>
 				<span
-					class="font-normal text-xs whitespace-nowrap truncate text-gray-600 mr-2 w-full"
+					class="mr-2 w-full truncate whitespace-nowrap text-xs font-normal text-slate-400"
 					data-testid="sidebar-user-email-display"
 				>
 					{page.data.user.email}
@@ -67,13 +73,13 @@
 				open={openState}
 				onOpenChange={(e) => (openState = e.open)}
 				positioning={{ placement: 'top' }}
-				triggerBase="btn "
-				contentBase="card whitespace-nowrap bg-white py-2 w-fit shadow-lg space-y-1"
+				triggerBase="btn"
+				contentBase="brand-sidebar-footer-card w-fit space-y-1 whitespace-nowrap p-2 shadow-lg"
 				zIndex="1000"
 			>
 				{#snippet trigger()}
 					<button
-						class="btn bg-initial"
+						class="btn border border-white/10 bg-white/6 text-slate-200 shadow-none hover:bg-white/10"
 						data-testid="sidebar-more-btn"
 						aria-label="More options"
 						id="sidebar-more-btn"
@@ -88,14 +94,14 @@
 							onclick={(e) => {
 								window.location.href = e.target.href;
 							}}
-							class="unstyled cursor-pointer flex items-center gap-2 w-full px-4 py-2.5 text-left text-sm hover:bg-gray-100 disabled:text-gray-500 text-gray-800"
+							class={menuItemClass}
 							data-testid="profile-button"
 							><i class="fa-solid fa-address-card mr-2"></i>{m.myProfile()}</a
 						>
 						<select
 							{value}
 							onchange={handleLocaleChange}
-							class="border-y-white border-x-gray-100 focus:border-y-white focus:border-x-gray-100 w-full px-4 py-2.5 cursor-pointer block text-sm text-gray-800 bg-white focus:ring-0"
+							class={selectClass}
 							data-testid="language-select"
 						>
 							{#each locales as lang}
@@ -106,32 +112,32 @@
 						</select>
 						<button
 							onclick={() => dispatch('triggerGT')}
-							class="cursor-pointer flex items-center gap-2 w-full px-4 py-2.5 text-left text-sm hover:bg-gray-100 disabled:text-gray-500 text-gray-800"
+							class={menuItemClass}
 							data-testid="gt-button"
 							><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>{m.guidedTour()}</button
 						>
 						<button
 							onclick={() => dispatch('loadDemoDomain')}
-							class="cursor-pointer flex items-center gap-2 w-full px-4 py-2.5 text-left text-sm hover:bg-gray-100 disabled:text-gray-500 text-gray-800"
+							class={menuItemClass}
 							data-testid="load-demo-data-button"
 							><i class="fa-solid fa-file-import mr-2"></i>{m.loadDemoData()}</button
 						>
-						<button
-							onclick={modalBuildInfo}
-							class="cursor-pointer flex items-center gap-2 w-full px-4 py-2.5 text-left text-sm hover:bg-gray-100 disabled:text-gray-500 text-gray-800"
-							data-testid="about-button"
+						<button onclick={modalBuildInfo} class={menuItemClass} data-testid="about-button"
 							><i class="fa-solid fa-circle-info mr-2"></i>{m.aboutCiso()}</button
 						>
-						<a
-							href="https://github.com/tashiscool/ciso-assistant-community"
-							target="_blank"
-							class="unstyled cursor-pointer flex items-center gap-2 w-full px-4 py-2.5 text-left text-sm hover:bg-gray-100 disabled:text-gray-500 text-gray-800"
-							data-testid="docs-button"><i class="fa-brands fa-github mr-2"></i>{m.onlineDocs()}</a
-						>
+						{#if BRAND_DOCS_URL}
+							<a
+								href={BRAND_DOCS_URL}
+								target="_blank"
+								rel="noopener noreferrer"
+								class={`unstyled ${menuItemClass}`}
+								data-testid="docs-button"
+								><i class="fa-solid fa-book-open mr-2"></i>{m.onlineDocs()}</a
+							>
+						{/if}
 						<form action="/logout" method="POST">
 							<button class="w-full" type="submit" data-testid="logout-button">
-								<span
-									class="flex items-center gap-2 w-full px-4 py-2.5 text-left text-sm hover:bg-gray-100 disabled:text-gray-500 text-gray-800"
+								<span class={menuItemClass}
 									><i class="fa-solid fa-right-from-bracket mr-2"></i>{m.Logout()}</span
 								>
 							</button>
@@ -141,7 +147,7 @@
 			</Popover>
 		{:else}
 			<button
-				class="btn bg-initial"
+				class="btn border border-white/10 bg-white/6 text-slate-200 shadow-none"
 				data-testid="sidebar-more-btn-disabled"
 				aria-label="More options"
 				id="sidebar-more-btn-disabled"><i class="fa-solid fa-ellipsis-vertical"></i></button

@@ -61,16 +61,26 @@ export class PageContent extends BasePage {
 		addButtonValue?: string
 	) {
 		this.lastCreatedItemId = null;
+		const waitForCollectionPageReady = async () => {
+			await this.page
+				.waitForURL((url) => url.pathname.startsWith(this.url), { timeout: 15_000 })
+				.catch(() => null);
+			await this.page.waitForLoadState('domcontentloaded').catch(() => null);
+			await this.page.locator('#page-title').waitFor({ state: 'visible', timeout: 20_000 }).catch(() => null);
+			await this.waitUntilLoaded().catch(() => null);
+		};
 		if (dependency) {
 			await this.page.goto('/libraries');
 			await this.page.waitForURL('/libraries');
 
 			await this.importLibrary(dependency.name, dependency.urn);
 			await this.goto();
+			await waitForCollectionPageReady();
 		}
 
 		// Open creation modal with retries to absorb transient UI overlays/animation timing.
 		let opened = false;
+		let addButtonError: Error | null = null;
 		for (let attempt = 0; attempt < 3; attempt++) {
 			if (PAGE_DEBUG) {
 				console.log(`[createItem] open attempt=${attempt + 1} url=${this.url} pageUrl=${this.page.url()}`);
@@ -82,19 +92,26 @@ export class PageContent extends BasePage {
 							.locator('[data-testid="add-button"]:visible')
 							.filter({ hasText: addButtonValue })
 							.first();
-			const addButtonVisible = await addButtonLocator.isVisible({ timeout: 1_500 }).catch(() => false);
-			if (!addButtonVisible) {
-				await this.goto().catch(() => null);
-				await this.page
-					.waitForURL((url) => url.pathname.startsWith(this.url), { timeout: 8_000 })
-					.catch(() => null);
-			}
-			await expect(addButtonLocator).toBeVisible({ timeout: 10_000 });
-			await addButtonLocator.click({ timeout: 10_000 });
-			opened = await this.form.formTitle
-				.waitFor({ state: 'visible', timeout: 5_000 })
-				.then(() => true)
-				.catch(() => false);
+				const addButtonVisible = await addButtonLocator.isVisible({ timeout: 1_500 }).catch(() => false);
+				if (!addButtonVisible) {
+					await this.goto().catch(() => null);
+					await waitForCollectionPageReady();
+				}
+				const addButtonReady = await addButtonLocator
+					.isVisible({ timeout: 10_000 })
+					.catch(() => false);
+				if (!addButtonReady) {
+					addButtonError = new Error(
+						`Could not find a visible add button on ${this.url}; current page=${this.page.url()}`
+					);
+					await this.page.waitForTimeout(500);
+					continue;
+				}
+				await addButtonLocator.click({ timeout: 10_000 });
+				opened = await this.form.formTitle
+					.waitFor({ state: 'visible', timeout: 5_000 })
+					.then(() => true)
+					.catch(() => false);
 			if (!opened) {
 				await this.page.keyboard.press('c').catch(() => null);
 				opened = await this.form.formTitle
@@ -103,12 +120,15 @@ export class PageContent extends BasePage {
 					.catch(() => false);
 			}
 			if (opened) break;
-			await this.page.locator('body').press('Escape').catch(() => null);
-			await this.page.waitForTimeout(400);
-		}
-		if (!opened) {
-			throw new Error(`Could not open create modal on ${this.url}`);
-		}
+				await this.page.locator('body').press('Escape').catch(() => null);
+				await this.page.waitForTimeout(400);
+			}
+			if (!opened) {
+				if (addButtonError) {
+					throw addButtonError;
+				}
+				throw new Error(`Could not open create modal on ${this.url}`);
+			}
 		if (PAGE_DEBUG) {
 			console.log(`[createItem] modal opened url=${this.url} pageUrl=${this.page.url()}`);
 		}
@@ -1237,9 +1257,15 @@ export class PageContent extends BasePage {
 											? values.str.trim()
 											: '';
 						if (submittedPrimaryValue) {
-							const recoveredId = await this.findItemIdByName(submittedPrimaryValue);
-							if (recoveredId) {
-								this.lastCreatedItemId = recoveredId;
+							for (let recoveryAttempt = 0; recoveryAttempt < 4; recoveryAttempt += 1) {
+								const recoveredId = await this.findItemIdByName(submittedPrimaryValue);
+								if (recoveredId) {
+									this.lastCreatedItemId = recoveredId;
+									break;
+								}
+								await this.page.waitForTimeout(750);
+							}
+							if (this.lastCreatedItemId) {
 								break;
 							}
 						}

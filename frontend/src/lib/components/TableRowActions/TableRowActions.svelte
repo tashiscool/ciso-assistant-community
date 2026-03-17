@@ -10,6 +10,7 @@
 	import { m } from '$paraglide/messages';
 	import Anchor from '$lib/components/Anchor/Anchor.svelte';
 	import { canPerformAction } from '$lib/utils/access-control';
+	import { hasModelPermission } from '$lib/utils/access-control';
 	import {
 		getModalStore,
 		type ModalStore,
@@ -139,7 +140,7 @@
 									? row.meta.id
 									: (row.meta.folder?.id ?? row.meta.folder ?? user.root_folder_id)
 						})
-					: Object.hasOwn(user.permissions, `delete_${model.name}`)
+					: hasModelPermission(user, 'delete', model.name)
 				: false)
 	);
 	let canEditObject = $derived(
@@ -155,7 +156,7 @@
 									? row.meta.id
 									: (row.meta.folder?.id ?? row.meta.folder ?? user.root_folder_id)
 						})
-					: Object.hasOwn(user.permissions, `change_${model.name}`)
+					: hasModelPermission(user, 'change', model.name)
 				: false)
 	);
 

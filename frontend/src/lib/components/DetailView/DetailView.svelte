@@ -11,6 +11,7 @@
 	import { formatDateOrDateTime } from '$lib/utils/datetime';
 	import { isURL } from '$lib/utils/helpers';
 	import { safeTranslate } from '$lib/utils/i18n';
+	import { normalizeIncidentSeverityLabel } from '$lib/utils/incidents';
 	import { toCamelCase } from '$lib/utils/locales.js';
 	import { countMasked, isMaskedPlaceholder } from '$lib/utils/related-visibility';
 	import { m } from '$paraglide/messages';
@@ -495,14 +496,16 @@
 												<Anchor breadcrumbAction="push" href={itemHref} class="anchor"
 													>{value.name}</Anchor
 												>
-											{:else if key === 'severity' && data.urlModel !== 'incidents'}
-												<!-- We must add translations for the following severity levels -->
-												<!-- Is this a correct way to convert the severity integer to the stringified security level ? -->
-												{@const stringifiedSeverity = !value
-													? '--'
-													: (safeTranslate(value) ?? m.undefined())}
-												{stringifiedSeverity}
-											{:else if key === 'children_assets'}
+												{:else if key === 'severity' && data.urlModel !== 'incidents'}
+													<!-- We must add translations for the following severity levels -->
+													<!-- Is this a correct way to convert the severity integer to the stringified security level ? -->
+													{@const stringifiedSeverity = !value
+														? '--'
+														: (safeTranslate(value) ?? m.undefined())}
+													{stringifiedSeverity}
+												{:else if key === 'severity' && data.urlModel === 'incidents'}
+													{safeTranslate(normalizeIncidentSeverityLabel(value))}
+												{:else if key === 'children_assets'}
 												{#if Object.keys(value).length > 0}
 													<ul class="inline-flex flex-wrap space-x-4">
 														{#each value as val}

@@ -11,13 +11,29 @@ import { z } from 'zod';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { m } from '$paraglide/messages';
 
-export const load = (async ({ fetch, params }) => {
+export const load = (async ({ fetch, params, locals }) => {
 	const URLModel = 'compliance-assessments';
 	const endpoint = `${BASE_API_URL}/${URLModel}/${params.id}/`;
 	const objectEndpoint = `${endpoint}object/`;
 
 	const res = await fetch(endpoint);
 	const compliance_assessment = await res.json();
+
+	if (!compliance_assessment.folder?.id && compliance_assessment.perimeter?.id) {
+		const perimeter = await fetch(`${BASE_API_URL}/perimeters/${compliance_assessment.perimeter.id}/`).then(
+			(res) => (res.ok ? res.json() : null)
+		);
+		if (perimeter?.folder?.id) {
+			compliance_assessment.folder = perimeter.folder;
+		}
+	}
+
+	if (!compliance_assessment.folder?.id && locals.user?.root_folder_id) {
+		compliance_assessment.folder = {
+			id: locals.user.root_folder_id,
+			str: 'Global'
+		};
+	}
 
 	const object = await fetch(objectEndpoint).then((res) => res.json());
 
@@ -52,7 +68,7 @@ export const load = (async ({ fetch, params }) => {
 
 	const selectOptions: Record<string, any> = {};
 
-	const frameworksMappings = await fetch(`/compliance-assessments/${params.id}/frameworks`).then(
+	const frameworksMappings = await fetch(`${BASE_API_URL}/${URLModel}/${params.id}/frameworks/`).then(
 		(res) => res.json()
 	);
 

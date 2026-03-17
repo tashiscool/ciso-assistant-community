@@ -235,33 +235,34 @@
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 	<!-- Header -->
-	<div class="mb-8 flex justify-between items-start">
+	<div class="brand-card-dark mb-8 flex items-start justify-between overflow-hidden px-6 py-7 lg:px-8">
 		<div>
-			<h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+			<span class="brand-overline !text-white/70">Regovise Connectors</span>
+			<h1 class="mt-3 text-3xl font-bold text-white">
 				{m.connectorManagement?.() || 'Connector Management'}
 			</h1>
-			<p class="mt-2 text-lg text-gray-600 dark:text-gray-400">
+			<p class="mt-2 max-w-2xl text-base text-white/72">
 				{m.connectorDescription?.() || 'Connect to security tools and automate evidence collection'}
 			</p>
 		</div>
 	</div>
 
 	<!-- Tabs -->
-	<div class="border-b border-gray-200 mb-6">
-		<nav class="-mb-px flex space-x-8">
+	<div class="brand-card mb-6 p-2">
+		<nav class="flex flex-wrap gap-2">
 			<button
-				class="py-4 px-1 border-b-2 font-medium text-sm {activeTab === 'configured'
-					? 'border-indigo-500 text-indigo-600'
-					: 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}"
+				class="brand-chip {activeTab === 'configured'
+					? '!bg-[var(--rv-midnight)] !text-white !border-[rgba(88,181,255,0.24)]'
+					: ''}"
 				onclick={() => (activeTab = 'configured')}
 			>
 				<i class="fa-solid fa-plug mr-2"></i>
 				{m.configuredConnectors?.() || 'Configured'} ({connectors.length})
 			</button>
 			<button
-				class="py-4 px-1 border-b-2 font-medium text-sm {activeTab === 'available'
-					? 'border-indigo-500 text-indigo-600'
-					: 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}"
+				class="brand-chip {activeTab === 'available'
+					? '!bg-[var(--rv-midnight)] !text-white !border-[rgba(88,181,255,0.24)]'
+					: ''}"
 				onclick={() => (activeTab = 'available')}
 			>
 				<i class="fa-solid fa-plus-circle mr-2"></i>
@@ -273,16 +274,17 @@
 	<!-- Configured Connectors Tab -->
 	{#if activeTab === 'configured'}
 		{#if connectors.length === 0}
-			<div class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow">
+			<div class="brand-card px-6 py-14 text-center">
 				<i class="fa-solid fa-plug text-6xl text-gray-300 mb-4"></i>
-				<h3 class="text-lg font-medium text-gray-900 dark:text-white">
+				<h3 class="text-lg font-medium text-[var(--rv-midnight)]">
 					{m.noConnectorsConfigured?.() || 'No connectors configured'}
 				</h3>
-				<p class="mt-2 text-gray-500 dark:text-gray-400">
+				<p class="mt-2 text-slate-500">
 					{m.addConnectorPrompt?.() || 'Add a connector to start automating evidence collection'}
 				</p>
 				<button
-					class="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+					class="btn mt-4 inline-flex items-center px-4 py-2 text-sm font-medium text-white"
+					style="background: var(--rv-gradient-accent); box-shadow: var(--rv-shadow-glow);"
 					onclick={() => (activeTab = 'available')}
 				>
 					<i class="fa-solid fa-plus mr-2"></i>
@@ -292,16 +294,16 @@
 		{:else}
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				{#each connectors as connector}
-					<div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden" data-testid="configured-connector-card">
+					<div class="brand-card overflow-hidden" data-testid="configured-connector-card">
 						<div class="p-6">
 							<div class="flex items-start justify-between">
 								<div class="flex items-center">
-									<div class="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center mr-4">
-										<i class="fa-solid {getCategoryIcon(connector.connector_type)} text-indigo-600 text-xl"></i>
+									<div class="brand-icon-badge mr-4 h-12 w-12 rounded-[18px] text-xl">
+										<i class="fa-solid {getCategoryIcon(connector.connector_type)} text-white"></i>
 									</div>
 									<div>
-										<h3 class="font-semibold text-gray-900 dark:text-white">{connector.name}</h3>
-										<p class="text-sm text-gray-500">{connector.connector_type}</p>
+										<h3 class="font-semibold text-[var(--rv-midnight)]">{connector.name}</h3>
+										<p class="text-sm text-slate-500">{connector.connector_type}</p>
 									</div>
 								</div>
 								<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {getStatusColor(connector.status)}">
@@ -335,9 +337,9 @@
 							</div>
 						</div>
 
-						<div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-between">
+						<div class="flex justify-between border-t border-slate-200/70 px-6 py-4">
 							<button
-								class="text-sm text-indigo-600 hover:text-indigo-900 dark:text-indigo-400"
+								class="text-sm font-medium text-[var(--rv-blue)] hover:text-[var(--rv-midnight)]"
 								onclick={() => syncConnector(connector.id)}
 								disabled={loading || connector.status === 'syncing'}
 								data-testid="connector-sync-button"
@@ -370,21 +372,21 @@
 	<!-- Available Connectors Tab -->
 	{#if activeTab === 'available'}
 		<!-- Filters -->
-		<div class="mb-6 flex flex-wrap gap-4">
+		<div class="brand-card mb-6 flex flex-wrap gap-4 p-4">
 			<div class="flex-1 min-w-[200px]">
 				<input
 					type="text"
 					bind:value={searchQuery}
 					placeholder="{m.searchConnectors?.() || 'Search connectors...'}"
-					class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600"
+					class="input w-full px-4 py-2"
 				/>
 			</div>
 			<div class="flex gap-2 flex-wrap">
 				{#each categories as category}
 					<button
-						class="px-3 py-1 rounded-full text-sm font-medium {selectedCategory === category
-							? 'bg-indigo-600 text-white'
-							: 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300'}"
+						class="brand-chip {selectedCategory === category
+							? '!bg-[var(--rv-midnight)] !text-white !border-[rgba(88,181,255,0.24)]'
+							: ''}"
 						onclick={() => (selectedCategory = category)}
 					>
 						{category === 'all' ? 'All' : category.replace('_', ' ')}
@@ -396,32 +398,33 @@
 		<!-- Connector Grid -->
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 			{#each filteredAvailable as connector}
-				<div class="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden">
+				<div class="brand-card overflow-hidden transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_36px_rgb(11_31_42_/_0.12)]">
 					<div class="p-6">
 						<div class="flex items-start">
-							<div class="w-14 h-14 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mr-4">
-								<i class="fa-solid {getCategoryIcon(connector.category)} text-white text-2xl"></i>
+							<div class="brand-icon-badge mr-4 h-14 w-14 rounded-[20px] text-2xl">
+								<i class="fa-solid {getCategoryIcon(connector.category)} text-white"></i>
 							</div>
 							<div class="flex-1">
-								<h3 class="font-semibold text-gray-900 dark:text-white">{connector.name}</h3>
-								<span class="inline-block mt-1 px-2 py-0.5 text-xs rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+								<h3 class="font-semibold text-[var(--rv-midnight)]">{connector.name}</h3>
+								<span class="brand-chip mt-2">
 									{connector.category.replace('_', ' ')}
 								</span>
 							</div>
 						</div>
-						<p class="mt-4 text-sm text-gray-600 dark:text-gray-400">{connector.description}</p>
+						<p class="mt-4 text-sm text-slate-600">{connector.description}</p>
 						<div class="mt-4 flex flex-wrap gap-2">
 							{#each connector.auth_methods as method}
-								<span class="inline-flex items-center px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded dark:bg-blue-900/20 dark:text-blue-400">
+								<span class="brand-chip !bg-[rgba(88,181,255,0.12)] !text-[var(--rv-midnight)]">
 									<i class="fa-solid fa-key mr-1"></i>
 									{method}
 								</span>
 							{/each}
 						</div>
 					</div>
-					<div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50">
+					<div class="border-t border-slate-200/70 px-6 py-4">
 						<button
-							class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+							class="btn w-full inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white"
+							style="background: var(--rv-gradient-accent); box-shadow: var(--rv-shadow-glow);"
 							onclick={() => openAddModal(connector)}
 							data-testid="connector-configure-button"
 						>
@@ -438,17 +441,17 @@
 <!-- Add Connector Modal -->
 {#if showAddModal && selectedConnectorType}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4" data-testid="connector-configure-modal">
-			<div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+		<div class="brand-card mx-4 w-full max-w-md" data-testid="connector-configure-modal">
+			<div class="flex items-center justify-between border-b border-slate-200/70 px-6 py-4">
+				<h3 class="text-lg font-semibold text-[var(--rv-midnight)]">
 					Configure {selectedConnectorType.name}
 				</h3>
-				<button onclick={() => (showAddModal = false)} class="text-gray-400 hover:text-gray-600">
+				<button onclick={() => (showAddModal = false)} class="text-slate-400 hover:text-[var(--rv-midnight)]">
 					<i class="fa-solid fa-times"></i>
 				</button>
 			</div>
 			<div class="p-6">
-				<p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+				<p class="mb-4 text-sm text-slate-600">
 					{selectedConnectorType.description}
 				</p>
 				<form class="space-y-4" onsubmit={(e) => { e.preventDefault(); saveConnector(); }}>
@@ -495,16 +498,17 @@
 					{/if}
 				</form>
 			</div>
-			<div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end gap-3">
+			<div class="flex justify-end gap-3 border-t border-slate-200/70 px-6 py-4">
 				<button
-					class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500"
+					class="btn px-4 py-2 text-sm font-medium text-slate-700"
 					onclick={() => (showAddModal = false)}
 					data-testid="connector-cancel-button"
 				>
 					Cancel
 				</button>
 				<button
-					class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 disabled:opacity-50"
+					class="btn px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+					style="background: var(--rv-gradient-accent); box-shadow: var(--rv-shadow-glow);"
 					onclick={saveConnector}
 					disabled={addingConnector}
 					data-testid="connector-save-button"

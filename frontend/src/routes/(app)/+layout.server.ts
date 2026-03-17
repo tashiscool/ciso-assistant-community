@@ -1,11 +1,24 @@
 import type { LayoutServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 import { loadFlash } from 'sveltekit-flash-message/server';
+import { IS_CLOUDFLARE_RUNTIME } from '$lib/utils/constants';
 
 const loginPageRegex = /^[a-zA-Z0-9]+:\/\/[^\/]+\/login\/?.*$/;
 
 // get `locals.user` and pass it to the `page` store
 export const load = loadFlash(async ({ locals, url, cookies, request }) => {
+	if (IS_CLOUDFLARE_RUNTIME) {
+		const hasAccessToken = Boolean(cookies.get('token'));
+		if (!locals.user && !hasAccessToken && !url.pathname.includes('/login')) {
+			redirect(302, `/login?next=${url.pathname}`);
+		}
+		return {
+			user: locals.user ?? null,
+			settings: locals.settings ?? {},
+			featureflags: locals.featureflags ?? {}
+		};
+	}
+
 	if (!locals.user && !url.pathname.includes('/login')) {
 		redirect(302, `/login?next=${url.pathname}`);
 	} else {

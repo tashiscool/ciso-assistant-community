@@ -9,10 +9,12 @@ declare global {
 	namespace App {
 		// interface Error {}
 		interface Locals {
-			user: User;
+			user: User | null;
 			featureFlags: FeatureFlags;
-			globalSettings: GlobalSettings;
-			generalSettings: Record<string, any>;
+			globalSettings?: GlobalSettings;
+			generalSettings?: Record<string, any>;
+			settings?: Record<string, any>;
+			featureflags?: Record<string, any>;
 		}
 		interface PageData {
 			flash?: { type: 'success' | 'error' | 'warning' | 'info'; message: string };

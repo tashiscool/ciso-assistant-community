@@ -189,7 +189,7 @@
 </script>
 
 <svelte:head>
-  <title>RMF Upload - CISO Assistant</title>
+  <title>RMF Upload - Regovise</title>
 </svelte:head>
 
 <div class="rmf-upload min-h-screen bg-gray-50">

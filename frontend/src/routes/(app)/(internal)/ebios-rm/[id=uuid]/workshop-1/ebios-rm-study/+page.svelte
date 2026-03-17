@@ -35,6 +35,7 @@
 	let { data }: Props = $props();
 
 	const ebiosRmStudy = data.data;
+	const referenceEntity = ebiosRmStudy.reference_entity;
 
 	function modalCreateForm(model: Record<string, any>): void {
 		let modalComponent: ModalComponent = {
@@ -136,21 +137,33 @@
 		<div class="flex justify-center items-center w-full gap-5">
 			<span class="text-sm text-gray-500"
 				>{m.domainSemiColon()}
-				<Anchor class="anchor" href="/folders/{ebiosRmStudy.folder.id}"
-					>{ebiosRmStudy.folder.str}</Anchor
-				>
+				{#if ebiosRmStudy.folder?.id}
+					<Anchor class="anchor" href="/folders/{ebiosRmStudy.folder.id}"
+						>{ebiosRmStudy.folder.str}</Anchor
+					>
+				{:else}
+					<span class="font-bold">--</span>
+				{/if}
 			</span>
 			<span class="text-sm text-gray-500"
 				>{m.referenceEntitySemiColon()}
-				<Anchor class="anchor" href="/entities/{ebiosRmStudy.reference_entity.id}"
-					>{ebiosRmStudy.reference_entity.str}</Anchor
-				>
+				{#if referenceEntity?.id}
+					<Anchor class="anchor" href="/entities/{referenceEntity.id}"
+						>{referenceEntity.str}</Anchor
+					>
+				{:else}
+					<span class="font-bold">--</span>
+				{/if}
 			</span>
 			<span class="text-sm text-gray-500"
 				>{m.ebiosRmMatrixHelpText()}
-				<Anchor class="anchor" href="/risk-matrices/{ebiosRmStudy.risk_matrix.id}"
-					>{ebiosRmStudy.risk_matrix.str}</Anchor
-				>
+				{#if ebiosRmStudy.risk_matrix?.id}
+					<Anchor class="anchor" href="/risk-matrices/{ebiosRmStudy.risk_matrix.id}"
+						>{ebiosRmStudy.risk_matrix.str}</Anchor
+					>
+				{:else}
+					<span class="font-bold">--</span>
+				{/if}
 			</span>
 			<span class="text-sm text-gray-500"
 				>{m.quotationMethodSemiColon()}

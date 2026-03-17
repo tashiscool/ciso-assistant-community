@@ -76,7 +76,7 @@
 </script>
 
 <svelte:head>
-  <title>Checklist Upgrades - RMF Reports - CISO Assistant</title>
+  <title>Checklist Upgrades - RMF Reports - Regovise</title>
 </svelte:head>
 
 <div class="checklist-upgrades min-h-screen bg-gray-50">

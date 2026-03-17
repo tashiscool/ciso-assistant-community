@@ -98,7 +98,7 @@
 </script>
 
 <svelte:head>
-  <title>RMF Audit Log - CISO Assistant</title>
+  <title>RMF Audit Log - Regovise</title>
 </svelte:head>
 
 <div class="rmf-audit min-h-screen bg-gray-50">

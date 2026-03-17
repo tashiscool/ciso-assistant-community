@@ -3,6 +3,9 @@ import { redirect } from '@sveltejs/kit';
 import { loadFlash } from 'sveltekit-flash-message/server';
 
 export const load = loadFlash(async ({ locals }) => {
+	if (!locals.user) {
+		redirect(302, '/login?next=/');
+	}
 	if (locals.user.is_third_party) {
 		redirect(302, `/compliance-assessments`);
 	}

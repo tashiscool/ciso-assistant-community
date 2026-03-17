@@ -99,7 +99,7 @@
 </script>
 
 <svelte:head>
-  <title>Checklist Activity - RMF Reports - CISO Assistant</title>
+  <title>Checklist Activity - RMF Reports - Regovise</title>
 </svelte:head>
 
 <div class="checklist-activity min-h-screen bg-gray-50">

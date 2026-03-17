@@ -20,7 +20,7 @@
 	onclick={toggle}
 	class="{classesSidebarOpenButton(
 		open
-	)} z-20 fixed w-6 h-6 rounded-full content-center self-center bg-white shadow border text-gray-600 hover:scale-105 hover:bg-primary-700 hover:text-white transition-all duration-300 top-1/2 bottom-1/2"
+	)} z-20 fixed top-1/2 bottom-1/2 h-8 w-8 self-center rounded-full border border-[rgb(88_181_255_/_0.24)] bg-[var(--rv-midnight)] text-white shadow-[var(--rv-shadow-glow)] transition-all duration-300 hover:scale-105 hover:bg-[var(--color-secondary-700)]"
 	data-testid="sidebar-toggle-btn"
 >
 	<i class="fa-solid fa-angle-left"></i>

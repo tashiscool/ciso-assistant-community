@@ -35,6 +35,11 @@
 	}
 
 	let { data, form = $bindable() }: Props = $props();
+	const scenarioPerimeter = $derived(
+		data.scenario.perimeter || data.scenario.risk_assessment?.perimeter || { id: '', str: '', folder: { id: '' } }
+	);
+	const scenarioRiskAssessment = $derived(data.scenario.risk_assessment || { id: '', name: '', str: '' });
+	const scenarioRiskMatrix = $derived(data.scenario.risk_matrix || { id: '', str: '' });
 
 	const schema = modelSchema(data.model.urlModel!);
 
@@ -131,24 +136,24 @@
 						<p class="text-sm font-semibold text-gray-400">{m.perimeter()}</p>
 						<Anchor
 							class="anchor text-sm font-semibold"
-							href="/perimeters/{data.scenario.perimeter.id}">{data.scenario.perimeter.str}</Anchor
+							href="/perimeters/{scenarioPerimeter.id}">{scenarioPerimeter.str}</Anchor
 						>
 					</div>
 					<div>
 						<p class="text-sm font-semibold text-gray-400">{m.riskAssessment()}</p>
 						<Anchor
 							class="anchor text-sm font-semibold"
-							href="/risk-assessments/{data.scenario.risk_assessment.id}"
-							>{data.scenario.risk_assessment.name} {data.scenario.version}</Anchor
+							href="/risk-assessments/{scenarioRiskAssessment.id}"
+							>{scenarioRiskAssessment.name} {data.scenario.version}</Anchor
 						>
 					</div>
 					<div>
 						<p class="text-sm font-semibold text-gray-400">{m.riskMatrix()}</p>
 						<Anchor
 							class="anchor text-sm font-semibold"
-							href="/risk-matrices/{data.scenario.risk_matrix.id}"
+							href="/risk-matrices/{scenarioRiskMatrix.id}"
 							target="_blank"
-							rel="noopener noreferrer">{data.scenario.risk_matrix.str}</Anchor
+							rel="noopener noreferrer">{scenarioRiskMatrix.str}</Anchor
 						>
 					</div>
 				</div>
@@ -208,7 +213,7 @@
 					}}
 					field="assets"
 					optionsDetailedUrlParameters={[
-						['scope_folder_id', page.data.scenario.perimeter.folder.id]
+						['scope_folder_id', scenarioPerimeter.folder.id]
 					]}
 					label={m.assets()}
 				/>
@@ -217,7 +222,7 @@
 					multiple
 					optionsEndpoint="threats"
 					optionsDetailedUrlParameters={[
-						['scope_folder_id', page.data.scenario.perimeter.folder.id]
+						['scope_folder_id', scenarioPerimeter.folder.id]
 					]}
 					optionsExtraFields={[['folder', 'str']]}
 					optionsLabelField="auto"
@@ -229,7 +234,7 @@
 					form={_form}
 					optionsEndpoint="vulnerabilities"
 					optionsDetailedUrlParameters={[
-						['scope_folder_id', page.data.scenario.perimeter.folder.id]
+						['scope_folder_id', scenarioPerimeter.folder.id]
 					]}
 					optionsExtraFields={[['folder', 'str']]}
 					field="vulnerabilities"
@@ -334,7 +339,7 @@
 									optionsEndpoint="applied-controls"
 									optionsExtraFields={[['folder', 'str']]}
 									optionsDetailedUrlParameters={[
-										['scope_folder_id', page.data.scenario.perimeter.folder.id]
+										['scope_folder_id', scenarioPerimeter.folder.id]
 									]}
 									field="existing_applied_controls"
 									label={m.existingControls()}
@@ -410,7 +415,7 @@
 									optionsEndpoint="applied-controls"
 									optionsExtraFields={[['folder', 'str']]}
 									optionsDetailedUrlParameters={[
-										['scope_folder_id', page.data.scenario.perimeter.folder.id]
+										['scope_folder_id', scenarioPerimeter.folder.id]
 									]}
 									field="applied_controls"
 									label={m.extraAppliedControls()}

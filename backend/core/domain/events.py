@@ -25,7 +25,7 @@ def get_event_store():
     return EventStore
 
 
-@dataclass
+@dataclass(init=False)
 class DomainEvent:
     """
     Base class for all domain events.
@@ -40,10 +40,31 @@ class DomainEvent:
     event_type: str = None
     payload: Dict[str, Any] = field(default_factory=dict)
 
-    def __post_init__(self):
-        """Set event_type from class name if not provided"""
-        if self.event_type is None:
-            self.event_type = self.__class__.__name__
+    def __init__(
+        self,
+        event_id: Optional[uuid.UUID] = None,
+        aggregate_id: Optional[uuid.UUID] = None,
+        aggregate_version: int = 0,
+        occurred_at: Optional[datetime] = None,
+        event_type: Optional[str] = None,
+        payload: Optional[Dict[str, Any]] = None,
+        **event_fields: Any,
+    ):
+        """
+        Initialize a domain event.
+
+        Any additional keyword arguments are folded into ``payload`` so aggregate
+        code can pass event attributes directly without raising ``TypeError``.
+        """
+        self.event_id = event_id or uuid.uuid4()
+        self.aggregate_id = aggregate_id
+        self.aggregate_version = aggregate_version
+        self.occurred_at = occurred_at or timezone.now()
+        self.event_type = event_type or self.__class__.__name__
+        combined_payload = dict(payload or {})
+        if event_fields:
+            combined_payload.update(event_fields)
+        self.payload = combined_payload
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert event to dictionary for storage"""
@@ -186,4 +207,3 @@ _event_bus = EventBus()
 def get_event_bus() -> EventBus:
     """Get the global event bus instance"""
     return _event_bus
-

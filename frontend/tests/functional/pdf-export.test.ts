@@ -29,6 +29,30 @@ async function exportPdfAndVerify(page: Page, pdfButton: Locator) {
 	});
 }
 
+async function openExportMenu(page: Page) {
+	const visiblePdfLink = page.getByRole('link', { name: /pdf/i }).first();
+	if (await visiblePdfLink.isVisible({ timeout: 1_000 }).catch(() => false)) {
+		return;
+	}
+
+	const exportButtonCandidates: Locator[] = [
+		page.getByTestId('export-button').first(),
+		page.getByRole('button', { name: /export|exporter|eksporter|exportar|exporta/i }).first(),
+		page.locator('button').filter({ has: page.locator('i.fa-file-export, i.fa-download') }).first()
+	];
+
+	for (const candidate of exportButtonCandidates) {
+		if (await candidate.isVisible({ timeout: 1_000 }).catch(() => false)) {
+			await candidate.click();
+			if (await visiblePdfLink.isVisible({ timeout: 5_000 }).catch(() => false)) {
+				return;
+			}
+		}
+	}
+
+	await expect(visiblePdfLink).toBeVisible({ timeout: 20_000 });
+}
+
 test('setup', async ({ page, logedPage, foldersPage, perimetersPage }) => {
 	await test.step('create required folder', async () => {
 		await foldersPage.goto();
@@ -64,10 +88,11 @@ test('pdf export works properly for compliance assessments', async ({
 			testObjectsData.complianceAssessmentsPage.build,
 			testObjectsData.complianceAssessmentsPage.dependency
 		);
+		await complianceAssessmentsPage.viewItemDetail(testObjectsData.complianceAssessmentsPage.build.name);
 	});
 
 	await test.step('test pdf export on compliance assessment', async () => {
-		await page.getByTestId('export-button').click();
+		await openExportMenu(page);
 		await exportPdfAndVerify(page, page.getByRole('link', { name: /pdf/i }));
 	});
 });
@@ -88,7 +113,7 @@ test('pdf export works properly for risk assessment', async ({
 	});
 
 	await test.step('test risk assessment export as pdf', async () => {
-		await page.getByTestId('export-button').click(); // this will be necessary only one time,since it will stay open
+		await openExportMenu(page); // only needed once; menu remains open for additional export links
 		const pdfLinks = page.getByRole('link', { name: /pdf/i });
 		await exportPdfAndVerify(page, pdfLinks.first());
 	});

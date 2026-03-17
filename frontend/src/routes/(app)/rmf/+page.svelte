@@ -103,7 +103,7 @@
 </script>
 
 <svelte:head>
-  <title>RMF Dashboard - CISO Assistant</title>
+  <title>RMF Dashboard - Regovise</title>
 </svelte:head>
 
 <div class="rmf-dashboard">

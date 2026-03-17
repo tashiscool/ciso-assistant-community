@@ -15,19 +15,30 @@ import type { PageServerLoad } from './$types';
 export const load = (async ({ fetch }) => {
 	const storedLibrariesEndpoint = `${BASE_API_URL}/stored-libraries/`;
 	const storedLibrariesResponse = await fetch(storedLibrariesEndpoint);
-	const storedLibraries = await storedLibrariesResponse.json();
+	const storedLibrariesPayload = storedLibrariesResponse.ok
+		? await storedLibrariesResponse.json()
+		: { results: [], count: 0, next: null, previous: null };
+	const storedLibraries =
+		storedLibrariesPayload && typeof storedLibrariesPayload === 'object'
+			? storedLibrariesPayload
+			: { results: [], count: 0, next: null, previous: null };
+	const libraryRows = Array.isArray((storedLibraries as Record<string, any>).results)
+		? (storedLibraries as Record<string, any>).results
+		: Array.isArray(storedLibraries)
+			? storedLibraries
+			: [];
 
 	const prepareRow = (row: Record<string, any>) => {
+		const objectsMeta = row.objects_meta && typeof row.objects_meta === 'object' ? row.objects_meta : {};
 		row.overview = [
-			`Packager: ${row.packager}`,
-			`Version: ${row.version}`,
-			...Object.entries(row.objects_meta).map(([key, value]) => `${key}: ${value}`)
+			`Packager: ${row.packager ?? '-'}`,
+			`Version: ${row.version ?? '-'}`,
+			...Object.entries(objectsMeta).map(([key, value]) => `${key}: ${value}`)
 		];
-		row.allowDeleteLibrary = row.allowDeleteLibrary =
-			row.reference_count && row.reference_count > 0 ? false : true;
+		row.allowDeleteLibrary = row.reference_count && row.reference_count > 0 ? false : true;
 	};
 
-	storedLibraries.results.forEach(prepareRow);
+	libraryRows.forEach(prepareRow);
 
 	const makeHeadData = (URLModel) => {
 		return listViewFields[URLModel].body.reduce((obj, key, index) => {
@@ -38,7 +49,13 @@ export const load = (async ({ fetch }) => {
 
 	const storedLibrariesTable = {
 		head: makeHeadData('stored-libraries'),
-		meta: { urlmodel: 'stored-libraries', ...storedLibraries },
+		meta: {
+			urlmodel: 'stored-libraries',
+			...(typeof storedLibraries === 'object' && !Array.isArray(storedLibraries)
+				? storedLibraries
+				: { results: libraryRows, count: libraryRows.length, next: null, previous: null }),
+			results: libraryRows
+		},
 		body: []
 	};
 

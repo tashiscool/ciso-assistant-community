@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { safeTranslate } from '$lib/utils/i18n';
+	import { hasPermission } from '$lib/utils/access-control';
 	import { RequirementAssessmentSchema } from '$lib/utils/schemas';
 	import type { ActionData, PageData } from './$types';
 
@@ -73,6 +74,12 @@
 	}
 
 	const complianceAssessmentURL = `/compliance-assessments/${data.requirementAssessment.compliance_assessment.id}`;
+	const requirementAssessmentFolder = $derived(
+		data.requirementAssessment.folder ??
+			data.requirementAssessment.compliance_assessment?.folder ??
+			data.requirementAssessment.compliance_assessment?.perimeter?.folder ??
+			null
+	);
 	const schema = RequirementAssessmentSchema;
 
 	const modalStore: ModalStore = getModalStore();
@@ -487,7 +494,7 @@
 								</div>
 								<div class="h-full flex flex-col space-y-2 rounded-container p-4">
 									<span class="flex flex-row justify-end items-center space-x-2">
-										{#if Object.hasOwn(page.data.user.permissions, 'add_appliedcontrol') && reference_controls.length > 0}
+										{#if hasPermission(page.data.user, 'add_appliedcontrol') && reference_controls.length > 0}
 											<button
 												class="btn text-gray-100 bg-linear-to-r from-fuchsia-500 to-pink-500 h-fit whitespace-normal"
 												type="button"
@@ -527,7 +534,7 @@
 											{form}
 											optionsEndpoint="applied-controls"
 											optionsDetailedUrlParameters={[
-												['scope_folder_id', page.data.requirementAssessment.folder.id]
+												['scope_folder_id', requirementAssessmentFolder?.id ?? '']
 											]}
 											optionsExtraFields={[['folder', 'str']]}
 											field="applied_controls"
@@ -564,7 +571,7 @@
 											optionsEndpoint="evidences"
 											optionsExtraFields={[['folder', 'str']]}
 											optionsDetailedUrlParameters={[
-												['scope_folder_id', page.data.requirementAssessment.folder.id]
+												['scope_folder_id', requirementAssessmentFolder?.id ?? '']
 											]}
 											field="evidences"
 										/>

@@ -1,6 +1,7 @@
+import { env as privateEnv } from '$env/dynamic/private';
 import { getSecureRedirect } from '$lib/utils/helpers';
 
-import { ALLAUTH_API_URL, BASE_API_URL } from '$lib/utils/constants';
+import { ALLAUTH_API_URL, BASE_API_URL, DEFAULT_TENANT_ID, IS_CLOUDFLARE_RUNTIME } from '$lib/utils/constants';
 import { loginSchema } from '$lib/utils/schemas';
 import type { LoginRequestBody } from '$lib/utils/types';
 import { fail, redirect, type Actions } from '@sveltejs/kit';
@@ -28,6 +29,81 @@ interface AuthenticationFlow {
 function useSecureCookies(url: URL): boolean {
 	const isLocalHttpHost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
 	return url.protocol === 'https:' && !isLocalHttpHost;
+}
+
+function resolveEdgeApiBaseUrl(): string | null {
+	const raw =
+		privateEnv.CLOUDFLARE_EDGE_API_URL || privateEnv.CLOUDFLARE_API_URL || privateEnv.BACKEND_API_URL;
+	if (!raw) {
+		return null;
+	}
+	return raw.endsWith('/') ? raw.slice(0, -1) : raw;
+}
+
+async function loginViaCloudflareWorker(
+	fetchFn: typeof fetch,
+	body: LoginRequestBody
+): Promise<{
+	status: number;
+	meta?: { access_token?: string; session_token?: string };
+	errors?: Array<{ param: string; code: string }>;
+	data?: Record<string, unknown>;
+}> {
+	const edgeApiBaseUrl = resolveEdgeApiBaseUrl();
+	if (!edgeApiBaseUrl) {
+		return {
+			status: 503,
+			errors: [{ param: 'username', code: 'cloudflare_runtime_unavailable' }]
+		};
+	}
+
+	const response = await fetchFn(`${edgeApiBaseUrl}/legacy/dispatch`, {
+		method: 'POST',
+		headers: {
+			'content-type': 'application/json',
+			'x-tenant-id': DEFAULT_TENANT_ID
+		},
+		body: JSON.stringify({
+			tenant_id: DEFAULT_TENANT_ID,
+			legacy_path: 'iam/login',
+			method: 'POST',
+			query: {},
+			body
+		})
+	});
+
+	const rawBody = await response.text();
+	const payload = rawBody ? JSON.parse(rawBody) : {};
+	if (!response.ok) {
+		const rawError =
+			typeof payload?.error === 'string'
+				? payload.error.toLowerCase().replace(/\s+/g, '_')
+				: 'login_failed';
+		const normalizedError =
+			response.status === 401 && rawError === 'invalid_credentials'
+				? 'emailPasswordMismatch'
+				: rawError;
+		return {
+			status: response.status,
+			errors: [
+				{
+					param: 'password',
+					code: normalizedError
+				}
+			]
+		};
+	}
+
+	return {
+		status: 200,
+		data: payload,
+		meta: {
+			access_token:
+				typeof payload?.access_token === 'string' ? payload.access_token : undefined,
+			session_token:
+				typeof payload?.session_token === 'string' ? payload.session_token : undefined
+		}
+	};
 }
 
 export const load: PageServerLoad = async ({ fetch, request, locals }) => {
@@ -68,14 +144,12 @@ export const actions: Actions = {
 			password
 		};
 
-		const endpoint = `${ALLAUTH_API_URL}/auth/login`;
-
-		const requestInitOptions: RequestInit = {
-			method: 'POST',
-			body: JSON.stringify(login)
-		};
-
-		const res = await fetch(endpoint, requestInitOptions).then((res) => res.json());
+		const res = IS_CLOUDFLARE_RUNTIME
+			? await loginViaCloudflareWorker(fetch, login)
+			: await fetch(`${ALLAUTH_API_URL}/auth/login`, {
+					method: 'POST',
+					body: JSON.stringify(login)
+				}).then((res) => res.json());
 
 		if (res.status !== 200) {
 			console.error(res);
@@ -134,7 +208,7 @@ export const actions: Actions = {
 		});
 		const next = url.searchParams.get('next');
 		const secureNext = getSecureRedirect(next) || '/';
-		redirect(302, secureNext);
+		redirect(302, secureNext === '/' ? '/analytics' : secureNext);
 	},
 	mfaAuthenticate: async (event) => {
 		const formData = await event.request.formData();

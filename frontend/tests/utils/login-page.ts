@@ -45,6 +45,10 @@ export class LoginPage extends BasePage {
 		this.password = password;
 		// Avoid waiting on long-lived background requests; wait for interactive form controls instead.
 		await this.page.waitForLoadState('domcontentloaded').catch(() => null);
+		const currentPathname = new URL(this.page.url()).pathname;
+		if (!currentPathname.endsWith('/login')) {
+			return;
+		}
 		await this.usernameInput.waitFor({ state: 'visible', timeout: 20_000 });
 		await this.passwordInput.waitFor({ state: 'visible', timeout: 20_000 });
 		await this.usernameInput.fill(email);

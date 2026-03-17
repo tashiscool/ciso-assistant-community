@@ -159,46 +159,43 @@
 <div class="overflow-x-hidden">
 	<SideBar bind:open={sidebarOpen} {sideBarVisibleItems} />
 	<AppBar
-		base="relative transition-all duration-300 {classesSidebarOpen(sidebarOpen)}"
-		background="bg-white"
-		padding="pb-2 px-4"
+		base="relative z-10 transition-all duration-300 {classesSidebarOpen(sidebarOpen)}"
+		background="brand-appbar"
+		padding="px-5 pt-4 pb-3"
 	>
 		{#snippet headline()}
 			<div
-				class="text-2xl font-bold pb-1 bg-linear-to-r from-pink-500 to-violet-600 bg-clip-text text-transparent"
+				class="brand-title-gradient pb-1 text-2xl font-bold tracking-tight"
 				id="page-title"
 			>
 				{safeTranslate(displayTitle)}
 			</div>
 			{#if displayModelName}
-				<div class="text-sm text-slate-500 font-medium">
+				<div class="text-sm font-medium text-slate-600">
 					{safeTranslate(displayModelName)}
 				</div>
 			{/if}
 			{#if displayModelDescription}
-				<div class="text-xs text-slate-400 italic">
+				<div class="text-xs italic text-slate-500">
 					{safeTranslate(displayModelDescription)}
 				</div>
 			{/if}
 			{#if data?.user?.is_admin}
 				<button
 					onclick={modalQuickStart}
-					class="absolute top-7 right-9 p-2 rounded-full bg-violet-500 text-white text-xs shadow-lg
-        ring-2 ring-violet-400 ring-offset-2 transition-all duration-300 hover:bg-violet-600
-        hover:ring-violet-300 hover:ring-offset-violet-100 hover:shadow-violet-500/50
-        focus:outline-hidden focus:ring-violet-500"
+					class="absolute right-8 top-6 inline-flex items-center rounded-full border border-[rgb(88_181_255_/_0.2)] bg-[var(--rv-midnight)] px-4 py-2 text-xs font-semibold text-white shadow-[var(--rv-shadow-glow)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[color-mix(in_srgb,var(--rv-midnight)_82%,var(--rv-blue)_18%)] focus:outline-hidden focus:ring-2 focus:ring-[var(--rv-blue)]"
 				>
 					{m.quickStart()}
 				</button>
 			{/if}
-			<hr class="w-screen my-1" />
+			<hr class="my-2 w-screen border-slate-200/80" />
 			<Breadcrumbs />
 		{/snippet}
 	</AppBar>
 	<!-- Router Slot -->
 	<CommandPalette />
 	<main
-		class="min-h-screen p-8 bg-linear-to-br from-violet-100 to-slate-200 transition-all duration-300 {classesSidebarOpen(
+		class="brand-main min-h-screen p-8 transition-all duration-300 {classesSidebarOpen(
 			sidebarOpen
 		)}"
 	>

@@ -3,7 +3,7 @@
  *
  * Provides a simple fetch-based API client for making HTTP requests.
  * Used by the service modules for DDD bounded context API calls.
- * Aligns with the original CISO Assistant patterns using BASE_API_URL.
+ * Aligns with the original Regovise patterns using BASE_API_URL.
  */
 
 import { BASE_API_URL } from '$lib/utils/constants';

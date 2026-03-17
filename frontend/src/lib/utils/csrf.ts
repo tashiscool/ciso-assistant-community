@@ -1,6 +1,6 @@
 import { BASE_API_URL } from '$lib/utils/constants';
 
-async function getCsrfToken() {
+export async function getCsrfToken(): Promise<string | undefined> {
 	try {
 		const response = await fetch(`${BASE_API_URL}/csrf/`, {
 			credentials: 'include'
@@ -10,5 +10,3 @@ async function getCsrfToken() {
 		console.error(error);
 	}
 }
-
-export const csrfToken = await getCsrfToken();

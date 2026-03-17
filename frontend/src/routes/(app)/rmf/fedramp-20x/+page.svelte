@@ -209,7 +209,7 @@
 </script>
 
 <svelte:head>
-	<title>FedRAMP 20x Authorization - CISO Assistant</title>
+	<title>FedRAMP 20x Authorization - Regovise</title>
 </svelte:head>
 
 <div class="fedramp-20x-page">

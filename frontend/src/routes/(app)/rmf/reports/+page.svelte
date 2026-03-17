@@ -123,7 +123,7 @@
 </script>
 
 <svelte:head>
-  <title>RMF Reports - CISO Assistant</title>
+  <title>RMF Reports - Regovise</title>
 </svelte:head>
 
 <div class="rmf-reports min-h-screen bg-gray-50">

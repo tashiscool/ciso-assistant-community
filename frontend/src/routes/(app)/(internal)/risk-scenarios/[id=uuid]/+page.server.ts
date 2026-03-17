@@ -15,6 +15,19 @@ export const load = (async ({ fetch, params }) => {
 	const objectEndpoint = `${BASE_API_URL}/${URLModel}/${params.id}/object/`;
 	const object = await fetch(objectEndpoint).then((res) => res.json());
 	const scenario = await fetch(baseEndpoint).then((res) => res.json());
+	scenario.owner = Array.isArray(scenario.owner) ? scenario.owner : [];
+	scenario.applied_controls = Array.isArray(scenario.applied_controls)
+		? scenario.applied_controls
+		: [];
+	scenario.qualifications = Array.isArray(scenario.qualifications) ? scenario.qualifications : [];
+
+	const riskMatrixId =
+		typeof object.risk_matrix === 'string'
+			? object.risk_matrix
+			: scenario.risk_matrix?.id ||
+				(typeof scenario.risk_assessment?.risk_matrix === 'string'
+					? scenario.risk_assessment.risk_matrix
+					: scenario.risk_assessment?.risk_matrix?.id);
 
 	const tables: Record<string, any> = {};
 
@@ -46,7 +59,7 @@ export const load = (async ({ fetch, params }) => {
 		})
 	);
 
-	const riskMatrix = await fetch(`${BASE_API_URL}/risk-matrices/${object.risk_matrix}/`)
+	const riskMatrix = await fetch(`${BASE_API_URL}/risk-matrices/${riskMatrixId}/`)
 		.then((res) => res.json())
 		.then((res) => JSON.parse(res.json_definition));
 

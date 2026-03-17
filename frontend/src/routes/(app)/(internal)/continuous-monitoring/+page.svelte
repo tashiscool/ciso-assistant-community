@@ -7,7 +7,46 @@
 
 	let { data }: { data: PageData } = $props();
 
-	let selectedProfileId: string = '';
+	type LooseRecord = Record<string, unknown>;
+	type ActivityItem = {
+		id?: string;
+		ref_id?: string;
+		name?: string;
+		status?: string;
+	};
+
+	const asRecord = (value: unknown): LooseRecord | null =>
+		typeof value === 'object' && value !== null && !Array.isArray(value)
+			? (value as LooseRecord)
+			: null;
+
+	const asActivities = (value: unknown): ActivityItem[] =>
+		Array.isArray(value) ? (value as ActivityItem[]) : [];
+
+	const rollup = asRecord(data.operationalRollup);
+	const operationalViews = asRecord(rollup?.operational_views);
+	const auditTraceability = asRecord(rollup?.audit_traceability);
+	const controlIndex = asRecord(auditTraceability?.control_index);
+	const controlFamilyIndex = asRecord(auditTraceability?.control_family_index);
+	const controlEnhancementIndex = asRecord(auditTraceability?.control_enhancement_index);
+
+	const operationalCards = [
+		{ key: 'weekly_reports', label: 'Weekly Reports' },
+		{ key: 'monthly_reports', label: 'Monthly Reports' },
+		{ key: 'quarterly_reviews', label: 'Quarterly Reviews' },
+		{ key: 'yearly_reviews', label: 'Yearly Reviews' },
+		{ key: 'alerts_triaged', label: 'Alerts Triaged' },
+		{ key: 'changes_processed_audited_approved', label: 'Changes Audited/Approved' }
+	];
+
+	const topControlFamilies = (Object.entries(controlFamilyIndex || {}) as Array<
+		[string, LooseRecord]
+	>)
+		.sort((a, b) => (Number(b[1]?.activity_count || 0) || 0) - (Number(a[1]?.activity_count || 0) || 0))
+		.slice(0, 6);
+
+	let selectedProfileId: string =
+		typeof data.selectedProfileId === 'string' ? data.selectedProfileId : '';
 
 	const breadcrumbs = $derived([
 		{ label: m.continuousMonitoring?.() || 'Continuous Monitoring', href: `${base}/continuous-monitoring` }
@@ -59,6 +98,13 @@
 	const formatDate = (dateString: string) => {
 		if (!dateString) return '-';
 		return new Date(dateString).toLocaleDateString();
+	};
+
+	const viewItems = (key: string): ActivityItem[] => asActivities(operationalViews?.[key]);
+
+	const activityLabel = (item: ActivityItem): string => {
+		const ref = item.ref_id ? `${item.ref_id}: ` : '';
+		return `${ref}${item.name || 'Unnamed activity'}`;
 	};
 
 	// Handle profile selection
@@ -317,6 +363,93 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- Operational Rollup -->
+	{#if rollup}
+		<div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-8">
+			<div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+				<h3 class="text-lg font-medium text-gray-900 dark:text-white">
+					Operational Audit Readiness Rollup
+				</h3>
+				<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+					Cadence-grouped evidence activity views and control traceability indexes.
+				</p>
+			</div>
+			<div class="p-6">
+				<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+					{#each operationalCards as card}
+						<div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900/30">
+							<div class="flex items-center justify-between mb-2">
+								<h4 class="text-sm font-semibold text-gray-900 dark:text-white">{card.label}</h4>
+								<span class="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-800">
+									{viewItems(card.key).length}
+								</span>
+							</div>
+							{#if viewItems(card.key).length > 0}
+								<ul class="space-y-1 text-sm text-gray-700 dark:text-gray-300">
+									{#each viewItems(card.key).slice(0, 3) as item}
+										<li class="truncate" title={activityLabel(item)}>
+											{activityLabel(item)}
+										</li>
+									{/each}
+								</ul>
+							{:else}
+								<p class="text-sm text-gray-500 dark:text-gray-400">No mapped activities.</p>
+							{/if}
+						</div>
+					{/each}
+				</div>
+
+				<div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+					<div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+						<div class="text-xs uppercase text-gray-500 dark:text-gray-400">Mapped Controls</div>
+						<div class="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
+							{Object.keys(controlIndex || {}).length}
+						</div>
+					</div>
+					<div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+						<div class="text-xs uppercase text-gray-500 dark:text-gray-400">Control Families</div>
+						<div class="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
+							{Object.keys(controlFamilyIndex || {}).length}
+						</div>
+					</div>
+					<div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+						<div class="text-xs uppercase text-gray-500 dark:text-gray-400">Enhancements</div>
+						<div class="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
+							{Object.keys(controlEnhancementIndex || {}).length}
+						</div>
+					</div>
+				</div>
+
+				{#if topControlFamilies.length > 0}
+					<div class="mt-6">
+						<h4 class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Top Control Families</h4>
+						<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+							{#each topControlFamilies as [family, payload]}
+								<div class="rounded border border-gray-200 dark:border-gray-700 p-3">
+									<div class="flex items-center justify-between">
+										<span class="font-medium text-gray-900 dark:text-white">{family}</span>
+										<span class="text-xs px-2 py-1 rounded-full bg-teal-100 text-teal-800">
+											{Number(payload?.activity_count || 0)}
+										</span>
+									</div>
+									<div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+										{Array.isArray(payload?.controls) ? payload.controls.length : 0} controls mapped
+									</div>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{/if}
+			</div>
+		</div>
+	{:else if selectedProfileId}
+		<div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-8 p-6">
+			<p class="text-sm text-gray-500 dark:text-gray-400">
+				Operational rollup data is not yet available for this profile.
+			</p>
+		</div>
+	{/if}
 
 	<!-- Compliance by Frequency -->
 	{#if data.dashboard?.compliance_by_frequency && Object.keys(data.dashboard.compliance_by_frequency).length > 0}

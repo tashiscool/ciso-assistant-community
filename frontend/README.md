@@ -20,7 +20,7 @@ npm install -g pnpm
 pnpm install
 ```
 
-4. Start a development server (ensure that the django app is running)
+4. Start a development server
 
 ```bash
 pnpm run dev
@@ -33,6 +33,28 @@ To create a production version of your app:
 ```bash
 pnpm run build
 ```
+
+## Cloudflare SPA mode
+
+The frontend now supports a Cloudflare-first SPA runtime with typed `/api/v2` integration.
+
+Environment variables:
+
+```bash
+PUBLIC_FRONTEND_RUNTIME=cloudflare
+PUBLIC_CLOUDFLARE_API_URL=/api/v2
+PUBLIC_BACKEND_API_URL=/api
+SVELTEKIT_ADAPTER=cloudflare
+CLOUDFLARE_EDGE_API_URL=http://127.0.0.1:8787/api/v2
+```
+
+In this mode:
+
+- SSR is disabled globally (`src/routes/+layout.ts`), so routing is client-side SPA.
+- Django session/CSRF hooks are bypassed (`src/hooks.server.ts`).
+- Legacy `/api/*` calls are translated through the Cloudflare compatibility adapter (`src/routes/api/[...segments]/+server.ts`).
+- `/api/v2/*` calls are proxied to the edge worker (`src/routes/api/v2/[...segments]/+server.ts`) using `CLOUDFLARE_EDGE_API_URL`.
+- The root app page (`src/routes/(app)/+page.svelte`) uses typed Cloudflare API contracts from `src/lib/cloudflare/*`.
 
 You can preview the production build with `pnpm run preview`.
 

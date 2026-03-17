@@ -113,7 +113,7 @@
 </script>
 
 <svelte:head>
-  <title>RMF STIG Checklists - CISO Assistant</title>
+  <title>RMF STIG Checklists - Regovise</title>
 </svelte:head>
 
 <div class="rmf-checklists">

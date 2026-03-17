@@ -132,6 +132,28 @@ class TestConMonProfileAPI:
         assert data["name"] == "New API Profile"
         assert data["profile_type"] == "fedramp_moderate"
 
+    def test_operational_rollup(self, authenticated_client, conmon_profile, conmon_activity):
+        """Test operational cadence rollup endpoint."""
+        response = authenticated_client.get(
+            f"/api/conmon/profiles/{conmon_profile.id}/operational_rollup/"
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert "cadence_summary" in data
+        assert "theme_summary" in data
+        assert "operational_views" in data
+        assert "weekly_reports" in data["operational_views"]
+        assert "monthly_reports" in data["operational_views"]
+        assert "quarterly_reviews" in data["operational_views"]
+        assert "yearly_reviews" in data["operational_views"]
+        assert "alerts_triaged" in data["operational_views"]
+        assert "changes_processed_audited_approved" in data["operational_views"]
+        assert "audit_traceability" in data
+        assert "control_family_index" in data["audit_traceability"]
+        assert "control_index" in data["audit_traceability"]
+        assert "control_enhancement_index" in data["audit_traceability"]
+
 
 @pytest.mark.django_db
 class TestConMonActivityAPI:
@@ -182,6 +204,45 @@ class TestConMonExecutionAPI:
 
         assert response.status_code == 200
 
+    def test_upcoming_executions_profile_filter(
+        self, authenticated_client, test_folder, conmon_profile, conmon_activity, conmon_execution
+    ):
+        """Test upcoming executions can be scoped to a profile."""
+        other_profile = ConMonProfile.objects.create(
+            name="Other Profile",
+            description="Another profile",
+            folder=test_folder,
+            profile_type="custom",
+            status="active",
+        )
+        other_activity = ConMonActivityConfig.objects.create(
+            folder=test_folder,
+            profile=other_profile,
+            requirement_urn="urn:test:api:activity-02",
+            ref_id="API-02",
+            name="Other Activity",
+            enabled=True,
+            frequency_override="monthly",
+        )
+        today = timezone.localdate()
+        ConMonExecution.objects.create(
+            folder=test_folder,
+            activity_config=other_activity,
+            period_start=today - timedelta(days=30),
+            period_end=today,
+            due_date=today + timedelta(days=5),
+            status="pending",
+        )
+
+        response = authenticated_client.get(
+            f"/api/conmon/executions/upcoming/?days=14&profile={conmon_profile.id}"
+        )
+
+        assert response.status_code == 200
+        payload = response.json()
+        assert len(payload) == 1
+        assert payload[0]["activity_ref_id"] == conmon_activity.ref_id
+
     def test_overdue_executions(self, authenticated_client, test_folder, conmon_activity):
         """Test getting overdue executions."""
         # Create an overdue execution
@@ -198,6 +259,54 @@ class TestConMonExecutionAPI:
         response = authenticated_client.get("/api/conmon/executions/overdue/")
 
         assert response.status_code == 200
+
+    def test_overdue_executions_profile_filter(
+        self, authenticated_client, test_folder, conmon_profile, conmon_activity
+    ):
+        """Test overdue executions can be scoped to a profile."""
+        today = timezone.localdate()
+        own = ConMonExecution.objects.create(
+            folder=test_folder,
+            activity_config=conmon_activity,
+            period_start=today - timedelta(days=60),
+            period_end=today - timedelta(days=30),
+            due_date=today - timedelta(days=2),
+            status="pending",
+        )
+
+        other_profile = ConMonProfile.objects.create(
+            name="Other Profile 2",
+            description="Another profile",
+            folder=test_folder,
+            profile_type="custom",
+            status="active",
+        )
+        other_activity = ConMonActivityConfig.objects.create(
+            folder=test_folder,
+            profile=other_profile,
+            requirement_urn="urn:test:api:activity-03",
+            ref_id="API-03",
+            name="Other Activity 2",
+            enabled=True,
+            frequency_override="monthly",
+        )
+        ConMonExecution.objects.create(
+            folder=test_folder,
+            activity_config=other_activity,
+            period_start=today - timedelta(days=60),
+            period_end=today - timedelta(days=30),
+            due_date=today - timedelta(days=5),
+            status="pending",
+        )
+
+        response = authenticated_client.get(
+            f"/api/conmon/executions/overdue/?profile={conmon_profile.id}"
+        )
+
+        assert response.status_code == 200
+        payload = response.json()
+        assert len(payload) == 1
+        assert payload[0]["id"] == str(own.id)
 
 
 @pytest.mark.django_db

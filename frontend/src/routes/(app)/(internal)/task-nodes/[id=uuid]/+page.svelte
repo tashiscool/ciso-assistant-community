@@ -8,6 +8,7 @@
 	import CreateModal from '$lib/components/Modals/CreateModal.svelte';
 	import { modelSchema } from '$lib/utils/schemas';
 	import { getModelInfo } from '$lib/utils/crud';
+	import { hasPermission } from '$lib/utils/access-control';
 	import {
 		getModalStore,
 		type ModalStore,
@@ -249,7 +250,7 @@
 						</td>
 						<td class="py-1 pl-2 w-8 text-center">
 							{#if !taskNode.evidence_reviewed.includes(evidence.id)}
-								{#if page.data.user.permissions['add_evidencerevision']}
+								{#if hasPermission(page.data.user, 'add_evidencerevision')}
 									<button
 										onclick={() => modalRevisionCreate(evidence)}
 										class="text-primary-500 hover:text-primary-700"

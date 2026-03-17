@@ -117,7 +117,7 @@
 </script>
 
 <svelte:head>
-  <title>Add Evidence Source - CISO Assistant</title>
+  <title>Add Evidence Source - Regovise</title>
 </svelte:head>
 
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -135,7 +135,7 @@
       Add Evidence Source
     </h1>
     <p class="mt-1 text-sm text-gray-600">
-      Connect an external system so CISO Assistant can collect evidence automatically.
+      Connect an external system so Regovise can collect evidence automatically.
     </p>
   </div>
 

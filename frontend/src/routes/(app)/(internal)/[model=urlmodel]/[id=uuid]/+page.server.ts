@@ -18,8 +18,16 @@ import { modelSchema } from '$lib/utils/schemas';
 
 import { loadDetail } from '$lib/utils/load';
 import type { PageServerLoad } from './$types';
+import {
+	load as loadComplianceAssessmentDetail,
+	actions as complianceAssessmentActions
+} from '../../../(third-party)/compliance-assessments/[id=uuid]/+page.server';
 
 export const load: PageServerLoad = async (event) => {
+	if (event.params.model === 'compliance-assessments') {
+		return loadComplianceAssessmentDetail(event);
+	}
+
 	const modelInfo = getModelInfo(event.params.model);
 
 	const data = await loadDetail({
@@ -52,8 +60,17 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
 	create: async (event) => {
+		if (event.params.model === 'compliance-assessments') {
+			return complianceAssessmentActions.create(event);
+		}
 		const redirectToWrittenObject = Boolean(event.params.model === 'perimeters');
 		return nestedWriteFormAction({ event, action: 'create', redirectToWrittenObject });
+	},
+	createSuggestedControls: async (event) => {
+		if (event.params.model !== 'compliance-assessments') {
+			return fail(404, { form: null });
+		}
+		return complianceAssessmentActions.createSuggestedControls(event);
 	},
 	delete: async (event) => {
 		return nestedDeleteFormAction({ event });
@@ -94,6 +111,12 @@ export const actions: Actions = {
 		);
 
 		return { form };
+	},
+	syncToActions: async (event) => {
+		if (event.params.model !== 'compliance-assessments') {
+			return fail(404, { form: null });
+		}
+		return complianceAssessmentActions.syncToActions(event);
 	},
 	reject: async ({ request, fetch, params }) => {
 		const formData = await request.formData();

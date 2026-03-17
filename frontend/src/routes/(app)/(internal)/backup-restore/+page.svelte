@@ -11,6 +11,7 @@
 		type ModalSettings,
 		type ModalStore
 	} from '$lib/components/Modals/stores';
+	import { hasPermission } from '$lib/utils/access-control';
 	interface Props {
 		data: PageData;
 	}
@@ -96,7 +97,7 @@
 
 	const authorizedExtensions = ['.bak'];
 	const user = page.data.user;
-	const canBackup: boolean = Object.hasOwn(user.permissions, 'backup');
+	const canBackup: boolean = hasPermission(user, 'backup');
 </script>
 
 {#if canBackup}

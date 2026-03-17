@@ -317,7 +317,7 @@
 					<div>
 						<h2 class="text-lg font-semibold text-gray-900 mb-4">{m.oscalImport()}</h2>
 						<p class="text-sm text-gray-600 mb-4">
-							Import OSCAL-compliant documents into CISO Assistant. Supported formats: SSP, Catalog, Profile,
+							Import OSCAL-compliant documents into Regovise. Supported formats: SSP, Catalog, Profile,
 							Assessment Plan, Assessment Results, and POA&M.
 						</p>
 					</div>
@@ -409,7 +409,7 @@
 					<div>
 						<h2 class="text-lg font-semibold text-gray-900 mb-4">{m.oscalExport()}</h2>
 						<p class="text-sm text-gray-600 mb-4">
-							Export CISO Assistant data as OSCAL-compliant documents for interoperability with other GRC tools.
+							Export Regovise data as OSCAL-compliant documents for interoperability with other GRC tools.
 						</p>
 					</div>
 

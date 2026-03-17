@@ -24,120 +24,149 @@
 
 	let { data, form }: Props = $props();
 
+	const buildDefaultWorkshopSteps = (count: number) =>
+		Array.from({ length: count }, () => ({ status: 'to_do' }));
+	const defaultWorkshopMeta = [
+		{ steps: buildDefaultWorkshopSteps(4) },
+		{ steps: buildDefaultWorkshopSteps(3) },
+		{ steps: buildDefaultWorkshopSteps(3) },
+		{ steps: buildDefaultWorkshopSteps(3) },
+		{ steps: buildDefaultWorkshopSteps(5) }
+	];
+	const workshopMeta = $derived(
+		Array.isArray(data.data?.meta?.workshops) && data.data.meta.workshops.length === defaultWorkshopMeta.length
+			? data.data.meta.workshops
+			: defaultWorkshopMeta
+	);
+	const rotoCount = $derived(typeof data.data?.roto_count === 'number' ? data.data.roto_count : 1);
+	const selectedRotoCount = $derived(
+		typeof data.data?.selected_roto_count === 'number' ? data.data.selected_roto_count : 1
+	);
+	const selectedAttackPathCount = $derived(
+		typeof data.data?.selected_attack_path_count === 'number'
+			? data.data.selected_attack_path_count
+			: 1
+	);
+	const operationalScenarioCount = $derived(
+		typeof data.data?.operational_scenario_count === 'number'
+			? data.data.operational_scenario_count
+			: 1
+	);
+
 	const workshopsData = {
 		ws1: [
 			{
 				title: safeTranslate(m.ebiosWs1_1()),
-				status: data.data.meta.workshops[0].steps[0].status,
+				status: workshopMeta[0].steps[0].status,
 				href: `${page.url.pathname}/workshop-1/ebios-rm-study?activity=one&next=${page.url.pathname}`
 			},
 			{
 				title: safeTranslate(m.ebiosWs1_2()),
-				status: data.data.meta.workshops[0].steps[1].status,
+				status: workshopMeta[0].steps[1].status,
 				href: `${page.url.pathname}/workshop-1/ebios-rm-study?activity=two&next=${page.url.pathname}`
 			},
 			{
 				title: safeTranslate(m.ebiosWs1_3()),
-				status: data.data.meta.workshops[0].steps[2].status,
+				status: workshopMeta[0].steps[2].status,
 				href: `${page.url.pathname}/workshop-1/feared-events?next=${page.url.pathname}`
 			},
 			{
 				title: safeTranslate(m.ebiosWs1_4()),
-				status: data.data.meta.workshops[0].steps[3].status,
+				status: workshopMeta[0].steps[3].status,
 				href: `${page.url.pathname}/workshop-1/baseline?next=${page.url.pathname}`
 			}
 		],
 		ws2: [
 			{
 				title: safeTranslate(m.ebiosWs2_1()),
-				status: data.data.meta.workshops[1].steps[0].status,
+				status: workshopMeta[1].steps[0].status,
 				href: `${page.url.pathname}/workshop-2/ro-to?activity=one&next=${page.url.pathname}`
 			},
 			{
 				title: safeTranslate(m.ebiosWs2_2()),
-				status: data.data.meta.workshops[1].steps[1].status,
+				status: workshopMeta[1].steps[1].status,
 				href: `${page.url.pathname}/workshop-2/ro-to?activity=two&next=${page.url.pathname}`,
-				disabled: data.data.roto_count < 1,
+				disabled: rotoCount < 1,
 				tooltip: safeTranslate(m.ebiosWs2_2_tooltip())
 			},
 			{
 				title: safeTranslate(m.ebiosWs2_3()),
-				status: data.data.meta.workshops[1].steps[2].status,
+				status: workshopMeta[1].steps[2].status,
 				href: `${page.url.pathname}/workshop-2/ro-to?activity=three&next=${page.url.pathname}`,
-				disabled: data.data.roto_count < 1,
+				disabled: rotoCount < 1,
 				tooltip: safeTranslate(m.ebiosWs2_3_tooltip())
 			}
 		],
 		ws3: [
 			{
 				title: safeTranslate(m.ebiosWs3_1()),
-				status: data.data.meta.workshops[2].steps[0].status,
+				status: workshopMeta[2].steps[0].status,
 				href: `${page.url.pathname}/workshop-3/ecosystem?activity=one&next=${page.url.pathname}`
 			},
 			{
 				title: safeTranslate(m.ebiosWs3_2()),
-				status: data.data.meta.workshops[2].steps[1].status,
+				status: workshopMeta[2].steps[1].status,
 				href: `${page.url.pathname}/workshop-3/strategic-scenarios?next=${page.url.pathname}`,
-				disabled: data.data.selected_roto_count < 1,
+				disabled: selectedRotoCount < 1,
 				tooltip: safeTranslate(m.ebiosWs3_2_tooltip())
 			},
 			{
 				title: safeTranslate(m.ebiosWs3_3()),
-				status: data.data.meta.workshops[2].steps[2].status,
+				status: workshopMeta[2].steps[2].status,
 				href: `${page.url.pathname}/workshop-3/ecosystem?activity=three&next=${page.url.pathname}`
 			}
 		],
 		ws4: [
 			{
 				title: safeTranslate(m.ebiosWs4_0()),
-				status: data.data.meta.workshops[3].steps[0].status,
+				status: workshopMeta[3].steps[0].status,
 				href: `${page.url.pathname}/workshop-4/elementary-actions`
 			},
 			{
 				title: safeTranslate(m.ebiosWs4_1()),
-				status: data.data.meta.workshops[3].steps[1].status,
+				status: workshopMeta[3].steps[1].status,
 				href: `${page.url.pathname}/workshop-4/operational-scenario?activity=one&next=${page.url.pathname}`,
-				disabled: data.data.selected_attack_path_count < 1,
+				disabled: selectedAttackPathCount < 1,
 				tooltip: safeTranslate(m.ebiosWs4_2_tooltip())
 			},
 			{
 				title: safeTranslate(m.ebiosWs4_2()),
-				status: data.data.meta.workshops[3].steps[2].status,
+				status: workshopMeta[3].steps[2].status,
 				href: `${page.url.pathname}/workshop-4/operational-scenario?activity=two&next=${page.url.pathname}`,
-				disabled: data.data.operational_scenario_count < 1,
+				disabled: operationalScenarioCount < 1,
 				tooltip: safeTranslate(m.ebiosWs4_3_tooltip())
 			}
 		],
 		ws5: [
 			{
 				title: safeTranslate(m.ebiosWs5_1()),
-				status: data.data.meta.workshops[4].steps[0].status,
+				status: workshopMeta[4].steps[0].status,
 				href: '#'
 			},
 			{
 				title: safeTranslate(m.ebiosWs5_2()),
-				status: data.data.meta.workshops[4].steps[1].status,
+				status: workshopMeta[4].steps[1].status,
 				href: `/risk-assessments/${data.data.last_risk_assessment?.id}?activity=two&next=${page.url.pathname}`,
 				disabled: data.data.last_risk_assessment == null,
 				tooltip: safeTranslate(m.ebiosWs5_tooltip())
 			},
 			{
 				title: safeTranslate(m.ebiosWs5_3()),
-				status: data.data.meta.workshops[4].steps[2].status,
+				status: workshopMeta[4].steps[2].status,
 				href: `/risk-assessments/${data.data.last_risk_assessment?.id}?activity=three&next=${page.url.pathname}`,
 				disabled: data.data.last_risk_assessment == null,
 				tooltip: safeTranslate(m.ebiosWs5_tooltip())
 			},
 			{
 				title: safeTranslate(m.ebiosWs5_4()),
-				status: data.data.meta.workshops[4].steps[3].status,
+				status: workshopMeta[4].steps[3].status,
 				href: `/risk-assessments/${data.data.last_risk_assessment?.id}?activity=four&next=${page.url.pathname}`,
 				disabled: data.data.last_risk_assessment == null,
 				tooltip: safeTranslate(m.ebiosWs5_tooltip())
 			},
 			{
 				title: safeTranslate(m.ebiosWs5_5()),
-				status: data.data.meta.workshops[4].steps[4].status,
+				status: workshopMeta[4].steps[4].status,
 				href: `/risk-assessments/${data.data.last_risk_assessment?.id}/action-plan?next=${page.url.pathname}`,
 				disabled: data.data.last_risk_assessment == null,
 				tooltip: safeTranslate(m.ebiosWs5_tooltip())
@@ -248,7 +277,7 @@
 						class="flex flex-col text-left hover:text-purple-800"
 						onclick={handleActivityOneClick}
 					>
-						{#if data.data.meta.workshops[4].steps[0].status == 'done'}
+						{#if workshopMeta[4].steps[0].status == 'done'}
 							<span
 								class="absolute flex items-center justify-center w-8 h-8 bg-success-200 rounded-full -start-4 ring-4 ring-white"
 							>

@@ -213,7 +213,7 @@
 </script>
 
 <svelte:head>
-  <title>{system?.name || 'System'} - RMF - CISO Assistant</title>
+  <title>{system?.name || 'System'} - RMF - Regovise</title>
 </svelte:head>
 
 <div class="system-detail min-h-screen bg-gray-50">

@@ -1796,6 +1796,19 @@ export const URL_MODEL_MAP: ModelMap = {
 			{ field: 'folder', urlModel: 'folders' }
 		],
 		selectFields: [{ field: 'entry_type' }],
+		detailViewFields: [
+			{ field: 'id' },
+			{ field: 'folder' },
+			{ field: 'incident' },
+			{ field: 'entry_type' },
+			{ field: 'entry' },
+			{ field: 'author' },
+			{ field: 'timestamp' },
+			{ field: 'observation' },
+			{ field: 'evidences' },
+			{ field: 'created_at' },
+			{ field: 'updated_at' }
+		],
 		reverseForeignKeyFields: [{ field: 'timeline_entries', urlModel: 'evidences' }]
 	},
 	'task-templates': {

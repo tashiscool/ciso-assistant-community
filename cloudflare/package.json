@@ -1,0 +1,30 @@
+{
+  "name": "ciso-assistant-cloudflare",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "dev:edge": "wrangler dev --config wrangler.edge-api.toml",
+    "dev:command": "wrangler dev --config wrangler.command-worker.toml",
+    "dev:analytics": "wrangler dev --config wrangler.analytics-worker.toml",
+    "dev:projection": "wrangler dev --config wrangler.projection-worker.toml",
+    "dev:automation": "wrangler dev --config wrangler.automation-worker.toml",
+    "dev:export": "wrangler dev --config wrangler.export-worker.toml",
+    "deploy:edge": "wrangler deploy --config wrangler.edge-api.toml",
+    "deploy:command": "wrangler deploy --config wrangler.command-worker.toml",
+    "deploy:analytics": "wrangler deploy --config wrangler.analytics-worker.toml",
+    "deploy:projection": "wrangler deploy --config wrangler.projection-worker.toml",
+    "deploy:automation": "wrangler deploy --config wrangler.automation-worker.toml",
+    "deploy:export": "wrangler deploy --config wrangler.export-worker.toml",
+    "migrate": "bash ./scripts/apply-migrations.sh"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260304.0",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.6.0"
+  },
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  }
+}

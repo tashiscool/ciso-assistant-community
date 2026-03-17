@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type * as echarts from 'echarts';
+	import { BRAND_COLORS } from '$lib/brand';
 
 	interface Props {
 		data: {
@@ -36,8 +37,15 @@
 		const normalizedData = getNormalizedData();
 
 		return {
+			backgroundColor: 'transparent',
 			tooltip: {
 				trigger: 'item',
+				backgroundColor: 'rgba(11, 31, 42, 0.94)',
+				borderColor: 'rgba(88, 181, 255, 0.3)',
+				borderWidth: 1,
+				textStyle: {
+					color: '#EAF3F7'
+				},
 				formatter: (params: any) => {
 					if (params.dataType === 'node') {
 						return `<strong>${params.data.name}</strong><br/>
@@ -56,7 +64,10 @@
 				data: normalizedData.categories.map((c: any) => c.name),
 				orient: 'vertical',
 				left: 10,
-				top: 'middle'
+				top: 'middle',
+				textStyle: {
+					color: '#C9D9E3'
+				}
 			},
 			series: [
 				{
@@ -72,7 +83,8 @@
 					label: {
 						show: false,
 						position: 'right',
-						formatter: '{b}'
+						formatter: '{b}',
+						color: '#EAF3F7'
 					},
 					emphasis: {
 						focus: 'adjacency',
@@ -169,72 +181,79 @@
 	};
 </script>
 
-<div class="flex flex-col h-full bg-white">
-	<!-- Search bar -->
-	<div class="p-3 border-b bg-gray-50">
-		<div class="flex items-center space-x-2">
+<div class="flex h-full flex-col overflow-hidden rounded-[30px] bg-[linear-gradient(180deg,rgba(6,17,24,0.96),rgba(11,31,42,0.94))] text-white shadow-[0_30px_80px_rgba(11,31,42,0.28)]">
+	<div class="border-b border-white/10 px-4 py-4 lg:px-5">
+		<div class="flex flex-col gap-3 lg:flex-row lg:items-center">
+			<span class="brand-chip w-fit !border-white/12 !bg-white/8 !text-white">
+				<i class="fa-solid fa-wave-square"></i>
+				Live topology
+			</span>
 			<div class="relative flex-1">
 				<label for="graph-search-nodes" class="sr-only">Search nodes</label>
 				<input
 					id="graph-search-nodes"
 					type="text"
-					class="w-full rounded-md border-gray-300 shadow-sm pl-10 pr-4 py-2 text-sm"
-					placeholder="Search nodes..."
+					class="w-full rounded-full border border-white/12 bg-white/8 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-400 focus:border-[rgba(20,200,181,0.55)] focus:ring-0"
+					placeholder="Search nodes, controls, threats, or scenarios"
 					bind:value={searchQuery}
 					onkeydown={handleKeyDown}
 				/>
-				<i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true"></i>
+				<i
+					class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+					aria-hidden="true"
+				></i>
 			</div>
-			<button
-				class="px-3 py-2 text-sm bg-primary-600 text-white rounded-md hover:bg-primary-700"
-				onclick={() => searchNodes(searchQuery)}
-				aria-label="Search nodes in graph"
-			>
-				Search
-			</button>
-			<button
-				class="px-3 py-2 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
-				onclick={clearHighlight}
-				aria-label="Clear search highlights"
-			>
-				Clear
-			</button>
+			<div class="flex items-center gap-2">
+				<button
+					class="btn px-4 py-2 text-sm font-semibold text-white"
+					style="background: var(--rv-gradient-accent);"
+					onclick={() => searchNodes(searchQuery)}
+					aria-label="Search nodes in graph"
+				>
+					Search
+				</button>
+				<button
+					class="btn border border-white/12 bg-white/8 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-white/12"
+					onclick={clearHighlight}
+					aria-label="Clear search highlights"
+				>
+					Clear
+				</button>
+			</div>
 		</div>
 	</div>
 
-	<!-- Graph container -->
 	<div
 		bind:this={chartContainer}
 		class="{width} {height} flex-1"
-		style="min-height: 500px;"
+		style="min-height: 540px;"
 	></div>
 
-	<!-- Legend explanation -->
-	<div class="p-3 border-t bg-gray-50">
-		<div class="flex flex-wrap items-center gap-4 text-xs text-gray-600">
-			<span class="flex items-center">
-				<span class="w-3 h-3 rounded-full bg-green-500 mr-1"></span>
-				Asset
+	<div class="border-t border-white/10 px-4 py-4 lg:px-5">
+		<div class="flex flex-wrap items-center gap-4 text-xs text-slate-300">
+			<span class="flex items-center gap-2">
+				<span class="h-3 w-3 rounded-full" style="background-color: {BRAND_COLORS.teal};"></span>
+				Assets
 			</span>
-			<span class="flex items-center">
-				<span class="w-3 h-3 rounded-full bg-blue-500 mr-1"></span>
-				Control
+			<span class="flex items-center gap-2">
+				<span class="h-3 w-3 rounded-full" style="background-color: {BRAND_COLORS.blue};"></span>
+				Controls
 			</span>
-			<span class="flex items-center">
-				<span class="w-3 h-3 rounded-full bg-red-500 mr-1"></span>
-				Risk
+			<span class="flex items-center gap-2">
+				<span class="h-3 w-3 rounded-full" style="background-color: #F7B54A;"></span>
+				Risks
 			</span>
-			<span class="flex items-center">
-				<span class="w-3 h-3 rounded-full bg-orange-500 mr-1"></span>
-				Threat
+			<span class="flex items-center gap-2">
+				<span class="h-3 w-3 rounded-full" style="background-color: #F97316;"></span>
+				Threats
 			</span>
-			<span class="flex items-center">
-				<span class="w-3 h-3 rounded-full bg-purple-500 mr-1"></span>
-				Vulnerability
+			<span class="flex items-center gap-2">
+				<span class="h-3 w-3 rounded-full" style="background-color: #DC2626;"></span>
+				Vulnerabilities
 			</span>
-			<span class="ml-auto text-gray-400">
+			<span class="ml-auto text-slate-400">
 				<i class="fa-solid fa-mouse-pointer mr-1"></i>
-				Click to select • Double-click to navigate • Drag to move
+				Click to inspect, double-click to navigate, drag to reposition
 			</span>
 		</div>
 	</div>

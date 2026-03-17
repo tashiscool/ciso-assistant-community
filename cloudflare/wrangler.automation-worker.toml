@@ -1,0 +1,27 @@
+name = "ciso-automation-worker"
+main = "src/automation-worker.ts"
+compatibility_date = "2026-03-05"
+
+[vars]
+AUTOMATION_DEFAULT_TENANT = "global"
+
+[[d1_databases]]
+binding = "APP_D1_MAIN"
+database_name = "app_d1_main"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+
+[[queues.consumers]]
+queue = "connector-sync-q"
+max_batch_size = 50
+max_batch_timeout = 5
+
+[[queues.producers]]
+binding = "COMMANDS_Q"
+queue = "commands-q"
+
+[triggers]
+crons = [
+  "*/15 * * * *",
+  "5 */1 * * *",
+  "0 3 * * *"
+]

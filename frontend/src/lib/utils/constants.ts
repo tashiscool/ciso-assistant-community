@@ -1,14 +1,30 @@
 import { env } from '$env/dynamic/public';
 import { m } from '$paraglide/messages';
 
+export const FRONTEND_RUNTIME = `${
+	Object.hasOwn(env, 'PUBLIC_FRONTEND_RUNTIME') ? env.PUBLIC_FRONTEND_RUNTIME : 'django'
+}`.toLowerCase();
+
+export const IS_CLOUDFLARE_RUNTIME = FRONTEND_RUNTIME === 'cloudflare';
+
+const DEFAULT_BACKEND_API_URL = IS_CLOUDFLARE_RUNTIME ? '/api' : 'http://localhost:8000/api';
+
 export const BASE_API_URL = `${
-	Object.hasOwn(env, 'PUBLIC_BACKEND_API_URL')
-		? env.PUBLIC_BACKEND_API_URL
-		: 'http://localhost:8000/api'
+	Object.hasOwn(env, 'PUBLIC_BACKEND_API_URL') ? env.PUBLIC_BACKEND_API_URL : DEFAULT_BACKEND_API_URL
+}`;
+
+export const CLOUDFLARE_API_BASE_URL = `${
+	Object.hasOwn(env, 'PUBLIC_CLOUDFLARE_API_URL')
+		? env.PUBLIC_CLOUDFLARE_API_URL
+		: '/api/v2'
 }`;
 
 export const DEFAULT_LANGUAGE = `${
 	Object.hasOwn(env, 'PUBLIC_DEFAULT_LANGUAGE') ? env.PUBLIC_DEFAULT_LANGUAGE : 'en'
+}`;
+
+export const DEFAULT_TENANT_ID = `${
+	Object.hasOwn(env, 'PUBLIC_DEFAULT_TENANT_ID') ? env.PUBLIC_DEFAULT_TENANT_ID : 'default'
 }`;
 
 export const ALLAUTH_API_URL = `${BASE_API_URL}/_allauth/app/v1`;

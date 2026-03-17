@@ -268,7 +268,7 @@
 </script>
 
 <svelte:head>
-  <title>{checklist?.hostName || 'Checklist'} - RMF - CISO Assistant</title>
+  <title>{checklist?.hostName || 'Checklist'} - RMF - Regovise</title>
 </svelte:head>
 
 <div class="single-checklist min-h-screen bg-gray-50">

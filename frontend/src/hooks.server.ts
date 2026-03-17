@@ -1,4 +1,4 @@
-import { BASE_API_URL, DEFAULT_LANGUAGE } from '$lib/utils/constants';
+import { BASE_API_URL, DEFAULT_LANGUAGE, IS_CLOUDFLARE_RUNTIME } from '$lib/utils/constants';
 import { safeTranslate } from '$lib/utils/i18n';
 import type { User } from '$lib/utils/types';
 import { redirect, type Handle, type HandleFetch, type RequestEvent } from '@sveltejs/kit';
@@ -74,6 +74,18 @@ async function ensureCsrfToken(event: RequestEvent): Promise<string> {
 	return csrfToken;
 }
 
+async function readJsonBody<T>(response: Response): Promise<T | null> {
+	try {
+		return (await response.clone().json()) as T;
+	} catch {
+		try {
+			return (await response.json()) as T;
+		} catch {
+			return null;
+		}
+	}
+}
+
 function logoutUser(event: RequestEvent) {
 	event.cookies.delete('token', {
 		path: '/'
@@ -90,19 +102,38 @@ async function validateUserSession(event: RequestEvent): Promise<User | null> {
 	if (!token) return null;
 
 	const allauthSessionToken = event.cookies.get('allauth_session_token');
-	if (!allauthSessionToken) logoutUser(event);
+	if (!allauthSessionToken && !IS_CLOUDFLARE_RUNTIME) logoutUser(event);
 
-	const res = await event.fetch(`${BASE_API_URL}/iam/current-user/`, {
-		credentials: 'include',
-		headers: {
-			'content-type': 'application/json',
-			Authorization: `Token ${token}`
+	for (let attempt = 0; attempt < 3; attempt += 1) {
+		try {
+			const res = await event.fetch(`${BASE_API_URL}/iam/current-user/`, {
+				credentials: 'include',
+				headers: {
+					'content-type': 'application/json',
+					Authorization: `Token ${token}`
+				}
+			});
+
+			if (res.ok) {
+				return (await readJsonBody<User>(res)) ?? null;
+			}
+
+			if (res.status === 401 || res.status === 403) {
+				logoutUser(event);
+			}
+
+			if (!IS_CLOUDFLARE_RUNTIME || attempt === 2) {
+				return null;
+			}
+		} catch (error) {
+			if (!IS_CLOUDFLARE_RUNTIME || attempt === 2) {
+				console.error('Error validating user session', error);
+				return null;
+			}
 		}
-	});
+	}
 
-	if (!res.ok) logoutUser(event);
-
-	return res.json();
+	return null;
 }
 
 export const handle: Handle = async ({ event, resolve }) =>
@@ -110,6 +141,54 @@ export const handle: Handle = async ({ event, resolve }) =>
 		event.request = localizedRequest;
 
 		event.locals.featureFlags = loadFeatureFlags();
+
+		if (IS_CLOUDFLARE_RUNTIME) {
+			if (isFrontendProxyApiPath(event.url.pathname)) {
+				return resolve(event, {
+					transformPageChunk: ({ html }) => html.replace('%lang%', locale)
+				});
+			}
+			event.locals.settings = {};
+			event.locals.featureflags = {};
+			const token = event.cookies.get('token');
+			if (token) {
+				const user = await validateUserSession(event);
+				if (user) {
+					event.locals.user = user;
+					try {
+						const [generalSettingsResponse, featureFlagSettingsResponse] = await Promise.all([
+							event.fetch(`${BASE_API_URL}/settings/general/object/`, {
+								credentials: 'include',
+								headers: {
+									'content-type': 'application/json',
+									Authorization: `Token ${token}`
+								}
+							}),
+							event.fetch(`${BASE_API_URL}/settings/feature-flags/`, {
+								credentials: 'include',
+								headers: {
+									'content-type': 'application/json',
+									Authorization: `Token ${token}`
+								}
+							})
+						]);
+						event.locals.settings = generalSettingsResponse.ok
+							? ((await readJsonBody<Record<string, unknown>>(generalSettingsResponse)) ?? {})
+							: {};
+						event.locals.featureflags = featureFlagSettingsResponse.ok
+							? ((await readJsonBody<Record<string, unknown>>(featureFlagSettingsResponse)) ?? {})
+							: {};
+					} catch (error) {
+						console.error('Error hydrating Cloudflare runtime session', error);
+						event.locals.settings = {};
+						event.locals.featureflags = {};
+					}
+				}
+			}
+			return resolve(event, {
+				transformPageChunk: ({ html }) => html.replace('%lang%', locale)
+			});
+		}
 
 		if (isFrontendProxyApiPath(event.url.pathname)) {
 			return resolve(event);
@@ -140,7 +219,7 @@ export const handle: Handle = async ({ event, resolve }) =>
 					Authorization: `Token ${event.cookies.get('token')}`
 				}
 			});
-			event.locals.settings = await generalSettings.json();
+			event.locals.settings = (await readJsonBody<Record<string, unknown>>(generalSettings)) ?? {};
 
 			const featureFlagSettings = await event.fetch(`${BASE_API_URL}/settings/feature-flags/`, {
 				credentials: 'include',
@@ -150,7 +229,8 @@ export const handle: Handle = async ({ event, resolve }) =>
 				}
 			});
 			try {
-				event.locals.featureflags = await featureFlagSettings.json();
+				event.locals.featureflags =
+					(await readJsonBody<Record<string, unknown>>(featureFlagSettings)) ?? {};
 			} catch (e) {
 				console.error('Error fetching feature flags', e);
 				event.locals.featureflags = {};
@@ -165,6 +245,11 @@ export const handle: Handle = async ({ event, resolve }) =>
 	});
 
 export const handleFetch: HandleFetch = async ({ request, fetch, event }) => {
+	if (IS_CLOUDFLARE_RUNTIME) {
+		request.headers.set('Accept-Language', DEFAULT_LANGUAGE);
+		return fetch(request);
+	}
+
 	const unsafeMethods = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 	const currentLang = event.locals.user?.preferences?.lang || DEFAULT_LANGUAGE;
 	if (isBackendApiRequest(request.url)) {

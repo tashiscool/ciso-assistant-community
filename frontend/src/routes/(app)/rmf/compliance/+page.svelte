@@ -164,7 +164,7 @@
 </script>
 
 <svelte:head>
-  <title>RMF Compliance - CISO Assistant</title>
+  <title>RMF Compliance - Regovise</title>
 </svelte:head>
 
 <div class="rmf-compliance min-h-screen bg-gray-50">

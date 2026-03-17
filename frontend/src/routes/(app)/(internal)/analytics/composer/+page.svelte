@@ -2,193 +2,290 @@
 	import DonutChart from '$lib/components/Chart/DonutChart.svelte';
 	import BarChart from '$lib/components/Chart/BarChart.svelte';
 	import { m } from '$paraglide/messages';
-	import type { AppliedControlStatus } from '$lib/utils/types';
 
 	interface Props {
-		// Props
 		data: any;
 	}
 
 	let { data }: Props = $props();
 
-	// Make a reactive copy of data to track changes properly
-	let riskData = $state({ ...data });
-	riskData.risk_assessment_objects.forEach((risk_assessment: Record<string, any>) => {
-		risk_assessment.show = false;
+	const seededAssessments = Array.isArray(data?.risk_assessment_objects)
+		? data.risk_assessment_objects.map((item: Record<string, any>) => ({ ...item, show: false }))
+		: [];
+
+	let riskData = $state({
+		...data,
+		risk_assessment_objects: seededAssessments
 	});
 
-	let applied_control_status: AppliedControlStatus = riskData.applied_control_status;
+	function reviewBadgeClass(count: number): string {
+		return count > 0
+			? 'bg-amber-100 text-amber-800'
+			: 'bg-emerald-100 text-emerald-800';
+	}
 </script>
 
-<div class="flex flex-col space-y-4 p-2">
-	<div>
-		<div class="px-2 mx-2 font-semibold text-xl">{m.yourSelection()}</div>
-		<div class="px-2 mx-2 text-sm">
-			<i class="fa-solid fa-info-circle mr-2"></i>{m.composerHint()}
-		</div>
-	</div>
-	<div class="card p-4 bg-white shadow-sm">
-		<div class="p-2 font-semibold text-lg">
-			{riskData.risk_assessment_objects.length <= 1
-				? m.composerTitle()
-				: m.composerTitlePlural({ number: riskData.risk_assessment_objects.length })}:
-		</div>
-		<div class="flex space-x-2">
-			<div class="w-1/3">
+<div class="space-y-5 p-2 lg:p-3">
+	<div class="brand-card-dark overflow-hidden px-6 py-7 lg:px-8">
+		<div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+			<div class="max-w-3xl space-y-4">
+				<span class="brand-overline !text-white/70">Composer Analytics</span>
 				<div>
-					<div class="p-2 text-sm font-semibold">{m.currentRiskLevelPerScenario()}</div>
+					<h1 class="text-3xl font-semibold tracking-tight text-white lg:text-4xl">
+						{m.composerTitlePlural({
+							number: riskData.risk_assessment_objects?.length || 0
+						})}
+					</h1>
+					<p class="mt-3 max-w-2xl text-sm leading-6 text-slate-300 lg:text-base">
+						Combine risk assessments into one Regovise view to compare exposure, treatment
+						progress, and review hotspots across the selected scope.
+					</p>
+				</div>
+			</div>
 
-					<div class="items-center h-96">
-						<DonutChart
-							name="current_risk_level"
-							s_label={m.currentRiskLevelPerScenario()}
-							values={riskData.current_level}
-							colors={riskData.current_level.map((object) => object.color)}
-						/>
+			<div class="grid gap-3 sm:grid-cols-3">
+				<div class="rounded-[24px] border border-white/12 bg-white/8 px-4 py-4 backdrop-blur">
+					<div class="text-3xl font-semibold text-white">{riskData.counters?.untreated || 0}</div>
+					<div class="mt-1 text-xs font-medium uppercase tracking-[0.22em] text-slate-300">
+						Untreated
+					</div>
+				</div>
+				<div class="rounded-[24px] border border-white/12 bg-white/8 px-4 py-4 backdrop-blur">
+					<div class="text-3xl font-semibold text-white">{riskData.counters?.accepted || 0}</div>
+					<div class="mt-1 text-xs font-medium uppercase tracking-[0.22em] text-slate-300">
+						Accepted
+					</div>
+				</div>
+				<div class="rounded-[24px] border border-white/12 bg-white/8 px-4 py-4 backdrop-blur">
+					<div class="text-3xl font-semibold text-white">
+						{riskData.risk_assessment_objects?.length || 0}
+					</div>
+					<div class="mt-1 text-xs font-medium uppercase tracking-[0.22em] text-slate-300">
+						Assessments
 					</div>
 				</div>
 			</div>
-			<div class="w-1/3">
-				<div class="p-2 text-sm font-semibold">{m.statusOfAssociatedMeasures()}</div>
-				<div>
-					<div class="items-center justify-center h-96">
-						<BarChart
-							name="composer"
-							labels={riskData.applied_control_status.labels}
-							values={riskData.applied_control_status.values}
-						/>
-					</div>
-				</div>
-			</div>
-			<div class="w-1/3">
-				<div class="p-2 text-sm font-semibold">{m.residualRiskLevelPerScenario()}</div>
-				<div class="items-center h-96">
-					<DonutChart
-						name="residual_risk_level"
-						s_label={m.residualRiskLevelPerScenario()}
-						values={riskData.residual_level}
-						colors={riskData.residual_level.map((object) => object.color)}
-					/>
-				</div>
-			</div>
-		</div>
-		<div class="bg-zinc-100 shadow-sm rounded-sm p-3 flex flex-col space-y-2">
-			<div>
-				<i class="far fa-lightbulb mr-1"></i>
-				<span class="font-semibold">{m.forTheSelectedScope()}:</span>
-			</div>
-			<ul class="list-disc px-6">
-				<li>
-					{m.untreatedRiskScenarios({
-						count: riskData.counters.untreated,
-						s: riskData.counters.untreated > 1 ? 's' : ''
-					})}
-					<ul class="list-circle ml-4">
-						{#each riskData.riskscenarios.untreated as scenario}
-							<li>{scenario.name}</li>
-						{/each}
-					</ul>
-				</li>
-				<li>
-					{m.acceptedRiskScenarios({
-						count: riskData.counters.accepted,
-						s: riskData.counters.accepted > 1 ? 's' : ''
-					})}
-					<ul class="list-circle ml-4">
-						{#each riskData.riskscenarios.accepted as scenario}
-							<li>{scenario.name}</li>
-						{/each}
-					</ul>
-				</li>
-			</ul>
 		</div>
 	</div>
-	<!-- SECOND PART -->
-	<div class="flex flex-col space-y-2">
-		{#each riskData.risk_assessment_objects as item}
+
+	<div class="grid gap-5 xl:grid-cols-3">
+		<div class="brand-card p-5 lg:p-6">
+			<div class="flex items-center justify-between">
+				<div>
+					<h2 class="text-lg font-semibold text-[var(--rv-midnight)]">
+						{m.currentRiskLevelPerScenario()}
+					</h2>
+					<p class="mt-1 text-sm text-slate-500">Current exposure across scoped scenarios.</p>
+				</div>
+				<span class="brand-chip">Current</span>
+			</div>
+			<div class="mt-4 h-96">
+				<DonutChart
+					name="current_risk_level"
+					s_label={m.currentRiskLevelPerScenario()}
+					values={riskData.current_level}
+					colors={riskData.current_level.map((object) => object.color)}
+				/>
+			</div>
+		</div>
+
+		<div class="brand-card p-5 lg:p-6">
+			<div class="flex items-center justify-between">
+				<div>
+					<h2 class="text-lg font-semibold text-[var(--rv-midnight)]">
+						{m.statusOfAssociatedMeasures()}
+					</h2>
+					<p class="mt-1 text-sm text-slate-500">Execution state of linked controls and actions.</p>
+				</div>
+				<span class="brand-chip">Controls</span>
+			</div>
+			<div class="mt-4 h-96">
+				<BarChart
+					name="composer"
+					labels={riskData.applied_control_status.labels}
+					values={riskData.applied_control_status.values}
+				/>
+			</div>
+		</div>
+
+		<div class="brand-card p-5 lg:p-6">
+			<div class="flex items-center justify-between">
+				<div>
+					<h2 class="text-lg font-semibold text-[var(--rv-midnight)]">
+						{m.residualRiskLevelPerScenario()}
+					</h2>
+					<p class="mt-1 text-sm text-slate-500">Residual posture after current treatment plans.</p>
+				</div>
+				<span class="brand-chip">Residual</span>
+			</div>
+			<div class="mt-4 h-96">
+				<DonutChart
+					name="residual_risk_level"
+					s_label={m.residualRiskLevelPerScenario()}
+					values={riskData.residual_level}
+					colors={riskData.residual_level.map((object) => object.color)}
+				/>
+			</div>
+		</div>
+	</div>
+
+	<div class="brand-card p-5 lg:p-6">
+		<div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
 			<div>
-				<div class="card bg-white overflow-hidden shadow-sm" id="headingOne">
-					<div
-						class="flex flex-row space-x-4 px-8 py-4 w-full hover:bg-gray-100 cursor-pointer items-center"
-						onclick={() => {
-							item.show = !item.show;
-						}}
-						role="button"
-						tabindex="0"
-						onkeydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') item.show = !item.show;
-						}}
-					>
-						<div class="text-gray-700">
-							{#if item.show}
-								<i class="fas fa-angle-up"></i>
-							{:else}
-								<i class="fas fa-angle-down"></i>
-							{/if}
+				<span class="brand-overline">Selection Summary</span>
+				<h2 class="mt-3 text-2xl font-semibold text-[var(--rv-midnight)]">
+					{m.forTheSelectedScope()}
+				</h2>
+				<p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+					Use this roll-up to quickly identify untreated exposure and accepted scenarios that
+					need renewed attention or documentation.
+				</p>
+			</div>
+			<a href="/x-rays" class="brand-chip !bg-[rgba(88,181,255,0.14)] !text-[var(--rv-midnight)]">
+				<i class="fa-solid fa-x-ray"></i>
+				Review in x-rays
+			</a>
+		</div>
+
+		<div class="mt-6 grid gap-5 lg:grid-cols-2">
+			<div class="rounded-[24px] border border-slate-100 bg-slate-50/80 p-5">
+				<div class="flex items-center justify-between">
+					<h3 class="text-lg font-semibold text-[var(--rv-midnight)]">
+						{m.untreatedRiskScenarios({
+							count: riskData.counters?.untreated || 0,
+							s: (riskData.counters?.untreated || 0) > 1 ? 's' : ''
+						})}
+					</h3>
+					<span class="brand-chip !bg-[rgba(247,181,74,0.16)] !text-[var(--rv-midnight)]">
+						{riskData.counters?.untreated || 0}
+					</span>
+				</div>
+				<ul class="mt-4 space-y-3">
+					{#each riskData.riskscenarios?.untreated || [] as scenario}
+						<li class="rounded-[18px] border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+							{scenario.name}
+						</li>
+					{/each}
+				</ul>
+			</div>
+
+			<div class="rounded-[24px] border border-slate-100 bg-slate-50/80 p-5">
+				<div class="flex items-center justify-between">
+					<h3 class="text-lg font-semibold text-[var(--rv-midnight)]">
+						{m.acceptedRiskScenarios({
+							count: riskData.counters?.accepted || 0,
+							s: (riskData.counters?.accepted || 0) > 1 ? 's' : ''
+						})}
+					</h3>
+					<span class="brand-chip !bg-[rgba(20,200,181,0.14)] !text-[var(--rv-midnight)]">
+						{riskData.counters?.accepted || 0}
+					</span>
+				</div>
+				<ul class="mt-4 space-y-3">
+					{#each riskData.riskscenarios?.accepted || [] as scenario}
+						<li class="rounded-[18px] border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+							{scenario.name}
+						</li>
+					{/each}
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="space-y-4">
+		{#each riskData.risk_assessment_objects || [] as item}
+			<div class="brand-card overflow-hidden">
+				<div
+					class="flex cursor-pointer flex-col gap-3 px-6 py-5 transition hover:bg-slate-50/80 lg:flex-row lg:items-center lg:justify-between"
+					onclick={() => {
+						item.show = !item.show;
+					}}
+					role="button"
+					tabindex="0"
+					onkeydown={(e) => {
+						if (e.key === 'Enter' || e.key === ' ') item.show = !item.show;
+					}}
+				>
+					<div class="flex items-center gap-3">
+						<div class="brand-icon-badge h-11 w-11 rounded-[18px] text-base">
+							<i class={`fa-solid ${item.show ? 'fa-angle-up' : 'fa-angle-down'}`}></i>
 						</div>
-						<button class="text-gray-700 font-semibold focus:outline-hidden" type="button">
-							{item.risk_assessment.perimeter.str}/{item.risk_assessment.name}
-						</button>
 						<div>
-							{#if item.risk_assessment.quality_check.count > 0}
-								<span class="text-xs px-2 py-1 rounded-sm bg-orange-200 shadow-sm"
-									>{m.reviewNeeded()}</span
-								>
-							{:else}
-								<span class="text-xs px-2 py-1 rounded-sm bg-green-200 shadow-sm">{m.ok()}</span>
-							{/if}
+							<h3 class="text-lg font-semibold text-[var(--rv-midnight)]">
+								{item.risk_assessment.perimeter.str}/{item.risk_assessment.name}
+							</h3>
+							<p class="mt-1 text-sm text-slate-500">Assessment posture and review quality signals</p>
 						</div>
 					</div>
-					{#if item.show}
-						<div class="border-t px-10 py-4 bg-white flex flex-row space-x-4">
-							<div>
-								<div class="pb-2">
-									{#if item.risk_assessment.quality_check.count > 0}
-										➡️ <span class="text-sm"
-											>{m.inconsistenciesFoundComposer({
-												count: item.risk_assessment.quality_check.count,
-												s: item.risk_assessment.quality_check.count > 1 ? 's' : '',
-												plural: item.risk_assessment.quality_check.count > 1 ? 'ies' : 'y'
-											})}
-											<a class="simple-link hover:underline visited:text-indigo-600" href="/x-rays"
-												>x-rays</a
-											></span
-										>.
-									{/if}
-								</div>
-								<div>
-									<table class="border border-collapse my-2 p-2 rounded-sm">
-										<thead>
-											<tr>
-												<th class="border p-2 bg-gray-200"></th>
-												<th class="border p-2 bg-gray-200">{m.current()}</th>
-												<th class="border p-2 bg-gray-200">{m.residual()}</th>
-											</tr>
-										</thead>
-										<tbody>
-											{#each item.synth_table as lvl}
-												<tr>
-													<td class="border p-2" style="background-color: {lvl.color}">{lvl.lvl}</td
-													>
-													<td class="border p-2 text-center">{lvl.current}</td>
-													<td class="border p-2 text-center">{lvl.residual}</td>
-												</tr>
-											{/each}
-										</tbody>
-									</table>
-								</div>
 
-								<div>
-									<a
-										class="text-indigo-800 hover:text-indigo-600 py-2 my-2"
-										href="/risk-assessments/{item.risk_assessment.id}/"
-										><i class="fas fa-external-link-square-alt"></i> {m.jumpToRiskAssessment()}</a
-									>
-								</div>
+					<span
+						class="inline-flex w-fit rounded-full px-3 py-1.5 text-xs font-semibold {reviewBadgeClass(
+							item.risk_assessment.quality_check.count
+						)}"
+					>
+						{#if item.risk_assessment.quality_check.count > 0}
+							{m.reviewNeeded()}
+						{:else}
+							{m.ok()}
+						{/if}
+					</span>
+				</div>
+
+				{#if item.show}
+					<div class="border-t border-slate-100 px-6 py-5">
+						{#if item.risk_assessment.quality_check.count > 0}
+							<div class="mb-5 rounded-[20px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+								<i class="fa-solid fa-lightbulb mr-2"></i>
+								{m.inconsistenciesFoundComposer({
+									count: item.risk_assessment.quality_check.count,
+									s: item.risk_assessment.quality_check.count > 1 ? 's' : '',
+									plural: item.risk_assessment.quality_check.count > 1 ? 'ies' : 'y'
+								})}
+								<a class="ml-2 font-semibold text-amber-900 underline" href="/x-rays">x-rays</a>
+							</div>
+						{/if}
+
+						<div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
+							<div class="overflow-x-auto">
+								<table class="w-full overflow-hidden rounded-[24px] border border-slate-200 text-sm">
+									<thead class="bg-slate-50 text-slate-600">
+										<tr>
+											<th class="px-4 py-3 text-left font-medium"></th>
+											<th class="px-4 py-3 text-center font-medium">{m.current()}</th>
+											<th class="px-4 py-3 text-center font-medium">{m.residual()}</th>
+										</tr>
+									</thead>
+									<tbody>
+										{#each item.synth_table as lvl}
+											<tr class="border-t border-slate-100">
+												<td class="px-4 py-3 font-semibold text-[var(--rv-midnight)]">
+													<span
+														class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+														style="background-color: {lvl.color}; color: #0b1f2a;"
+													>
+														{lvl.lvl}
+													</span>
+												</td>
+												<td class="px-4 py-3 text-center text-slate-700">{lvl.current}</td>
+												<td class="px-4 py-3 text-center text-slate-700">{lvl.residual}</td>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							</div>
+
+							<div class="flex flex-col gap-3">
+								<a
+									class="btn flex items-center justify-center border border-slate-200 bg-white px-4 py-3 font-semibold text-slate-700 hover:border-[rgb(88_181_255_/_0.24)] hover:bg-slate-50"
+									href="/risk-assessments/{item.risk_assessment.id}/"
+								>
+									<i class="fa-solid fa-arrow-up-right-from-square mr-2"></i>
+									{m.jumpToRiskAssessment()}
+								</a>
 							</div>
 						</div>
-					{/if}
-				</div>
+					</div>
+				{/if}
 			</div>
 		{/each}
 	</div>

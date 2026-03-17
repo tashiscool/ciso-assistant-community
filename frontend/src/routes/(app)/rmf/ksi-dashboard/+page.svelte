@@ -83,7 +83,7 @@
 </script>
 
 <svelte:head>
-  <title>FedRAMP KSI Dashboard - CISO Assistant</title>
+  <title>FedRAMP KSI Dashboard - Regovise</title>
 </svelte:head>
 
 <div class="fedramp-dashboard">

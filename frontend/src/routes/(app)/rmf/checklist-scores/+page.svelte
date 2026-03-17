@@ -64,7 +64,7 @@
 </script>
 
 <svelte:head>
-  <title>RMF Checklist Scores - CISO Assistant</title>
+  <title>RMF Checklist Scores - Regovise</title>
 </svelte:head>
 
 <div class="rmf-checklist-scores">

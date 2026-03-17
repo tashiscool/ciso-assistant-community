@@ -135,7 +135,7 @@
 </script>
 
 <svelte:head>
-  <title>Evidence Sources - CISO Assistant</title>
+  <title>Evidence Sources - Regovise</title>
 </svelte:head>
 
 <div class="evidence-sources">

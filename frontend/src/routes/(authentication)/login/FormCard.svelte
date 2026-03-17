@@ -49,18 +49,18 @@
 	});
 </script>
 
-<div class="flex flex-col w-7/8 lg:w-3/4 p-10 rounded-lg shadow-lg bg-white bg-opacity-[.90]">
-	<div data-testid="login" class="flex flex-col w-full items-center space-y-4">
-		<div class="bg-primary-300 px-6 py-5 rounded-full text-3xl">
+<div class="brand-card w-full max-w-[32rem] p-8 lg:p-10">
+	<div data-testid="login" class="flex flex-col w-full items-center space-y-5">
+		<div class="brand-icon-badge text-3xl">
 			<i class="fa-solid fa-right-to-bracket"></i>
 		</div>
 		<h3
-			class="font-bold leading-tight tracking-tight md:text-2xl bg-linear-to-r from-pink-500 to-violet-600 bg-clip-text text-transparent"
+			class="brand-title-gradient text-center text-3xl font-bold leading-tight tracking-tight"
 		>
 			{m.logIntoYourAccount()}
 		</h3>
-		<p class="text-center text-gray-600 text-sm">
-			{m.youNeedToLogIn()}
+		<p class="text-center text-sm text-slate-600">
+			Access your governance workspace and continue with evidence, controls, and assurance work.
 		</p>
 		<div class="w-full">
 			<!-- SuperForm with dataType 'form' -->
@@ -85,7 +85,7 @@
 					</div>
 					<p class="">
 						<button
-							class="btn preset-filled-primary-500 font-semibold w-full"
+							class="btn preset-filled-primary-500 w-full font-semibold shadow-[var(--rv-shadow-soft)]"
 							data-testid="login-btn"
 							type="submit">{m.login()}</button
 						>
@@ -95,12 +95,12 @@
 		</div>
 		{#if data.SSOInfo.is_enabled}
 			<div class="flex items-center justify-center w-full space-x-2">
-				<hr class="w-64 items-center bg-gray-200 border-0" />
-				<span class="flex items-center text-gray-600 text-sm">{m.or()}</span>
-				<hr class="w-64 items-center bg-gray-200 border-0" />
+				<hr class="w-64 items-center border-0 bg-slate-200" />
+				<span class="flex items-center text-sm text-slate-500">{m.or()}</span>
+				<hr class="w-64 items-center border-0 bg-slate-200" />
 			</div>
 			<button
-				class="btn bg-linear-to-l from-violet-800 to-violet-400 text-white font-semibold w-1/2"
+				class="btn w-full bg-[var(--rv-midnight)] text-white font-semibold hover:bg-[color-mix(in_srgb,var(--rv-midnight)_82%,var(--rv-blue)_18%)]"
 				onclick={() =>
 					redirectToProvider(data.SSOInfo.sp_entity_id, data.SSOInfo.callback_url, 'login')}
 				>{m.loginSSO()}</button

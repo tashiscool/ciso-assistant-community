@@ -10,17 +10,47 @@ import { z } from 'zod';
 import type { LayoutServerLoad } from './$types';
 import { zod } from 'sveltekit-superforms/adapters';
 
-export const load: LayoutServerLoad = async ({ fetch, params }) => {
+export const load: LayoutServerLoad = async ({ fetch, params, locals }) => {
 	const endpoint = `${BASE_API_URL}/risk-assessments/${params.id}/`;
 
 	const risk_assessment = await fetch(endpoint).then((res) => res.json());
-	const scenarios = await fetch(`${BASE_API_URL}/risk-scenarios/?risk_assessment=${params.id}`)
-		.then((res) => res.json())
-		.then((res) => res.results);
+	if (!risk_assessment.folder?.id && risk_assessment.perimeter?.id) {
+		const perimeter = await fetch(`${BASE_API_URL}/perimeters/${risk_assessment.perimeter.id}/`).then(
+			(res) => (res.ok ? res.json() : null)
+		);
+		if (perimeter?.folder?.id) {
+			risk_assessment.folder = perimeter.folder;
+		}
+	}
+	if (!risk_assessment.folder?.id && locals.user?.root_folder_id) {
+		risk_assessment.folder = {
+			id: locals.user.root_folder_id,
+			str: 'Global'
+		};
+	}
+	risk_assessment.authors = Array.isArray(risk_assessment.authors) ? risk_assessment.authors : [];
+	risk_assessment.reviewers = Array.isArray(risk_assessment.reviewers)
+		? risk_assessment.reviewers
+		: [];
+	if (risk_assessment.name && risk_assessment.version) {
+		risk_assessment.str = `${risk_assessment.name} - ${risk_assessment.version}`;
+	}
+	const scenariosResponse = await fetch(`${BASE_API_URL}/risk-scenarios/?risk_assessment=${params.id}`).then(
+		(res) => res.json()
+	);
+	const scenarios = Array.isArray(scenariosResponse)
+		? scenariosResponse
+		: Array.isArray(scenariosResponse?.results)
+			? scenariosResponse.results
+			: [];
 
-	const risk_matrix = await fetch(
-		`${BASE_API_URL}/risk-matrices/${risk_assessment.risk_matrix.id}/`
-	).then((res) => res.json());
+	const riskMatrixId =
+		typeof risk_assessment.risk_matrix === 'string'
+			? risk_assessment.risk_matrix
+			: risk_assessment.risk_matrix?.id;
+	const risk_matrix = riskMatrixId
+		? await fetch(`${BASE_API_URL}/risk-matrices/${riskMatrixId}/`).then((res) => res.json())
+		: risk_assessment.risk_matrix;
 
 	const interface_settings = await fetch(`${BASE_API_URL}/settings/general/object/`).then((res) =>
 		res.json()
@@ -133,7 +163,7 @@ export const load: LayoutServerLoad = async ({ fetch, params }) => {
 		riskAssessmentModel,
 		validationFlowForm,
 		validationFlowModel,
-		title: risk_assessment.str,
+		title: risk_assessment.str || risk_assessment.name,
 		useBubbles: interface_settings.interface_agg_scenario_matrix
 	};
 };

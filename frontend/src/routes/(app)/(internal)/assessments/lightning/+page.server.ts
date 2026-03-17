@@ -12,6 +12,7 @@ function toAssessment(a: Record<string, unknown>) {
 		testedControls: a.tested_controls,
 		passedControls: a.passed_controls,
 		failedControls: a.failed_controls,
+		notApplicable: a.not_applicable,
 		complianceScore: a.compliance_score,
 		progressPercentage: a.progress_percentage,
 		startedAt: a.started_at,

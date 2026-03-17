@@ -6,6 +6,7 @@
 	import { ResetPasswordSchema } from '$lib/utils/schemas';
 	import { zod } from 'sveltekit-superforms/adapters';
 	import { m } from '$paraglide/messages';
+	import { BRAND_TAGLINE } from '$lib/brand';
 
 	interface Props {
 		data: PageData;
@@ -14,19 +15,24 @@
 	let { data }: Props = $props();
 </script>
 
-<div class="flex mx-auto justify-center items-center h-screen w-screen bg-slate-200">
-	<div class="absolute top-5 left-5">
-		<div class="flex flex-row w-full space-x-4 pb-3">
-			<Logo />
-		</div>
+<div class="brand-shell relative min-h-screen overflow-hidden px-6 py-6 lg:px-10 lg:py-8">
+	<div class="flex items-start justify-between">
+		<Logo theme="light" width={194} className="h-auto w-[194px]" />
+		<span class="hidden lg:inline-flex rounded-full border border-white/12 bg-white/6 px-3 py-1.5 text-xs font-semibold tracking-[0.18em] text-white/70 uppercase">
+			Credential Reset
+		</span>
 	</div>
-	<div class="flex w-full items-center justify-center">
-		<div class="flex flex-col bg-white p-12 rounded-lg shadow-lg items-center space-y-4">
-			<div class="bg-primary-300 px-6 py-5 rounded-full text-3xl">
+	<div class="flex min-h-[calc(100vh-7rem)] w-full items-center justify-center p-4">
+		<div class="brand-card flex w-full max-w-md flex-col items-center space-y-4 p-8 lg:p-10">
+			<div class="brand-icon-badge text-3xl">
 				<i class="fa-solid fa-key"></i>
 			</div>
-			<p class="text-gray-600 text-sm text-center">
+			<p class="brand-title-gradient text-center text-3xl font-bold">Set a new password</p>
+			<p class="text-center text-sm text-slate-600">
 				{m.resetPasswordHere()}<br />
+			</p>
+			<p class="text-center text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
+				{BRAND_TAGLINE}
 			</p>
 			<!-- SuperForm with dataType 'form' -->
 			<div class="flex w-full">

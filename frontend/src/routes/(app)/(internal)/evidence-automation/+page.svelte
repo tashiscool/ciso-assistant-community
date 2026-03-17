@@ -120,7 +120,7 @@
 </script>
 
 <svelte:head>
-  <title>Evidence Automation - CISO Assistant</title>
+  <title>Evidence Automation - Regovise</title>
 </svelte:head>
 
 <div class="evidence-automation">

@@ -112,7 +112,7 @@
 </script>
 
 <svelte:head>
-  <title>Controls Listing - RMF Reports - CISO Assistant</title>
+  <title>Controls Listing - RMF Reports - Regovise</title>
 </svelte:head>
 
 <div class="controls-listing min-h-screen bg-gray-50">

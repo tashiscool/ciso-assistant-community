@@ -33,7 +33,10 @@ test.describe('Critical Feature Smoke Coverage', () => {
 		await page.goto('/security-graph');
 		await expect(page).toHaveURL(/\/security-graph/);
 		await expect(
-			page.getByRole('heading', { name: /security relationship graph/i })
+			page.getByRole('heading', {
+				level: 1,
+				name: /security relationship graph|operational graph/i
+			})
 		).toBeVisible();
 		await expect(page.getByRole('button', { name: /attack paths/i })).toBeVisible();
 	});

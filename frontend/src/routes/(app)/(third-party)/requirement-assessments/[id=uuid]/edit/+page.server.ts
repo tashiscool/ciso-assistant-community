@@ -29,6 +29,39 @@ export const load = (async ({ fetch, params }) => {
 	}
 
 	const requirementAssessment = await fetchJson(endpoint);
+	const complianceAssessmentId =
+		typeof requirementAssessment.compliance_assessment === 'string'
+			? requirementAssessment.compliance_assessment
+			: requirementAssessment.compliance_assessment?.id;
+	if (
+		!requirementAssessment.folder?.id &&
+		!requirementAssessment.compliance_assessment?.folder?.id &&
+		complianceAssessmentId
+	) {
+		const complianceAssessment = await fetchJson(
+			`${baseUrl}/compliance-assessments/${complianceAssessmentId}/`
+		);
+		if (complianceAssessment) {
+			requirementAssessment.compliance_assessment = complianceAssessment;
+			if (!requirementAssessment.perimeter?.id && complianceAssessment.perimeter?.id) {
+				requirementAssessment.perimeter = complianceAssessment.perimeter;
+			}
+		}
+	}
+	const requirementAssessmentFolder =
+		requirementAssessment.folder?.id
+			? requirementAssessment.folder
+			: requirementAssessment.compliance_assessment?.folder?.id
+				? requirementAssessment.compliance_assessment.folder
+				: requirementAssessment.compliance_assessment?.perimeter?.folder?.id
+					? requirementAssessment.compliance_assessment.perimeter.folder
+					: requirementAssessment.perimeter?.folder?.id
+						? requirementAssessment.perimeter.folder
+						: null;
+	if (requirementAssessmentFolder?.id) {
+		requirementAssessment.folder = requirementAssessmentFolder;
+	}
+	const requirementAssessmentFolderId = requirementAssessmentFolder?.id ?? '';
 	const requirement = requirementAssessment.requirement;
 	const compliance_assessment_score = await fetchJson(
 		`${baseUrl}/compliance-assessments/${requirementAssessment.compliance_assessment.id}/global_score/`
@@ -43,6 +76,18 @@ export const load = (async ({ fetch, params }) => {
 			object[key] = object[key].id;
 		}
 	});
+	if (!object.folder && requirementAssessmentFolderId) {
+		object.folder = requirementAssessmentFolderId;
+	}
+	if (!object.perimeter && requirementAssessment.perimeter?.id) {
+		object.perimeter = requirementAssessment.perimeter.id;
+	}
+	if (!object.compliance_assessment && requirementAssessment.compliance_assessment?.id) {
+		object.compliance_assessment = requirementAssessment.compliance_assessment.id;
+	}
+	if (!object.requirement && requirementAssessment.requirement?.id) {
+		object.requirement = requirementAssessment.requirement.id;
+	}
 
 	const schema = modelSchema(URLModel);
 	object.evidences = object.evidences.map((evidence) => evidence.id);
@@ -70,7 +115,7 @@ export const load = (async ({ fetch, params }) => {
 
 	const measureCreateSchema = modelSchema('applied-controls');
 	const measureCreateForm = await superValidate(
-		{ folder: requirementAssessment.folder.id },
+		{ folder: requirementAssessmentFolderId },
 		zod(measureCreateSchema),
 		{ errors: false }
 	);
@@ -89,7 +134,7 @@ export const load = (async ({ fetch, params }) => {
 						value: selectField.valueType === 'number' ? parseInt(key) : key
 					}));
 				} else {
-					console.error(`Failed to fetch data for ${selectField.field}: ${response.statusText}`);
+					console.error(`Failed to fetch data for ${selectField.field}`);
 				}
 			})
 		);
@@ -113,7 +158,7 @@ export const load = (async ({ fetch, params }) => {
 	const evidenceModel = getModelInfo('evidences');
 	const evidenceCreateSchema = modelSchema('evidences');
 	const evidenceCreateForm = await superValidate(
-		{ requirement_assessments: [params.id], folder: requirementAssessment.folder.id },
+		{ requirement_assessments: [params.id], folder: requirementAssessmentFolderId },
 		zod(evidenceCreateSchema),
 		{ errors: false }
 	);
@@ -138,7 +183,7 @@ export const load = (async ({ fetch, params }) => {
 	const securityExceptionModel = getModelInfo('security-exceptions');
 	const securityExceptionCreateSchema = modelSchema('security-exceptions');
 	const securityExceptionCreateForm = await superValidate(
-		{ requirement_assessments: [params.id], folder: requirementAssessment.folder.id },
+		{ requirement_assessments: [params.id], folder: requirementAssessmentFolderId },
 		zod(securityExceptionCreateSchema),
 		{ errors: false }
 	);
@@ -204,13 +249,17 @@ export const actions: Actions = {
 		if (!response.ok) return handleErrorResponse({ event, response, form });
 
 		const object = await response.json();
+		const complianceAssessmentId =
+			typeof object.compliance_assessment === 'string'
+				? object.compliance_assessment
+				: object.compliance_assessment?.id;
 		const model: string = urlParamModelVerboseName(URLModel);
 		setFlash({ type: 'success', message: m.successfullySavedObject({ object: model }) }, event);
 		if (formData.noRedirect) return;
 		redirect(
 			302,
 			getSecureRedirect(event.url.searchParams.get('next')) ||
-				`/compliance-assessments/${object.compliance_assessment}/`
+				`/compliance-assessments/${complianceAssessmentId || event.params.id}/`
 		);
 	},
 	createAppliedControl: async (event) => {

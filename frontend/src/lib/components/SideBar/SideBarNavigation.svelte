@@ -7,6 +7,7 @@
 	import { page } from '$app/state';
 	import { URL_MODEL_MAP } from '$lib/utils/crud';
 	import { driverInstance } from '$lib/utils/stores';
+	import { hasModelPermission, hasPermission } from '$lib/utils/access-control';
 
 	const user = page.data.user;
 
@@ -17,13 +18,10 @@
 				if (subItem.exclude) {
 					return subItem.exclude.some((role) => user?.roles && !user.roles.includes(role));
 				} else if (subItem.permissions) {
-					return subItem.permissions?.some(
-						(permission) => user?.permissions && Object.hasOwn(user.permissions, permission)
-					);
+					return subItem.permissions?.some((permission) => hasPermission(user, permission));
 				} else if (Object.hasOwn(URL_MODEL_MAP, subItem.href.split('/')[1])) {
 					const model = URL_MODEL_MAP[subItem.href.split('/')[1]];
-					const canViewObject =
-						user?.permissions && Object.hasOwn(user.permissions, `view_${model.name}`);
+					const canViewObject = hasModelPermission(user, 'view', model.name);
 					return canViewObject;
 				}
 				return false;

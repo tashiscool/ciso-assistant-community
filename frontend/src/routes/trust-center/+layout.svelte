@@ -1,4 +1,7 @@
 <script lang="ts">
+	import Logo from '$lib/components/Logo/Logo.svelte';
+	import { BRAND_NAME, BRAND_TAGLINE } from '$lib/brand';
+
 	interface Props {
 		children?: import('svelte').Snippet;
 	}
@@ -6,17 +9,17 @@
 	let { children }: Props = $props();
 </script>
 
-<div class="min-h-screen bg-gray-50">
+<div class="brand-shell-light min-h-screen">
 	<!-- Public Header -->
-	<header class="bg-white shadow-sm border-b">
+	<header class="sticky top-0 z-20 border-b border-slate-200/80 bg-white/88 shadow-[0_20px_45px_rgb(11_31_42_/_0.08)] backdrop-blur-xl">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center space-x-4">
-					<a href="/trust-center" class="flex items-center space-x-3">
-						<i class="fa-solid fa-shield-halved text-2xl text-primary-600"></i>
+					<a href="/trust-center" class="flex items-center space-x-4">
+						<Logo theme="dark" width={158} className="h-auto w-[158px]" />
 						<div>
-							<h1 class="text-xl font-bold text-gray-900">FedRAMP Trust Center</h1>
-							<p class="text-sm text-gray-500">Authorization Status Portal</p>
+							<h1 class="text-xl font-semibold text-slate-950">{BRAND_NAME} Trust Center</h1>
+							<p class="text-sm text-slate-500">FedRAMP authorization transparency</p>
 						</div>
 					</a>
 				</div>
@@ -25,7 +28,7 @@
 						href="https://www.fedramp.gov"
 						target="_blank"
 						rel="noopener noreferrer"
-						class="text-sm text-gray-500 hover:text-gray-700"
+						class="brand-chip hover:bg-white"
 					>
 						<i class="fa-solid fa-external-link mr-1"></i>
 						FedRAMP.gov
@@ -41,11 +44,11 @@
 	</main>
 
 	<!-- Footer -->
-	<footer class="bg-white border-t mt-auto">
+	<footer class="mt-auto border-t border-slate-200/80 bg-white/86 backdrop-blur-xl">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-			<div class="flex items-center justify-between text-sm text-gray-500">
-				<p>Powered by CISO Assistant</p>
-				<p>FedRAMP 20x Trust Center</p>
+			<div class="flex items-center justify-between text-sm text-slate-500">
+				<p>Powered by {BRAND_NAME}</p>
+				<p>{BRAND_TAGLINE}</p>
 			</div>
 		</div>
 	</footer>

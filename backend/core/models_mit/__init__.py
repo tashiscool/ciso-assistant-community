@@ -15,6 +15,7 @@ This module provides the core domain models for a GRC platform:
 - Metadata: Labels and terminology
 - Library: Reference controls and requirement nodes
 - Assessments: Compliance, findings, risk acceptance
+- Assessment Workflow: see core.governance package
 """
 
 from .organization import (

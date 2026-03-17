@@ -251,7 +251,7 @@
 </script>
 
 <svelte:head>
-  <title>{source?.name ?? 'Evidence Source'} - CISO Assistant</title>
+  <title>{source?.name ?? 'Evidence Source'} - Regovise</title>
 </svelte:head>
 
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">

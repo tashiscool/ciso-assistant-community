@@ -84,7 +84,7 @@
 </script>
 
 <svelte:head>
-  <title>RMF System Groups - CISO Assistant</title>
+  <title>RMF System Groups - Regovise</title>
 </svelte:head>
 
 <div class="rmf-system-groups">

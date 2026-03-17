@@ -26,6 +26,7 @@
 	} from '$lib/components/Modals/stores';
 	import { navData } from '$lib/components/SideBar/navData';
 	import { URL_MODEL_MAP } from '$lib/utils/crud';
+	import { hasModelPermission, hasPermission } from '$lib/utils/access-control';
 
 	interface Props {
 		open: boolean;
@@ -69,13 +70,10 @@
 		if (subItem.exclude) {
 			return subItem.exclude.some((role: string) => user?.roles && !user.roles.includes(role));
 		} else if (subItem.permissions) {
-			return subItem.permissions?.some(
-				(permission: string) => user?.permissions && Object.hasOwn(user.permissions, permission)
-			);
+			return subItem.permissions?.some((permission: string) => hasPermission(user, permission));
 		} else if (Object.hasOwn(URL_MODEL_MAP, subItem.href.split('/')[1])) {
 			const model = URL_MODEL_MAP[subItem.href.split('/')[1]];
-			const canViewObject =
-				user?.permissions && Object.hasOwn(user.permissions, `view_${model.name}`);
+			const canViewObject = hasModelPermission(user, 'view', model.name);
 			return canViewObject;
 		}
 		return false;

@@ -70,7 +70,7 @@ done
 
 if [[ " ${SCRIPT_SHORT_ARGS[@]} " =~ " -h " ]] || [[ " ${SCRIPT_LONG_ARGS[@]} " =~ " --help " ]]; then
   echo "Usage: e2e-tests.sh [options] [test_path]"
-  echo "Run the end-to-end tests for the CISO Assistant application."
+  echo "Run the end-to-end tests for the Regovise application."
   echo "Options:"
   echo "  -q                      Quick mode: execute only the tests 1 time with no retries and only 1 project"
   echo "  --no-quick              Disable quick mode: execute the tests with retries and all projects"
@@ -81,7 +81,7 @@ if [[ " ${SCRIPT_SHORT_ARGS[@]} " =~ " -h " ]] || [[ " ${SCRIPT_LONG_ARGS[@]} " 
   echo "  --no-sudo               Run docker commands without using sudo as a prefix."
   echo "  --port=PORT             Run the backend server on the specified port (default: $BACKEND_PORT)"
   echo "  -m, --mailer=PORT/PORT  Use an existing mailer service on the optionally defined ports (default: $MAILER_SMTP_SERVER_PORT/$MAILER_WEB_SERVER_PORT)"
-  echo "  -e, --enterprise        Run the tests on the enterprise version of the CISO Assistant"
+  echo "  -e, --enterprise        Run the tests on the enterprise version of Regovise"
 
   echo "Playwright options:"
   echo "  --browser=NAME          Run the tests in the specified browser (chromium, firefox, webkit)"

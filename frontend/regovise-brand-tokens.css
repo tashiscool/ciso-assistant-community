@@ -1,0 +1,26 @@
+:root {
+  --rv-midnight: #0B1F2A;
+  --rv-teal: #14C8B5;
+  --rv-blue: #58B5FF;
+  --rv-slate: #687784;
+  --rv-cloud: #EAF3F7;
+  --rv-white: #FFFFFF;
+  --rv-amber: #F7B54A;
+  --rv-success: #26A77B;
+
+  --rv-gradient-accent: linear-gradient(135deg, #14C8B5 0%, #58B5FF 100%);
+
+  --rv-font-display: 'Inter Display', 'Inter', sans-serif;
+  --rv-font-body: 'Inter', Arial, sans-serif;
+  --rv-font-mono: 'PT Mono', monospace;
+
+  --rv-radius-sm: 10px;
+  --rv-radius-md: 16px;
+  --rv-radius-lg: 24px;
+  --rv-radius-xl: 32px;
+  --rv-radius-pill: 999px;
+
+  --rv-shadow-card: 0 14px 40px rgba(11, 31, 42, 0.12);
+  --rv-shadow-soft: 0 8px 24px rgba(11, 31, 42, 0.10);
+  --rv-shadow-glow: 0 0 0 1px rgba(88, 181, 255, 0.12), 0 20px 40px rgba(20, 200, 181, 0.12);
+}

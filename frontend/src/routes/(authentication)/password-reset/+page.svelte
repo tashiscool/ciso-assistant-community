@@ -7,6 +7,7 @@
 	import { m } from '$paraglide/messages';
 	import { zod } from 'sveltekit-superforms/adapters';
 	import Logo from '$lib/components/Logo/Logo.svelte';
+	import { BRAND_TAGLINE } from '$lib/brand';
 
 	interface Props {
 		data: PageData;
@@ -15,23 +16,27 @@
 	let { data }: Props = $props();
 </script>
 
-<div class="flex mx-auto justify-center items-center h-screen w-screen bg-slate-200">
-	<div class="absolute top-5 left-5">
-		<div class="flex flex-row w-full space-x-4 pb-3">
-			<Logo />
-		</div>
+<div class="brand-shell relative min-h-screen overflow-hidden px-6 py-6 lg:px-10 lg:py-8">
+	<div class="flex items-start justify-between">
+		<Logo theme="light" width={194} className="h-auto w-[194px]" />
+		<span class="hidden lg:inline-flex rounded-full border border-white/12 bg-white/6 px-3 py-1.5 text-xs font-semibold tracking-[0.18em] text-white/70 uppercase">
+			Password Recovery
+		</span>
 	</div>
-	<div class="flex items-center justify-center p-10 space-x-4 w-full">
-		<div class="lg:w-1/4 p-6 shadow-lg rounded-lg bg-white">
+	<div class="flex min-h-[calc(100vh-7rem)] items-center justify-center p-4">
+		<div class="brand-card w-full max-w-md p-8 lg:p-10">
 			<div id="password_reset" class="flex flex-col items-center space-y-4">
-				<div class="bg-primary-300 px-6 py-5 rounded-full text-3xl">
+				<div class="brand-icon-badge text-3xl">
 					<i class="fa-solid fa-lock"></i>
 				</div>
-				<h3 class="font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
+				<h3 class="brand-title-gradient text-center text-3xl font-bold leading-tight tracking-tight">
 					{m.forgtPassword()}
 				</h3>
-				<p class="text-center text-gray-600 text-sm">
-					{m.enterYourEmail()}.
+				<p class="text-center text-sm text-slate-600">
+					{m.enterYourEmail()}. We will send you a secure link so you can return to Regovise.
+				</p>
+				<p class="text-center text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
+					{BRAND_TAGLINE}
 				</p>
 				<div>
 					<!-- SuperForm with dataType 'form' -->
@@ -53,10 +58,7 @@
 						{/snippet}
 					</SuperForm>
 				</div>
-				<a
-					href="/login"
-					class="flex items-center space-x-2 text-primary-800 hover:text-primary-600"
-				>
+				<a href="/login" class="flex items-center space-x-2 text-primary-800 hover:text-primary-600">
 					<i class="fa-solid fa-arrow-left"></i>
 					<p class="">{m.goBackToLogin()}</p>
 				</a>

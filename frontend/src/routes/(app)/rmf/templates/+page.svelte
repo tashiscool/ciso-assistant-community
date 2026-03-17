@@ -131,7 +131,7 @@
 </script>
 
 <svelte:head>
-  <title>RMF Templates - CISO Assistant</title>
+  <title>RMF Templates - Regovise</title>
 </svelte:head>
 
 <div class="rmf-templates min-h-screen bg-gray-50">

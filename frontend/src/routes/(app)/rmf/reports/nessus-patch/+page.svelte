@@ -88,7 +88,7 @@
 </script>
 
 <svelte:head>
-  <title>Nessus Patch Report - RMF Reports - CISO Assistant</title>
+  <title>Nessus Patch Report - RMF Reports - Regovise</title>
 </svelte:head>
 
 <div class="nessus-patch min-h-screen bg-gray-50">

@@ -42,11 +42,22 @@
 
 	const user = page.data.user;
 	const model = URL_MODEL_MAP['risk-scenarios'];
+	const scenarioPerimeter = $derived(
+		data.scenario.perimeter || data.scenario.risk_assessment?.perimeter || { id: '', str: '', folder: { id: user.root_folder_id || '' } }
+	);
+	const scenarioRiskAssessment = $derived(data.scenario.risk_assessment || { id: '', str: '' });
+	const scenarioOwners = $derived(Array.isArray(data.scenario.owner) ? data.scenario.owner : []);
+	const scenarioAppliedControls = $derived(
+		Array.isArray(data.scenario.applied_controls) ? data.scenario.applied_controls : []
+	);
+	const scenarioQualifications = $derived(
+		Array.isArray(data.scenario.qualifications) ? data.scenario.qualifications : []
+	);
 	const canEditObject: boolean = canPerformAction({
 		user,
 		action: 'change',
 		model: model.name,
-		domain: data.scenario.perimeter.folder.id
+		domain: scenarioPerimeter.folder?.id || user.root_folder_id
 	});
 	let color_map = $state({});
 	color_map['--'] = '#A9A9A9';
@@ -103,7 +114,9 @@
 				URLModel: 'risk-scenarios',
 				formAction: action,
 				listProps: {
-					items: appliedControlsSync.changes.map((ac) => ac.name),
+					items: (appliedControlsSync.changes || []).map(
+						(ac) => ac?.name || ac?.str || ac?.id || String(ac)
+					),
 					message: m.theFollowingControlsWillBeMovedToExisting()
 				}
 			}
@@ -114,7 +127,7 @@
 			// Data
 			title: m.syncToAppliedControls(),
 			body: m.syncToAppliedControlsRiskScenarioMessage({
-				count: data.scenario.applied_controls.length //change this
+				count: scenarioAppliedControls.length
 			}),
 			response: (r: boolean) => {
 				syncingToActionsIsLoading = r;
@@ -216,15 +229,15 @@
 					<p class="text-sm font-semibold text-gray-400">{m.perimeter()}</p>
 					<Anchor
 						class="anchor text-sm font-semibold"
-						href="/perimeters/{data.scenario.perimeter.id}">{data.scenario.perimeter.str}</Anchor
+						href="/perimeters/{scenarioPerimeter.id}">{scenarioPerimeter.str}</Anchor
 					>
 				</span>
 				<span>
 					<p class="text-sm font-semibold text-gray-400">{m.riskAssessment()}</p>
 					<Anchor
 						class="anchor text-sm font-semibold"
-						href="/risk-assessments/{data.scenario.risk_assessment.id}"
-						>{data.scenario.risk_assessment.str}</Anchor
+						href="/risk-assessments/{scenarioRiskAssessment.id}"
+						>{scenarioRiskAssessment.str}</Anchor
 					>
 				</span>
 				<span>
@@ -255,7 +268,7 @@
 				<div>
 					<span class=" text-sm text-gray-400 font-semibold">{m.owner()}</span>
 					<ul>
-						{#each data.scenario.owner as owner}
+						{#each scenarioOwners as owner}
 							<li class="text-xs font-semibold">{owner.str}</li>
 						{/each}
 					</ul>
@@ -429,11 +442,11 @@
 				>
 				<span
 					class="text-sm text-center font-semibold p-2 rounded-md w-20 {classesCellText(
-						data.scenario.current_level.hexcolor
+						data.scenario.current_level?.hexcolor || color_map['--']
 					)}"
-					style="background-color: {data.scenario.current_level.hexcolor}"
+					style="background-color: {data.scenario.current_level?.hexcolor || color_map['--']}"
 				>
-					{safeTranslate(data.scenario.current_level.name)}
+					{safeTranslate(data.scenario.current_level?.name || '--')}
 				</span>
 			</p>
 		</div>
@@ -479,11 +492,11 @@
 				>
 				<span
 					class="text-sm text-center font-semibold p-2 rounded-md w-20 {classesCellText(
-						data.scenario.residual_level.hexcolor
+						data.scenario.residual_level?.hexcolor || color_map['--']
 					)}"
-					style="background-color: {data.scenario.residual_level.hexcolor}"
+					style="background-color: {data.scenario.residual_level?.hexcolor || color_map['--']}"
 				>
-					{safeTranslate(data.scenario.residual_level.name)}
+					{safeTranslate(data.scenario.residual_level?.name || '--')}
 				</span>
 			</p>
 		</div>
@@ -493,7 +506,7 @@
 			<p class="text-sm font-semibold text-gray-400">{m.qualifications()}</p>
 			<p>
 				<span class="font-semibold">
-					{#each data.scenario.qualifications.sort( (a, b) => safeTranslate(a.str).localeCompare(safeTranslate(b.str)) ) as qualification, i}
+					{#each scenarioQualifications.sort( (a, b) => safeTranslate(a.str).localeCompare(safeTranslate(b.str)) ) as qualification, i}
 						{#if i > 0},{/if}
 						{safeTranslate(qualification.str) || m.undefined()}
 					{/each}
@@ -503,11 +516,11 @@
 		<div>
 			<p class="text-sm font-semibold text-gray-400">{m.strengthOfKnowledge()}</p>
 			<p>
-				{#if data.scenario.strength_of_knowledge.symbol}
+				{#if data.scenario.strength_of_knowledge?.symbol}
 					{data.scenario.strength_of_knowledge.symbol}
 				{/if}
 				<span class="font-semibold">
-					{safeTranslate(data.scenario.strength_of_knowledge.name) || m.undefined()}
+					{safeTranslate(data.scenario.strength_of_knowledge?.name || '--') || m.undefined()}
 				</span>
 			</p>
 		</div>

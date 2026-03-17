@@ -8,6 +8,7 @@
 	import { ISO_8601_REGEX } from '$lib/utils/constants';
 	import { CUSTOM_ACTIONS_COMPONENT, getFieldComponentMap, URL_MODEL_MAP } from '$lib/utils/crud';
 	import { safeTranslate, unsafeTranslate } from '$lib/utils/i18n';
+	import { normalizeIncidentSeverityLabel } from '$lib/utils/incidents';
 	import { toCamelCase } from '$lib/utils/locales.js';
 	import { onMount } from 'svelte';
 
@@ -40,6 +41,7 @@
 	import Th from './Th.svelte';
 	import ThFilter from './ThFilter.svelte';
 	import { canPerformAction } from '$lib/utils/access-control';
+	import { hasModelPermission } from '$lib/utils/access-control';
 	import { ContextMenu } from 'bits-ui';
 	import { tableHandlers, tableStates } from '$lib/utils/stores';
 	import DeleteConfirmModal from '$lib/components/Modals/DeleteConfirmModal.svelte';
@@ -410,7 +412,7 @@
 							page.params.id ||
 							user.root_folder_id
 					})
-				: Object.hasOwn(user.permissions, `add_${model.name}`)
+				: hasModelPermission(user, 'add', model.name)
 			: false
 	);
 	let contextMenuCanEditObject = $derived(
@@ -427,7 +429,7 @@
 									contextMenuOpenRow?.meta.folder ??
 									user.root_folder_id)
 					})
-				: Object.hasOwn(user.permissions, `change_${model.name}`)
+				: hasModelPermission(user, 'change', model.name)
 			: false) && !(contextMenuOpenRow?.meta.builtin || contextMenuOpenRow?.meta.urn)
 	);
 
@@ -452,7 +454,7 @@
 										contextMenuOpenRow?.meta.folder ??
 										user.root_folder_id)
 						})
-					: Object.hasOwn(user.permissions, `delete_${model.name}`)
+					: hasModelPermission(user, 'delete', model.name)
 				: false)
 	);
 
@@ -797,11 +799,13 @@
 															{formatDateOrDateTime(value, getLocale())}
 														{:else if [true, false].includes(value)}
 															<span class="ml-4">{safeTranslate(value ?? '-')}</span>
-														{:else if key === 'progress'}
-															<span class="ml-9"
-																>{safeTranslate('percentageDisplay', { number: value })}</span
-															>
-														{:else if key === 'translations'}
+															{:else if key === 'progress'}
+																<span class="ml-9"
+																	>{safeTranslate('percentageDisplay', { number: value })}</span
+																>
+															{:else if URLModel === 'incidents' && key === 'severity'}
+																{safeTranslate(normalizeIncidentSeverityLabel(value))}
+															{:else if key === 'translations'}
 															{#if Object.keys(value).length > 0}
 																<div class="flex flex-col gap-2">
 																	{#each Object.entries(value) as [lang, translation]}
