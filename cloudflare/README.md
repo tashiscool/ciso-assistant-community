@@ -1,114 +1,216 @@
-# Cloudflare Workers Foundation (D1 + R2 + CQRS)
+# Cloudflare Edge Runtime
 
-This directory now contains a full Cloudflare-first implementation slice for all major CISO Assistant feature domains.
+This directory is the starting point for the Django/Svelte to Cloudflare Workers/React migration.
 
-## Services
+It is set up to:
 
-- `edge-api-worker`: command/job API, signed R2 upload/download URLs, projection reads, export job intake
-- `command-worker`: CQRS command executor, domain writes, domain event persistence, projection/event fan-out, export enqueue
-- `analytics-worker`: immutable event consumer, R2 raw shard writer, D1 rollup projector, retention runner
-- `projection-worker`: read-model projector for dashboards, graph, automation, workflows, compliance, risk, scanner, integrations
-- `automation-worker`: cron enqueue + connector queue fan-in with persisted command/job rows
-- `export-worker`: async report/transform generation to R2 with module-specific completion events
+- serve the React app from [`apps/web`](../apps/web)
+- expose API routes from `/_api/*`
+- persist metadata in D1
+- persist workspace administration state for folders, users, groups, roles, and assignments in D1
+- persist framework controls and compliance requirement review state in D1
+- persist library-pack metadata and generated applied-control action plans in D1
+- persist third-party, privacy, and resilience workspace records in D1
+- persist report exports, chat sessions, import jobs, portal assignments, and advanced-risk studies in D1
+- store evidence artifacts in R2
+- process background work with Queues
+- coordinate tenant-scoped work with a Durable Object
 
-## Queues
+## Local workflow
 
-Expected queues:
-
-- `commands-q`
-- `events-q`
-- `projections-q`
-- `connector-sync-q`
-- `exports-q`
-- `dead-letter-q`
-
-## D1 migrations
-
-SQL migrations are in `migrations/`:
-
-- `0001_core.sql`: commands, jobs, outbox, domain events, projection checkpoints
-- `0002_read_models.sql`: initial projection/read-model tables
-- `0003_domain_and_read_expansion.sql`: feature write-model tables, artifact metadata tables, expanded read models
-- `0004_field_parity.sql`: field-level parity models/records/index tables
-- `0009_analytics_subsystem.sql`: immutable analytics dedupe, raw shard metadata, rollups, checkpoints
-
-Apply:
+1. Build the React app:
 
 ```bash
-cd cloudflare
+npm --prefix ../apps/web install
+npm --prefix ../apps/web run build
+```
+
+2. Install Worker dependencies:
+
+```bash
 npm install
-npm run migrate
 ```
 
-Or with explicit wrangler config/environment:
+3. Apply D1 migrations locally:
 
 ```bash
-WRANGLER_CONFIG=wrangler.edge-api.toml WRANGLER_ENV=staging ./scripts/apply-migrations.sh
+npm run migrate:local
 ```
 
-## `/api/v2` endpoints
-
-- `GET /api/v2/catalog`
-- `POST /api/v2/commands/{command_type}`
-- `GET /api/v2/jobs/{job_id}`
-- `POST /api/v2/exports`
-- `POST /api/v2/files/upload-url`
-- `GET /api/v2/files/download-url`
-- `PUT /api/v2/files/upload/{token}`
-- `GET /api/v2/files/download/{token}`
-- `GET /api/v2/read/{projection}`
-- `GET /api/v2/legacy/state`
-- `GET /api/v2/canonical/resources`
-- `GET /api/v2/resources`
-- `POST /api/v2/resources/mutate`
-- `POST /api/v2/legacy/dispatch`
-- `POST /api/v2/analytics/events`
-- `GET /api/v2/analytics/overview`
-- `GET /api/v2/analytics/volume`
-- `GET /api/v2/analytics/domains`
-- `GET /api/v2/analytics/sources`
-- `GET /api/v2/analytics/models`
-- `GET /api/v2/analytics/checkpoints`
-- `GET /api/v2/parity/models`
-- `POST /api/v2/parity/models/seed` (Bearer token if `CISO_ADMIN_TOKEN` set)
-- `GET /api/v2/parity/records`
-- `GET /api/v2/parity/validate`
-- `GET /api/v2/parity/checklist`
-- `GET /api/v2/parity/coverage`
-
-`/api/v2/commands/{command_type}` accepts both known command types (listed in `/api/v2/catalog`) and unknown types, which are routed through a legacy migration bridge (`legacy_domain_state` + `rm_legacy_domain_overview`) to keep long-tail Python features migrating without blocking.
-
-For the large mounted DRF-style surface, prefer the canonical resource layer:
-
-- `GET /api/v2/canonical/resources?resource_path=folders`
-- `GET /api/v2/resources?tenant_id=<tenant>&resource_path=folders`
-- `POST /api/v2/resources/mutate`
-
-That layer resolves route families against the seeded Django model/route registries in D1 and keeps generic CRUD migration logic inside the worker instead of the frontend proxy.
-
-For broad legacy `/api/*` parity, the frontend compat layer can now forward generic traffic to:
-
-- `POST /api/v2/legacy/dispatch`
-
-This endpoint parses legacy paths like `/api/folders/`, `/api/folders/{id}/`, and `/api/folders/status/` and routes them through the worker-side canonical resource handlers.
-
-## Cost optimization defaults
-
-- Heavy payloads are persisted in R2; D1 keeps metadata pointers and compact projections.
-- Analytics uses write-once immutable events, R2 NDJSON shard storage, and multi-grain D1 rollups instead of raw scans.
-- Field parity snapshots preserve full record payloads per model key (`field_parity_records`), with strict completeness checks (`STRICT_FIELD_PARITY=true`) and R2 offload for large records.
-- Tenant-scoped object keys are enforced (`{prefix}/{tenant_id}/...`) for safety and sharding readiness.
-- Artifact metadata is centralized in `r2_artifacts` for lifecycle/retention management.
-- Async-heavy domains route through queues and read models instead of synchronous joins.
-
-## Frontend cutover toggle
-
-The existing frontend config supports adapter selection via env var:
+4. Run the Worker:
 
 ```bash
-SVELTEKIT_ADAPTER=cloudflare
-PUBLIC_FRONTEND_RUNTIME=cloudflare
-PUBLIC_CLOUDFLARE_API_URL=/api/v2
+npm run dev
 ```
 
-In Cloudflare mode, the frontend runs as SPA (`frontend/src/routes/+layout.ts` has `ssr=false`) and the root app page uses typed `/api/v2` contracts from `frontend/src/lib/cloudflare/*`.
+Or run the verified local path that rebuilds the React shell first:
+
+```bash
+npm run dev:local
+```
+
+Wait until Wrangler prints that the local server is ready before running requests or the smoke test.
+
+5. Bootstrap demo data:
+
+```bash
+curl -X POST http://127.0.0.1:8787/_api/core/bootstrap-demo
+```
+
+6. Run the local smoke test:
+
+```bash
+npm run smoke:local
+```
+
+Then use the React shell with:
+
+- tenant id: `tenant-demo`
+- user id: `user-demo`
+
+The seeded workspace also includes:
+
+- users: `user-demo`, `user-analyst-demo`, `user-vendor-demo`
+- libraries: `library-demo-iso-pack`, `library-demo-vendor-pack`
+- entities: `entity-demo-main`, `entity-demo-vendor`, `entity-demo-resilience`
+- processings: `processing-demo-workforce`, `processing-demo-customer`
+- business impact analyses: `bia-demo-enterprise`, `bia-demo-vendor`
+- report export: `report-export-demo-dora`
+- import job: `import-job-demo-risk`
+- chat session: `chat-session-demo-overview`
+- portal assignment: `portal-assignment-demo-vendor`
+- EBIOS study: `ebios-study-demo-enterprise`
+- quantitative study: `quantitative-study-demo-enterprise`
+- routes: `/workspace/me`, `/workspace/domains`, `/workspace/team`, `/workspace/access`, `/frameworks`, `/frameworks/framework-demo-iso27001`, `/libraries`, `/libraries/library-demo-iso-pack`, `/assessments`, `/risk-assessments/risk-assessment-enterprise-demo`, `/risk-assessments/risk-assessment-enterprise-demo/action-plan`, `/compliance-assessments/compliance-assessment-iso-demo`, `/compliance-assessments/compliance-assessment-iso-demo/action-plan`, `/compliance-assessments/compliance-assessment-iso-demo/flash-mode`, `/applied-controls/flash-mode?complianceAssessmentId=compliance-assessment-iso-demo`, `/applied-controls/kanban-mode?complianceAssessmentId=compliance-assessment-iso-demo`, `/third-party`, `/third-party/entities/entity-demo-vendor`, `/entities/entity-demo-vendor`, `/privacy`, `/privacy/processings/processing-demo-customer`, `/processings/processing-demo-customer`, `/resilience`, `/resilience/business-impact-analyses/bia-demo-enterprise`, `/business-impact-analysis/bia-demo-enterprise`, `/reports`, `/reports/dora-roi`, `/chat`, `/imports`, `/portal`, `/portal/assignments/portal-assignment-demo-vendor`, `/advanced-risk/ebios`, `/advanced-risk/ebios/ebios-study-demo-enterprise`, `/advanced-risk/quantitative`, `/advanced-risk/quantitative/quantitative-study-demo-enterprise`, `/advanced-risk/quantitative/quantitative-study-demo-enterprise/executive-summary`, `/advanced-risk/quantitative/quantitative-study-demo-enterprise/key-metrics`, `/advanced-risk/quantitative/quantitative-study-demo-enterprise/action-plan`, `/quantitative-risk-scenarios/quant-scenario-demo-ransomware`, `/quantitative-risk-hypotheses/quant-hypothesis-demo-ransomware-current`
+
+The smoke test verifies:
+
+- folder creation
+- user creation
+- user group creation
+- custom role creation
+- direct and group-based role assignments
+- scoped access resolution for a secondary user
+- framework detail and requirement tree endpoints
+- library catalog and library detail endpoints
+- third-party entity, solution, and contract endpoints
+- privacy processing, rights request, and breach endpoints
+- business impact analysis endpoints
+- reports catalog, DORA linting, export creation, and downloads
+- workspace chat session creation and messaging
+- import pipeline execution and created-object tracking
+- portal assignment detail, response updates, and submission
+- EBIOS study detail and workshop progression
+- quantitative study detail, executive-summary, key-metrics, action-plan, and refresh flows
+- risk action-plan summary and budget-overview flows
+- perimeter creation
+- risk assessment creation
+- risk-assessment detail and scoped scenario endpoints
+- compliance assessment creation
+- compliance requirement review updates
+- compliance action-plan summary and budget endpoints
+- applied-control generation and update flows
+- framework, risk, ConMon, evidence, queue, and R2 flows
+
+Legacy route note:
+
+- the React shell now includes a legacy route bridge so old Svelte paths still land on an owned migrated workspace instead of a dead route
+
+## Production deployment
+
+This Worker now follows the same production-operating pattern used in the `../alovoa` Cloudflare setup:
+
+- a local private env file for deployment secrets and runtime knobs
+- Cloudflare token preflight verification
+- explicit production D1 migration and deploy scripts
+- post-deploy smoke and latency validation
+- a GitHub Actions deploy workflow that injects Cloudflare secrets
+
+### Local production env file
+
+Copy `cloudflare/.env.production.example` to `cloudflare/.env-prod` and fill in the private values.
+
+The deploy scripts now follow the same naming convention used in `../alovoa` and `../taxes`:
+
+- preferred: `cloudflare/.env-prod`
+- also accepted: `cloudflare/.env.production.local`
+
+For local Wrangler development, use `cloudflare/.dev.vars` when you need local-only secret bindings.
+
+Important values:
+
+- `CLOUDFLARE_ACCOUNT_ID`
+- `CLOUDFLARE_API_TOKEN`
+- `REGOVISE_WORKER_SERVICE_NAME`
+- `REGOVISE_PROD_BASE_URL`
+- optional smoke identity values: `PROD_SMOKE_TENANT_ID`, `PROD_SMOKE_USER_ID`
+- optional mail settings: `EMAIL_PROVIDER`, `EMAIL_FROM`, `EMAIL_FROM_NAME`, `EMAIL_TIMEOUT_SECONDS`, `EMAIL_WEBHOOK_URL`, `EMAIL_WEBHOOK_BEARER_TOKEN`, `EMAIL_MAILCHANNELS_URL`, `EMAIL_DKIM_*`, `MAILCHANNELS_API_KEY`
+
+The Worker now supports real Mailchannels-backed transactional email for:
+
+- workspace access provisioning
+- report export completion
+- portal assignment submission confirmation
+
+Runtime behavior:
+
+- `EMAIL_PROVIDER=none` skips delivery but still logs delivery attempts
+- `EMAIL_PROVIDER=webhook` forwards transactional email payloads to your own notification service
+- `EMAIL_PROVIDER=mailchannels` enables live delivery
+- `MAILCHANNELS_API_KEY` should be synced as a Cloudflare Worker secret
+- `EMAIL_WEBHOOK_BEARER_TOKEN` should be synced as a Cloudflare Worker secret when using `EMAIL_PROVIDER=webhook`
+- `OTP_EMAIL_*` aliases are also accepted for compatibility with the `alovoa` deploy pattern
+
+Local validation commands:
+
+```bash
+npm run smoke:local
+npm run smoke:local:email
+```
+
+Or run both together:
+
+```bash
+npm run smoke:local:full
+```
+
+### Production commands
+
+Verify token and API access:
+
+```bash
+npm run verify:production-token
+```
+
+Apply production D1 migrations:
+
+```bash
+npm run migrate:production:script
+```
+
+Run the scripted production deploy pipeline:
+
+```bash
+npm run deploy:production:script
+```
+
+The deploy script can optionally sync the `MAILCHANNELS_API_KEY` and `EMAIL_WEBHOOK_BEARER_TOKEN` Worker secrets before deployment when `RUN_SECRET_SYNC=1`.
+
+Run only the post-deploy smoke:
+
+```bash
+npm run smoke:production
+```
+
+### GitHub Actions
+
+The production deploy workflow lives at `.github/workflows/deploy-regovise-edge.yml`.
+
+It expects these GitHub Actions secrets:
+
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+- `PROD_SMOKE_TENANT_ID`
+- `PROD_SMOKE_USER_ID`
+- `MAILCHANNELS_API_KEY` (optional, enables live transactional email)
+- `EMAIL_WEBHOOK_BEARER_TOKEN` (optional, enables authenticated webhook email delivery)

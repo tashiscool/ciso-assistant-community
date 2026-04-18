@@ -4,27 +4,26 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "wrangler dev",
+    "dev:local": "node ./scripts/prepare_local_dev_vars.mjs && npm --prefix ../apps/web run build && wrangler dev --port 8787",
+    "deploy": "wrangler deploy",
+    "deploy:production": "wrangler deploy --env production",
+    "deploy:production:script": "bash ./scripts/deploy_production.sh",
     "typecheck": "tsc --noEmit",
-    "dev:edge": "wrangler dev --config wrangler.edge-api.toml",
-    "dev:command": "wrangler dev --config wrangler.command-worker.toml",
-    "dev:analytics": "wrangler dev --config wrangler.analytics-worker.toml",
-    "dev:projection": "wrangler dev --config wrangler.projection-worker.toml",
-    "dev:automation": "wrangler dev --config wrangler.automation-worker.toml",
-    "dev:export": "wrangler dev --config wrangler.export-worker.toml",
-    "deploy:edge": "wrangler deploy --config wrangler.edge-api.toml",
-    "deploy:command": "wrangler deploy --config wrangler.command-worker.toml",
-    "deploy:analytics": "wrangler deploy --config wrangler.analytics-worker.toml",
-    "deploy:projection": "wrangler deploy --config wrangler.projection-worker.toml",
-    "deploy:automation": "wrangler deploy --config wrangler.automation-worker.toml",
-    "deploy:export": "wrangler deploy --config wrangler.export-worker.toml",
-    "migrate": "bash ./scripts/apply-migrations.sh"
+    "types": "wrangler types",
+    "migrate:local": "wrangler d1 migrations apply D1_MAIN --local",
+    "migrate:remote": "wrangler d1 migrations apply D1_MAIN",
+    "migrate:production": "wrangler d1 migrations apply D1_MAIN --env production --remote",
+    "migrate:production:script": "bash ./scripts/apply_d1_migrations_remote.sh",
+    "smoke:local": "node ./scripts/local-smoke.mjs",
+    "smoke:local:email": "node ./scripts/assert_email_logs.mjs",
+    "smoke:local:full": "node ./scripts/local-smoke.mjs && node ./scripts/assert_email_logs.mjs",
+    "smoke:production": "node ./scripts/prod_smoke.mjs",
+    "verify:production-token": "bash ./scripts/verify_cloudflare_token.sh"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260304.0",
+    "@cloudflare/workers-types": "^4.20260305.1",
     "typescript": "^5.8.3",
-    "wrangler": "^4.6.0"
-  },
-  "dependencies": {
-    "xlsx": "^0.18.5"
+    "wrangler": "^4.56.0"
   }
 }

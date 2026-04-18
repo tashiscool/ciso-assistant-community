@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+
+  /* shadcn/ui CSS variables — dark theme wired to the glassmorphism palette */
+  --background: 222 47% 4%;
+  --foreground: 210 40% 98%;
+  --card: 222 47% 4%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222 47% 4%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 186 100% 52%;
+  --primary-foreground: 222 47% 4%;
+  --secondary: 217 32% 12%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217 32% 12%;
+  --muted-foreground: 215 20% 55%;
+  --accent: 217 32% 12%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 63% 31%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217 32% 14%;
+  --input: 217 32% 14%;
+  --ring: 186 100% 52%;
+  --radius: 1rem;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  @apply text-slate-50;
+  margin: 0;
+  font-family: 'Avenir Next', 'Segoe UI', sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(34, 211, 238, 0.18), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(251, 146, 60, 0.14), transparent 26%),
+    linear-gradient(180deg, #081019 0%, #05080f 100%);
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-slate-950/55 backdrop-blur-xl;
+  }
+
+  .panel {
+    @apply glass-panel rounded-[28px] border border-white/10 p-6 shadow-[0_24px_80px_rgba(2,8,23,0.55)];
+  }
+
+  .panel-subtle {
+    @apply rounded-3xl border border-white/10 bg-white/[0.03] p-4;
+  }
+
+  .eyebrow {
+    @apply text-[11px] uppercase tracking-[0.24em] text-cyan-300/70;
+  }
+
+  .label {
+    @apply text-[11px] uppercase tracking-[0.2em] text-slate-500;
+  }
+
+  .input {
+    @apply w-full rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-300/60 focus:ring-2 focus:ring-cyan-400/20;
+  }
+
+  .button-primary {
+    @apply inline-flex items-center justify-center rounded-2xl bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .button-secondary {
+    @apply inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .badge-success {
+    @apply inline-flex rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium uppercase tracking-[0.12em] text-emerald-300;
+  }
+
+  .badge-neutral {
+    @apply inline-flex rounded-full bg-slate-500/15 px-2.5 py-1 text-xs font-medium uppercase tracking-[0.12em] text-slate-300;
+  }
+
+  .badge-danger {
+    @apply inline-flex rounded-full bg-rose-500/10 px-2.5 py-1 text-xs font-medium uppercase tracking-[0.12em] text-rose-300;
+  }
+
+  .notice-success {
+    @apply rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200;
+  }
+
+  .notice-error {
+    @apply rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200;
+  }
+
+  .metric-card {
+    @apply panel-subtle;
+  }
+
+  .metric-label {
+    @apply text-xs uppercase tracking-[0.2em] text-slate-500;
+  }
+
+  .metric-value {
+    @apply mt-3 text-3xl font-semibold text-white;
+  }
+}

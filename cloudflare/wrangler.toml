@@ -1,0 +1,97 @@
+name = "ciso-assistant-edge"
+main = "src/index.ts"
+compatibility_date = "2026-03-01"
+
+[assets]
+directory = "../apps/web/dist"
+binding = "ASSETS"
+html_handling = "auto-trailing-slash"
+not_found_handling = "single-page-application"
+
+[vars]
+APP_ENV = "development"
+
+[[d1_databases]]
+binding = "D1_MAIN"
+database_name = "ciso-assistant-d1"
+database_id = "d14a0f7a-6158-4ea3-9622-e735417fb51e"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "R2_EVIDENCE"
+bucket_name = "ciso-assistant-evidence"
+preview_bucket_name = "ciso-assistant-evidence-preview"
+
+[durable_objects]
+bindings = [
+  { name = "TENANT_WORKFLOW_COORDINATOR", class_name = "TenantWorkflowCoordinator" }
+]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["TenantWorkflowCoordinator"]
+
+[queues]
+producers = [
+  { binding = "QUEUE_EVIDENCE_JOBS", queue = "ciso-assistant-evidence-jobs" },
+  { binding = "QUEUE_CONMON_JOBS", queue = "ciso-assistant-conmon-jobs" }
+]
+consumers = [
+  { queue = "ciso-assistant-evidence-jobs", max_batch_size = 5, max_retries = 3 },
+  { queue = "ciso-assistant-conmon-jobs", max_batch_size = 5, max_retries = 3 }
+]
+
+[env.production]
+name = "ciso-assistant-edge-production"
+workers_dev = false
+
+[env.production.vars]
+APP_ENV = "production"
+APP_ORIGIN = "https://regovise.com"
+EMAIL_PROVIDER = "none"
+EMAIL_FROM = "no-reply@regovise.com"
+EMAIL_FROM_NAME = "Regovise"
+EMAIL_DKIM_DOMAIN = "regovise.com"
+EMAIL_DKIM_SELECTOR = "mcdkim"
+
+[env.production.ai]
+binding = "AI"
+remote = true
+
+[[env.production.vectorize]]
+binding = "EVIDENCE_VECTOR_INDEX"
+index_name = "ciso-assistant-evidence-index"
+
+[[env.production.d1_databases]]
+binding = "D1_MAIN"
+database_name = "ciso-assistant-d1"
+database_id = "d14a0f7a-6158-4ea3-9622-e735417fb51e"
+migrations_dir = "migrations"
+
+[[env.production.r2_buckets]]
+binding = "R2_EVIDENCE"
+bucket_name = "ciso-assistant-evidence"
+preview_bucket_name = "ciso-assistant-evidence-preview"
+
+[env.production.durable_objects]
+bindings = [
+  { name = "TENANT_WORKFLOW_COORDINATOR", class_name = "TenantWorkflowCoordinator" }
+]
+
+[env.production.queues]
+producers = [
+  { binding = "QUEUE_EVIDENCE_JOBS", queue = "ciso-assistant-evidence-jobs" },
+  { binding = "QUEUE_CONMON_JOBS", queue = "ciso-assistant-conmon-jobs" }
+]
+consumers = [
+  { queue = "ciso-assistant-evidence-jobs", max_batch_size = 5, max_retries = 3 },
+  { queue = "ciso-assistant-conmon-jobs", max_batch_size = 5, max_retries = 3 }
+]
+
+[[env.production.routes]]
+pattern = "regovise.com"
+custom_domain = true
+
+[[env.production.routes]]
+pattern = "www.regovise.com"
+custom_domain = true
