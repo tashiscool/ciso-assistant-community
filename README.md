@@ -45,6 +45,22 @@ CISO Assistant offers a fresh perspective on Cybersecurity Management and **GRC*
 - Supports custom frameworks via a simple syntax and flexible tooling,
 - Provides rich **import/export** capabilities across various channels and formats (UI, CLI, Kafka, reports, etc.).
 
+## Canonical Product Direction
+
+Within this workspace, the one canonical stack is now:
+
+- shipped product: [`Regovise`](https://regovise.com)
+- canonical frontend: [apps/web](/Users/tkhan/IdeaProjects/ciso-assistant-community/apps/web)
+- canonical backend/runtime: [cloudflare](/Users/tkhan/IdeaProjects/ciso-assistant-community/cloudflare)
+- canonical production domain: `regovise.com`
+
+The other major app tracks in this repository have a narrower role:
+
+- [backend](/Users/tkhan/IdeaProjects/ciso-assistant-community/backend) and [frontend](/Users/tkhan/IdeaProjects/ciso-assistant-community/frontend) are the legacy parity source
+- [openregscale](/Users/tkhan/IdeaProjects/ciso-assistant-community/openregscale) is the UX and workflow reference sandbox
+
+The detailed consolidation decision lives in [documentation/architecture/canonical-platform.md](/Users/tkhan/IdeaProjects/ciso-assistant-community/documentation/architecture/canonical-platform.md).
+
 ![Single Hub](single_hub.png)
 
 Our vision is to create a **one-stop-shop** for cybersecurity management—modernizing GRC through **simplification** and **interoperability**.

@@ -1,6 +1,11 @@
 *.DS_Store
 *~$*
 .env
+cloudflare/.env.production.local
+cloudflare/.env-prod
+cloudflare/.dev.vars
+cloudflare/.wrangler/
+/.wrangler/
 .venv
 venv
 cli/.mcp.env

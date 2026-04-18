@@ -1,0 +1,142 @@
+name: Deploy Regovise Edge
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/**'
+      - 'cloudflare/**'
+  workflow_dispatch:
+    inputs:
+      apply_migrations:
+        description: 'Apply production D1 migrations before deploy'
+        required: false
+        default: false
+        type: boolean
+      dry_run:
+        description: 'Dry run (skip the actual deploy)'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '20'
+  CLOUDFLARE_WORKER_ENV: production
+  REGOVISE_PROD_BASE_URL: https://regovise.com
+
+jobs:
+  validate:
+    name: Typecheck and Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            apps/web/package-lock.json
+            cloudflare/package-lock.json
+
+      - run: npm ci
+        working-directory: apps/web
+
+      - run: npm ci
+        working-directory: cloudflare
+
+      - run: npm run typecheck
+        working-directory: apps/web
+
+      - run: npm run build
+        working-directory: apps/web
+
+      - run: npm run typecheck
+        working-directory: cloudflare
+
+      - name: Dry-run package validation
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler deploy --dry-run --env production
+        working-directory: cloudflare
+
+  deploy:
+    name: Deploy to Cloudflare
+    needs: [validate]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    concurrency:
+      group: regovise-cloudflare-deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            apps/web/package-lock.json
+            cloudflare/package-lock.json
+
+      - run: npm ci
+        working-directory: apps/web
+
+      - run: npm ci
+        working-directory: cloudflare
+
+      - run: npm run build
+        working-directory: apps/web
+
+      - name: Sync Mailchannels secret
+        if: github.event_name != 'workflow_dispatch' || inputs.dry_run != true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          MAILCHANNELS_API_KEY: ${{ secrets.MAILCHANNELS_API_KEY }}
+          EMAIL_WEBHOOK_BEARER_TOKEN: ${{ secrets.EMAIL_WEBHOOK_BEARER_TOKEN }}
+          BOOTSTRAP_SETUP_SECRET: ${{ secrets.BOOTSTRAP_SETUP_SECRET }}
+        run: |
+          if [ -n "${MAILCHANNELS_API_KEY:-}" ]; then
+            printf '%s' "${MAILCHANNELS_API_KEY}" | npx wrangler secret put MAILCHANNELS_API_KEY --env production
+          else
+            echo "[skip] MAILCHANNELS_API_KEY secret not configured"
+          fi
+          if [ -n "${EMAIL_WEBHOOK_BEARER_TOKEN:-}" ]; then
+            printf '%s' "${EMAIL_WEBHOOK_BEARER_TOKEN}" | npx wrangler secret put EMAIL_WEBHOOK_BEARER_TOKEN --env production
+          else
+            echo "[skip] EMAIL_WEBHOOK_BEARER_TOKEN secret not configured"
+          fi
+          if [ -n "${BOOTSTRAP_SETUP_SECRET:-}" ]; then
+            printf '%s' "${BOOTSTRAP_SETUP_SECRET}" | npx wrangler secret put BOOTSTRAP_SETUP_SECRET --env production
+          else
+            echo "[skip] BOOTSTRAP_SETUP_SECRET secret not configured"
+          fi
+        working-directory: cloudflare
+
+      - name: Apply D1 migrations
+        if: github.event_name == 'workflow_dispatch' && inputs.apply_migrations == true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npm run migrate:production
+        working-directory: cloudflare
+
+      - name: Deploy worker
+        if: github.event_name != 'workflow_dispatch' || inputs.dry_run != true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npm run deploy:production
+        working-directory: cloudflare
+
+      - name: Post-deploy smoke
+        if: github.event_name != 'workflow_dispatch' || inputs.dry_run != true
+        env:
+          REGOVISE_PROD_BASE_URL: ${{ env.REGOVISE_PROD_BASE_URL }}
+          PROD_SMOKE_TENANT_ID: ${{ secrets.PROD_SMOKE_TENANT_ID }}
+          PROD_SMOKE_USER_ID: ${{ secrets.PROD_SMOKE_USER_ID }}
+        run: npm run smoke:production
+        working-directory: cloudflare

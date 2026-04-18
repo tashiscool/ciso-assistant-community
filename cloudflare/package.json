@@ -1,0 +1,29 @@
+{
+  "name": "ciso-assistant-cloudflare",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "dev:local": "node ./scripts/prepare_local_dev_vars.mjs && npm --prefix ../apps/web run build && wrangler dev --port 8787",
+    "deploy": "wrangler deploy",
+    "deploy:production": "wrangler deploy --env production",
+    "deploy:production:script": "bash ./scripts/deploy_production.sh",
+    "typecheck": "tsc --noEmit",
+    "types": "wrangler types",
+    "migrate:local": "wrangler d1 migrations apply D1_MAIN --local",
+    "migrate:remote": "wrangler d1 migrations apply D1_MAIN",
+    "migrate:production": "wrangler d1 migrations apply D1_MAIN --env production --remote",
+    "migrate:production:script": "bash ./scripts/apply_d1_migrations_remote.sh",
+    "smoke:local": "node ./scripts/local-smoke.mjs",
+    "smoke:local:email": "node ./scripts/assert_email_logs.mjs",
+    "smoke:local:full": "node ./scripts/local-smoke.mjs && node ./scripts/assert_email_logs.mjs",
+    "smoke:production": "node ./scripts/prod_smoke.mjs",
+    "verify:production-token": "bash ./scripts/verify_cloudflare_token.sh"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260305.1",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.56.0"
+  }
+}
