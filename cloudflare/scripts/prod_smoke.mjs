@@ -27,6 +27,36 @@ const authedChecks = [
   { name: 'parity overview', path: '/_api/ops/parity/overview', expect: [200] },
 ];
 
+async function exchangeWorkspaceSession() {
+  const res = await fetch(`${baseUrl}/_api/core/session/exchange`, {
+    method: 'POST',
+    headers: {
+      'User-Agent': 'regovise-prod-smoke/1.0',
+      'x-tenant-id': tenantId,
+      'x-user-id': userId,
+    },
+  });
+
+  if (res.status !== 201) {
+    const body = await res.text();
+    throw new Error(
+      `Unexpected status for session exchange: ${res.status}. Body=${body.slice(0, 500)}`,
+    );
+  }
+
+  const setCookie = res.headers.get('set-cookie');
+  if (!setCookie) {
+    throw new Error('Session exchange succeeded but did not return a Set-Cookie header.');
+  }
+
+  const cookieHeader = setCookie.split(';', 1)[0]?.trim();
+  if (!cookieHeader) {
+    throw new Error('Unable to derive a Cookie header from the session exchange response.');
+  }
+
+  return cookieHeader;
+}
+
 function percentile(sorted, p) {
   if (sorted.length === 0) return 0;
   const index = Math.min(sorted.length - 1, Math.ceil((p / 100) * sorted.length) - 1);
@@ -77,8 +107,7 @@ for (const check of publicChecks) {
 }
 
 const authHeaders = {
-  'x-tenant-id': tenantId,
-  'x-user-id': userId,
+  Cookie: await exchangeWorkspaceSession(),
 };
 
 for (const check of authedChecks) {
