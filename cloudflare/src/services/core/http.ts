@@ -4,7 +4,7 @@ import {
   getEmailRuntimeSummary,
   sendLocalSignInCodeEmail,
 } from '../../email';
-import { requireRootAdminAccess } from '../../authorization';
+import { requireAnyPermission, requireRootAdminAccess } from '../../authorization';
 import { getAiRuntimeStatus } from '../ai/runtime';
 import { seedDemoIamWorkspace } from '../iam/http';
 import { buildOpsOverviewCounts, seedDemoOpsWorkspace } from '../ops/http';
@@ -887,6 +887,77 @@ const APPLIED_CONTROL_STATUSES = new Set([
 ]);
 const APPLIED_CONTROL_PRIORITIES = new Set(['P1', 'P2', 'P3', 'P4']);
 const APPLIED_CONTROL_EFFORTS = new Set(['XS', 'S', 'M', 'L', 'XL']);
+const FOLDER_READ_PERMISSIONS = ['view_folder', 'add_folder', 'change_folder'];
+const FOLDER_WRITE_PERMISSIONS = ['add_folder', 'change_folder'];
+const FRAMEWORK_READ_PERMISSIONS = ['view_framework', 'add_framework', 'change_framework'];
+const FRAMEWORK_WRITE_PERMISSIONS = ['add_framework', 'change_framework'];
+const RISK_READ_PERMISSIONS = [
+  'view_riskregister',
+  'add_riskregister',
+  'change_riskregister',
+  'view_riskscenario',
+  'add_riskscenario',
+  'change_riskscenario',
+];
+const RISK_WRITE_PERMISSIONS = [
+  'add_riskregister',
+  'change_riskregister',
+  'add_riskscenario',
+  'change_riskscenario',
+];
+const TPRM_READ_PERMISSIONS = [
+  'view_entity',
+  'add_entity',
+  'change_entity',
+  'view_solution',
+  'add_solution',
+  'change_solution',
+  'view_contract',
+  'add_contract',
+  'change_contract',
+  'view_entityassessment',
+  'add_entityassessment',
+  'change_entityassessment',
+];
+const TPRM_WRITE_PERMISSIONS = [
+  'add_entity',
+  'change_entity',
+  'add_solution',
+  'change_solution',
+  'add_contract',
+  'change_contract',
+  'add_entityassessment',
+  'change_entityassessment',
+];
+const PRIVACY_READ_PERMISSIONS = [
+  'view_processing',
+  'add_processing',
+  'change_processing',
+  'view_rightrequest',
+  'add_rightrequest',
+  'change_rightrequest',
+  'view_databreach',
+  'add_databreach',
+  'change_databreach',
+];
+const PRIVACY_WRITE_PERMISSIONS = [
+  'add_processing',
+  'change_processing',
+  'add_rightrequest',
+  'change_rightrequest',
+  'add_databreach',
+  'change_databreach',
+];
+const RESILIENCE_READ_PERMISSIONS = ['view_bia', 'add_bia', 'change_bia'];
+const RESILIENCE_WRITE_PERMISSIONS = ['add_bia', 'change_bia'];
+const CORE_OVERVIEW_READ_PERMISSIONS = [
+  ...FOLDER_READ_PERMISSIONS,
+  ...FRAMEWORK_READ_PERMISSIONS,
+  ...RISK_READ_PERMISSIONS,
+  ...TPRM_READ_PERMISSIONS,
+  ...PRIVACY_READ_PERMISSIONS,
+  ...RESILIENCE_READ_PERMISSIONS,
+];
 
 const DEMO_FRAMEWORK_CONTROLS = [
   {
@@ -1030,6 +1101,23 @@ const DEMO_FRAMEWORK_CONTROLS = [
     description: 'Exercise recovery plans and feed lessons learned into operations.',
   },
 ];
+
+async function requireCorePermissionFamily(
+  ctx: WorkerRequestContext,
+  readPermissions: string[],
+  writePermissions: string[],
+  domainLabel: string,
+): Promise<Response | null> {
+  const isReadOperation = ctx.request.method === 'GET' || ctx.request.method === 'HEAD';
+  const requiredPermissions = isReadOperation ? readPermissions : writePermissions;
+  const access = await requireAnyPermission(
+    ctx,
+    requiredPermissions,
+    `${domainLabel} access is not permitted for the active identity.`,
+  );
+
+  return access instanceof Response ? access : null;
+}
 
 const DEMO_LIBRARIES = [
   {
@@ -4376,6 +4464,30 @@ async function initializeFirstTenant(
     'view_riskscenario',
     'add_riskscenario',
     'change_riskscenario',
+    'view_entity',
+    'add_entity',
+    'change_entity',
+    'view_solution',
+    'add_solution',
+    'change_solution',
+    'view_contract',
+    'add_contract',
+    'change_contract',
+    'view_entityassessment',
+    'add_entityassessment',
+    'change_entityassessment',
+    'view_processing',
+    'add_processing',
+    'change_processing',
+    'view_rightrequest',
+    'add_rightrequest',
+    'change_rightrequest',
+    'view_databreach',
+    'add_databreach',
+    'change_databreach',
+    'view_bia',
+    'add_bia',
+    'change_bia',
     'view_conmon',
     'run_conmon',
     'view_evidence',
@@ -5675,6 +5787,15 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      CORE_OVERVIEW_READ_PERMISSIONS,
+      CORE_OVERVIEW_READ_PERMISSIONS,
+      'Workspace overview',
+    );
+    if (accessError) {
+      return accessError;
+    }
 
     const counts = await buildOverviewCounts(ctx.env, ctx.tenantId);
 
@@ -5689,6 +5810,15 @@ export async function handleCoreRoutes(
   if (resource === 'libraries') {
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
+    }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      FRAMEWORK_READ_PERMISSIONS,
+      FRAMEWORK_WRITE_PERMISSIONS,
+      'Library',
+    );
+    if (accessError) {
+      return accessError;
     }
 
     if (id) {
@@ -5805,6 +5935,15 @@ export async function handleCoreRoutes(
   if (resource === 'frameworks') {
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
+    }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      FRAMEWORK_READ_PERMISSIONS,
+      FRAMEWORK_WRITE_PERMISSIONS,
+      'Framework',
+    );
+    if (accessError) {
+      return accessError;
     }
 
     if (id) {
@@ -6038,6 +6177,15 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      FOLDER_READ_PERMISSIONS,
+      FOLDER_WRITE_PERMISSIONS,
+      'Perimeter',
+    );
+    if (accessError) {
+      return accessError;
+    }
 
     if (ctx.request.method === 'GET') {
       const { results } = await ctx.env.D1_MAIN.prepare(
@@ -6223,6 +6371,15 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      RISK_READ_PERMISSIONS,
+      RISK_WRITE_PERMISSIONS,
+      'Risk register',
+    );
+    if (accessError) {
+      return accessError;
+    }
 
     if (ctx.request.method === 'GET') {
       const { results } = await ctx.env.D1_MAIN.prepare(
@@ -6341,6 +6498,15 @@ export async function handleCoreRoutes(
   if (resource === 'risk-scenarios') {
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
+    }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      RISK_READ_PERMISSIONS,
+      RISK_WRITE_PERMISSIONS,
+      'Risk scenario',
+    );
+    if (accessError) {
+      return accessError;
     }
 
     if (ctx.request.method === 'GET') {
@@ -6583,6 +6749,15 @@ export async function handleCoreRoutes(
   if (resource === 'risk-assessments') {
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
+    }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      RISK_READ_PERMISSIONS,
+      RISK_WRITE_PERMISSIONS,
+      'Risk assessment',
+    );
+    if (accessError) {
+      return accessError;
     }
 
     if (id) {
@@ -7099,6 +7274,15 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      FRAMEWORK_READ_PERMISSIONS,
+      FRAMEWORK_WRITE_PERMISSIONS,
+      'Compliance assessment',
+    );
+    if (accessError) {
+      return accessError;
+    }
 
     if (id) {
       const assessment = await ctx.env.D1_MAIN.prepare(
@@ -7594,6 +7778,15 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      FRAMEWORK_READ_PERMISSIONS,
+      FRAMEWORK_WRITE_PERMISSIONS,
+      'Applied control',
+    );
+    if (accessError) {
+      return accessError;
+    }
 
     if (id) {
       if (ctx.request.method !== 'POST') {
@@ -7685,6 +7878,15 @@ export async function handleCoreRoutes(
   if (resource === 'entities') {
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
+    }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      TPRM_READ_PERMISSIONS,
+      TPRM_WRITE_PERMISSIONS,
+      'Third-party entity',
+    );
+    if (accessError) {
+      return accessError;
     }
 
     if (id) {
@@ -8206,6 +8408,15 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      TPRM_READ_PERMISSIONS,
+      TPRM_WRITE_PERMISSIONS,
+      'Third-party solution',
+    );
+    if (accessError) {
+      return accessError;
+    }
 
     if (ctx.request.method === 'GET') {
       const entityId = ctx.url.searchParams.get('entityId')?.trim();
@@ -8534,6 +8745,15 @@ export async function handleCoreRoutes(
   if (resource === 'contracts') {
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
+    }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      TPRM_READ_PERMISSIONS,
+      TPRM_WRITE_PERMISSIONS,
+      'Contract',
+    );
+    if (accessError) {
+      return accessError;
     }
 
     if (ctx.request.method === 'GET') {
@@ -8885,6 +9105,15 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      TPRM_READ_PERMISSIONS,
+      TPRM_WRITE_PERMISSIONS,
+      'Entity assessment',
+    );
+    if (accessError) {
+      return accessError;
+    }
 
     if (ctx.request.method !== 'GET') {
       return methodNotAllowed(['GET']);
@@ -8949,6 +9178,15 @@ export async function handleCoreRoutes(
   if (resource === 'processings') {
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
+    }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      PRIVACY_READ_PERMISSIONS,
+      PRIVACY_WRITE_PERMISSIONS,
+      'Processing',
+    );
+    if (accessError) {
+      return accessError;
     }
 
     if (id) {
@@ -9262,6 +9500,15 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      PRIVACY_READ_PERMISSIONS,
+      PRIVACY_WRITE_PERMISSIONS,
+      'Privacy right request',
+    );
+    if (accessError) {
+      return accessError;
+    }
 
     if (ctx.request.method === 'GET') {
       const { results } = await ctx.env.D1_MAIN.prepare(
@@ -9490,6 +9737,15 @@ export async function handleCoreRoutes(
   if (resource === 'data-breaches') {
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
+    }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      PRIVACY_READ_PERMISSIONS,
+      PRIVACY_WRITE_PERMISSIONS,
+      'Data breach',
+    );
+    if (accessError) {
+      return accessError;
     }
 
     if (ctx.request.method === 'GET') {
@@ -9754,6 +10010,15 @@ export async function handleCoreRoutes(
   if (resource === 'business-impact-analyses') {
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
+    }
+    const accessError = await requireCorePermissionFamily(
+      ctx,
+      RESILIENCE_READ_PERMISSIONS,
+      RESILIENCE_WRITE_PERMISSIONS,
+      'Business impact analysis',
+    );
+    if (accessError) {
+      return accessError;
     }
 
     if (id) {

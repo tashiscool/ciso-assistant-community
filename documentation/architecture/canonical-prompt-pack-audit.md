@@ -135,6 +135,13 @@ What is true today:
   - the auditee portal now uses actor-safe authorization semantics:
     - internal users need framework-view/framework-management permissions
     - auditee users can only access assignments whose `actor_email` matches their signed-in identity
+- Canonical `core` routes now also enforce real permission families instead of relying on tenant/session presence alone:
+  - libraries, frameworks, compliance assessments, and applied controls align to framework permissions
+  - perimeters align to folder-management permissions
+  - risk registers, scenarios, and risk assessments align to risk permissions
+  - third-party entities, solutions, contracts, and entity assessments align to TPRM permissions
+  - processings, right requests, and data breaches align to privacy permissions
+  - business impact analyses align to resilience permissions
 - The Worker now includes dedicated service namespaces for:
   - `core`
   - `iam`
@@ -155,6 +162,7 @@ What is not yet true:
 - The canonical stack now satisfies the prompt-pack route coverage bar, but not the broader production-hardening bar.
 - The canonical stack still has production-hardening work left, but the builder, operations, setup/admin, and AI/export prompt-pack families now exist as first-class Cloudflare-native surfaces.
 - The canonical AI family now supports optional Workers AI and Vectorize-backed execution with deterministic fallback for environments where those bindings are not provisioned.
+- The canonical permission model is stronger now, but several core query paths still need folder/domain-scope filtering so scoped roles do not automatically expand to tenant-wide reads for every row family.
 
 ## Recommended Next Tranches
 
@@ -167,7 +175,7 @@ What is not yet true:
    - the canonical stack now also includes a guarded first-run bootstrap and admin recovery path for empty production tenants, backed by `BOOTSTRAP_SETUP_SECRET`
    - canonical local sign-in now supports D1-backed one-time email codes for users marked with `keep_local_login`, with production delivery gated on the configured email provider and dev environments falling back to preview codes when delivery is intentionally disabled
    - canonical local sign-in also supports D1-backed password credentials for `keep_local_login` users, including guarded bootstrap-side password initialization, normal cookie-session sign-in on production, authenticated self-service password rotation in `My Access`, and tenant-admin temporary-password provisioning in `Team & Groups`
-   - next likely slices are finer-grained IAM enforcement on non-admin services and broader first-party identity options beyond bootstrap/admin recovery, local email codes, and local password sign-in
+   - next likely slices are scope-aware folder/domain filtering across the core services and broader first-party identity options beyond bootstrap/admin recovery, local email codes, and local password sign-in
 
 ## Bottom Line
 
