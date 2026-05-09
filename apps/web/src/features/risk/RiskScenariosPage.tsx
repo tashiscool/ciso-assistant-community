@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import { ApiClient } from '../../shared/api/client';
 import { useEdgeIdentity } from '../../shared/session/identity';
+import type { WorkspaceFolder } from '../iam/types';
 
 type RiskRegister = {
   id: string;
   tenantId: string;
+  folderId: string | null;
+  folderName: string | null;
   name: string;
   description: string | null;
   createdAt: string;
@@ -31,6 +34,7 @@ const client = new ApiClient();
 
 export function RiskScenariosPage() {
   const { identity } = useEdgeIdentity();
+  const [folders, setFolders] = useState<WorkspaceFolder[]>([]);
   const [registers, setRegisters] = useState<RiskRegister[]>([]);
   const [scenarios, setScenarios] = useState<RiskScenario[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +42,7 @@ export function RiskScenariosPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const [registerBusy, setRegisterBusy] = useState(false);
   const [scenarioBusy, setScenarioBusy] = useState(false);
+  const [registerFolderId, setRegisterFolderId] = useState('');
   const [registerName, setRegisterName] = useState('');
   const [registerDescription, setRegisterDescription] = useState('');
   const [selectedRegisterId, setSelectedRegisterId] = useState('');
@@ -51,12 +56,17 @@ export function RiskScenariosPage() {
     try {
       setLoading(true);
       setError(null);
-      const [registerResponse, scenarioResponse] = await Promise.all([
+      const [folderResponse, registerResponse, scenarioResponse] = await Promise.all([
+        client.get<{ data: WorkspaceFolder[] }>('/iam/folders?contentType=domain'),
         client.get<{ data: RiskRegister[] }>('/core/risk-registers'),
         client.get<{ data: RiskScenario[] }>('/core/risk-scenarios'),
       ]);
+      setFolders(folderResponse.data);
       setRegisters(registerResponse.data);
       setScenarios(scenarioResponse.data);
+      if (!registerFolderId && folderResponse.data[0]?.id) {
+        setRegisterFolderId(folderResponse.data[0].id);
+      }
       if (!selectedRegisterId && registerResponse.data[0]?.id) {
         setSelectedRegisterId(registerResponse.data[0].id);
       }
@@ -77,11 +87,19 @@ export function RiskScenariosPage() {
     }
   }, [registers, selectedRegisterId]);
 
+  useEffect(() => {
+    if (!registerFolderId && folders[0]?.id) {
+      setRegisterFolderId(folders[0].id);
+    }
+  }, [folders, registerFolderId]);
+
   async function createRegister() {
     try {
       setRegisterBusy(true);
+      setError(null);
       setNotice(null);
       const response = await client.post<{ data: RiskRegister }>('/core/risk-registers', {
+        folderId: registerFolderId,
         name: registerName,
         description: registerDescription,
       });
@@ -149,6 +167,11 @@ export function RiskScenariosPage() {
               {registers.map((register) => (
                 <div className="panel-subtle" key={register.id}>
                   <div className="font-medium text-white">{register.name}</div>
+                  {register.folderName && (
+                    <div className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">
+                      {register.folderName}
+                    </div>
+                  )}
                   <div className="mt-2 text-sm leading-6 text-slate-300">{register.description}</div>
                 </div>
               ))}
@@ -170,6 +193,20 @@ export function RiskScenariosPage() {
               }}
             >
               <label className="space-y-1">
+                <span className="label">Domain</span>
+                <select
+                  className="input"
+                  onChange={(event) => setRegisterFolderId(event.target.value)}
+                  value={registerFolderId}
+                >
+                  {folders.map((folder) => (
+                    <option key={folder.id} value={folder.id}>
+                      {folder.pathLabel}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="space-y-1">
                 <span className="label">Register name</span>
                 <input
                   className="input"
@@ -190,6 +227,11 @@ export function RiskScenariosPage() {
               <button className="button-primary" disabled={registerBusy} type="submit">
                 {registerBusy ? 'Saving...' : 'Add Register'}
               </button>
+              {folders.length === 0 && (
+                <div className="text-sm text-slate-400">
+                  No accessible domains are available for new risk registers.
+                </div>
+              )}
             </form>
           </section>
         </div>

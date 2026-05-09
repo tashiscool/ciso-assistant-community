@@ -4,7 +4,12 @@ import {
   getEmailRuntimeSummary,
   sendLocalSignInCodeEmail,
 } from '../../email';
-import { requireAnyPermission, requireRootAdminAccess } from '../../authorization';
+import {
+  loadScopedPermissionContext,
+  requireAnyPermission,
+  requireRootAdminAccess,
+  type ScopedPermissionContext,
+} from '../../authorization';
 import { getAiRuntimeStatus } from '../ai/runtime';
 import { seedDemoIamWorkspace } from '../iam/http';
 import { buildOpsOverviewCounts, seedDemoOpsWorkspace } from '../ops/http';
@@ -158,6 +163,8 @@ type ControlRow = {
 type RiskRegisterRow = {
   id: string;
   tenant_id: string;
+  folder_id: string | null;
+  folder_name: string | null;
   name: string;
   description: string | null;
   created_at: string;
@@ -640,6 +647,7 @@ type CreateControlInput = {
 };
 
 type CreateRiskRegisterInput = {
+  folderId?: string;
   name?: string;
   description?: string;
 };
@@ -1107,16 +1115,62 @@ async function requireCorePermissionFamily(
   readPermissions: string[],
   writePermissions: string[],
   domainLabel: string,
-): Promise<Response | null> {
+): Promise<ScopedPermissionContext | Response> {
   const isReadOperation = ctx.request.method === 'GET' || ctx.request.method === 'HEAD';
   const requiredPermissions = isReadOperation ? readPermissions : writePermissions;
-  const access = await requireAnyPermission(
+  const access = await loadScopedPermissionContext(
     ctx,
     requiredPermissions,
-    `${domainLabel} access is not permitted for the active identity.`,
   );
+  if (access instanceof Response) {
+    return access;
+  }
+  if (access.permissions.length > 0) {
+    return access;
+  }
 
-  return access instanceof Response ? access : null;
+  return json(
+    {
+      error: 'forbidden',
+      message: `${domainLabel} access is not permitted for the active identity.`,
+    },
+    { status: 403 },
+  );
+}
+
+function buildInListPredicate(column: string, values: readonly string[]): { clause: string; bindings: string[] } {
+  if (values.length === 0) {
+    return {
+      clause: '1 = 0',
+      bindings: [],
+    };
+  }
+
+  return {
+    clause: `${column} IN (${values.map(() => '?').join(', ')})`,
+    bindings: [...values],
+  };
+}
+
+function buildAccessibleDomainPredicate(
+  column: string,
+  access: ScopedPermissionContext,
+): { clause: string; bindings: string[] } {
+  return buildInListPredicate(column, access.accessibleDomainIds);
+}
+
+function hasAccessibleDomainScope(
+  access: ScopedPermissionContext,
+  folderId: string | null | undefined,
+): folderId is string {
+  return Boolean(folderId && access.accessibleDomainIds.includes(folderId));
+}
+
+function filterRowsByAccessibleDomainScope<T extends { folder_id: string | null }>(
+  rows: T[],
+  access: ScopedPermissionContext,
+): T[] {
+  return rows.filter((row) => hasAccessibleDomainScope(access, row.folder_id));
 }
 
 const DEMO_LIBRARIES = [
@@ -1343,6 +1397,8 @@ function toRiskRegisterResponse(row: RiskRegisterRow) {
   return {
     id: row.id,
     tenantId: row.tenant_id,
+    folderId: row.folder_id,
+    folderName: row.folder_name,
     name: row.name,
     description: row.description,
     createdAt: row.created_at,
@@ -3692,23 +3748,25 @@ async function bootstrapDemoTenant(env: EnvBindings) {
     ),
     env.D1_MAIN.prepare(
       `
-      INSERT OR IGNORE INTO risk_registers (id, tenant_id, name, description)
-      VALUES (?, ?, ?, ?)
+      INSERT OR IGNORE INTO risk_registers (id, tenant_id, folder_id, name, description)
+      VALUES (?, ?, ?, ?, ?)
       `,
     ).bind(
       DEMO_IDS.registerId,
       DEMO_IDS.tenantId,
+      DEMO_IDS.governanceFolderId,
       'Enterprise Risk Register',
       'Seeded register for the Workers migration baseline',
     ),
     env.D1_MAIN.prepare(
       `
-      INSERT OR IGNORE INTO risk_registers (id, tenant_id, name, description)
-      VALUES (?, ?, ?, ?)
+      INSERT OR IGNORE INTO risk_registers (id, tenant_id, folder_id, name, description)
+      VALUES (?, ?, ?, ?, ?)
       `,
     ).bind(
       DEMO_IDS.registerSecondaryId,
       DEMO_IDS.tenantId,
+      DEMO_IDS.vendorFolderId,
       'Vendor Risk Register',
       'Third-party and supplier exposure tracked for the demo workspace',
     ),
@@ -5787,14 +5845,14 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const overviewAccess = await requireCorePermissionFamily(
       ctx,
       CORE_OVERVIEW_READ_PERMISSIONS,
       CORE_OVERVIEW_READ_PERMISSIONS,
       'Workspace overview',
     );
-    if (accessError) {
-      return accessError;
+    if (overviewAccess instanceof Response) {
+      return overviewAccess;
     }
 
     const counts = await buildOverviewCounts(ctx.env, ctx.tenantId);
@@ -5811,14 +5869,14 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const libraryAccess = await requireCorePermissionFamily(
       ctx,
       FRAMEWORK_READ_PERMISSIONS,
       FRAMEWORK_WRITE_PERMISSIONS,
       'Library',
     );
-    if (accessError) {
-      return accessError;
+    if (libraryAccess instanceof Response) {
+      return libraryAccess;
     }
 
     if (id) {
@@ -5936,14 +5994,14 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const frameworkAccess = await requireCorePermissionFamily(
       ctx,
       FRAMEWORK_READ_PERMISSIONS,
       FRAMEWORK_WRITE_PERMISSIONS,
       'Framework',
     );
-    if (accessError) {
-      return accessError;
+    if (frameworkAccess instanceof Response) {
+      return frameworkAccess;
     }
 
     if (id) {
@@ -6177,14 +6235,14 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const access = await requireCorePermissionFamily(
       ctx,
       FOLDER_READ_PERMISSIONS,
       FOLDER_WRITE_PERMISSIONS,
       'Perimeter',
     );
-    if (accessError) {
-      return accessError;
+    if (access instanceof Response) {
+      return access;
     }
 
     if (ctx.request.method === 'GET') {
@@ -6212,7 +6270,7 @@ export async function handleCoreRoutes(
         .all<PerimeterRow>();
 
       return json({
-        data: results.map(toPerimeterResponse),
+        data: filterRowsByAccessibleDomainScope(results, access).map(toPerimeterResponse),
       });
     }
 
@@ -6239,7 +6297,7 @@ export async function handleCoreRoutes(
         .bind(ctx.tenantId, folderId)
         .first<{ id: string; name: string }>();
 
-      if (!folder) {
+      if (!folder || !hasAccessibleDomainScope(access, folderId)) {
         return json(
           { error: 'folder_not_found', message: 'The selected folder does not exist.' },
           { status: 404 },
@@ -6292,6 +6350,21 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'PUT' && id) {
+      const existing = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM perimeters
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, id)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const body = (await ctx.request.json()) as CreatePerimeterInput;
       const name = body.name?.trim();
 
@@ -6350,6 +6423,21 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'DELETE' && id) {
+      const existing = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM perimeters
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, id)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const result = await ctx.env.D1_MAIN.prepare(
         `DELETE FROM perimeters WHERE id = ? AND tenant_id = ?`,
       )
@@ -6371,26 +6459,38 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const access = await requireCorePermissionFamily(
       ctx,
       RISK_READ_PERMISSIONS,
       RISK_WRITE_PERMISSIONS,
       'Risk register',
     );
-    if (accessError) {
-      return accessError;
+    if (access instanceof Response) {
+      return access;
     }
 
     if (ctx.request.method === 'GET') {
+      const registerScope = buildAccessibleDomainPredicate('risk_register.folder_id', access);
       const { results } = await ctx.env.D1_MAIN.prepare(
         `
-        SELECT id, tenant_id, name, description, created_at, updated_at
-        FROM risk_registers
-        WHERE tenant_id = ?
-        ORDER BY name ASC
+        SELECT
+          risk_register.id,
+          risk_register.tenant_id,
+          risk_register.folder_id,
+          folder_item.name AS folder_name,
+          risk_register.name,
+          risk_register.description,
+          risk_register.created_at,
+          risk_register.updated_at
+        FROM risk_registers AS risk_register
+        LEFT JOIN folders AS folder_item
+          ON folder_item.id = risk_register.folder_id
+        WHERE risk_register.tenant_id = ?
+          AND ${registerScope.clause}
+        ORDER BY folder_item.name ASC, risk_register.name ASC
         `,
       )
-        .bind(ctx.tenantId)
+        .bind(ctx.tenantId, ...registerScope.bindings)
         .all<RiskRegisterRow>();
 
       return json({
@@ -6400,12 +6500,37 @@ export async function handleCoreRoutes(
 
     if (ctx.request.method === 'POST') {
       const body = (await ctx.request.json()) as CreateRiskRegisterInput;
+      const folderId = body.folderId?.trim();
       const name = body.name?.trim();
 
-      if (!name) {
+      if (!folderId || !name) {
         return json(
-          { error: 'invalid_risk_register', message: 'Risk register name is required.' },
+          {
+            error: 'invalid_risk_register',
+            message: 'Risk register name and folder are required.',
+          },
           { status: 400 },
+        );
+      }
+
+      const folder = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, name
+        FROM folders
+        WHERE tenant_id = ? AND id = ? AND content_type = 'domain'
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, folderId)
+        .first<{ id: string; name: string }>();
+
+      if (!folder || !hasAccessibleDomainScope(access, folderId)) {
+        return json(
+          {
+            error: 'folder_not_found',
+            message: 'The selected folder does not exist.',
+          },
+          { status: 404 },
         );
       }
 
@@ -6414,18 +6539,28 @@ export async function handleCoreRoutes(
 
       await ctx.env.D1_MAIN.prepare(
         `
-        INSERT INTO risk_registers (id, tenant_id, name, description)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO risk_registers (id, tenant_id, folder_id, name, description)
+        VALUES (?, ?, ?, ?, ?)
         `,
       )
-        .bind(registerId, ctx.tenantId, name, description)
+        .bind(registerId, ctx.tenantId, folderId, name, description)
         .run();
 
       const register = await ctx.env.D1_MAIN.prepare(
         `
-        SELECT id, tenant_id, name, description, created_at, updated_at
-        FROM risk_registers
-        WHERE id = ? AND tenant_id = ?
+        SELECT
+          risk_register.id,
+          risk_register.tenant_id,
+          risk_register.folder_id,
+          folder_item.name AS folder_name,
+          risk_register.name,
+          risk_register.description,
+          risk_register.created_at,
+          risk_register.updated_at
+        FROM risk_registers AS risk_register
+        LEFT JOIN folders AS folder_item
+          ON folder_item.id = risk_register.folder_id
+        WHERE risk_register.id = ? AND risk_register.tenant_id = ?
         LIMIT 1
         `,
       )
@@ -6442,6 +6577,7 @@ export async function handleCoreRoutes(
 
     if (ctx.request.method === 'PUT' && id) {
       const body = (await ctx.request.json()) as CreateRiskRegisterInput;
+      const folderId = body.folderId?.trim() || null;
       const name = body.name?.trim();
 
       if (!name) {
@@ -6451,37 +6587,79 @@ export async function handleCoreRoutes(
         );
       }
 
+      if (folderId) {
+        const folder = await ctx.env.D1_MAIN.prepare(
+          `
+          SELECT id
+          FROM folders
+          WHERE tenant_id = ? AND id = ? AND content_type = 'domain'
+          LIMIT 1
+          `,
+        )
+          .bind(ctx.tenantId, folderId)
+          .first<{ id: string }>();
+
+        if (!folder || !hasAccessibleDomainScope(access, folderId)) {
+          return json(
+            {
+              error: 'folder_not_found',
+              message: 'The selected folder does not exist.',
+            },
+            { status: 404 },
+          );
+        }
+      }
+
+      const registerScope = buildAccessibleDomainPredicate('folder_id', access);
       await ctx.env.D1_MAIN.prepare(
         `
         UPDATE risk_registers
         SET name = ?,
             description = ?,
+            folder_id = COALESCE(?, folder_id),
             updated_at = (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
         WHERE id = ? AND tenant_id = ?
+          AND ${registerScope.clause}
         `,
       )
-        .bind(name, body.description?.trim() || null, id, ctx.tenantId)
+        .bind(name, body.description?.trim() || null, folderId, id, ctx.tenantId, ...registerScope.bindings)
         .run();
 
       const updated = await ctx.env.D1_MAIN.prepare(
         `
-        SELECT id, tenant_id, name, description, created_at, updated_at
-        FROM risk_registers
-        WHERE id = ? AND tenant_id = ?
+        SELECT
+          risk_register.id,
+          risk_register.tenant_id,
+          risk_register.folder_id,
+          folder_item.name AS folder_name,
+          risk_register.name,
+          risk_register.description,
+          risk_register.created_at,
+          risk_register.updated_at
+        FROM risk_registers AS risk_register
+        LEFT JOIN folders AS folder_item
+          ON folder_item.id = risk_register.folder_id
+        WHERE risk_register.id = ? AND risk_register.tenant_id = ?
+          AND ${buildAccessibleDomainPredicate('risk_register.folder_id', access).clause}
         LIMIT 1
         `,
       )
-        .bind(id, ctx.tenantId)
+        .bind(id, ctx.tenantId, ...buildAccessibleDomainPredicate('risk_register.folder_id', access).bindings)
         .first<RiskRegisterRow>();
 
       return updated ? json({ data: toRiskRegisterResponse(updated) }) : json({ error: 'not_found' }, { status: 404 });
     }
 
     if (ctx.request.method === 'DELETE' && id) {
+      const registerScope = buildAccessibleDomainPredicate('folder_id', access);
       const result = await ctx.env.D1_MAIN.prepare(
-        `DELETE FROM risk_registers WHERE id = ? AND tenant_id = ?`,
+        `
+        DELETE FROM risk_registers
+        WHERE id = ? AND tenant_id = ?
+          AND ${registerScope.clause}
+        `,
       )
-        .bind(id, ctx.tenantId)
+        .bind(id, ctx.tenantId, ...registerScope.bindings)
         .run();
 
       if (!result.meta.changes) return json({ error: 'not_found' }, { status: 404 });
@@ -6499,17 +6677,18 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const access = await requireCorePermissionFamily(
       ctx,
       RISK_READ_PERMISSIONS,
       RISK_WRITE_PERMISSIONS,
       'Risk scenario',
     );
-    if (accessError) {
-      return accessError;
+    if (access instanceof Response) {
+      return access;
     }
 
     if (ctx.request.method === 'GET') {
+      const scenarioScope = buildAccessibleDomainPredicate('register_item.folder_id', access);
       const { results } = await ctx.env.D1_MAIN.prepare(
         `
         SELECT
@@ -6530,10 +6709,11 @@ export async function handleCoreRoutes(
         INNER JOIN risk_registers AS register_item
           ON register_item.id = scenario.register_id
         WHERE scenario.tenant_id = ?
+          AND ${scenarioScope.clause}
         ORDER BY scenario.updated_at DESC
         `,
       )
-        .bind(ctx.tenantId)
+        .bind(ctx.tenantId, ...scenarioScope.bindings)
         .all<RiskScenarioRow>();
 
       return json({
@@ -6558,20 +6738,30 @@ export async function handleCoreRoutes(
 
       const registerExists = await ctx.env.D1_MAIN.prepare(
         `
-        SELECT id
+        SELECT id, folder_id
         FROM risk_registers
         WHERE id = ? AND tenant_id = ?
         LIMIT 1
         `,
       )
         .bind(registerId, ctx.tenantId)
-        .first<{ id: string }>();
+        .first<{ id: string; folder_id: string | null }>();
 
       if (!registerExists) {
         return json(
           {
             error: 'risk_register_not_found',
             message: 'The selected risk register does not exist for this tenant.',
+          },
+          { status: 404 },
+        );
+      }
+
+      if (!hasAccessibleDomainScope(access, registerExists.folder_id)) {
+        return json(
+          {
+            error: 'risk_register_not_found',
+            message: 'The selected risk register does not exist for this scope.',
           },
           { status: 404 },
         );
@@ -6654,6 +6844,24 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'PUT' && id) {
+      const existingScenario = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT scenario.id
+        FROM risk_scenarios AS scenario
+        INNER JOIN risk_registers AS register_item
+          ON register_item.id = scenario.register_id
+        WHERE scenario.id = ? AND scenario.tenant_id = ?
+          AND ${buildAccessibleDomainPredicate('register_item.folder_id', access).clause}
+        LIMIT 1
+        `,
+      )
+        .bind(id, ctx.tenantId, ...buildAccessibleDomainPredicate('register_item.folder_id', access).bindings)
+        .first<{ id: string }>();
+
+      if (!existingScenario) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const body = (await ctx.request.json()) as CreateRiskScenarioInput;
       const title = body.title?.trim();
 
@@ -6719,20 +6927,32 @@ export async function handleCoreRoutes(
         INNER JOIN risk_registers AS register_item
           ON register_item.id = scenario.register_id
         WHERE scenario.id = ? AND scenario.tenant_id = ?
+          AND ${buildAccessibleDomainPredicate('register_item.folder_id', access).clause}
         LIMIT 1
         `,
       )
-        .bind(id, ctx.tenantId)
+        .bind(id, ctx.tenantId, ...buildAccessibleDomainPredicate('register_item.folder_id', access).bindings)
         .first<RiskScenarioRow>();
 
       return updated ? json({ data: toRiskScenarioResponse(updated) }) : json({ error: 'not_found' }, { status: 404 });
     }
 
     if (ctx.request.method === 'DELETE' && id) {
+      const scenarioScope = buildAccessibleDomainPredicate('register_item.folder_id', access);
       const result = await ctx.env.D1_MAIN.prepare(
-        `DELETE FROM risk_scenarios WHERE id = ? AND tenant_id = ?`,
+        `
+        DELETE FROM risk_scenarios
+        WHERE id IN (
+          SELECT scenario.id
+          FROM risk_scenarios AS scenario
+          INNER JOIN risk_registers AS register_item
+            ON register_item.id = scenario.register_id
+          WHERE scenario.id = ? AND scenario.tenant_id = ?
+            AND ${scenarioScope.clause}
+        )
+        `,
       )
-        .bind(id, ctx.tenantId)
+        .bind(id, ctx.tenantId, ...scenarioScope.bindings)
         .run();
 
       if (!result.meta.changes) return json({ error: 'not_found' }, { status: 404 });
@@ -6750,14 +6970,14 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const access = await requireCorePermissionFamily(
       ctx,
       RISK_READ_PERMISSIONS,
       RISK_WRITE_PERMISSIONS,
       'Risk assessment',
     );
-    if (accessError) {
-      return accessError;
+    if (access instanceof Response) {
+      return access;
     }
 
     if (id) {
@@ -6802,7 +7022,7 @@ export async function handleCoreRoutes(
           .bind(ctx.tenantId, id)
           .first<RiskAssessmentRow>();
 
-        if (!assessment) {
+        if (!assessment || !hasAccessibleDomainScope(access, assessment.folder_id)) {
           return json(
             {
               error: 'risk_assessment_not_found',
@@ -6820,16 +7040,16 @@ export async function handleCoreRoutes(
       if (subresource === 'scenarios') {
         const assessment = await ctx.env.D1_MAIN.prepare(
           `
-          SELECT id, risk_register_id
+          SELECT id, folder_id, risk_register_id
           FROM risk_assessments
           WHERE tenant_id = ? AND id = ?
           LIMIT 1
           `,
         )
           .bind(ctx.tenantId, id)
-          .first<{ id: string; risk_register_id: string | null }>();
+          .first<{ id: string; folder_id: string | null; risk_register_id: string | null }>();
 
-        if (!assessment) {
+        if (!assessment || !hasAccessibleDomainScope(access, assessment.folder_id)) {
           return json(
             {
               error: 'risk_assessment_not_found',
@@ -7014,7 +7234,7 @@ export async function handleCoreRoutes(
           .bind(ctx.tenantId, id)
           .first<RiskAssessmentRow>();
 
-        if (!assessment) {
+        if (!assessment || !hasAccessibleDomainScope(access, assessment.folder_id)) {
           return json(
             {
               error: 'risk_assessment_not_found',
@@ -7132,7 +7352,7 @@ export async function handleCoreRoutes(
         .all<RiskAssessmentRow>();
 
       return json({
-        data: results.map(toRiskAssessmentResponse),
+        data: filterRowsByAccessibleDomainScope(results, access).map(toRiskAssessmentResponse),
       });
     }
 
@@ -7163,7 +7383,7 @@ export async function handleCoreRoutes(
         .bind(ctx.tenantId, perimeterId)
         .first<{ id: string; folder_id: string }>();
 
-      if (!perimeter) {
+      if (!perimeter || !hasAccessibleDomainScope(access, perimeter.folder_id)) {
         return json(
           { error: 'perimeter_not_found', message: 'The selected perimeter does not exist.' },
           { status: 404 },
@@ -7172,22 +7392,32 @@ export async function handleCoreRoutes(
 
       const registerExists = await ctx.env.D1_MAIN.prepare(
         `
-        SELECT id
+        SELECT id, folder_id
         FROM risk_registers
         WHERE tenant_id = ? AND id = ?
         LIMIT 1
         `,
       )
         .bind(ctx.tenantId, riskRegisterId)
-        .first<{ id: string }>();
+        .first<{ id: string; folder_id: string | null }>();
 
-      if (!registerExists) {
+      if (!registerExists || !hasAccessibleDomainScope(access, registerExists.folder_id)) {
         return json(
           {
             error: 'risk_register_not_found',
             message: 'The selected risk register does not exist for this tenant.',
           },
           { status: 404 },
+        );
+      }
+
+      if (registerExists.folder_id !== perimeter.folder_id) {
+        return json(
+          {
+            error: 'risk_register_scope_mismatch',
+            message: 'Risk assessments must use a risk register from the same domain as the perimeter.',
+          },
+          { status: 400 },
         );
       }
 
@@ -7274,14 +7504,14 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const access = await requireCorePermissionFamily(
       ctx,
       FRAMEWORK_READ_PERMISSIONS,
       FRAMEWORK_WRITE_PERMISSIONS,
       'Compliance assessment',
     );
-    if (accessError) {
-      return accessError;
+    if (access instanceof Response) {
+      return access;
     }
 
     if (id) {
@@ -7321,7 +7551,7 @@ export async function handleCoreRoutes(
         .bind(ctx.tenantId, id)
         .first<ComplianceAssessmentRow>();
 
-      if (!assessment) {
+      if (!assessment || !hasAccessibleDomainScope(access, assessment.folder_id)) {
         return json(
           {
             error: 'compliance_assessment_not_found',
@@ -7609,7 +7839,7 @@ export async function handleCoreRoutes(
         .all<ComplianceAssessmentRow>();
 
       return json({
-        data: results.map(toComplianceAssessmentResponse),
+        data: filterRowsByAccessibleDomainScope(results, access).map(toComplianceAssessmentResponse),
       });
     }
 
@@ -7652,7 +7882,7 @@ export async function handleCoreRoutes(
           .first<{ id: string }>(),
       ]);
 
-      if (!perimeter) {
+      if (!perimeter || !hasAccessibleDomainScope(access, perimeter.folder_id)) {
         return json(
           { error: 'perimeter_not_found', message: 'The selected perimeter does not exist.' },
           { status: 404 },
@@ -7778,14 +8008,14 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const access = await requireCorePermissionFamily(
       ctx,
       FRAMEWORK_READ_PERMISSIONS,
       FRAMEWORK_WRITE_PERMISSIONS,
       'Applied control',
     );
-    if (accessError) {
-      return accessError;
+    if (access instanceof Response) {
+      return access;
     }
 
     if (id) {
@@ -7797,16 +8027,16 @@ export async function handleCoreRoutes(
 
       const existing = await ctx.env.D1_MAIN.prepare(
         `
-        SELECT id
+        SELECT id, folder_id
         FROM applied_controls
         WHERE tenant_id = ? AND id = ?
         LIMIT 1
         `,
       )
         .bind(ctx.tenantId, id)
-        .first<{ id: string }>();
+        .first<{ id: string; folder_id: string | null }>();
 
-      if (!existing) {
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
         return json(
           {
             error: 'applied_control_not_found',
@@ -7866,12 +8096,34 @@ export async function handleCoreRoutes(
     }
 
     const complianceAssessmentId = ctx.url.searchParams.get('complianceAssessmentId')?.trim() || undefined;
+    if (complianceAssessmentId) {
+      const assessment = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM compliance_assessments
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, complianceAssessmentId)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!assessment || !hasAccessibleDomainScope(access, assessment.folder_id)) {
+        return json(
+          {
+            error: 'compliance_assessment_not_found',
+            message: 'The selected compliance assessment does not exist.',
+          },
+          { status: 404 },
+        );
+      }
+    }
     const appliedControls = await listAppliedControlRows(ctx.env, ctx.tenantId, {
       complianceAssessmentId,
     });
 
     return json({
-      data: appliedControls.map(toAppliedControlResponse),
+      data: filterRowsByAccessibleDomainScope(appliedControls, access).map(toAppliedControlResponse),
     });
   }
 
@@ -7879,14 +8131,14 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const access = await requireCorePermissionFamily(
       ctx,
       TPRM_READ_PERMISSIONS,
       TPRM_WRITE_PERMISSIONS,
       'Third-party entity',
     );
-    if (accessError) {
-      return accessError;
+    if (access instanceof Response) {
+      return access;
     }
 
     if (id) {
@@ -7943,7 +8195,7 @@ export async function handleCoreRoutes(
         .bind(ctx.tenantId, id)
         .first<EntityRow>();
 
-      if (!entity) {
+      if (!entity || !hasAccessibleDomainScope(access, entity.folder_id)) {
         return json(
           { error: 'entity_not_found', message: 'The selected entity does not exist.' },
           { status: 404 },
@@ -8081,9 +8333,11 @@ export async function handleCoreRoutes(
       return json({
         data: {
           entity: toEntityResponse(entity),
-          solutions: solutionsResult.results.map(toSolutionResponse),
-          contracts: contractsResult.results.map(toContractResponse),
-          assessments: assessmentsResult.results.map(toEntityAssessmentResponse),
+          solutions: filterRowsByAccessibleDomainScope(solutionsResult.results, access).map(toSolutionResponse),
+          contracts: filterRowsByAccessibleDomainScope(contractsResult.results, access).map(toContractResponse),
+          assessments: filterRowsByAccessibleDomainScope(assessmentsResult.results, access).map(
+            toEntityAssessmentResponse,
+          ),
         },
       });
     }
@@ -8139,7 +8393,7 @@ export async function handleCoreRoutes(
         .all<EntityRow>();
 
       return json({
-        data: results.map(toEntityResponse),
+        data: filterRowsByAccessibleDomainScope(results, access).map(toEntityResponse),
       });
     }
 
@@ -8169,25 +8423,28 @@ export async function handleCoreRoutes(
         body.parentEntityId?.trim()
           ? ctx.env.D1_MAIN.prepare(
               `
-              SELECT id
+              SELECT id, folder_id
               FROM entities
               WHERE tenant_id = ? AND id = ?
               LIMIT 1
               `,
             )
               .bind(ctx.tenantId, body.parentEntityId.trim())
-              .first<{ id: string }>()
+              .first<{ id: string; folder_id: string | null }>()
           : Promise.resolve(null),
       ]);
 
-      if (!folder) {
+      if (!folder || !hasAccessibleDomainScope(access, folderId)) {
         return json(
           { error: 'folder_not_found', message: 'The selected folder does not exist.' },
           { status: 404 },
         );
       }
 
-      if (body.parentEntityId?.trim() && !parentEntity) {
+      if (
+        body.parentEntityId?.trim() &&
+        (!parentEntity || !hasAccessibleDomainScope(access, parentEntity.folder_id))
+      ) {
         return json(
           { error: 'parent_entity_not_found', message: 'The selected parent entity does not exist.' },
           { status: 404 },
@@ -8296,6 +8553,21 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'PUT' && id) {
+      const existing = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM entities
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, id)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const body = (await ctx.request.json()) as CreateEntityInput;
       const name = body.name?.trim();
 
@@ -8387,6 +8659,21 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'DELETE' && id) {
+      const existing = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM entities
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, id)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const result = await ctx.env.D1_MAIN.prepare(
         `DELETE FROM entities WHERE id = ? AND tenant_id = ?`,
       )
@@ -8408,14 +8695,14 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const access = await requireCorePermissionFamily(
       ctx,
       TPRM_READ_PERMISSIONS,
       TPRM_WRITE_PERMISSIONS,
       'Third-party solution',
     );
-    if (accessError) {
-      return accessError;
+    if (access instanceof Response) {
+      return access;
     }
 
     if (ctx.request.method === 'GET') {
@@ -8472,7 +8759,7 @@ export async function handleCoreRoutes(
         .all<SolutionRow>();
 
       return json({
-        data: results.map(toSolutionResponse),
+        data: filterRowsByAccessibleDomainScope(results, access).map(toSolutionResponse),
       });
     }
 
@@ -8502,27 +8789,37 @@ export async function handleCoreRoutes(
           .first<{ id: string }>(),
         ctx.env.D1_MAIN.prepare(
           `
-          SELECT id
+          SELECT id, folder_id
           FROM entities
           WHERE tenant_id = ? AND id = ?
           LIMIT 1
           `,
         )
           .bind(ctx.tenantId, providerEntityId)
-          .first<{ id: string }>(),
+          .first<{ id: string; folder_id: string | null }>(),
       ]);
 
-      if (!folder) {
+      if (!folder || !hasAccessibleDomainScope(access, folderId)) {
         return json(
           { error: 'folder_not_found', message: 'The selected folder does not exist.' },
           { status: 404 },
         );
       }
 
-      if (!entity) {
+      if (!entity || !hasAccessibleDomainScope(access, entity.folder_id)) {
         return json(
           { error: 'provider_not_found', message: 'The selected provider entity does not exist.' },
           { status: 404 },
+        );
+      }
+
+      if (entity.folder_id !== folderId) {
+        return json(
+          {
+            error: 'provider_scope_mismatch',
+            message: 'Third-party solutions must use a provider entity from the same domain.',
+          },
+          { status: 400 },
         );
       }
 
@@ -8627,6 +8924,21 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'PUT' && id) {
+      const existing = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM solutions
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, id)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const body = (await ctx.request.json()) as CreateSolutionInput;
       const name = body.name?.trim();
 
@@ -8725,6 +9037,21 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'DELETE' && id) {
+      const existing = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM solutions
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, id)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const result = await ctx.env.D1_MAIN.prepare(
         `DELETE FROM solutions WHERE id = ? AND tenant_id = ?`,
       )
@@ -8746,14 +9073,14 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const access = await requireCorePermissionFamily(
       ctx,
       TPRM_READ_PERMISSIONS,
       TPRM_WRITE_PERMISSIONS,
       'Contract',
     );
-    if (accessError) {
-      return accessError;
+    if (access instanceof Response) {
+      return access;
     }
 
     if (ctx.request.method === 'GET') {
@@ -8809,7 +9136,7 @@ export async function handleCoreRoutes(
         .all<ContractRow>();
 
       return json({
-        data: results.map(toContractResponse),
+        data: filterRowsByAccessibleDomainScope(results, access).map(toContractResponse),
       });
     }
 
@@ -8839,14 +9166,14 @@ export async function handleCoreRoutes(
           .first<{ id: string }>(),
         ctx.env.D1_MAIN.prepare(
           `
-          SELECT id
+          SELECT id, folder_id
           FROM entities
           WHERE tenant_id = ? AND id = ?
           LIMIT 1
           `,
         )
           .bind(ctx.tenantId, providerEntityId)
-          .first<{ id: string }>(),
+          .first<{ id: string; folder_id: string | null }>(),
         body.beneficiaryEntityId?.trim()
           ? ctx.env.D1_MAIN.prepare(
               `
@@ -8861,17 +9188,27 @@ export async function handleCoreRoutes(
           : Promise.resolve(null),
       ]);
 
-      if (!folder) {
+      if (!folder || !hasAccessibleDomainScope(access, folderId)) {
         return json(
           { error: 'folder_not_found', message: 'The selected folder does not exist.' },
           { status: 404 },
         );
       }
 
-      if (!provider) {
+      if (!provider || !hasAccessibleDomainScope(access, provider.folder_id)) {
         return json(
           { error: 'provider_not_found', message: 'The selected provider entity does not exist.' },
           { status: 404 },
+        );
+      }
+
+      if (provider.folder_id !== folderId) {
+        return json(
+          {
+            error: 'provider_scope_mismatch',
+            message: 'Contracts must use a provider entity from the same domain.',
+          },
+          { status: 400 },
         );
       }
 
@@ -8987,6 +9324,21 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'PUT' && id) {
+      const existing = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM contracts
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, id)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const body = (await ctx.request.json()) as CreateContractInput;
       const name = body.name?.trim();
 
@@ -9084,6 +9436,21 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'DELETE' && id) {
+      const existing = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM contracts
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, id)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const result = await ctx.env.D1_MAIN.prepare(
         `DELETE FROM contracts WHERE id = ? AND tenant_id = ?`,
       )
@@ -9105,14 +9472,14 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const access = await requireCorePermissionFamily(
       ctx,
       TPRM_READ_PERMISSIONS,
       TPRM_WRITE_PERMISSIONS,
       'Entity assessment',
     );
-    if (accessError) {
-      return accessError;
+    if (access instanceof Response) {
+      return access;
     }
 
     if (ctx.request.method !== 'GET') {
@@ -9171,7 +9538,7 @@ export async function handleCoreRoutes(
       .all<EntityAssessmentRow>();
 
     return json({
-      data: results.map(toEntityAssessmentResponse),
+      data: filterRowsByAccessibleDomainScope(results, access).map(toEntityAssessmentResponse),
     });
   }
 
@@ -9179,14 +9546,14 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const access = await requireCorePermissionFamily(
       ctx,
       PRIVACY_READ_PERMISSIONS,
       PRIVACY_WRITE_PERMISSIONS,
       'Processing',
     );
-    if (accessError) {
-      return accessError;
+    if (access instanceof Response) {
+      return access;
     }
 
     if (id) {
@@ -9229,7 +9596,7 @@ export async function handleCoreRoutes(
         .bind(ctx.tenantId, id)
         .first<ProcessingRow>();
 
-      if (!processing) {
+      if (!processing || !hasAccessibleDomainScope(access, processing.folder_id)) {
         return json(
           { error: 'processing_not_found', message: 'The selected processing does not exist.' },
           { status: 404 },
@@ -9278,7 +9645,7 @@ export async function handleCoreRoutes(
         .all<ProcessingRow>();
 
       return json({
-        data: results.map(toProcessingResponse),
+        data: filterRowsByAccessibleDomainScope(results, access).map(toProcessingResponse),
       });
     }
 
@@ -9305,7 +9672,7 @@ export async function handleCoreRoutes(
         .bind(ctx.tenantId, folderId)
         .first<{ id: string }>();
 
-      if (!folder) {
+      if (!folder || !hasAccessibleDomainScope(access, folderId)) {
         return json(
           { error: 'folder_not_found', message: 'The selected folder does not exist.' },
           { status: 404 },
@@ -9399,6 +9766,21 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'PUT' && id) {
+      const existing = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM processings
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, id)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const body = (await ctx.request.json()) as CreateProcessingInput;
       const name = body.name?.trim();
 
@@ -9479,6 +9861,21 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'DELETE' && id) {
+      const existing = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM processings
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, id)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const result = await ctx.env.D1_MAIN.prepare(
         `DELETE FROM processings WHERE id = ? AND tenant_id = ?`,
       )
@@ -9500,14 +9897,14 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const access = await requireCorePermissionFamily(
       ctx,
       PRIVACY_READ_PERMISSIONS,
       PRIVACY_WRITE_PERMISSIONS,
       'Privacy right request',
     );
-    if (accessError) {
-      return accessError;
+    if (access instanceof Response) {
+      return access;
     }
 
     if (ctx.request.method === 'GET') {
@@ -9539,7 +9936,7 @@ export async function handleCoreRoutes(
         .all<RightRequestRow>();
 
       return json({
-        data: results.map(toRightRequestResponse),
+        data: filterRowsByAccessibleDomainScope(results, access).map(toRightRequestResponse),
       });
     }
 
@@ -9570,7 +9967,7 @@ export async function handleCoreRoutes(
         .bind(ctx.tenantId, folderId)
         .first<{ id: string }>();
 
-      if (!folder) {
+      if (!folder || !hasAccessibleDomainScope(access, folderId)) {
         return json(
           { error: 'folder_not_found', message: 'The selected folder does not exist.' },
           { status: 404 },
@@ -9647,6 +10044,21 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'PUT' && id) {
+      const existing = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM right_requests
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, id)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const body = (await ctx.request.json()) as CreateRightRequestInput;
       const name = body.name?.trim();
 
@@ -9717,6 +10129,21 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'DELETE' && id) {
+      const existing = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM right_requests
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, id)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const result = await ctx.env.D1_MAIN.prepare(
         `DELETE FROM right_requests WHERE id = ? AND tenant_id = ?`,
       )
@@ -9738,14 +10165,14 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const access = await requireCorePermissionFamily(
       ctx,
       PRIVACY_READ_PERMISSIONS,
       PRIVACY_WRITE_PERMISSIONS,
       'Data breach',
     );
-    if (accessError) {
-      return accessError;
+    if (access instanceof Response) {
+      return access;
     }
 
     if (ctx.request.method === 'GET') {
@@ -9782,7 +10209,7 @@ export async function handleCoreRoutes(
         .all<DataBreachRow>();
 
       return json({
-        data: results.map(toDataBreachResponse),
+        data: filterRowsByAccessibleDomainScope(results, access).map(toDataBreachResponse),
       });
     }
 
@@ -9813,7 +10240,7 @@ export async function handleCoreRoutes(
         .bind(ctx.tenantId, folderId)
         .first<{ id: string }>();
 
-      if (!folder) {
+      if (!folder || !hasAccessibleDomainScope(access, folderId)) {
         return json(
           { error: 'folder_not_found', message: 'The selected folder does not exist.' },
           { status: 404 },
@@ -9905,6 +10332,21 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'PUT' && id) {
+      const existing = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM data_breaches
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, id)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const body = (await ctx.request.json()) as CreateDataBreachInput;
       const name = body.name?.trim();
 
@@ -9990,6 +10432,21 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'DELETE' && id) {
+      const existing = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM data_breaches
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, id)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const result = await ctx.env.D1_MAIN.prepare(
         `DELETE FROM data_breaches WHERE id = ? AND tenant_id = ?`,
       )
@@ -10011,14 +10468,14 @@ export async function handleCoreRoutes(
     if (!ctx.tenantId) {
       return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
     }
-    const accessError = await requireCorePermissionFamily(
+    const access = await requireCorePermissionFamily(
       ctx,
       RESILIENCE_READ_PERMISSIONS,
       RESILIENCE_WRITE_PERMISSIONS,
       'Business impact analysis',
     );
-    if (accessError) {
-      return accessError;
+    if (access instanceof Response) {
+      return access;
     }
 
     if (id) {
@@ -10058,7 +10515,7 @@ export async function handleCoreRoutes(
         .bind(ctx.tenantId, id)
         .first<BusinessImpactAnalysisRow>();
 
-      if (!analysis) {
+      if (!analysis || !hasAccessibleDomainScope(access, analysis.folder_id)) {
         return json(
           {
             error: 'business_impact_analysis_not_found',
@@ -10107,7 +10564,7 @@ export async function handleCoreRoutes(
         .all<BusinessImpactAnalysisRow>();
 
       return json({
-        data: results.map(toBusinessImpactAnalysisResponse),
+        data: filterRowsByAccessibleDomainScope(results, access).map(toBusinessImpactAnalysisResponse),
       });
     }
 
@@ -10137,7 +10594,7 @@ export async function handleCoreRoutes(
         .bind(ctx.tenantId, perimeterId)
         .first<{ id: string; folder_id: string }>();
 
-      if (!perimeter) {
+      if (!perimeter || !hasAccessibleDomainScope(access, perimeter.folder_id)) {
         return json(
           { error: 'perimeter_not_found', message: 'The selected perimeter does not exist.' },
           { status: 404 },
@@ -10232,6 +10689,21 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'PUT' && id) {
+      const existing = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM business_impact_analyses
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, id)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const body = (await ctx.request.json()) as CreateBusinessImpactAnalysisInput;
       const name = body.name?.trim();
 
@@ -10305,6 +10777,21 @@ export async function handleCoreRoutes(
     }
 
     if (ctx.request.method === 'DELETE' && id) {
+      const existing = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id, folder_id
+        FROM business_impact_analyses
+        WHERE tenant_id = ? AND id = ?
+        LIMIT 1
+        `,
+      )
+        .bind(ctx.tenantId, id)
+        .first<{ id: string; folder_id: string | null }>();
+
+      if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+
       const result = await ctx.env.D1_MAIN.prepare(
         `DELETE FROM business_impact_analyses WHERE id = ? AND tenant_id = ?`,
       )

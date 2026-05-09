@@ -40,7 +40,7 @@ async function waitForStableHealth() {
   throw new Error('Worker did not reach a stable healthy state in time.');
 }
 
-async function poll(path, predicate, attempts = 15, delayMs = 500) {
+async function poll(path, predicate, attempts = 30, delayMs = 500) {
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     const payload = await request(path, { headers });
     if (predicate(payload)) {
@@ -51,6 +51,26 @@ async function poll(path, predicate, attempts = 15, delayMs = 500) {
   }
 
   throw new Error(`Polling ${path} timed out after ${attempts} attempts.`);
+}
+
+async function pollWithDevReplay(path, predicate, replayPath, appEnv, attempts = 30, delayMs = 500) {
+  try {
+    return await poll(path, predicate, attempts, delayMs);
+  } catch (error) {
+    if (!(error instanceof Error) || !error.message.includes(`Polling ${path} timed out`)) {
+      throw error;
+    }
+    if (appEnv !== 'development' || !replayPath) {
+      throw error;
+    }
+
+    await request(replayPath, {
+      method: 'POST',
+      headers,
+    });
+
+    return poll(path, predicate, Math.max(10, Math.floor(attempts / 2)), delayMs);
+  }
 }
 
 function assert(condition, message) {
@@ -66,6 +86,7 @@ async function main() {
   await waitForStableHealth();
   const health = await request('/_api/core/health');
   assert(health?.data?.ok === true, 'Health endpoint did not return ok=true.');
+  const appEnv = typeof health?.data?.appEnv === 'string' ? health.data.appEnv : 'development';
 
   const bootstrap = await request('/_api/core/bootstrap-demo', {
     method: 'POST',
@@ -240,6 +261,7 @@ async function main() {
     method: 'POST',
     headers,
     body: JSON.stringify({
+      folderId: domainId,
       name: `Risk Register ${uniqueSuffix}`,
       description: 'Created by the local smoke test.',
     }),
@@ -641,6 +663,88 @@ async function main() {
   });
   assert(analysisCreate?.data?.id, 'Business impact analysis creation did not return an id.');
 
+  const [
+    scopedRegisters,
+    scopedPerimeters,
+    scopedRiskAssessments,
+    scopedComplianceAssessments,
+    scopedEntities,
+    scopedSolutions,
+    scopedContracts,
+    scopedProcessings,
+    scopedRightRequests,
+    scopedBreaches,
+    scopedAnalyses,
+  ] = await Promise.all([
+    request('/_api/core/risk-registers', { headers: scopedHeaders }),
+    request('/_api/core/perimeters', { headers: scopedHeaders }),
+    request('/_api/core/risk-assessments', { headers: scopedHeaders }),
+    request('/_api/core/compliance-assessments', { headers: scopedHeaders }),
+    request('/_api/core/entities', { headers: scopedHeaders }),
+    request('/_api/core/solutions', { headers: scopedHeaders }),
+    request('/_api/core/contracts', { headers: scopedHeaders }),
+    request('/_api/core/processings', { headers: scopedHeaders }),
+    request('/_api/core/right-requests', { headers: scopedHeaders }),
+    request('/_api/core/data-breaches', { headers: scopedHeaders }),
+    request('/_api/core/business-impact-analyses', { headers: scopedHeaders }),
+  ]);
+
+  assert(
+    scopedRegisters?.data?.some((item) => item.id === registerId) &&
+      scopedRegisters.data.every((item) => item.folderId === domainId),
+    'Scoped risk-register list leaked data outside the assigned domain.',
+  );
+  assert(
+    scopedPerimeters?.data?.some((item) => item.id === perimeterId) &&
+      scopedPerimeters.data.every((item) => item.folderId === domainId),
+    'Scoped perimeter list leaked data outside the assigned domain.',
+  );
+  assert(
+    scopedRiskAssessments?.data?.some((item) => item.id === riskAssessmentCreate.data.id) &&
+      scopedRiskAssessments.data.every((item) => item.folderId === domainId),
+    'Scoped risk-assessment list leaked data outside the assigned domain.',
+  );
+  assert(
+    scopedComplianceAssessments?.data?.some((item) => item.id === complianceAssessmentCreate.data.id) &&
+      scopedComplianceAssessments.data.every((item) => item.folderId === domainId),
+    'Scoped compliance-assessment list leaked data outside the assigned domain.',
+  );
+  assert(
+    scopedEntities?.data?.some((item) => item.id === entityId) &&
+      scopedEntities.data.every((item) => item.folderId === domainId),
+    'Scoped entity list leaked data outside the assigned domain.',
+  );
+  assert(
+    scopedSolutions?.data?.some((item) => item.id === solutionId) &&
+      scopedSolutions.data.every((item) => item.folderId === domainId),
+    'Scoped solution list leaked data outside the assigned domain.',
+  );
+  assert(
+    scopedContracts?.data?.some((item) => item.id === contractCreate.data.id) &&
+      scopedContracts.data.every((item) => item.folderId === domainId),
+    'Scoped contract list leaked data outside the assigned domain.',
+  );
+  assert(
+    scopedProcessings?.data?.some((item) => item.id === processingId) &&
+      scopedProcessings.data.every((item) => item.folderId === domainId),
+    'Scoped processing list leaked data outside the assigned domain.',
+  );
+  assert(
+    scopedRightRequests?.data?.some((item) => item.id === requestCreate.data.id) &&
+      scopedRightRequests.data.every((item) => item.folderId === domainId),
+    'Scoped right-request list leaked data outside the assigned domain.',
+  );
+  assert(
+    scopedBreaches?.data?.some((item) => item.id === breachCreate.data.id) &&
+      scopedBreaches.data.every((item) => item.folderId === domainId),
+    'Scoped data-breach list leaked data outside the assigned domain.',
+  );
+  assert(
+    scopedAnalyses?.data?.some((item) => item.id === analysisCreate.data.id) &&
+      scopedAnalyses.data.every((item) => item.folderId === domainId),
+    'Scoped business-impact-analysis list leaked data outside the assigned domain.',
+  );
+
   const reportCatalog = await request('/_api/ops/reports', { headers });
   assert(
     Array.isArray(reportCatalog?.data?.catalog) && reportCatalog.data.catalog.length >= 1,
@@ -856,7 +960,9 @@ async function main() {
   assert(profileId, 'No ConMon profile found after bootstrap.');
 
   const sources = await request('/_api/evidence/sources', { headers });
-  const sourceId = sources?.data?.[0]?.id;
+  const sourceId =
+    sources?.data?.find((item) => item.name === 'GitHub Org Inventory')?.id ??
+    sources?.data?.[0]?.id;
   assert(sourceId, 'No evidence source found after bootstrap.');
 
   const run = await request(`/_api/conmon/profiles/${profileId}/run`, {
@@ -873,13 +979,17 @@ async function main() {
   const jobId = collect?.data?.jobId;
   assert(jobId, 'Evidence collect did not return a job id.');
 
-  const executions = await poll(
+  const executions = await pollWithDevReplay(
     '/_api/conmon/executions',
     (payload) => payload?.data?.some((item) => item.id === executionId && item.status === 'success'),
+    `/_api/conmon/executions/${executionId}/replay`,
+    appEnv,
   );
-  const jobs = await poll(
+  const jobs = await pollWithDevReplay(
     '/_api/evidence/jobs',
     (payload) => payload?.data?.some((item) => item.id === jobId && item.status === 'success'),
+    `/_api/evidence/jobs/${jobId}/replay`,
+    appEnv,
   );
   const artifacts = await poll(
     '/_api/evidence/artifacts',
@@ -889,6 +999,494 @@ async function main() {
   assert(executions.data.length >= 1, 'No ConMon executions returned.');
   assert(jobs.data.length >= 1, 'No evidence jobs returned.');
   assert(artifacts.data.length >= 1, 'No evidence artifacts returned.');
+
+  const trackerImport = await request('/_api/assurance/tracker/import', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      folderId: domainId,
+      name: `Observable tracker import ${uniqueSuffix}`,
+      sourceType: 'json',
+      rows: [
+        {
+          control_id: `CM-8-${uniqueSuffix}`,
+          category: 'inventory',
+          severity: 'high',
+          owner: 'Platform',
+          status: 'open',
+          detail: 'Asset is missing from discovery output.',
+        },
+        {
+          control_id: `SC-7-${uniqueSuffix}`,
+          category: 'exposure',
+          severity: 'critical',
+          owner: 'Network',
+          status: 'open',
+          detail: 'Public IP is still reachable without closure evidence.',
+        },
+      ],
+    }),
+  });
+  const trackerImportId = trackerImport?.data?.importJobId;
+  assert(trackerImportId, 'Tracker import did not return an import job id.');
+
+  const trackerDetail = await request(`/_api/assurance/tracker/imports/${trackerImportId}`, { headers });
+  assert(
+    Array.isArray(trackerDetail?.data?.diagnostics) && trackerDetail.data.diagnostics.length === 2,
+    'Tracker import detail did not return the expected diagnostics.',
+  );
+
+  const trackerDiagnosticsArtifact = await request(
+    `/_api/assurance/tracker/imports/${trackerImportId}/artifacts/tracker_diagnostics`,
+    { headers },
+  );
+  assert(
+    Array.isArray(trackerDiagnosticsArtifact?.data?.preview) &&
+      trackerDiagnosticsArtifact.data.preview.length === 2,
+    'Tracker diagnostics artifact preview did not return parsed tracker rows.',
+  );
+
+  const trackerGapReportArtifact = await request(
+    `/_api/assurance/tracker/imports/${trackerImportId}/artifacts/tracker_gap_report`,
+    { headers },
+  );
+  assert(
+    typeof trackerGapReportArtifact?.data?.preview === 'string' &&
+      trackerGapReportArtifact.data.preview.includes('Tracker Gap Report') &&
+      trackerGapReportArtifact.data.preview.includes('Highest-Priority Rows'),
+    'Tracker gap report artifact was not published correctly.',
+  );
+
+  const trackerGapMatrixArtifact = await request(
+    `/_api/assurance/tracker/imports/${trackerImportId}/artifacts/tracker_gap_matrix`,
+    { headers },
+  );
+  assert(
+    typeof trackerGapMatrixArtifact?.data?.preview === 'string' &&
+      trackerGapMatrixArtifact.data.preview.includes('row_index') &&
+      trackerGapMatrixArtifact.data.preview.includes(`CM-8-${uniqueSuffix}`),
+    'Tracker gap matrix artifact was not published correctly.',
+  );
+
+  const trackerInstrumentationArtifact = await request(
+    `/_api/assurance/tracker/imports/${trackerImportId}/artifacts/tracker_instrumentation_plan`,
+    { headers },
+  );
+  assert(
+    typeof trackerInstrumentationArtifact?.data?.preview === 'string' &&
+      trackerInstrumentationArtifact.data.preview.includes('Tracker Instrumentation Plan') &&
+      trackerInstrumentationArtifact.data.preview.includes('Splunk'),
+    'Tracker instrumentation-plan artifact was not published correctly.',
+  );
+
+  const threatHuntCollect = await request(`/_api/evidence/sources/${sourceId}/collect`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      inputMode: 'live',
+      bundleKind: 'threat-hunt',
+      folderId: domainId,
+      adapterHints: {
+        liveCollection: {
+          declaredInventory: [
+            {
+              assetId: `asset-${uniqueSuffix}`,
+              name: `Threat Hunt Asset ${uniqueSuffix}`,
+              assetType: 'ec2',
+              environment: 'production',
+              owner: 'Security Engineering',
+              region: 'us-east-1',
+              accountId: 'prod-primary',
+              inBoundary: true,
+              scannerRequired: true,
+              logRequired: true,
+              isPublic: false,
+            },
+          ],
+          assets: [
+            {
+              assetId: `asset-${uniqueSuffix}`,
+              name: `Threat Hunt Asset ${uniqueSuffix}`,
+              assetType: 'ec2',
+              environment: 'production',
+              owner: 'Security Engineering',
+              region: 'us-east-1',
+              accountId: 'prod-primary',
+              inBoundary: true,
+              isPublic: false,
+              privateIps: ['10.20.30.40'],
+              publicIps: [],
+            },
+          ],
+          securityGroups: [
+            {
+              groupId: `sg-${uniqueSuffix}`,
+              ipPermissions: [
+                {
+                  ipProtocol: 'tcp',
+                  fromPort: 22,
+                  toPort: 22,
+                  ipRanges: [{ cidrIp: '0.0.0.0/0' }],
+                },
+              ],
+            },
+          ],
+          cloudTrail: [
+            {
+              detail: {
+                eventID: `event-${uniqueSuffix}`,
+                eventName: 'AuthorizeSecurityGroupIngress',
+                eventSource: 'ec2.amazonaws.com',
+                requestParameters: {
+                  groupId: `sg-${uniqueSuffix}`,
+                  instanceId: `asset-${uniqueSuffix}`,
+                },
+                userIdentity: {
+                  userName: 'demo-operator',
+                },
+              },
+              title: 'Security group ingress rule opened publicly',
+            },
+          ],
+          scannerFindings: [
+            {
+              findingId: `finding-${uniqueSuffix}`,
+              assetId: `asset-${uniqueSuffix}`,
+              severity: 'critical',
+              status: 'open',
+              title: 'Critical remote exposure requires exploitation review',
+              linkedTicketIds: [`ticket-${uniqueSuffix}`],
+              exploitationReview: {},
+            },
+          ],
+          tickets: [
+            {
+              ticketId: `ticket-${uniqueSuffix}`,
+              title: 'Threat hunt remediation ticket',
+              status: 'open',
+              linkedAssetIds: [`asset-${uniqueSuffix}`],
+              linkedFindingIds: [`finding-${uniqueSuffix}`],
+              hasSecurityImpactAnalysis: true,
+              hasTestingEvidence: false,
+              hasApproval: false,
+              hasDeploymentEvidence: false,
+              hasVerificationEvidence: false,
+            },
+          ],
+          logSources: [
+            {
+              sourceId: `logs-${uniqueSuffix}`,
+              assetId: `asset-${uniqueSuffix}`,
+              sourceType: 'cloudtrail',
+              localSource: 'cloudtrail',
+              centralDestination: 'siem',
+              status: 'stale',
+              sampleLocalEventRef: `event-${uniqueSuffix}`,
+              sampleCentralEventRef: null,
+              lastSeen: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
+            },
+          ],
+          alertRules: [
+            {
+              ruleId: `rule-${uniqueSuffix}`,
+              name: 'Generic triage rule',
+              enabled: true,
+              semanticTypes: ['generic.event'],
+              recipients: ['soc@example.com'],
+            },
+          ],
+        },
+      },
+    }),
+  });
+  const threatHuntJobId = threatHuntCollect?.data?.jobId;
+  assert(threatHuntJobId, 'Threat-hunt evidence collect did not return a job id.');
+
+  await pollWithDevReplay(
+    '/_api/evidence/jobs',
+    (payload) => payload?.data?.some((item) => item.id === threatHuntJobId && item.status === 'success'),
+    `/_api/evidence/jobs/${threatHuntJobId}/replay`,
+    appEnv,
+  );
+
+  const threatHuntEval = await request('/_api/assurance/evals/run', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      evidenceJobId: threatHuntJobId,
+    }),
+  });
+  assert(
+    threatHuntEval?.data?.summary?.bundleKind === 'threat-hunt',
+    'Threat-hunt evaluation did not preserve the threat-hunt bundle kind.',
+  );
+
+  const threatHuntDetail = await request(`/_api/evidence/jobs/${threatHuntJobId}`, { headers });
+  const threatHuntFamilies = new Set(threatHuntDetail?.data?.artifacts?.map((item) => item.artifactFamily) ?? []);
+  for (const family of [
+    'correlation_report',
+    'auditor_questions',
+    'instrumentation_plan',
+    'evidence_gap_matrix',
+    'validation_report',
+    'threat_hunt_findings',
+    'threat_hunt_timeline',
+    'threat_hunt_queries',
+  ]) {
+    assert(threatHuntFamilies.has(family), `Threat-hunt evidence job is missing ${family}.`);
+  }
+
+  const threatHuntValidation = await request(
+    `/_api/evidence/jobs/${threatHuntJobId}/artifacts/validation_report`,
+    { headers },
+  );
+  assert(
+    ['pass', 'warn', 'fail'].includes(threatHuntValidation?.data?.preview?.status),
+    'Threat-hunt evidence validation report did not return a recognized status.',
+  );
+  const threatHuntQueries = await request(
+    `/_api/evidence/jobs/${threatHuntJobId}/artifacts/threat_hunt_queries`,
+    { headers },
+  );
+  assert(
+    typeof threatHuntQueries?.data?.preview === 'string' &&
+      threatHuntQueries.data.preview.includes('Threat Hunt Queries') &&
+      threatHuntQueries.data.preview.includes('Splunk'),
+    'Threat-hunt query artifact did not return the expected markdown guidance.',
+  );
+
+  const threatHuntPackage = await request('/_api/assurance/packages/build', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      evidenceJobId: threatHuntJobId,
+      folderId: domainId,
+    }),
+  });
+  const threatHuntPackageId = threatHuntPackage?.data?.package?.packageJobId;
+  assert(threatHuntPackageId, 'Threat-hunt package build did not return a package job id.');
+
+  const packageValidation = await request(
+    `/_api/assurance/packages/${threatHuntPackageId}/artifacts/validation_report`,
+    { headers },
+  );
+  assert(
+    ['pass', 'warn', 'fail'].includes(packageValidation?.data?.preview?.status),
+    'Threat-hunt package validation artifact did not return a recognized status.',
+  );
+  const packageValidationChecks = packageValidation?.data?.preview?.checks ?? [];
+  assert(
+    Array.isArray(packageValidationChecks) &&
+      packageValidationChecks.some((item) => item.id === 'package_evidence_links') &&
+      packageValidationChecks.some((item) => item.id === 'review_ledger_alignment') &&
+      packageValidationChecks.some((item) => item.id === 'assessor_poam_report_rows'),
+    'Threat-hunt package validation report is missing deep evidence-link or review-ledger checks.',
+  );
+  const packageManifest = await request(
+    `/_api/assurance/packages/${threatHuntPackageId}/artifacts/report_manifest`,
+    { headers },
+  );
+  assert(
+    Array.isArray(packageManifest?.data?.preview) &&
+      packageManifest.data.preview.some((item) => item.role === 'assessor_poam_md'),
+    'Threat-hunt package report manifest did not include the assessor POA&M report.',
+  );
+  const assessorPoamReport = await request(
+    `/_api/assurance/packages/${threatHuntPackageId}/artifacts/assessor_poam_md`,
+    { headers },
+  );
+  assert(
+    typeof assessorPoamReport?.data?.preview === 'string' &&
+      assessorPoamReport.data.preview.includes('Assessor POA&M') &&
+      assessorPoamReport.data.preview.includes('| POA&M ID | Severity | Status |'),
+    'Threat-hunt package did not persist the assessor POA&M report artifact.',
+  );
+
+  const agentRun = await request('/_api/agent/runs', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      evidenceJobId: threatHuntJobId,
+      folderId: domainId,
+      requestedWritebacks: true,
+    }),
+  });
+  assert(agentRun?.data?.trace?.status === 'awaiting_review', 'Threat-hunt agent run should require review.');
+  assert(
+    typeof agentRun?.data?.trace?.summary?.validationStatus === 'string',
+    'Threat-hunt agent run did not return validation status in the trace summary.',
+  );
+  assert(
+    Array.isArray(agentRun?.data?.trace?.summary?.awaitingReviewReasons) &&
+      agentRun.data.trace.summary.awaitingReviewReasons.length >= 1,
+    'Threat-hunt agent run did not preserve awaiting-review reasons.',
+  );
+  const agentRunId = agentRun?.data?.trace?.runId;
+  assert(agentRunId, 'Threat-hunt agent run did not return a run id.');
+  const refreshedPackageId = agentRun?.data?.trace?.summary?.packageJobId;
+  assert(refreshedPackageId, 'Threat-hunt agent run did not preserve the package job id.');
+
+  const taskGraphArtifact = await request(
+    `/_api/agent/runs/${agentRunId}/artifacts/task_graph`,
+    { headers },
+  );
+  assert(
+    Array.isArray(taskGraphArtifact?.data?.preview?.tasks) &&
+      taskGraphArtifact.data.preview.tasks.length >= 5,
+    'Threat-hunt agent run did not persist a usable task-graph artifact.',
+  );
+
+  const workflowMemoryArtifact = await request(
+    `/_api/agent/runs/${agentRunId}/artifacts/workflow_memory`,
+    { headers },
+  );
+  assert(
+    workflowMemoryArtifact?.data?.preview?.workflowName === 'observable-assurance-agent' &&
+      workflowMemoryArtifact?.data?.preview?.perTask &&
+      Object.keys(workflowMemoryArtifact.data.preview.perTask).length >= 5,
+    'Threat-hunt agent run did not persist workflow memory.',
+  );
+  const agentEvalResultsArtifact = await request(
+    `/_api/agent/runs/${agentRunId}/artifacts/agent_eval_results`,
+    { headers },
+  );
+  assert(
+    Array.isArray(agentEvalResultsArtifact?.data?.preview?.evaluations) &&
+      agentEvalResultsArtifact.data.preview.evaluations.some((item) => item.evalId === 'AGENT_APPROVAL_GATES'),
+    'Threat-hunt agent run did not persist deterministic agent governance evaluations.',
+  );
+  const agentRiskReportArtifact = await request(
+    `/_api/agent/runs/${agentRunId}/artifacts/agent_risk_report`,
+    { headers },
+  );
+  assert(
+    typeof agentRiskReportArtifact?.data?.preview === 'string' &&
+      agentRiskReportArtifact.data.preview.includes('Agentic Risk Assessment') &&
+      agentRiskReportArtifact.data.preview.includes('Agent Governance Evaluations'),
+    'Threat-hunt agent run did not persist the agent risk report artifact.',
+  );
+  const agentPoamArtifact = await request(
+    `/_api/agent/runs/${agentRunId}/artifacts/agent_poam`,
+    { headers },
+  );
+  assert(
+    typeof agentPoamArtifact?.data?.preview === 'string' &&
+      agentPoamArtifact.data.preview.includes('source_eval_id') &&
+      agentPoamArtifact.data.preview.includes('AGENT_APPROVAL_GATES'),
+    'Threat-hunt agent run did not persist the agent POA&M artifact.',
+  );
+  const agentInstrumentationArtifact = await request(
+    `/_api/agent/runs/${agentRunId}/artifacts/agent_instrumentation_plan`,
+    { headers },
+  );
+  assert(
+    typeof agentInstrumentationArtifact?.data?.preview === 'string' &&
+      agentInstrumentationArtifact.data.preview.includes('Agent Instrumentation Plan') &&
+      agentInstrumentationArtifact.data.preview.includes('Sentinel'),
+    'Threat-hunt agent run did not persist the agent instrumentation plan.',
+  );
+  const secureArchitectureArtifact = await request(
+    `/_api/agent/runs/${agentRunId}/artifacts/secure_agent_architecture`,
+    { headers },
+  );
+  assert(
+    typeof secureArchitectureArtifact?.data?.preview === 'string' &&
+      secureArchitectureArtifact.data.preview.includes('Secure Agent Architecture') &&
+      secureArchitectureArtifact.data.preview.includes('Bounded Mission'),
+    'Threat-hunt agent run did not persist the secure agent architecture artifact.',
+  );
+  const refreshedPackageJson = await request(
+    `/_api/assurance/packages/${refreshedPackageId}/artifacts/package_json`,
+    { headers },
+  );
+  const refreshedEvidenceLinks = refreshedPackageJson?.data?.preview?.evidence_links ?? [];
+  assert(
+    refreshedPackageJson?.data?.preview?.metadata?.agent_run_id === agentRunId,
+    'Threat-hunt package JSON did not record the linked agent run id after refresh.',
+  );
+  assert(
+    Array.isArray(refreshedEvidenceLinks) &&
+      refreshedEvidenceLinks.some((item) => item.family === 'agent_eval_results') &&
+      refreshedEvidenceLinks.some((item) => item.family === 'agent_poam'),
+    'Threat-hunt package JSON did not link the agent security artifacts after refresh.',
+  );
+  assert(
+    Array.isArray(refreshedPackageJson?.data?.preview?.ksi_validation_results) &&
+      refreshedPackageJson.data.preview.ksi_validation_results.some((item) => item.eval_code === 'AGENT_APPROVAL_GATES'),
+    'Threat-hunt package JSON did not fold agent governance evaluations into package validation results.',
+  );
+  assert(
+    refreshedPackageJson?.data?.preview?.agent_security_summary?.run_id === agentRunId &&
+      refreshedPackageJson?.data?.preview?.agent_security_summary?.evaluation_count >= 1 &&
+      refreshedPackageJson?.data?.preview?.agent_security_summary?.top_non_pass_eval_codes?.length >= 1,
+    'Threat-hunt package JSON did not persist the machine-readable agent security summary.',
+  );
+  const refreshedPackageValidation = await request(
+    `/_api/assurance/packages/${refreshedPackageId}/artifacts/validation_report`,
+    { headers },
+  );
+  const refreshedPackageValidationChecks = refreshedPackageValidation?.data?.preview?.checks ?? [];
+  assert(
+    Array.isArray(refreshedPackageValidationChecks) &&
+      refreshedPackageValidationChecks.some((item) => item.id === 'agent_security_summary_alignment' && item.status === 'pass') &&
+      refreshedPackageValidationChecks.some((item) => item.id === 'agent_eval_embedding' && item.status === 'pass') &&
+      refreshedPackageValidationChecks.some((item) => item.id === 'agent_finding_lineage' && item.status === 'pass') &&
+      refreshedPackageValidationChecks.some((item) => item.id === 'agent_poam_alignment' && item.status === 'pass'),
+    'Threat-hunt package validation report did not preserve the embedded agent-security contract checks.',
+  );
+  const refreshedAssessorReport = await request(
+    `/_api/assurance/packages/${refreshedPackageId}/artifacts/assessor`,
+    { headers },
+  );
+  assert(
+    typeof refreshedAssessorReport?.data?.preview === 'string' &&
+      refreshedAssessorReport.data.preview.includes('## Embedded Agent Security') &&
+      refreshedAssessorReport.data.preview.includes(agentRunId),
+    'Threat-hunt assessor report did not embed the agent-security narrative section.',
+  );
+  const refreshedExecutiveReport = await request(
+    `/_api/assurance/packages/${refreshedPackageId}/artifacts/executive`,
+    { headers },
+  );
+  assert(
+    typeof refreshedExecutiveReport?.data?.preview === 'string' &&
+      refreshedExecutiveReport.data.preview.includes('## Agent Governance') &&
+      refreshedExecutiveReport.data.preview.includes(agentRunId),
+    'Threat-hunt executive report did not embed the agent-governance narrative section.',
+  );
+  const refreshedAoReport = await request(
+    `/_api/assurance/packages/${refreshedPackageId}/artifacts/ao`,
+    { headers },
+  );
+  assert(
+    typeof refreshedAoReport?.data?.preview === 'string' &&
+      refreshedAoReport.data.preview.includes('## Agent Residual Risk') &&
+      refreshedAoReport.data.preview.includes(agentRunId),
+    'Threat-hunt AO report did not embed the agent residual-risk section.',
+  );
+  const refreshedPackageList = await request('/_api/assurance/packages', { headers });
+  const refreshedPackageListEntry = refreshedPackageList?.data?.find((item) => item.id === refreshedPackageId);
+  assert(
+    refreshedPackageListEntry?.validationStatus === 'pass' &&
+      refreshedPackageListEntry?.validationCheckCount >= 17 &&
+      refreshedPackageListEntry?.coverage?.reconciliationStatus === 'matched',
+    'Threat-hunt package list entry did not preserve refreshed validation and reconciliation coverage after agent refresh.',
+  );
+  const agentPackageExplanation = await request('/_api/assurance/explain', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      audience: 'assessor',
+      evidenceJobId: threatHuntJobId,
+      focusId: 'AGENT_APPROVAL_GATES',
+    }),
+  });
+  assert(
+    agentPackageExplanation?.data?.focusId === 'AGENT_APPROVAL_GATES' &&
+      typeof agentPackageExplanation?.data?.explanation === 'string' &&
+      agentPackageExplanation.data.explanation.includes('AGENT_APPROVAL_GATES'),
+    'Threat-hunt package explanation did not resolve agent governance focus through the assurance explainer.',
+  );
 
   console.log(
     'Health, IAM, governance, reports, chat, imports, portal, advanced risk, third-party, privacy, resilience, queue consumers, and R2 artifact flow all passed.',

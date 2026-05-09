@@ -1,6 +1,8 @@
 import type { WorkerRequestContext } from '../../router';
 import type { EnvBindings } from '../../types/env';
 import { loadPermissionContext, requireAnyPermission } from '../../authorization';
+import { getAiRuntimeStatus } from '../ai/runtime';
+import { buildWorkspaceChatReply } from '../ai/workspaceGuidance';
 import {
   sendPortalAssignmentSubmittedEmail,
   sendReportExportReadyEmail,
@@ -1256,78 +1258,6 @@ async function getReportLint(env: EnvBindings, tenantId: string) {
     available_identifiers: availableIdentifiers,
     entity_country: entityCountry,
     competent_authority: competentAuthority,
-  };
-}
-
-async function buildChatReply(env: EnvBindings, tenantId: string, message: string) {
-  const lower = message.toLowerCase();
-  const counts = await Promise.all([
-    getTenantCount(env, 'risk_assessments', tenantId),
-    getTenantCount(env, 'processings', tenantId),
-    getTenantCount(env, 'entities', tenantId),
-    getTenantCount(env, 'ebios_studies', tenantId),
-    getTenantCount(env, 'quantitative_studies', tenantId),
-    getTenantCount(env, 'portal_assignments', tenantId),
-  ]);
-
-  const summary = {
-    riskAssessments: counts[0],
-    processings: counts[1],
-    entities: counts[2],
-    ebiosStudies: counts[3],
-    quantitativeStudies: counts[4],
-    portalAssignments: counts[5],
-  };
-
-  if (lower.includes('privacy')) {
-    return {
-      content: `Privacy coverage currently tracks ${summary.processings} processing records. Focus next on open rights requests and breach handling if you want the privacy posture tightened further.`,
-      citations: [{ label: 'Privacy processings', value: String(summary.processings) }],
-    };
-  }
-
-  if (lower.includes('vendor') || lower.includes('third')) {
-    return {
-      content: `Third-party oversight currently covers ${summary.entities} entities and ${summary.portalAssignments} auditee assignments. The strongest next move is to finish any in-progress portal responses and link them back to the compliance review.`,
-      citations: [
-        { label: 'Third-party entities', value: String(summary.entities) },
-        { label: 'Portal assignments', value: String(summary.portalAssignments) },
-      ],
-    };
-  }
-
-  if (lower.includes('ebios')) {
-    return {
-      content: `The workspace has ${summary.ebiosStudies} EBIOS RM study in scope. Use it to move workshop evidence, stakeholders, and scenarios into a single operating narrative before exporting.`,
-      citations: [{ label: 'EBIOS RM studies', value: String(summary.ebiosStudies) }],
-    };
-  }
-
-  if (lower.includes('quant') || lower.includes('ale')) {
-    return {
-      content: `The quantitative module is tracking ${summary.quantitativeStudies} study with combined scenario economics ready for executive summaries and action planning.`,
-      citations: [{ label: 'Quantitative studies', value: String(summary.quantitativeStudies) }],
-    };
-  }
-
-  if (lower.includes('risk')) {
-    return {
-      content: `The risk workspace currently includes ${summary.riskAssessments} qualitative assessments, ${summary.ebiosStudies} EBIOS study, and ${summary.quantitativeStudies} quantitative study. Choose the assessment style based on whether you need treatment tracking, attack-path analysis, or economic loss modeling.`,
-      citations: [
-        { label: 'Risk assessments', value: String(summary.riskAssessments) },
-        { label: 'EBIOS RM studies', value: String(summary.ebiosStudies) },
-        { label: 'Quantitative studies', value: String(summary.quantitativeStudies) },
-      ],
-    };
-  }
-
-  return {
-    content: `Workspace summary: ${summary.riskAssessments} risk assessments, ${summary.processings} processings, ${summary.entities} third-party entities, ${summary.ebiosStudies} EBIOS study, ${summary.quantitativeStudies} quantitative study, and ${summary.portalAssignments} active portal assignment. Ask about a domain and I’ll narrow the answer down.`,
-    citations: [
-      { label: 'Risk assessments', value: String(summary.riskAssessments) },
-      { label: 'Privacy processings', value: String(summary.processings) },
-      { label: 'Third-party entities', value: String(summary.entities) },
-    ],
   };
 }
 
@@ -2891,7 +2821,18 @@ async function buildWorkflowControlSnapshot(env: EnvBindings, tenantId: string) 
       }>(),
   ]);
 
-  const recentRuns = [
+  const coordinatorRuns = leaseSnapshot.workflowRuns.map((run) => ({
+    id: run.runId,
+    title: run.title,
+    module: run.module,
+    status: run.status,
+    detail: run.detail,
+    updatedAt: run.updatedAt,
+    route: run.route,
+  }));
+
+  const mergedRuns = [
+    ...coordinatorRuns,
     ...assignments.slice(0, 8).map((assignment) => ({
       id: assignment.id,
       title: assignment.name,
@@ -2937,12 +2878,22 @@ async function buildWorkflowControlSnapshot(env: EnvBindings, tenantId: string) 
       updatedAt: row.updated_at,
       route: '/conmon/executions',
     })),
-  ]
-    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+  ].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+
+  const recentRuns = mergedRuns
+    .filter((run, index, source) => source.findIndex((item) => `${item.module}:${item.id}` === `${run.module}:${run.id}`) === index)
     .slice(0, 20);
 
   const statusCounts = recentRuns.reduce<Record<string, number>>((acc, run) => {
     acc[run.status] = (acc[run.status] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  const coordinatorModuleCounts = coordinatorRuns.reduce<Record<string, number>>((acc, run) => {
+    if (run.status === 'Done') {
+      return acc;
+    }
+    acc[run.module] = (acc[run.module] ?? 0) + 1;
     return acc;
   }, {});
 
@@ -2978,6 +2929,22 @@ async function buildWorkflowControlSnapshot(env: EnvBindings, tenantId: string) 
       activeCount: sessions.length,
       detail: 'Active workflow-aware guidance sessions and coordination hints.',
       route: '/chat',
+    },
+    {
+      id: 'assurance-orchestration',
+      title: 'Assurance Orchestration',
+      module: 'Assurance',
+      activeCount: coordinatorModuleCounts['Assurance'] ?? 0,
+      detail: 'Evidence evaluation, tracker conversion, packaging, and review activity coordinated through the tenant workflow ledger.',
+      route: '/assurance/evidence',
+    },
+    {
+      id: 'agent-governance',
+      title: 'Agent Governance',
+      module: 'Agent',
+      activeCount: coordinatorModuleCounts['Agent'] ?? 0,
+      detail: 'Bounded agent runs and approval-gated writeback decisions.',
+      route: '/assurance/agent-runs',
     },
   ];
 
@@ -4867,21 +4834,25 @@ export async function handleOpsRoutes(
 
     if (id === 'status' && ctx.request.method === 'GET') {
       const counts = await buildOpsOverviewCounts(ctx.env, ctx.tenantId);
+      const runtime = await getAiRuntimeStatus(ctx.env);
       return json({
         data: {
           available: true,
-          provider: 'workspace-guidance',
+          provider: runtime.textGenerationAvailable ? 'workspace-guidance-ai' : 'workspace-guidance-fallback',
           sessionsCount: counts.chatSessions,
         },
       });
     }
 
     if (id === 'ollama-models' && ctx.request.method === 'GET') {
+      const runtime = await getAiRuntimeStatus(ctx.env);
       return json({
         data: {
-          available: false,
+          available: runtime.textGenerationAvailable,
           models: [],
-          message: 'Local demo chat uses deterministic workspace guidance rather than an LLM backend.',
+          message: runtime.textGenerationAvailable
+            ? 'Workspace chat is backed by Workers AI with tenant-grounded context and deterministic fallback.'
+            : 'Workspace chat is currently using deterministic fallback guidance because Workers AI is not provisioned.',
         },
       });
     }
@@ -4963,14 +4934,20 @@ export async function handleOpsRoutes(
 
         const sessionRow = await ctx.env.D1_MAIN.prepare(
           `
-          SELECT messages_json, title
-          FROM chat_sessions
-          WHERE tenant_id = ? AND id = ?
+          SELECT
+            session.messages_json,
+            session.title,
+            session.workflow,
+            folder_item.name AS folder_name
+          FROM chat_sessions AS session
+          INNER JOIN folders AS folder_item
+            ON folder_item.id = session.folder_id
+          WHERE session.tenant_id = ? AND session.id = ?
           LIMIT 1
           `,
         )
           .bind(ctx.tenantId, subresource)
-          .first<{ messages_json: string; title: string }>();
+          .first<{ messages_json: string; title: string; workflow: string | null; folder_name: string | null }>();
 
         if (!sessionRow) {
           return json(
@@ -4986,7 +4963,10 @@ export async function handleOpsRoutes(
           content,
           createdAt: nowIso(),
         };
-        const reply = await buildChatReply(ctx.env, ctx.tenantId, content);
+        const reply = await buildWorkspaceChatReply(ctx.env, ctx.tenantId, content, {
+          folderName: sessionRow.folder_name,
+          workflow: sessionRow.workflow,
+        });
         const assistantMessage: ChatMessage = {
           id: crypto.randomUUID(),
           role: 'assistant',

@@ -18,6 +18,7 @@
     "smoke:local": "node ./scripts/local-smoke.mjs",
     "smoke:local:email": "node ./scripts/assert_email_logs.mjs",
     "smoke:local:full": "node ./scripts/local-smoke.mjs && node ./scripts/assert_email_logs.mjs",
+    "verify:observable-local": "node ./scripts/local-smoke.mjs && node ./scripts/verify_observable_parity.mjs",
     "smoke:production": "node ./scripts/prod_smoke.mjs",
     "verify:production-token": "bash ./scripts/verify_cloudflare_token.sh"
   },

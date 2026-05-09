@@ -14,6 +14,8 @@ export type Perimeter = {
 export type RiskRegister = {
   id: string;
   tenantId: string;
+  folderId: string | null;
+  folderName: string | null;
   name: string;
   description: string | null;
   createdAt: string;

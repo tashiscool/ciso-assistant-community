@@ -46,6 +46,7 @@ import {
   Wand2,
   Palette,
   Globe2,
+  Gauge,
   ChevronLeft,
   ChevronRight,
   type LucideIcon,
@@ -140,11 +141,17 @@ const navigation: NavItem[] = [
   { to: '/conmon/executions', label: 'ConMon Runs', section: 'ConMon', icon: PlayCircle },
   { to: '/evidence/sources', label: 'Evidence Sources', section: 'Evidence', icon: Database },
   { to: '/evidence/jobs', label: 'Evidence Jobs', section: 'Evidence', icon: Cpu },
+  { to: '/assurance', label: 'Assurance Overview', section: 'Assurance', icon: Gauge },
+  { to: '/assurance/evidence', label: 'Evidence Explorer', section: 'Assurance', icon: Search },
+  { to: '/assurance/tracker', label: 'Tracker Workbench', section: 'Assurance', icon: Upload },
+  { to: '/assurance/packages', label: '20x Packages', section: 'Assurance', icon: FileOutput },
+  { to: '/assurance/reviews', label: 'Review Queue', section: 'Assurance', icon: ClipboardCheck },
+  { to: '/assurance/agent-runs', label: 'Agent Runs', section: 'Assurance', icon: Bot },
 ];
 
-const sections = ['Overview', 'Workspace', 'Setup', 'Governance', 'AI', 'Builders', 'Risk', 'Operations', 'Advanced Risk', 'ConMon', 'Evidence'];
+const sections = ['Overview', 'Workspace', 'Setup', 'Governance', 'AI', 'Builders', 'Risk', 'Operations', 'Advanced Risk', 'ConMon', 'Evidence', 'Assurance'];
 
-const SECTION_SEPARATORS_BEFORE = new Set(['Workspace', 'Setup', 'Governance', 'AI', 'Builders', 'Risk', 'Operations', 'Advanced Risk', 'ConMon', 'Evidence']);
+const SECTION_SEPARATORS_BEFORE = new Set(['Workspace', 'Setup', 'Governance', 'AI', 'Builders', 'Risk', 'Operations', 'Advanced Risk', 'ConMon', 'Evidence', 'Assurance']);
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
