@@ -28,6 +28,39 @@ type LoginConfig = {
   suggestedTenantSlug: string | null;
   suggestedEmail: string | null;
   message: string;
+  sso: {
+    configured: boolean;
+    ready: boolean;
+    protocol: 'none' | 'oidc' | 'saml' | 'cloudflare-access';
+    providerType: string | null;
+    buttonLabel: string | null;
+    loginEnforced: boolean;
+    allowLocalFallback: boolean;
+    callbackUrl: string | null;
+    message: string;
+  };
+};
+
+type TenantLoginOptions = {
+  tenantSlug: string;
+  tenantName: string | null;
+  found: boolean;
+  local: {
+    passwordEnabled: boolean;
+    emailCodeEnabled: boolean;
+    allowed: boolean;
+    message: string;
+  };
+  sso: {
+    configured: boolean;
+    ready: boolean;
+    protocol: 'none' | 'oidc' | 'saml' | 'cloudflare-access';
+    providerType: string | null;
+    buttonLabel: string | null;
+    loginEnforced: boolean;
+    domainHint: string | null;
+    message: string;
+  };
 };
 
 type BootstrapResult = {
@@ -71,12 +104,13 @@ async function parseJsonError(response: Response): Promise<string> {
 }
 
 function slugifyTenant(value: string): string {
-  return value
+  const normalized = value
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 48);
+  return normalized;
 }
 
 function formatExpiresAt(value: string | null): string {
@@ -114,11 +148,13 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
   const { setIdentity, setAuthMode } = useEdgeIdentity();
   const [status, setStatus] = useState<BootstrapStatus | null>(null);
   const [loginConfig, setLoginConfig] = useState<LoginConfig | null>(null);
+  const [tenantOptions, setTenantOptions] = useState<TenantLoginOptions | null>(null);
+  const [tenantOptionsLoading, setTenantOptionsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState<
-    'initialize' | 'admin-access' | 'login-request' | 'login-verify' | 'password-sign-in' | 'password-set' | null
+    'initialize' | 'admin-access' | 'login-request' | 'login-verify' | 'password-sign-in' | 'password-set' | 'sso-start' | null
   >(null);
   const [defaultsApplied, setDefaultsApplied] = useState(false);
 
@@ -135,7 +171,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
   const [newLocalPassword, setNewLocalPassword] = useState('');
   const [confirmLocalPassword, setConfirmLocalPassword] = useState('');
   const [loginStep, setLoginStep] = useState<'request' | 'verify'>('request');
-  const [loginMethod, setLoginMethod] = useState<'password' | 'email'>('password');
+  const [loginMethod, setLoginMethod] = useState<'password' | 'email' | 'sso'>('password');
 
   useEffect(() => {
     void (async () => {
@@ -219,6 +255,11 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
       return;
     }
 
+    if (tenantOptions?.sso.loginEnforced && tenantOptions.sso.ready) {
+      setLoginMethod('sso');
+      return;
+    }
+
     if (!canUsePasswordSignIn && canUseEmailSignIn) {
       setLoginMethod('email');
       return;
@@ -227,7 +268,52 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
     if (!canUseEmailSignIn) {
       setLoginMethod('password');
     }
-  }, [canUseEmailSignIn, canUsePasswordSignIn, showLoginSurface]);
+  }, [canUseEmailSignIn, canUsePasswordSignIn, showLoginSurface, tenantOptions]);
+
+  useEffect(() => {
+    if (!showLoginSurface || !status?.initialized) {
+      setTenantOptions(null);
+      return;
+    }
+
+    const slug = tenantSlug.trim();
+    if (!slug) {
+      setTenantOptions(null);
+      return;
+    }
+
+    let cancelled = false;
+    setTenantOptionsLoading(true);
+
+    void (async () => {
+      try {
+        const response = await fetch(`/_api/core/login/options?tenantSlug=${encodeURIComponent(slug)}`, {
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          throw new Error(await parseJsonError(response));
+        }
+
+        const payload = (await response.json()) as { data: TenantLoginOptions };
+        if (!cancelled) {
+          setTenantOptions(payload.data);
+        }
+      } catch {
+        if (!cancelled) {
+          setTenantOptions(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setTenantOptionsLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [showLoginSurface, status?.initialized, tenantSlug]);
 
   const title = useMemo(() => {
     if (loading) return 'Checking workspace access';
@@ -249,9 +335,19 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
 
   const tenantSlugPlaceholder = loginConfig?.suggestedTenantSlug?.trim() || 'regovise';
   const emailPlaceholder = loginConfig?.suggestedEmail?.trim() || 'admin@regovise.com';
+  const tenantLocalAllowed = tenantOptions?.local.allowed ?? true;
+  const tenantPasswordEnabled = tenantOptions?.local.passwordEnabled ?? canUsePasswordSignIn;
+  const tenantEmailEnabled = tenantOptions?.local.emailCodeEnabled ?? canUseEmailSignIn;
+  const tenantSsoReady = tenantOptions?.sso.ready ?? loginConfig?.sso.ready ?? false;
+  const tenantSsoEnforced = tenantOptions?.sso.loginEnforced ?? loginConfig?.sso.loginEnforced ?? false;
+  const ssoButtonLabel =
+    tenantOptions?.sso.buttonLabel?.trim() ||
+    loginConfig?.sso.buttonLabel?.trim() ||
+    'Continue with SSO';
   const signInPosture = [
-    loginConfig?.passwordConfiguredUserCount ? 'Password sign-in ready' : null,
-    canUseEmailSignIn ? 'Email codes available' : null,
+    tenantSsoReady ? `${tenantOptions?.sso.providerType || loginConfig?.sso.providerType || 'SSO'} ready` : null,
+    tenantPasswordEnabled && tenantLocalAllowed ? 'Password sign-in ready' : null,
+    tenantEmailEnabled && tenantLocalAllowed ? 'Email codes available' : null,
     tenantSlug || tenantSlugPlaceholder ? `Workspace ${tenantSlug || tenantSlugPlaceholder}` : null,
   ]
     .filter((item): item is string => Boolean(item))
@@ -465,6 +561,41 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
     }
   }
 
+  async function handleSsoStart() {
+    try {
+      setBusy('sso-start');
+      setError(null);
+      setNotice(null);
+
+      const response = await fetch('/_api/core/sso/start', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          tenantSlug,
+          nextPath: pendingRoute,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(await parseJsonError(response));
+      }
+
+      const payload = (await response.json()) as {
+        data: {
+          redirectUrl: string;
+        };
+      };
+
+      window.location.assign(payload.data.redirectUrl);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to start single sign-on.');
+      setBusy(null);
+    }
+  }
+
   return (
     <section
       className={cn(
@@ -496,57 +627,22 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
       {notice && <div className="notice-success">{notice}</div>}
 
       {showLoginSurface && status?.initialized ? (
-        <section className="panel-subtle space-y-5">
-          <div className="space-y-2">
-            <div>
-              <div className="text-sm font-semibold text-white">Secure sign-in</div>
-              <p className="mt-1 text-sm leading-6 text-slate-400">
-                Choose one path and finish it. Regovise will open the workspace only after the session is established.
-              </p>
+        <>
+          <section className="panel-subtle space-y-5">
+            <div className="space-y-2">
+              <div>
+                <div className="text-sm font-semibold text-white">Workspace sign-in</div>
+                <p className="mt-1 text-sm leading-6 text-slate-400">
+                  Regovise workspaces usually use one of three paths: enterprise SSO, local password fallback, or
+                  email-code fallback. Start with the workspace slug and we will show the path that fits that tenant.
+                </p>
+              </div>
+              {signInPosture ? <div className="text-xs text-slate-500">{signInPosture}</div> : null}
             </div>
-            {signInPosture ? <div className="text-xs text-slate-500">{signInPosture}</div> : null}
-          </div>
 
-          {loginConfig?.message ? (
-            <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
-              {loginConfig.message}
-              {loginConfig.statusNote ? <div className="mt-2 text-xs text-slate-500">{loginConfig.statusNote}</div> : null}
-            </div>
-          ) : null}
-
-          <div className="inline-flex rounded-full border border-white/10 bg-slate-950/40 p-1">
-            <button
-              className={cn(
-                'rounded-full px-4 py-2 text-sm transition',
-                loginMethod === 'password'
-                  ? 'bg-white text-slate-950'
-                  : 'text-slate-400 hover:text-white',
-              )}
-              onClick={() => setLoginMethod('password')}
-              type="button"
-            >
-              Password
-            </button>
-            <button
-              className={cn(
-                'rounded-full px-4 py-2 text-sm transition',
-                loginMethod === 'email'
-                  ? 'bg-white text-slate-950'
-                  : 'text-slate-400 hover:text-white',
-                !canUseEmailSignIn && 'cursor-not-allowed opacity-50',
-              )}
-              disabled={!canUseEmailSignIn}
-              onClick={() => setLoginMethod('email')}
-              type="button"
-            >
-              Email code
-            </button>
-          </div>
-
-          {loginMethod === 'password' ? (
             <div className="mx-auto max-w-xl space-y-4">
               <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Workspace</span>
+                <span className="text-slate-300">Workspace slug</span>
                 <input
                   className="input"
                   value={tenantSlug}
@@ -555,166 +651,252 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
                 />
               </label>
 
-              <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Email</span>
-                <input
-                  className="input"
-                  value={loginEmail}
-                  onChange={(event) => setLoginEmail(event.target.value)}
-                  placeholder={emailPlaceholder}
-                  type="email"
-                />
-              </label>
-
-              <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Password</span>
-                <input
-                  className="input"
-                  value={loginPassword}
-                  onChange={(event) => setLoginPassword(event.target.value)}
-                  placeholder="Enter the local account password"
-                  type="password"
-                />
-              </label>
-
-              {!canUsePasswordSignIn ? (
+              {tenantOptionsLoading ? (
+                <div className="text-xs text-slate-500">Checking workspace sign-in methods...</div>
+              ) : tenantOptions?.tenantName ? (
                 <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
-                  No local password is configured yet for this account.
+                  Workspace detected: <span className="font-medium text-white">{tenantOptions.tenantName}</span>
                 </div>
-              ) : (
+              ) : null}
+
+              {tenantOptions?.sso.message ? (
+                <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                  {tenantOptions.sso.message}
+                </div>
+              ) : loginConfig?.message ? (
+                <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                  {loginConfig.message}
+                  {loginConfig.statusNote ? <div className="mt-2 text-xs text-slate-500">{loginConfig.statusNote}</div> : null}
+                </div>
+              ) : null}
+            </div>
+
+            <div className="inline-flex flex-wrap rounded-full border border-white/10 bg-slate-950/40 p-1">
+              {tenantSsoReady ? (
                 <button
-                  className="button-primary w-full justify-center"
-                  disabled={busy === 'password-sign-in'}
-                  onClick={() => void handlePasswordSignIn()}
+                  className={cn(
+                    'rounded-full px-4 py-2 text-sm transition',
+                    loginMethod === 'sso' ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white',
+                  )}
+                  onClick={() => setLoginMethod('sso')}
                   type="button"
                 >
-                  {busy === 'password-sign-in' ? 'Signing in…' : 'Sign in with password'}
+                  SSO
                 </button>
-              )}
+              ) : null}
+              {tenantLocalAllowed ? (
+                <button
+                  className={cn(
+                    'rounded-full px-4 py-2 text-sm transition',
+                    loginMethod === 'password' ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white',
+                    !tenantPasswordEnabled && 'cursor-not-allowed opacity-50',
+                  )}
+                  disabled={!tenantPasswordEnabled}
+                  onClick={() => setLoginMethod('password')}
+                  type="button"
+                >
+                  Password
+                </button>
+              ) : null}
+              {tenantLocalAllowed ? (
+                <button
+                  className={cn(
+                    'rounded-full px-4 py-2 text-sm transition',
+                    loginMethod === 'email' ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white',
+                    !tenantEmailEnabled && 'cursor-not-allowed opacity-50',
+                  )}
+                  disabled={!tenantEmailEnabled}
+                  onClick={() => setLoginMethod('email')}
+                  type="button"
+                >
+                  Email code
+                </button>
+              ) : null}
             </div>
-          ) : (
-            <div className="mx-auto max-w-xl space-y-4">
-              <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Workspace</span>
-                <input
-                  className="input"
-                  value={tenantSlug}
-                  onChange={(event) => setTenantSlug(slugifyTenant(event.target.value))}
-                  placeholder={tenantSlugPlaceholder}
-                />
-              </label>
 
-              <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Email</span>
-                <input
-                  className="input"
-                  value={loginEmail}
-                  onChange={(event) => setLoginEmail(event.target.value)}
-                  placeholder={emailPlaceholder}
-                  type="email"
-                />
-              </label>
+            {loginMethod === 'sso' ? (
+              <div className="mx-auto max-w-xl space-y-4">
+                <div className="rounded-2xl border border-cyan-300/15 bg-cyan-400/[0.06] px-4 py-4 text-sm text-cyan-100">
+                  Use the enterprise identity provider configured for this workspace. After the provider confirms the
+                  account, Regovise opens the tenant session and returns you here.
+                </div>
+                <button
+                  className="button-primary w-full justify-center"
+                  disabled={!tenantSsoReady || busy === 'sso-start'}
+                  onClick={() => void handleSsoStart()}
+                  type="button"
+                >
+                  {busy === 'sso-start' ? 'Redirecting…' : ssoButtonLabel}
+                </button>
+                {!tenantSsoReady ? (
+                  <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                    Enter a workspace slug with an active OIDC provider to continue with SSO.
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
 
-              {loginStep === 'verify' ? (
+            {loginMethod === 'password' ? (
+              <div className="mx-auto max-w-xl space-y-4">
                 <label className="block space-y-2 text-sm">
-                  <span className="text-slate-300">Six-digit code</span>
+                  <span className="text-slate-300">Email</span>
                   <input
                     className="input"
-                    inputMode="numeric"
-                    maxLength={6}
-                    onChange={(event) => setLoginCode(event.target.value.replace(/\D+/g, '').slice(0, 6))}
-                    placeholder="123456"
-                    value={loginCode}
+                    value={loginEmail}
+                    onChange={(event) => setLoginEmail(event.target.value)}
+                    placeholder={emailPlaceholder}
+                    type="email"
                   />
                 </label>
-              ) : null}
 
-              {loginStep === 'verify' ? (
-                <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
-                  {formatExpiresAt(loginExpiresAt)}
-                  {loginPreviewCode ? <div className="mt-2 text-xs text-cyan-300">Preview code: {loginPreviewCode}</div> : null}
-                </div>
-              ) : null}
+                <label className="block space-y-2 text-sm">
+                  <span className="text-slate-300">Password</span>
+                  <input
+                    className="input"
+                    value={loginPassword}
+                    onChange={(event) => setLoginPassword(event.target.value)}
+                    placeholder="Enter the local account password"
+                    type="password"
+                  />
+                </label>
 
-              {!canUseEmailSignIn ? (
-                <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
-                  Email sign-in is not available for this environment.
-                </div>
-              ) : loginStep === 'request' ? (
-                <button
-                  className="button-primary w-full justify-center"
-                  disabled={busy === 'login-request'}
-                  onClick={() => void handleRequestCode()}
-                  type="button"
-                >
-                  {busy === 'login-request' ? 'Sending code…' : 'Request sign-in code'}
-                </button>
-              ) : (
-                <div className="flex flex-wrap gap-3">
+                {!tenantLocalAllowed ? (
+                  <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                    This workspace requires SSO for normal sign-in. Use the SSO tab instead.
+                  </div>
+                ) : !tenantPasswordEnabled ? (
+                  <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                    No local password is configured yet for this account.
+                  </div>
+                ) : (
                   <button
-                    className="button-primary"
-                    disabled={busy === 'login-verify'}
-                    onClick={() => void handleVerifyCode()}
+                    className="button-primary w-full justify-center"
+                    disabled={busy === 'password-sign-in'}
+                    onClick={() => void handlePasswordSignIn()}
                     type="button"
                   >
-                    {busy === 'login-verify' ? 'Verifying…' : 'Verify code'}
+                    {busy === 'password-sign-in' ? 'Signing in…' : 'Sign in with password'}
                   </button>
+                )}
+              </div>
+            ) : null}
+
+            {loginMethod === 'email' ? (
+              <div className="mx-auto max-w-xl space-y-4">
+                <label className="block space-y-2 text-sm">
+                  <span className="text-slate-300">Email</span>
+                  <input
+                    className="input"
+                    value={loginEmail}
+                    onChange={(event) => setLoginEmail(event.target.value)}
+                    placeholder={emailPlaceholder}
+                    type="email"
+                  />
+                </label>
+
+                {loginStep === 'verify' ? (
+                  <label className="block space-y-2 text-sm">
+                    <span className="text-slate-300">Six-digit code</span>
+                    <input
+                      className="input"
+                      inputMode="numeric"
+                      maxLength={6}
+                      onChange={(event) => setLoginCode(event.target.value.replace(/\D+/g, '').slice(0, 6))}
+                      placeholder="123456"
+                      value={loginCode}
+                    />
+                  </label>
+                ) : null}
+
+                {loginStep === 'verify' ? (
+                  <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                    {formatExpiresAt(loginExpiresAt)}
+                    {loginPreviewCode ? <div className="mt-2 text-xs text-cyan-300">Preview code: {loginPreviewCode}</div> : null}
+                  </div>
+                ) : null}
+
+                {!tenantLocalAllowed ? (
+                  <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                    This workspace requires SSO for normal sign-in. Use the SSO tab instead.
+                  </div>
+                ) : !tenantEmailEnabled ? (
+                  <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                    Email-code sign-in is not available for this workspace.
+                  </div>
+                ) : loginStep === 'request' ? (
                   <button
-                    className="button-secondary"
+                    className="button-primary w-full justify-center"
                     disabled={busy === 'login-request'}
                     onClick={() => void handleRequestCode()}
                     type="button"
                   >
-                    {busy === 'login-request' ? 'Sending…' : 'Send a new code'}
+                    {busy === 'login-request' ? 'Sending code…' : 'Request sign-in code'}
                   </button>
+                ) : (
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      className="button-primary"
+                      disabled={busy === 'login-verify'}
+                      onClick={() => void handleVerifyCode()}
+                      type="button"
+                    >
+                      {busy === 'login-verify' ? 'Verifying…' : 'Verify code'}
+                    </button>
+                    <button
+                      className="button-secondary"
+                      disabled={busy === 'login-request'}
+                      onClick={() => void handleRequestCode()}
+                      type="button"
+                    >
+                      {busy === 'login-request' ? 'Sending…' : 'Send a new code'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : null}
+
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4 text-sm text-slate-400">
+              <div>
+                Workspace access is usually provisioned by a tenant administrator or through enterprise SSO.
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Link className="button-secondary" to="/admin/recover">
+                  Need recovery access?
+                </Link>
+                <Link className="button-secondary" to={`/logout${pendingRoute !== '/' ? `?next=${encodeURIComponent(pendingRoute)}` : ''}`}>
+                  Sign out and start fresh
+                </Link>
+              </div>
+            </div>
+          </section>
+
+          <section className="space-y-3">
+            <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">How access works</div>
+            <div className="grid gap-3 md:grid-cols-3">
+              <div className="rounded-3xl border border-white/10 bg-white/[0.02] px-4 py-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">1. Workspace</div>
+                <div className="mt-2 text-sm font-medium text-white">Choose the right tenant</div>
+                <div className="mt-2 text-sm leading-6 text-slate-400">
+                  The workspace slug tells Regovise which tenant policy and identity path should be used.
                 </div>
-              )}
+              </div>
+              <div className="rounded-3xl border border-white/10 bg-white/[0.02] px-4 py-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">2. Identity</div>
+                <div className="mt-2 text-sm font-medium text-white">Use the tenant method</div>
+                <div className="mt-2 text-sm leading-6 text-slate-400">
+                  Some workspaces use OIDC SSO, some keep local fallback during rollout, and all keep guarded recovery separate.
+                </div>
+              </div>
+              <div className="rounded-3xl border border-white/10 bg-white/[0.02] px-4 py-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">3. Session</div>
+                <div className="mt-2 text-sm font-medium text-white">Open a secure workspace session</div>
+                <div className="mt-2 text-sm leading-6 text-slate-400">
+                  After identity is verified, Regovise creates a secure tenant session and returns you to the workspace.
+                </div>
+              </div>
             </div>
-          )}
-
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4 text-sm text-slate-400">
-            <div>
-              {loginConfig?.supportEmail ? `Support: ${loginConfig.supportEmail}` : 'Use recovery only when normal sign-in is unavailable.'}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Link className="button-secondary" to="/admin/recover">
-                Need recovery access?
-              </Link>
-              <Link className="button-secondary" to={`/logout${pendingRoute !== '/' ? `?next=${encodeURIComponent(pendingRoute)}` : ''}`}>
-                Sign out and start fresh
-              </Link>
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      {showLoginSurface && status?.initialized ? (
-        <section className="space-y-3">
-          <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">How Regovise works</div>
-          <div className="grid gap-3 md:grid-cols-3">
-            <div className="rounded-3xl border border-white/10 bg-white/[0.02] px-4 py-4">
-            <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">1. Program</div>
-            <div className="mt-2 text-sm font-medium text-white">Set the program context</div>
-            <div className="mt-2 text-sm leading-6 text-slate-400">
-              Domains, frameworks, and assessments define what the workspace is actually operating.
-            </div>
-            </div>
-            <div className="rounded-3xl border border-white/10 bg-white/[0.02] px-4 py-4">
-            <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">2. Evidence</div>
-            <div className="mt-2 text-sm font-medium text-white">Ground the work in records</div>
-            <div className="mt-2 text-sm leading-6 text-slate-400">
-              Evidence and monitoring feed the deterministic checks that keep assurance honest.
-            </div>
-            </div>
-            <div className="rounded-3xl border border-white/10 bg-white/[0.02] px-4 py-4">
-            <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">3. Assurance</div>
-            <div className="mt-2 text-sm font-medium text-white">Review and package the result</div>
-            <div className="mt-2 text-sm leading-6 text-slate-400">
-              Human review, packages, and bounded automation turn the program into something shareable.
-            </div>
-            </div>
-          </div>
-        </section>
+          </section>
+        </>
       ) : null}
 
       {showInitializeSurface && status?.initialized ? (

@@ -5,7 +5,7 @@ const USER_STORAGE_KEY = 'ciso-assistant.edge.user-id';
 const AUTH_MODE_STORAGE_KEY = 'ciso-assistant.edge.auth-mode';
 const IDENTITY_EVENT = 'ciso-assistant-edge-identity-change';
 const LOOPBACK_AUTO_SESSION_SUPPRESS_KEY = 'ciso-assistant.edge.loopback-auto-session-suppressed';
-const AUTH_ENTRY_PATHS = new Set(['/login', '/setup/initialize', '/admin/recover']);
+const AUTH_ENTRY_PATHS = new Set(['/login', '/auth/callback', '/setup/initialize', '/admin/recover']);
 
 function normalizePathname(pathname: string | null | undefined): string {
   const value = (pathname ?? '').trim();

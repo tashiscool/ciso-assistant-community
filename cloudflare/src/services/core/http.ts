@@ -15,6 +15,16 @@ import { seedDemoIamWorkspace } from '../iam/http';
 import { buildOpsOverviewCounts, seedDemoOpsWorkspace } from '../ops/http';
 import { seedDemoSetupWorkspace } from '../setup/http';
 import {
+  buildOidcAuthorizationUrl,
+  completeOidcCodeExchange,
+  type OidcConfigRecord,
+  type OidcIdentityClaims,
+  randomBase64Url,
+  normalizeAuthProtocol,
+  normalizeNextPath,
+  isRunnableOidcConfig,
+} from './oidc';
+import {
   buildClearedSessionCookieHeader,
   buildSessionCookieHeader,
   createSession,
@@ -82,6 +92,39 @@ type LoginConfigPayload = {
   suggestedTenantSlug: string | null;
   suggestedEmail: string | null;
   message: string;
+  sso: {
+    configured: boolean;
+    ready: boolean;
+    protocol: 'none' | 'oidc' | 'saml' | 'cloudflare-access';
+    providerType: string | null;
+    buttonLabel: string | null;
+    loginEnforced: boolean;
+    allowLocalFallback: boolean;
+    callbackUrl: string | null;
+    message: string;
+  };
+};
+
+type TenantLoginOptionsPayload = {
+  tenantSlug: string;
+  tenantName: string | null;
+  found: boolean;
+  local: {
+    passwordEnabled: boolean;
+    emailCodeEnabled: boolean;
+    allowed: boolean;
+    message: string;
+  };
+  sso: {
+    configured: boolean;
+    ready: boolean;
+    protocol: 'none' | 'oidc' | 'saml' | 'cloudflare-access';
+    providerType: string | null;
+    buttonLabel: string | null;
+    loginEnforced: boolean;
+    domainHint: string | null;
+    message: string;
+  };
 };
 
 type LocalLoginPrincipal = {
@@ -92,6 +135,10 @@ type LocalLoginPrincipal = {
   userEmail: string;
   displayName: string;
   loginEnforced: boolean;
+  ssoProtocol: 'none' | 'oidc' | 'saml' | 'cloudflare-access';
+  ssoProviderType: string | null;
+  ssoAllowLocalFallback: boolean;
+  ssoReady: boolean;
 };
 
 type LocalLoginCodeRow = {
@@ -132,7 +179,37 @@ type SetupEmailConfigSummaryRow = {
 };
 
 type SetupSsoLoginSummaryRow = {
+  tenant_id?: string;
+  provider_type: string | null;
+  auth_protocol?: string | null;
+  client_id?: string | null;
+  callback_url?: string | null;
+  metadata_url?: string | null;
+  domain_hint?: string | null;
+  button_label?: string | null;
+  allow_local_fallback?: number;
   login_enforced: number;
+};
+
+type TenantLookupRow = {
+  tenant_id: string;
+  tenant_slug: string;
+  tenant_name: string;
+};
+
+type SsoAuthTransactionRow = {
+  id: string;
+  tenant_id: string;
+  tenant_slug: string;
+  provider_type: string;
+  auth_protocol: string;
+  next_path: string;
+  redirect_uri: string;
+  code_verifier: string;
+  nonce: string;
+  created_at: string;
+  expires_at: string;
+  consumed_at: string | null;
 };
 
 type FrameworkRow = {
@@ -4140,7 +4217,7 @@ function slugifyTenant(value: string): string {
     .replace(/^-+|-+$/g, '')
     .slice(0, 48);
 
-  return normalized || 'workspace';
+  return normalized;
 }
 
 function normalizeEmail(value: string | null | undefined): string {
@@ -4223,6 +4300,775 @@ function isStrongPassword(password: string): boolean {
   );
 }
 
+function normalizeSsoProviderType(value: string | null | undefined): string | null {
+  const normalized = (value ?? '').trim();
+  return normalized || null;
+}
+
+function isOidcProtocol(protocol: string | null | undefined): boolean {
+  return normalizeAuthProtocol(protocol) === 'oidc';
+}
+
+function isActiveOidcConfig(config: OidcConfigRecord | null | undefined): boolean {
+  return isRunnableOidcConfig(config);
+}
+
+function coerceSsoRuntimeConfig(
+  row:
+    | ({
+        tenant_id?: string | null;
+        tenant_slug?: string | null;
+        tenant_name?: string | null;
+        provider_type?: string | null;
+        auth_protocol?: string | null;
+        client_id?: string | null;
+        callback_url?: string | null;
+        metadata_url?: string | null;
+        domain_hint?: string | null;
+        group_sync_enabled?: number;
+        login_enforced?: number;
+        status?: string | null;
+        roles_claim?: string | null;
+        email_claim?: string | null;
+        given_name_claim?: string | null;
+        family_name_claim?: string | null;
+        username_claim?: string | null;
+        button_label?: string | null;
+        allow_local_fallback?: number;
+        jit_provisioning_enabled?: number;
+      })
+    | null
+    | undefined,
+  requestOrigin: string,
+  tenant: { id?: string; slug: string; name: string } | null = null,
+): OidcConfigRecord | null {
+  if (!row && !tenant) {
+    return null;
+  }
+
+  const protocol = normalizeAuthProtocol(row?.auth_protocol ?? row?.provider_type ?? null);
+  return {
+    tenantId: row?.tenant_id?.trim() || tenant?.id || '',
+    tenantSlug: row?.tenant_slug?.trim() || tenant?.slug || '',
+    tenantName: row?.tenant_name?.trim() || tenant?.name || '',
+    providerType: normalizeSsoProviderType(row?.provider_type),
+    authProtocol: protocol,
+    clientId: row?.client_id?.trim() || null,
+    callbackUrl: row?.callback_url?.trim() || `${requestOrigin}/auth/callback`,
+    metadataUrl: row?.metadata_url?.trim() || null,
+    domainHint: row?.domain_hint?.trim() || null,
+    buttonLabel: row?.button_label?.trim() || null,
+    rolesClaim: row?.roles_claim?.trim() || 'roles',
+    emailClaim: row?.email_claim?.trim() || 'email',
+    givenNameClaim: row?.given_name_claim?.trim() || 'given_name',
+    familyNameClaim: row?.family_name_claim?.trim() || 'family_name',
+    usernameClaim: row?.username_claim?.trim() || 'preferred_username',
+    groupSyncEnabled: row?.group_sync_enabled === 1,
+    loginEnforced: row?.login_enforced === 1,
+    allowLocalFallback: row?.allow_local_fallback !== 0,
+    jitProvisioningEnabled: row?.jit_provisioning_enabled === 1,
+  };
+}
+
+async function loadTenantBySlug(env: EnvBindings, tenantSlug: string): Promise<TenantLookupRow | null> {
+  return env.D1_MAIN.prepare(
+    `
+    SELECT id AS tenant_id, slug AS tenant_slug, name AS tenant_name
+    FROM tenants
+    WHERE slug = ?
+    LIMIT 1
+    `,
+  )
+    .bind(tenantSlug)
+    .first<TenantLookupRow>();
+}
+
+async function loadTenantSsoRuntimeConfigByTenantId(
+  env: EnvBindings,
+  tenantId: string,
+  requestOrigin: string,
+  tenant?: { slug: string; name: string } | null,
+): Promise<OidcConfigRecord | null> {
+  const row = await env.D1_MAIN.prepare(
+    `
+    SELECT
+      tenant_id,
+      provider_type,
+      auth_protocol,
+      client_id,
+      callback_url,
+      metadata_url,
+      domain_hint,
+      group_sync_enabled,
+      login_enforced,
+      roles_claim,
+      email_claim,
+      given_name_claim,
+      family_name_claim,
+      username_claim,
+      button_label,
+      allow_local_fallback,
+      jit_provisioning_enabled
+    FROM setup_sso_configs
+    WHERE tenant_id = ?
+    LIMIT 1
+    `,
+  )
+    .bind(tenantId)
+    .first<Record<string, unknown>>();
+
+  if (!row && !tenant) {
+    return null;
+  }
+
+  return coerceSsoRuntimeConfig(
+    {
+      ...(row ?? {}),
+      tenant_id: tenantId,
+      tenant_slug: tenant?.slug ?? null,
+      tenant_name: tenant?.name ?? null,
+    },
+    requestOrigin,
+  );
+}
+
+async function loadTenantSsoRuntimeConfigBySlug(
+  env: EnvBindings,
+  tenantSlug: string,
+  requestOrigin: string,
+): Promise<OidcConfigRecord | null> {
+  const tenant = await loadTenantBySlug(env, tenantSlug);
+  if (!tenant) {
+    return null;
+  }
+
+  return loadTenantSsoRuntimeConfigByTenantId(
+    env,
+    tenant.tenant_id,
+    requestOrigin,
+    {
+      slug: tenant.tenant_slug,
+      name: tenant.tenant_name,
+    },
+  );
+}
+
+function buildSsoTenantMessage(config: OidcConfigRecord | null): string {
+  if (!config) {
+    return 'No single sign-on provider is configured for this workspace yet.';
+  }
+
+  if (config.authProtocol === 'saml') {
+    return 'SAML metadata can be documented here, but interactive SAML sign-in is not active in this worker yet.';
+  }
+
+  if (config.authProtocol === 'cloudflare-access') {
+    return 'Cloudflare Access can protect the front door, but workspace sign-in still relies on Regovise sessions after entry.';
+  }
+
+  if (!isActiveOidcConfig(config)) {
+    return 'OIDC is selected, but the discovery URL, client id, or callback URL is still incomplete.';
+  }
+
+  if (config.loginEnforced) {
+    return 'This workspace requires OIDC single sign-on for normal user access.';
+  }
+
+  if (!config.allowLocalFallback) {
+    return 'OIDC is active for this workspace and local fallback is turned off once cutover finishes.';
+  }
+
+  return 'OIDC single sign-on is ready for this workspace alongside the local recovery paths.';
+}
+
+async function buildTenantLoginOptions(
+  env: EnvBindings,
+  tenantSlugRaw: string,
+  requestOrigin: string,
+): Promise<TenantLoginOptionsPayload> {
+  const rawTenantSlug = tenantSlugRaw.trim();
+  if (!rawTenantSlug) {
+    return {
+      tenantSlug: '',
+      tenantName: null,
+      found: false,
+      local: {
+        passwordEnabled: false,
+        emailCodeEnabled: false,
+        allowed: false,
+        message: 'Enter a workspace slug to review the available sign-in methods.',
+      },
+      sso: {
+        configured: false,
+        ready: false,
+        protocol: 'none',
+        providerType: null,
+        buttonLabel: null,
+        loginEnforced: false,
+        domainHint: null,
+        message: 'Single sign-on options appear after the workspace slug is entered.',
+      },
+    };
+  }
+
+  const tenantSlug = slugifyTenant(rawTenantSlug);
+  const tenant = await loadTenantBySlug(env, tenantSlug);
+  const emailRuntime = getEmailRuntimeSummary(env);
+  const previewOnly = !emailRuntime.sendingEnabled && env.APP_ENV !== 'production';
+
+  if (!tenant) {
+    return {
+      tenantSlug,
+      tenantName: null,
+      found: false,
+      local: {
+        passwordEnabled: false,
+        emailCodeEnabled: false,
+        allowed: false,
+        message: 'No workspace matched that slug. Check the tenant slug and try again.',
+      },
+      sso: {
+        configured: false,
+        ready: false,
+        protocol: 'none',
+        providerType: null,
+        buttonLabel: null,
+        loginEnforced: false,
+        domainHint: null,
+        message: 'No workspace matched that slug yet.',
+      },
+    };
+  }
+
+  const [localCountRow, ssoConfig] = await Promise.all([
+    env.D1_MAIN.prepare(
+      `
+      SELECT COUNT(1) AS count
+      FROM users
+      WHERE tenant_id = ?
+        AND is_active = 1
+        AND keep_local_login = 1
+      `,
+    )
+      .bind(tenant.tenant_id)
+      .first<{ count: number }>(),
+    loadTenantSsoRuntimeConfigByTenantId(
+      env,
+      tenant.tenant_id,
+      requestOrigin,
+      {
+        slug: tenant.tenant_slug,
+        name: tenant.tenant_name,
+      },
+    ),
+  ]);
+
+  const localEnabled = Number(localCountRow?.count ?? 0) > 0;
+  const ssoReady = isActiveOidcConfig(ssoConfig);
+  const loginEnforced = Boolean(ssoConfig?.loginEnforced && ssoReady);
+  const localAllowed = !loginEnforced && (ssoConfig?.allowLocalFallback !== false || !ssoReady);
+  const localMessage = loginEnforced
+    ? 'This workspace requires OIDC single sign-on for normal sign-in.'
+    : localEnabled
+      ? 'Local password or email-code sign-in is still available for eligible users.'
+      : 'No active users are currently marked for local fallback in this workspace.';
+
+  return {
+    tenantSlug: tenant.tenant_slug,
+    tenantName: tenant.tenant_name,
+    found: true,
+    local: {
+      passwordEnabled: localEnabled,
+      emailCodeEnabled: localEnabled && (emailRuntime.sendingEnabled || previewOnly),
+      allowed: localAllowed,
+      message: localMessage,
+    },
+    sso: {
+      configured: Boolean(ssoConfig?.authProtocol && ssoConfig.authProtocol !== 'none'),
+      ready: ssoReady,
+      protocol: ssoConfig?.authProtocol ?? 'none',
+      providerType: ssoConfig?.providerType ?? null,
+      buttonLabel:
+        ssoConfig?.buttonLabel?.trim() ||
+        (ssoConfig?.providerType ? `Continue with ${ssoConfig.providerType}` : 'Continue with SSO'),
+      loginEnforced,
+      domainHint: ssoConfig?.domainHint ?? null,
+      message: buildSsoTenantMessage(ssoConfig),
+    },
+  };
+}
+
+function buildSsoSummary(config: OidcConfigRecord | null): LoginConfigPayload['sso'] {
+  return {
+    configured: Boolean(config?.authProtocol && config.authProtocol !== 'none'),
+    ready: isActiveOidcConfig(config),
+    protocol: config?.authProtocol ?? 'none',
+    providerType: config?.providerType ?? null,
+    buttonLabel:
+      config?.buttonLabel?.trim() ||
+      (config?.providerType ? `Continue with ${config.providerType}` : null),
+    loginEnforced: Boolean(config?.loginEnforced && isActiveOidcConfig(config)),
+    allowLocalFallback: config?.allowLocalFallback !== false,
+    callbackUrl: config?.callbackUrl ?? null,
+    message: buildSsoTenantMessage(config),
+  };
+}
+
+async function markSsoTransactionConsumed(env: EnvBindings, transactionId: string): Promise<void> {
+  await env.D1_MAIN.prepare(
+    `
+    UPDATE sso_auth_transactions
+    SET consumed_at = ?
+    WHERE id = ?
+    `,
+  )
+    .bind(new Date().toISOString(), transactionId)
+    .run();
+}
+
+async function loadPendingSsoTransaction(
+  env: EnvBindings,
+  transactionId: string,
+): Promise<SsoAuthTransactionRow | null> {
+  const row = await env.D1_MAIN.prepare(
+    `
+    SELECT
+      id,
+      tenant_id,
+      tenant_slug,
+      provider_type,
+      auth_protocol,
+      next_path,
+      redirect_uri,
+      code_verifier,
+      nonce,
+      created_at,
+      expires_at,
+      consumed_at
+    FROM sso_auth_transactions
+    WHERE id = ?
+    LIMIT 1
+    `,
+  )
+    .bind(transactionId)
+    .first<SsoAuthTransactionRow>();
+
+  if (!row || row.consumed_at) {
+    return null;
+  }
+
+  if (Date.parse(row.expires_at) <= Date.now()) {
+    await markSsoTransactionConsumed(env, transactionId);
+    return null;
+  }
+
+  return row;
+}
+
+async function createSsoTransaction(
+  env: EnvBindings,
+  config: OidcConfigRecord,
+  nextPath: string,
+): Promise<SsoAuthTransactionRow> {
+  const transactionId = crypto.randomUUID();
+  const createdAt = new Date().toISOString();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+  const codeVerifier = randomBase64Url(64);
+  const nonce = randomBase64Url(32);
+  const redirectUri = config.callbackUrl?.trim() || '/auth/callback';
+
+  await env.D1_MAIN.prepare(
+    `
+    INSERT INTO sso_auth_transactions (
+      id,
+      tenant_id,
+      tenant_slug,
+      provider_type,
+      auth_protocol,
+      next_path,
+      redirect_uri,
+      code_verifier,
+      nonce,
+      created_at,
+      expires_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `,
+  )
+    .bind(
+      transactionId,
+      config.tenantId,
+      config.tenantSlug,
+      config.providerType ?? 'OIDC',
+      config.authProtocol,
+      normalizeNextPath(nextPath),
+      redirectUri,
+      codeVerifier,
+      nonce,
+      createdAt,
+      expiresAt,
+    )
+    .run();
+
+  return {
+    id: transactionId,
+    tenant_id: config.tenantId,
+    tenant_slug: config.tenantSlug,
+    provider_type: config.providerType ?? 'OIDC',
+    auth_protocol: config.authProtocol,
+    next_path: normalizeNextPath(nextPath),
+    redirect_uri: redirectUri,
+    code_verifier: codeVerifier,
+    nonce,
+    created_at: createdAt,
+    expires_at: expiresAt,
+    consumed_at: null,
+  };
+}
+
+async function loadBuiltinOrNamedRolesByNames(
+  env: EnvBindings,
+  tenantId: string,
+  roleNames: string[],
+): Promise<Array<{ id: string; name: string }>> {
+  const uniqueNames = Array.from(
+    new Set(roleNames.map((item) => item.trim()).filter(Boolean).map((item) => item.toLowerCase())),
+  );
+  if (uniqueNames.length === 0) {
+    return [];
+  }
+
+  const placeholders = uniqueNames.map(() => '?').join(', ');
+  const rows = await env.D1_MAIN.prepare(
+    `
+    SELECT id, name
+    FROM roles
+    WHERE tenant_id = ?
+      AND lower(name) IN (${placeholders})
+    `,
+  )
+    .bind(tenantId, ...uniqueNames)
+    .all<{ id: string; name: string }>();
+
+  return rows.results ?? [];
+}
+
+async function loadRootFolderId(env: EnvBindings, tenantId: string): Promise<string | null> {
+  const row = await env.D1_MAIN.prepare(
+    `
+    SELECT id
+    FROM folders
+    WHERE tenant_id = ?
+      AND content_type = 'root'
+    LIMIT 1
+    `,
+  )
+    .bind(tenantId)
+    .first<{ id: string }>();
+
+  return row?.id ?? null;
+}
+
+async function loadUserByTenantEmailOrSubject(
+  env: EnvBindings,
+  tenantId: string,
+  email: string | null,
+  provider: string | null,
+  subject: string,
+): Promise<{
+  id: string;
+  email: string;
+  display_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  is_active: number;
+  keep_local_login: number;
+  auth_provider: string | null;
+  auth_subject: string | null;
+} | null> {
+  const normalizedEmail = normalizeEmail(email);
+  const bySubject =
+    provider && subject
+      ? await env.D1_MAIN.prepare(
+          `
+          SELECT
+            id,
+            email,
+            display_name,
+            first_name,
+            last_name,
+            is_active,
+            keep_local_login,
+            auth_provider,
+            auth_subject
+          FROM users
+          WHERE tenant_id = ?
+            AND auth_provider = ?
+            AND auth_subject = ?
+          LIMIT 1
+          `,
+        )
+          .bind(tenantId, provider, subject)
+          .first<{
+            id: string;
+            email: string;
+            display_name: string | null;
+            first_name: string | null;
+            last_name: string | null;
+            is_active: number;
+            keep_local_login: number;
+            auth_provider: string | null;
+            auth_subject: string | null;
+          }>()
+      : null;
+
+  if (bySubject) {
+    return bySubject;
+  }
+
+  if (!normalizedEmail) {
+    return null;
+  }
+
+  return env.D1_MAIN.prepare(
+    `
+    SELECT
+      id,
+      email,
+      display_name,
+      first_name,
+      last_name,
+      is_active,
+      keep_local_login,
+      auth_provider,
+      auth_subject
+    FROM users
+    WHERE tenant_id = ?
+      AND lower(email) = ?
+    LIMIT 1
+    `,
+  )
+    .bind(tenantId, normalizedEmail)
+    .first<{
+      id: string;
+      email: string;
+      display_name: string | null;
+      first_name: string | null;
+      last_name: string | null;
+      is_active: number;
+      keep_local_login: number;
+      auth_provider: string | null;
+      auth_subject: string | null;
+    }>();
+}
+
+function resolveSsoDisplayName(claims: OidcIdentityClaims): string {
+  return (
+    claims.displayName?.trim() ||
+    [claims.givenName?.trim(), claims.familyName?.trim()].filter(Boolean).join(' ').trim() ||
+    claims.preferredUsername?.trim() ||
+    claims.email?.trim() ||
+    'Workspace User'
+  );
+}
+
+async function upsertSsoUser(
+  env: EnvBindings,
+  config: OidcConfigRecord,
+  claims: OidcIdentityClaims,
+): Promise<{ userId: string; email: string; created: boolean }> {
+  const provider = config.providerType?.trim() || 'OIDC';
+  const existing = await loadUserByTenantEmailOrSubject(
+    env,
+    config.tenantId,
+    claims.email,
+    provider,
+    claims.subject,
+  );
+
+  const normalizedEmail = normalizeEmail(claims.email ?? claims.preferredUsername);
+  if (existing) {
+    if (existing.is_active !== 1) {
+      throw new Error('This workspace account is inactive.');
+    }
+
+    await env.D1_MAIN.prepare(
+      `
+      UPDATE users
+      SET
+        email = COALESCE(?, email),
+        display_name = COALESCE(?, display_name),
+        first_name = COALESCE(?, first_name),
+        last_name = COALESCE(?, last_name),
+        auth_provider = ?,
+        auth_subject = ?,
+        updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+      WHERE id = ?
+      `,
+    )
+      .bind(
+        normalizedEmail || null,
+        resolveSsoDisplayName(claims),
+        claims.givenName ?? null,
+        claims.familyName ?? null,
+        provider,
+        claims.subject,
+        existing.id,
+      )
+      .run();
+
+    return {
+      userId: existing.id,
+      email: normalizedEmail || normalizeEmail(existing.email),
+      created: false,
+    };
+  }
+
+  if (!config.jitProvisioningEnabled) {
+    throw new Error('No workspace account matched this identity provider user. Ask an administrator to provision access first.');
+  }
+
+  if (!normalizedEmail) {
+    throw new Error('The identity provider did not return a usable email claim for this workspace.');
+  }
+
+  const userId = crypto.randomUUID();
+  await env.D1_MAIN.prepare(
+    `
+    INSERT INTO users (
+      id,
+      tenant_id,
+      email,
+      display_name,
+      first_name,
+      last_name,
+      locale,
+      is_active,
+      keep_local_login,
+      is_third_party,
+      is_auditee,
+      preferences_json,
+      auth_provider,
+      auth_subject
+    ) VALUES (?, ?, ?, ?, ?, ?, 'en', 1, 0, 0, 0, ?, ?, ?)
+    `,
+  )
+    .bind(
+      userId,
+      config.tenantId,
+      normalizedEmail,
+      resolveSsoDisplayName(claims),
+      claims.givenName ?? null,
+      claims.familyName ?? null,
+      JSON.stringify({ lang: 'en' }),
+      provider,
+      claims.subject,
+    )
+    .run();
+
+  return {
+    userId,
+    email: normalizedEmail,
+    created: true,
+  };
+}
+
+async function syncSsoRoles(
+  env: EnvBindings,
+  config: OidcConfigRecord,
+  userId: string,
+  roleNames: string[],
+): Promise<{ syncedRoleCount: number }> {
+  if (!config.groupSyncEnabled) {
+    return { syncedRoleCount: 0 };
+  }
+
+  const rootFolderId = await loadRootFolderId(env, config.tenantId);
+  if (!rootFolderId) {
+    return { syncedRoleCount: 0 };
+  }
+
+  const roles = await loadBuiltinOrNamedRolesByNames(env, config.tenantId, roleNames);
+  for (const role of roles) {
+    const existingAssignment = await env.D1_MAIN.prepare(
+      `
+      SELECT id
+      FROM role_assignments
+      WHERE tenant_id = ?
+        AND role_id = ?
+        AND user_id = ?
+        AND group_id IS NULL
+        AND scope_folder_id = ?
+      LIMIT 1
+      `,
+    )
+      .bind(config.tenantId, role.id, userId, rootFolderId)
+      .first<{ id: string }>();
+
+    if (!existingAssignment?.id) {
+      await env.D1_MAIN.prepare(
+        `
+        INSERT INTO role_assignments (
+          id,
+          tenant_id,
+          role_id,
+          user_id,
+          group_id,
+          scope_folder_id,
+          assigned_by_user_id,
+          is_recursive,
+          is_builtin
+        ) VALUES (?, ?, ?, ?, NULL, ?, ?, 1, 0)
+        `,
+      )
+        .bind(
+          crypto.randomUUID(),
+          config.tenantId,
+          role.id,
+          userId,
+          rootFolderId,
+          userId,
+        )
+        .run();
+    }
+  }
+
+  return { syncedRoleCount: roles.length };
+}
+
+async function finalizeSsoAuthentication(
+  env: EnvBindings,
+  request: Request,
+  config: OidcConfigRecord,
+  claims: OidcIdentityClaims,
+): Promise<{
+  session: Awaited<ReturnType<typeof createSession>>;
+  userId: string;
+  email: string;
+  syncedRoleCount: number;
+}> {
+  const user = await upsertSsoUser(env, config, claims);
+  const roleSync = await syncSsoRoles(env, config, user.userId, claims.roleNames);
+
+  if (user.created && roleSync.syncedRoleCount === 0) {
+    await env.D1_MAIN.prepare(`DELETE FROM users WHERE id = ?`).bind(user.userId).run();
+    throw new Error(
+      'The identity provider login succeeded, but no matching Regovise roles were found for just-in-time provisioning.',
+    );
+  }
+
+  const session = await createSession(env, request, {
+    tenantId: config.tenantId,
+    userId: user.userId,
+  });
+
+  return {
+    session,
+    userId: user.userId,
+    email: user.email,
+    syncedRoleCount: roleSync.syncedRoleCount,
+  };
+}
+
 async function countRows(env: EnvBindings, table: string): Promise<number> {
   const row = await env.D1_MAIN.prepare(`SELECT COUNT(1) AS count FROM ${table}`).first<{ count: number }>();
   return Number(row?.count ?? 0);
@@ -4260,6 +5106,7 @@ async function buildLoginConfig(env: EnvBindings): Promise<LoginConfigPayload> {
   ];
   const bootstrap = await buildBootstrapStatus(env);
   const emailRuntime = getEmailRuntimeSummary(env);
+  const requestOrigin = env.APP_ORIGIN?.trim() || 'https://regovise.com';
   const [emailConfigRow, ssoRow, localLoginUserCount, passwordConfiguredRow, suggestedLoginRow] = await Promise.all([
     env.D1_MAIN.prepare(
       `
@@ -4271,7 +5118,17 @@ async function buildLoginConfig(env: EnvBindings): Promise<LoginConfigPayload> {
     ).first<SetupEmailConfigSummaryRow>(),
     env.D1_MAIN.prepare(
       `
-      SELECT login_enforced
+      SELECT
+        tenant_id,
+        provider_type,
+        auth_protocol,
+        client_id,
+        callback_url,
+        metadata_url,
+        domain_hint,
+        button_label,
+        allow_local_fallback,
+        login_enforced
       FROM setup_sso_configs
       ORDER BY updated_at DESC
       LIMIT 1
@@ -4326,10 +5183,14 @@ async function buildLoginConfig(env: EnvBindings): Promise<LoginConfigPayload> {
   const emailCodeEnabled = bootstrap.initialized && (emailRuntime.sendingEnabled || previewOnly);
   const passwordConfiguredUserCount = Number(passwordConfiguredRow?.count ?? 0);
   const passwordSignInEnabled = bootstrap.initialized && Number(localLoginUserCount?.count ?? 0) > 0;
+  const ssoConfig = coerceSsoRuntimeConfig(ssoRow, requestOrigin);
+  const ssoSummary = buildSsoSummary(ssoConfig);
 
   let message = 'Email code sign-in is ready for users with local-login access.';
   if (!bootstrap.initialized) {
     message = 'Initialize the first tenant before enabling standard sign-in.';
+  } else if (ssoSummary.loginEnforced) {
+    message = 'This workspace expects normal users to continue through OIDC single sign-on.';
   } else if (passwordConfiguredUserCount > 0) {
     message = 'Local password sign-in is ready for users with configured credentials.';
   } else if (previewOnly) {
@@ -4349,7 +5210,7 @@ async function buildLoginConfig(env: EnvBindings): Promise<LoginConfigPayload> {
     emailProvider: emailRuntime.provider,
     emailSendingEnabled: emailRuntime.sendingEnabled,
     passwordSignInEnabled,
-    loginEnforced: ssoRow?.login_enforced === 1,
+    loginEnforced: ssoSummary.loginEnforced,
     deliveryMode: emailConfigRow?.delivery_mode ?? null,
     supportEmail: emailConfigRow?.support_email ?? null,
     status: emailConfigRow?.status ?? null,
@@ -4359,6 +5220,7 @@ async function buildLoginConfig(env: EnvBindings): Promise<LoginConfigPayload> {
     suggestedTenantSlug: suggestedLoginRow?.tenant_slug ?? null,
     suggestedEmail: suggestedLoginRow?.email ?? null,
     message,
+    sso: ssoSummary,
   };
 }
 
@@ -4606,7 +5468,13 @@ async function loadLocalLoginPrincipal(
       user_item.id AS user_id,
       user_item.email AS user_email,
       COALESCE(NULLIF(user_item.display_name, ''), user_item.email) AS display_name,
-      COALESCE(sso.login_enforced, 0) AS login_enforced
+      COALESCE(sso.login_enforced, 0) AS login_enforced,
+      COALESCE(sso.auth_protocol, 'none') AS auth_protocol,
+      sso.provider_type AS provider_type,
+      COALESCE(sso.allow_local_fallback, 1) AS allow_local_fallback,
+      sso.client_id AS sso_client_id,
+      sso.metadata_url AS sso_metadata_url,
+      sso.callback_url AS sso_callback_url
     FROM tenants AS tenant
     INNER JOIN users AS user_item
       ON user_item.tenant_id = tenant.id
@@ -4628,6 +5496,12 @@ async function loadLocalLoginPrincipal(
       user_email: string;
       display_name: string;
       login_enforced: number;
+      auth_protocol: string;
+      provider_type: string | null;
+      allow_local_fallback: number;
+      sso_client_id: string | null;
+      sso_metadata_url: string | null;
+      sso_callback_url: string | null;
     }>();
 
   if (!row?.tenant_id || !row?.user_id) {
@@ -4641,7 +5515,19 @@ async function loadLocalLoginPrincipal(
     userId: row.user_id,
     userEmail: normalizeEmail(row.user_email),
     displayName: row.display_name,
-    loginEnforced: row.login_enforced === 1,
+    loginEnforced:
+      row.login_enforced === 1 &&
+      isOidcProtocol(row.auth_protocol) &&
+      Boolean(row.sso_client_id?.trim() && row.sso_metadata_url?.trim() && row.sso_callback_url?.trim()),
+    ssoProtocol: normalizeAuthProtocol(row.auth_protocol),
+    ssoProviderType: row.provider_type?.trim() || null,
+    ssoAllowLocalFallback: row.allow_local_fallback !== 0,
+    ssoReady: Boolean(
+      isOidcProtocol(row.auth_protocol) &&
+        row.sso_client_id?.trim() &&
+        row.sso_metadata_url?.trim() &&
+        row.sso_callback_url?.trim(),
+    ),
   };
 }
 
@@ -5055,6 +5941,12 @@ export async function handleCoreRoutes(
       });
     }
 
+    if (id === 'options' && ctx.request.method === 'GET') {
+      return json({
+        data: await buildTenantLoginOptions(ctx.env, ctx.url.searchParams.get('tenantSlug') ?? '', ctx.url.origin),
+      });
+    }
+
     if (id === 'request-code' && ctx.request.method === 'POST') {
       const config = await buildLoginConfig(ctx.env);
       if (!config.initialized) {
@@ -5104,6 +5996,16 @@ export async function handleCoreRoutes(
             previewCode: null,
           },
         });
+      }
+
+      if (principal.loginEnforced || (principal.ssoReady && !principal.ssoAllowLocalFallback)) {
+        return json(
+          {
+            error: 'sso_enforced',
+            message: `${principal.tenantName} requires single sign-on. Use the SSO button on the sign-in page instead.`,
+          },
+          { status: 409 },
+        );
       }
 
       const minuteAgo = new Date(Date.now() - 60 * 1000).toISOString();
@@ -5279,6 +6181,16 @@ export async function handleCoreRoutes(
         );
       }
 
+      if (principal.loginEnforced || (principal.ssoReady && !principal.ssoAllowLocalFallback)) {
+        return json(
+          {
+            error: 'sso_enforced',
+            message: `${principal.tenantName} requires single sign-on. Use the SSO button on the sign-in page instead.`,
+          },
+          { status: 409 },
+        );
+      }
+
       const loginCode = await ctx.env.D1_MAIN.prepare(
         `
         SELECT id, tenant_id, user_id, email_normalized, purpose, code_hash, requested_at, expires_at, consumed_at, attempts, last_attempt_at
@@ -5403,6 +6315,211 @@ export async function handleCoreRoutes(
     return methodNotAllowed(['GET', 'POST']);
   }
 
+  if (resource === 'sso') {
+    if (id === 'start' && ctx.request.method === 'POST') {
+      const body = await readJson<{
+        tenantSlug?: string;
+        nextPath?: string;
+      }>(ctx.request);
+      const rawTenantSlug = body.tenantSlug?.trim() || '';
+      if (!rawTenantSlug) {
+        return json(
+          {
+            error: 'invalid_sso_payload',
+            message: 'A workspace slug is required before starting single sign-on.',
+          },
+          { status: 400 },
+        );
+      }
+      const tenantSlug = slugifyTenant(rawTenantSlug);
+      if (!tenantSlug) {
+        return json(
+          {
+            error: 'invalid_sso_payload',
+            message: 'A workspace slug is required before starting single sign-on.',
+          },
+          { status: 400 },
+        );
+      }
+
+      const config = await loadTenantSsoRuntimeConfigBySlug(ctx.env, tenantSlug, ctx.url.origin);
+      if (!config) {
+        return json(
+          {
+            error: 'sso_not_configured',
+            message: 'No single sign-on provider is configured for that workspace.',
+          },
+          { status: 404 },
+        );
+      }
+
+      if (config.authProtocol === 'saml') {
+        return json(
+          {
+            error: 'saml_not_active',
+            message: 'SAML configuration can be documented, but interactive SAML sign-in is not active in this worker yet.',
+          },
+          { status: 409 },
+        );
+      }
+
+      if (config.authProtocol === 'cloudflare-access') {
+        return json(
+          {
+            error: 'cloudflare_access_only',
+            message: 'Cloudflare Access can protect the front door, but workspace sign-in still uses Regovise sessions after entry.',
+          },
+          { status: 409 },
+        );
+      }
+
+      if (!isActiveOidcConfig(config)) {
+        return json(
+          {
+            error: 'sso_not_ready',
+            message: 'OIDC is selected for that workspace, but the provider configuration is not complete yet.',
+          },
+          { status: 409 },
+        );
+      }
+
+      const transaction = await createSsoTransaction(ctx.env, config, normalizeNextPath(body.nextPath));
+      const redirectUrl = await buildOidcAuthorizationUrl(config, {
+        id: transaction.id,
+        tenantId: transaction.tenant_id,
+        tenantSlug: transaction.tenant_slug,
+        providerType: transaction.provider_type,
+        authProtocol: normalizeAuthProtocol(transaction.auth_protocol),
+        nextPath: transaction.next_path,
+        redirectUri: transaction.redirect_uri,
+        codeVerifier: transaction.code_verifier,
+        nonce: transaction.nonce,
+        expiresAt: transaction.expires_at,
+      });
+
+      return json({
+        data: {
+          tenantSlug: config.tenantSlug,
+          providerType: config.providerType,
+          redirectUrl,
+          nextPath: transaction.next_path,
+        },
+      });
+    }
+
+    if (id === 'callback' && ctx.request.method === 'POST') {
+      const body = await readJson<{
+        state?: string;
+        code?: string;
+        error?: string;
+        errorDescription?: string;
+      }>(ctx.request);
+
+      if (body.error?.trim()) {
+        return json(
+          {
+            error: 'sso_provider_error',
+            message: body.errorDescription?.trim() || `The identity provider returned ${body.error.trim()}.`,
+          },
+          { status: 400 },
+        );
+      }
+
+      const transactionId = body.state?.trim() || '';
+      const code = body.code?.trim() || '';
+      if (!transactionId || !code) {
+        return json(
+          {
+            error: 'invalid_sso_callback',
+            message: 'The single sign-on callback was missing the required state or code values.',
+          },
+          { status: 400 },
+        );
+      }
+
+      const transaction = await loadPendingSsoTransaction(ctx.env, transactionId);
+      if (!transaction) {
+        return json(
+          {
+            error: 'stale_sso_callback',
+            message: 'This single sign-on callback is no longer valid. Start sign-in again from the login page.',
+          },
+          { status: 409 },
+        );
+      }
+
+      const config = await loadTenantSsoRuntimeConfigByTenantId(
+        ctx.env,
+        transaction.tenant_id,
+        ctx.url.origin,
+        {
+          slug: transaction.tenant_slug,
+          name: transaction.tenant_slug,
+        },
+      );
+
+      if (!config || !isActiveOidcConfig(config)) {
+        await markSsoTransactionConsumed(ctx.env, transaction.id);
+        return json(
+          {
+            error: 'sso_not_ready',
+            message: 'The workspace no longer has a valid OIDC configuration for this sign-in request.',
+          },
+          { status: 409 },
+        );
+      }
+
+      const claims = await completeOidcCodeExchange(
+        config,
+        {
+          id: transaction.id,
+          tenantId: transaction.tenant_id,
+          tenantSlug: transaction.tenant_slug,
+          providerType: transaction.provider_type,
+          authProtocol: normalizeAuthProtocol(transaction.auth_protocol),
+          nextPath: transaction.next_path,
+          redirectUri: transaction.redirect_uri,
+          codeVerifier: transaction.code_verifier,
+          nonce: transaction.nonce,
+          expiresAt: transaction.expires_at,
+        },
+        code,
+      );
+
+      const authResult = await finalizeSsoAuthentication(ctx.env, ctx.request, config, claims);
+      await markSsoTransactionConsumed(ctx.env, transaction.id);
+
+      return json(
+        {
+          data: {
+            appEnv: ctx.env.APP_ENV,
+            authStrategy: 'd1-session',
+            isAuthenticated: true,
+            userId: authResult.userId,
+            tenantId: config.tenantId,
+            sessionId: authResult.session.id,
+            sessionExpiresAt: authResult.session.expires_at,
+            nextPath: transaction.next_path,
+            providerType: config.providerType,
+            syncedRoleCount: authResult.syncedRoleCount,
+          },
+        },
+        {
+          status: 201,
+          headers: {
+            'Set-Cookie': buildSessionCookieHeader(
+              authResult.session.id,
+              authResult.session.expires_at,
+              isSecureRequest(ctx),
+            ),
+          },
+        },
+      );
+    }
+
+    return methodNotAllowed(['POST']);
+  }
+
   if (resource === 'local-auth') {
     if (id === 'admin-set-password' && ctx.request.method === 'POST') {
       const adminAccess = await requireRootAdminAccess(
@@ -5518,6 +6635,16 @@ export async function handleCoreRoutes(
             message: 'That email or password was not accepted.',
           },
           { status: 401 },
+        );
+      }
+
+      if (principal.loginEnforced || (principal.ssoReady && !principal.ssoAllowLocalFallback)) {
+        return json(
+          {
+            error: 'sso_enforced',
+            message: `${principal.tenantName} requires single sign-on. Use the SSO button on the sign-in page instead.`,
+          },
+          { status: 409 },
         );
       }
 
