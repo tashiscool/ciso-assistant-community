@@ -8,6 +8,7 @@ import {
   buildThreatHuntQueryMarkdown,
   buildThreatHuntTimelineMarkdown,
 } from './threatHunt';
+import { collectAwsLiveBundle } from './awsLiveCollection';
 import { resolveLiveAdapterBundle } from './liveAdapters';
 import {
   buildTrackerGapMatrixCsv,
@@ -942,7 +943,7 @@ export function bundleFromTrackerDiagnostics(args: {
   };
 }
 
-export function resolveBundleFromCollection(args: {
+export async function resolveBundleFromCollection(args: {
   tenantId: string;
   folderId: string | null;
   provider: string;
@@ -952,7 +953,7 @@ export function resolveBundleFromCollection(args: {
   sourceConfig: EvidenceSourceConfig;
   adapterHints: Record<string, unknown>;
   trackerDiagnostics?: TrackerDiagnosticRow[];
-}): { rawBundle: Record<string, unknown>; bundle: NormalizedEvidenceBundle } {
+}): Promise<{ rawBundle: Record<string, unknown>; bundle: NormalizedEvidenceBundle }> {
   if (args.inputMode === 'tracker' && args.trackerDiagnostics) {
     const bundle = bundleFromTrackerDiagnostics({
       tenantId: args.tenantId,
@@ -968,6 +969,29 @@ export function resolveBundleFromCollection(args: {
         findings: bundle.scannerFindings,
       },
       bundle,
+    };
+  }
+
+  const awsLiveBundle = await collectAwsLiveBundle({
+    provider: args.provider,
+    sourceName: args.sourceName,
+    inputMode: args.inputMode,
+    bundleKind: args.bundleKind,
+    sourceConfig: args.sourceConfig,
+    adapterHints: args.adapterHints,
+  });
+  if (awsLiveBundle) {
+    return {
+      rawBundle: awsLiveBundle,
+      bundle: normalizeEvidenceBundle({
+        tenantId: args.tenantId,
+        folderId: args.folderId,
+        sourceName: args.sourceName,
+        provider: args.provider,
+        inputMode: args.inputMode,
+        bundleKind: args.bundleKind,
+        rawBundle: awsLiveBundle,
+      }),
     };
   }
 
@@ -1409,6 +1433,15 @@ export async function storeBundleArtifacts(args: {
     'live_collection_coverage',
   );
   const coverage = coverageSummary(args.bundle);
+  const livePermissionCoverage = toRecord(toRecord(args.rawBundle.metadata).permissionCoverage);
+  const liveCoveragePayload = {
+    status: 'ready',
+    coverage,
+    permissionCoverage: Object.keys(livePermissionCoverage).length > 0 ? livePermissionCoverage : null,
+    sourceName: args.bundle.sourceName,
+    provider: args.bundle.provider,
+    collectedAt: args.bundle.collectedAt,
+  };
   const manifest = {
     schemaVersion: 'v1',
     generatedAt: nowIso(),
@@ -1422,13 +1455,7 @@ export async function storeBundleArtifacts(args: {
   await Promise.all([
     writeJsonArtifact(args.env, rawKey, args.rawBundle),
     writeJsonArtifact(args.env, bundleKey, args.bundle),
-    writeJsonArtifact(args.env, liveCoverageKey, {
-      status: 'ready',
-      coverage,
-      sourceName: args.bundle.sourceName,
-      provider: args.bundle.provider,
-      collectedAt: args.bundle.collectedAt,
-    }),
+    writeJsonArtifact(args.env, liveCoverageKey, liveCoveragePayload),
     writeJsonArtifact(args.env, manifestKey, manifest),
   ]);
 
@@ -1436,7 +1463,7 @@ export async function storeBundleArtifacts(args: {
   const artifactEntries: Array<[BundleArtifactFamily, string, unknown]> = [
     ['raw_input', rawKey, args.rawBundle],
     ['normalized_bundle', bundleKey, args.bundle],
-    ['live_collection_coverage', liveCoverageKey, coverage],
+    ['live_collection_coverage', liveCoverageKey, liveCoveragePayload],
     ['bundle_manifest', manifestKey, manifest],
   ];
 
