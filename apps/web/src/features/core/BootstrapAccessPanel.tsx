@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useEdgeIdentity } from '../../shared/session/identity';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { isAuthEntryPath, isLogoutPath, useEdgeIdentity } from '../../shared/session/identity';
+import { cn } from '../../lib/utils';
 
 type BootstrapStatus = {
   initialized: boolean;
@@ -49,6 +50,12 @@ type LoginRequestResult = {
   };
 };
 
+type AccessSurface = 'login' | 'initialize' | 'recovery';
+
+type BootstrapAccessPanelProps = {
+  surface?: AccessSurface;
+};
+
 async function parseJsonError(response: Response): Promise<string> {
   const text = await response.text();
   if (!text.trim()) {
@@ -88,7 +95,20 @@ function formatExpiresAt(value: string | null): string {
   })}.`;
 }
 
-export function BootstrapAccessPanel() {
+function readPendingRoute(location: ReturnType<typeof useLocation>): string {
+  const next = new URLSearchParams(location.search).get('next');
+  if (next && next.startsWith('/')) {
+    return next;
+  }
+
+  if (isAuthEntryPath(location.pathname) || isLogoutPath(location.pathname)) {
+    return '/';
+  }
+
+  return location.pathname && location.pathname !== '/' ? `${location.pathname}${location.search}${location.hash}` : '/';
+}
+
+export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanelProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { setIdentity, setAuthMode } = useEdgeIdentity();
@@ -115,6 +135,7 @@ export function BootstrapAccessPanel() {
   const [newLocalPassword, setNewLocalPassword] = useState('');
   const [confirmLocalPassword, setConfirmLocalPassword] = useState('');
   const [loginStep, setLoginStep] = useState<'request' | 'verify'>('request');
+  const [loginMethod, setLoginMethod] = useState<'password' | 'email'>('password');
 
   useEffect(() => {
     void (async () => {
@@ -156,14 +177,16 @@ export function BootstrapAccessPanel() {
   const isInitialize = mode === 'initialize';
   const canUseEmailSignIn = Boolean(status?.initialized && loginConfig?.emailCodeEnabled);
   const canUsePasswordSignIn = Boolean(status?.initialized && loginConfig?.passwordSignInEnabled);
-  const pendingRoute =
-    location.pathname && location.pathname !== '/' ? `${location.pathname}${location.search}${location.hash}` : '/';
+  const pendingRoute = readPendingRoute(location);
+  const showInitializeSurface = surface === 'initialize';
+  const showLoginSurface = surface === 'login';
+  const showRecoverySurface = surface === 'recovery';
 
   useEffect(() => {
     if (isInitialize) {
       setTenantSlug(slugifyTenant(tenantName || tenantSlug));
     }
-  }, [isInitialize, tenantName]);
+  }, [isInitialize, tenantName, tenantSlug]);
 
   useEffect(() => {
     if (defaultsApplied || loading || !status) {
@@ -191,12 +214,28 @@ export function BootstrapAccessPanel() {
     setDefaultsApplied(true);
   }, [defaultsApplied, isInitialize, loading, loginConfig, status]);
 
+  useEffect(() => {
+    if (!showLoginSurface) {
+      return;
+    }
+
+    if (!canUsePasswordSignIn && canUseEmailSignIn) {
+      setLoginMethod('email');
+      return;
+    }
+
+    if (!canUseEmailSignIn) {
+      setLoginMethod('password');
+    }
+  }, [canUseEmailSignIn, canUsePasswordSignIn, showLoginSurface]);
+
   const title = useMemo(() => {
     if (loading) return 'Checking workspace access';
-    if (mode === 'initialize') return 'Initialize the first Regovise workspace';
-    if (mode === 'admin-access') return 'Open a secure Regovise session';
-    return 'Access setup unavailable';
-  }, [loading, mode]);
+    if (showInitializeSurface) return 'Initialize the first Regovise workspace';
+    if (showRecoverySurface) return 'Recover administrator access';
+    if (status?.initialized) return 'Sign in to Regovise';
+    return 'Finish workspace setup';
+  }, [loading, showInitializeSurface, showRecoverySurface, status?.initialized]);
 
   async function completeSession(result: BootstrapResult, nextNotice: string) {
     setIdentity({
@@ -210,6 +249,13 @@ export function BootstrapAccessPanel() {
 
   const tenantSlugPlaceholder = loginConfig?.suggestedTenantSlug?.trim() || 'regovise';
   const emailPlaceholder = loginConfig?.suggestedEmail?.trim() || 'admin@regovise.com';
+  const signInPosture = [
+    loginConfig?.passwordConfiguredUserCount ? 'Password sign-in ready' : null,
+    canUseEmailSignIn ? 'Email codes available' : null,
+    tenantSlug || tenantSlugPlaceholder ? `Workspace ${tenantSlug || tenantSlugPlaceholder}` : null,
+  ]
+    .filter((item): item is string => Boolean(item))
+    .join(' · ');
 
   async function handleInitialize() {
     try {
@@ -420,62 +466,300 @@ export function BootstrapAccessPanel() {
   }
 
   return (
-    <section className="panel max-w-5xl space-y-6">
+    <section
+      className={cn(
+        'panel space-y-6',
+        showLoginSurface ? 'mx-auto max-w-3xl' : 'mx-auto max-w-2xl',
+      )}
+    >
       <div>
-        <div className="eyebrow">Secure Session</div>
-        <h1 className="mt-2 text-2xl font-semibold text-white">{title}</h1>
+        <div className="eyebrow">
+          {showInitializeSurface ? 'Workspace Setup' : showRecoverySurface ? 'Administrator Recovery' : 'Secure Sign-In'}
+        </div>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">{title}</h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-          Regovise now prefers secure Cloudflare session cookies. Use this access surface to initialize the first tenant,
-          sign in with a local password or one-time email code, or recover an administrator session with the guarded bootstrap
-          secret when needed.
+          {showInitializeSurface
+            ? 'Create the first Regovise workspace, establish the first administrator account, and start the first secure session.'
+            : showRecoverySurface
+              ? 'Use the guarded recovery flow only when normal sign-in is unavailable and an administrator session must be restored.'
+              : 'Use the simplest sign-in path available for this workspace. Setup and recovery live on separate guarded routes so the main entry stays focused.'}
         </p>
-        {pendingRoute !== '/' && (
+        {showLoginSurface && pendingRoute !== '/' ? (
           <div className="mt-4 rounded-2xl border border-cyan-300/15 bg-cyan-400/[0.06] px-4 py-3 text-sm text-cyan-100">
             Sign in to continue to <span className="font-medium">{pendingRoute}</span>.
           </div>
-        )}
+        ) : null}
       </div>
 
       {loading && <div className="text-sm text-slate-400">Loading access status…</div>}
       {error && <div className="notice-warning">{error}</div>}
       {notice && <div className="notice-success">{notice}</div>}
 
-      {status && (
-        <div className="grid gap-4 md:grid-cols-4">
-          <div className="metric-card">
-            <div className="metric-label">Mode</div>
-            <div className="metric-value">{status.mode}</div>
+      {showLoginSurface && status?.initialized ? (
+        <section className="panel-subtle space-y-5">
+          <div className="space-y-2">
+            <div>
+              <div className="text-sm font-semibold text-white">Secure sign-in</div>
+              <p className="mt-1 text-sm leading-6 text-slate-400">
+                Choose one path and finish it. Regovise will open the workspace only after the session is established.
+              </p>
+            </div>
+            {signInPosture ? <div className="text-xs text-slate-500">{signInPosture}</div> : null}
           </div>
-          <div className="metric-card">
-            <div className="metric-label">Tenants</div>
-            <div className="metric-value">{status.tenantCount}</div>
+
+          {loginConfig?.message ? (
+            <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+              {loginConfig.message}
+              {loginConfig.statusNote ? <div className="mt-2 text-xs text-slate-500">{loginConfig.statusNote}</div> : null}
+            </div>
+          ) : null}
+
+          <div className="inline-flex rounded-full border border-white/10 bg-slate-950/40 p-1">
+            <button
+              className={cn(
+                'rounded-full px-4 py-2 text-sm transition',
+                loginMethod === 'password'
+                  ? 'bg-white text-slate-950'
+                  : 'text-slate-400 hover:text-white',
+              )}
+              onClick={() => setLoginMethod('password')}
+              type="button"
+            >
+              Password
+            </button>
+            <button
+              className={cn(
+                'rounded-full px-4 py-2 text-sm transition',
+                loginMethod === 'email'
+                  ? 'bg-white text-slate-950'
+                  : 'text-slate-400 hover:text-white',
+                !canUseEmailSignIn && 'cursor-not-allowed opacity-50',
+              )}
+              disabled={!canUseEmailSignIn}
+              onClick={() => setLoginMethod('email')}
+              type="button"
+            >
+              Email code
+            </button>
           </div>
-          <div className="metric-card">
-            <div className="metric-label">Users</div>
-            <div className="metric-value">{status.userCount}</div>
-          </div>
-          <div className="metric-card">
-            <div className="metric-label">Local sign-in</div>
-            <div className="metric-value">
-              {loginConfig?.passwordConfiguredUserCount
-                ? 'Password ready'
-                : loginConfig?.emailCodeEnabled
-                  ? loginConfig.previewOnly
-                    ? 'Preview'
-                    : 'Email ready'
-                  : 'Unavailable'}
+
+          {loginMethod === 'password' ? (
+            <div className="mx-auto max-w-xl space-y-4">
+              <label className="block space-y-2 text-sm">
+                <span className="text-slate-300">Workspace</span>
+                <input
+                  className="input"
+                  value={tenantSlug}
+                  onChange={(event) => setTenantSlug(slugifyTenant(event.target.value))}
+                  placeholder={tenantSlugPlaceholder}
+                />
+              </label>
+
+              <label className="block space-y-2 text-sm">
+                <span className="text-slate-300">Email</span>
+                <input
+                  className="input"
+                  value={loginEmail}
+                  onChange={(event) => setLoginEmail(event.target.value)}
+                  placeholder={emailPlaceholder}
+                  type="email"
+                />
+              </label>
+
+              <label className="block space-y-2 text-sm">
+                <span className="text-slate-300">Password</span>
+                <input
+                  className="input"
+                  value={loginPassword}
+                  onChange={(event) => setLoginPassword(event.target.value)}
+                  placeholder="Enter the local account password"
+                  type="password"
+                />
+              </label>
+
+              {!canUsePasswordSignIn ? (
+                <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                  No local password is configured yet for this account.
+                </div>
+              ) : (
+                <button
+                  className="button-primary w-full justify-center"
+                  disabled={busy === 'password-sign-in'}
+                  onClick={() => void handlePasswordSignIn()}
+                  type="button"
+                >
+                  {busy === 'password-sign-in' ? 'Signing in…' : 'Sign in with password'}
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="mx-auto max-w-xl space-y-4">
+              <label className="block space-y-2 text-sm">
+                <span className="text-slate-300">Workspace</span>
+                <input
+                  className="input"
+                  value={tenantSlug}
+                  onChange={(event) => setTenantSlug(slugifyTenant(event.target.value))}
+                  placeholder={tenantSlugPlaceholder}
+                />
+              </label>
+
+              <label className="block space-y-2 text-sm">
+                <span className="text-slate-300">Email</span>
+                <input
+                  className="input"
+                  value={loginEmail}
+                  onChange={(event) => setLoginEmail(event.target.value)}
+                  placeholder={emailPlaceholder}
+                  type="email"
+                />
+              </label>
+
+              {loginStep === 'verify' ? (
+                <label className="block space-y-2 text-sm">
+                  <span className="text-slate-300">Six-digit code</span>
+                  <input
+                    className="input"
+                    inputMode="numeric"
+                    maxLength={6}
+                    onChange={(event) => setLoginCode(event.target.value.replace(/\D+/g, '').slice(0, 6))}
+                    placeholder="123456"
+                    value={loginCode}
+                  />
+                </label>
+              ) : null}
+
+              {loginStep === 'verify' ? (
+                <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                  {formatExpiresAt(loginExpiresAt)}
+                  {loginPreviewCode ? <div className="mt-2 text-xs text-cyan-300">Preview code: {loginPreviewCode}</div> : null}
+                </div>
+              ) : null}
+
+              {!canUseEmailSignIn ? (
+                <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                  Email sign-in is not available for this environment.
+                </div>
+              ) : loginStep === 'request' ? (
+                <button
+                  className="button-primary w-full justify-center"
+                  disabled={busy === 'login-request'}
+                  onClick={() => void handleRequestCode()}
+                  type="button"
+                >
+                  {busy === 'login-request' ? 'Sending code…' : 'Request sign-in code'}
+                </button>
+              ) : (
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    className="button-primary"
+                    disabled={busy === 'login-verify'}
+                    onClick={() => void handleVerifyCode()}
+                    type="button"
+                  >
+                    {busy === 'login-verify' ? 'Verifying…' : 'Verify code'}
+                  </button>
+                  <button
+                    className="button-secondary"
+                    disabled={busy === 'login-request'}
+                    onClick={() => void handleRequestCode()}
+                    type="button"
+                  >
+                    {busy === 'login-request' ? 'Sending…' : 'Send a new code'}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4 text-sm text-slate-400">
+            <div>
+              {loginConfig?.supportEmail ? `Support: ${loginConfig.supportEmail}` : 'Use recovery only when normal sign-in is unavailable.'}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link className="button-secondary" to="/admin/recover">
+                Need recovery access?
+              </Link>
+              <Link className="button-secondary" to={`/logout${pendingRoute !== '/' ? `?next=${encodeURIComponent(pendingRoute)}` : ''}`}>
+                Sign out and start fresh
+              </Link>
             </div>
           </div>
-        </div>
-      )}
+        </section>
+      ) : null}
 
-      {status?.mode === 'disabled' ? (
+      {showLoginSurface && status?.initialized ? (
+        <section className="space-y-3">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">How Regovise works</div>
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="rounded-3xl border border-white/10 bg-white/[0.02] px-4 py-4">
+            <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">1. Program</div>
+            <div className="mt-2 text-sm font-medium text-white">Set the program context</div>
+            <div className="mt-2 text-sm leading-6 text-slate-400">
+              Domains, frameworks, and assessments define what the workspace is actually operating.
+            </div>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-white/[0.02] px-4 py-4">
+            <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">2. Evidence</div>
+            <div className="mt-2 text-sm font-medium text-white">Ground the work in records</div>
+            <div className="mt-2 text-sm leading-6 text-slate-400">
+              Evidence and monitoring feed the deterministic checks that keep assurance honest.
+            </div>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-white/[0.02] px-4 py-4">
+            <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">3. Assurance</div>
+            <div className="mt-2 text-sm font-medium text-white">Review and package the result</div>
+            <div className="mt-2 text-sm leading-6 text-slate-400">
+              Human review, packages, and bounded automation turn the program into something shareable.
+            </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {showInitializeSurface && status?.initialized ? (
+        <div className="panel-subtle space-y-3 text-sm text-slate-300">
+          <div>This workspace is already initialized. Use the normal sign-in path to continue.</div>
+          <div>
+            <Link className="button-primary" to={`/login${pendingRoute !== '/' ? `?next=${encodeURIComponent(pendingRoute)}` : ''}`}>
+              Open sign-in
+            </Link>
+          </div>
+        </div>
+      ) : showInitializeSurface && status?.mode === 'disabled' ? (
         <div className="panel-subtle text-sm text-slate-300">
           Set a `BOOTSTRAP_SETUP_SECRET` Worker secret to enable first-run initialization and administrator recovery.
         </div>
+      ) : showLoginSurface && status && !status.initialized ? (
+        <div className="panel-subtle space-y-3 text-sm text-slate-300">
+          <div>No workspace has been initialized yet, so normal sign-in is not available.</div>
+          <div>
+            <Link className="button-primary" to={`/setup/initialize${pendingRoute !== '/' ? `?next=${encodeURIComponent(pendingRoute)}` : ''}`}>
+              Open workspace setup
+            </Link>
+          </div>
+        </div>
+      ) : showRecoverySurface && status && !status.initialized ? (
+        <div className="panel-subtle space-y-3 text-sm text-slate-300">
+          <div>Administrator recovery is only available after the first workspace has been initialized.</div>
+          <div>
+            <Link className="button-primary" to="/setup/initialize">
+              Initialize the workspace
+            </Link>
+          </div>
+        </div>
+      ) : showRecoverySurface && status?.mode === 'disabled' ? (
+        <div className="panel-subtle space-y-3 text-sm text-slate-300">
+          <div>Administrator recovery is not enabled for this environment.</div>
+          <div>
+            <Link className="button-primary" to={`/login${pendingRoute !== '/' ? `?next=${encodeURIComponent(pendingRoute)}` : ''}`}>
+              Back to sign in
+            </Link>
+          </div>
+        </div>
       ) : (
-        <div className="grid gap-6 xl:grid-cols-2">
-          {isInitialize && (
+        <div className="space-y-6">
+          {showInitializeSurface && isInitialize ? (
             <section className="panel-subtle space-y-4">
               <div>
                 <div className="text-sm font-semibold text-white">Initialize first tenant</div>
@@ -545,199 +829,14 @@ export function BootstrapAccessPanel() {
                 {busy === 'initialize' ? 'Initializing…' : 'Initialize workspace'}
               </button>
             </section>
-          )}
+          ) : null}
 
-          {status?.initialized && (
-            <section className="panel-subtle space-y-4">
-              <div>
-                <div className="text-sm font-semibold text-white">Password sign-in</div>
-                <p className="mt-1 text-sm text-slate-400">
-                  Use a local password for accounts that keep local login enabled. This gives production a normal first-party
-                  sign-in path even before email delivery is configured.
-                </p>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3">
-                  <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Password-ready users</div>
-                  <div className="mt-2 text-sm font-semibold text-white">
-                    {loginConfig?.passwordConfiguredUserCount ?? 0}
-                  </div>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3">
-                  <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Local-login users</div>
-                  <div className="mt-2 text-sm font-semibold text-white">{loginConfig?.localLoginUserCount ?? 0}</div>
-                </div>
-              </div>
-
-              <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Tenant slug</span>
-                <input
-                  className="input"
-                  value={tenantSlug}
-                  onChange={(event) => setTenantSlug(slugifyTenant(event.target.value))}
-                  placeholder={tenantSlugPlaceholder}
-                />
-              </label>
-
-              <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Email</span>
-                <input
-                  className="input"
-                  value={loginEmail}
-                  onChange={(event) => setLoginEmail(event.target.value)}
-                  placeholder={emailPlaceholder}
-                  type="email"
-                />
-              </label>
-
-              <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Password</span>
-                <input
-                  className="input"
-                  value={loginPassword}
-                  onChange={(event) => setLoginPassword(event.target.value)}
-                  placeholder="Enter the local account password"
-                  type="password"
-                />
-              </label>
-
-              {!canUsePasswordSignIn ? (
-                <div className="panel-subtle text-sm text-slate-300">
-                  No local password is configured yet. Use the bootstrap recovery section to set one for a local-login account.
-                </div>
-              ) : (
-                <button
-                  className="button-primary"
-                  disabled={busy === 'password-sign-in'}
-                  onClick={() => void handlePasswordSignIn()}
-                  type="button"
-                >
-                  {busy === 'password-sign-in' ? 'Signing in…' : 'Sign in with password'}
-                </button>
-              )}
-            </section>
-          )}
-
-          {status?.initialized && (
-            <section className="panel-subtle space-y-4">
-              <div>
-                <div className="text-sm font-semibold text-white">Email sign-in</div>
-                <p className="mt-1 text-sm text-slate-400">
-                  Request a one-time code for a user with local-login access. This opens a secure session without relying on
-                  header-mode identity.
-                </p>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3">
-                  <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Delivery</div>
-                  <div className="mt-2 text-sm font-semibold text-white">
-                    {loginConfig?.previewOnly ? 'Preview only' : loginConfig?.emailProvider ?? 'Unavailable'}
-                  </div>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3">
-                  <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Local-login users</div>
-                  <div className="mt-2 text-sm font-semibold text-white">{loginConfig?.localLoginUserCount ?? 0}</div>
-                </div>
-              </div>
-
-              <div className="panel-subtle text-sm text-slate-300">
-                {loginConfig?.message ?? 'Loading sign-in posture…'}
-                {loginConfig?.statusNote ? <div className="mt-2 text-xs text-slate-400">{loginConfig.statusNote}</div> : null}
-                {loginConfig?.supportEmail ? (
-                  <div className="mt-2 text-xs text-slate-400">Support contact: {loginConfig.supportEmail}</div>
-                ) : null}
-              </div>
-
-              <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Tenant slug</span>
-                <input
-                  className="input"
-                  value={tenantSlug}
-                  onChange={(event) => setTenantSlug(slugifyTenant(event.target.value))}
-                  placeholder={tenantSlugPlaceholder}
-                />
-              </label>
-
-              <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Email</span>
-                <input
-                  className="input"
-                  value={loginEmail}
-                  onChange={(event) => setLoginEmail(event.target.value)}
-                  placeholder={emailPlaceholder}
-                  type="email"
-                />
-              </label>
-
-              {loginStep === 'verify' && (
-                <label className="block space-y-2 text-sm">
-                  <span className="text-slate-300">Six-digit code</span>
-                  <input
-                    className="input"
-                    inputMode="numeric"
-                    maxLength={6}
-                    onChange={(event) => setLoginCode(event.target.value.replace(/\D+/g, '').slice(0, 6))}
-                    placeholder="123456"
-                    value={loginCode}
-                  />
-                </label>
-              )}
-
-              {loginStep === 'verify' && (
-                <div className="panel-subtle text-sm text-slate-300">
-                  {formatExpiresAt(loginExpiresAt)}
-                  {loginPreviewCode ? (
-                    <div className="mt-2 text-xs text-cyan-300">Preview code: {loginPreviewCode}</div>
-                  ) : null}
-                </div>
-              )}
-
-              {!canUseEmailSignIn ? (
-                <div className="panel-subtle text-sm text-slate-300">
-                  Email sign-in is not available yet for this environment. Configure the production email provider or keep
-                  local preview mode enabled in development.
-                </div>
-              ) : loginStep === 'request' ? (
-                <button
-                  className="button-primary"
-                  disabled={busy === 'login-request'}
-                  onClick={() => void handleRequestCode()}
-                  type="button"
-                >
-                  {busy === 'login-request' ? 'Sending code…' : 'Request sign-in code'}
-                </button>
-              ) : (
-                <div className="flex flex-wrap gap-3">
-                  <button
-                    className="button-primary"
-                    disabled={busy === 'login-verify'}
-                    onClick={() => void handleVerifyCode()}
-                    type="button"
-                  >
-                    {busy === 'login-verify' ? 'Verifying…' : 'Verify code'}
-                  </button>
-                  <button
-                    className="button-secondary"
-                    disabled={busy === 'login-request'}
-                    onClick={() => void handleRequestCode()}
-                    type="button"
-                  >
-                    {busy === 'login-request' ? 'Sending…' : 'Send a new code'}
-                  </button>
-                </div>
-              )}
-            </section>
-          )}
-
-          {status?.initialized && (
+          {showRecoverySurface && status?.initialized ? (
             <section className="panel-subtle space-y-4">
               <div>
                 <div className="text-sm font-semibold text-white">Administrator recovery</div>
                 <p className="mt-1 text-sm text-slate-400">
-                  Use the guarded bootstrap secret to recover an administrator session when email or SSO access is not yet
-                  available.
+                  Use the guarded bootstrap secret to recover an administrator session when normal sign-in is unavailable.
                 </p>
               </div>
 
@@ -817,9 +916,22 @@ export function BootstrapAccessPanel() {
                 </button>
               </div>
             </section>
-          )}
+          ) : null}
         </div>
       )}
+
+      <div className="flex flex-wrap gap-3">
+        {!showLoginSurface ? (
+          <Link className="button-secondary" to={`/login${pendingRoute !== '/' ? `?next=${encodeURIComponent(pendingRoute)}` : ''}`}>
+            Back to sign in
+          </Link>
+        ) : null}
+        {showLoginSurface && !status?.initialized ? (
+          <Link className="button-secondary" to="/setup/initialize">
+            Initialize workspace
+          </Link>
+        ) : null}
+      </div>
     </section>
   );
 }

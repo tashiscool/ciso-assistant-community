@@ -13,6 +13,7 @@ import {
 } from './api';
 import { AssuranceExplainPanel } from './AssuranceExplainPanel';
 import { AssuranceWorkflowPanel } from './AssuranceWorkflowPanel';
+import { CoachMarksPanel } from '../../components/CoachMarksPanel';
 import type {
   AssuranceEvidenceJob,
   AssuranceEvidenceJobDetail,
@@ -340,6 +341,39 @@ export function AssuranceEvidenceExplorerPage() {
         };
       });
   }, [evaluation, graphNodeLookup, selectedGraphNodeKey]);
+  const coachMarkItems = [
+    {
+      id: 'evidence-bundles',
+      eyebrow: 'Bundles',
+      title: 'Each evidence job becomes a normalized bundle',
+      body: 'This is the grounded record that later evaluations, reviews, packages, and agent runs refer back to.',
+      route: detail?.id ? `/assurance/evidence?evidenceJobId=${encodeURIComponent(detail.id)}` : '/assurance/evidence',
+      ctaLabel: 'Stay in explorer',
+    },
+    {
+      id: 'evidence-evals',
+      eyebrow: 'Deterministic checks',
+      title: 'Run evaluations before asking for explanations',
+      body: 'The pass, partial, and fail states here are meant to come from deterministic checks first, not from AI narration.',
+      tone: 'focus' as const,
+    },
+    {
+      id: 'evidence-packages',
+      eyebrow: 'Outputs',
+      title: 'Packages are downstream of evidence',
+      body: 'Once evidence and evaluations look right, build the 20x package from this same job instead of jumping to a separate export flow.',
+      route: lastBuiltPackageId ? `/assurance/packages?packageId=${encodeURIComponent(lastBuiltPackageId)}` : '/assurance/packages',
+      ctaLabel: 'Open packages',
+    },
+    {
+      id: 'evidence-agent',
+      eyebrow: 'Automation',
+      title: 'Agent runs should stay traceable',
+      body: 'If you hand this bundle to automation, the next stop should still be a bounded, inspectable agent run with explicit review gates.',
+      route: lastAgentRunId ? `/assurance/agent-runs?runId=${encodeURIComponent(lastAgentRunId)}` : '/assurance/agent-runs',
+      ctaLabel: 'Open agent runs',
+    },
+  ];
 
   useEffect(() => {
     const nodeKeys = evaluation?.graph.nodes.map((node) => node.key) ?? [];
@@ -419,6 +453,13 @@ export function AssuranceEvidenceExplorerPage() {
           Inspect normalized evidence bundles, deterministic assurance outputs, artifact previews, and downstream package or agent actions from one explorer.
         </p>
       </section>
+
+      <CoachMarksPanel
+        storageKey="assurance-evidence-explorer"
+        title="Use Evidence Explorer to understand the source record before you package it."
+        description="This page is the best place to confirm what was actually collected, what deterministic checks concluded, and what downstream actions will inherit from this evidence bundle."
+        items={coachMarkItems}
+      />
 
       {notice && <div className="notice-success">{notice}</div>}
       {error && <div className="notice-error">{error}</div>}

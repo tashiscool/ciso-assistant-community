@@ -4,7 +4,12 @@ import { AssuranceExplainPanel } from './AssuranceExplainPanel';
 import { AssuranceWorkflowPanel } from './AssuranceWorkflowPanel';
 import { explainAssurance, getAssuranceOverview, getObservableParityStatus } from './api';
 import type { AssuranceExplainAudience, AssuranceOverview, AssuranceParityStatus } from './types';
+import { CoachMarksPanel } from '../../components/CoachMarksPanel';
 import { useEdgeIdentity } from '../../shared/session/identity';
+
+type AssuranceOverviewPageProps = {
+  showOperationalReadiness?: boolean;
+};
 
 type AttentionTone = 'danger' | 'warning' | 'neutral';
 
@@ -147,7 +152,7 @@ function summarizeMetricEntries(metrics: Record<string, unknown> | null | undefi
     .slice(0, 3);
 }
 
-export function AssuranceOverviewPage() {
+export function AssuranceOverviewPage({ showOperationalReadiness = false }: AssuranceOverviewPageProps) {
   const { identity } = useEdgeIdentity();
   const [searchParams, setSearchParams] = useSearchParams();
   const [overview, setOverview] = useState<AssuranceOverview | null>(null);
@@ -159,10 +164,9 @@ export function AssuranceOverviewPage() {
     try {
       setLoading(true);
       setError(null);
-      const [overviewData, parityData] = await Promise.all([
-        getAssuranceOverview(),
-        getObservableParityStatus(),
-      ]);
+      const overviewPromise = getAssuranceOverview();
+      const readinessPromise = showOperationalReadiness ? getObservableParityStatus() : Promise.resolve(null);
+      const [overviewData, parityData] = await Promise.all([overviewPromise, readinessPromise]);
       setOverview(overviewData);
       setParityStatus(parityData);
     } catch (err) {
@@ -175,7 +179,7 @@ export function AssuranceOverviewPage() {
 
   useEffect(() => {
     void loadOverview();
-  }, [identity.tenantId, identity.userId]);
+  }, [identity.tenantId, identity.userId, showOperationalReadiness]);
 
   const evidenceJobs = overview?.evidenceJobs ?? [];
   const trackerImports = overview?.trackerImports ?? [];
@@ -215,6 +219,41 @@ export function AssuranceOverviewPage() {
   const latestPendingReview = pendingReviews[0] ?? null;
   const latestReviewDecision = reviewHistory[0] ?? null;
   const latestAgentRun = agentRuns[0] ?? null;
+  const coachMarkItems = [
+    {
+      id: 'assurance-evidence',
+      eyebrow: 'Intake',
+      title: 'Evidence arrives before anything else',
+      body: 'Evidence jobs and tracker imports are the grounded inputs the rest of the assurance flow depends on.',
+      route: '/assurance/evidence',
+      ctaLabel: 'Open evidence explorer',
+    },
+    {
+      id: 'assurance-reviews',
+      eyebrow: 'Human review',
+      title: 'Recommendations are meant to pause for people',
+      body: 'Pending reviews and approval gates are part of the contract, not cleanup after the fact.',
+      route: '/assurance/reviews',
+      ctaLabel: 'Open review queue',
+      tone: 'focus' as const,
+    },
+    {
+      id: 'assurance-packages',
+      eyebrow: 'Packages',
+      title: 'Packages are the shareable result',
+      body: 'Validation, reconciliation, rendered reports, and lineage all come together in the package workbench.',
+      route: '/assurance/packages',
+      ctaLabel: 'Open packages',
+    },
+    {
+      id: 'assurance-agents',
+      eyebrow: 'Bounded automation',
+      title: 'Agent runs stay inspectable and approval-gated',
+      body: 'Automation here is designed to explain itself and wait for review instead of acting like a black box.',
+      route: '/assurance/agent-runs',
+      ctaLabel: 'Open agent runs',
+    },
+  ];
   const reviewBacklog = pendingReviews.slice(0, 4);
   const recentDecisions = reviewHistory.slice(0, 2);
   const mismatchedPackageIds = new Set(mismatchedPackages.map((item) => item.id));
@@ -438,6 +477,13 @@ export function AssuranceOverviewPage() {
         </div>
       </section>
 
+      <CoachMarksPanel
+        storageKey="assurance-overview"
+        title="Assurance is a flow from evidence to review to package."
+        description="Use this overview to understand where the current assurance chain is blocked, then drop into the specific workbench that owns the next decision."
+        items={coachMarkItems}
+      />
+
       {error && <div className="notice-error">{error}</div>}
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -455,7 +501,7 @@ export function AssuranceOverviewPage() {
           <div className="metric-value">{summary.packageMismatchCount}</div>
         </div>
         <div className="metric-card">
-          <div className="metric-label">Parity-ready packages</div>
+          <div className="metric-label">Verified packages</div>
           <div className="metric-value">{summary.observableParityReadyPackageCount}</div>
         </div>
         <div className="metric-card">
@@ -480,27 +526,28 @@ export function AssuranceOverviewPage() {
         </div>
       </section>
 
-      <section className="panel-subtle">
+      {showOperationalReadiness ? (
+        <section className="panel-subtle">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <div className="label">Observable parity</div>
+            <div className="label">Assurance readiness</div>
             <div className="mt-1 text-sm text-slate-400">
-              Live view of threat-hunt packages that are agent-backed, validation-clean, and reconciliation-matched.
+              Live view of packages that are validation-clean, reconciliation-matched, and backed by the current evidence and agent review chain.
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
             <span className={parityStatusBadgeClass(parityStatus?.status)}>{humanizeKey(parityStatus?.status ?? 'loading')}</span>
             <span>
-              {summary.observableParityReadyPackageCount} parity-ready package{summary.observableParityReadyPackageCount === 1 ? '' : 's'}
+              {summary.observableParityReadyPackageCount} verified package{summary.observableParityReadyPackageCount === 1 ? '' : 's'}
             </span>
           </div>
         </div>
         <div className="mt-4 grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl border border-white/8 bg-black/15 px-4 py-4">
-              <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Latest parity package</div>
+              <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Latest verified package</div>
               <div className="mt-2 text-sm font-medium text-white">
-                {paritySource?.packageFileName ?? latestParityReadyPackage?.fileName ?? 'No parity-ready package yet'}
+                {paritySource?.packageFileName ?? latestParityReadyPackage?.fileName ?? 'No verified package yet'}
               </div>
               <div className="mt-2 text-xs text-slate-500">
                 {formatDate(paritySource?.updatedAt ?? latestParityReadyPackage?.updatedAt ?? null)}
@@ -564,7 +611,7 @@ export function AssuranceOverviewPage() {
             <div className="rounded-2xl border border-white/8 bg-black/15 px-4 py-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Parity contract</div>
+                  <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Verification checklist</div>
                   <div className="mt-1 text-sm text-slate-400">
                     Verified {formatDate(parityStatus?.generatedAt ?? null)} against package, evidence, tracker, workflow, and agent artifacts.
                   </div>
@@ -616,7 +663,7 @@ export function AssuranceOverviewPage() {
             })}
             {parityChecks.length === 0 && (
               <div className="rounded-2xl border border-white/8 bg-black/15 px-4 py-4 text-sm text-slate-400">
-                {loading ? 'Loading observable parity checks...' : 'No observable parity checks are available yet.'}
+                {loading ? 'Loading readiness checks...' : 'No readiness checks are available yet.'}
               </div>
             )}
             <div className="space-y-2">
@@ -633,7 +680,7 @@ export function AssuranceOverviewPage() {
                         {humanizeKey(item.validationStatus ?? 'pass')} · {humanizeKey(item.reconciliationStatus ?? 'matched')}
                       </div>
                     </div>
-                    <span className="badge-success">Parity ready</span>
+                    <span className="badge-success">Ready</span>
                   </div>
                   <div className="mt-3 grid gap-2 text-xs text-slate-400 sm:grid-cols-4">
                     <div>{readNumber(item.coverage, 'evaluationCount')} eval(s)</div>
@@ -645,19 +692,20 @@ export function AssuranceOverviewPage() {
               ))}
               {parityReadyPackages.length === 0 && (
                 <div className="rounded-2xl border border-white/8 bg-black/15 px-4 py-4 text-sm text-slate-400">
-                  No parity-ready threat-hunt packages are currently available in this scope.
+                  No verified assurance packages are currently available in this scope.
                 </div>
               )}
             </div>
           </div>
         </div>
       </section>
+      ) : null}
 
       <section className="panel-subtle">
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="label">Attention queue</div>
-            <div className="mt-1 text-sm text-slate-400">The highest-signal approvals, exceptions, and review items that still need operator action.</div>
+            <div className="mt-1 text-sm text-slate-400">The highest-signal approvals, exceptions, and review items that still need follow-up.</div>
           </div>
           <div className="text-xs text-slate-500">
             Showing {attentionItems.length} actionable item{attentionItems.length === 1 ? '' : 's'}

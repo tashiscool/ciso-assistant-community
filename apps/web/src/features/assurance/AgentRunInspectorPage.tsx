@@ -11,6 +11,7 @@ import {
 } from './api';
 import { AssuranceExplainPanel } from './AssuranceExplainPanel';
 import { AssuranceWorkflowPanel } from './AssuranceWorkflowPanel';
+import { CoachMarksPanel } from '../../components/CoachMarksPanel';
 import type { AgentRunDetail, AgentRunListItem, AgentRunTrace, AssuranceArtifactPreview, AssuranceExplainAudience, WritebackApproval } from './types';
 import { useEdgeIdentity } from '../../shared/session/identity';
 
@@ -269,6 +270,37 @@ export function AgentRunInspectorPage() {
     () => detail?.writebacks.find((item) => item.id === selectedWritebackId) ?? null,
     [detail, selectedWritebackId],
   );
+  const coachMarkItems = [
+    {
+      id: 'agent-trace',
+      eyebrow: 'Trace',
+      title: 'Start with the run trace before you trust the summary',
+      body: 'The trace and step log are meant to show how the bounded agent reasoned through the work, not just what it concluded.',
+      tone: 'focus' as const,
+    },
+    {
+      id: 'agent-policy',
+      eyebrow: 'Policy',
+      title: 'Policy decisions explain what the agent was allowed to do',
+      body: 'Blocked actions and approval gates are as important as successful actions because they define the safety boundary.',
+    },
+    {
+      id: 'agent-writebacks',
+      eyebrow: 'Writebacks',
+      title: 'External actions should wait for explicit approval',
+      body: 'Use the writeback area to confirm the destination, justification, and evidence context before letting anything leave the workspace.',
+      route: selectedWriteback ? `/assurance/agent-runs?runId=${encodeURIComponent(selectedRunId)}&writebackId=${encodeURIComponent(selectedWriteback.id)}` : '/assurance/agent-runs',
+      ctaLabel: 'Inspect writebacks',
+    },
+    {
+      id: 'agent-evidence',
+      eyebrow: 'Source record',
+      title: 'Agent runs should still lead back to the original evidence',
+      body: 'If an agent conclusion matters, you should be able to jump from here back into the originating bundle or package without losing context.',
+      route: trace?.evidenceJobId ? `/assurance/evidence?evidenceJobId=${encodeURIComponent(trace.evidenceJobId)}` : '/assurance/evidence',
+      ctaLabel: 'Open evidence explorer',
+    },
+  ];
 
   useEffect(() => {
     const availableStepIds = trace?.steps.map((item) => item.id) ?? [];
@@ -411,6 +443,13 @@ export function AgentRunInspectorPage() {
           Inspect bounded assurance-agent traces, policy decisions, and approval-gated writebacks without leaving the workspace.
         </p>
       </section>
+
+      <CoachMarksPanel
+        storageKey="assurance-agent-inspector"
+        title="Use Agent Run Inspector to verify the automation boundary."
+        description="This page should help you understand what the bounded agent observed, what policy allowed or blocked, and which actions still need a human to decide."
+        items={coachMarkItems}
+      />
 
       {notice && <div className="notice-success">{notice}</div>}
       {error && <div className="notice-error">{error}</div>}

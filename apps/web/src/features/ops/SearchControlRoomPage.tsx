@@ -2,10 +2,27 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { RefreshCw, Search } from 'lucide-react';
 import { useOpsParityOverview } from './useOpsParityOverview';
+import type { ShellAccessProfile } from '../../shell/shellAccess';
+import { canAccessShellRoute } from '../../shell/shellAccess';
 
-export function SearchControlRoomPage() {
+type SearchControlRoomPageProps = {
+  access: ShellAccessProfile;
+};
+
+export function SearchControlRoomPage({ access }: SearchControlRoomPageProps) {
   const { overview, loading, error, refresh } = useOpsParityOverview();
   const [query, setQuery] = useState('');
+  const nextRoutes = [
+    access.canUseProgramWorkspace ? { route: '/program', label: 'Open program workspace' } : null,
+    access.canUseAssurance ? { route: '/assurance', label: 'Open assurance' } : null,
+    access.canUsePortal && !access.canUseProgramWorkspace && !access.canUseAssurance
+      ? { route: '/portal', label: 'Open auditee portal' }
+      : null,
+  ].filter((item): item is { route: string; label: string } => Boolean(item));
+  const visibleSearchIndex = useMemo(
+    () => overview?.searchIndex.filter((entry) => canAccessShellRoute(entry.route, access)) ?? [],
+    [access, overview],
+  );
 
   const results = useMemo(() => {
     if (!overview) {
@@ -14,10 +31,10 @@ export function SearchControlRoomPage() {
 
     const normalized = query.trim().toLowerCase();
     if (!normalized) {
-      return overview.searchIndex;
+      return visibleSearchIndex;
     }
 
-    return overview.searchIndex.filter((entry) => {
+    return visibleSearchIndex.filter((entry) => {
       return (
         entry.title.toLowerCase().includes(normalized) ||
         entry.subtitle.toLowerCase().includes(normalized) ||
@@ -25,7 +42,7 @@ export function SearchControlRoomPage() {
         entry.keywords.some((keyword) => keyword.toLowerCase().includes(normalized))
       );
     });
-  }, [overview, query]);
+  }, [overview, query, visibleSearchIndex]);
 
   if (loading) {
     return <div className="panel p-6 text-sm text-slate-300">Loading workspace search...</div>;
@@ -48,12 +65,11 @@ export function SearchControlRoomPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Link className="button-secondary" to="/program">
-              Open program workspace
-            </Link>
-            <Link className="button-secondary" to="/assurance">
-              Open assurance
-            </Link>
+            {nextRoutes.map((item) => (
+              <Link key={item.route} className="button-secondary" to={item.route}>
+                {item.label}
+              </Link>
+            ))}
             <button className="button-primary" onClick={() => void refresh()} type="button">
               <RefreshCw className="mr-2 h-4 w-4" />
               Refresh
@@ -74,7 +90,7 @@ export function SearchControlRoomPage() {
           </div>
         <div className="mt-5">
           <label className="block">
-            <span className="sr-only">Search canonical records</span>
+            <span className="sr-only">Search workspace records</span>
             <input
               className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/40"
               onChange={(event) => setQuery(event.target.value)}
@@ -89,7 +105,9 @@ export function SearchControlRoomPage() {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {results.length === 0 ? (
           <div className="panel-subtle col-span-full text-sm text-slate-400">
-            No workspace records matched that query.
+            {visibleSearchIndex.length === 0
+              ? 'No workspace records are available in your current access scope.'
+              : 'No workspace records matched that query.'}
           </div>
         ) : (
           results.map((entry) => (

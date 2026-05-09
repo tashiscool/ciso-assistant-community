@@ -15,10 +15,12 @@ import {
 } from 'lucide-react';
 import { ApiClient } from '../../shared/api/client';
 import { useEdgeIdentity } from '../../shared/session/identity';
+import { CoachMarksPanel, type CoachMarkItem } from '../../components/CoachMarksPanel';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Progress } from '../../components/ui/progress';
 import { Skeleton } from '../../components/ui/skeleton';
 import { cn } from '../../lib/utils';
+import { canAccessShellRoute, type ShellAccessProfile } from '../../shell/shellAccess';
 import type { OpsParityOverview } from '../ops/useOpsParityOverview';
 import type {
   AssuranceOverview,
@@ -47,13 +49,17 @@ type CoreOverviewPayload = {
   };
 };
 
-type HomeStage = 'setup' | 'program' | 'assurance';
+type HomeStage = 'setup' | 'program' | 'assurance' | 'portal' | 'workspace';
 
 type HomeData = {
-  core: CoreOverviewPayload;
-  ops: OpsParityOverview;
-  assurance: AssuranceOverview;
-  parity: AssuranceParityStatus;
+  core: CoreOverviewPayload | null;
+  ops: OpsParityOverview | null;
+  assurance: AssuranceOverview | null;
+  readiness: AssuranceParityStatus | null;
+};
+
+type HomePageProps = {
+  access: ShellAccessProfile;
 };
 
 type WorklistItem = {
@@ -99,13 +105,259 @@ const STAGE_COPY: Record<
     primaryAction: { label: 'Open assurance overview', route: '/assurance' },
     secondaryAction: { label: 'Open package explorer', route: '/assurance/packages' },
   },
+  portal: {
+    eyebrow: 'External collaboration',
+    title: 'Keep vendor and auditee work moving without exposing the wider workspace.',
+    description:
+      'Respond to external assignments, keep evidence requests moving, and work from the portal surface without needing the broader program console.',
+    primaryAction: { label: 'Open auditee portal', route: '/portal' },
+    secondaryAction: { label: 'Open my access', route: '/workspace/me' },
+  },
+  workspace: {
+    eyebrow: 'Workspace access',
+    title: 'Start from the surfaces your role is allowed to use.',
+    description:
+      'Regovise is keeping this session focused on the workspace capabilities currently assigned to your account.',
+    primaryAction: { label: 'Open my access', route: '/workspace/me' },
+    secondaryAction: { label: 'Refresh workspace', route: '/' },
+  },
 };
 
 const STAGE_LABELS: Record<HomeStage, string> = {
   setup: 'Guided setup',
   program: 'Program',
   assurance: 'Assurance',
+  portal: 'Portal',
+  workspace: 'Workspace',
 };
+
+const EMPTY_CORE_OVERVIEW: CoreOverviewPayload = {
+  tenantId: '',
+  counts: {
+    users: 0,
+    domains: 0,
+    roleAssignments: 0,
+    riskAssessments: 0,
+    complianceAssessments: 0,
+    frameworks: 0,
+    entities: 0,
+    processings: 0,
+    businessImpactAnalyses: 0,
+    conMonExecutions: 0,
+    evidenceJobs: 0,
+  },
+};
+
+const EMPTY_ASSURANCE_OVERVIEW: AssuranceOverview = {
+  summary: {
+    evidenceJobCount: 0,
+    trackerImportCount: 0,
+    trackerImportErrorCount: 0,
+    packageCount: 0,
+    agentBackedPackageCount: 0,
+    observableParityReadyPackageCount: 0,
+    packageMismatchCount: 0,
+    packageValidationReviewCount: 0,
+    pendingReviewCount: 0,
+    reviewDecisionCount: 0,
+    agentRunCount: 0,
+    pendingWritebackCount: 0,
+    runningWorkflowCount: 0,
+    awaitingReviewWorkflowCount: 0,
+    failedWorkflowCount: 0,
+  },
+  evidenceJobs: [],
+  trackerImports: [],
+  trackerImportsWithErrors: [],
+  packages: [],
+  parityReadyPackages: [],
+  mismatchedPackages: [],
+  packagesWithValidationDrift: [],
+  pendingReviews: [],
+  reviewHistory: [],
+  agentRuns: [],
+  pendingWritebacks: [],
+  workflowRuns: [],
+};
+
+function buildHomeCoachMarks(stage: HomeStage, access: ShellAccessProfile): { title: string; description: string; items: CoachMarkItem[] } {
+  const allItems: Record<HomeStage, { title: string; description: string; items: CoachMarkItem[] }> = {
+    setup: {
+      title: 'Set up the workspace in the order the product expects.',
+      description:
+        'Regovise works best when domains, team access, governance sources, and the first assessment are established in sequence instead of as isolated admin chores.',
+      items: [
+        {
+          id: 'setup-domains',
+          eyebrow: 'Boundaries',
+          title: 'Define domains first',
+          body: 'Domains and access boundaries decide what every later page, review, and package is allowed to see.',
+          route: '/workspace/domains',
+          ctaLabel: 'Open domains',
+        },
+        {
+          id: 'setup-team',
+          eyebrow: 'People',
+          title: 'Assign the operating team',
+          body: 'Invite administrators, contributors, and portal users before loading too much content into the workspace.',
+          route: '/workspace/team',
+          ctaLabel: 'Open team',
+        },
+        {
+          id: 'setup-frameworks',
+          eyebrow: 'Sources',
+          title: 'Load frameworks and controls',
+          body: 'Frameworks give assessments, evidence mapping, and reports a common source of truth.',
+          route: '/frameworks',
+          ctaLabel: 'Open frameworks',
+          tone: 'focus',
+        },
+        {
+          id: 'setup-assessments',
+          eyebrow: 'Launch',
+          title: 'Start the first assessment',
+          body: 'Once the foundations exist, assessments become the engine that creates evidence demand, review work, and package outputs.',
+          route: '/assessments',
+          ctaLabel: 'Open assessments',
+        },
+      ],
+    },
+    program: {
+      title: 'Think in one operating loop, not separate modules.',
+      description:
+        'Program work in Regovise starts with frameworks and domains, runs through assessments and supporting records, and then feeds evidence and assurance work.',
+      items: [
+        {
+          id: 'program-workspace',
+          eyebrow: 'Program',
+          title: 'This page is the operating layer',
+          body: 'Use Program as the place to orient the governance program before you dive into a specific workbench.',
+          route: '/program',
+          ctaLabel: 'Stay here',
+        },
+        {
+          id: 'program-assessments',
+          eyebrow: 'Assessments',
+          title: 'Assessments create the real work',
+          body: 'Risk and compliance assessments are where the program turns frameworks and business context into concrete action.',
+          route: '/assessments',
+          ctaLabel: 'Open assessments',
+          tone: 'focus',
+        },
+        {
+          id: 'program-evidence',
+          eyebrow: 'Evidence',
+          title: 'Evidence is downstream of program work',
+          body: 'Evidence and monitoring should support active assessments instead of being collected as an isolated archive.',
+          route: '/evidence-management',
+          ctaLabel: 'Open evidence',
+        },
+        {
+          id: 'program-assurance',
+          eyebrow: 'Outputs',
+          title: 'Assurance packages are the final product',
+          body: 'When the program is healthy, packages and reviews become the clean, shareable output of the system.',
+          route: '/assurance',
+          ctaLabel: 'Open assurance',
+        },
+      ],
+    },
+    assurance: {
+      title: 'Assurance is a chain, not a report folder.',
+      description:
+        'The assurance side of Regovise is meant to move from evidence intake to deterministic checks, human review, packages, and bounded automation.',
+      items: [
+        {
+          id: 'assurance-evidence',
+          eyebrow: 'Evidence',
+          title: 'Start with evidence intake',
+          body: 'Evidence jobs and source artifacts are the grounded inputs that the rest of assurance depends on.',
+          route: '/assurance/evidence',
+          ctaLabel: 'Open evidence explorer',
+        },
+        {
+          id: 'assurance-reviews',
+          eyebrow: 'Review',
+          title: 'Human review is part of the contract',
+          body: 'Recommendations, approval gates, and review history are first-class, not afterthoughts.',
+          route: '/assurance/reviews',
+          ctaLabel: 'Open review queue',
+          tone: 'focus',
+        },
+        {
+          id: 'assurance-packages',
+          eyebrow: 'Packages',
+          title: 'Packages assemble the shareable output',
+          body: '20x packages are where validation, reconciliation, lineage, and final report artifacts come together.',
+          route: '/assurance/packages',
+          ctaLabel: 'Open packages',
+        },
+        {
+          id: 'assurance-agents',
+          eyebrow: 'Automation',
+          title: 'Agent runs stay bounded and reviewable',
+          body: 'The automation layer is designed to explain itself and wait for approval instead of hiding decisions.',
+          route: '/assurance/agent-runs',
+          ctaLabel: 'Open agent runs',
+        },
+      ],
+    },
+    portal: {
+      title: 'Portal users stay on the external collaboration path.',
+      description:
+        'The portal flow exists so outside contributors can respond to assigned work without navigating the broader program and assurance shell.',
+      items: [
+        {
+          id: 'portal-assignments',
+          eyebrow: 'Assignments',
+          title: 'Start with assigned work',
+          body: 'The portal is for responding to specific requests, not for browsing the full compliance workspace.',
+          route: '/portal',
+          ctaLabel: 'Open portal',
+          tone: 'focus',
+        },
+        {
+          id: 'portal-requests',
+          eyebrow: 'Responses',
+          title: 'Complete evidence requests in place',
+          body: 'Keep external collaboration inside the portal flow instead of sending users into the admin shell.',
+          route: '/portal',
+          ctaLabel: 'Review assignments',
+        },
+        {
+          id: 'portal-access',
+          eyebrow: 'Identity',
+          title: 'Use My Access if something looks wrong',
+          body: 'If the wrong assignments or domains appear, check the current role and perimeter before escalating.',
+          route: '/workspace/me',
+          ctaLabel: 'Open My Access',
+        },
+      ],
+    },
+    workspace: {
+      title: 'This account is intentionally scoped.',
+      description:
+        'Regovise is keeping the workspace intentionally narrow until the role expands. That keeps limited users focused on the few places they actually need.',
+      items: [
+        {
+          id: 'workspace-access',
+          eyebrow: 'Access',
+          title: 'Check your current scope first',
+          body: 'My Access explains the active roles, groups, and domains shaping what this account can see.',
+          route: '/workspace/me',
+          ctaLabel: 'Open My Access',
+          tone: 'focus',
+        },
+      ],
+    },
+  };
+
+  const coachMarks = allItems[stage];
+  return {
+    ...coachMarks,
+    items: coachMarks.items.filter((item) => !item.route || canAccessShellRoute(item.route, access)),
+  };
+}
 
 function toneClasses(tone: WorklistItem['tone']) {
   if (tone === 'complete') {
@@ -117,32 +369,55 @@ function toneClasses(tone: WorklistItem['tone']) {
   return 'bg-amber-400/10 text-amber-300';
 }
 
-function deriveStage(data: HomeData): HomeStage {
-  const quickStartCompleted = data.ops.quickStart.filter((step) => step.completed).length;
-  const quickStartThreshold = data.ops.quickStart.length > 0 ? Math.min(data.ops.quickStart.length, 3) : 0;
-  const hasFoundation =
-    data.core.counts.domains > 0 &&
-    data.core.counts.users > 0 &&
-    data.core.counts.roleAssignments > 0 &&
-    data.core.counts.frameworks > 0;
+function hasAnyProgramArea(access: ShellAccessProfile): boolean {
+  return (
+    access.canUseProgramWorkspace ||
+    access.canUseFrameworks ||
+    access.canUseLibraries ||
+    access.canUseAssessmentWorkspace ||
+    access.canUseThirdParty ||
+    access.canUsePrivacy ||
+    access.canUseResilience ||
+    access.canUseAdvancedRisk
+  );
+}
 
-  if (!hasFoundation || quickStartCompleted < quickStartThreshold) {
+function deriveStage(data: HomeData, access: ShellAccessProfile): HomeStage {
+  const core = data.core ?? EMPTY_CORE_OVERVIEW;
+  const assurance = data.assurance ?? EMPTY_ASSURANCE_OVERVIEW;
+  const quickStartCompleted = data.ops?.quickStart.filter((step) => step.completed).length ?? 0;
+  const quickStartThreshold = data.ops && data.ops.quickStart.length > 0 ? Math.min(data.ops.quickStart.length, 3) : 0;
+  const hasFoundation =
+    core.counts.domains > 0 &&
+    core.counts.users > 0 &&
+    core.counts.roleAssignments > 0 &&
+    core.counts.frameworks > 0;
+
+  if (access.isWorkspaceAdmin && (!hasFoundation || quickStartCompleted < quickStartThreshold)) {
     return 'setup';
   }
 
   const assuranceSignals =
-    data.assurance.summary.packageCount +
-    data.assurance.summary.pendingReviewCount +
-    data.assurance.summary.pendingWritebackCount +
-    data.assurance.summary.agentRunCount +
-    data.core.counts.evidenceJobs +
-    data.core.counts.conMonExecutions;
+    assurance.summary.packageCount +
+    assurance.summary.pendingReviewCount +
+    assurance.summary.pendingWritebackCount +
+    assurance.summary.agentRunCount +
+    core.counts.evidenceJobs +
+    core.counts.conMonExecutions;
 
-  if (assuranceSignals > 0) {
+  if (access.canUseAssurance && assuranceSignals > 0) {
     return 'assurance';
   }
 
-  return 'program';
+  if (access.canUsePortal && !hasAnyProgramArea(access) && !access.canUseAssurance) {
+    return 'portal';
+  }
+
+  if (hasAnyProgramArea(access)) {
+    return 'program';
+  }
+
+  return 'workspace';
 }
 
 function buildAssuranceWorklist(
@@ -200,7 +475,7 @@ function buildAssuranceWorklist(
   return items.slice(0, 5);
 }
 
-export function HomePage() {
+export function HomePage({ access }: HomePageProps) {
   const { identity } = useEdgeIdentity();
   const [data, setData] = useState<HomeData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -211,18 +486,40 @@ export function HomePage() {
       setLoading(true);
       setError(null);
 
-      const [coreResponse, opsResponse, assuranceResponse, parityResponse] = await Promise.all([
-        client.get<{ data: CoreOverviewPayload }>('/core/overview'),
-        client.get<{ data: OpsParityOverview }>('/ops/parity/overview'),
-        client.get<{ data: AssuranceOverview }>('/assurance/overview'),
-        client.get<{ data: AssuranceParityStatus }>('/assurance/parity/status'),
+      const shouldLoadCore =
+        access.isWorkspaceAdmin ||
+        access.canUseFrameworks ||
+        access.canUseRiskAssessments ||
+        access.canUseThirdParty ||
+        access.canUsePrivacy ||
+        access.canUseResilience;
+      const shouldLoadAssurance = access.canUseAssurance;
+
+      const coreRequest = shouldLoadCore
+        ? client.get<{ data: CoreOverviewPayload }>('/core/overview')
+        : Promise.resolve(null);
+      const assuranceRequest = shouldLoadAssurance
+        ? client.get<{ data: AssuranceOverview }>('/assurance/overview')
+        : Promise.resolve(null);
+      const opsRequest = access.isWorkspaceAdmin
+        ? client.get<{ data: OpsParityOverview }>('/ops/parity/overview')
+        : Promise.resolve(null);
+      const readinessRequest = access.isWorkspaceAdmin
+        ? client.get<{ data: AssuranceParityStatus }>('/assurance/parity/status')
+        : Promise.resolve(null);
+
+      const [coreResponse, assuranceResponse, opsResponse, readinessResponse] = await Promise.all([
+        coreRequest,
+        assuranceRequest,
+        opsRequest,
+        readinessRequest,
       ]);
 
       setData({
-        core: coreResponse.data,
-        ops: opsResponse.data,
-        assurance: assuranceResponse.data,
-        parity: parityResponse.data,
+        core: coreResponse?.data ?? null,
+        ops: opsResponse?.data ?? null,
+        assurance: assuranceResponse?.data ?? null,
+        readiness: readinessResponse?.data ?? null,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Home workspace could not be loaded.');
@@ -233,41 +530,43 @@ export function HomePage() {
 
   useEffect(() => {
     void loadHome();
-  }, [identity.tenantId, identity.userId]);
+  }, [access.canUseAssurance, access.canUseFrameworks, access.canUsePrivacy, access.canUseResilience, access.canUseRiskAssessments, access.canUseThirdParty, access.isWorkspaceAdmin, identity.tenantId, identity.userId]);
 
   const derived = useMemo(() => {
     if (!data) {
       return null;
     }
 
-    const stage = deriveStage(data);
+    const core = data.core ?? EMPTY_CORE_OVERVIEW;
+    const assurance = data.assurance ?? EMPTY_ASSURANCE_OVERVIEW;
+    const stage = deriveStage(data, access);
     const copy = STAGE_COPY[stage];
-    const quickStartCompleted = data.ops.quickStart.filter((step) => step.completed).length;
+    const quickStartCompleted = data.ops?.quickStart.filter((step) => step.completed).length ?? 0;
     const quickStartProgress =
-      data.ops.quickStart.length > 0 ? (quickStartCompleted / data.ops.quickStart.length) * 100 : 100;
-    const assessmentCount = data.core.counts.riskAssessments + data.core.counts.complianceAssessments;
+      data.ops && data.ops.quickStart.length > 0 ? (quickStartCompleted / data.ops.quickStart.length) * 100 : 100;
+    const assessmentCount = core.counts.riskAssessments + core.counts.complianceAssessments;
     const assuranceSignals =
-      data.assurance.summary.packageCount +
-      data.assurance.summary.pendingReviewCount +
-      data.assurance.summary.pendingWritebackCount;
+      assurance.summary.packageCount +
+      assurance.summary.pendingReviewCount +
+      assurance.summary.pendingWritebackCount;
 
     const journeyCards = [
       {
         id: 'setup',
         title: 'Guided setup',
         description:
-          'Finish the foundation: domains, access, governance sources, and the first operator paths.',
+          'Finish the foundation: domains, access, governance sources, and the first working flows.',
         route: '/program/setup',
-        metric: `${quickStartCompleted}/${data.ops.quickStart.length || 0}`,
+        metric: `${quickStartCompleted}/${data.ops?.quickStart.length || 0}`,
         metricLabel: 'setup steps complete',
         tone:
-          quickStartCompleted === data.ops.quickStart.length && data.ops.quickStart.length > 0
+          quickStartCompleted === (data.ops?.quickStart.length ?? 0) && (data.ops?.quickStart.length ?? 0) > 0
             ? 'complete'
             : stage === 'setup'
               ? 'active'
               : 'attention',
         statusLabel:
-          quickStartCompleted === data.ops.quickStart.length && data.ops.quickStart.length > 0
+          quickStartCompleted === (data.ops?.quickStart.length ?? 0) && (data.ops?.quickStart.length ?? 0) > 0
             ? 'Ready'
             : stage === 'setup'
               ? 'Recommended now'
@@ -290,15 +589,26 @@ export function HomePage() {
         description:
           'Collect evidence, review findings, manage approval gates, and assemble review-ready packages.',
         route: '/assurance',
-        metric: String(data.assurance.summary.packageCount),
+        metric: String(assurance.summary.packageCount),
         metricLabel: 'packages assembled',
         tone: assuranceSignals > 0 ? 'complete' : stage === 'assurance' ? 'active' : 'attention',
         statusLabel:
           assuranceSignals > 0 ? 'Live' : stage === 'assurance' ? 'Recommended now' : 'Activate when ready',
       },
+      {
+        id: 'portal',
+        title: 'External portal',
+        description:
+          'Keep auditee and vendor follow-up moving from a portal surface that stays separate from the broader workspace.',
+        route: '/portal',
+        metric: access.isAuditee ? 'Assigned' : String(core.counts.frameworks),
+        metricLabel: access.isAuditee ? 'portal role active' : 'framework-backed portal flows',
+        tone: access.canUsePortal ? (stage === 'portal' ? 'active' : 'complete') : 'attention',
+        statusLabel: access.canUsePortal ? (stage === 'portal' ? 'Recommended now' : 'Available') : 'Unavailable',
+      },
     ] as const;
 
-    const setupWorklist: WorklistItem[] = data.ops.quickStart
+    const setupWorklist: WorklistItem[] = (data.ops?.quickStart ?? [])
       .filter((step) => !step.completed)
       .slice(0, 5)
       .map((step) => ({
@@ -310,7 +620,7 @@ export function HomePage() {
         tone: 'attention',
       }));
 
-    const programWorklist: WorklistItem[] = [
+    const programWorklist = [
       {
         id: 'assessments',
         title: 'Assessments',
@@ -322,34 +632,67 @@ export function HomePage() {
       {
         id: 'third-party',
         title: 'Third-party oversight',
-        detail: `${data.core.counts.entities} entity records are available for vendor and supplier governance.`,
+        detail: `${core.counts.entities} entity records are available for vendor and supplier governance.`,
         route: '/third-party',
-        statusLabel: data.core.counts.entities > 0 ? 'In use' : 'Ready to launch',
-        tone: data.core.counts.entities > 0 ? 'active' : 'attention',
+        statusLabel: core.counts.entities > 0 ? 'In use' : 'Ready to launch',
+        tone: core.counts.entities > 0 ? 'active' : 'attention',
       },
       {
         id: 'privacy',
         title: 'Privacy operations',
-        detail: `${data.core.counts.processings} processing records are tied back to the same workspace domains.`,
+        detail: `${core.counts.processings} processing records are tied back to the same workspace domains.`,
         route: '/privacy',
-        statusLabel: data.core.counts.processings > 0 ? 'In use' : 'Available',
-        tone: data.core.counts.processings > 0 ? 'active' : 'attention',
+        statusLabel: core.counts.processings > 0 ? 'In use' : 'Available',
+        tone: core.counts.processings > 0 ? 'active' : 'attention',
       },
       {
         id: 'resilience',
         title: 'Resilience planning',
-        detail: `${data.core.counts.businessImpactAnalyses} continuity and impact-analysis records are available to the team.`,
+        detail: `${core.counts.businessImpactAnalyses} continuity and impact-analysis records are available to the team.`,
         route: '/resilience',
-        statusLabel: data.core.counts.businessImpactAnalyses > 0 ? 'In use' : 'Available',
-        tone: data.core.counts.businessImpactAnalyses > 0 ? 'active' : 'attention',
+        statusLabel: core.counts.businessImpactAnalyses > 0 ? 'In use' : 'Available',
+        tone: core.counts.businessImpactAnalyses > 0 ? 'active' : 'attention',
+      },
+    ].filter((item) => {
+      if (item.route === '/assessments') {
+        return access.canUseAssessmentWorkspace;
+      }
+      if (item.route === '/third-party') {
+        return access.canUseThirdParty;
+      }
+      if (item.route === '/privacy') {
+        return access.canUsePrivacy;
+      }
+      if (item.route === '/resilience') {
+        return access.canUseResilience;
+      }
+      return true;
+    }) as WorklistItem[];
+
+    const portalWorklist: WorklistItem[] = [
+      {
+        id: 'portal-dashboard',
+        title: 'Open the auditee portal',
+        detail: 'Review assigned questionnaires, evidence requests, and external follow-up from the portal surface.',
+        route: '/portal',
+        statusLabel: 'Available now',
+        tone: 'active',
+      },
+      {
+        id: 'my-access',
+        title: 'Review your access',
+        detail: 'Confirm the current workspace, role context, and session security for this account.',
+        route: '/workspace/me',
+        statusLabel: 'Account',
+        tone: 'complete',
       },
     ];
 
     const assuranceWorklist = buildAssuranceWorklist(
-      data.assurance.pendingReviews,
-      data.assurance.pendingWritebacks,
-      data.assurance.mismatchedPackages,
-      data.assurance.packagesWithValidationDrift,
+      assurance.pendingReviews,
+      assurance.pendingWritebacks,
+      assurance.mismatchedPackages,
+      assurance.packagesWithValidationDrift,
     );
 
     return {
@@ -359,15 +702,33 @@ export function HomePage() {
       quickStartProgress,
       assessmentCount,
       assuranceSignals,
-      journeyCards,
+      journeyCards: journeyCards.filter((card) => {
+        if (card.id === 'setup') {
+          return access.isWorkspaceAdmin;
+        }
+        if (card.id === 'program') {
+          return hasAnyProgramArea(access);
+        }
+        if (card.id === 'assurance') {
+          return access.canUseAssurance;
+        }
+        if (card.id === 'portal') {
+          return access.canUsePortal;
+        }
+        return true;
+      }),
       worklist:
         stage === 'setup'
           ? setupWorklist
-          : stage === 'program'
-            ? programWorklist
-            : assuranceWorklist,
+          : stage === 'portal'
+            ? portalWorklist
+            : stage === 'workspace'
+              ? portalWorklist.filter((item) => item.route === '/workspace/me')
+              : stage === 'program'
+                ? programWorklist
+                : assuranceWorklist,
     };
-  }, [data]);
+  }, [access, data]);
 
   if (loading) {
     return (
@@ -396,12 +757,55 @@ export function HomePage() {
     return <div className="notice-error">{error ?? 'Home workspace could not be loaded.'}</div>;
   }
 
+  const core = data.core ?? EMPTY_CORE_OVERVIEW;
+  const assurance = data.assurance ?? EMPTY_ASSURANCE_OVERVIEW;
+  const nextPlaces = [
+    access.canUseSearch ? { route: '/search', label: 'Search the workspace', icon: Search } : null,
+    access.canUseAnalytics ? { route: '/analytics', label: 'Review workspace analytics', icon: Gauge } : null,
+    access.isWorkspaceAdmin ? { route: '/features/regml', label: 'Open AI authoring tools', icon: Sparkles } : null,
+    access.canUseAssurance
+      ? { route: '/assurance', label: 'Open the assurance command center', icon: ClipboardCheck }
+      : access.canUsePortal
+        ? { route: '/portal', label: 'Open the auditee portal', icon: ClipboardCheck }
+        : null,
+  ].filter(
+    (item): item is { route: string; label: string; icon: typeof Search } => Boolean(item),
+  );
+  const heroTitle =
+    derived.stage === 'portal'
+      ? 'Keep external collaboration moving from the right Regovise surface.'
+      : derived.stage === 'workspace'
+        ? 'Work from the Regovise areas assigned to this account.'
+        : 'Run the complete compliance program from Regovise.';
+  const hasCoreSnapshot = Boolean(data.core);
+  const primaryMetric = access.canUsePortal && !hasAnyProgramArea(access)
+    ? { label: 'Portal access', value: access.isAuditee ? 'Active' : 'Available', detail: 'This session is centered on external assignments and collaboration.' }
+    : { label: 'Assessments', value: String(derived.assessmentCount), detail: 'Risk and compliance work already running in this tenant.' };
+  const secondaryMetric = access.canUseAssurance
+    ? {
+        label: 'Assurance queue',
+        value: String(derived.assuranceSignals),
+        detail: 'Packages, pending reviews, and approval-gated assurance actions.',
+      }
+    : access.canUsePortal
+      ? {
+          label: 'Assigned surfaces',
+          value: access.canUsePortal ? 'Portal' : 'Workspace',
+          detail: 'The current account is focused on external collaboration and scoped workspace access.',
+        }
+      : {
+          label: 'Current access',
+          value: 'Scoped',
+          detail: 'This account only sees the routes and records allowed by the current role assignments.',
+        };
+
   const stageCardTone =
     derived.stage === 'assurance'
       ? 'bg-cyan-400/10 text-cyan-300'
       : derived.stage === 'program'
         ? 'bg-violet-400/10 text-violet-300'
         : 'bg-amber-400/10 text-amber-300';
+  const coachMarks = buildHomeCoachMarks(derived.stage, access);
 
   return (
     <div className="space-y-6">
@@ -409,7 +813,7 @@ export function HomePage() {
         <div>
           <div className="eyebrow">{derived.copy.eyebrow}</div>
           <h1 className="mt-2 text-4xl font-semibold tracking-tight text-white">
-            Run the complete compliance program from Regovise.
+            {heroTitle}
           </h1>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300">{derived.copy.description}</p>
           <div className="mt-5 flex flex-wrap gap-3">
@@ -444,26 +848,31 @@ export function HomePage() {
           <CardContent className="space-y-5 pt-0">
             <div>
               <div className="flex items-center justify-between text-xs uppercase tracking-[0.18em] text-slate-500">
-                <span>Setup progress</span>
+                <span>{access.isWorkspaceAdmin && data.ops ? 'Setup progress' : 'Workspace maturity'}</span>
                 <span>
-                  {derived.quickStartCompleted}/{data.ops.quickStart.length || 0}
+                  {access.isWorkspaceAdmin && data.ops
+                    ? `${derived.quickStartCompleted}/${data.ops.quickStart.length || 0}`
+                    : `${derived.assessmentCount} active assessment${derived.assessmentCount === 1 ? '' : 's'}`}
                 </span>
               </div>
-              <Progress className="mt-3 h-2" value={derived.quickStartProgress} />
+              <Progress
+                className="mt-3 h-2"
+                value={access.isWorkspaceAdmin && data.ops ? derived.quickStartProgress : Math.min(100, derived.assuranceSignals > 0 ? 100 : 60)}
+              />
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Assessments</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{derived.assessmentCount}</div>
+                <div className="text-xs uppercase tracking-[0.18em] text-slate-500">{primaryMetric.label}</div>
+                <div className="mt-2 text-2xl font-semibold text-white">{primaryMetric.value}</div>
                 <div className="mt-2 text-xs leading-5 text-slate-400">
-                  Risk and compliance work already running in this tenant.
+                  {primaryMetric.detail}
                 </div>
               </div>
               <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Assurance queue</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{derived.assuranceSignals}</div>
+                <div className="text-xs uppercase tracking-[0.18em] text-slate-500">{secondaryMetric.label}</div>
+                <div className="mt-2 text-2xl font-semibold text-white">{secondaryMetric.value}</div>
                 <div className="mt-2 text-xs leading-5 text-slate-400">
-                  Packages, pending reviews, and approval-gated assurance actions.
+                  {secondaryMetric.detail}
                 </div>
               </div>
             </div>
@@ -471,43 +880,63 @@ export function HomePage() {
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <div className="text-xs uppercase tracking-[0.18em] text-slate-500">
-                    Assurance package readiness
+                    {access.canUseAssurance ? 'Assurance package readiness' : 'Current access surface'}
                   </div>
                   <div className="mt-2 text-sm font-medium text-white">
-                    {data.parity.source.packageFileName ?? 'No assurance package has been built yet'}
+                    {access.canUseAssurance
+                      ? data.readiness?.source.packageFileName ??
+                        (assurance.summary.packageCount > 0
+                          ? `${assurance.summary.packageCount} package${assurance.summary.packageCount === 1 ? '' : 's'} assembled`
+                          : 'No assurance package has been built yet')
+                      : access.canUsePortal
+                        ? 'This session is focused on portal-driven collaboration and assigned external work.'
+                        : 'This session is limited to the workspace capabilities currently assigned to your account.'}
                   </div>
                 </div>
-                <span
-                  className={cn(
-                    'inline-flex items-center rounded-full px-3 py-1 text-xs font-medium uppercase tracking-[0.18em]',
-                    data.parity.status === 'pass'
-                      ? 'bg-emerald-400/10 text-emerald-300'
-                      : data.parity.status === 'attention'
-                        ? 'bg-amber-400/10 text-amber-300'
-                        : 'bg-rose-400/10 text-rose-300',
-                  )}
-                >
-                  {data.parity.status}
-                </span>
+                {access.canUseAssurance && data.readiness?.status ? (
+                  <span
+                    className={cn(
+                      'inline-flex items-center rounded-full px-3 py-1 text-xs font-medium uppercase tracking-[0.18em]',
+                      data.readiness.status === 'pass'
+                        ? 'bg-emerald-400/10 text-emerald-300'
+                        : data.readiness.status === 'attention'
+                          ? 'bg-amber-400/10 text-amber-300'
+                          : 'bg-rose-400/10 text-rose-300',
+                    )}
+                  >
+                    {data.readiness.status}
+                  </span>
+                ) : null}
               </div>
               <div className="mt-3 text-sm text-slate-400">
-                {data.parity.source.packageRoute
-                  ? 'The current evidence, package, and agent workflow chain is grounded enough to check end-to-end readiness from here.'
-                  : 'Build an evidence-backed package to unlock end-to-end readiness checks directly from the Home surface.'}
+                {access.canUseAssurance
+                  ? data.readiness?.source.packageRoute
+                    ? 'The current evidence, review, and package chain is ready to inspect from one place.'
+                    : 'Build an evidence-backed package to unlock review-ready assurance sharing from the Home surface.'
+                  : access.canUsePortal
+                    ? 'Open the auditee portal to respond to assigned work without exposing the broader workspace.'
+                    : 'Use My Access to confirm the current role or request broader access when you need additional workspace areas.'}
               </div>
-              {data.parity.source.packageRoute && (
+              {access.canUseAssurance && data.readiness?.source.packageRoute ? (
                 <Link
                   className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-cyan-300 transition hover:text-cyan-200"
-                  to={data.parity.source.packageRoute}
+                  to={data.readiness.source.packageRoute}
                 >
                   Open current package
                   <ArrowRight className="h-4 w-4" />
                 </Link>
-              )}
+              ) : null}
             </div>
           </CardContent>
         </Card>
       </section>
+
+      <CoachMarksPanel
+        storageKey={`home-${derived.stage}`}
+        title={coachMarks.title}
+        description={coachMarks.description}
+        items={coachMarks.items}
+      />
 
       <section className="grid gap-4 xl:grid-cols-3">
         {derived.journeyCards.map((card) => (
@@ -552,20 +981,28 @@ export function HomePage() {
                 ? 'Immediate setup work'
                 : derived.stage === 'program'
                   ? 'Program focus'
-                  : 'Assurance attention queue'}
+                  : derived.stage === 'portal'
+                    ? 'Portal focus'
+                    : derived.stage === 'workspace'
+                      ? 'Current access'
+                      : 'Assurance attention queue'}
             </div>
             <CardTitle className="text-2xl text-white">
               {derived.stage === 'setup'
                 ? 'Finish the few steps that unlock the rest of the platform.'
                 : derived.stage === 'program'
                   ? 'Keep the program moving without losing the operating picture.'
-                  : 'Review the items most likely to block a package or approval flow.'}
+                  : derived.stage === 'portal'
+                    ? 'Move external assignments forward from the surfaces your role is meant to use.'
+                    : derived.stage === 'workspace'
+                      ? 'Start with your current access and expand only when the work calls for it.'
+                      : 'Review the items most likely to block a package or approval flow.'}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {derived.worklist.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-white/10 bg-slate-950/20 p-5 text-sm text-slate-400">
-                No immediate items are queued here right now. Use search or the program workspace to move into the next operating area.
+                No immediate items are queued here right now. Use the next recommended workspace to move into the right operating area for this role.
               </div>
             ) : (
               derived.worklist.map((item) => (
@@ -598,44 +1035,56 @@ export function HomePage() {
           <Card className="border-white/10">
             <CardHeader className="pb-3">
               <div className="eyebrow">Workspace snapshot</div>
-              <CardTitle className="text-xl text-white">What is already active</CardTitle>
+              <CardTitle className="text-xl text-white">
+                {hasCoreSnapshot ? 'What is already active' : 'What this role is focused on'}
+              </CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-white">
-                  <Users className="h-4 w-4 text-cyan-300" />
-                  Domains and access
+            {hasCoreSnapshot ? (
+              <CardContent className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-white">
+                    <Users className="h-4 w-4 text-cyan-300" />
+                    Domains and access
+                  </div>
+                  <div className="mt-3 text-2xl font-semibold text-white">{core.counts.domains}</div>
+                  <div className="mt-1 text-xs text-slate-400">
+                    {core.counts.users} team members and {core.counts.roleAssignments} assignments.
+                  </div>
                 </div>
-                <div className="mt-3 text-2xl font-semibold text-white">{data.core.counts.domains}</div>
-                <div className="mt-1 text-xs text-slate-400">
-                  {data.core.counts.users} team members and {data.core.counts.roleAssignments} assignments.
+                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-white">
+                    <ShieldCheck className="h-4 w-4 text-cyan-300" />
+                    Governance sources
+                  </div>
+                  <div className="mt-3 text-2xl font-semibold text-white">{core.counts.frameworks}</div>
+                  <div className="mt-1 text-xs text-slate-400">Frameworks ready to support policy and assessment work.</div>
                 </div>
-              </div>
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-white">
-                  <ShieldCheck className="h-4 w-4 text-cyan-300" />
-                  Governance sources
+                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-white">
+                    <Activity className="h-4 w-4 text-cyan-300" />
+                    Monitoring activity
+                  </div>
+                  <div className="mt-3 text-2xl font-semibold text-white">{core.counts.conMonExecutions}</div>
+                  <div className="mt-1 text-xs text-slate-400">Continuous-monitoring runs already captured in the workspace.</div>
                 </div>
-                <div className="mt-3 text-2xl font-semibold text-white">{data.core.counts.frameworks}</div>
-                <div className="mt-1 text-xs text-slate-400">Frameworks ready to support policy and assessment work.</div>
-              </div>
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-white">
-                  <Activity className="h-4 w-4 text-cyan-300" />
-                  Monitoring activity
+                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-white">
+                    <FileOutput className="h-4 w-4 text-cyan-300" />
+                    Evidence collection
+                  </div>
+                  <div className="mt-3 text-2xl font-semibold text-white">{core.counts.evidenceJobs}</div>
+                  <div className="mt-1 text-xs text-slate-400">Evidence jobs that can now feed review and package workflows.</div>
                 </div>
-                <div className="mt-3 text-2xl font-semibold text-white">{data.core.counts.conMonExecutions}</div>
-                <div className="mt-1 text-xs text-slate-400">Continuous-monitoring runs already captured in the workspace.</div>
-              </div>
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-white">
-                  <FileOutput className="h-4 w-4 text-cyan-300" />
-                  Evidence collection
+              </CardContent>
+            ) : (
+              <CardContent className="space-y-3">
+                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4 text-sm leading-6 text-slate-300">
+                  {access.canUsePortal
+                    ? 'This account is centered on portal collaboration and scoped external work rather than the broader program workspace.'
+                    : 'This account currently has a narrower workspace role, so Regovise is only presenting the areas needed for the assigned work.'}
                 </div>
-                <div className="mt-3 text-2xl font-semibold text-white">{data.core.counts.evidenceJobs}</div>
-                <div className="mt-1 text-xs text-slate-400">Evidence jobs that can now feed review and package workflows.</div>
-              </div>
-            </CardContent>
+              </CardContent>
+            )}
           </Card>
 
           <Card className="border-white/10">
@@ -644,52 +1093,34 @@ export function HomePage() {
               <CardTitle className="text-xl text-white">Jump straight to the right workspace</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Link
-                className="flex items-center justify-between rounded-3xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-200 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
-                to="/search"
-              >
-                <span className="flex items-center gap-3">
-                  <Search className="h-4 w-4 text-cyan-300" />
-                  Search the workspace
-                </span>
-                <ArrowRight className="h-4 w-4 text-slate-500" />
-              </Link>
-              <Link
-                className="flex items-center justify-between rounded-3xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-200 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
-                to="/analytics"
-              >
-                <span className="flex items-center gap-3">
-                  <Gauge className="h-4 w-4 text-cyan-300" />
-                  Review workspace analytics
-                </span>
-                <ArrowRight className="h-4 w-4 text-slate-500" />
-              </Link>
-              <Link
-                className="flex items-center justify-between rounded-3xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-200 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
-                to="/features/regml"
-              >
-                <span className="flex items-center gap-3">
-                  <Sparkles className="h-4 w-4 text-cyan-300" />
-                  Use AI and automation tools
-                </span>
-                <ArrowRight className="h-4 w-4 text-slate-500" />
-              </Link>
-              <Link
-                className="flex items-center justify-between rounded-3xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-200 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
-                to="/assurance"
-              >
-                <span className="flex items-center gap-3">
-                  <ClipboardCheck className="h-4 w-4 text-cyan-300" />
-                  Open the assurance command center
-                </span>
-                <ArrowRight className="h-4 w-4 text-slate-500" />
-              </Link>
+              {nextPlaces.length === 0 ? (
+                <div className="rounded-3xl border border-dashed border-white/10 bg-slate-950/20 p-5 text-sm text-slate-400">
+                  Open My Access to review the current role and request broader workspace capabilities if you need them.
+                </div>
+              ) : (
+                nextPlaces.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.route}
+                      className="flex items-center justify-between rounded-3xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-200 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
+                      to={item.route}
+                    >
+                      <span className="flex items-center gap-3">
+                        <Icon className="h-4 w-4 text-cyan-300" />
+                        {item.label}
+                      </span>
+                      <ArrowRight className="h-4 w-4 text-slate-500" />
+                    </Link>
+                  );
+                })
+              )}
             </CardContent>
           </Card>
         </div>
       </section>
 
-      {data.parity.checks.some((check) => check.status !== 'pass') && (
+      {access.isWorkspaceAdmin && data.readiness?.checks.some((check) => check.status !== 'pass') ? (
         <section className="panel-subtle">
           <div className="flex items-start gap-3">
             <div className="mt-1 flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-400/10 text-amber-300">
@@ -701,7 +1132,7 @@ export function HomePage() {
                 The current package chain has open readiness checks. Review the flagged evidence, package, or agent work before treating it as fully share-ready.
               </p>
               <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                {data.parity.checks
+                {data.readiness.checks
                   .filter((check) => check.status !== 'pass')
                   .slice(0, 6)
                   .map((check) => (
@@ -730,7 +1161,7 @@ export function HomePage() {
             </div>
           </div>
         </section>
-      )}
+      ) : null}
     </div>
   );
 }

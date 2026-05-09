@@ -14,6 +14,7 @@ import {
 } from './api';
 import { AssuranceExplainPanel } from './AssuranceExplainPanel';
 import { AssuranceWorkflowPanel } from './AssuranceWorkflowPanel';
+import { CoachMarksPanel } from '../../components/CoachMarksPanel';
 import type {
   AssuranceArtifactPreview,
   AssuranceExplainAudience,
@@ -315,6 +316,37 @@ export function TrackerWorkbenchPage() {
     [diagnostics],
   );
   const closedRows = diagnostics.length - openRows;
+  const coachMarkItems = [
+    {
+      id: 'tracker-import',
+      eyebrow: 'Import',
+      title: 'Tracker rows land here before they become assurance records',
+      body: 'This workbench is for row-level intake, diagnostics, and cleanup before you convert tracker material into the formal evidence and package chain.',
+      tone: 'focus' as const,
+    },
+    {
+      id: 'tracker-diagnostics',
+      eyebrow: 'Diagnostics',
+      title: 'Use row diagnostics to classify the real issue',
+      body: 'The row list is meant to explain whether the problem is evidence, mapping, ownership, severity, or packaging readiness.',
+    },
+    {
+      id: 'tracker-evidence',
+      eyebrow: 'Conversion',
+      title: 'Tracker to 20x is a handoff into assurance',
+      body: 'Once the row diagnostics make sense, convert the import so Evidence and Packages inherit one consistent record.',
+      route: lastConvertedEvidenceJobId ? `/assurance/evidence?evidenceJobId=${encodeURIComponent(lastConvertedEvidenceJobId)}` : '/assurance/evidence',
+      ctaLabel: 'Open evidence explorer',
+    },
+    {
+      id: 'tracker-package',
+      eyebrow: 'Outputs',
+      title: 'Converted packages are meant to stay inspectable',
+      body: 'Use the package workbench after conversion to confirm validation, reconciliation, and report outputs instead of treating conversion as the final step.',
+      route: lastConvertedPackageId ? `/assurance/packages?packageId=${encodeURIComponent(lastConvertedPackageId)}` : '/assurance/packages',
+      ctaLabel: 'Open packages',
+    },
+  ];
 
   async function handleImport() {
     try {
@@ -370,6 +402,13 @@ export function TrackerWorkbenchPage() {
           Import tracker rows, inspect row-level diagnostics, and convert evidence-gap scenarios into assurance-backed 20x package flows.
         </p>
       </section>
+
+      <CoachMarksPanel
+        storageKey="assurance-tracker-workbench"
+        title="Use Tracker as the intake-and-diagnostics layer."
+        description="This page helps teams turn messy tracker rows into a cleaner evidence-backed assurance flow instead of treating a spreadsheet as the system of record."
+        items={coachMarkItems}
+      />
 
       {notice && <div className="notice-success">{notice}</div>}
       {error && <div className="notice-error">{error}</div>}

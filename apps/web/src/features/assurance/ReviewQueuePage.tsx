@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { explainAssurance, listPendingReviews, listReviewHistory, recordReviewDecision } from './api';
 import { AssuranceExplainPanel } from './AssuranceExplainPanel';
 import { AssuranceWorkflowPanel } from './AssuranceWorkflowPanel';
+import { CoachMarksPanel } from '../../components/CoachMarksPanel';
 import type { AssuranceExplainAudience, ReviewDecision, ReviewRecommendation } from './types';
 import { useEdgeIdentity } from '../../shared/session/identity';
 
@@ -188,6 +189,37 @@ export function ReviewQueuePage() {
     }
     return options;
   }, [selectedDecision, selectedRecommendation]);
+  const coachMarkItems = [
+    {
+      id: 'review-recommendations',
+      eyebrow: 'Recommendations',
+      title: 'This queue is where deterministic findings meet human judgment',
+      body: 'The purpose of this page is not just to click approve or reject, but to capture why a person accepted or overruled the recommendation.',
+      tone: 'focus' as const,
+    },
+    {
+      id: 'review-lineage',
+      eyebrow: 'Lineage',
+      title: 'A good decision should stay close to the evidence',
+      body: 'Use the evidence and package links here to verify that the recommendation really came from the record you think it did.',
+      route: selectedRecommendation?.evidenceJobId ? `/assurance/evidence?evidenceJobId=${encodeURIComponent(selectedRecommendation.evidenceJobId)}` : '/assurance/evidence',
+      ctaLabel: 'Open evidence explorer',
+    },
+    {
+      id: 'review-history',
+      eyebrow: 'History',
+      title: 'Decision history is part of the output',
+      body: 'The history panel is meant to explain how the human review posture evolved, not just archive old clicks.',
+    },
+    {
+      id: 'review-packages',
+      eyebrow: 'Propagation',
+      title: 'Accepted decisions should refresh downstream packages',
+      body: 'Use the refreshed package links after a decision to verify that the shareable output now reflects the human review outcome.',
+      route: lastRefreshedPackageIds[0] ? `/assurance/packages?packageId=${encodeURIComponent(lastRefreshedPackageIds[0])}` : '/assurance/packages',
+      ctaLabel: 'Open packages',
+    },
+  ];
 
   async function handleDecision(decision: 'accepted' | 'rejected') {
     if (!selectedRecommendation) {
@@ -234,6 +266,13 @@ export function ReviewQueuePage() {
           Review deterministic recommendations, capture human decisions, and keep an immutable decision history close to the evidence bundle.
         </p>
       </section>
+
+      <CoachMarksPanel
+        storageKey="assurance-review-queue"
+        title="Use Review Queue to make explicit human decisions, not silent overrides."
+        description="This is the human governance layer of assurance. Good decisions here should be justified, linked to evidence, and reflected downstream in the package record."
+        items={coachMarkItems}
+      />
 
       {notice && <div className="notice-success">{notice}</div>}
       {error && <div className="notice-error">{error}</div>}

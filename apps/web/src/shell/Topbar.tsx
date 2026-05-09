@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Bell, ChevronRight, Search, LogOut, Settings, User as UserIcon } from 'lucide-react';
+import { Bell, ChevronRight, Search, LogOut, Settings, SlidersHorizontal, User as UserIcon } from 'lucide-react';
 import { ApiClient } from '../shared/api/client';
 import { canUseHeaderIdentity, resetEdgeIdentity, useEdgeIdentity } from '../shared/session/identity';
 import type { WorkspaceUser } from '../features/iam/types';
@@ -14,15 +14,28 @@ import {
 } from '../components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '../components/ui/avatar';
 import { Button } from '../components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { cn } from '../lib/utils';
+import type { ShellAccessProfile } from './shellAccess';
 
 const client = new ApiClient();
 
 type TopbarProps = {
   sessionReady: boolean;
   sessionSyncing: boolean;
+  access: ShellAccessProfile;
+  profileName?: string | null;
+  profileEmail?: string | null;
 };
 
 /** Map route segments to human-readable breadcrumb labels. */
@@ -89,7 +102,7 @@ function getInitials(name: string): string {
     .join('');
 }
 
-export function Topbar({ sessionReady, sessionSyncing }: TopbarProps) {
+export function Topbar({ sessionReady, sessionSyncing, access, profileName, profileEmail }: TopbarProps) {
   const { identity, authMode, setIdentity, setAuthMode } = useEdgeIdentity();
   const navigate = useNavigate();
   const [tenantId, setTenantId] = useState(identity.tenantId);
@@ -97,8 +110,10 @@ export function Topbar({ sessionReady, sessionSyncing }: TopbarProps) {
   const [users, setUsers] = useState<WorkspaceUser[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [hasNotification] = useState(true);
+  const [previewToolsOpen, setPreviewToolsOpen] = useState(false);
 
   const breadcrumbs = useBreadcrumbs();
+  const showIdentityControls = access.canViewAdminNavigation && (canUseHeaderIdentity() || authMode === 'headers');
 
   useEffect(() => {
     setTenantId(identity.tenantId);
@@ -107,7 +122,7 @@ export function Topbar({ sessionReady, sessionSyncing }: TopbarProps) {
 
   useEffect(() => {
     void (async () => {
-      if (!sessionReady || authMode === 'anonymous') {
+      if (!sessionReady || authMode === 'anonymous' || !showIdentityControls) {
         setUsers([]);
         setLoadError(null);
         return;
@@ -122,12 +137,18 @@ export function Topbar({ sessionReady, sessionSyncing }: TopbarProps) {
         setLoadError(err instanceof Error ? err.message : 'Unknown error');
       }
     })();
-  }, [authMode, identity.tenantId, identity.userId, sessionReady]);
+  }, [authMode, identity.tenantId, identity.userId, sessionReady, showIdentityControls]);
 
   const currentUser = users.find((u) => u.id === userId);
-  const displayName = currentUser?.displayName ?? userId ?? 'User';
+  const displayName = profileName?.trim() || currentUser?.displayName || userId || 'User';
+  const displayEmail = profileEmail?.trim() || currentUser?.email || '';
   const initials = getInitials(displayName);
-  const showIdentityControls = canUseHeaderIdentity() || authMode === 'headers';
+  const settingsTarget = access.canViewInternalTools
+    ? '/settings'
+    : access.canViewAdminNavigation
+      ? '/setup/general'
+      : null;
+  const settingsLabel = access.canViewInternalTools ? 'Platform settings' : 'Workspace settings';
 
   function applyIdentityChange(nextTenantId: string, nextUserId: string) {
     if (nextTenantId === identity.tenantId && nextUserId === identity.userId) {
@@ -144,6 +165,14 @@ export function Topbar({ sessionReady, sessionSyncing }: TopbarProps) {
     applyIdentityChange(tenantId, userId);
   }
 
+  function handleResetPreviewIdentity() {
+    const nextIdentity = resetEdgeIdentity('headers');
+    setIdentity(nextIdentity);
+    setTenantId(nextIdentity.tenantId);
+    setUserId(nextIdentity.userId);
+    setPreviewToolsOpen(false);
+  }
+
   async function handleSignOut() {
     try {
       await fetch('/_api/core/session', {
@@ -156,7 +185,7 @@ export function Topbar({ sessionReady, sessionSyncing }: TopbarProps) {
     setIdentity(nextIdentity);
     setUsers([]);
     setLoadError(null);
-    navigate('/workspace/me');
+    navigate('/login');
   }
 
   return (
@@ -178,76 +207,120 @@ export function Topbar({ sessionReady, sessionSyncing }: TopbarProps) {
             </span>
           </div>
         ))}
-        {loadError && (
-          <span className="ml-3 text-xs text-rose-300">{loadError}</span>
-        )}
       </div>
 
       {/* Right: identity controls + search + notifications + user menu */}
       <div className="flex items-center gap-2 shrink-0">
-        {/* Tenant input */}
-        {showIdentityControls && (
-          <div className="hidden lg:flex items-center gap-1.5">
-            <span className="text-[10px] uppercase tracking-[0.18em] text-slate-500">Tenant</span>
-            <Input
-              className="h-8 w-36 text-xs"
-              value={tenantId}
-              onChange={(e) => setTenantId(e.target.value)}
-              onBlur={handleApplyIdentity}
-              onKeyDown={(e) => e.key === 'Enter' && handleApplyIdentity()}
-            />
-          </div>
-        )}
+        {showIdentityControls ? (
+          <Dialog open={previewToolsOpen} onOpenChange={setPreviewToolsOpen}>
+            <DialogTrigger asChild>
+              <Button className="hidden lg:inline-flex" size="sm" variant="secondary">
+                <SlidersHorizontal className="h-4 w-4" />
+                Preview tools
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Loopback preview tools</DialogTitle>
+                <DialogDescription>
+                  These controls are only for local preview and review. They stay out of the main shell so the product chrome remains focused on normal users.
+                </DialogDescription>
+              </DialogHeader>
 
-        {/* User select */}
-        {showIdentityControls && (
-          <div className="hidden lg:flex items-center gap-1.5">
-            <span className="text-[10px] uppercase tracking-[0.18em] text-slate-500">User</span>
-            {users.length > 0 ? (
-              <Select
-                value={userId}
-                onValueChange={(val) => {
-                  setUserId(val);
-                  applyIdentityChange(tenantId, val);
-                }}
-              >
-                <SelectTrigger className="h-8 w-56 text-xs">
-                  <SelectValue placeholder="Select user" />
-                </SelectTrigger>
-                <SelectContent>
-                  {users.map((user) => (
-                    <SelectItem key={user.id} value={user.id}>
-                      {user.displayName} ({user.email})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            ) : (
-              <Input
-                className="h-8 w-36 text-xs"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
-                onBlur={handleApplyIdentity}
-                onKeyDown={(e) => e.key === 'Enter' && handleApplyIdentity()}
-              />
-            )}
-          </div>
-        )}
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="rounded-3xl border border-white/10 bg-white/[0.02] px-4 py-4">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Current preview identity</div>
+                  <div className="mt-2 text-sm font-medium text-white">{displayName}</div>
+                  <div className="mt-1 text-xs text-cyan-200">{displayEmail || 'Workspace account'}</div>
+                  <div className="mt-3 text-xs text-slate-500">
+                    {tenantId} / {userId}
+                  </div>
+                </div>
+                <div className="rounded-3xl border border-cyan-300/15 bg-cyan-400/[0.04] px-4 py-4">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-200">Why this is hidden</div>
+                  <div className="mt-2 text-sm leading-6 text-slate-300">
+                    Tenant switching and identity overrides are preview-only mechanics. Regular users should never have to understand them to use Regovise.
+                  </div>
+                </div>
+              </div>
 
-        <div className="hidden lg:flex items-center rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-slate-400">
-          {sessionSyncing ? 'Syncing session' : authMode === 'session' ? 'Secure session' : authMode}
-        </div>
+              {loadError ? <div className="notice-warning">{loadError}</div> : null}
+
+              <div className="grid gap-4 md:grid-cols-[0.7fr_1.3fr]">
+                <label className="space-y-2">
+                  <span className="text-sm text-slate-300">Tenant</span>
+                  <Input
+                    className="h-10 text-sm"
+                    value={tenantId}
+                    onChange={(e) => setTenantId(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleApplyIdentity()}
+                  />
+                </label>
+
+                <label className="space-y-2">
+                  <span className="text-sm text-slate-300">User</span>
+                  {users.length > 0 ? (
+                    <Select value={userId} onValueChange={(val) => setUserId(val)}>
+                      <SelectTrigger className="h-10 text-sm">
+                        <SelectValue placeholder="Select user" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {users.map((user) => (
+                          <SelectItem key={user.id} value={user.id}>
+                            {user.displayName} ({user.email})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input
+                      className="h-10 text-sm"
+                      value={userId}
+                      onChange={(e) => setUserId(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleApplyIdentity()}
+                    />
+                  )}
+                </label>
+              </div>
+
+              <DialogFooter className="gap-2">
+                <Button onClick={handleResetPreviewIdentity} size="sm" type="button" variant="ghost">
+                  Reset to demo identity
+                </Button>
+                <Button
+                  onClick={() => {
+                    handleApplyIdentity();
+                    setPreviewToolsOpen(false);
+                  }}
+                  size="sm"
+                  type="button"
+                  variant="default"
+                >
+                  Switch preview identity
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        ) : null}
+
+        {sessionSyncing ? (
+          <div className="hidden lg:flex items-center rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-slate-400">
+            Syncing session
+          </div>
+        ) : null}
 
         {/* Search trigger */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 text-slate-400 hover:text-white"
-          aria-label="Search (Cmd+K)"
-          onClick={() => navigate('/search')}
-        >
-          <Search className="h-4 w-4" />
-        </Button>
+        {access.canUseSearch ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 text-slate-400 hover:text-white"
+            aria-label="Search (Cmd+K)"
+            onClick={() => navigate('/search')}
+          >
+            <Search className="h-4 w-4" />
+          </Button>
+        ) : null}
 
         {/* Notifications */}
         <Button
@@ -274,34 +347,44 @@ export function Topbar({ sessionReady, sessionSyncing }: TopbarProps) {
               </Avatar>
               <div className="hidden sm:block text-left">
                 <div className="text-xs font-medium text-white leading-none">{displayName}</div>
-                <div className="mt-0.5 text-[10px] text-slate-500 leading-none truncate max-w-[100px]">{tenantId}</div>
+                <div className="mt-0.5 text-[10px] text-slate-500 leading-none truncate max-w-[140px]">
+                  {displayEmail || 'Workspace account'}
+                </div>
               </div>
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-52">
-            <DropdownMenuLabel>Identity</DropdownMenuLabel>
+            <DropdownMenuLabel>Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="flex-col items-start gap-0.5 cursor-default focus:bg-transparent">
-              <span className="text-xs text-slate-400">Tenant</span>
-              <span className="font-mono text-xs text-cyan-300 truncate w-full">{tenantId}</span>
+              <span className="text-xs text-slate-400">Signed in as</span>
+              <span className="text-xs text-cyan-300 truncate w-full">{displayName}</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="flex-col items-start gap-0.5 cursor-default focus:bg-transparent">
-              <span className="text-xs text-slate-400">User ID</span>
-              <span className="font-mono text-xs text-cyan-300 truncate w-full">{userId}</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="flex-col items-start gap-0.5 cursor-default focus:bg-transparent">
-              <span className="text-xs text-slate-400">Auth mode</span>
-              <span className="font-mono text-xs text-cyan-300 truncate w-full">{authMode}</span>
-            </DropdownMenuItem>
+            {displayEmail ? (
+              <DropdownMenuItem className="flex-col items-start gap-0.5 cursor-default focus:bg-transparent">
+                <span className="text-xs text-slate-400">Email</span>
+                <span className="text-xs text-cyan-300 truncate w-full">{displayEmail}</span>
+              </DropdownMenuItem>
+            ) : null}
+            {showIdentityControls ? (
+              <DropdownMenuItem className="flex-col items-start gap-0.5 cursor-default focus:bg-transparent">
+                <span className="text-xs text-slate-400">Debug identity</span>
+                <span className="font-mono text-xs text-cyan-300 truncate w-full">
+                  {tenantId} / {userId}
+                </span>
+              </DropdownMenuItem>
+            ) : null}
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={() => navigate('/workspace/me')}>
               <UserIcon className="h-4 w-4 text-slate-400" />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => navigate('/settings')}>
-              <Settings className="h-4 w-4 text-slate-400" />
-              Settings
-            </DropdownMenuItem>
+            {settingsTarget ? (
+              <DropdownMenuItem onSelect={() => navigate(settingsTarget)}>
+                <Settings className="h-4 w-4 text-slate-400" />
+                {settingsLabel}
+              </DropdownMenuItem>
+            ) : null}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-rose-400 focus:text-rose-300 focus:bg-rose-500/10"

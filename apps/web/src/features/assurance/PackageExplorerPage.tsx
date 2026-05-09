@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { explainAssurance, getPackage, getPackageArtifactPreview, getPackageDocument, listPackages, listReviewHistory } from './api';
 import { AssuranceExplainPanel } from './AssuranceExplainPanel';
 import { AssuranceWorkflowPanel } from './AssuranceWorkflowPanel';
+import { CoachMarksPanel } from '../../components/CoachMarksPanel';
 import type { AssuranceArtifactPreview, AssuranceExplainAudience, PackageDetail, PackageListItem, ReviewDecision, TwentyXPackageDocument } from './types';
 import { useEdgeIdentity } from '../../shared/session/identity';
 
@@ -433,6 +434,37 @@ export function PackageExplorerPage() {
     }
     return options;
   }, [failedValidationResults, packageDocument, reviewLedgerDecisions]);
+  const coachMarkItems = [
+    {
+      id: 'package-json',
+      eyebrow: 'Contract',
+      title: 'Package JSON is the source of truth',
+      body: 'Rendered reports are important, but this page should first answer whether the machine-readable package is complete, validated, and internally consistent.',
+      tone: 'focus' as const,
+    },
+    {
+      id: 'package-lineage',
+      eyebrow: 'Lineage',
+      title: 'Every package should point back to evidence and review history',
+      body: 'If a package can’t tell you which bundle, review decisions, and agent outputs shaped it, it is not ready enough.',
+      route: detail?.summary?.evidenceJobId ? `/assurance/evidence?evidenceJobId=${encodeURIComponent(detail.summary.evidenceJobId)}` : '/assurance/evidence',
+      ctaLabel: 'Open evidence explorer',
+    },
+    {
+      id: 'package-reconciliation',
+      eyebrow: 'Reconciliation',
+      title: 'Validation and reconciliation are separate checks',
+      body: 'A package can validate structurally and still have a mismatch problem, so operators should look at both before sharing it.',
+    },
+    {
+      id: 'package-reviews',
+      eyebrow: 'Human decisions',
+      title: 'Accepted reviews should appear in the package story',
+      body: 'The package is meant to carry human review posture forward, not hide it in a separate queue.',
+      route: detail?.summary?.evidenceJobId ? `/assurance/reviews?evidenceJobId=${encodeURIComponent(detail.summary.evidenceJobId)}` : '/assurance/reviews',
+      ctaLabel: 'Open review queue',
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -443,6 +475,13 @@ export function PackageExplorerPage() {
           Browse generated package jobs, inspect deterministic rollups, and validate machine-to-human reconciliation before export or handoff.
         </p>
       </section>
+
+      <CoachMarksPanel
+        storageKey="assurance-package-explorer"
+        title="Use Package Explorer to decide whether an output is truly share-ready."
+        description="This page is where validation, reconciliation, lineage, rendered reports, and human review context should converge into one trustworthy package story."
+        items={coachMarkItems}
+      />
 
       {error && <div className="notice-error">{error}</div>}
 

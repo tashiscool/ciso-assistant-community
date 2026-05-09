@@ -1,8 +1,14 @@
 import { Link } from 'react-router-dom';
 import { BarChart3, RefreshCw, ShieldCheck, Sparkles } from 'lucide-react';
 import { useOpsParityOverview } from './useOpsParityOverview';
+import type { ShellAccessProfile } from '../../shell/shellAccess';
+import { canAccessShellRoute } from '../../shell/shellAccess';
 
-export function AnalyticsControlRoomPage() {
+type AnalyticsControlRoomPageProps = {
+  access: ShellAccessProfile;
+};
+
+export function AnalyticsControlRoomPage({ access }: AnalyticsControlRoomPageProps) {
   const { overview, loading, error, refresh } = useOpsParityOverview();
 
   if (loading) {
@@ -12,6 +18,13 @@ export function AnalyticsControlRoomPage() {
   if (error || !overview) {
     return <div className="notice-error">{error ?? 'Workspace analytics could not be loaded.'}</div>;
   }
+
+  const visibleValidationFlows = overview.validationFlows.filter((item) => canAccessShellRoute(item.route, access));
+  const nextRoutes = [
+    { route: '/', label: 'Open home' },
+    access.canUseReports ? { route: '/reports', label: 'Open reports' } : null,
+    access.canUsePortal && !access.canUseReports ? { route: '/portal', label: 'Open auditee portal' } : null,
+  ].filter((item): item is { route: string; label: string } => Boolean(item));
 
   return (
     <div className="space-y-6">
@@ -26,12 +39,11 @@ export function AnalyticsControlRoomPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Link className="button-secondary" to="/">
-              Open home
-            </Link>
-            <Link className="button-secondary" to="/reports">
-              Open reports
-            </Link>
+            {nextRoutes.map((item) => (
+              <Link key={item.route} className="button-secondary" to={item.route}>
+                {item.label}
+              </Link>
+            ))}
             <button className="button-primary" onClick={() => void refresh()} type="button">
               <RefreshCw className="mr-2 h-4 w-4" />
               Refresh
@@ -80,16 +92,16 @@ export function AnalyticsControlRoomPage() {
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-white">Validation pressure</h2>
-                <p className="text-sm text-slate-400">Exports and compliance exceptions currently shaping operator attention.</p>
+                <p className="text-sm text-slate-400">Exports and compliance exceptions that currently need team follow-up.</p>
               </div>
             </div>
             <div className="mt-5 space-y-3">
-              {overview.validationFlows.length === 0 ? (
+              {visibleValidationFlows.length === 0 ? (
                 <div className="rounded-3xl border border-dashed border-white/10 bg-slate-950/20 p-4 text-sm text-slate-400">
-                  No validation flows are currently active for this tenant.
+                  No validation follow-up is currently visible in your access scope.
                 </div>
               ) : (
-                overview.validationFlows.slice(0, 5).map((item) => (
+                visibleValidationFlows.slice(0, 5).map((item) => (
                   <Link
                     key={item.id}
                     className="block rounded-3xl border border-white/10 bg-slate-950/30 p-4 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
@@ -109,29 +121,57 @@ export function AnalyticsControlRoomPage() {
             </div>
           </div>
 
-          <div className="panel-subtle">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-fuchsia-400/10 text-fuchsia-300">
-                <Sparkles className="h-5 w-5" />
+          {access.canViewAdminNavigation ? (
+            <div className="panel-subtle">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-fuchsia-400/10 text-fuchsia-300">
+                  <Sparkles className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-white">Operational replay</h2>
+                  <p className="text-sm text-slate-400">Backup and import activity available to rehydrate or inspect workspace state.</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-lg font-semibold text-white">Operational replay</h2>
-                <p className="text-sm text-slate-400">Backup and import activity available to rehydrate or inspect tenant state.</p>
+              <div className="mt-5 grid gap-3 md:grid-cols-2">
+                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+                  <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Exports</div>
+                  <div className="mt-2 text-2xl font-semibold text-white">{overview.backupRestore.exportsCount}</div>
+                  <div className="mt-2 text-xs leading-5 text-slate-400">{overview.backupRestore.latestExport ?? 'No export yet'}</div>
+                </div>
+                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+                  <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Imports</div>
+                  <div className="mt-2 text-2xl font-semibold text-white">{overview.backupRestore.importsCount}</div>
+                  <div className="mt-2 text-xs leading-5 text-slate-400">{overview.backupRestore.latestImport ?? 'No import yet'}</div>
+                </div>
               </div>
             </div>
-            <div className="mt-5 grid gap-3 md:grid-cols-2">
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Exports</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{overview.backupRestore.exportsCount}</div>
-                <div className="mt-2 text-xs leading-5 text-slate-400">{overview.backupRestore.latestExport ?? 'No export yet'}</div>
+          ) : (
+            <div className="panel-subtle">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-fuchsia-400/10 text-fuchsia-300">
+                  <Sparkles className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-white">Workspace output</h2>
+                  <p className="text-sm text-slate-400">Recent report activity and collaboration signals visible within your current workspace access.</p>
+                </div>
               </div>
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Imports</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{overview.backupRestore.importsCount}</div>
-                <div className="mt-2 text-xs leading-5 text-slate-400">{overview.backupRestore.latestImport ?? 'No import yet'}</div>
+              <div className="mt-5 grid gap-3 md:grid-cols-2">
+                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+                  <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Reports</div>
+                  <div className="mt-2 text-2xl font-semibold text-white">{overview.backupRestore.exportsCount}</div>
+                  <div className="mt-2 text-xs leading-5 text-slate-400">{overview.backupRestore.latestExport ?? 'No report export yet'}</div>
+                </div>
+                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+                  <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Portal activity</div>
+                  <div className="mt-2 text-2xl font-semibold text-white">
+                    {overview.analytics.find((item) => item.id === 'portal')?.value ?? 0}
+                  </div>
+                  <div className="mt-2 text-xs leading-5 text-slate-400">Assignments and external collaboration activity connected to the current workspace.</div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
     </div>
