@@ -14,14 +14,32 @@ const userId =
   process.env.PROD_SMOKE_USER_ID ??
   'user-demo';
 const baseUrl = baseUrlRaw.endsWith('/') ? baseUrlRaw.slice(0, -1) : baseUrlRaw;
-const headers = {
-  'content-type': 'application/json',
-  'x-tenant-id': tenantId,
-  'x-user-id': userId,
-};
+const bootstrapSecret =
+  process.env.REGOVISE_VERIFY_BOOTSTRAP_SECRET ??
+  process.env.BOOTSTRAP_SETUP_SECRET ??
+  '';
+const bootstrapTenantSlug = process.env.REGOVISE_VERIFY_TENANT_SLUG ?? 'regovise';
+const bootstrapEmail = process.env.REGOVISE_VERIFY_EMAIL ?? 'admin@regovise.com';
+let sessionCookie = '';
+
+function authHeaders() {
+  if (sessionCookie) {
+    return {
+      cookie: sessionCookie,
+    };
+  }
+
+  return {
+    'x-tenant-id': tenantId,
+    'x-user-id': userId,
+  };
+}
 
 async function request(path, init = {}) {
-  const response = await fetch(`${baseUrl}${path}`, init);
+  const response = await fetch(`${baseUrl}${path}`, {
+    ...init,
+    headers: new Headers(init.headers ?? {}),
+  });
   const text = await response.text();
   if (!response.ok) {
     throw new Error(`${init.method ?? 'GET'} ${path} failed (${response.status}): ${text}`);
@@ -50,11 +68,47 @@ async function waitForStableHealth() {
   throw new Error('Worker did not reach a stable healthy state in time.');
 }
 
+async function establishAdminSessionIfConfigured() {
+  if (!bootstrapSecret) {
+    return false;
+  }
+
+  const response = await fetch(`${baseUrl}/_api/core/bootstrap/admin-session`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      secret: bootstrapSecret,
+      tenantSlug: bootstrapTenantSlug,
+      email: bootstrapEmail,
+    }),
+  });
+  const text = await response.text();
+  if (!response.ok) {
+    throw new Error(
+      `POST /_api/core/bootstrap/admin-session failed (${response.status}): ${text}`,
+    );
+  }
+
+  const setCookie = response.headers.get('set-cookie');
+  if (!setCookie) {
+    throw new Error('Bootstrap admin-session response did not include a session cookie.');
+  }
+
+  sessionCookie = setCookie.split(';', 1)[0] ?? '';
+  if (!sessionCookie) {
+    throw new Error('Bootstrap admin-session response returned an empty session cookie.');
+  }
+
+  return true;
+}
+
 function agentEvalStatusCount(evaluations, status) {
   return evaluations.filter((item) => item?.status === status).length;
 }
 
-async function findParityPackage(packages) {
+async function findParityPackage(packages, headers) {
   for (const item of packages.slice(0, 8)) {
     const packageJson = await request(`/_api/assurance/packages/${item.id}/artifacts/package_json`, {
       headers,
@@ -79,6 +133,16 @@ async function main() {
     `Running observable parity verifier against ${baseUrl} as tenant=${tenantId} user=${userId}`,
   );
   await waitForStableHealth();
+  const usingSession = await establishAdminSessionIfConfigured();
+  const headers = {
+    'content-type': 'application/json',
+    ...authHeaders(),
+  };
+  console.log(
+    usingSession
+      ? `Established bootstrap admin session for ${bootstrapEmail} in ${bootstrapTenantSlug}.`
+      : 'Using direct tenant/user headers for observable parity verification.',
+  );
 
   const overview = await request('/_api/assurance/overview', { headers });
   const overviewData = overview?.data;
@@ -112,7 +176,7 @@ async function main() {
 
   const packages = await request('/_api/assurance/packages', { headers });
   assert(Array.isArray(packages?.data) && packages.data.length >= 1, 'Package list is empty.');
-  const { listItem: parityPackage, packageDocument } = await findParityPackage(packages.data);
+  const { listItem: parityPackage, packageDocument } = await findParityPackage(packages.data, headers);
   const packageId = parityPackage.id;
   const evidenceJobId = packageDocument.metadata.evidence_job_id;
   const agentRunId = packageDocument.metadata.agent_run_id;
