@@ -37,62 +37,86 @@ import {
 import { Separator } from '../components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import { cn } from '../lib/utils';
+import { canAccessShellRoute, type ShellAccessProfile } from './shellAccess';
 
 interface NavItem {
   to: string;
   label: string;
   section: string;
   icon: LucideIcon;
+  audience: 'standard' | 'admin' | 'internal';
 }
 
 const navigation: NavItem[] = [
-  { to: '/', label: 'Home', section: 'Home', icon: Gauge },
-  { to: '/program/setup', label: 'Guided Setup', section: 'Home', icon: PlayCircle },
-  { to: '/search', label: 'Search', section: 'Home', icon: Search },
-  { to: '/analytics', label: 'Analytics', section: 'Home', icon: BarChart3 },
-  { to: '/program', label: 'Program Workspace', section: 'Program', icon: Compass },
-  { to: '/workspace/domains', label: 'Domains', section: 'Program', icon: Boxes },
-  { to: '/workspace/team', label: 'Team', section: 'Program', icon: Users },
-  { to: '/libraries', label: 'Libraries', section: 'Program', icon: BookOpen },
-  { to: '/frameworks', label: 'Frameworks', section: 'Program', icon: GitBranch },
-  { to: '/policies', label: 'Policies', section: 'Program', icon: FileText },
-  { to: '/assessments', label: 'Assessments', section: 'Program', icon: ClipboardCheck },
-  { to: '/third-party', label: 'Third Party', section: 'Program', icon: Building2 },
-  { to: '/privacy', label: 'Privacy', section: 'Program', icon: Lock },
-  { to: '/resilience', label: 'Resilience', section: 'Program', icon: Activity },
-  { to: '/portal', label: 'External Portal', section: 'Program', icon: Link2 },
-  { to: '/advanced-risk/ebios', label: 'EBIOS RM', section: 'Program', icon: ShieldCheck },
-  { to: '/advanced-risk/quantitative', label: 'Quantitative Risk', section: 'Program', icon: BarChart3 },
-  { to: '/evidence-management', label: 'Evidence Workspace', section: 'Evidence & Monitoring', icon: Database },
-  { to: '/evidence/sources', label: 'Evidence Sources', section: 'Evidence & Monitoring', icon: Database },
-  { to: '/evidence/jobs', label: 'Collection Jobs', section: 'Evidence & Monitoring', icon: Cpu },
-  { to: '/conmon/profiles', label: 'Monitoring Profiles', section: 'Evidence & Monitoring', icon: Eye },
-  { to: '/conmon/executions', label: 'Monitoring Runs', section: 'Evidence & Monitoring', icon: PlayCircle },
-  { to: '/reports', label: 'Reports', section: 'Evidence & Monitoring', icon: FileOutput },
-  { to: '/assurance', label: 'Assurance Overview', section: 'Assurance', icon: Gauge },
-  { to: '/assurance/evidence', label: 'Evidence Explorer', section: 'Assurance', icon: Search },
-  { to: '/assurance/tracker', label: 'Tracker Workbench', section: 'Assurance', icon: Upload },
-  { to: '/assurance/packages', label: '20x Packages', section: 'Assurance', icon: FileOutput },
-  { to: '/assurance/reviews', label: 'Review Queue', section: 'Assurance', icon: ClipboardCheck },
-  { to: '/assurance/agent-runs', label: 'Agent Runs', section: 'Assurance', icon: Bot },
-  { to: '/chat', label: 'Workspace AI', section: 'Automation', icon: MessageSquare },
-  { to: '/features/regml', label: 'RegML', section: 'Automation', icon: Sparkles },
-  { to: '/response-automation', label: 'Response Automation', section: 'Automation', icon: Bot },
-  { to: '/evidence-mapping', label: 'Evidence Mapping', section: 'Automation', icon: Link2 },
-  { to: '/workflow', label: 'Workflow', section: 'Automation', icon: Workflow },
-  { to: '/automation-manager', label: 'Integrations', section: 'Automation', icon: ServerCog },
-  { to: '/workspace/me', label: 'My Access', section: 'Admin', icon: User },
-  { to: '/workspace/access', label: 'Permissions', section: 'Admin', icon: Shield },
-  { to: '/setup/general', label: 'Workspace Settings', section: 'Admin', icon: SlidersHorizontal },
-  { to: '/setup/security', label: 'Security', section: 'Admin', icon: ShieldCheck },
-  { to: '/settings', label: 'System Settings', section: 'Admin', icon: ServerCog },
+  { to: '/', label: 'Home', section: 'Home', icon: Gauge, audience: 'standard' },
+  { to: '/search', label: 'Search', section: 'Home', icon: Search, audience: 'standard' },
+  { to: '/analytics', label: 'Analytics', section: 'Home', icon: BarChart3, audience: 'standard' },
+  { to: '/program', label: 'Program Workspace', section: 'Program', icon: Compass, audience: 'standard' },
+  { to: '/libraries', label: 'Libraries', section: 'Program', icon: BookOpen, audience: 'standard' },
+  { to: '/frameworks', label: 'Frameworks', section: 'Program', icon: GitBranch, audience: 'standard' },
+  { to: '/assessments', label: 'Assessments', section: 'Program', icon: ClipboardCheck, audience: 'standard' },
+  { to: '/third-party', label: 'Third Party', section: 'Program', icon: Building2, audience: 'standard' },
+  { to: '/privacy', label: 'Privacy', section: 'Program', icon: Lock, audience: 'standard' },
+  { to: '/resilience', label: 'Resilience', section: 'Program', icon: Activity, audience: 'standard' },
+  { to: '/portal', label: 'External Portal', section: 'Program', icon: Link2, audience: 'standard' },
+  { to: '/advanced-risk/ebios', label: 'EBIOS RM', section: 'Program', icon: ShieldCheck, audience: 'standard' },
+  {
+    to: '/advanced-risk/quantitative',
+    label: 'Quantitative Risk',
+    section: 'Program',
+    icon: BarChart3,
+    audience: 'standard',
+  },
+  { to: '/evidence-management', label: 'Evidence Workspace', section: 'Evidence & Monitoring', icon: Database, audience: 'standard' },
+  { to: '/evidence/jobs', label: 'Collection Jobs', section: 'Evidence & Monitoring', icon: Cpu, audience: 'standard' },
+  { to: '/conmon/executions', label: 'Monitoring Runs', section: 'Evidence & Monitoring', icon: PlayCircle, audience: 'standard' },
+  { to: '/reports', label: 'Reports', section: 'Evidence & Monitoring', icon: FileOutput, audience: 'standard' },
+  { to: '/assurance', label: 'Assurance Overview', section: 'Assurance', icon: Gauge, audience: 'standard' },
+  { to: '/assurance/evidence', label: 'Evidence Explorer', section: 'Assurance', icon: Search, audience: 'standard' },
+  { to: '/assurance/tracker', label: 'Tracker Workbench', section: 'Assurance', icon: Upload, audience: 'standard' },
+  { to: '/assurance/packages', label: '20x Packages', section: 'Assurance', icon: FileOutput, audience: 'standard' },
+  { to: '/assurance/reviews', label: 'Review Queue', section: 'Assurance', icon: ClipboardCheck, audience: 'standard' },
+  { to: '/assurance/agent-runs', label: 'Agent Runs', section: 'Assurance', icon: Bot, audience: 'standard' },
+  { to: '/workspace/me', label: 'My Access', section: 'Home', icon: User, audience: 'standard' },
+  { to: '/chat', label: 'Workspace AI', section: 'Automation', icon: MessageSquare, audience: 'standard' },
+  { to: '/program/setup', label: 'Guided Setup', section: 'Administration', icon: PlayCircle, audience: 'admin' },
+  { to: '/policies', label: 'Policies', section: 'Administration', icon: FileText, audience: 'admin' },
+  { to: '/workspace/domains', label: 'Domains', section: 'Administration', icon: Boxes, audience: 'admin' },
+  { to: '/workspace/team', label: 'Team', section: 'Administration', icon: Users, audience: 'admin' },
+  { to: '/evidence/sources', label: 'Evidence Sources', section: 'Administration', icon: Database, audience: 'admin' },
+  { to: '/conmon/profiles', label: 'Monitoring Profiles', section: 'Administration', icon: Eye, audience: 'admin' },
+  { to: '/workspace/access', label: 'Permissions', section: 'Administration', icon: Shield, audience: 'admin' },
+  { to: '/setup/general', label: 'Workspace Settings', section: 'Administration', icon: SlidersHorizontal, audience: 'admin' },
+  { to: '/setup/security', label: 'Security', section: 'Administration', icon: ShieldCheck, audience: 'admin' },
+  { to: '/automation-manager', label: 'Integrations', section: 'Administration', icon: ServerCog, audience: 'admin' },
+  { to: '/response-automation', label: 'Response Automation', section: 'Administration', icon: Bot, audience: 'admin' },
+  { to: '/evidence-mapping', label: 'Evidence Mapping', section: 'Administration', icon: Link2, audience: 'admin' },
+  { to: '/features/regml', label: 'AI Authoring', section: 'Administration', icon: Sparkles, audience: 'admin' },
+  { to: '/settings', label: 'Platform Settings', section: 'Internal', icon: ServerCog, audience: 'internal' },
+  { to: '/workflow', label: 'Workflow Console', section: 'Internal', icon: Workflow, audience: 'internal' },
 ];
 
-const sections = ['Home', 'Program', 'Evidence & Monitoring', 'Assurance', 'Automation', 'Admin'];
+const sections = ['Home', 'Program', 'Evidence & Monitoring', 'Assurance', 'Automation', 'Administration', 'Internal'];
 
-const SECTION_SEPARATORS_BEFORE = new Set(['Program', 'Evidence & Monitoring', 'Assurance', 'Automation', 'Admin']);
+const SECTION_SEPARATORS_BEFORE = new Set(['Program', 'Evidence & Monitoring', 'Assurance', 'Automation', 'Administration', 'Internal']);
 
-export function Sidebar() {
+type SidebarProps = {
+  access: ShellAccessProfile;
+};
+
+function canSeeNavItem(item: NavItem, access: ShellAccessProfile) {
+  if (item.audience === 'admin' && !access.canViewAdminNavigation) {
+    return false;
+  }
+
+  if (item.audience === 'internal' && !access.canViewInternalTools) {
+    return false;
+  }
+
+  return canAccessShellRoute(item.to, access);
+}
+
+export function Sidebar({ access }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -146,7 +170,7 @@ export function Sidebar() {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3 scrollbar-thin">
           {sections.map((section, sectionIndex) => {
-            const items = navigation.filter((item) => item.section === section);
+            const items = navigation.filter((item) => item.section === section && canSeeNavItem(item, access));
             if (items.length === 0) return null;
 
             return (

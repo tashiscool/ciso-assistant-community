@@ -2,6 +2,7 @@ import { type FormEvent, useEffect, useState } from 'react';
 import { ApiClient } from '../../shared/api/client';
 import { useEdgeIdentity } from '../../shared/session/identity';
 import type { IamMePayload } from '../iam/types';
+import { CoachMarksPanel } from '../../components/CoachMarksPanel';
 
 const client = new ApiClient();
 
@@ -68,6 +69,39 @@ export function MePage() {
         </p>
       </section>
 
+      <CoachMarksPanel
+        storageKey="my-access"
+        title="Use My Access to understand scope before assuming the app is missing something."
+        description="This page explains what the current session can actually see, why those permissions exist, and whether local sign-in is available for this identity."
+        items={[
+          {
+            id: 'my-access-identity',
+            eyebrow: 'Identity',
+            title: 'The session only sees one active identity',
+            body: 'The name, email, and session state here describe the exact account the rest of the app is currently rendering for.',
+            tone: 'focus',
+          },
+          {
+            id: 'my-access-roles',
+            eyebrow: 'Role sources',
+            title: 'Role sources explain why access exists',
+            body: 'Direct roles and group-inherited roles both matter. If access feels wrong, the answer is usually in the role source list below.',
+          },
+          {
+            id: 'my-access-domains',
+            eyebrow: 'Perimeter',
+            title: 'Domain perimeter is the real visibility boundary',
+            body: 'Even with a broad-looking role, this session can only work inside the domains and permissions attached to those domains.',
+          },
+          {
+            id: 'my-access-local-login',
+            eyebrow: 'Sign-in',
+            title: 'Local password access is optional, not assumed',
+            body: 'If local sign-in is enabled for this identity, you can manage that password here. Otherwise the account stays on the workspace-managed path.',
+          },
+        ]}
+      />
+
       {notice && <div className="notice-success">{notice}</div>}
       {error && <div className="notice-error">{error}</div>}
 
@@ -80,9 +114,9 @@ export function MePage() {
           <div className="mt-2 text-xs text-cyan-200">{me?.profile?.email ?? 'No profile found'}</div>
         </div>
         <div className="metric-card">
-          <div className="metric-label">Authentication</div>
-          <div className="metric-value">{me?.isAuthenticated ? 'yes' : 'no'}</div>
-          <div className="mt-2 text-xs text-slate-500">{me?.authStrategy ?? 'unknown'}</div>
+          <div className="metric-label">Session</div>
+          <div className="metric-value">{me?.isAuthenticated ? 'active' : 'inactive'}</div>
+          <div className="mt-2 text-xs text-slate-500">This workspace session is currently secured and available for use.</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Permissions</div>
@@ -195,7 +229,7 @@ export function MePage() {
                 <div className="text-sm leading-6 text-slate-300">
                   {me.profile.localPasswordConfigured
                     ? 'Rotate the local password used for direct Regovise sign-in. The current password is required before a new one can be saved.'
-                    : 'No local password is configured yet for this identity. Set one now to enable direct Regovise sign-in without the bootstrap path.'}
+                    : 'No local password is configured yet for this identity. Set one now to enable direct Regovise sign-in without administrator recovery.'}
                 </div>
 
                 <form className="space-y-3" onSubmit={(event) => void handlePasswordChange(event)}>

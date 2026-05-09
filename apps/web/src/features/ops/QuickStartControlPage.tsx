@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Compass, RefreshCw, Rocket } from 'lucide-react';
 import { useOpsParityOverview } from './useOpsParityOverview';
+import { CoachMarksPanel } from '../../components/CoachMarksPanel';
 
 export function QuickStartControlPage() {
   const { overview, loading, error, refresh } = useOpsParityOverview();
@@ -41,6 +42,47 @@ export function QuickStartControlPage() {
           </div>
         </div>
       </section>
+
+      <CoachMarksPanel
+        storageKey="guided-setup"
+        title="Set up the workspace in the order the operating model expects."
+        description="Guided Setup should establish boundaries, people, sources, and the first live workflows in sequence so the rest of Regovise inherits a clean operating model."
+        items={[
+          {
+            id: 'guided-setup-domains',
+            eyebrow: 'Boundaries',
+            title: 'Start with domains and access',
+            body: 'If domains and permissions are vague at the start, every later assessment, evidence job, and review trail becomes harder to trust.',
+            route: '/workspace/domains',
+            ctaLabel: 'Open domains',
+          },
+          {
+            id: 'guided-setup-team',
+            eyebrow: 'People',
+            title: 'Assign the right team early',
+            body: 'Invite administrators, contributors, and external-facing users before the program starts producing shared records.',
+            route: '/workspace/team',
+            ctaLabel: 'Open team',
+          },
+          {
+            id: 'guided-setup-frameworks',
+            eyebrow: 'Sources',
+            title: 'Load frameworks before collecting too much evidence',
+            body: 'Frameworks and controls give the rest of the workspace a stable vocabulary for assessments, packages, and remediation work.',
+            route: '/frameworks',
+            ctaLabel: 'Open frameworks',
+            tone: 'focus',
+          },
+          {
+            id: 'guided-setup-assessments',
+            eyebrow: 'Launch',
+            title: 'Use assessments to trigger the real operating loop',
+            body: 'Assessments create the work that evidence, review, and assurance are meant to support. They should not be an afterthought.',
+            route: '/assessments',
+            ctaLabel: 'Open assessments',
+          },
+        ]}
+      />
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="metric-card">

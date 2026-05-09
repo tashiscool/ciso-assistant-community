@@ -1,5 +1,6 @@
 import {
   requireAnyScopedPermission,
+  requireRootAdminAccess,
   type ScopedPermissionContext,
 } from '../../authorization';
 import type { WorkerRequestContext } from '../../router';
@@ -1771,6 +1772,14 @@ export async function handleAssuranceRoutes(
   }
 
   if (resource === 'parity' && id === 'status' && !action && ctx.request.method === 'GET') {
+    const adminAccess = await requireRootAdminAccess(
+      ctx,
+      'Tenant administrator access is required to inspect operational readiness.',
+    );
+    if (adminAccess instanceof Response) {
+      return adminAccess;
+    }
+
     const access = await requireAnyScopedPermission(ctx, ['view_evidence', 'collect_evidence']);
     if (access instanceof Response) {
       return access;

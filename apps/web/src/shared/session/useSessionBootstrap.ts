@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { canUseHeaderIdentity, isLoopbackAutoSessionSuppressed, useEdgeIdentity } from './identity';
+import { canUseHeaderIdentity, isAuthEntryPath, isLoopbackAutoSessionSuppressed, useEdgeIdentity } from './identity';
 
 type SessionPayload = {
   data: {
@@ -39,12 +39,20 @@ export function useSessionBootstrap() {
   useEffect(() => {
     let cancelled = false;
     const headerIdentityAllowed = canUseHeaderIdentity();
+    const onAuthEntryPath = typeof window !== 'undefined' && isAuthEntryPath(window.location.pathname);
 
     async function syncSession() {
       setSyncing(true);
       setReady(false);
 
       try {
+        if (authMode === 'headers' && onAuthEntryPath) {
+          setIsAuthenticated(false);
+          setError(null);
+          setReady(true);
+          return;
+        }
+
         if (authMode === 'headers' && !headerIdentityAllowed) {
           setIsAuthenticated(false);
           setAuthMode('anonymous');
@@ -113,6 +121,7 @@ export function useSessionBootstrap() {
         if (
           authMode === 'anonymous' &&
           headerIdentityAllowed &&
+          !onAuthEntryPath &&
           typeof window !== 'undefined' &&
           !isLoopbackAutoSessionSuppressed() &&
           !window.sessionStorage.getItem(LOOPBACK_BOOTSTRAP_MIGRATION_KEY)
@@ -124,7 +133,7 @@ export function useSessionBootstrap() {
         }
 
         if (authMode === 'session') {
-          setAuthMode(headerIdentityAllowed ? 'headers' : 'anonymous');
+          setAuthMode(headerIdentityAllowed && !onAuthEntryPath ? 'headers' : 'anonymous');
         }
       } catch (err) {
         if (cancelled) return;
@@ -133,7 +142,7 @@ export function useSessionBootstrap() {
         setError(err instanceof Error ? err.message : 'Unable to establish a secure workspace session.');
 
         if (authMode === 'session' || (authMode === 'headers' && !headerIdentityAllowed)) {
-          setAuthMode(headerIdentityAllowed ? 'headers' : 'anonymous');
+          setAuthMode(headerIdentityAllowed && !onAuthEntryPath ? 'headers' : 'anonymous');
         }
       } finally {
         if (!cancelled) {

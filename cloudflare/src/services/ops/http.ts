@@ -600,6 +600,32 @@ const RISK_WRITE_PERMISSIONS = [
   'add_riskscenario',
   'change_riskscenario',
 ];
+const TPRM_READ_PERMISSIONS = [
+  'view_entity',
+  'add_entity',
+  'change_entity',
+  'view_solution',
+  'add_solution',
+  'change_solution',
+  'view_contract',
+  'add_contract',
+  'change_contract',
+  'view_entityassessment',
+  'add_entityassessment',
+  'change_entityassessment',
+];
+const PRIVACY_READ_PERMISSIONS = [
+  'view_processing',
+  'add_processing',
+  'change_processing',
+  'view_rightrequest',
+  'add_rightrequest',
+  'change_rightrequest',
+  'view_databreach',
+  'add_databreach',
+  'change_databreach',
+];
+const RESILIENCE_READ_PERMISSIONS = ['view_bia', 'add_bia', 'change_bia'];
 const OPERATIONS_READ_PERMISSIONS = [
   'view_framework',
   'add_framework',
@@ -625,6 +651,238 @@ const OPERATIONS_WRITE_PERMISSIONS = [
   'run_conmon',
   'collect_evidence',
 ];
+
+const WORKSPACE_ADMIN_VISIBILITY_PERMISSIONS = new Set([
+  'add_user',
+  'change_user',
+  'delete_user',
+  'add_usergroup',
+  'change_usergroup',
+  'delete_usergroup',
+  'add_role',
+  'change_role',
+  'delete_role',
+  'add_roleassignment',
+  'change_roleassignment',
+  'delete_roleassignment',
+  'add_folder',
+  'change_folder',
+  'delete_folder',
+]);
+
+const ADMIN_ROUTE_PREFIXES = [
+  '/program/setup',
+  '/workspace/domains',
+  '/workspace/team',
+  '/workspace/access',
+  '/setup/',
+  '/builders/',
+  '/features/regml',
+  '/features/compliance-exports',
+  '/features/response-automation',
+  '/features/evidence-mapping',
+  '/features/automation-manager',
+];
+
+const ADMIN_ROUTE_EXACT = new Set([
+  '/sso',
+  '/setup-mfa',
+  '/ai-policy-builder',
+  '/features/ai-policy-builder',
+  '/response-automation',
+  '/evidence-mapping',
+  '/compliance-exports',
+  '/imports',
+  '/automation-manager',
+  '/folders',
+  '/users',
+  '/quick-start',
+  '/conmon/profiles',
+  '/evidence/sources',
+  '/policies',
+  '/settings',
+]);
+
+const INTERNAL_ROUTE_PREFIXES = [
+  '/workflow',
+  '/features/workflow',
+  '/utilities',
+  '/features/utilities',
+  '/subsystems',
+  '/features/subsystems',
+  '/rmf',
+  '/features/rmf',
+  '/app-management',
+  '/features/app-management',
+  '/workbench',
+  '/features/workbench',
+  '/news-feed',
+  '/features/news-feed',
+];
+
+const INTERNAL_ROUTE_EXACT = new Set([
+  '/assets',
+  '/asset-assessments',
+  '/actors',
+  '/vulnerabilities',
+  '/incidents',
+  '/security-exceptions',
+  '/backup-restore',
+  '/calendar',
+  '/dashboards',
+  '/recap',
+  '/validation-flows',
+  '/x-rays',
+  '/task-nodes',
+  '/task-templates',
+  '/risk-matrices',
+  '/requirement-assessments',
+  '/requirement-mapping-sets',
+  '/sync-mappings',
+  '/content-types',
+  '/generic-collections',
+  '/presets',
+  '/preset-journeys',
+  '/experimental',
+  '/license-management',
+  '/metric-instances',
+  '/accreditations',
+  '/findings-assessments',
+  '/scoring-assistant',
+]);
+
+type OpsSurfaceAccessProfile = {
+  isWorkspaceAdmin: boolean;
+  canViewAdminNavigation: boolean;
+  canViewInternalTools: boolean;
+  canUseSearch: boolean;
+  canUseAnalytics: boolean;
+  canUseProgramWorkspace: boolean;
+  canUseLibraries: boolean;
+  canUseFrameworks: boolean;
+  canUseAssessmentWorkspace: boolean;
+  canUseComplianceAssessments: boolean;
+  canUseRiskAssessments: boolean;
+  canUseThirdParty: boolean;
+  canUsePrivacy: boolean;
+  canUseResilience: boolean;
+  canUsePortal: boolean;
+  canUseAdvancedRisk: boolean;
+  canUseEvidence: boolean;
+  canUseConMon: boolean;
+  canUseReports: boolean;
+  canUseAssurance: boolean;
+  canUseChat: boolean;
+};
+
+function deriveOpsSurfaceAccessProfile(permissions: string[]): OpsSurfaceAccessProfile {
+  const isWorkspaceAdmin = permissions.some((permission) =>
+    WORKSPACE_ADMIN_VISIBILITY_PERMISSIONS.has(permission),
+  );
+  const canUseFrameworks = permissions.some((permission) => FRAMEWORK_READ_PERMISSIONS.includes(permission));
+  const canUseRiskAssessments = permissions.some((permission) => RISK_READ_PERMISSIONS.includes(permission));
+  const canUseThirdParty = permissions.some((permission) => TPRM_READ_PERMISSIONS.includes(permission));
+  const canUsePrivacy = permissions.some((permission) => PRIVACY_READ_PERMISSIONS.includes(permission));
+  const canUseResilience = permissions.some((permission) => RESILIENCE_READ_PERMISSIONS.includes(permission));
+  const canUseEvidence = permissions.some((permission) => ['view_evidence', 'collect_evidence'].includes(permission));
+  const canUseConMon = permissions.some((permission) => ['view_conmon', 'run_conmon'].includes(permission));
+  const canUseOperations = permissions.some((permission) => OPERATIONS_READ_PERMISSIONS.includes(permission));
+
+  return {
+    isWorkspaceAdmin,
+    canViewAdminNavigation: isWorkspaceAdmin,
+    canViewInternalTools: isWorkspaceAdmin,
+    canUseSearch: canUseOperations,
+    canUseAnalytics: canUseOperations,
+    canUseProgramWorkspace: canUseOperations,
+    canUseLibraries: canUseFrameworks,
+    canUseFrameworks,
+    canUseAssessmentWorkspace: canUseFrameworks && canUseRiskAssessments,
+    canUseComplianceAssessments: canUseFrameworks,
+    canUseRiskAssessments,
+    canUseThirdParty,
+    canUsePrivacy,
+    canUseResilience,
+    canUsePortal: canUseFrameworks,
+    canUseAdvancedRisk: canUseRiskAssessments,
+    canUseEvidence,
+    canUseConMon,
+    canUseReports: canUseFrameworks,
+    canUseAssurance: canUseEvidence,
+    canUseChat: canUseOperations,
+  };
+}
+
+function canAccessOpsStandardRoute(route: string, access: OpsSurfaceAccessProfile): boolean | null {
+  const capabilityChecks: Array<[string[], boolean]> = [
+    [['/search'], access.canUseSearch],
+    [['/analytics'], access.canUseAnalytics],
+    [['/program'], access.canUseProgramWorkspace],
+    [['/libraries', '/loaded-libraries', '/mapping-libraries', '/stored-libraries'], access.canUseLibraries],
+    [['/frameworks'], access.canUseFrameworks],
+    [['/assessments', '/compliance-assessments'], access.canUseAssessmentWorkspace],
+    [['/applied-controls'], access.canUseComplianceAssessments],
+    [['/risk-assessments', '/risk-scenarios'], access.canUseRiskAssessments],
+    [['/third-party', '/entities', '/contracts'], access.canUseThirdParty],
+    [['/privacy', '/processings'], access.canUsePrivacy],
+    [['/resilience', '/business-impact-analysis'], access.canUseResilience],
+    [['/portal'], access.canUsePortal],
+    [
+      [
+        '/advanced-risk/ebios',
+        '/advanced-risk/quantitative',
+        '/ebios-rm',
+        '/operating-modes',
+        '/operational-scenarios',
+        '/strategic-scenarios',
+        '/ro-to',
+        '/stakeholders',
+        '/quantitative-risk-studies',
+        '/quantitative-risk-scenarios',
+        '/quantitative-risk-hypotheses',
+      ],
+      access.canUseAdvancedRisk,
+    ],
+    [['/evidence-management', '/features/evidence-management', '/evidence/jobs'], access.canUseEvidence],
+    [['/conmon/executions'], access.canUseConMon],
+    [['/reports'], access.canUseReports],
+    [['/assurance'], access.canUseAssurance],
+    [['/chat'], access.canUseChat],
+  ];
+
+  for (const [prefixes, allowed] of capabilityChecks) {
+    if (prefixes.some((prefix) => route === prefix || route.startsWith(`${prefix}/`))) {
+      return allowed;
+    }
+  }
+
+  return null;
+}
+
+function canAccessOpsSurfaceRoute(route: string, access: OpsSurfaceAccessProfile): boolean {
+  if (!route.startsWith('/')) {
+    return true;
+  }
+
+  if (INTERNAL_ROUTE_EXACT.has(route) || INTERNAL_ROUTE_PREFIXES.some((prefix) => route.startsWith(prefix))) {
+    return access.canViewInternalTools;
+  }
+
+  if (ADMIN_ROUTE_EXACT.has(route) || ADMIN_ROUTE_PREFIXES.some((prefix) => route.startsWith(prefix))) {
+    return access.canViewAdminNavigation;
+  }
+
+  const standardRouteAccess = canAccessOpsStandardRoute(route, access);
+  if (standardRouteAccess !== null) {
+    return standardRouteAccess;
+  }
+
+  return true;
+}
+
+function filterRouteItems<T extends { route: string }>(items: T[], access: OpsSurfaceAccessProfile): T[] {
+  return items.filter((item) => canAccessOpsSurfaceRoute(item.route, access));
+}
 
 const utilityCatalog: UtilityCatalogEntry[] = [
   {
@@ -3508,7 +3766,7 @@ async function getQuantitativeHypothesisDetail(
   return null;
 }
 
-async function buildParityOverview(ctx: WorkerRequestContext) {
+async function buildParityOverview(ctx: WorkerRequestContext, access: OpsSurfaceAccessProfile) {
   const tenantId = ctx.tenantId as string;
 
   const assetRows = await ctx.env.D1_MAIN.prepare(
@@ -3871,31 +4129,49 @@ async function buildParityOverview(ctx: WorkerRequestContext) {
     },
   ];
 
+  const visibleActors = filterRouteItems(actors, access);
+  const visiblePolicies = filterRouteItems(policies, access);
+  const visibleVulnerabilities = filterRouteItems(vulnerabilities, access);
+  const visibleIncidents = filterRouteItems(incidents, access);
+  const visibleQuickStart = access.canViewAdminNavigation ? filterRouteItems(quickStart, access) : [];
+  const visibleSearchIndex = filterRouteItems(searchIndex, access);
+  const visibleValidationFlows = filterRouteItems(validationFlows, access);
+  const visibleProgram = filterRouteItems(program, access);
+  const visibleXRays = access.canViewInternalTools ? filterRouteItems(xRays, access) : [];
+  const visibleBackupRestore = access.canViewAdminNavigation
+    ? backupRestore
+    : {
+        exportsCount: backupRestore.exportsCount,
+        importsCount: 0,
+        latestExport: backupRestore.latestExport,
+        latestImport: null,
+      };
+
   return {
     tenantId,
     assets,
-    actors,
-    vulnerabilities,
-    policies,
-    incidents,
+    actors: visibleActors,
+    vulnerabilities: visibleVulnerabilities,
+    policies: visiblePolicies,
+    incidents: visibleIncidents,
     exceptions,
     analytics,
     calendar,
-    backupRestore,
-    quickStart,
-    searchIndex,
+    backupRestore: visibleBackupRestore,
+    quickStart: visibleQuickStart,
+    searchIndex: visibleSearchIndex,
     settings: {
       tenantId,
-      userId: ctx.userId,
-      authStrategy: ctx.authStrategy,
-      appEnv: ctx.env.APP_ENV,
+      userId: access.canViewAdminNavigation ? ctx.userId : null,
+      authStrategy: access.canViewAdminNavigation ? ctx.authStrategy : 'session',
+      appEnv: access.canViewInternalTools ? ctx.env.APP_ENV : 'workspace',
     },
     libraryOperations,
     tasks,
     dashboards,
-    validationFlows,
-    xRays,
-    program,
+    validationFlows: visibleValidationFlows,
+    xRays: visibleXRays,
+    program: visibleProgram,
   };
 }
 
@@ -5830,8 +6106,16 @@ export async function handleOpsRoutes(
   }
 
   if (resource === 'parity' && id === 'overview' && ctx.request.method === 'GET') {
+    const permissionContext = await loadPermissionContext(ctx);
+    if (permissionContext instanceof Response) {
+      return permissionContext;
+    }
+
     return json({
-      data: await buildParityOverview(ctx),
+      data: await buildParityOverview(
+        ctx,
+        deriveOpsSurfaceAccessProfile(permissionContext.permissions),
+      ),
     });
   }
 

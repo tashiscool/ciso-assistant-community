@@ -5,6 +5,21 @@ const USER_STORAGE_KEY = 'ciso-assistant.edge.user-id';
 const AUTH_MODE_STORAGE_KEY = 'ciso-assistant.edge.auth-mode';
 const IDENTITY_EVENT = 'ciso-assistant-edge-identity-change';
 const LOOPBACK_AUTO_SESSION_SUPPRESS_KEY = 'ciso-assistant.edge.loopback-auto-session-suppressed';
+const AUTH_ENTRY_PATHS = new Set(['/login', '/setup/initialize', '/admin/recover']);
+
+function normalizePathname(pathname: string | null | undefined): string {
+  const value = (pathname ?? '').trim();
+  if (!value) {
+    return '/';
+  }
+
+  if (value === '/') {
+    return '/';
+  }
+
+  const normalized = value.replace(/\/+$/g, '');
+  return normalized || '/';
+}
 
 export type EdgeIdentity = {
   tenantId: string;
@@ -34,6 +49,14 @@ export function canUseHeaderIdentity(): boolean {
   }
 
   return isLoopbackHost(window.location.hostname);
+}
+
+export function isAuthEntryPath(pathname: string | null | undefined): boolean {
+  return AUTH_ENTRY_PATHS.has(normalizePathname(pathname));
+}
+
+export function isLogoutPath(pathname: string | null | undefined): boolean {
+  return normalizePathname(pathname) === '/logout';
 }
 
 export function clearLoopbackAutoSessionSuppression() {
