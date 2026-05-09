@@ -7,14 +7,40 @@ export type WorkflowLease = {
   metadata: Record<string, unknown> | null;
 };
 
+export type WorkflowRunStatus = 'Queued' | 'Running' | 'Awaiting Review' | 'Done' | 'Failed';
+
+export type WorkflowRunRecord = {
+  runId: string;
+  runType: string;
+  module: string;
+  title: string;
+  status: WorkflowRunStatus;
+  folderId: string | null;
+  sourceRecordId: string | null;
+  route: string;
+  detail: string;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type WorkflowSnapshot = {
   tenantId: string;
   activeLeases: WorkflowLease[];
+  workflowRuns: WorkflowRunRecord[];
 };
 
 type AcquireLeaseResponse = {
   acquired: boolean;
   lease: WorkflowLease;
+};
+
+type WorkflowRunsResponse = {
+  workflowRuns: WorkflowRunRecord[];
+};
+
+type WorkflowRunResponse = {
+  workflowRun: WorkflowRunRecord;
 };
 
 function getTenantWorkflowStub(env: EnvBindings, tenantId: string) {
@@ -78,12 +104,74 @@ export async function getTenantWorkflowSnapshot(
   env: EnvBindings,
   tenantId: string,
 ): Promise<WorkflowSnapshot> {
-  const snapshot = await doRequest<WorkflowSnapshot>(env, tenantId, '/leases', {
-    method: 'GET',
-  });
+  const [leaseSnapshot, runSnapshot] = await Promise.all([
+    doRequest<{ activeLeases: WorkflowLease[] }>(env, tenantId, '/leases', {
+      method: 'GET',
+    }),
+    doRequest<WorkflowRunsResponse>(env, tenantId, '/runs?limit=25', {
+      method: 'GET',
+    }),
+  ]);
 
   return {
     tenantId,
-    activeLeases: snapshot.activeLeases,
+    activeLeases: leaseSnapshot.activeLeases,
+    workflowRuns: runSnapshot.workflowRuns,
   };
+}
+
+export async function getTenantWorkflowRuns(
+  env: EnvBindings,
+  tenantId: string,
+  limit = 25,
+): Promise<WorkflowRunRecord[]> {
+  const response = await doRequest<WorkflowRunsResponse>(
+    env,
+    tenantId,
+    `/runs?limit=${Math.max(1, Math.min(limit, 200))}`,
+    {
+      method: 'GET',
+    },
+  );
+  return response.workflowRuns;
+}
+
+export async function startTenantWorkflowRun(
+  env: EnvBindings,
+  tenantId: string,
+  run: Omit<WorkflowRunRecord, 'createdAt' | 'updatedAt'>,
+): Promise<WorkflowRunRecord> {
+  const response = await doRequest<WorkflowRunResponse>(env, tenantId, '/runs/start', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(run),
+  });
+
+  return response.workflowRun;
+}
+
+export async function updateTenantWorkflowRun(
+  env: EnvBindings,
+  tenantId: string,
+  update: {
+    runId: string;
+    title?: string;
+    status?: WorkflowRunStatus;
+    route?: string;
+    detail?: string;
+    metadata?: Record<string, unknown> | null;
+    sourceRecordId?: string | null;
+  },
+): Promise<WorkflowRunRecord> {
+  const response = await doRequest<WorkflowRunResponse>(env, tenantId, '/runs/update', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(update),
+  });
+
+  return response.workflowRun;
 }

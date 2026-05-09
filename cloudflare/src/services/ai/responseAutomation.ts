@@ -1,10 +1,12 @@
 import type { WorkerRequestContext } from '../../router';
 import {
-  generateTextWithAi,
+  generateJsonWithAi,
   getAiRuntimeStatus,
   queryVectorDocuments,
   upsertVectorDocuments,
 } from './runtime';
+import { buildResponseAutomationPrompts } from './promptPacks';
+import { buildTenantAiContext } from './tenantContext';
 import { json, methodNotAllowed, readJson } from '../../utils/http';
 
 type ResponseAutomationSourceType = 'Policy' | 'Questionnaire' | 'Security Plan' | 'Evidence';
@@ -79,6 +81,14 @@ type GeneratedResponseItem = {
   reviewState: string;
   sourceIds: string[];
   sortOrder: number;
+};
+
+type GeneratedAnswerDraft = {
+  answer?: string;
+  confidence?: number;
+  review_state?: string;
+  citations?: string[];
+  evidence_gaps?: string[];
 };
 
 const responseQuestionBank = [
@@ -287,6 +297,27 @@ async function listSources(env: WorkerRequestContext['env'], tenantId: string) {
   return records;
 }
 
+async function listAcceptedAnswerPatterns(env: WorkerRequestContext['env'], tenantId: string) {
+  const { results } = await env.D1_MAIN.prepare(
+    `
+    SELECT question, answer, confidence
+    FROM response_automation_items
+    WHERE tenant_id = ?
+      AND accepted = 1
+      AND LENGTH(TRIM(COALESCE(answer, ''))) > 0
+    ORDER BY updated_at DESC
+    LIMIT 5
+    `,
+  )
+    .bind(tenantId)
+    .all<{ question: string; answer: string; confidence: number }>();
+
+  return (results ?? []).map((row) => {
+    const compactAnswer = row.answer.replace(/\s+/g, ' ').trim();
+    return `${row.question} -> ${compactAnswer.slice(0, 180)} (confidence ${row.confidence})`;
+  });
+}
+
 async function listJobs(env: WorkerRequestContext['env'], tenantId: string) {
   const { results } = await env.D1_MAIN.prepare(
     `
@@ -487,7 +518,11 @@ async function deriveItemAnswers(
     return deriveFallbackItemAnswers(sourceIds, sources);
   }
 
-  const runtime = await getAiRuntimeStatus(env);
+  const [runtime, tenantContext, acceptedPatterns] = await Promise.all([
+    getAiRuntimeStatus(env),
+    buildTenantAiContext(env, tenantId),
+    listAcceptedAnswerPatterns(env, tenantId),
+  ]);
   if (!runtime.textGenerationAvailable) {
     return deriveFallbackItemAnswers(sourceIds, sources);
   }
@@ -526,37 +561,54 @@ async function deriveItemAnswers(
     const sourceContext = relevantSources
       .map((source) => `- ${buildSourceDocumentText(source)}`)
       .join('\n');
-
-    const generatedAnswer = await generateTextWithAi(env, {
-      systemPrompt:
-        'You are a compliance response assistant. Use only the provided internal sources. If the sources do not support an answer, reply with exactly INSUFFICIENT_EVIDENCE.',
-      userPrompt: [
-        `Question: ${template.question}`,
-        '',
-        'Allowed source snippets:',
-        sourceContext || '- No approved source snippets were provided.',
-        '',
-        'Return a concise 2-4 sentence answer grounded only in those snippets.',
-      ].join('\n'),
-      maxTokens: 260,
-      temperature: 0.15,
+    const relevantSourceLabels = relevantSources.map((source) => `${source.type}: ${source.label}`);
+    const prompts = buildResponseAutomationPrompts({
+      question: template.question,
+      context: tenantContext,
+      sourceContext: sourceContext || '- No approved source snippets were provided.',
+      acceptedPatterns,
+      relevantSourceLabels,
     });
 
+    const generatedDraft = await generateJsonWithAi<GeneratedAnswerDraft>(env, {
+      systemPrompt: prompts.systemPrompt,
+      userPrompt: prompts.userPrompt,
+      maxTokens: 420,
+      temperature: 0.1,
+    });
+
+    const generatedAnswer = generatedDraft?.answer?.trim() ?? '';
     const noGrounding =
       !generatedAnswer ||
-      generatedAnswer.trim().toUpperCase() === 'INSUFFICIENT_EVIDENCE' ||
-      relevantSources.length === 0;
+      relevantSources.length === 0 ||
+      generatedDraft?.review_state === 'Blank';
 
     const topScore = matches[0]?.score ?? 0;
+    const confidence = Math.round(
+      Math.max(
+        noGrounding ? 35 : 60,
+        Math.min(noGrounding ? 55 : 98, Number(generatedDraft?.confidence ?? (topScore || template.confidence))),
+      ),
+    );
+    const citations =
+      relevantSources.length > 0
+        ? ((generatedDraft?.citations ?? [])
+            .filter((label) => relevantSourceLabels.includes(label))
+            .slice(0, 3))
+        : [];
+
     generatedItems.push({
       id: crypto.randomUUID(),
       question: template.question,
-      answer: noGrounding ? '' : generatedAnswer.trim(),
-      confidence: noGrounding ? Math.min(template.confidence, 52) : Math.max(68, Math.min(98, topScore || template.confidence)),
+      answer: noGrounding ? '' : generatedAnswer,
+      confidence,
       retrievalScore: noGrounding ? Math.min(template.retrievalScore, 55) : Math.max(64, Math.min(99, topScore || template.retrievalScore)),
-      citations: relevantSources.length > 0
-        ? relevantSources.map((source) => `${source.type}: ${source.label}`)
-        : ['No strong source context was available for this answer.'],
+      citations:
+        citations.length > 0
+          ? citations
+          : relevantSources.length > 0
+            ? relevantSourceLabels.slice(0, 3)
+            : ['No strong source context was available for this answer.'],
       accepted: false,
       reviewState: noGrounding ? 'Blank' : 'Needs Review',
       sourceIds,

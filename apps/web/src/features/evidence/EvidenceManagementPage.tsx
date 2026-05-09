@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Database, PlayCircle, Plus, Search, Trash2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { ApiClient } from '../../shared/api/client';
@@ -247,6 +248,30 @@ export function EvidenceManagementPage() {
             </form>
           </div>
         </div>
+      </section>
+
+      <section className="grid gap-4 xl:grid-cols-3">
+        <Link className="panel-subtle transition hover:border-cyan-300/30" to="/assurance/evidence">
+          <div className="eyebrow">Assurance</div>
+          <div className="mt-2 text-lg font-semibold text-white">Open Evidence Explorer</div>
+          <div className="mt-2 text-sm leading-6 text-slate-400">
+            Move from raw collection jobs into normalized bundle previews, deterministic checks, and package-ready evidence detail.
+          </div>
+        </Link>
+        <Link className="panel-subtle transition hover:border-cyan-300/30" to="/assurance/tracker">
+          <div className="eyebrow">Assurance</div>
+          <div className="mt-2 text-lg font-semibold text-white">Open Tracker Workbench</div>
+          <div className="mt-2 text-sm leading-6 text-slate-400">
+            Import tracker rows, inspect diagnostics, and convert evidence-gap scenarios into assurance-backed 20x packages.
+          </div>
+        </Link>
+        <Link className="panel-subtle transition hover:border-cyan-300/30" to="/assurance/packages">
+          <div className="eyebrow">Assurance</div>
+          <div className="mt-2 text-lg font-semibold text-white">Open 20x Package Explorer</div>
+          <div className="mt-2 text-sm leading-6 text-slate-400">
+            Review generated packages, reconciliation checks, and report bundles after collection and evaluation complete.
+          </div>
+        </Link>
       </section>
 
       {notice && <div className="notice-success">{notice}</div>}

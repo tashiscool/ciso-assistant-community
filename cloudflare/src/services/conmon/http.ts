@@ -2,6 +2,8 @@ import type { WorkerRequestContext } from '../../router';
 import type { ConMonJobMessage } from '../../types/env';
 import { requireAnyPermission } from '../../authorization';
 import { json, methodNotAllowed, readJson } from '../../utils/http';
+import { startTenantWorkflowRun } from '../../utils/workflows';
+import { processConMonExecution } from '../../queues/conmon';
 
 type ConMonProfileRow = {
   id: string;
@@ -25,6 +27,17 @@ type ConMonExecutionRow = {
   status: string;
   status_detail: string | null;
   metrics_json: string | null;
+};
+
+type ConMonExecutionReplayRow = {
+  id: string;
+  profile_id: string;
+  activity_id: string;
+  status: string;
+  status_detail: string | null;
+  finished_at: string | null;
+  normalization_status: string;
+  manifest_key: string | null;
 };
 
 type CreateConMonProfileInput = {
@@ -150,6 +163,26 @@ export async function handleConMonRoutes(
         null,
       )
       .run();
+
+    try {
+      await startTenantWorkflowRun(ctx.env, access.tenantId, {
+        runId: executionId,
+        runType: 'conmon_execution',
+        module: 'ConMon',
+        title: `ConMon execution for profile ${id}`,
+        status: 'Queued',
+        folderId: null,
+        sourceRecordId: id,
+        route: '/conmon/executions',
+        detail: 'Queued continuous monitoring execution from the Worker API.',
+        metadata: {
+          profileId: id,
+          activityId: activity.id,
+        },
+      });
+    } catch (error) {
+      console.warn('Failed to publish ConMon workflow run', error);
+    }
 
     await ctx.env.QUEUE_CONMON_JOBS.send(payload);
 
@@ -378,6 +411,76 @@ export async function handleConMonRoutes(
         statusDetail: row.status_detail,
         metrics: row.metrics_json ? JSON.parse(row.metrics_json) : null,
       })),
+    });
+  }
+
+  if (resource === 'executions' && id && action === 'replay') {
+    if (ctx.request.method !== 'POST') {
+      return methodNotAllowed(['POST']);
+    }
+
+    if (ctx.env.APP_ENV !== 'development') {
+      return json({ error: 'not_found', path: segments.join('/') }, { status: 404 });
+    }
+
+    const access = await requireAnyPermission(
+      ctx,
+      ['run_conmon'],
+      'Replaying continuous monitoring executions requires ConMon execution permissions.',
+    );
+    if (access instanceof Response) {
+      return access;
+    }
+
+    const execution = await ctx.env.D1_MAIN.prepare(
+      `
+      SELECT id, profile_id, activity_id, status, status_detail, finished_at, normalization_status, manifest_key
+      FROM conmon_executions
+      WHERE tenant_id = ? AND id = ?
+      LIMIT 1
+      `,
+    )
+      .bind(access.tenantId, id)
+      .first<ConMonExecutionReplayRow>();
+
+    if (!execution) {
+      return json({ error: 'not_found', message: 'ConMon execution not found.' }, { status: 404 });
+    }
+
+    const result = await processConMonExecution(
+      {
+        type: 'conmon.execution.run',
+        tenantId: access.tenantId,
+        profileId: execution.profile_id,
+        activityId: execution.activity_id,
+        executionId: execution.id,
+        requestedBy: access.userId,
+      },
+      ctx.env,
+      'inline-replay',
+    );
+
+    const updated = await ctx.env.D1_MAIN.prepare(
+      `
+      SELECT id, profile_id, activity_id, status, status_detail, finished_at, normalization_status, manifest_key
+      FROM conmon_executions
+      WHERE tenant_id = ? AND id = ?
+      LIMIT 1
+      `,
+    )
+      .bind(access.tenantId, id)
+      .first<ConMonExecutionReplayRow>();
+
+    return json({
+      data: {
+        replayResult: result,
+        executionId: id,
+        status: updated?.status ?? execution.status,
+        statusDetail: updated?.status_detail ?? execution.status_detail,
+        normalizationStatus: updated?.normalization_status ?? execution.normalization_status,
+        manifestKey: updated?.manifest_key ?? execution.manifest_key,
+        finishedAt: updated?.finished_at ?? execution.finished_at,
+      },
     });
   }
 

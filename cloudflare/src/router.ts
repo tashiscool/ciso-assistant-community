@@ -7,6 +7,8 @@ import { handleOpsRoutes } from './services/ops/http';
 import { handleBuilderRoutes } from './services/builders/http';
 import { handleAiRoutes } from './services/ai/http';
 import { handleSetupRoutes } from './services/setup/http';
+import { handleAssuranceRoutes } from './services/assurance/http';
+import { handleAgentRoutes } from './services/agent/http';
 import { withAuth } from './auth';
 import type { AuthStrategy, EnvBindings } from './types/env';
 import { corsPreflight, json, withCors } from './utils/http';
@@ -82,6 +84,12 @@ export async function handleRequest(
         break;
       case 'setup':
         response = await handleSetupRoutes(rest, baseCtx);
+        break;
+      case 'assurance':
+        response = await handleAssuranceRoutes(rest, baseCtx);
+        break;
+      case 'agent':
+        response = await handleAgentRoutes(rest, baseCtx);
         break;
       default:
         response = json({ error: 'unknown_service', service }, { status: 404 });

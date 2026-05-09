@@ -53,6 +53,11 @@ const ROUTE_LABELS: Record<string, string> = {
   evidence: 'Evidence',
   sources: 'Sources',
   jobs: 'Jobs',
+  assurance: 'Assurance',
+  tracker: 'Tracker',
+  packages: 'Packages',
+  reviews: 'Reviews',
+  'agent-runs': 'Agent Runs',
 };
 
 function useBreadcrumbs() {

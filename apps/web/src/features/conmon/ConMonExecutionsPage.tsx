@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ApiClient } from '../../shared/api/client';
 import { useEdgeIdentity } from '../../shared/session/identity';
 
@@ -49,6 +50,23 @@ export function ConMonExecutionsPage() {
         <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
           Review recent monitoring runs, their outcomes, and the metrics they produced.
         </p>
+      </section>
+
+      <section className="grid gap-4 xl:grid-cols-2">
+        <Link className="panel-subtle transition hover:border-cyan-300/30" to="/assurance/evidence">
+          <div className="eyebrow">Assurance</div>
+          <div className="mt-2 text-lg font-semibold text-white">Inspect evidence-backed reasonableness</div>
+          <div className="mt-2 text-sm leading-6 text-slate-400">
+            Open the assurance explorer to compare recent ConMon posture with normalized evidence, gaps, and policy rollups.
+          </div>
+        </Link>
+        <Link className="panel-subtle transition hover:border-cyan-300/30" to="/assurance/packages">
+          <div className="eyebrow">Assurance</div>
+          <div className="mt-2 text-lg font-semibold text-white">Review package reconciliation</div>
+          <div className="mt-2 text-sm leading-6 text-slate-400">
+            Validate the latest package-level reconciliation results before downstream export or human review handoff.
+          </div>
+        </Link>
       </section>
 
       {error && <div className="notice-error">{error}</div>}

@@ -10,6 +10,12 @@ import { GeneralPage } from '../features/setup/GeneralPage';
 import { EvidenceSourcesPage } from '../features/evidence/EvidenceSourcesPage';
 import { EvidenceJobsPage } from '../features/evidence/EvidenceJobsPage';
 import { EvidenceManagementPage } from '../features/evidence/EvidenceManagementPage';
+import { AssuranceOverviewPage } from '../features/assurance/AssuranceOverviewPage';
+import { AssuranceEvidenceExplorerPage } from '../features/assurance/AssuranceEvidenceExplorerPage';
+import { TrackerWorkbenchPage } from '../features/assurance/TrackerWorkbenchPage';
+import { PackageExplorerPage } from '../features/assurance/PackageExplorerPage';
+import { ReviewQueuePage } from '../features/assurance/ReviewQueuePage';
+import { AgentRunInspectorPage } from '../features/assurance/AgentRunInspectorPage';
 import { EmailPage } from '../features/setup/EmailPage';
 import { MePage } from '../features/core/MePage';
 import { BootstrapAccessPanel } from '../features/core/BootstrapAccessPanel';
@@ -640,6 +646,12 @@ export function AppLayout() {
             <Route path="/features/evidence-management" element={<EvidenceManagementPage />} />
             <Route path="/evidence/sources" element={<EvidenceSourcesPage />} />
             <Route path="/evidence/jobs" element={<EvidenceJobsPage />} />
+            <Route path="/assurance" element={<AssuranceOverviewPage />} />
+            <Route path="/assurance/evidence" element={<AssuranceEvidenceExplorerPage />} />
+            <Route path="/assurance/tracker" element={<TrackerWorkbenchPage />} />
+            <Route path="/assurance/packages" element={<PackageExplorerPage />} />
+            <Route path="/assurance/reviews" element={<ReviewQueuePage />} />
+            <Route path="/assurance/agent-runs" element={<AgentRunInspectorPage />} />
             {legacyBridgeModels.map((model) => (
               <Route
                 key={model}

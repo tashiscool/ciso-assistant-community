@@ -1,5 +1,7 @@
 import type { WorkerRequestContext } from '../../router';
-import { generateTextWithAi, getAiRuntimeStatus } from './runtime';
+import { generateJsonWithAi, getAiRuntimeStatus } from './runtime';
+import { buildRegmlAttemptPrompts, buildRegmlPlanPrompts } from './promptPacks';
+import { buildTenantAiContext } from './tenantContext';
 import { json, methodNotAllowed, readJson } from '../../utils/http';
 
 type RegmlWorkspaceMode = 'SSP Author' | 'Auditor' | 'AI Generator';
@@ -81,20 +83,17 @@ type RegmlMessageRow = {
   created_at: string;
 };
 
-type CountRow = {
-  count: number | string;
+type RegmlPlanDraft = {
+  steps?: string[];
+  reviewer_note?: string;
 };
 
-type TenantSignals = {
-  organizationName: string;
-  primaryFramework: string;
-  policyCount: number;
-  questionnaireCount: number;
-  securityPlanCount: number;
-  evidenceCount: number;
-  controlCount: number;
-  componentCount: number;
-  issueThreshold: number | null;
+type RegmlAttemptDraft = {
+  summary?: string[];
+  before_items?: string[];
+  after_items?: string[];
+  note?: string;
+  warning?: string | null;
 };
 
 const regmlWorkspaceModes: RegmlWorkspaceMode[] = ['SSP Author', 'Auditor', 'AI Generator'];
@@ -194,75 +193,6 @@ function getStatusLabel(settings: RegmlSettingsRow) {
 function toBooleanFlag(value: number) {
   return value === 1;
 }
-
-async function getTenantSignals(env: WorkerRequestContext['env'], tenantId: string): Promise<TenantSignals> {
-  const [
-    folderRow,
-    frameworkRow,
-    policyCountRow,
-    questionnaireCountRow,
-    securityPlanCountRow,
-    evidenceCountRow,
-    controlCountRow,
-    componentCountRow,
-  ] = await Promise.all([
-    env.D1_MAIN.prepare(
-      `
-      SELECT name
-      FROM folders
-      WHERE tenant_id = ?
-      ORDER BY CASE WHEN content_type = 'domain' THEN 0 ELSE 1 END, created_at ASC
-      LIMIT 1
-      `,
-    )
-      .bind(tenantId)
-      .first<{ name: string | null }>(),
-    env.D1_MAIN.prepare(
-      `
-      SELECT name
-      FROM frameworks
-      WHERE tenant_id = ?
-      ORDER BY created_at ASC
-      LIMIT 1
-      `,
-    )
-      .bind(tenantId)
-      .first<{ name: string | null }>(),
-    env.D1_MAIN.prepare(`SELECT COUNT(*) AS count FROM libraries WHERE tenant_id = ?`)
-      .bind(tenantId)
-      .first<CountRow>(),
-    env.D1_MAIN.prepare(`SELECT COUNT(*) AS count FROM questionnaire_templates WHERE tenant_id = ?`)
-      .bind(tenantId)
-      .first<CountRow>(),
-    env.D1_MAIN.prepare(`SELECT COUNT(*) AS count FROM compliance_assessments WHERE tenant_id = ?`)
-      .bind(tenantId)
-      .first<CountRow>(),
-    env.D1_MAIN.prepare(`SELECT COUNT(*) AS count FROM evidence_artifacts WHERE tenant_id = ?`)
-      .bind(tenantId)
-      .first<CountRow>(),
-    env.D1_MAIN.prepare(`SELECT COUNT(*) AS count FROM applied_controls WHERE tenant_id = ?`)
-      .bind(tenantId)
-      .first<CountRow>(),
-    env.D1_MAIN.prepare(`SELECT COUNT(*) AS count FROM solutions WHERE tenant_id = ?`)
-      .bind(tenantId)
-      .first<CountRow>(),
-  ]);
-
-  const securityPlanCount = Number(securityPlanCountRow?.count ?? 0);
-
-  return {
-    organizationName: folderRow?.name?.trim() || 'Demo Tenant',
-    primaryFramework: frameworkRow?.name?.trim() || 'FedRAMP Moderate',
-    policyCount: Number(policyCountRow?.count ?? 0),
-    questionnaireCount: Number(questionnaireCountRow?.count ?? 0),
-    securityPlanCount,
-    evidenceCount: Number(evidenceCountRow?.count ?? 0),
-    controlCount: Number(controlCountRow?.count ?? 0),
-    componentCount: Number(componentCountRow?.count ?? 0),
-    issueThreshold: securityPlanCount > 0 ? 72 : null,
-  };
-}
-
 async function ensureRegmlSettings(
   env: WorkerRequestContext['env'],
   tenantId: string,
@@ -472,26 +402,29 @@ async function buildRegmlPromptPlanWithAi(
   env: WorkerRequestContext['env'],
   mode: RegmlWorkspaceMode,
   prompt: string,
-  signals: TenantSignals,
+  workspaceContext: Awaited<ReturnType<typeof buildTenantAiContext>>,
+  issueThreshold: number | null,
 ) {
   const fallbackPlan = buildRegmlPromptPlan(mode, prompt);
-  const generated = await generateTextWithAi(env, {
-    systemPrompt:
-      'You are RegML, a compliance drafting assistant. Return exactly three short planning bullets with no preamble.',
-    userPrompt: [
-      `Workspace mode: ${mode}`,
-      `Prompt: ${prompt}`,
-      `Organization: ${signals.organizationName}`,
-      `Primary framework: ${signals.primaryFramework}`,
-      `Available counts: policies=${signals.policyCount}, questionnaires=${signals.questionnaireCount}, securityPlans=${signals.securityPlanCount}, evidence=${signals.evidenceCount}, controls=${signals.controlCount}, components=${signals.componentCount}`,
-    ].join('\n'),
-    maxTokens: 320,
-    temperature: 0.15,
+  const prompts = buildRegmlPlanPrompts({
+    mode,
+    prompt,
+    context: workspaceContext,
+    issueThreshold,
+  });
+  const generated = await generateJsonWithAi<RegmlPlanDraft>(env, {
+    systemPrompt: prompts.systemPrompt,
+    userPrompt: prompts.userPrompt,
+    maxTokens: 360,
+    temperature: 0.1,
   });
 
   return {
     title: fallbackPlan.title,
-    steps: extractBulletLines(generated, fallbackPlan.steps),
+    steps:
+      Array.isArray(generated?.steps) && generated.steps.length >= 3
+        ? generated.steps.map((step) => String(step).trim()).filter(Boolean).slice(0, 3)
+        : fallbackPlan.steps,
   };
 }
 
@@ -605,55 +538,43 @@ async function buildRegmlAttemptFromPromptWithAi(
   prompt: string,
   attemptIndex: number,
   creditsCost: number,
-  signals: TenantSignals,
+  workspaceContext: Awaited<ReturnType<typeof buildTenantAiContext>>,
+  issueThreshold: number | null,
 ) {
   const fallbackAttempt = buildRegmlAttemptFromPrompt(mode, prompt, attemptIndex, creditsCost);
-  const sharedContext = [
-    `Workspace mode: ${mode}`,
-    `Prompt: ${prompt}`,
-    `Organization: ${signals.organizationName}`,
-    `Primary framework: ${signals.primaryFramework}`,
-    `Available counts: policies=${signals.policyCount}, questionnaires=${signals.questionnaireCount}, securityPlans=${signals.securityPlanCount}, evidence=${signals.evidenceCount}, controls=${signals.controlCount}, components=${signals.componentCount}`,
-    `Issue threshold: ${signals.issueThreshold ?? 'n/a'}`,
-  ].join('\n');
-
-  const [summaryText, beforeText, afterText, noteText] = await Promise.all([
-    generateTextWithAi(env, {
-      systemPrompt:
-        'You are RegML. Return exactly three concise bullets describing what this run produced.',
-      userPrompt: sharedContext,
-      maxTokens: 260,
-      temperature: 0.2,
-    }),
-    generateTextWithAi(env, {
-      systemPrompt:
-        'You are RegML. Return exactly three concise bullets describing the problems before this run.',
-      userPrompt: sharedContext,
-      maxTokens: 260,
-      temperature: 0.2,
-    }),
-    generateTextWithAi(env, {
-      systemPrompt:
-        'You are RegML. Return exactly three concise bullets describing the improved state after this run.',
-      userPrompt: sharedContext,
-      maxTokens: 260,
-      temperature: 0.2,
-    }),
-    generateTextWithAi(env, {
-      systemPrompt:
-        'You are RegML. Return one short sentence describing the result of this run to the user.',
-      userPrompt: sharedContext,
-      maxTokens: 120,
-      temperature: 0.2,
-    }),
-  ]);
+  const prompts = buildRegmlAttemptPrompts({
+    mode,
+    prompt,
+    context: workspaceContext,
+    issueThreshold,
+    creditsCost,
+  });
+  const generated = await generateJsonWithAi<RegmlAttemptDraft>(env, {
+    systemPrompt: prompts.systemPrompt,
+    userPrompt: prompts.userPrompt,
+    maxTokens: 520,
+    temperature: 0.15,
+  });
 
   return {
     ...fallbackAttempt,
-    summary: extractBulletLines(summaryText, fallbackAttempt.summary),
-    beforeItems: extractBulletLines(beforeText, fallbackAttempt.beforeItems),
-    afterItems: extractBulletLines(afterText, fallbackAttempt.afterItems),
-    note: noteText?.trim() || fallbackAttempt.note,
+    summary:
+      Array.isArray(generated?.summary) && generated.summary.length >= 3
+        ? generated.summary.map((item) => String(item).trim()).filter(Boolean).slice(0, 3)
+        : fallbackAttempt.summary,
+    beforeItems:
+      Array.isArray(generated?.before_items) && generated.before_items.length >= 3
+        ? generated.before_items.map((item) => String(item).trim()).filter(Boolean).slice(0, 3)
+        : fallbackAttempt.beforeItems,
+    afterItems:
+      Array.isArray(generated?.after_items) && generated.after_items.length >= 3
+        ? generated.after_items.map((item) => String(item).trim()).filter(Boolean).slice(0, 3)
+        : fallbackAttempt.afterItems,
+    note: generated?.note?.trim() || fallbackAttempt.note,
+    warning:
+      typeof generated?.warning === 'string'
+        ? generated.warning.trim() || null
+        : fallbackAttempt.warning,
   };
 }
 
@@ -783,7 +704,7 @@ async function buildSession(
   env: WorkerRequestContext['env'],
   tenantId: string,
   mode: RegmlWorkspaceMode,
-  signals: TenantSignals,
+  workspaceContext: Awaited<ReturnType<typeof buildTenantAiContext>>,
 ) {
   const [sessionRow, attemptRows, messageRows] = await Promise.all([
     getSessionRow(env, tenantId, mode),
@@ -796,18 +717,18 @@ async function buildSession(
   }
 
   const sourceCoverage = [
-    `Policies (${signals.policyCount})`,
-    `Questionnaires (${signals.questionnaireCount})`,
-    `Security Plans (${signals.securityPlanCount})`,
-    `Evidence (${signals.evidenceCount})`,
+    `Policies (${workspaceContext.metrics.policies})`,
+    `Questionnaires (${workspaceContext.metrics.questionnaires})`,
+    `Security Plans (${workspaceContext.metrics.securityPlans})`,
+    `Evidence (${workspaceContext.metrics.evidenceArtifacts})`,
   ];
 
   if (mode !== 'SSP Author') {
-    sourceCoverage.push(`Controls (${signals.controlCount})`);
+    sourceCoverage.push(`Controls (${workspaceContext.metrics.controls})`);
   }
 
   if (mode === 'AI Generator') {
-    sourceCoverage.push(`Components (${signals.componentCount})`);
+    sourceCoverage.push(`Components (${workspaceContext.metrics.components})`);
   }
 
   return {
@@ -826,10 +747,10 @@ async function buildSession(
     messages: messageRows.map(toMessage),
     attempts: attemptRows.map(toAttempt),
     context: {
-      organizationName: signals.organizationName,
+      organizationName: workspaceContext.organizationName,
       workspaceLabel: mode,
-      primaryFramework: signals.primaryFramework,
-      issueThreshold: mode === 'Auditor' ? signals.issueThreshold : null,
+      primaryFramework: workspaceContext.primaryFramework,
+      issueThreshold: mode === 'Auditor' && workspaceContext.metrics.securityPlans > 0 ? 72 : null,
       sourceCoverage,
       modeFocus: regmlModeFocus[mode],
     },
@@ -927,13 +848,13 @@ async function buildRegmlWorkspace(
   const settings = await ensureRegmlSettings(env, tenantId, userId);
   await ensureRegmlSessions(env, tenantId);
 
-  const [signals, runtime] = await Promise.all([
-    getTenantSignals(env, tenantId),
+  const [workspaceContext, runtime] = await Promise.all([
+    buildTenantAiContext(env, tenantId),
     getAiRuntimeStatus(env),
   ]);
   const sessions = Object.fromEntries(
     await Promise.all(
-      regmlWorkspaceModes.map(async (mode) => [mode, await buildSession(env, tenantId, mode, signals)]),
+      regmlWorkspaceModes.map(async (mode) => [mode, await buildSession(env, tenantId, mode, workspaceContext)]),
     ),
   );
 
@@ -960,13 +881,13 @@ async function buildRegmlWorkspace(
     },
     health: {
       environmentHealthy: runtime.environmentHealthy,
-      policiesCount: signals.policyCount,
-      questionnairesCount: signals.questionnaireCount,
-      securityPlansCount: signals.securityPlanCount,
-      evidenceCount: signals.evidenceCount,
-      controlsCount: signals.controlCount,
-      componentsCount: signals.componentCount,
-      issueThreshold: signals.issueThreshold,
+      policiesCount: workspaceContext.metrics.policies,
+      questionnairesCount: workspaceContext.metrics.questionnaires,
+      securityPlansCount: workspaceContext.metrics.securityPlans,
+      evidenceCount: workspaceContext.metrics.evidenceArtifacts,
+      controlsCount: workspaceContext.metrics.controls,
+      componentsCount: workspaceContext.metrics.components,
+      issueThreshold: workspaceContext.metrics.securityPlans > 0 ? 72 : null,
       vectorDatabaseDeployed: runtime.vectorizeAvailable,
     },
     deploymentGuidance: {
@@ -1067,12 +988,13 @@ async function runRegmlPrompt(
   await insertMessage(ctx.env, tenantId, session.id, mode, 'user', 'text', { content: prompt }, timestamp);
 
   let selectedAttemptId: string | null = session.selected_attempt_id;
-  const signals = await getTenantSignals(ctx.env, tenantId);
+  const workspaceContext = await buildTenantAiContext(ctx.env, tenantId);
+  const issueThreshold = workspaceContext.metrics.securityPlans > 0 ? 72 : null;
   const runtime = await getAiRuntimeStatus(ctx.env);
 
   if (promptMode === 'Plan') {
     const plan = runtime.textGenerationAvailable
-      ? await buildRegmlPromptPlanWithAi(ctx.env, mode, prompt, signals)
+      ? await buildRegmlPromptPlanWithAi(ctx.env, mode, prompt, workspaceContext, issueThreshold)
       : buildRegmlPromptPlan(mode, prompt);
     await insertMessage(ctx.env, tenantId, session.id, mode, 'assistant', 'plan', plan, timestamp);
     await insertMessage(
@@ -1094,7 +1016,8 @@ async function runRegmlPrompt(
           prompt,
           existingAttempts.length,
           creditsCost,
-          signals,
+          workspaceContext,
+          issueThreshold,
         )
       : buildRegmlAttemptFromPrompt(mode, prompt, existingAttempts.length, creditsCost);
     selectedAttemptId = crypto.randomUUID();
@@ -1191,7 +1114,7 @@ async function runRegmlPrompt(
 
   return json({
     data: {
-      session: await buildSession(ctx.env, tenantId, mode, signals),
+      session: await buildSession(ctx.env, tenantId, mode, workspaceContext),
     },
   });
 }
@@ -1266,11 +1189,11 @@ async function applyRegmlAttempt(
     },
     timestamp,
   );
+  const workspaceContext = await buildTenantAiContext(ctx.env, tenantId);
 
-  const signals = await getTenantSignals(ctx.env, tenantId);
   return json({
     data: {
-      session: await buildSession(ctx.env, tenantId, mode, signals),
+      session: await buildSession(ctx.env, tenantId, mode, workspaceContext),
     },
   });
 }
@@ -1320,8 +1243,8 @@ export async function handleRegmlRoutes(
     }
 
     if (!subresource && ctx.request.method === 'GET') {
-      const signals = await getTenantSignals(ctx.env, tenantId);
-      const session = await buildSession(ctx.env, tenantId, mode, signals);
+      const workspaceContext = await buildTenantAiContext(ctx.env, tenantId);
+      const session = await buildSession(ctx.env, tenantId, mode, workspaceContext);
       return session
         ? json({ data: { session } })
         : json({ error: 'regml_workspace_not_found' }, { status: 404 });
