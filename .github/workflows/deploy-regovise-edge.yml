@@ -20,7 +20,7 @@ on:
         type: boolean
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
   CLOUDFLARE_WORKER_ENV: production
   REGOVISE_PROD_BASE_URL: https://regovise.com
 
@@ -29,9 +29,9 @@ jobs:
     name: Typecheck and Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -71,9 +71,9 @@ jobs:
       group: regovise-cloudflare-deploy
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -139,4 +139,13 @@ jobs:
           PROD_SMOKE_TENANT_ID: ${{ secrets.PROD_SMOKE_TENANT_ID }}
           PROD_SMOKE_USER_ID: ${{ secrets.PROD_SMOKE_USER_ID }}
         run: npm run smoke:production
+        working-directory: cloudflare
+
+      - name: Post-deploy observable parity verification
+        if: github.event_name != 'workflow_dispatch' || inputs.dry_run != true
+        env:
+          REGOVISE_VERIFY_BASE_URL: ${{ env.REGOVISE_PROD_BASE_URL }}
+          REGOVISE_VERIFY_TENANT_ID: ${{ secrets.PROD_SMOKE_TENANT_ID }}
+          REGOVISE_VERIFY_USER_ID: ${{ secrets.PROD_SMOKE_USER_ID }}
+        run: npm run verify:observable-production
         working-directory: cloudflare

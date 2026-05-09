@@ -27,12 +27,17 @@ type TopbarProps = {
 
 /** Map route segments to human-readable breadcrumb labels. */
 const ROUTE_LABELS: Record<string, string> = {
-  '': 'Dashboard',
+  '': 'Home',
+  program: 'Program',
+  'quick-start': 'Guided Setup',
+  analytics: 'Analytics',
+  search: 'Search',
+  setup: 'Setup',
   workspace: 'Workspace',
   me: 'My Access',
   domains: 'Domains',
   team: 'Team',
-  access: 'Access Control',
+  access: 'Permissions',
   libraries: 'Libraries',
   frameworks: 'Frameworks',
   assessments: 'Assessments',
@@ -43,7 +48,7 @@ const ROUTE_LABELS: Record<string, string> = {
   reports: 'Reports',
   chat: 'Chat',
   imports: 'Imports',
-  portal: 'Auditee Portal',
+  portal: 'External Portal',
   'advanced-risk': 'Advanced Risk',
   ebios: 'EBIOS RM',
   quantitative: 'Quantitative',
@@ -51,6 +56,7 @@ const ROUTE_LABELS: Record<string, string> = {
   profiles: 'Profiles',
   executions: 'Runs',
   evidence: 'Evidence',
+  'evidence-management': 'Evidence Workspace',
   sources: 'Sources',
   jobs: 'Jobs',
   assurance: 'Assurance',
@@ -65,7 +71,7 @@ function useBreadcrumbs() {
   const segments = pathname.split('/').filter(Boolean);
 
   if (segments.length === 0) {
-    return [{ label: 'Dashboard', href: '/' }];
+    return [{ label: 'Home', href: '/' }];
   }
 
   return segments.map((seg, i) => ({

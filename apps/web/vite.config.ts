@@ -1,6 +1,72 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 
+function manualChunks(id: string): string | undefined {
+  const normalized = id.replace(/\\/g, '/');
+
+  if (normalized.includes('/node_modules/')) {
+    if (
+      normalized.includes('/react/') ||
+      normalized.includes('/react-dom/') ||
+      normalized.includes('/react-router-dom/')
+    ) {
+      return 'react-vendor';
+    }
+    if (normalized.includes('/@radix-ui/')) {
+      return 'radix-ui';
+    }
+    if (normalized.includes('/lucide-react/')) {
+      return 'lucide';
+    }
+    return undefined;
+  }
+
+  if (normalized.includes('/apps/web/src/features/assurance/')) {
+    return 'assurance-workbench';
+  }
+  if (
+    normalized.includes('/apps/web/src/features/evidence/') ||
+    normalized.includes('/apps/web/src/features/conmon/')
+  ) {
+    return 'evidence-operations';
+  }
+  if (normalized.includes('/apps/web/src/features/advanced-risk/')) {
+    return 'advanced-risk';
+  }
+  if (
+    normalized.includes('/apps/web/src/features/builders/') ||
+    normalized.includes('/apps/web/src/features/ai/')
+  ) {
+    return 'builders-ai';
+  }
+  if (
+    normalized.includes('/apps/web/src/features/ops/') ||
+    normalized.includes('/apps/web/src/features/parity/')
+  ) {
+    return 'ops-surfaces';
+  }
+  if (
+    normalized.includes('/apps/web/src/features/assessments/') ||
+    normalized.includes('/apps/web/src/features/risk/') ||
+    normalized.includes('/apps/web/src/features/tprm/') ||
+    normalized.includes('/apps/web/src/features/privacy/') ||
+    normalized.includes('/apps/web/src/features/resilience/') ||
+    normalized.includes('/apps/web/src/features/reports/')
+  ) {
+    return 'program-operations';
+  }
+  if (
+    normalized.includes('/apps/web/src/features/integrations/') ||
+    normalized.includes('/apps/web/src/features/imports/') ||
+    normalized.includes('/apps/web/src/features/portal/') ||
+    normalized.includes('/apps/web/src/features/chat/')
+  ) {
+    return 'workspace-utilities';
+  }
+
+  return undefined;
+}
+
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -9,27 +75,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'radix-ui': [
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-select',
-            '@radix-ui/react-tabs',
-            '@radix-ui/react-tooltip',
-            '@radix-ui/react-label',
-            '@radix-ui/react-progress',
-            '@radix-ui/react-separator',
-            '@radix-ui/react-scroll-area',
-            '@radix-ui/react-avatar',
-            '@radix-ui/react-checkbox',
-            '@radix-ui/react-popover',
-            '@radix-ui/react-switch',
-            '@radix-ui/react-accordion',
-            '@radix-ui/react-slot',
-          ],
-          'lucide': ['lucide-react'],
-        },
+        manualChunks,
       },
     },
   },

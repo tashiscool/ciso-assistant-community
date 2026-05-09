@@ -28,11 +28,11 @@ export function SearchControlRoomPage() {
   }, [overview, query]);
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading canonical search...</div>;
+    return <div className="panel p-6 text-sm text-slate-300">Loading workspace search...</div>;
   }
 
   if (error || !overview) {
-    return <div className="notice-error">{error ?? 'Canonical search could not be loaded.'}</div>;
+    return <div className="notice-error">{error ?? 'Workspace search could not be loaded.'}</div>;
   }
 
   return (
@@ -41,18 +41,18 @@ export function SearchControlRoomPage() {
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-cyan-400/0 via-cyan-300/60 to-cyan-400/0" />
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
-            <div className="eyebrow">Canonical Discovery</div>
+            <div className="eyebrow">Workspace Search</div>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Search</h1>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-              Search now lands on a Worker-backed index of canonical workspace records instead of a generic parity bridge.
+              Search across the current workspace so teams can move quickly between program, evidence, and assurance records without guessing where something lives.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Link className="button-secondary" to="/libraries">
-              Open libraries
+            <Link className="button-secondary" to="/program">
+              Open program workspace
             </Link>
-            <Link className="button-secondary" to="/frameworks">
-              Open frameworks
+            <Link className="button-secondary" to="/assurance">
+              Open assurance
             </Link>
             <button className="button-primary" onClick={() => void refresh()} type="button">
               <RefreshCw className="mr-2 h-4 w-4" />
@@ -67,18 +67,18 @@ export function SearchControlRoomPage() {
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300">
             <Search className="h-5 w-5" />
           </div>
-          <div>
-            <h2 className="text-lg font-semibold text-white">Search index</h2>
-            <p className="text-sm text-slate-400">Filter by title, section, subtitle, or canonical keywords.</p>
+            <div>
+              <h2 className="text-lg font-semibold text-white">Search index</h2>
+              <p className="text-sm text-slate-400">Filter by title, section, subtitle, or workspace keywords.</p>
+            </div>
           </div>
-        </div>
         <div className="mt-5">
           <label className="block">
             <span className="sr-only">Search canonical records</span>
             <input
               className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/40"
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search frameworks, assets, studies, assignments, and more..."
+              placeholder="Search frameworks, assessments, evidence, studies, assignments, and more..."
               type="search"
               value={query}
             />
@@ -89,7 +89,7 @@ export function SearchControlRoomPage() {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {results.length === 0 ? (
           <div className="panel-subtle col-span-full text-sm text-slate-400">
-            No canonical records matched that query.
+            No workspace records matched that query.
           </div>
         ) : (
           results.map((entry) => (
