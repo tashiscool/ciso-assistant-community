@@ -3,6 +3,7 @@ import type { WorkerRequestContext } from '../../router';
 import { getEmailRuntimeSummary } from '../../email';
 import type { EnvBindings } from '../../types/env';
 import { json, methodNotAllowed, readJson } from '../../utils/http';
+import { isRunnableOidcConfig, normalizeAuthProtocol, type OidcConfigRecord } from '../core/oidc';
 
 type SetupTagRow = {
   id: string;
@@ -59,12 +60,21 @@ type SetupModulesFeaturesRow = {
 type SetupSsoConfigRow = {
   tenant_id: string;
   provider_type: string;
+  auth_protocol: string;
   domain_hint: string | null;
   client_id: string | null;
   callback_url: string | null;
   metadata_url: string | null;
   group_sync_enabled: number;
   login_enforced: number;
+  roles_claim: string | null;
+  email_claim: string | null;
+  given_name_claim: string | null;
+  family_name_claim: string | null;
+  username_claim: string | null;
+  button_label: string | null;
+  allow_local_fallback: number;
+  jit_provisioning_enabled: number;
   status: string;
   created_at: string;
   updated_at: string;
@@ -200,13 +210,22 @@ type UpdateModulesFeaturesPayload = {
 };
 
 type UpdateSsoPayload = {
+  authProtocol?: string;
   providerType?: string;
   domainHint?: string | null;
   clientId?: string | null;
   callbackUrl?: string | null;
   metadataUrl?: string | null;
+  rolesClaim?: string | null;
+  emailClaim?: string | null;
+  givenNameClaim?: string | null;
+  familyNameClaim?: string | null;
+  usernameClaim?: string | null;
+  buttonLabel?: string | null;
   groupSyncEnabled?: boolean;
   loginEnforced?: boolean;
+  allowLocalFallback?: boolean;
+  jitProvisioningEnabled?: boolean;
   status?: string;
 };
 
@@ -476,6 +495,84 @@ function asJson<T>(value: string | null | undefined, fallback: T): T {
   } catch {
     return fallback;
   }
+}
+
+function defaultSsoCallbackUrl(env: EnvBindings): string {
+  return `${env.APP_ORIGIN?.trim() || 'https://regovise.com'}/auth/callback`;
+}
+
+function toSsoRuntimeConfig(
+  env: EnvBindings,
+  tenantId: string,
+  row: SetupSsoConfigRow | null | undefined,
+): OidcConfigRecord | null {
+  if (!row) {
+    return null;
+  }
+
+  return {
+    tenantId,
+    tenantSlug: '',
+    tenantName: '',
+    providerType: row.provider_type?.trim() || null,
+    authProtocol: normalizeAuthProtocol(row.auth_protocol ?? row.provider_type),
+    clientId: row.client_id?.trim() || null,
+    callbackUrl: row.callback_url?.trim() || defaultSsoCallbackUrl(env),
+    metadataUrl: row.metadata_url?.trim() || null,
+    domainHint: row.domain_hint?.trim() || null,
+    buttonLabel: row.button_label?.trim() || null,
+    rolesClaim: row.roles_claim?.trim() || 'roles',
+    emailClaim: row.email_claim?.trim() || 'email',
+    givenNameClaim: row.given_name_claim?.trim() || 'given_name',
+    familyNameClaim: row.family_name_claim?.trim() || 'family_name',
+    usernameClaim: row.username_claim?.trim() || 'preferred_username',
+    groupSyncEnabled: row.group_sync_enabled === 1,
+    loginEnforced: row.login_enforced === 1,
+    allowLocalFallback: row.allow_local_fallback !== 0,
+    jitProvisioningEnabled: row.jit_provisioning_enabled === 1,
+  };
+}
+
+function getSsoRuntimeStatus(config: OidcConfigRecord | null) {
+  if (!config) {
+    return {
+      ready: false,
+      active: false,
+      message: 'No SSO provider is configured for this workspace yet.',
+    };
+  }
+
+  if (config.authProtocol === 'saml') {
+    return {
+      ready: false,
+      active: false,
+      message: 'SAML metadata can be documented here, but interactive SAML sign-in is not active in this worker yet.',
+    };
+  }
+
+  if (config.authProtocol === 'cloudflare-access') {
+    return {
+      ready: false,
+      active: false,
+      message: 'Cloudflare Access can protect the front door, but it is not the workspace session provider.',
+    };
+  }
+
+  if (!isRunnableOidcConfig(config)) {
+    return {
+      ready: false,
+      active: false,
+      message: 'OIDC is selected, but discovery, client id, or callback settings are still incomplete.',
+    };
+  }
+
+  return {
+    ready: true,
+    active: true,
+    message: config.loginEnforced
+      ? 'OIDC is active and tenant sign-in is enforced through the configured identity provider.'
+      : 'OIDC is active and available for tenant sign-in alongside recovery paths.',
+  };
 }
 
 function requireTenant(ctx: WorkerRequestContext): string | Response {
@@ -866,22 +963,31 @@ async function ensureSeedSsoConfig(env: EnvBindings, tenantId: string, userId: s
     `
     INSERT INTO setup_sso_configs (
       tenant_id,
+      auth_protocol,
       provider_type,
       domain_hint,
       client_id,
       callback_url,
       metadata_url,
+      roles_claim,
+      email_claim,
+      given_name_claim,
+      family_name_claim,
+      username_claim,
+      button_label,
       group_sync_enabled,
       login_enforced,
+      allow_local_fallback,
+      jit_provisioning_enabled,
       status,
       created_by_user_id,
       updated_by_user_id,
       created_at,
       updated_at
-    ) VALUES (?, 'Google Workspace', 'corp.example.com', 'google-client-demo', 'https://regovise.com/auth/callback', 'https://accounts.google.com/.well-known/openid-configuration', 1, 0, 'Review', ?, ?, ?, ?)
+    ) VALUES (?, 'oidc', 'Google Workspace', 'corp.example.com', 'google-client-demo', ?, 'https://accounts.google.com/.well-known/openid-configuration', 'roles', 'email', 'given_name', 'family_name', 'preferred_username', 'Continue with Google', 1, 0, 1, 0, 'Review', ?, ?, ?, ?)
     `,
   )
-    .bind(tenantId, userId, userId, now, now)
+    .bind(tenantId, defaultSsoCallbackUrl(env), userId, userId, now, now)
     .run();
 }
 
@@ -1561,7 +1667,7 @@ async function buildModulesFeaturesSnapshot(env: EnvBindings, tenantId: string) 
       .first<RegmlSettingsStateRow>(),
     env.D1_MAIN.prepare(
       `
-      SELECT tenant_id, provider_type, domain_hint, client_id, callback_url, metadata_url, group_sync_enabled, login_enforced, status, created_at, updated_at
+      SELECT tenant_id, provider_type, auth_protocol, domain_hint, client_id, callback_url, metadata_url, roles_claim, email_claim, given_name_claim, family_name_claim, username_claim, button_label, group_sync_enabled, login_enforced, allow_local_fallback, jit_provisioning_enabled, status, created_at, updated_at
       FROM setup_sso_configs
       WHERE tenant_id = ?
       LIMIT 1
@@ -1587,7 +1693,7 @@ async function buildModulesFeaturesSnapshot(env: EnvBindings, tenantId: string) 
   );
   const regmlEnabled = regmlRow ? regmlRow.enabled === 1 : modulesRow?.regml_enabled === 1;
   const regmlTermsAccepted = regmlRow ? regmlRow.terms_accepted === 1 : modulesRow?.regml_terms_accepted === 1;
-  const ssoConfigured = Boolean(ssoRow?.client_id && ssoRow?.callback_url);
+  const ssoConfigured = isRunnableOidcConfig(toSsoRuntimeConfig(env, tenantId, ssoRow));
   const mfaMethods = asJson<Record<string, boolean>>(mfaRow?.methods_json, {});
   const mfaConfigured = Object.values(mfaMethods).some(Boolean);
 
@@ -1625,7 +1731,7 @@ async function buildModulesFeaturesSnapshot(env: EnvBindings, tenantId: string) 
 async function buildSsoSnapshot(env: EnvBindings, tenantId: string) {
   const row = await env.D1_MAIN.prepare(
     `
-    SELECT tenant_id, provider_type, domain_hint, client_id, callback_url, metadata_url, group_sync_enabled, login_enforced, status, created_at, updated_at
+    SELECT tenant_id, provider_type, auth_protocol, domain_hint, client_id, callback_url, metadata_url, roles_claim, email_claim, given_name_claim, family_name_claim, username_claim, button_label, group_sync_enabled, login_enforced, allow_local_fallback, jit_provisioning_enabled, status, created_at, updated_at
     FROM setup_sso_configs
     WHERE tenant_id = ?
     LIMIT 1
@@ -1634,47 +1740,62 @@ async function buildSsoSnapshot(env: EnvBindings, tenantId: string) {
     .bind(tenantId)
     .first<SetupSsoConfigRow>();
 
+  const config = toSsoRuntimeConfig(env, tenantId, row);
+  const runtime = getSsoRuntimeStatus(config);
+
   const providerCards = [
     {
-      name: 'Google Workspace',
-      description: 'OIDC-backed Google Workspace authentication and group sync.',
-      ready: row?.provider_type === 'Google Workspace' && Boolean(row?.client_id),
+      name: 'Microsoft Entra / Generic OIDC',
+      description: 'Public-client OIDC with PKCE for Entra, Okta, Google, and similar identity providers.',
+      ready: config?.authProtocol === 'oidc' && runtime.ready,
     },
     {
       name: 'SAML / Enterprise IdP',
-      description: 'Federated sign-on for enterprise identity providers and directory sync.',
-      ready: row?.provider_type === 'SAML / Enterprise IdP' && Boolean(row?.metadata_url),
+      description: 'Metadata can be captured for planning, but interactive SAML sign-in is not active in this worker yet.',
+      ready: config?.authProtocol === 'saml' && Boolean(config.metadataUrl),
     },
     {
       name: 'Cloudflare Access',
-      description: 'Zero Trust front-door integration for administrative or internal surfaces.',
-      ready: row?.provider_type === 'Cloudflare Access',
+      description: 'Zero Trust front-door protection for admin or internal surfaces, separate from workspace sessions.',
+      ready: config?.authProtocol === 'cloudflare-access',
     },
   ];
 
   return {
     metrics: {
-      configuredProviders: providerCards.filter((provider) => provider.ready).length,
-      loginEnforced: row?.login_enforced === 1,
-      groupSyncEnabled: row?.group_sync_enabled === 1,
-      callbackConfigured: Boolean(row?.callback_url),
+      configuredProviders: config?.providerType ? 1 : 0,
+      loginEnforced: Boolean(config?.loginEnforced && runtime.ready),
+      groupSyncEnabled: config?.groupSyncEnabled === true,
+      callbackConfigured: Boolean(config?.callbackUrl),
     },
     config: {
-      providerType: row?.provider_type ?? 'Google Workspace',
-      domainHint: row?.domain_hint ?? '',
-      clientId: row?.client_id ?? '',
-      callbackUrl: row?.callback_url ?? 'https://regovise.com/auth/callback',
-      metadataUrl: row?.metadata_url ?? '',
-      groupSyncEnabled: row?.group_sync_enabled === 1,
-      loginEnforced: row?.login_enforced === 1,
+      authProtocol: config?.authProtocol ?? 'oidc',
+      providerType: config?.providerType ?? 'Generic OIDC',
+      domainHint: config?.domainHint ?? '',
+      clientId: config?.clientId ?? '',
+      callbackUrl: config?.callbackUrl ?? defaultSsoCallbackUrl(env),
+      metadataUrl: config?.metadataUrl ?? '',
+      rolesClaim: config?.rolesClaim ?? 'roles',
+      emailClaim: config?.emailClaim ?? 'email',
+      givenNameClaim: config?.givenNameClaim ?? 'given_name',
+      familyNameClaim: config?.familyNameClaim ?? 'family_name',
+      usernameClaim: config?.usernameClaim ?? 'preferred_username',
+      buttonLabel: config?.buttonLabel ?? '',
+      groupSyncEnabled: config?.groupSyncEnabled === true,
+      loginEnforced: Boolean(config?.loginEnforced && runtime.ready),
+      allowLocalFallback: config?.allowLocalFallback !== false,
+      jitProvisioningEnabled: config?.jitProvisioningEnabled === true,
       status: row?.status ?? 'Review',
+      runtimeReady: runtime.ready,
+      runtimeMessage: runtime.message,
       updatedAt: row?.updated_at ?? nowIso(),
     },
     providerCards,
     checklist: [
-      'Validate redirect and callback URLs against the production domain.',
-      'Enable group synchronization only after role mappings are ready.',
-      'Test login and logout flows with a non-admin account before enforcing tenant-wide access.',
+      'Register the callback URI on the provider exactly as shown here before testing sign-in.',
+      'Use a public-client OIDC app with PKCE. No client secret is required for the current worker flow.',
+      'Map the roles claim to existing Regovise role names before enabling JIT provisioning or group sync.',
+      'Test sign-in and sign-out with a non-admin account before enforcing tenant-wide access.',
     ],
   };
 }
@@ -2518,7 +2639,7 @@ export async function handleSetupRoutes(
 
       const current = await ctx.env.D1_MAIN.prepare(
         `
-        SELECT tenant_id, provider_type, domain_hint, client_id, callback_url, metadata_url, group_sync_enabled, login_enforced, status, created_at, updated_at
+        SELECT tenant_id, provider_type, auth_protocol, domain_hint, client_id, callback_url, metadata_url, roles_claim, email_claim, given_name_claim, family_name_claim, username_claim, button_label, group_sync_enabled, login_enforced, allow_local_fallback, jit_provisioning_enabled, status, created_at, updated_at
         FROM setup_sso_configs
         WHERE tenant_id = ?
         LIMIT 1
@@ -2527,13 +2648,23 @@ export async function handleSetupRoutes(
         .bind(tenantId)
         .first<SetupSsoConfigRow>();
       const body = await readJson<UpdateSsoPayload>(ctx.request);
-      const providerType = body.providerType?.trim() || current?.provider_type || 'Google Workspace';
+      const authProtocol = normalizeAuthProtocol(body.authProtocol ?? current?.auth_protocol ?? 'oidc');
+      const providerType = body.providerType?.trim() || current?.provider_type || 'Generic OIDC';
       const domainHint = body.domainHint?.trim() || '';
       const clientId = body.clientId?.trim() || '';
-      const callbackUrl = body.callbackUrl?.trim() || 'https://regovise.com/auth/callback';
+      const callbackUrl = body.callbackUrl?.trim() || defaultSsoCallbackUrl(ctx.env);
       const metadataUrl = body.metadataUrl?.trim() || '';
+      const rolesClaim = body.rolesClaim?.trim() || current?.roles_claim || 'roles';
+      const emailClaim = body.emailClaim?.trim() || current?.email_claim || 'email';
+      const givenNameClaim = body.givenNameClaim?.trim() || current?.given_name_claim || 'given_name';
+      const familyNameClaim = body.familyNameClaim?.trim() || current?.family_name_claim || 'family_name';
+      const usernameClaim = body.usernameClaim?.trim() || current?.username_claim || 'preferred_username';
+      const buttonLabel = body.buttonLabel?.trim() || current?.button_label || '';
       const groupSyncEnabled = body.groupSyncEnabled ?? current?.group_sync_enabled === 1;
       const loginEnforced = body.loginEnforced ?? current?.login_enforced === 1;
+      const allowLocalFallback = body.allowLocalFallback ?? current?.allow_local_fallback !== 0;
+      const jitProvisioningEnabled =
+        body.jitProvisioningEnabled ?? current?.jit_provisioning_enabled === 1;
       const status = body.status?.trim() || current?.status || 'Review';
       const now = nowIso();
 
@@ -2541,27 +2672,45 @@ export async function handleSetupRoutes(
         `
         INSERT INTO setup_sso_configs (
           tenant_id,
+          auth_protocol,
           provider_type,
           domain_hint,
           client_id,
           callback_url,
           metadata_url,
+          roles_claim,
+          email_claim,
+          given_name_claim,
+          family_name_claim,
+          username_claim,
+          button_label,
           group_sync_enabled,
           login_enforced,
+          allow_local_fallback,
+          jit_provisioning_enabled,
           status,
           created_by_user_id,
           updated_by_user_id,
           created_at,
           updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(tenant_id) DO UPDATE SET
+          auth_protocol = excluded.auth_protocol,
           provider_type = excluded.provider_type,
           domain_hint = excluded.domain_hint,
           client_id = excluded.client_id,
           callback_url = excluded.callback_url,
           metadata_url = excluded.metadata_url,
+          roles_claim = excluded.roles_claim,
+          email_claim = excluded.email_claim,
+          given_name_claim = excluded.given_name_claim,
+          family_name_claim = excluded.family_name_claim,
+          username_claim = excluded.username_claim,
+          button_label = excluded.button_label,
           group_sync_enabled = excluded.group_sync_enabled,
           login_enforced = excluded.login_enforced,
+          allow_local_fallback = excluded.allow_local_fallback,
+          jit_provisioning_enabled = excluded.jit_provisioning_enabled,
           status = excluded.status,
           updated_by_user_id = excluded.updated_by_user_id,
           updated_at = excluded.updated_at
@@ -2569,13 +2718,22 @@ export async function handleSetupRoutes(
       )
         .bind(
           tenantId,
+          authProtocol,
           providerType,
           domainHint,
           clientId,
           callbackUrl,
           metadataUrl,
+          rolesClaim,
+          emailClaim,
+          givenNameClaim,
+          familyNameClaim,
+          usernameClaim,
+          buttonLabel,
           groupSyncEnabled ? 1 : 0,
           loginEnforced ? 1 : 0,
+          allowLocalFallback ? 1 : 0,
+          jitProvisioningEnabled ? 1 : 0,
           status,
           userId,
           userId,

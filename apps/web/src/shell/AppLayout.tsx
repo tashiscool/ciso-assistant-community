@@ -19,6 +19,7 @@ import { AgentRunInspectorPage } from '../features/assurance/AgentRunInspectorPa
 import { EmailPage } from '../features/setup/EmailPage';
 import { MePage } from '../features/core/MePage';
 import { BootstrapAccessPanel } from '../features/core/BootstrapAccessPanel';
+import { SsoCallbackPage } from '../features/core/SsoCallbackPage';
 import { ConMonExecutionsPage } from '../features/conmon/ConMonExecutionsPage';
 import { FrameworksPage } from '../features/core/FrameworksPage';
 import { FrameworkDetailPage } from '../features/core/FrameworkDetailPage';
@@ -309,6 +310,7 @@ function AccessEntryRouter() {
       {error ? <div className="notice-warning mb-6">{error}</div> : null}
       <Routes>
         <Route path="/login" element={<BootstrapAccessPanel surface="login" />} />
+        <Route path="/auth/callback" element={<SsoCallbackPage />} />
         <Route path="/setup/initialize" element={<BootstrapAccessPanel surface="initialize" />} />
         <Route path="/admin/recover" element={<BootstrapAccessPanel surface="recovery" />} />
         <Route path="*" element={<Navigate replace to={defaultTarget} />} />
@@ -459,6 +461,7 @@ export function AppLayout() {
             )}
             <Routes>
             <Route path="/login" element={<Navigate replace to="/" />} />
+            <Route path="/auth/callback" element={<Navigate replace to="/" />} />
             <Route path="/setup/initialize" element={<Navigate replace to="/" />} />
             <Route path="/admin/recover" element={<Navigate replace to="/" />} />
             <Route path="/" element={<HomePage access={access} />} />

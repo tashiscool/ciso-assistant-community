@@ -155,14 +155,25 @@ export type SetupSsoSnapshot = {
     callbackConfigured: boolean;
   };
   config: {
+    authProtocol: string;
     providerType: string;
     domainHint: string;
     clientId: string;
     callbackUrl: string;
     metadataUrl: string;
+    rolesClaim: string;
+    emailClaim: string;
+    givenNameClaim: string;
+    familyNameClaim: string;
+    usernameClaim: string;
+    buttonLabel: string;
     groupSyncEnabled: boolean;
     loginEnforced: boolean;
+    allowLocalFallback: boolean;
+    jitProvisioningEnabled: boolean;
     status: string;
+    runtimeReady: boolean;
+    runtimeMessage: string;
     updatedAt: string;
   };
   providerCards: Array<{
