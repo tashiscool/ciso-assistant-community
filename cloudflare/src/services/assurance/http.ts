@@ -700,7 +700,7 @@ async function buildAndPersistTrackerDerivedEvidenceJob(args: {
     .run();
 
   const diagnostics = await loadTrackerDiagnostics(args.ctx.env, args.tracker.id);
-  const { bundle, rawBundle } = resolveBundleFromCollection({
+  const { bundle, rawBundle } = await resolveBundleFromCollection({
     tenantId: args.tenantId,
     folderId: args.tracker.folder_id,
     provider: source.provider,

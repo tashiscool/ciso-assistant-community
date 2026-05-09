@@ -23,6 +23,11 @@ export function EvidenceSourcesPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [provider, setProvider] = useState('github');
+  const [awsRegion, setAwsRegion] = useState('us-gov-west-1');
+  const [awsAccessKeyId, setAwsAccessKeyId] = useState('');
+  const [awsSecretAccessKey, setAwsSecretAccessKey] = useState('');
+  const [awsSessionToken, setAwsSessionToken] = useState('');
+  const [awsAllEnabledRegions, setAwsAllEnabledRegions] = useState(false);
 
   async function loadSources() {
     try {
@@ -41,19 +46,46 @@ export function EvidenceSourcesPage() {
     void loadSources();
   }, [identity.tenantId, identity.userId]);
 
+  const canCreateSource =
+    name.trim().length > 0 &&
+    (provider !== 'aws' ||
+      (awsRegion.trim().length > 0 &&
+        awsAccessKeyId.trim().length > 0 &&
+        awsSecretAccessKey.trim().length > 0));
+
   async function createSource() {
     try {
       setBusyId('create');
       setNotice(null);
+      const config =
+        provider === 'aws'
+          ? {
+              owner: 'Cloud Security',
+              allowSyntheticSeed: false,
+              region: awsRegion.trim() || 'us-gov-west-1',
+              regions: awsAllEnabledRegions ? [] : [awsRegion.trim() || 'us-gov-west-1'],
+              allEnabledRegions: awsAllEnabledRegions,
+              auth: {
+                accessKeyId: awsAccessKeyId.trim(),
+                secretAccessKey: awsSecretAccessKey,
+                sessionToken: awsSessionToken.trim() || undefined,
+              },
+            }
+          : {
+              createdFrom: 'react-shell',
+            };
       await client.post('/evidence/sources', {
         name,
         provider,
-        config: {
-          createdFrom: 'react-shell',
-        },
+        config,
       });
       setName('');
       setProvider('github');
+      setAwsRegion('us-gov-west-1');
+      setAwsAccessKeyId('');
+      setAwsSecretAccessKey('');
+      setAwsSessionToken('');
+      setAwsAllEnabledRegions(false);
       setNotice('Created a new evidence source in D1.');
       await loadSources();
     } catch (err) {
@@ -112,13 +144,38 @@ export function EvidenceSourcesPage() {
               onChange={(event) => setProvider(event.target.value)}
               value={provider}
             >
+              <option value="aws">AWS</option>
               <option value="github">GitHub</option>
               <option value="snyk">Snyk</option>
               <option value="wiz">Wiz</option>
               <option value="custom_http">Custom HTTP</option>
             </select>
           </label>
-          <button className="button-primary" disabled={busyId === 'create'} type="submit">
+          {provider === 'aws' && (
+            <div className="space-y-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/5 p-4">
+              <label className="space-y-1">
+                <span className="label">AWS region</span>
+                <input className="input" onChange={(event) => setAwsRegion(event.target.value)} value={awsRegion} />
+              </label>
+              <label className="space-y-1">
+                <span className="label">Access key id</span>
+                <input className="input" onChange={(event) => setAwsAccessKeyId(event.target.value)} value={awsAccessKeyId} />
+              </label>
+              <label className="space-y-1">
+                <span className="label">Secret access key</span>
+                <input className="input" onChange={(event) => setAwsSecretAccessKey(event.target.value)} type="password" value={awsSecretAccessKey} />
+              </label>
+              <label className="space-y-1">
+                <span className="label">Session token</span>
+                <input className="input" onChange={(event) => setAwsSessionToken(event.target.value)} value={awsSessionToken} />
+              </label>
+              <label className="flex items-center gap-2 text-sm text-slate-300">
+                <input checked={awsAllEnabledRegions} onChange={(event) => setAwsAllEnabledRegions(event.target.checked)} type="checkbox" />
+                Collect all enabled regions
+              </label>
+            </div>
+          )}
+          <button className="button-primary" disabled={busyId === 'create' || !canCreateSource} type="submit">
             {busyId === 'create' ? 'Creating...' : 'Create Source'}
           </button>
         </form>

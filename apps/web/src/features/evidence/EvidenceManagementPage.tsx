@@ -70,6 +70,11 @@ export function EvidenceManagementPage() {
   const [search, setSearch] = useState('');
   const [name, setName] = useState('');
   const [provider, setProvider] = useState('github');
+  const [awsRegion, setAwsRegion] = useState('us-gov-west-1');
+  const [awsAccessKeyId, setAwsAccessKeyId] = useState('');
+  const [awsSecretAccessKey, setAwsSecretAccessKey] = useState('');
+  const [awsSessionToken, setAwsSessionToken] = useState('');
+  const [awsAllEnabledRegions, setAwsAllEnabledRegions] = useState(false);
 
   async function loadWorkspace() {
     try {
@@ -153,20 +158,47 @@ export function EvidenceManagementPage() {
     [artifacts.length, jobs, sources.length],
   );
 
+  const canCreateSource =
+    name.trim().length > 0 &&
+    (provider !== 'aws' ||
+      (awsRegion.trim().length > 0 &&
+        awsAccessKeyId.trim().length > 0 &&
+        awsSecretAccessKey.trim().length > 0));
+
   async function createSource() {
     try {
       setBusyAction('create');
       setError(null);
       setNotice(null);
+      const config =
+        provider === 'aws'
+          ? {
+              owner: 'Cloud Security',
+              allowSyntheticSeed: false,
+              region: awsRegion.trim() || 'us-gov-west-1',
+              regions: awsAllEnabledRegions ? [] : [awsRegion.trim() || 'us-gov-west-1'],
+              allEnabledRegions: awsAllEnabledRegions,
+              auth: {
+                accessKeyId: awsAccessKeyId.trim(),
+                secretAccessKey: awsSecretAccessKey,
+                sessionToken: awsSessionToken.trim() || undefined,
+              },
+            }
+          : {
+              createdFrom: 'evidence-management-workspace',
+            };
       await client.post('/evidence/sources', {
         name,
         provider,
-        config: {
-          createdFrom: 'evidence-management-workspace',
-        },
+        config,
       });
       setName('');
       setProvider('github');
+      setAwsRegion('us-gov-west-1');
+      setAwsAccessKeyId('');
+      setAwsSecretAccessKey('');
+      setAwsSessionToken('');
+      setAwsAllEnabledRegions(false);
       await loadWorkspace();
       setNotice('Evidence source created in the canonical evidence service.');
     } catch (err) {
@@ -236,16 +268,57 @@ export function EvidenceManagementPage() {
                 onChange={(event) => setName(event.target.value)}
               />
               <select className="input" value={provider} onChange={(event) => setProvider(event.target.value)}>
+                <option value="aws">AWS</option>
                 <option value="github">GitHub</option>
                 <option value="snyk">Snyk</option>
                 <option value="wiz">Wiz</option>
                 <option value="custom_http">Custom HTTP</option>
               </select>
-              <button className="button-primary" disabled={busyAction === 'create'} type="submit">
+              <button className="button-primary" disabled={busyAction === 'create' || !canCreateSource} type="submit">
                 <Plus className="mr-2 h-4 w-4" />
                 {busyAction === 'create' ? 'Creating...' : 'Add Source'}
               </button>
             </form>
+            {provider === 'aws' && (
+              <div className="mt-3 grid gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/5 p-4 md:grid-cols-2">
+                <input
+                  className="input"
+                  placeholder="AWS region"
+                  value={awsRegion}
+                  onChange={(event) => setAwsRegion(event.target.value)}
+                />
+                <label className="flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-sm text-slate-300">
+                  <input
+                    checked={awsAllEnabledRegions}
+                    onChange={(event) => setAwsAllEnabledRegions(event.target.checked)}
+                    type="checkbox"
+                  />
+                  Collect all enabled regions
+                </label>
+                <input
+                  className="input"
+                  placeholder="AWS access key id"
+                  value={awsAccessKeyId}
+                  onChange={(event) => setAwsAccessKeyId(event.target.value)}
+                />
+                <input
+                  className="input"
+                  placeholder="AWS session token (optional)"
+                  value={awsSessionToken}
+                  onChange={(event) => setAwsSessionToken(event.target.value)}
+                />
+                <input
+                  className="input md:col-span-2"
+                  placeholder="AWS secret access key"
+                  type="password"
+                  value={awsSecretAccessKey}
+                  onChange={(event) => setAwsSecretAccessKey(event.target.value)}
+                />
+                <div className="md:col-span-2 text-xs leading-5 text-slate-400">
+                  Use a read-only AWS credential scoped for evidence collection. Regovise will call AWS APIs directly during live evidence jobs instead of relying on synthetic seed data.
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>

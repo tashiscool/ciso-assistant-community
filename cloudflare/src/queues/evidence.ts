@@ -114,7 +114,7 @@ export async function processEvidenceJob(
           : null
         : null;
     const trackerDiagnostics = trackerImportId ? await loadTrackerDiagnostics(env, trackerImportId) : undefined;
-    const { rawBundle, bundle } = resolveBundleFromCollection({
+    const { rawBundle, bundle } = await resolveBundleFromCollection({
       tenantId: payload.tenantId,
       folderId: job.folder_id,
       provider: source.provider,

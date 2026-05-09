@@ -16,6 +16,7 @@
     "migrate:production": "wrangler d1 migrations apply D1_MAIN --env production --remote",
     "migrate:production:script": "bash ./scripts/apply_d1_migrations_remote.sh",
     "smoke:local": "node ./scripts/local-smoke.mjs",
+    "verify:aws-live-local": "node ./scripts/verify_live_aws_regovise.mjs",
     "smoke:local:email": "node ./scripts/assert_email_logs.mjs",
     "smoke:local:full": "node ./scripts/local-smoke.mjs && node ./scripts/assert_email_logs.mjs",
     "verify:observable-local": "node ./scripts/local-smoke.mjs && node ./scripts/verify_observable_parity.mjs",
@@ -28,5 +29,9 @@
     "@cloudflare/workers-types": "^4.20260305.1",
     "typescript": "^5.8.3",
     "wrangler": "^4.56.0"
+  },
+  "dependencies": {
+    "aws4fetch": "^1.0.20",
+    "fast-xml-parser": "^5.7.3"
   }
 }
