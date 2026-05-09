@@ -3,7 +3,7 @@ import { Link, Route, Routes } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 import { ConMonProfilesPage } from '../features/conmon/ConMonProfilesPage';
-import { DashboardPage } from '../features/dashboard/DashboardPage';
+import { HomePage } from '../features/home/HomePage';
 import { BrandingPage } from '../features/setup/BrandingPage';
 import { ClassificationPage } from '../features/setup/ClassificationPage';
 import { GeneralPage } from '../features/setup/GeneralPage';
@@ -275,7 +275,9 @@ export function AppLayout() {
               </div>
             )}
             <Routes>
-            <Route path="/" element={<DashboardPage />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/program" element={<ProgramControlPage />} />
+            <Route path="/program/setup" element={<QuickStartControlPage />} />
             <Route path="/workspace/me" element={<MePage />} />
             <Route path="/workspace/domains" element={<FoldersPage />} />
             <Route path="/workspace/team" element={<TeamPage />} />
@@ -663,7 +665,7 @@ export function AppLayout() {
                   path="*"
                   element={
                     <div className="panel flex min-h-[240px] items-center justify-center text-slate-300">
-                      Select a workspace area from the left navigation.
+                      Choose a Regovise workspace area from the left navigation.
                     </div>
                   }
                 />

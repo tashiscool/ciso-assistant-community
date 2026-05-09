@@ -479,12 +479,19 @@ export function LegacyRouteBridgePage({ legacyModel }: LegacyRouteBridgePageProp
   if (!config) {
     return (
       <div className="panel p-6">
-        <div className="eyebrow">Legacy Route</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Route bridge unavailable</h1>
+        <div className="eyebrow">Older Link</div>
+        <h1 className="mt-2 text-3xl font-semibold text-white">This route is not mapped yet</h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-          This legacy path does not have a dedicated bridge entry yet, but the migrated workspace is
-          available from the main navigation.
+          This bookmarked path does not have a dedicated mapping yet. You can still continue from Home, Search, or the Program workspace.
         </p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <Link className="button-primary" to="/">
+            Open Home
+          </Link>
+          <Link className="button-secondary" to="/search">
+            Search the workspace
+          </Link>
+        </div>
       </div>
     );
   }
@@ -492,24 +499,26 @@ export function LegacyRouteBridgePage({ legacyModel }: LegacyRouteBridgePageProp
   return (
     <div className="space-y-6">
       <section className="panel">
-        <div className="eyebrow">Legacy Route Bridge</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">{config.title}</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">{config.description}</p>
+        <div className="eyebrow">Older Link</div>
+        <h1 className="mt-2 text-3xl font-semibold text-white">{config.title} moved</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+          This link points to an older route. Regovise mapped it to the closest current workspace so you can keep moving without hunting through the app.
+        </p>
         <div className="mt-5 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="panel-subtle">
-            <div className="label">Requested legacy path</div>
+            <div className="label">Requested path</div>
             <div className="mt-3 font-mono text-xs text-cyan-200">{location.pathname}</div>
             {segments.length > 0 && (
               <div className="mt-3 text-sm text-slate-300">
-                Parsed tail: <span className="font-mono text-cyan-200">{segments.join(' / ')}</span>
+                Route details: <span className="font-mono text-cyan-200">{segments.join(' / ')}</span>
               </div>
             )}
           </div>
           <div className="panel-subtle">
-            <div className="label">Migrated equivalent</div>
+            <div className="label">Current workspace</div>
             <div className="mt-3">
               <Link className="button-primary" to={canonicalPath}>
-                Open equivalent workspace
+                Open current workspace
               </Link>
             </div>
             <div className="mt-3 font-mono text-xs text-slate-400">{canonicalPath}</div>
@@ -518,13 +527,17 @@ export function LegacyRouteBridgePage({ legacyModel }: LegacyRouteBridgePageProp
       </section>
 
       <section className="panel">
-        <div className="eyebrow">Ownership</div>
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
-          {config.ownership.map((item) => (
-            <div key={item} className="panel-subtle text-sm text-slate-300">
-              {item}
-            </div>
-          ))}
+        <div className="eyebrow">Need a different starting point?</div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <Link className="panel-subtle text-sm text-slate-300 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]" to="/">
+            Home
+          </Link>
+          <Link className="panel-subtle text-sm text-slate-300 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]" to="/program">
+            Program Workspace
+          </Link>
+          <Link className="panel-subtle text-sm text-slate-300 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]" to="/search">
+            Search the workspace
+          </Link>
         </div>
       </section>
     </div>

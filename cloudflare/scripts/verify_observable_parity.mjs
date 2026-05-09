@@ -1,8 +1,23 @@
-const baseUrl = process.env.CLOUDFLARE_LOCAL_URL ?? 'http://127.0.0.1:8787';
+const baseUrlRaw =
+  process.env.REGOVISE_VERIFY_BASE_URL ??
+  process.env.REGOVISE_PROD_BASE_URL ??
+  process.env.CLOUDFLARE_LOCAL_URL ??
+  process.argv[2] ??
+  'http://127.0.0.1:8787';
+
+const tenantId =
+  process.env.REGOVISE_VERIFY_TENANT_ID ??
+  process.env.PROD_SMOKE_TENANT_ID ??
+  'tenant-demo';
+const userId =
+  process.env.REGOVISE_VERIFY_USER_ID ??
+  process.env.PROD_SMOKE_USER_ID ??
+  'user-demo';
+const baseUrl = baseUrlRaw.endsWith('/') ? baseUrlRaw.slice(0, -1) : baseUrlRaw;
 const headers = {
   'content-type': 'application/json',
-  'x-tenant-id': 'tenant-demo',
-  'x-user-id': 'user-demo',
+  'x-tenant-id': tenantId,
+  'x-user-id': userId,
 };
 
 async function request(path, init = {}) {
@@ -60,7 +75,9 @@ async function findParityPackage(packages) {
 }
 
 async function main() {
-  console.log(`Running observable parity verifier against ${baseUrl}`);
+  console.log(
+    `Running observable parity verifier against ${baseUrl} as tenant=${tenantId} user=${userId}`,
+  );
   await waitForStableHealth();
 
   const overview = await request('/_api/assurance/overview', { headers });

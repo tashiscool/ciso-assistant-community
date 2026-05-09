@@ -6,11 +6,11 @@ export function AnalyticsControlRoomPage() {
   const { overview, loading, error, refresh } = useOpsParityOverview();
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading analytics control room...</div>;
+    return <div className="panel p-6 text-sm text-slate-300">Loading workspace analytics...</div>;
   }
 
   if (error || !overview) {
-    return <div className="notice-error">{error ?? 'Analytics control room could not be loaded.'}</div>;
+    return <div className="notice-error">{error ?? 'Workspace analytics could not be loaded.'}</div>;
   }
 
   return (
@@ -19,15 +19,15 @@ export function AnalyticsControlRoomPage() {
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-cyan-400/0 via-cyan-300/60 to-cyan-400/0" />
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
-            <div className="eyebrow">Analytics Control Room</div>
+            <div className="eyebrow">Workspace Analytics</div>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Analytics</h1>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-              Cross-domain operational metrics are now surfaced directly from the Worker-backed control plane so analytics lands on canonical governance, risk, portal, and advanced-risk signals.
+              Review the operating metrics that show how the program, evidence, portal, and assurance work are moving across the workspace.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link className="button-secondary" to="/">
-              Open main dashboard
+              Open home
             </Link>
             <Link className="button-secondary" to="/reports">
               Open reports
