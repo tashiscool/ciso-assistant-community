@@ -17,12 +17,13 @@ import { seedDemoSetupWorkspace } from '../setup/http';
 import {
   buildOidcAuthorizationUrl,
   completeOidcCodeExchange,
+  describeOidcConfigGap,
   type OidcConfigRecord,
   type OidcIdentityClaims,
-  randomBase64Url,
+  isRunnableOidcConfig,
   normalizeAuthProtocol,
   normalizeNextPath,
-  isRunnableOidcConfig,
+  randomBase64Url,
 } from './oidc';
 import {
   buildClearedSessionCookieHeader,
@@ -33,6 +34,7 @@ import {
   getSessionIdFromRequest,
   isSessionValid,
 } from '../../session';
+import { decryptTenantConfigSecret } from '../../utils/secrets';
 import { getTenantWorkflowSnapshot } from '../../utils/workflows';
 import { json, methodNotAllowed, readJson } from '../../utils/http';
 
@@ -183,6 +185,7 @@ type SetupSsoLoginSummaryRow = {
   provider_type: string | null;
   auth_protocol?: string | null;
   client_id?: string | null;
+  client_secret_encrypted?: string | null;
   callback_url?: string | null;
   metadata_url?: string | null;
   domain_hint?: string | null;
@@ -4335,7 +4338,8 @@ function isActiveOidcConfig(config: OidcConfigRecord | null | undefined): boolea
   return isRunnableOidcConfig(config);
 }
 
-function coerceSsoRuntimeConfig(
+async function coerceSsoRuntimeConfig(
+  env: EnvBindings,
   row:
     | ({
         tenant_id?: string | null;
@@ -4344,6 +4348,7 @@ function coerceSsoRuntimeConfig(
         provider_type?: string | null;
         auth_protocol?: string | null;
         client_id?: string | null;
+        client_secret_encrypted?: string | null;
         callback_url?: string | null;
         metadata_url?: string | null;
         domain_hint?: string | null;
@@ -4364,12 +4369,13 @@ function coerceSsoRuntimeConfig(
     | undefined,
   requestOrigin: string,
   tenant: { id?: string; slug: string; name: string } | null = null,
-): OidcConfigRecord | null {
+): Promise<OidcConfigRecord | null> {
   if (!row && !tenant) {
     return null;
   }
 
   const protocol = normalizeAuthProtocol(row?.auth_protocol ?? row?.provider_type ?? null);
+  const clientSecret = await decryptTenantConfigSecret(env, row?.client_secret_encrypted);
   return {
     tenantId: row?.tenant_id?.trim() || tenant?.id || '',
     tenantSlug: row?.tenant_slug?.trim() || tenant?.slug || '',
@@ -4377,6 +4383,7 @@ function coerceSsoRuntimeConfig(
     providerType: normalizeSsoProviderType(row?.provider_type),
     authProtocol: protocol,
     clientId: row?.client_id?.trim() || null,
+    clientSecret,
     callbackUrl: row?.callback_url?.trim() || `${requestOrigin}/auth/callback`,
     metadataUrl: row?.metadata_url?.trim() || null,
     domainHint: row?.domain_hint?.trim() || null,
@@ -4420,6 +4427,7 @@ async function loadTenantSsoRuntimeConfigByTenantId(
       provider_type,
       auth_protocol,
       client_id,
+      client_secret_encrypted,
       callback_url,
       metadata_url,
       domain_hint,
@@ -4447,6 +4455,7 @@ async function loadTenantSsoRuntimeConfigByTenantId(
   }
 
   return coerceSsoRuntimeConfig(
+    env,
     {
       ...(row ?? {}),
       tenant_id: tenantId,
@@ -4491,8 +4500,9 @@ function buildSsoTenantMessage(config: OidcConfigRecord | null): string {
     return 'Cloudflare Access can protect the front door, but workspace sign-in still relies on Regovise sessions after entry.';
   }
 
-  if (!isActiveOidcConfig(config)) {
-    return 'OIDC is selected, but the discovery URL, client id, or callback URL is still incomplete.';
+  const readinessGap = describeOidcConfigGap(config);
+  if (readinessGap) {
+    return readinessGap;
   }
 
   const domainHint = config.domainHint?.trim();
@@ -5164,6 +5174,7 @@ async function buildLoginConfig(env: EnvBindings): Promise<LoginConfigPayload> {
         provider_type,
         auth_protocol,
         client_id,
+        client_secret_encrypted,
         callback_url,
         metadata_url,
         domain_hint,
@@ -5224,7 +5235,7 @@ async function buildLoginConfig(env: EnvBindings): Promise<LoginConfigPayload> {
   const emailCodeEnabled = bootstrap.initialized && (emailRuntime.sendingEnabled || previewOnly);
   const passwordConfiguredUserCount = Number(passwordConfiguredRow?.count ?? 0);
   const passwordSignInEnabled = bootstrap.initialized && Number(localLoginUserCount?.count ?? 0) > 0;
-  const ssoConfig = coerceSsoRuntimeConfig(ssoRow, requestOrigin);
+  const ssoConfig = await coerceSsoRuntimeConfig(env, ssoRow, requestOrigin);
   const ssoSummary = buildSsoSummary(ssoConfig);
 
   let message = 'Email code sign-in is ready for users with local-login access.';
@@ -5514,6 +5525,7 @@ async function loadLocalLoginPrincipal(
       sso.provider_type AS provider_type,
       COALESCE(sso.allow_local_fallback, 1) AS allow_local_fallback,
       sso.client_id AS sso_client_id,
+      sso.client_secret_encrypted AS sso_client_secret_encrypted,
       sso.metadata_url AS sso_metadata_url,
       sso.callback_url AS sso_callback_url
     FROM tenants AS tenant
@@ -5541,6 +5553,7 @@ async function loadLocalLoginPrincipal(
       provider_type: string | null;
       allow_local_fallback: number;
       sso_client_id: string | null;
+      sso_client_secret_encrypted: string | null;
       sso_metadata_url: string | null;
       sso_callback_url: string | null;
     }>();
@@ -5549,6 +5562,24 @@ async function loadLocalLoginPrincipal(
     return null;
   }
 
+  const ssoConfig = await coerceSsoRuntimeConfig(
+    env,
+    {
+      tenant_id: row.tenant_id,
+      tenant_slug: row.tenant_slug,
+      tenant_name: row.tenant_name,
+      provider_type: row.provider_type,
+      auth_protocol: row.auth_protocol,
+      client_id: row.sso_client_id,
+      client_secret_encrypted: row.sso_client_secret_encrypted,
+      callback_url: row.sso_callback_url,
+      metadata_url: row.sso_metadata_url,
+      allow_local_fallback: row.allow_local_fallback,
+      login_enforced: row.login_enforced,
+    },
+    env.APP_ORIGIN?.trim() || 'https://regovise.com',
+  );
+
   return {
     tenantId: row.tenant_id,
     tenantSlug: row.tenant_slug,
@@ -5556,10 +5587,7 @@ async function loadLocalLoginPrincipal(
     userId: row.user_id,
     userEmail: normalizeEmail(row.user_email),
     displayName: row.display_name,
-    loginEnforced:
-      row.login_enforced === 1 &&
-      isOidcProtocol(row.auth_protocol) &&
-      Boolean(row.sso_client_id?.trim() && row.sso_metadata_url?.trim() && row.sso_callback_url?.trim()),
+    loginEnforced: row.login_enforced === 1 && isActiveOidcConfig(ssoConfig),
     ssoProtocol: normalizeAuthProtocol(row.auth_protocol),
     ssoProviderType: row.provider_type?.trim() || null,
     ssoAllowLocalFallback: row.allow_local_fallback !== 0,

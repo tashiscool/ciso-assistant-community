@@ -159,6 +159,8 @@ export type SetupSsoSnapshot = {
     providerType: string;
     domainHint: string;
     clientId: string;
+    clientSecretConfigured: boolean;
+    clientSecretRequired: boolean;
     callbackUrl: string;
     metadataUrl: string;
     rolesClaim: string;

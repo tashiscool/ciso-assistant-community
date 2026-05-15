@@ -18,6 +18,8 @@ export function SSOPage() {
   const [providerType, setProviderType] = useState(providerOptions[0]);
   const [domainHint, setDomainHint] = useState('');
   const [clientId, setClientId] = useState('');
+  const [clientSecret, setClientSecret] = useState('');
+  const [clearClientSecret, setClearClientSecret] = useState(false);
   const [callbackUrl, setCallbackUrl] = useState('');
   const [metadataUrl, setMetadataUrl] = useState('');
   const [rolesClaim, setRolesClaim] = useState('roles');
@@ -43,6 +45,8 @@ export function SSOPage() {
     setProviderType(next.config.providerType);
     setDomainHint(next.config.domainHint);
     setClientId(next.config.clientId);
+    setClientSecret('');
+    setClearClientSecret(false);
     setCallbackUrl(next.config.callbackUrl);
     setMetadataUrl(next.config.metadataUrl);
     setRolesClaim(next.config.rolesClaim);
@@ -100,6 +104,8 @@ export function SSOPage() {
         providerType,
         domainHint,
         clientId,
+        clientSecret: clientSecret.trim() || undefined,
+        clearClientSecret,
         callbackUrl,
         metadataUrl,
         rolesClaim,
@@ -247,6 +253,40 @@ export function SSOPage() {
                   placeholder="regovise-public-client"
                   value={clientId}
                 />
+              </label>
+
+              <label className="space-y-1">
+                <span className="label">Client secret</span>
+                <input
+                  className="input"
+                  onChange={(event) => setClientSecret(event.target.value)}
+                  placeholder={
+                    snapshot?.config.clientSecretConfigured ? 'Leave blank to keep the saved secret' : 'google-client-secret'
+                  }
+                  type="password"
+                  value={clientSecret}
+                />
+                <div className="text-xs text-slate-500">
+                  {snapshot?.config.clientSecretRequired
+                    ? 'This provider needs a client secret for token exchange.'
+                    : 'Leave blank to keep the current secret if this provider already has one saved.'}{' '}
+                  {snapshot?.config.clientSecretConfigured ? 'A secret is already stored for this workspace.' : 'No secret is stored yet.'}
+                </div>
+              </label>
+
+              <label className="flex items-start gap-3 rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+                <input
+                  checked={clearClientSecret}
+                  className="mt-1 h-4 w-4 rounded border-white/15 bg-slate-950 text-cyan-400"
+                  onChange={(event) => setClearClientSecret(event.target.checked)}
+                  type="checkbox"
+                />
+                <div>
+                  <div className="font-medium text-white">Clear saved client secret</div>
+                  <div className="mt-2 text-sm text-slate-400">
+                    Use this if the tenant needs to remove or replace the currently stored secret.
+                  </div>
+                </div>
               </label>
 
               <label className="space-y-1">

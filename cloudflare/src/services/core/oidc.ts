@@ -7,6 +7,7 @@ export type OidcConfigRecord = {
   providerType: string | null;
   authProtocol: AuthProtocol;
   clientId: string | null;
+  clientSecret: string | null;
   callbackUrl: string | null;
   metadataUrl: string | null;
   domainHint: string | null;
@@ -41,6 +42,7 @@ type OidcDiscoveryDocument = {
   authorization_endpoint: string;
   token_endpoint: string;
   jwks_uri: string;
+  token_endpoint_auth_methods_supported?: string[];
 };
 
 type JwtHeader = {
@@ -127,6 +129,70 @@ function normalizeHostedDomain(value: string | null | undefined): string | null 
   return normalized || null;
 }
 
+function isGoogleWorkspaceConfig(config: Pick<OidcConfigRecord, 'providerType' | 'metadataUrl'>): boolean {
+  const providerType = (config.providerType ?? '').trim().toLowerCase();
+  const metadataUrl = (config.metadataUrl ?? '').trim().toLowerCase();
+  return (
+    providerType.includes('google') ||
+    metadataUrl.includes('accounts.google.com') ||
+    metadataUrl.includes('googleapis.com')
+  );
+}
+
+export function requiresOidcClientSecret(
+  config: Pick<OidcConfigRecord, 'providerType' | 'metadataUrl'>,
+  discovery?: Pick<OidcDiscoveryDocument, 'token_endpoint_auth_methods_supported'> | null,
+): boolean {
+  const methods = discovery?.token_endpoint_auth_methods_supported
+    ?.map((value) => value.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (methods && methods.length > 0) {
+    return !methods.includes('none');
+  }
+
+  return isGoogleWorkspaceConfig(config);
+}
+
+export function describeOidcConfigGap(config: OidcConfigRecord | null | undefined): string | null {
+  if (!config || config.authProtocol !== 'oidc') {
+    return null;
+  }
+
+  const clientId = config.clientId?.trim() ?? '';
+  const normalizedClientId = clientId.toLowerCase();
+  const isPlaceholderClientId =
+    !clientId ||
+    normalizedClientId === 'google-client-demo' ||
+    normalizedClientId === 'client-id-demo' ||
+    normalizedClientId === 'demo-client-id';
+
+  const missingItems: string[] = [];
+  if (!config.metadataUrl?.trim()) {
+    missingItems.push('discovery URL');
+  }
+  if (isPlaceholderClientId) {
+    missingItems.push('client id');
+  }
+  if (!config.callbackUrl?.trim()) {
+    missingItems.push('callback URL');
+  }
+  if (requiresOidcClientSecret(config) && !config.clientSecret?.trim()) {
+    missingItems.push('client secret');
+  }
+
+  if (missingItems.length === 0) {
+    return null;
+  }
+
+  if (missingItems.length === 1) {
+    return `OIDC is selected, but the ${missingItems[0]} is still incomplete.`;
+  }
+
+  const lastItem = missingItems[missingItems.length - 1];
+  return `OIDC is selected, but the ${missingItems.slice(0, -1).join(', ')} and ${lastItem} are still incomplete.`;
+}
+
 export function normalizeAuthProtocol(value: string | null | undefined): AuthProtocol {
   const normalized = (value ?? '').trim().toLowerCase();
   if (normalized === 'oidc' || normalized === 'oauth' || normalized === 'oauth2') {
@@ -161,6 +227,7 @@ export function isRunnableOidcConfig(config: OidcConfigRecord | null | undefined
   return Boolean(
     config &&
       config.authProtocol === 'oidc' &&
+      !describeOidcConfigGap(config) &&
       !isPlaceholderClientId &&
       config.metadataUrl?.trim() &&
       config.callbackUrl?.trim(),
@@ -202,6 +269,12 @@ async function loadDiscoveryDocument(metadataUrl: string): Promise<OidcDiscovery
     authorization_endpoint: payload.authorization_endpoint,
     token_endpoint: payload.token_endpoint,
     jwks_uri: payload.jwks_uri,
+    token_endpoint_auth_methods_supported: Array.isArray(payload.token_endpoint_auth_methods_supported)
+      ? payload.token_endpoint_auth_methods_supported
+          .filter((value): value is string => typeof value === 'string')
+          .map((value) => value.trim())
+          .filter(Boolean)
+      : undefined,
   };
 }
 
@@ -413,24 +486,36 @@ export async function completeOidcCodeExchange(
   transaction: OidcAuthTransactionRecord,
   code: string,
 ): Promise<OidcIdentityClaims> {
+  const readinessGap = describeOidcConfigGap(config);
+  if (readinessGap) {
+    throw new Error(readinessGap);
+  }
+
   if (!config.metadataUrl?.trim() || !config.clientId?.trim()) {
     throw new Error('OIDC sign-in is not configured for this workspace.');
   }
 
   const discovery = await loadDiscoveryDocument(config.metadataUrl.trim());
+  if (requiresOidcClientSecret(config, discovery) && !config.clientSecret?.trim()) {
+    throw new Error('This identity provider also requires a client secret before sign-in can go live.');
+  }
+  const tokenBody = new URLSearchParams({
+    grant_type: 'authorization_code',
+    code,
+    client_id: config.clientId.trim(),
+    redirect_uri: transaction.redirectUri,
+    code_verifier: transaction.codeVerifier,
+  });
+  if (config.clientSecret?.trim()) {
+    tokenBody.set('client_secret', config.clientSecret.trim());
+  }
   const tokenResponse = await fetch(discovery.token_endpoint, {
     method: 'POST',
     headers: {
       'content-type': 'application/x-www-form-urlencoded',
       accept: 'application/json',
     },
-    body: new URLSearchParams({
-      grant_type: 'authorization_code',
-      code,
-      client_id: config.clientId.trim(),
-      redirect_uri: transaction.redirectUri,
-      code_verifier: transaction.codeVerifier,
-    }),
+    body: tokenBody,
   });
 
   const tokenPayload = (await tokenResponse.json().catch(() => null)) as

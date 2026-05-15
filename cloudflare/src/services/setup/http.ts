@@ -2,8 +2,15 @@ import { requireRootAdminAccess } from '../../authorization';
 import type { WorkerRequestContext } from '../../router';
 import { getEmailRuntimeSummary } from '../../email';
 import type { EnvBindings } from '../../types/env';
+import { decryptTenantConfigSecret, encryptTenantConfigSecret } from '../../utils/secrets';
 import { json, methodNotAllowed, readJson } from '../../utils/http';
-import { isRunnableOidcConfig, normalizeAuthProtocol, type OidcConfigRecord } from '../core/oidc';
+import {
+  describeOidcConfigGap,
+  isRunnableOidcConfig,
+  normalizeAuthProtocol,
+  requiresOidcClientSecret,
+  type OidcConfigRecord,
+} from '../core/oidc';
 
 type SetupTagRow = {
   id: string;
@@ -63,6 +70,7 @@ type SetupSsoConfigRow = {
   auth_protocol: string;
   domain_hint: string | null;
   client_id: string | null;
+  client_secret_encrypted: string | null;
   callback_url: string | null;
   metadata_url: string | null;
   group_sync_enabled: number;
@@ -215,6 +223,8 @@ type UpdateSsoPayload = {
   providerType?: string;
   domainHint?: string | null;
   clientId?: string | null;
+  clientSecret?: string | null;
+  clearClientSecret?: boolean;
   callbackUrl?: string | null;
   metadataUrl?: string | null;
   rolesClaim?: string | null;
@@ -525,15 +535,16 @@ function parseSsoRoleNameList(value: string | null | undefined): string[] {
   }
 }
 
-function toSsoRuntimeConfig(
+async function toSsoRuntimeConfig(
   env: EnvBindings,
   tenantId: string,
   row: SetupSsoConfigRow | null | undefined,
-): OidcConfigRecord | null {
+): Promise<OidcConfigRecord | null> {
   if (!row) {
     return null;
   }
 
+  const clientSecret = await decryptTenantConfigSecret(env, row.client_secret_encrypted);
   return {
     tenantId,
     tenantSlug: '',
@@ -541,6 +552,7 @@ function toSsoRuntimeConfig(
     providerType: row.provider_type?.trim() || null,
     authProtocol: normalizeAuthProtocol(row.auth_protocol ?? row.provider_type),
     clientId: row.client_id?.trim() || null,
+    clientSecret,
     callbackUrl: row.callback_url?.trim() || defaultSsoCallbackUrl(env),
     metadataUrl: row.metadata_url?.trim() || null,
     domainHint: row.domain_hint?.trim() || null,
@@ -583,11 +595,12 @@ function getSsoRuntimeStatus(config: OidcConfigRecord | null) {
     };
   }
 
-  if (!isRunnableOidcConfig(config)) {
+  const readinessGap = describeOidcConfigGap(config);
+  if (readinessGap) {
     return {
       ready: false,
       active: false,
-      message: 'OIDC is selected, but discovery, client id, or callback settings are still incomplete.',
+      message: readinessGap,
     };
   }
 
@@ -998,6 +1011,7 @@ async function ensureSeedSsoConfig(env: EnvBindings, tenantId: string, userId: s
       provider_type,
       domain_hint,
       client_id,
+      client_secret_encrypted,
       callback_url,
       metadata_url,
       roles_claim,
@@ -1016,7 +1030,7 @@ async function ensureSeedSsoConfig(env: EnvBindings, tenantId: string, userId: s
       updated_by_user_id,
       created_at,
       updated_at
-    ) VALUES (?, 'oidc', 'Google Workspace', '', '', ?, 'https://accounts.google.com/.well-known/openid-configuration', 'roles', 'email', 'given_name', 'family_name', 'preferred_username', 'Continue with Google', 1, 0, 1, 0, '[]', 'Review', ?, ?, ?, ?)
+    ) VALUES (?, 'oidc', 'Google Workspace', '', '', NULL, ?, 'https://accounts.google.com/.well-known/openid-configuration', 'roles', 'email', 'given_name', 'family_name', 'preferred_username', 'Continue with Google', 1, 0, 1, 0, '[]', 'Review', ?, ?, ?, ?)
     `,
   )
     .bind(tenantId, defaultSsoCallbackUrl(env), userId, userId, now, now)
@@ -1699,7 +1713,7 @@ async function buildModulesFeaturesSnapshot(env: EnvBindings, tenantId: string) 
       .first<RegmlSettingsStateRow>(),
     env.D1_MAIN.prepare(
       `
-      SELECT tenant_id, provider_type, auth_protocol, domain_hint, client_id, callback_url, metadata_url, roles_claim, email_claim, given_name_claim, family_name_claim, username_claim, button_label, group_sync_enabled, login_enforced, allow_local_fallback, jit_provisioning_enabled, jit_default_role_names_json, status, created_at, updated_at
+      SELECT tenant_id, provider_type, auth_protocol, domain_hint, client_id, client_secret_encrypted, callback_url, metadata_url, roles_claim, email_claim, given_name_claim, family_name_claim, username_claim, button_label, group_sync_enabled, login_enforced, allow_local_fallback, jit_provisioning_enabled, jit_default_role_names_json, status, created_at, updated_at
       FROM setup_sso_configs
       WHERE tenant_id = ?
       LIMIT 1
@@ -1725,7 +1739,7 @@ async function buildModulesFeaturesSnapshot(env: EnvBindings, tenantId: string) 
   );
   const regmlEnabled = regmlRow ? regmlRow.enabled === 1 : modulesRow?.regml_enabled === 1;
   const regmlTermsAccepted = regmlRow ? regmlRow.terms_accepted === 1 : modulesRow?.regml_terms_accepted === 1;
-  const ssoConfigured = isRunnableOidcConfig(toSsoRuntimeConfig(env, tenantId, ssoRow));
+  const ssoConfigured = isRunnableOidcConfig(await toSsoRuntimeConfig(env, tenantId, ssoRow));
   const mfaMethods = asJson<Record<string, boolean>>(mfaRow?.methods_json, {});
   const mfaConfigured = Object.values(mfaMethods).some(Boolean);
 
@@ -1763,7 +1777,7 @@ async function buildModulesFeaturesSnapshot(env: EnvBindings, tenantId: string) 
 async function buildSsoSnapshot(env: EnvBindings, tenantId: string) {
   const row = await env.D1_MAIN.prepare(
     `
-    SELECT tenant_id, provider_type, auth_protocol, domain_hint, client_id, callback_url, metadata_url, roles_claim, email_claim, given_name_claim, family_name_claim, username_claim, button_label, group_sync_enabled, login_enforced, allow_local_fallback, jit_provisioning_enabled, jit_default_role_names_json, status, created_at, updated_at
+    SELECT tenant_id, provider_type, auth_protocol, domain_hint, client_id, client_secret_encrypted, callback_url, metadata_url, roles_claim, email_claim, given_name_claim, family_name_claim, username_claim, button_label, group_sync_enabled, login_enforced, allow_local_fallback, jit_provisioning_enabled, jit_default_role_names_json, status, created_at, updated_at
     FROM setup_sso_configs
     WHERE tenant_id = ?
     LIMIT 1
@@ -1772,13 +1786,15 @@ async function buildSsoSnapshot(env: EnvBindings, tenantId: string) {
     .bind(tenantId)
     .first<SetupSsoConfigRow>();
 
-  const config = toSsoRuntimeConfig(env, tenantId, row);
+  const config = await toSsoRuntimeConfig(env, tenantId, row);
   const runtime = getSsoRuntimeStatus(config);
+  const clientSecretConfigured = Boolean(row?.client_secret_encrypted?.trim());
+  const clientSecretRequired = Boolean(config && requiresOidcClientSecret(config));
 
   const providerCards = [
     {
       name: 'Microsoft Entra / Generic OIDC',
-      description: 'Public-client OIDC with PKCE for Entra, Okta, Google, and similar identity providers.',
+      description: 'OIDC with PKCE for Entra, Okta, and similar identity providers. Google Workspace also needs a client secret.',
       ready: config?.authProtocol === 'oidc' && runtime.ready,
     },
     {
@@ -1805,6 +1821,8 @@ async function buildSsoSnapshot(env: EnvBindings, tenantId: string) {
       providerType: config?.providerType ?? 'Generic OIDC',
       domainHint: config?.domainHint ?? '',
       clientId: config?.clientId ?? '',
+      clientSecretConfigured,
+      clientSecretRequired,
       callbackUrl: config?.callbackUrl ?? defaultSsoCallbackUrl(env),
       metadataUrl: config?.metadataUrl ?? '',
       rolesClaim: config?.rolesClaim ?? 'roles',
@@ -1826,7 +1844,7 @@ async function buildSsoSnapshot(env: EnvBindings, tenantId: string) {
     providerCards,
     checklist: [
       'Register the callback URI on the provider exactly as shown here before testing sign-in.',
-      'Use a public-client OIDC app with PKCE. No client secret is required for the current worker flow.',
+      'Use PKCE for the authorization flow. Google Workspace also requires a client secret for token exchange.',
       'For Google Workspace or similar providers that do not emit Regovise role claims, set default JIT roles before enabling automatic provisioning.',
       'Test sign-in and sign-out with a non-admin account before enforcing tenant-wide access.',
     ],
@@ -2672,7 +2690,7 @@ export async function handleSetupRoutes(
 
       const current = await ctx.env.D1_MAIN.prepare(
         `
-        SELECT tenant_id, provider_type, auth_protocol, domain_hint, client_id, callback_url, metadata_url, roles_claim, email_claim, given_name_claim, family_name_claim, username_claim, button_label, group_sync_enabled, login_enforced, allow_local_fallback, jit_provisioning_enabled, jit_default_role_names_json, status, created_at, updated_at
+        SELECT tenant_id, provider_type, auth_protocol, domain_hint, client_id, client_secret_encrypted, callback_url, metadata_url, roles_claim, email_claim, given_name_claim, family_name_claim, username_claim, button_label, group_sync_enabled, login_enforced, allow_local_fallback, jit_provisioning_enabled, jit_default_role_names_json, status, created_at, updated_at
         FROM setup_sso_configs
         WHERE tenant_id = ?
         LIMIT 1
@@ -2685,6 +2703,7 @@ export async function handleSetupRoutes(
       const providerType = body.providerType?.trim() || current?.provider_type || 'Generic OIDC';
       const domainHint = body.domainHint?.trim() || '';
       const clientId = body.clientId?.trim() || '';
+      const submittedClientSecret = body.clientSecret?.trim() || '';
       const callbackUrl = body.callbackUrl?.trim() || defaultSsoCallbackUrl(ctx.env);
       const metadataUrl = body.metadataUrl?.trim() || '';
       const rolesClaim = body.rolesClaim?.trim() || current?.roles_claim || 'roles';
@@ -2706,6 +2725,11 @@ export async function handleSetupRoutes(
         ),
       );
       const status = body.status?.trim() || current?.status || 'Review';
+      const clientSecretEncrypted = body.clearClientSecret
+        ? null
+        : submittedClientSecret
+          ? await encryptTenantConfigSecret(ctx.env, submittedClientSecret)
+          : current?.client_secret_encrypted ?? null;
       const now = nowIso();
 
       await ctx.env.D1_MAIN.prepare(
@@ -2716,6 +2740,7 @@ export async function handleSetupRoutes(
           provider_type,
           domain_hint,
           client_id,
+          client_secret_encrypted,
           callback_url,
           metadata_url,
           roles_claim,
@@ -2734,12 +2759,13 @@ export async function handleSetupRoutes(
           updated_by_user_id,
           created_at,
           updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(tenant_id) DO UPDATE SET
           auth_protocol = excluded.auth_protocol,
           provider_type = excluded.provider_type,
           domain_hint = excluded.domain_hint,
           client_id = excluded.client_id,
+          client_secret_encrypted = excluded.client_secret_encrypted,
           callback_url = excluded.callback_url,
           metadata_url = excluded.metadata_url,
           roles_claim = excluded.roles_claim,
@@ -2764,6 +2790,7 @@ export async function handleSetupRoutes(
           providerType,
           domainHint,
           clientId,
+          clientSecretEncrypted,
           callbackUrl,
           metadataUrl,
           rolesClaim,

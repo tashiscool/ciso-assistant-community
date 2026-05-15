@@ -130,6 +130,8 @@ export async function updateSetupSso(body: {
   providerType: string;
   domainHint: string;
   clientId: string;
+  clientSecret?: string;
+  clearClientSecret?: boolean;
   callbackUrl: string;
   metadataUrl: string;
   rolesClaim: string;
