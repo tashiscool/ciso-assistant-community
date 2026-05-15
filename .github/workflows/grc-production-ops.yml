@@ -102,16 +102,7 @@ jobs:
           fi
           if [ "$BANNED_COUNT" != "0" ]; then
             echo "Expected banned_count=0, got $BANNED_COUNT"
-            SAMPLE_SQL=$(cat <<'EOF'
-            SELECT document_id, substr(body_markdown, 1, 160) AS sample
-            FROM grc_content_revisions
-            WHERE lower(body_markdown) LIKE '%/plugin%'
-               OR lower(body_markdown) LIKE '%/grc-engineer:%'
-               OR lower(body_markdown) LIKE '%claude-grc%'
-               OR lower(body_markdown) LIKE '%marketplace%'
-            LIMIT 5;
-            EOF
-            )
+            SAMPLE_SQL="SELECT document_id, substr(body_markdown, 1, 160) AS sample FROM grc_content_revisions WHERE lower(body_markdown) LIKE '%/plugin%' OR lower(body_markdown) LIKE '%/grc-engineer:%' OR lower(body_markdown) LIKE '%claude-grc%' OR lower(body_markdown) LIKE '%marketplace%' LIMIT 5;"
             npx wrangler d1 execute D1_MAIN --env production --remote --json --command "$SAMPLE_SQL" | jq .
             exit 1
           fi
