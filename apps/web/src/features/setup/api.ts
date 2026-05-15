@@ -142,6 +142,7 @@ export async function updateSetupSso(body: {
   loginEnforced: boolean;
   allowLocalFallback: boolean;
   jitProvisioningEnabled: boolean;
+  jitDefaultRoleNames: string[];
   status: string;
 }): Promise<SetupSsoSnapshot> {
   const response = await client.put<{ data: SetupSsoSnapshot }>('/setup/sso', body);

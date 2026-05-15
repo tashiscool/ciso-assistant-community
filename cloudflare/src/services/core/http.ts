@@ -4305,6 +4305,28 @@ function normalizeSsoProviderType(value: string | null | undefined): string | nu
   return normalized || null;
 }
 
+function parseSsoRoleNameList(value: string | null | undefined): string[] {
+  if (!value) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    return Array.from(
+      new Set(
+        parsed
+          .map((item) => (typeof item === 'string' ? item.trim() : ''))
+          .filter(Boolean),
+      ),
+    );
+  } catch {
+    return [];
+  }
+}
+
 function isOidcProtocol(protocol: string | null | undefined): boolean {
   return normalizeAuthProtocol(protocol) === 'oidc';
 }
@@ -4336,6 +4358,7 @@ function coerceSsoRuntimeConfig(
         button_label?: string | null;
         allow_local_fallback?: number;
         jit_provisioning_enabled?: number;
+        jit_default_role_names_json?: string | null;
       })
     | null
     | undefined,
@@ -4367,6 +4390,7 @@ function coerceSsoRuntimeConfig(
     loginEnforced: row?.login_enforced === 1,
     allowLocalFallback: row?.allow_local_fallback !== 0,
     jitProvisioningEnabled: row?.jit_provisioning_enabled === 1,
+    jitDefaultRoleNames: parseSsoRoleNameList(row?.jit_default_role_names_json),
   };
 }
 
@@ -4408,7 +4432,8 @@ async function loadTenantSsoRuntimeConfigByTenantId(
       username_claim,
       button_label,
       allow_local_fallback,
-      jit_provisioning_enabled
+      jit_provisioning_enabled,
+      jit_default_role_names_json
     FROM setup_sso_configs
     WHERE tenant_id = ?
     LIMIT 1
@@ -4470,15 +4495,23 @@ function buildSsoTenantMessage(config: OidcConfigRecord | null): string {
     return 'OIDC is selected, but the discovery URL, client id, or callback URL is still incomplete.';
   }
 
+  const domainHint = config.domainHint?.trim();
+
   if (config.loginEnforced) {
-    return 'This workspace requires OIDC single sign-on for normal user access.';
+    return domainHint
+      ? `This workspace requires OIDC single sign-on for normal user access and only accepts ${domainHint} identities.`
+      : 'This workspace requires OIDC single sign-on for normal user access.';
   }
 
   if (!config.allowLocalFallback) {
-    return 'OIDC is active for this workspace and local fallback is turned off once cutover finishes.';
+    return domainHint
+      ? `OIDC is active for this workspace, accepts ${domainHint} identities, and local fallback is turned off once cutover finishes.`
+      : 'OIDC is active for this workspace and local fallback is turned off once cutover finishes.';
   }
 
-  return 'OIDC single sign-on is ready for this workspace alongside the local recovery paths.';
+  return domainHint
+    ? `OIDC single sign-on is ready for this workspace for ${domainHint} identities alongside the local recovery paths.`
+    : 'OIDC single sign-on is ready for this workspace alongside the local recovery paths.';
 }
 
 async function buildTenantLoginOptions(
@@ -4976,9 +5009,17 @@ async function syncSsoRoles(
   env: EnvBindings,
   config: OidcConfigRecord,
   userId: string,
+  isNewUser: boolean,
   roleNames: string[],
 ): Promise<{ syncedRoleCount: number }> {
-  if (!config.groupSyncEnabled) {
+  const effectiveRoleNames =
+    config.groupSyncEnabled && roleNames.length > 0
+      ? roleNames
+      : isNewUser
+        ? config.jitDefaultRoleNames
+        : [];
+
+  if (effectiveRoleNames.length === 0) {
     return { syncedRoleCount: 0 };
   }
 
@@ -4987,7 +5028,7 @@ async function syncSsoRoles(
     return { syncedRoleCount: 0 };
   }
 
-  const roles = await loadBuiltinOrNamedRolesByNames(env, config.tenantId, roleNames);
+  const roles = await loadBuiltinOrNamedRolesByNames(env, config.tenantId, effectiveRoleNames);
   for (const role of roles) {
     const existingAssignment = await env.D1_MAIN.prepare(
       `
@@ -5047,7 +5088,7 @@ async function finalizeSsoAuthentication(
   syncedRoleCount: number;
 }> {
   const user = await upsertSsoUser(env, config, claims);
-  const roleSync = await syncSsoRoles(env, config, user.userId, claims.roleNames);
+  const roleSync = await syncSsoRoles(env, config, user.userId, user.created, claims.roleNames);
 
   if (user.created && roleSync.syncedRoleCount === 0) {
     await env.D1_MAIN.prepare(`DELETE FROM users WHERE id = ?`).bind(user.userId).run();

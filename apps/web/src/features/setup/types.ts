@@ -171,6 +171,7 @@ export type SetupSsoSnapshot = {
     loginEnforced: boolean;
     allowLocalFallback: boolean;
     jitProvisioningEnabled: boolean;
+    jitDefaultRoleNames: string[];
     status: string;
     runtimeReady: boolean;
     runtimeMessage: string;

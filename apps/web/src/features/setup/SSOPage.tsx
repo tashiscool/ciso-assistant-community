@@ -30,6 +30,7 @@ export function SSOPage() {
   const [loginEnforced, setLoginEnforced] = useState(false);
   const [allowLocalFallback, setAllowLocalFallback] = useState(true);
   const [jitProvisioningEnabled, setJitProvisioningEnabled] = useState(false);
+  const [jitDefaultRoles, setJitDefaultRoles] = useState('');
   const [status, setStatus] = useState(statusOptions[0]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -54,6 +55,7 @@ export function SSOPage() {
     setLoginEnforced(next.config.loginEnforced);
     setAllowLocalFallback(next.config.allowLocalFallback);
     setJitProvisioningEnabled(next.config.jitProvisioningEnabled);
+    setJitDefaultRoles(next.config.jitDefaultRoleNames.join(', '));
     setStatus(next.config.status);
   }
 
@@ -110,6 +112,10 @@ export function SSOPage() {
         loginEnforced,
         allowLocalFallback,
         jitProvisioningEnabled,
+        jitDefaultRoleNames: jitDefaultRoles
+          .split(',')
+          .map((item) => item.trim())
+          .filter(Boolean),
         status,
       });
       hydrate(next);
@@ -337,8 +343,23 @@ export function SSOPage() {
               <div>
                 <div className="font-medium text-white">Allow just-in-time user provisioning</div>
                 <div className="mt-2 text-sm text-slate-400">
-                  Create a workspace account on first successful OIDC login if at least one mapped Regovise role is present.
+                  Create a workspace account on first successful OIDC login. If the provider does not emit Regovise role
+                  claims, the default JIT roles below are used instead.
                 </div>
+              </div>
+            </label>
+
+            <label className="space-y-1">
+              <span className="label">Default JIT roles</span>
+              <input
+                className="input"
+                onChange={(event) => setJitDefaultRoles(event.target.value)}
+                placeholder="Reader, Analyst"
+                value={jitDefaultRoles}
+              />
+              <div className="text-xs text-slate-500">
+                Comma-separated Regovise role names applied to first-time JIT users when the identity provider does not
+                send matching role claims.
               </div>
             </label>
 

@@ -75,6 +75,7 @@ type SetupSsoConfigRow = {
   button_label: string | null;
   allow_local_fallback: number;
   jit_provisioning_enabled: number;
+  jit_default_role_names_json: string | null;
   status: string;
   created_at: string;
   updated_at: string;
@@ -226,6 +227,7 @@ type UpdateSsoPayload = {
   loginEnforced?: boolean;
   allowLocalFallback?: boolean;
   jitProvisioningEnabled?: boolean;
+  jitDefaultRoleNames?: string[];
   status?: string;
 };
 
@@ -501,6 +503,28 @@ function defaultSsoCallbackUrl(env: EnvBindings): string {
   return `${env.APP_ORIGIN?.trim() || 'https://regovise.com'}/auth/callback`;
 }
 
+function parseSsoRoleNameList(value: string | null | undefined): string[] {
+  if (!value) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(value) as unknown;
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    return Array.from(
+      new Set(
+        parsed
+          .map((item) => (typeof item === 'string' ? item.trim() : ''))
+          .filter(Boolean),
+      ),
+    );
+  } catch {
+    return [];
+  }
+}
+
 function toSsoRuntimeConfig(
   env: EnvBindings,
   tenantId: string,
@@ -530,6 +554,7 @@ function toSsoRuntimeConfig(
     loginEnforced: row.login_enforced === 1,
     allowLocalFallback: row.allow_local_fallback !== 0,
     jitProvisioningEnabled: row.jit_provisioning_enabled === 1,
+    jitDefaultRoleNames: parseSsoRoleNameList(row.jit_default_role_names_json),
   };
 }
 
@@ -566,12 +591,18 @@ function getSsoRuntimeStatus(config: OidcConfigRecord | null) {
     };
   }
 
+  const domainHint = config.domainHint?.trim();
+
   return {
     ready: true,
     active: true,
     message: config.loginEnforced
-      ? 'OIDC is active and tenant sign-in is enforced through the configured identity provider.'
-      : 'OIDC is active and available for tenant sign-in alongside recovery paths.',
+      ? domainHint
+        ? `OIDC is active, tenant sign-in is enforced, and only ${domainHint} identities are accepted.`
+        : 'OIDC is active and tenant sign-in is enforced through the configured identity provider.'
+      : domainHint
+        ? `OIDC is active for ${domainHint} identities and available for tenant sign-in alongside recovery paths.`
+        : 'OIDC is active and available for tenant sign-in alongside recovery paths.',
   };
 }
 
@@ -979,12 +1010,13 @@ async function ensureSeedSsoConfig(env: EnvBindings, tenantId: string, userId: s
       login_enforced,
       allow_local_fallback,
       jit_provisioning_enabled,
+      jit_default_role_names_json,
       status,
       created_by_user_id,
       updated_by_user_id,
       created_at,
       updated_at
-    ) VALUES (?, 'oidc', 'Google Workspace', '', '', ?, 'https://accounts.google.com/.well-known/openid-configuration', 'roles', 'email', 'given_name', 'family_name', 'preferred_username', 'Continue with Google', 1, 0, 1, 0, 'Review', ?, ?, ?, ?)
+    ) VALUES (?, 'oidc', 'Google Workspace', '', '', ?, 'https://accounts.google.com/.well-known/openid-configuration', 'roles', 'email', 'given_name', 'family_name', 'preferred_username', 'Continue with Google', 1, 0, 1, 0, '[]', 'Review', ?, ?, ?, ?)
     `,
   )
     .bind(tenantId, defaultSsoCallbackUrl(env), userId, userId, now, now)
@@ -1667,7 +1699,7 @@ async function buildModulesFeaturesSnapshot(env: EnvBindings, tenantId: string) 
       .first<RegmlSettingsStateRow>(),
     env.D1_MAIN.prepare(
       `
-      SELECT tenant_id, provider_type, auth_protocol, domain_hint, client_id, callback_url, metadata_url, roles_claim, email_claim, given_name_claim, family_name_claim, username_claim, button_label, group_sync_enabled, login_enforced, allow_local_fallback, jit_provisioning_enabled, status, created_at, updated_at
+      SELECT tenant_id, provider_type, auth_protocol, domain_hint, client_id, callback_url, metadata_url, roles_claim, email_claim, given_name_claim, family_name_claim, username_claim, button_label, group_sync_enabled, login_enforced, allow_local_fallback, jit_provisioning_enabled, jit_default_role_names_json, status, created_at, updated_at
       FROM setup_sso_configs
       WHERE tenant_id = ?
       LIMIT 1
@@ -1731,7 +1763,7 @@ async function buildModulesFeaturesSnapshot(env: EnvBindings, tenantId: string) 
 async function buildSsoSnapshot(env: EnvBindings, tenantId: string) {
   const row = await env.D1_MAIN.prepare(
     `
-    SELECT tenant_id, provider_type, auth_protocol, domain_hint, client_id, callback_url, metadata_url, roles_claim, email_claim, given_name_claim, family_name_claim, username_claim, button_label, group_sync_enabled, login_enforced, allow_local_fallback, jit_provisioning_enabled, status, created_at, updated_at
+    SELECT tenant_id, provider_type, auth_protocol, domain_hint, client_id, callback_url, metadata_url, roles_claim, email_claim, given_name_claim, family_name_claim, username_claim, button_label, group_sync_enabled, login_enforced, allow_local_fallback, jit_provisioning_enabled, jit_default_role_names_json, status, created_at, updated_at
     FROM setup_sso_configs
     WHERE tenant_id = ?
     LIMIT 1
@@ -1785,6 +1817,7 @@ async function buildSsoSnapshot(env: EnvBindings, tenantId: string) {
       loginEnforced: Boolean(config?.loginEnforced && runtime.ready),
       allowLocalFallback: config?.allowLocalFallback !== false,
       jitProvisioningEnabled: config?.jitProvisioningEnabled === true,
+      jitDefaultRoleNames: config?.jitDefaultRoleNames ?? [],
       status: row?.status ?? 'Review',
       runtimeReady: runtime.ready,
       runtimeMessage: runtime.message,
@@ -1794,7 +1827,7 @@ async function buildSsoSnapshot(env: EnvBindings, tenantId: string) {
     checklist: [
       'Register the callback URI on the provider exactly as shown here before testing sign-in.',
       'Use a public-client OIDC app with PKCE. No client secret is required for the current worker flow.',
-      'Map the roles claim to existing Regovise role names before enabling JIT provisioning or group sync.',
+      'For Google Workspace or similar providers that do not emit Regovise role claims, set default JIT roles before enabling automatic provisioning.',
       'Test sign-in and sign-out with a non-admin account before enforcing tenant-wide access.',
     ],
   };
@@ -2639,7 +2672,7 @@ export async function handleSetupRoutes(
 
       const current = await ctx.env.D1_MAIN.prepare(
         `
-        SELECT tenant_id, provider_type, auth_protocol, domain_hint, client_id, callback_url, metadata_url, roles_claim, email_claim, given_name_claim, family_name_claim, username_claim, button_label, group_sync_enabled, login_enforced, allow_local_fallback, jit_provisioning_enabled, status, created_at, updated_at
+        SELECT tenant_id, provider_type, auth_protocol, domain_hint, client_id, callback_url, metadata_url, roles_claim, email_claim, given_name_claim, family_name_claim, username_claim, button_label, group_sync_enabled, login_enforced, allow_local_fallback, jit_provisioning_enabled, jit_default_role_names_json, status, created_at, updated_at
         FROM setup_sso_configs
         WHERE tenant_id = ?
         LIMIT 1
@@ -2665,6 +2698,13 @@ export async function handleSetupRoutes(
       const allowLocalFallback = body.allowLocalFallback ?? current?.allow_local_fallback !== 0;
       const jitProvisioningEnabled =
         body.jitProvisioningEnabled ?? current?.jit_provisioning_enabled === 1;
+      const jitDefaultRoleNames = Array.from(
+        new Set(
+          (body.jitDefaultRoleNames ?? parseSsoRoleNameList(current?.jit_default_role_names_json))
+            .map((item) => item.trim())
+            .filter(Boolean),
+        ),
+      );
       const status = body.status?.trim() || current?.status || 'Review';
       const now = nowIso();
 
@@ -2688,12 +2728,13 @@ export async function handleSetupRoutes(
           login_enforced,
           allow_local_fallback,
           jit_provisioning_enabled,
+          jit_default_role_names_json,
           status,
           created_by_user_id,
           updated_by_user_id,
           created_at,
           updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(tenant_id) DO UPDATE SET
           auth_protocol = excluded.auth_protocol,
           provider_type = excluded.provider_type,
@@ -2711,6 +2752,7 @@ export async function handleSetupRoutes(
           login_enforced = excluded.login_enforced,
           allow_local_fallback = excluded.allow_local_fallback,
           jit_provisioning_enabled = excluded.jit_provisioning_enabled,
+          jit_default_role_names_json = excluded.jit_default_role_names_json,
           status = excluded.status,
           updated_by_user_id = excluded.updated_by_user_id,
           updated_at = excluded.updated_at
@@ -2734,6 +2776,7 @@ export async function handleSetupRoutes(
           loginEnforced ? 1 : 0,
           allowLocalFallback ? 1 : 0,
           jitProvisioningEnabled ? 1 : 0,
+          JSON.stringify(jitDefaultRoleNames),
           status,
           userId,
           userId,

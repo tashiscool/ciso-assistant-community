@@ -20,6 +20,7 @@ export type OidcConfigRecord = {
   loginEnforced: boolean;
   allowLocalFallback: boolean;
   jitProvisioningEnabled: boolean;
+  jitDefaultRoleNames: string[];
 };
 
 export type OidcAuthTransactionRecord = {
@@ -119,6 +120,11 @@ function readStringArrayClaim(source: Record<string, unknown>, path: string | nu
       .filter(Boolean);
   }
   return [];
+}
+
+function normalizeHostedDomain(value: string | null | undefined): string | null {
+  const normalized = (value ?? '').trim().toLowerCase();
+  return normalized || null;
 }
 
 export function normalizeAuthProtocol(value: string | null | undefined): AuthProtocol {
@@ -380,6 +386,28 @@ function validateAudience(payload: Record<string, unknown>, clientId: string): v
   throw new Error('The identity token audience did not match this workspace.');
 }
 
+function validateHostedDomain(
+  payload: Record<string, unknown>,
+  config: OidcConfigRecord,
+  resolvedEmail: string | null,
+): void {
+  const expectedDomain = normalizeHostedDomain(config.domainHint);
+  if (!expectedDomain) {
+    return;
+  }
+
+  const hostedDomainClaim = normalizeHostedDomain(
+    typeof payload.hd === 'string' ? payload.hd : null,
+  );
+  const emailDomain = normalizeHostedDomain(resolvedEmail?.split('@').pop() ?? null);
+
+  if (hostedDomainClaim === expectedDomain || emailDomain === expectedDomain) {
+    return;
+  }
+
+  throw new Error(`This workspace only accepts ${expectedDomain} Google Workspace identities.`);
+}
+
 export async function completeOidcCodeExchange(
   config: OidcConfigRecord,
   transaction: OidcAuthTransactionRecord,
@@ -448,6 +476,7 @@ export async function completeOidcCodeExchange(
     readStringClaim(payload, 'email') ??
     readStringClaim(payload, config.usernameClaim) ??
     readStringClaim(payload, 'preferred_username');
+  validateHostedDomain(payload, config, email);
   const givenName =
     readStringClaim(payload, config.givenNameClaim) ?? readStringClaim(payload, 'given_name');
   const familyName =
