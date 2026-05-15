@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0.0",
+  "risk_id": "RISK-001",
+  "title": "Cloud misconfiguration could expose regulated data",
+  "statement": "Storage, IAM, or logging drift in the production AWS account could expose customer data or delay incident response.",
+  "category": "Security",
+  "status": "mitigating",
+  "owner": {
+    "name": "Alex Kim",
+    "team": "Platform Security",
+    "email": "alex@example.com"
+  },
+  "treatment": "mitigate",
+  "treatment_plan": "Enable preventive IaC checks, increase review coverage, and automate evidence collection for storage and IAM controls.",
+  "inherent": {
+    "likelihood": 4,
+    "impact": 5,
+    "score": 20,
+    "notes": "Historically noisy area with direct customer data exposure."
+  },
+  "residual": {
+    "likelihood": 2,
+    "impact": 4,
+    "score": 8,
+    "notes": "Residual score assumes weekly drift detection remains healthy."
+  },
+  "linked_findings": [
+    "github-inspector:20260418-9f8e7d6c",
+    "aws-inspector:20260418-1a2b3c4d"
+  ],
+  "linked_controls": [
+    "SCF-IAC-01",
+    "SCF-MON-01"
+  ],
+  "tags": [
+    "customer-data",
+    "aws",
+    "q2-priority"
+  ],
+  "created_at": "2026-04-01T14:00:00Z",
+  "updated_at": "2026-04-18T12:30:00Z",
+  "reviewed_at": "2026-04-18T12:30:00Z",
+  "target_close_at": "2026-06-30T00:00:00Z"
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0.0",
+  "metric_id": "automation.controls_automated",
+  "label": "Automated Controls",
+  "recorded_at": "2026-04-18T13:00:00Z",
+  "value": 42,
+  "unit": "controls",
+  "aggregation": "count",
+  "dimensions": {
+    "framework": "fedramp-moderate",
+    "provider": "aws"
+  },
+  "source": "grc-engineer://record-automation-metrics",
+  "subject": {
+    "kind": "framework",
+    "id": "fedramp-moderate"
+  },
+  "metadata": {
+    "notes": "Derived from the FedRAMP Moderate evidence automation baseline."
+  }
+}

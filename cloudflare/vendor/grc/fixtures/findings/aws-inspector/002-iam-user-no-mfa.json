@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "source": "aws-inspector",
+  "source_version": "0.1.0-fixture",
+  "run_id": "fixture-0002",
+  "collected_at": "2026-04-13T15:10:05Z",
+  "resource": {
+    "type": "aws_iam_user",
+    "id": "build-bot",
+    "arn": "arn:aws:iam::123456789012:user/build-bot",
+    "region": null,
+    "account_id": "123456789012"
+  },
+  "evaluations": [
+    {
+      "control_framework": "SCF",
+      "control_id": "IAC-02",
+      "status": "fail",
+      "severity": "medium",
+      "message": "IAM user has an active console password but no MFA device configured.",
+      "remediation": {
+        "summary": "Either disable console access for this service user or enforce MFA via an IAM policy condition.",
+        "ref": "grc-engineer://generate-implementation/mfa_enforcement/aws",
+        "effort_hours": 0.5,
+        "automation": "semi_automated"
+      }
+    },
+    {
+      "control_framework": "SCF",
+      "control_id": "VPM-01",
+      "status": "inconclusive",
+      "severity": "medium",
+      "message": "Could not retrieve last-password-used timestamp — IAM:GetLoginProfile denied. Re-run with iam:ListAccessKeys permission."
+    }
+  ]
+}

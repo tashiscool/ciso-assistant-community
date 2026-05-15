@@ -47,6 +47,14 @@ import { DoraReportPage } from '../features/reports/DoraReportPage';
 import { ChatWorkspacePage } from '../features/chat/ChatWorkspacePage';
 import { ImportsPage } from '../features/imports/ImportsPage';
 import { AutomationManagerPage } from '../features/integrations/AutomationManagerPage';
+import { FindingsExplorerPage } from '../features/grc/FindingsExplorerPage';
+import { FrameworkKnowledgeDetailPage } from '../features/grc/FrameworkKnowledgeDetailPage';
+import { FrameworkLibraryPage } from '../features/grc/FrameworkLibraryPage';
+import { GapAssessmentDetailPage } from '../features/grc/GapAssessmentDetailPage';
+import { GapAssessmentsPage } from '../features/grc/GapAssessmentsPage';
+import { GrcAdministrationPage } from '../features/grc/GrcAdministrationPage';
+import { ReportBundleDetailPage } from '../features/grc/ReportBundleDetailPage';
+import { ReportBundlesPage } from '../features/grc/ReportBundlesPage';
 import { PortalDashboardPage } from '../features/portal/PortalDashboardPage';
 import { PortalAssignmentDetailPage } from '../features/portal/PortalAssignmentDetailPage';
 import { ExportBuilderPage } from '../features/builders/ExportBuilderPage';
@@ -490,6 +498,13 @@ export function AppLayout() {
             <Route path="/libraries/:libraryId" element={allowedOnly(access.canUseLibraries, <LibraryDetailPage />)} />
             <Route path="/frameworks" element={allowedOnly(access.canUseFrameworks, <FrameworksPage />)} />
             <Route path="/frameworks/:frameworkId" element={allowedOnly(access.canUseFrameworks, <FrameworkDetailPage />)} />
+            <Route path="/framework-library" element={allowedOnly(access.canUseFrameworks, <FrameworkLibraryPage />)} />
+            <Route path="/framework-library/:frameworkId" element={allowedOnly(access.canUseFrameworks, <FrameworkKnowledgeDetailPage />)} />
+            <Route path="/findings" element={allowedOnly(access.canUseFrameworks, <FindingsExplorerPage />)} />
+            <Route path="/gap-assessments" element={allowedOnly(access.canUseFrameworks, <GapAssessmentsPage />)} />
+            <Route path="/gap-assessments/:assessmentId" element={allowedOnly(access.canUseFrameworks, <GapAssessmentDetailPage />)} />
+            <Route path="/report-bundles" element={allowedOnly(access.canUseFrameworks, <ReportBundlesPage />)} />
+            <Route path="/report-bundles/:bundleId" element={allowedOnly(access.canUseFrameworks, <ReportBundleDetailPage />)} />
             <Route path="/assessments" element={allowedOnly(access.canUseAssessmentWorkspace, <AssessmentsPage />)} />
             <Route path="/risk-assessments/:assessmentId" element={allowedOnly(access.canUseRiskAssessments, <RiskAssessmentDetailPage />)} />
             <Route
@@ -582,6 +597,7 @@ export function AppLayout() {
             <Route path="/imports" element={adminOnly(<ImportsPage />)} />
             <Route path="/automation-manager" element={adminOnly(<AutomationManagerPage />)} />
             <Route path="/features/automation-manager" element={adminOnly(<AutomationManagerPage />)} />
+            <Route path="/grc-admin" element={adminOnly(<GrcAdministrationPage />)} />
             <Route path="/workflow" element={internalOnly(<WorkflowControlPage />)} />
             <Route path="/features/workflow" element={internalOnly(<WorkflowControlPage />)} />
             <Route path="/utilities" element={internalOnly(<UtilitiesControlPage />)} />

@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0.0",
+  "source": "github-inspector",
+  "source_version": "0.1.0-fixture",
+  "run_id": "fixture-0001",
+  "collected_at": "2026-04-13T15:04:05Z",
+  "resource": {
+    "type": "github_repository",
+    "id": "acme/prod-api",
+    "uri": "https://github.com/acme/prod-api",
+    "account_id": "acme"
+  },
+  "evaluations": [
+    {
+      "control_framework": "SCF",
+      "control_id": "CHG-02",
+      "status": "fail",
+      "severity": "high",
+      "message": "Default branch 'main' has no protection rule; direct pushes are permitted without review.",
+      "remediation": {
+        "summary": "Enable branch protection on main with at least 1 required reviewer and dismiss stale reviews.",
+        "ref": "grc-engineer://generate-implementation/change_management/github",
+        "effort_hours": 0.25,
+        "automation": "auto_fixable"
+      }
+    },
+    {
+      "control_framework": "SCF",
+      "control_id": "MON-01",
+      "status": "pass",
+      "severity": "info"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0.0",
+  "vendor_id": "VENDOR-001",
+  "name": "Acme Payroll",
+  "tier": "high",
+  "status": "active",
+  "owner": {
+    "team": "TPRM"
+  },
+  "contacts": [
+    {
+      "name": "Robin Shah",
+      "email": "security@acmepayroll.example",
+      "role": "Security contact"
+    }
+  ],
+  "services": [
+    "Payroll processing",
+    "Tax filing"
+  ],
+  "last_review_at": "2026-03-31T18:00:00Z",
+  "next_review_at": "2026-09-30T18:00:00Z",
+  "risks": [
+    "RISK-001"
+  ],
+  "linked_findings": [
+    "questionnaire-2026-q1"
+  ]
+}

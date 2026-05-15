@@ -459,7 +459,7 @@ async function buildJobHealth(
   artifactsCount: number,
 ) {
   const [runtime, regmlEnabled] = await Promise.all([
-    getAiRuntimeStatus(ctx.env),
+    getAiRuntimeStatus(ctx.env, tenantId),
     getRegmlEnabled(ctx.env, tenantId),
   ]);
 
@@ -519,7 +519,7 @@ async function deriveItemAnswers(
   }
 
   const [runtime, tenantContext, acceptedPatterns] = await Promise.all([
-    getAiRuntimeStatus(env),
+    getAiRuntimeStatus(env, tenantId),
     buildTenantAiContext(env, tenantId),
     listAcceptedAnswerPatterns(env, tenantId),
   ]);
@@ -542,13 +542,14 @@ async function deriveItemAnswers(
           label: source.label,
         },
       })),
+      tenantId,
     );
   }
 
   const generatedItems = [];
   for (const [index, template] of responseQuestionBank.entries()) {
     const matches = runtime.vectorizeAvailable
-      ? await queryVectorDocuments(env, namespace, template.question, 3)
+      ? await queryVectorDocuments(env, namespace, template.question, 3, tenantId)
       : [];
 
     const relevantSources =
@@ -575,7 +576,7 @@ async function deriveItemAnswers(
       userPrompt: prompts.userPrompt,
       maxTokens: 420,
       temperature: 0.1,
-    });
+    }, tenantId);
 
     const generatedAnswer = generatedDraft?.answer?.trim() ?? '';
     const noGrounding =

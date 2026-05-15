@@ -286,7 +286,7 @@ async function buildRecommendationItems(
   artifact: EvidenceArtifactRow,
   targets: TargetRecord[],
 ) {
-  const runtime = await getAiRuntimeStatus(ctx.env);
+  const runtime = await getAiRuntimeStatus(ctx.env, tenantId);
   if (!runtime.vectorizeAvailable) {
     return targets
       .map((target) => ({
@@ -317,9 +317,10 @@ async function buildRecommendationItems(
         parentLabel: target.parentLabel,
       },
     })),
+    tenantId,
   );
 
-  const matches = await queryVectorDocuments(ctx.env, namespace, buildArtifactContext(artifact), 12);
+  const matches = await queryVectorDocuments(ctx.env, namespace, buildArtifactContext(artifact), 12, tenantId);
   if (matches.length === 0) {
     return targets
       .map((target) => ({
@@ -355,7 +356,7 @@ async function buildRecommendationItems(
         ].join('\n'),
         maxTokens: 120,
         temperature: 0.1,
-      })) ??
+      }, tenantId)) ??
       `Vector similarity aligned the artifact context with ${target.title} in the canonical target catalog.`;
 
     items.push({
@@ -376,7 +377,7 @@ async function buildWorkspace(ctx: WorkerRequestContext, tenantId: string) {
   const [artifacts, targets, runtime] = await Promise.all([
     listEvidenceArtifacts(ctx.env, tenantId),
     listTargets(ctx.env, tenantId),
-    getAiRuntimeStatus(ctx.env),
+    getAiRuntimeStatus(ctx.env, tenantId),
   ]);
 
   const records = await Promise.all(

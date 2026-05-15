@@ -15,11 +15,16 @@ CLI_DRY_RUN="${DRY_RUN-}"
 CLI_CLOUDFLARE_WORKER_ENV="${CLOUDFLARE_WORKER_ENV-}"
 
 cf_load_prod_env "${1:-}"
+
+if [[ -z "${BOOTSTRAP_SETUP_SECRET-}" && -f "${ROOT_DIR}/.env-prod" ]]; then
+  set -a
+  # shellcheck disable=SC1091
+  source "${ROOT_DIR}/.env-prod"
+  set +a
+fi
+
 cf_prepare_wrangler_env
 cf_verify_cloudflare_token
-
-REGOVISE_WORKER_SERVICE_NAME="${REGOVISE_WORKER_SERVICE_NAME:-ciso-assistant-edge-production}"
-export REGOVISE_WORKER_SERVICE_NAME
 
 RUN_PREDEPLOY_TESTS="${CLI_RUN_PREDEPLOY_TESTS:-${RUN_PREDEPLOY_TESTS:-1}}"
 APPLY_D1_MIGRATIONS="${CLI_APPLY_D1_MIGRATIONS:-${APPLY_D1_MIGRATIONS:-0}}"
@@ -27,6 +32,8 @@ RUN_POST_DEPLOY_SMOKE="${CLI_RUN_POST_DEPLOY_SMOKE:-${RUN_POST_DEPLOY_SMOKE:-1}}
 RUN_SECRET_SYNC="${CLI_RUN_SECRET_SYNC:-${RUN_SECRET_SYNC:-1}}"
 DRY_RUN="${CLI_DRY_RUN:-${DRY_RUN:-0}}"
 CLOUDFLARE_WORKER_ENV="${CLI_CLOUDFLARE_WORKER_ENV:-${CLOUDFLARE_WORKER_ENV:-production}}"
+REGOVISE_WORKER_SERVICE_NAME="${REGOVISE_WORKER_SERVICE_NAME:-ciso-assistant-edge-production}"
+export REGOVISE_WORKER_SERVICE_NAME
 
 cf_step "Cloudflare Workers deploy access preflight"
 cf_verify_workers_deploy_access

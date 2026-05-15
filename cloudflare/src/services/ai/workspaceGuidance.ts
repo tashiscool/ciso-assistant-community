@@ -173,7 +173,7 @@ export async function buildWorkspaceChatReply(
   const context = await buildTenantAiContext(env, tenantId);
   const domain = classifyWorkspaceGuidanceDomain(message);
   const fallback = buildFallbackReply(domain, message, context);
-  const runtime = await getAiRuntimeStatus(env);
+  const runtime = await getAiRuntimeStatus(env, tenantId);
 
   if (!runtime.textGenerationAvailable) {
     return fallback;
@@ -194,7 +194,7 @@ export async function buildWorkspaceChatReply(
     userPrompt: prompts.userPrompt,
     maxTokens: 420,
     temperature: 0.15,
-  });
+  }, tenantId);
 
   const answer = generated?.answer?.trim();
   if (!answer) {

@@ -99,6 +99,7 @@ const ADMIN_ROUTE_PREFIXES = [
   '/features/response-automation',
   '/features/evidence-mapping',
   '/features/automation-manager',
+  '/grc-admin',
 ];
 
 const ADMIN_ROUTE_EXACT = new Set([
@@ -222,6 +223,10 @@ function canAccessStandardRoute(route: string, access: ShellAccessProfile): bool
     [['/program'], access.canUseProgramWorkspace],
     [['/libraries', '/loaded-libraries', '/mapping-libraries', '/stored-libraries'], access.canUseLibraries],
     [['/frameworks'], access.canUseFrameworks],
+    [['/framework-library'], access.canUseFrameworks],
+    [['/findings'], access.canUseFrameworks],
+    [['/gap-assessments'], access.canUseFrameworks],
+    [['/report-bundles'], access.canUseFrameworks],
     [['/assessments', '/compliance-assessments'], access.canUseAssessmentWorkspace],
     [['/applied-controls'], access.canUseComplianceAssessments],
     [['/risk-assessments', '/risk-scenarios'], access.canUseRiskAssessments],

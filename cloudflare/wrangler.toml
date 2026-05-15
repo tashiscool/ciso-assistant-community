@@ -34,11 +34,21 @@ new_sqlite_classes = ["TenantWorkflowCoordinator"]
 [queues]
 producers = [
   { binding = "QUEUE_EVIDENCE_JOBS", queue = "ciso-assistant-evidence-jobs" },
-  { binding = "QUEUE_CONMON_JOBS", queue = "ciso-assistant-conmon-jobs" }
+  { binding = "QUEUE_CONMON_JOBS", queue = "ciso-assistant-conmon-jobs" },
+  { binding = "QUEUE_GRC_CONTENT_IMPORT", queue = "ciso-assistant-grc-content-import" },
+  { binding = "QUEUE_GRC_SCF_REFRESH", queue = "ciso-assistant-grc-scf-refresh" },
+  { binding = "QUEUE_GRC_FINDING_INGEST", queue = "ciso-assistant-grc-finding-ingest" },
+  { binding = "QUEUE_GRC_GAP_REPORT", queue = "ciso-assistant-grc-gap-report" },
+  { binding = "QUEUE_GRC_AI_ENRICH", queue = "ciso-assistant-grc-ai-enrich" }
 ]
 consumers = [
   { queue = "ciso-assistant-evidence-jobs", max_batch_size = 5, max_retries = 3 },
-  { queue = "ciso-assistant-conmon-jobs", max_batch_size = 5, max_retries = 3 }
+  { queue = "ciso-assistant-conmon-jobs", max_batch_size = 5, max_retries = 3 },
+  { queue = "ciso-assistant-grc-content-import", max_batch_size = 2, max_retries = 3 },
+  { queue = "ciso-assistant-grc-scf-refresh", max_batch_size = 2, max_retries = 3 },
+  { queue = "ciso-assistant-grc-finding-ingest", max_batch_size = 5, max_retries = 3 },
+  { queue = "ciso-assistant-grc-gap-report", max_batch_size = 2, max_retries = 3 },
+  { queue = "ciso-assistant-grc-ai-enrich", max_batch_size = 2, max_retries = 3 }
 ]
 
 [env.production]
@@ -81,11 +91,21 @@ bindings = [
 [env.production.queues]
 producers = [
   { binding = "QUEUE_EVIDENCE_JOBS", queue = "ciso-assistant-evidence-jobs" },
-  { binding = "QUEUE_CONMON_JOBS", queue = "ciso-assistant-conmon-jobs" }
+  { binding = "QUEUE_CONMON_JOBS", queue = "ciso-assistant-conmon-jobs" },
+  { binding = "QUEUE_GRC_CONTENT_IMPORT", queue = "ciso-assistant-grc-content-import" },
+  { binding = "QUEUE_GRC_SCF_REFRESH", queue = "ciso-assistant-grc-scf-refresh" },
+  { binding = "QUEUE_GRC_FINDING_INGEST", queue = "ciso-assistant-grc-finding-ingest" },
+  { binding = "QUEUE_GRC_GAP_REPORT", queue = "ciso-assistant-grc-gap-report" },
+  { binding = "QUEUE_GRC_AI_ENRICH", queue = "ciso-assistant-grc-ai-enrich" }
 ]
 consumers = [
   { queue = "ciso-assistant-evidence-jobs", max_batch_size = 5, max_retries = 3 },
-  { queue = "ciso-assistant-conmon-jobs", max_batch_size = 5, max_retries = 3 }
+  { queue = "ciso-assistant-conmon-jobs", max_batch_size = 5, max_retries = 3 },
+  { queue = "ciso-assistant-grc-content-import", max_batch_size = 2, max_retries = 3 },
+  { queue = "ciso-assistant-grc-scf-refresh", max_batch_size = 2, max_retries = 3 },
+  { queue = "ciso-assistant-grc-finding-ingest", max_batch_size = 5, max_retries = 3 },
+  { queue = "ciso-assistant-grc-gap-report", max_batch_size = 2, max_retries = 3 },
+  { queue = "ciso-assistant-grc-ai-enrich", max_batch_size = 2, max_retries = 3 }
 ]
 
 [[env.production.routes]]

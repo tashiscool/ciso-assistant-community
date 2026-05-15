@@ -9,6 +9,7 @@ import { handleAiRoutes } from './services/ai/http';
 import { handleSetupRoutes } from './services/setup/http';
 import { handleAssuranceRoutes } from './services/assurance/http';
 import { handleAgentRoutes } from './services/agent/http';
+import { handleGrcRoutes } from './services/grc-engine/http';
 import { withAuth } from './auth';
 import type { AuthStrategy, EnvBindings } from './types/env';
 import { corsPreflight, json, withCors } from './utils/http';
@@ -91,19 +92,41 @@ export async function handleRequest(
       case 'agent':
         response = await handleAgentRoutes(rest, baseCtx);
         break;
+      case 'grc':
+        response = await handleGrcRoutes(rest, baseCtx);
+        break;
       default:
         response = json({ error: 'unknown_service', service }, { status: 404 });
         break;
     }
   } catch (error) {
     console.error('Worker request failed', error);
-    response = json(
-      {
-        error: 'request_failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      },
-      { status: 500 },
-    );
+    if (
+      error &&
+      typeof error === 'object' &&
+      'status' in error &&
+      typeof (error as { status?: unknown }).status === 'number' &&
+      'code' in error &&
+      typeof (error as { code?: unknown }).code === 'string'
+    ) {
+      const typedError = error as { status: number; code: string; message: string; details?: Record<string, unknown> | null };
+      response = json(
+        {
+          error: typedError.code,
+          message: typedError.message,
+          ...(typedError.details ? { details: typedError.details } : {}),
+        },
+        { status: typedError.status },
+      );
+    } else {
+      response = json(
+        {
+          error: 'request_failed',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        },
+        { status: 500 },
+      );
+    }
   }
 
   return withCors(request, response);
