@@ -39,7 +39,7 @@ function stripFrontmatter(markdown: string) {
   return markdown.replace(/^---\s*\n[\s\S]*?\n---\s*\n?/m, '');
 }
 
-function sanitizeImportedText(value: string) {
+export function sanitizeImportedText(value: string) {
   let sanitized = value
     .replace(/\b[Cc]laude\b/g, 'Regovise')
     .replace(/\bmarketplace\b/gi, 'reference catalog')
@@ -59,7 +59,7 @@ function sanitizeImportedText(value: string) {
   return sanitized;
 }
 
-function sanitizeImportedMarkdown(markdown: string) {
+export function sanitizeImportedMarkdown(markdown: string) {
   let sanitized = stripFrontmatter(markdown).replace(/\r\n/g, '\n');
 
   sanitized = sanitized.replace(/```bash[\s\S]*?```/gi, (block) => {

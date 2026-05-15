@@ -16,6 +16,8 @@ import {
   finalizeCuratedSnapshotImport,
   getCuratedImportStatus,
   importCuratedSnapshotSlice,
+  sanitizeImportedMarkdown,
+  sanitizeImportedText,
 } from './snapshot';
 import {
   canUseFixtureCollectors,
@@ -1498,7 +1500,7 @@ async function listFrameworksInternal(ctx: WorkerRequestContext): Promise<Framew
         slug: row.slug,
         frameworkKey: row.framework_key,
         name: row.name,
-        description: row.description,
+        description: row.description ? sanitizeImportedText(row.description) : row.description,
         version: row.version,
         category: row.category,
         tags: asJson<string[]>(row.tags_json, []),
@@ -1548,8 +1550,8 @@ async function getFrameworkByToken(ctx: WorkerRequestContext, token: string): Pr
     documents: documentRows.results.map((document) => ({
       id: document.id,
       slug: document.slug,
-      title: document.title,
-      summary: document.summary,
+      title: sanitizeImportedText(document.title),
+      summary: document.summary ? sanitizeImportedText(document.summary) : document.summary,
       docKind: document.doc_kind,
       sourcePath: document.source_path,
       sourceRevision: document.source_revision,
@@ -1587,7 +1589,7 @@ async function getFrameworkContentDocument(
 
   return {
     ...document,
-    bodyMarkdown: revision?.body_markdown ?? '',
+    bodyMarkdown: sanitizeImportedMarkdown(revision?.body_markdown ?? ''),
   };
 }
 
