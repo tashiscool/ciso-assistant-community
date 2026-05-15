@@ -1,0 +1,139 @@
+name: GRC Production Ops
+
+on:
+  workflow_dispatch:
+    inputs:
+      purge_banned_revisions:
+        description: 'Delete stale banned GRC content revisions after re-import when a clean replacement revision exists'
+        required: false
+        default: true
+        type: boolean
+      require_ready_collector:
+        description: 'Fail if no live-ready native collector is available for launch'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NODE_VERSION: '22'
+  REGOVISE_PROD_BASE_URL: https://regovise.com
+  REGOVISE_VERIFY_TENANT_SLUG: regovise
+  REGOVISE_VERIFY_EMAIL: admin@regovise.com
+
+jobs:
+  grc-production-ops:
+    name: Re-import and Validate Production GRC
+    runs-on: ubuntu-latest
+    concurrency:
+      group: regovise-grc-production-ops
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: cloudflare/package-lock.json
+
+      - run: npm ci
+        working-directory: cloudflare
+
+      - name: Re-import curated snapshot and exercise async GRC jobs
+        env:
+          REGOVISE_PROD_BASE_URL: ${{ env.REGOVISE_PROD_BASE_URL }}
+          BOOTSTRAP_SETUP_SECRET: ${{ secrets.BOOTSTRAP_SETUP_SECRET }}
+          REGOVISE_VERIFY_TENANT_SLUG: ${{ env.REGOVISE_VERIFY_TENANT_SLUG }}
+          REGOVISE_VERIFY_EMAIL: ${{ env.REGOVISE_VERIFY_EMAIL }}
+          GRC_PROD_REQUIRE_READY_COLLECTOR: ${{ inputs.require_ready_collector }}
+          GRC_PROD_SUMMARY_FILE: /tmp/grc-production-ops-summary.json
+        run: node .github/scripts/ops_grc_production.mjs
+
+      - name: Purge stale banned GRC revisions with clean replacements
+        if: inputs.purge_banned_revisions == true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          SQL=$(cat <<'EOF'
+          DELETE FROM grc_content_revisions AS bad
+          WHERE (
+            lower(bad.body_markdown) LIKE '%/plugin%'
+            OR lower(bad.body_markdown) LIKE '%/grc-engineer:%'
+            OR lower(bad.body_markdown) LIKE '%claude-grc%'
+            OR lower(bad.body_markdown) LIKE '%marketplace%'
+          )
+          AND EXISTS (
+            SELECT 1
+            FROM grc_content_revisions AS clean
+            WHERE clean.document_id = bad.document_id
+              AND clean.id != bad.id
+              AND lower(clean.body_markdown) NOT LIKE '%/plugin%'
+              AND lower(clean.body_markdown) NOT LIKE '%/grc-engineer:%'
+              AND lower(clean.body_markdown) NOT LIKE '%claude-grc%'
+              AND lower(clean.body_markdown) NOT LIKE '%marketplace%'
+          );
+          EOF
+          )
+          npx wrangler d1 execute D1_MAIN --env production --remote --json --command "$SQL" > /tmp/grc-d1-cleanup.json
+          cat /tmp/grc-d1-cleanup.json | jq .
+        working-directory: cloudflare
+
+      - name: Verify no banned GRC revisions remain in production storage
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          SQL=$(cat <<'EOF'
+          SELECT COUNT(*) AS banned_count
+          FROM grc_content_revisions
+          WHERE lower(body_markdown) LIKE '%/plugin%'
+             OR lower(body_markdown) LIKE '%/grc-engineer:%'
+             OR lower(body_markdown) LIKE '%claude-grc%'
+             OR lower(body_markdown) LIKE '%marketplace%';
+          EOF
+          )
+          JSON=$(npx wrangler d1 execute D1_MAIN --env production --remote --json --command "$SQL")
+          echo "$JSON" | jq .
+          BANNED_COUNT=$(echo "$JSON" | jq -r '.. | objects | select(has("banned_count")) | .banned_count' | head -n1)
+          if [ -z "$BANNED_COUNT" ]; then
+            echo "Unable to parse banned_count from D1 query output"
+            exit 1
+          fi
+          if [ "$BANNED_COUNT" != "0" ]; then
+            echo "Expected banned_count=0, got $BANNED_COUNT"
+            SAMPLE_SQL=$(cat <<'EOF'
+            SELECT document_id, substr(body_markdown, 1, 160) AS sample
+            FROM grc_content_revisions
+            WHERE lower(body_markdown) LIKE '%/plugin%'
+               OR lower(body_markdown) LIKE '%/grc-engineer:%'
+               OR lower(body_markdown) LIKE '%claude-grc%'
+               OR lower(body_markdown) LIKE '%marketplace%'
+            LIMIT 5;
+            EOF
+            )
+            npx wrangler d1 execute D1_MAIN --env production --remote --json --command "$SAMPLE_SQL" | jq .
+            exit 1
+          fi
+        working-directory: cloudflare
+
+      - name: Re-run production smoke with real bootstrap session
+        env:
+          REGOVISE_PROD_BASE_URL: ${{ env.REGOVISE_PROD_BASE_URL }}
+          PROD_SMOKE_TENANT_ID: ${{ secrets.PROD_SMOKE_TENANT_ID }}
+          PROD_SMOKE_USER_ID: ${{ secrets.PROD_SMOKE_USER_ID }}
+          BOOTSTRAP_SETUP_SECRET: ${{ secrets.BOOTSTRAP_SETUP_SECRET }}
+          REGOVISE_VERIFY_TENANT_SLUG: ${{ env.REGOVISE_VERIFY_TENANT_SLUG }}
+          REGOVISE_VERIFY_EMAIL: ${{ env.REGOVISE_VERIFY_EMAIL }}
+          PROD_SMOKE_REQUIRE_SESSION: '1'
+        run: npm run smoke:production
+        working-directory: cloudflare
+
+      - name: Upload production GRC ops artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: grc-production-ops
+          path: |
+            /tmp/grc-production-ops-summary.json
+            /tmp/grc-d1-cleanup.json
