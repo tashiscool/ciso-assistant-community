@@ -6315,6 +6315,95 @@ export async function handleCoreRoutes(
     return methodNotAllowed(['GET', 'POST']);
   }
 
+  if (resource === 'tenants') {
+    if (!id && ctx.request.method === 'POST') {
+      const adminAccess = await requireRootAdminAccess(
+        ctx,
+        'Tenant administrator access is required to create a new workspace.',
+      );
+      if (adminAccess instanceof Response) {
+        return adminAccess;
+      }
+
+      const body = await readJson<{
+        tenantName?: string;
+        tenantSlug?: string;
+        adminEmail?: string;
+        adminDisplayName?: string;
+      }>(ctx.request);
+
+      const tenantName = body.tenantName?.trim() || '';
+      const tenantSlug = slugifyTenant(body.tenantSlug?.trim() || tenantName);
+      const adminEmail = normalizeEmail(body.adminEmail);
+      const adminDisplayName = body.adminDisplayName?.trim() || '';
+
+      if (!tenantName || !tenantSlug || !adminEmail || !adminDisplayName) {
+        return json(
+          {
+            error: 'invalid_tenant_payload',
+            message: 'Tenant name, tenant slug, admin email, and admin display name are required.',
+          },
+          { status: 400 },
+        );
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail)) {
+        return json(
+          {
+            error: 'invalid_tenant_payload',
+            message: 'A valid admin email address is required.',
+          },
+          { status: 400 },
+        );
+      }
+
+      const existingSlug = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT id
+        FROM tenants
+        WHERE slug = ?
+        LIMIT 1
+        `,
+      )
+        .bind(tenantSlug)
+        .first<{ id: string }>();
+
+      if (existingSlug) {
+        return json(
+          {
+            error: 'tenant_slug_exists',
+            message: 'That tenant slug is already in use.',
+          },
+          { status: 409 },
+        );
+      }
+
+      const initialized = await initializeFirstTenant(ctx.env, {
+        tenantName,
+        tenantSlug,
+        adminEmail,
+        adminDisplayName,
+      });
+
+      return json(
+        {
+          data: {
+            created: true,
+            tenantId: initialized.tenantId,
+            userId: initialized.userId,
+            tenantSlug,
+            tenantName,
+            adminEmail,
+            adminDisplayName,
+          },
+        },
+        { status: 201 },
+      );
+    }
+
+    return methodNotAllowed(['POST']);
+  }
+
   if (resource === 'sso') {
     if (id === 'start' && ctx.request.method === 'POST') {
       const body = await readJson<{
