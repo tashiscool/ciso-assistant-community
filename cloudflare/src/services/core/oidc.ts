@@ -144,10 +144,18 @@ export function normalizeNextPath(value: string | null | undefined): string {
 }
 
 export function isRunnableOidcConfig(config: OidcConfigRecord | null | undefined): boolean {
+  const clientId = config?.clientId?.trim() ?? '';
+  const normalizedClientId = clientId.toLowerCase();
+  const isPlaceholderClientId =
+    !clientId ||
+    normalizedClientId === 'google-client-demo' ||
+    normalizedClientId === 'client-id-demo' ||
+    normalizedClientId === 'demo-client-id';
+
   return Boolean(
     config &&
       config.authProtocol === 'oidc' &&
-      config.clientId?.trim() &&
+      !isPlaceholderClientId &&
       config.metadataUrl?.trim() &&
       config.callbackUrl?.trim(),
   );

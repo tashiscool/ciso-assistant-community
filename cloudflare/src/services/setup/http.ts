@@ -984,7 +984,7 @@ async function ensureSeedSsoConfig(env: EnvBindings, tenantId: string, userId: s
       updated_by_user_id,
       created_at,
       updated_at
-    ) VALUES (?, 'oidc', 'Google Workspace', 'corp.example.com', 'google-client-demo', ?, 'https://accounts.google.com/.well-known/openid-configuration', 'roles', 'email', 'given_name', 'family_name', 'preferred_username', 'Continue with Google', 1, 0, 1, 0, 'Review', ?, ?, ?, ?)
+    ) VALUES (?, 'oidc', 'Google Workspace', '', '', ?, 'https://accounts.google.com/.well-known/openid-configuration', 'roles', 'email', 'given_name', 'family_name', 'preferred_username', 'Continue with Google', 1, 0, 1, 0, 'Review', ?, ?, ?, ?)
     `,
   )
     .bind(tenantId, defaultSsoCallbackUrl(env), userId, userId, now, now)
@@ -2693,7 +2693,7 @@ export async function handleSetupRoutes(
           updated_by_user_id,
           created_at,
           updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(tenant_id) DO UPDATE SET
           auth_protocol = excluded.auth_protocol,
           provider_type = excluded.provider_type,
