@@ -11,7 +11,7 @@ import {
   type ScopedPermissionContext,
 } from '../../authorization';
 import { getAiRuntimeStatus } from '../ai/runtime';
-import { seedDemoIamWorkspace } from '../iam/http';
+import { BUILTIN_ROLE_TEMPLATES, seedDemoIamWorkspace } from '../iam/http';
 import { buildOpsOverviewCounts, seedDemoOpsWorkspace } from '../ops/http';
 import { seedDemoSetupWorkspace } from '../setup/http';
 import {
@@ -182,6 +182,8 @@ type SetupEmailConfigSummaryRow = {
 
 type SetupSsoLoginSummaryRow = {
   tenant_id?: string;
+  tenant_slug?: string | null;
+  tenant_name?: string | null;
   provider_type: string | null;
   auth_protocol?: string | null;
   client_id?: string | null;
@@ -4795,6 +4797,65 @@ async function loadBuiltinOrNamedRolesByNames(
   return rows.results ?? [];
 }
 
+async function ensureTenantBuiltinRolesByNames(
+  env: EnvBindings,
+  tenantId: string,
+  roleNames: string[],
+): Promise<void> {
+  const normalizedNames = Array.from(
+    new Set(roleNames.map((item) => item.trim()).filter(Boolean).map((item) => item.toLowerCase())),
+  );
+  if (normalizedNames.length === 0) {
+    return;
+  }
+
+  const templateByName = new Map(
+    BUILTIN_ROLE_TEMPLATES.map((template) => [template.name.trim().toLowerCase(), template]),
+  );
+  const desiredTemplates = normalizedNames
+    .map((name) => templateByName.get(name))
+    .filter((template): template is (typeof BUILTIN_ROLE_TEMPLATES)[number] => Boolean(template));
+
+  if (desiredTemplates.length === 0) {
+    return;
+  }
+
+  const existingRoles = await loadBuiltinOrNamedRolesByNames(
+    env,
+    tenantId,
+    desiredTemplates.map((template) => template.name),
+  );
+  const existingNames = new Set(existingRoles.map((role) => role.name.trim().toLowerCase()));
+
+  for (const template of desiredTemplates) {
+    const normalizedName = template.name.trim().toLowerCase();
+    if (existingNames.has(normalizedName)) {
+      continue;
+    }
+
+    const roleId = crypto.randomUUID();
+    await env.D1_MAIN.prepare(
+      `
+      INSERT INTO roles (id, tenant_id, name, description, builtin)
+      VALUES (?, ?, ?, ?, 1)
+      `,
+    )
+      .bind(roleId, tenantId, template.name, template.description)
+      .run();
+
+    for (const permission of template.permissions) {
+      await env.D1_MAIN.prepare(
+        `
+        INSERT OR IGNORE INTO role_permissions (role_id, permission)
+        VALUES (?, ?)
+        `,
+      )
+        .bind(roleId, permission)
+        .run();
+    }
+  }
+}
+
 async function loadRootFolderId(env: EnvBindings, tenantId: string): Promise<string | null> {
   const row = await env.D1_MAIN.prepare(
     `
@@ -5038,6 +5099,7 @@ async function syncSsoRoles(
     return { syncedRoleCount: 0 };
   }
 
+  await ensureTenantBuiltinRolesByNames(env, config.tenantId, effectiveRoleNames);
   const roles = await loadBuiltinOrNamedRolesByNames(env, config.tenantId, effectiveRoleNames);
   for (const role of roles) {
     const existingAssignment = await env.D1_MAIN.prepare(
@@ -5171,6 +5233,8 @@ async function buildLoginConfig(env: EnvBindings): Promise<LoginConfigPayload> {
       `
       SELECT
         tenant_id,
+        tenant.slug AS tenant_slug,
+        tenant.name AS tenant_name,
         provider_type,
         auth_protocol,
         client_id,
@@ -5182,7 +5246,9 @@ async function buildLoginConfig(env: EnvBindings): Promise<LoginConfigPayload> {
         allow_local_fallback,
         login_enforced
       FROM setup_sso_configs
-      ORDER BY updated_at DESC
+      INNER JOIN tenants AS tenant
+        ON tenant.id = setup_sso_configs.tenant_id
+      ORDER BY setup_sso_configs.updated_at DESC
       LIMIT 1
       `,
     ).first<SetupSsoLoginSummaryRow>(),
@@ -5237,6 +5303,10 @@ async function buildLoginConfig(env: EnvBindings): Promise<LoginConfigPayload> {
   const passwordSignInEnabled = bootstrap.initialized && Number(localLoginUserCount?.count ?? 0) > 0;
   const ssoConfig = await coerceSsoRuntimeConfig(env, ssoRow, requestOrigin);
   const ssoSummary = buildSsoSummary(ssoConfig);
+  const suggestedTenantSlug =
+    ssoSummary.loginEnforced && ssoConfig?.tenantSlug?.trim()
+      ? ssoConfig.tenantSlug.trim()
+      : suggestedLoginRow?.tenant_slug ?? null;
 
   let message = 'Email code sign-in is ready for users with local-login access.';
   if (!bootstrap.initialized) {
@@ -5269,7 +5339,7 @@ async function buildLoginConfig(env: EnvBindings): Promise<LoginConfigPayload> {
     statusNote: emailConfigRow?.status_note ?? null,
     localLoginUserCount: Number(localLoginUserCount?.count ?? 0),
     passwordConfiguredUserCount,
-    suggestedTenantSlug: suggestedLoginRow?.tenant_slug ?? null,
+    suggestedTenantSlug,
     suggestedEmail: suggestedLoginRow?.email ?? null,
     message,
     sso: ssoSummary,

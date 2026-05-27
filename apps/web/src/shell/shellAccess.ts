@@ -63,6 +63,8 @@ const OPERATIONS_READ_PERMISSIONS = new Set([
 ]);
 
 export type ShellAccessProfile = {
+  hasWorkspacePermissions: boolean;
+  needsAccessApproval: boolean;
   isWorkspaceAdmin: boolean;
   canViewAdminNavigation: boolean;
   canViewInternalTools: boolean;
@@ -178,6 +180,7 @@ function hasAnyPermission(payload: IamMePayload | null, permissions: Set<string>
 }
 
 export function deriveShellAccessProfile(payload: IamMePayload | null): ShellAccessProfile {
+  const hasWorkspacePermissions = Boolean(payload?.permissions.length);
   const isWorkspaceAdmin = hasAnyPermission(payload, WORKSPACE_ADMIN_PERMISSIONS);
   const canUseFrameworks = hasAnyPermission(payload, FRAMEWORK_READ_PERMISSIONS);
   const canUseRiskAssessments = hasAnyPermission(payload, RISK_READ_PERMISSIONS);
@@ -191,6 +194,8 @@ export function deriveShellAccessProfile(payload: IamMePayload | null): ShellAcc
   const canUsePortal = isAuditee || canUseFrameworks;
 
   return {
+    hasWorkspacePermissions,
+    needsAccessApproval: Boolean(payload?.profile) && !hasWorkspacePermissions,
     isWorkspaceAdmin,
     canViewAdminNavigation: isWorkspaceAdmin,
     canViewInternalTools: isWorkspaceAdmin,

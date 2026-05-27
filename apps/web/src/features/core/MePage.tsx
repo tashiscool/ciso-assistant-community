@@ -30,6 +30,8 @@ export function MePage() {
     void loadMe();
   }, [identity.tenantId, identity.userId]);
 
+  const awaitingAccessApproval = Boolean(me?.profile) && (me?.permissions.length ?? 0) === 0;
+
   async function handlePasswordChange(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -104,6 +106,13 @@ export function MePage() {
 
       {notice && <div className="notice-success">{notice}</div>}
       {error && <div className="notice-error">{error}</div>}
+      {awaitingAccessApproval && (
+        <div className="notice-warning">
+          This account can authenticate successfully, but no workspace capabilities are assigned yet. Ask a
+          workspace administrator to grant the appropriate role or scoped permission set before using the broader
+          Regovise workspace.
+        </div>
+      )}
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="metric-card">

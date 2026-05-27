@@ -540,7 +540,15 @@ export function HomePage({ access }: HomePageProps) {
     const core = data.core ?? EMPTY_CORE_OVERVIEW;
     const assurance = data.assurance ?? EMPTY_ASSURANCE_OVERVIEW;
     const stage = deriveStage(data, access);
-    const copy = STAGE_COPY[stage];
+    const copy =
+      access.needsAccessApproval && stage === 'workspace'
+        ? {
+            ...STAGE_COPY.workspace,
+            title: 'Your sign-in worked, but this account is still waiting for workspace access.',
+            description:
+              'An administrator still needs to grant roles or scoped permissions before this session can use the broader Regovise workspace.',
+          }
+        : STAGE_COPY[stage];
     const quickStartCompleted = data.ops?.quickStart.filter((step) => step.completed).length ?? 0;
     const quickStartProgress =
       data.ops && data.ops.quickStart.length > 0 ? (quickStartCompleted / data.ops.quickStart.length) * 100 : 100;
@@ -890,7 +898,9 @@ export function HomePage({ access }: HomePageProps) {
                           : 'No assurance package has been built yet')
                       : access.canUsePortal
                         ? 'This session is focused on portal-driven collaboration and assigned external work.'
-                        : 'This session is limited to the workspace capabilities currently assigned to your account.'}
+                        : access.needsAccessApproval
+                          ? 'This account can sign in, but it still needs an administrator to grant workspace roles or scoped permissions.'
+                          : 'This session is limited to the workspace capabilities currently assigned to your account.'}
                   </div>
                 </div>
                 {access.canUseAssurance && data.readiness?.status ? (
@@ -915,7 +925,9 @@ export function HomePage({ access }: HomePageProps) {
                     : 'Build an evidence-backed package to unlock review-ready assurance sharing from the Home surface.'
                   : access.canUsePortal
                     ? 'Open the auditee portal to respond to assigned work without exposing the broader workspace.'
-                    : 'Use My Access to confirm the current role or request broader access when you need additional workspace areas.'}
+                    : access.needsAccessApproval
+                      ? 'Open My Access, confirm the current identity, and ask a workspace administrator to assign the roles you need.'
+                      : 'Use My Access to confirm the current role or request broader access when you need additional workspace areas.'}
               </div>
               {access.canUseAssurance && data.readiness?.source.packageRoute ? (
                 <Link

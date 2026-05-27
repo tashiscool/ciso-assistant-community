@@ -296,13 +296,14 @@ const DEMO_IDS = {
   domainManagerRoleId: 'role-domain-manager-demo',
   analystRoleId: 'role-analyst-demo',
   readerRoleId: 'role-reader-demo',
+  pendingAccessRoleId: 'role-pending-access-demo',
   adminAssignmentId: 'role-assignment-admin-demo',
   analystAssignmentId: 'role-assignment-analyst-demo',
   vendorGroupAssignmentId: 'role-assignment-vendor-group-demo',
   vendorManagerAssignmentId: 'role-assignment-vendor-manager-demo',
 };
 
-const BUILTIN_ROLE_TEMPLATES = [
+export const BUILTIN_ROLE_TEMPLATES = [
   {
     id: DEMO_IDS.administratorRoleId,
     name: 'Administrator',
@@ -463,6 +464,12 @@ const BUILTIN_ROLE_TEMPLATES = [
       'view_conmon',
       'view_evidence',
     ],
+  },
+  {
+    id: DEMO_IDS.pendingAccessRoleId,
+    name: 'Pending Access',
+    description: 'Can sign in and review account posture, but needs an administrator to grant workspace roles.',
+    permissions: [],
   },
 ] as const;
 
