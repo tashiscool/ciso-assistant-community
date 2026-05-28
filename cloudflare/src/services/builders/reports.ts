@@ -1,10 +1,44 @@
 import type { WorkerRequestContext } from '../../router';
+import { loadScopedPermissionContext } from '../../authorization';
 import { json, methodNotAllowed, readJson } from '../../utils/http';
 import { MODULE_CATALOG, type ModuleCatalogEntry } from '../core/moduleRegistry';
 
 type ReportChartType = 'List' | 'Bar' | 'Line' | 'Pie';
 type ReportStatus = 'Active' | 'Draft';
 type RecurrenceType = 'Daily' | 'Weekly' | 'Monthly';
+
+const FRAMEWORK_READ_PERMISSIONS = ['view_framework', 'add_framework', 'change_framework'];
+const FRAMEWORK_WRITE_PERMISSIONS = ['add_framework', 'change_framework'];
+const RISK_READ_PERMISSIONS = [
+  'view_riskregister',
+  'add_riskregister',
+  'change_riskregister',
+  'view_riskscenario',
+  'add_riskscenario',
+  'change_riskscenario',
+];
+const TPRM_READ_PERMISSIONS = [
+  'view_entity',
+  'add_entity',
+  'change_entity',
+  'view_solution',
+  'add_solution',
+  'change_solution',
+  'view_contract',
+  'add_contract',
+  'change_contract',
+  'view_entityassessment',
+  'add_entityassessment',
+  'change_entityassessment',
+];
+const EVIDENCE_READ_PERMISSIONS = ['view_evidence', 'collect_evidence'];
+const OPERATIONS_READ_PERMISSIONS = [
+  ...FRAMEWORK_READ_PERMISSIONS,
+  ...RISK_READ_PERMISSIONS,
+  'view_conmon',
+  'run_conmon',
+  ...EVIDENCE_READ_PERMISSIONS,
+];
 
 type FilterRow = {
   id: string;
@@ -640,19 +674,61 @@ function evaluateFilterLogic(logic: string, matches: boolean[]): { valid: boolea
   return { valid: matched !== null && index === tokens.length, matched: matched ?? matches.every(Boolean) };
 }
 
+function readPermissionsForModule(entry: ModuleCatalogEntry): string[] {
+  switch (entry.permissionFamily) {
+    case 'risk':
+      return RISK_READ_PERMISSIONS;
+    case 'third-party':
+      return TPRM_READ_PERMISSIONS;
+    case 'evidence':
+      return EVIDENCE_READ_PERMISSIONS;
+    case 'operations':
+      return OPERATIONS_READ_PERMISSIONS;
+    case 'framework':
+    default:
+      return FRAMEWORK_READ_PERMISSIONS;
+  }
+}
+
+function buildInListPredicate(column: string, values: readonly string[]): { clause: string; bindings: string[] } {
+  if (values.length === 0) {
+    return { clause: '1 = 0', bindings: [] };
+  }
+
+  return {
+    clause: `${column} IN (${values.map(() => '?').join(', ')})`,
+    bindings: [...values],
+  };
+}
+
 async function loadModuleRows(
   env: WorkerRequestContext['env'],
   tenantId: string,
+  ctx: WorkerRequestContext,
   moduleName: string,
 ): Promise<{ entry: ModuleCatalogEntry | null; rows: ModuleRecordRow[] }> {
   const entry = resolveModuleEntry(moduleName);
   if (!entry || entry.implementationType !== 'shared-workspace') {
     return { entry, rows: [] };
   }
+  const access = await loadScopedPermissionContext(ctx, readPermissionsForModule(entry));
+  if (access instanceof Response || access.permissions.length === 0) {
+    return { entry, rows: [] };
+  }
+  const scopePredicate = buildInListPredicate('folder_id', access.accessibleDomainIds);
   const rows = await env.D1_MAIN.prepare(
-    `SELECT * FROM module_records WHERE tenant_id = ? AND module_key = ? AND archived = 0 ORDER BY updated_at DESC LIMIT 250`,
+    `
+    SELECT *
+    FROM module_records
+    WHERE tenant_id = ?
+      AND module_key = ?
+      AND archived = 0
+      AND ${scopePredicate.clause}
+    ORDER BY updated_at DESC
+    LIMIT 250
+    `,
   )
-    .bind(tenantId, entry.moduleKey)
+    .bind(tenantId, entry.moduleKey, ...scopePredicate.bindings)
     .all<ModuleRecordRow>();
   return { entry, rows: rows.results };
 }
@@ -692,7 +768,7 @@ async function previewForConfig(
   configInput: ReportConfig,
 ): Promise<ReportPreview> {
   const config = normalizeReportConfig(configInput, configInput.reportTitle);
-  const { entry, rows } = await loadModuleRows(env, tenantId, config.module);
+  const { entry, rows } = await loadModuleRows(env, tenantId, ctx, config.module);
   if (rows.length === 0) {
     return fallbackPreviewForConfig(config);
   }
@@ -806,6 +882,15 @@ async function getFirstFolderId(env: WorkerRequestContext['env'], tenantId: stri
     .bind(tenantId)
     .first<{ id: string }>();
   return folder?.id ?? null;
+}
+
+async function getFirstAccessibleReportFolderId(ctx: WorkerRequestContext, tenantId: string) {
+  const access = await loadScopedPermissionContext(ctx, FRAMEWORK_WRITE_PERMISSIONS);
+  if (!(access instanceof Response) && access.permissions.length > 0 && access.accessibleDomainIds[0]) {
+    return access.accessibleDomainIds[0];
+  }
+
+  return getFirstFolderId(ctx.env, tenantId);
 }
 
 function previewToRows(preview: ReportPreview): string[][] {
@@ -1007,7 +1092,7 @@ export async function handleReportBuilderRoutes(
       .bind(
         exportId,
         tenantId,
-        await getFirstFolderId(ctx.env, tenantId),
+        await getFirstAccessibleReportFolderId(ctx, tenantId),
         ctx.userId ?? null,
         `report-builder:${current.id}`,
         `${current.title} CSV export`,

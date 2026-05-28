@@ -1,6 +1,10 @@
 import type { WorkerRequestContext } from '../../router';
 import type { EnvBindings } from '../../types/env';
-import { loadPermissionContext, requireAnyPermission } from '../../authorization';
+import {
+  loadPermissionContext,
+  loadScopedPermissionContext,
+  requireAnyPermission,
+} from '../../authorization';
 import { getAiRuntimeStatus } from '../ai/runtime';
 import { buildWorkspaceChatReply } from '../ai/workspaceGuidance';
 import { MODULE_CATALOG, findModuleCatalogEntry, type ModuleCatalogEntry } from '../core/moduleRegistry';
@@ -740,6 +744,13 @@ const OPERATIONS_WRITE_PERMISSIONS = [
   'change_riskscenario',
   'run_conmon',
   'collect_evidence',
+];
+
+const MODULE_RECORD_OPS_SCOPE_PERMISSIONS = [
+  ...OPERATIONS_READ_PERMISSIONS,
+  ...TPRM_READ_PERMISSIONS,
+  ...PRIVACY_READ_PERMISSIONS,
+  ...RESILIENCE_READ_PERMISSIONS,
 ];
 
 const WORKSPACE_ADMIN_VISIBILITY_PERMISSIONS = new Set([
@@ -3030,50 +3041,27 @@ async function getUserRecipient(
     .first<UserRecipientRow>();
 }
 
-async function listRecentModuleRecordOpsRows(env: EnvBindings, tenantId: string, limit = 120) {
-  const result = await env.D1_MAIN.prepare(
-    `
-    SELECT
-      record.id,
-      record.module_key,
-      record.title,
-      record.status,
-      record.folder_id,
-      record.owner_user_id,
-      record.assignee_user_id,
-      record.start_on,
-      record.finish_on,
-      record.due_on,
-      record.review_on,
-      record.expires_on,
-      record.data_json,
-      record.updated_at,
-      record.created_at,
-      owner.display_name AS owner_display_name,
-      owner.first_name AS owner_first_name,
-      owner.last_name AS owner_last_name,
-      owner.email AS owner_email,
-      assignee.display_name AS assignee_display_name,
-      assignee.first_name AS assignee_first_name,
-      assignee.last_name AS assignee_last_name,
-      assignee.email AS assignee_email
-    FROM module_records AS record
-    LEFT JOIN users AS owner
-      ON owner.tenant_id = record.tenant_id AND owner.id = record.owner_user_id
-    LEFT JOIN users AS assignee
-      ON assignee.tenant_id = record.tenant_id AND assignee.id = record.assignee_user_id
-    WHERE record.tenant_id = ? AND record.archived = 0
-    ORDER BY record.updated_at DESC
-    LIMIT ?
-    `,
-  )
-    .bind(tenantId, limit)
-    .all<ModuleRecordOpsRow>();
+function buildModuleRecordScopeClause(accessibleDomainIds: readonly string[]) {
+  if (accessibleDomainIds.length === 0) {
+    return {
+      clause: '1 = 0',
+      bindings: [] as string[],
+    };
+  }
 
-  return result.results ?? [];
+  return {
+    clause: `record.folder_id IN (${accessibleDomainIds.map(() => '?').join(', ')})`,
+    bindings: [...accessibleDomainIds],
+  };
 }
 
-async function listDatedModuleRecordOpsRows(env: EnvBindings, tenantId: string, limit = 120) {
+async function listRecentModuleRecordOpsRows(
+  env: EnvBindings,
+  tenantId: string,
+  accessibleDomainIds: readonly string[],
+  limit = 120,
+) {
+  const scope = buildModuleRecordScopeClause(accessibleDomainIds);
   const result = await env.D1_MAIN.prepare(
     `
     SELECT
@@ -3107,6 +3095,58 @@ async function listDatedModuleRecordOpsRows(env: EnvBindings, tenantId: string, 
       ON assignee.tenant_id = record.tenant_id AND assignee.id = record.assignee_user_id
     WHERE record.tenant_id = ?
       AND record.archived = 0
+      AND ${scope.clause}
+    ORDER BY record.updated_at DESC
+    LIMIT ?
+    `,
+  )
+    .bind(tenantId, ...scope.bindings, limit)
+    .all<ModuleRecordOpsRow>();
+
+  return result.results ?? [];
+}
+
+async function listDatedModuleRecordOpsRows(
+  env: EnvBindings,
+  tenantId: string,
+  accessibleDomainIds: readonly string[],
+  limit = 120,
+) {
+  const scope = buildModuleRecordScopeClause(accessibleDomainIds);
+  const result = await env.D1_MAIN.prepare(
+    `
+    SELECT
+      record.id,
+      record.module_key,
+      record.title,
+      record.status,
+      record.folder_id,
+      record.owner_user_id,
+      record.assignee_user_id,
+      record.start_on,
+      record.finish_on,
+      record.due_on,
+      record.review_on,
+      record.expires_on,
+      record.data_json,
+      record.updated_at,
+      record.created_at,
+      owner.display_name AS owner_display_name,
+      owner.first_name AS owner_first_name,
+      owner.last_name AS owner_last_name,
+      owner.email AS owner_email,
+      assignee.display_name AS assignee_display_name,
+      assignee.first_name AS assignee_first_name,
+      assignee.last_name AS assignee_last_name,
+      assignee.email AS assignee_email
+    FROM module_records AS record
+    LEFT JOIN users AS owner
+      ON owner.tenant_id = record.tenant_id AND owner.id = record.owner_user_id
+    LEFT JOIN users AS assignee
+      ON assignee.tenant_id = record.tenant_id AND assignee.id = record.assignee_user_id
+    WHERE record.tenant_id = ?
+      AND record.archived = 0
+      AND ${scope.clause}
       AND (
         record.start_on IS NOT NULL OR
         record.finish_on IS NOT NULL OR
@@ -3118,7 +3158,7 @@ async function listDatedModuleRecordOpsRows(env: EnvBindings, tenantId: string, 
     LIMIT ?
     `,
   )
-    .bind(tenantId, limit)
+    .bind(tenantId, ...scope.bindings, limit)
     .all<ModuleRecordOpsRow>();
 
   return result.results ?? [];
@@ -3193,7 +3233,11 @@ async function listDatedAssessmentOpsRows(env: EnvBindings, tenantId: string, li
   return result.results ?? [];
 }
 
-async function buildWorkbenchSnapshot(env: EnvBindings, tenantId: string) {
+async function buildWorkbenchSnapshot(
+  env: EnvBindings,
+  tenantId: string,
+  moduleRecordAccessibleDomainIds: readonly string[],
+) {
   const [
     usersResult,
     exports,
@@ -3321,7 +3365,7 @@ async function buildWorkbenchSnapshot(env: EnvBindings, tenantId: string) {
         status: string;
         updated_at: string;
       }>(),
-    listRecentModuleRecordOpsRows(env, tenantId),
+    listRecentModuleRecordOpsRows(env, tenantId, moduleRecordAccessibleDomainIds),
     listRecentAssessmentOpsRows(env, tenantId),
   ]);
 
@@ -4489,9 +4533,12 @@ async function getQuantitativeHypothesisDetail(
 
 async function buildParityOverview(ctx: WorkerRequestContext, access: OpsSurfaceAccessProfile) {
   const tenantId = ctx.tenantId as string;
+  const moduleRecordScope = await loadScopedPermissionContext(ctx, MODULE_RECORD_OPS_SCOPE_PERMISSIONS);
+  const moduleRecordAccessibleDomainIds =
+    moduleRecordScope instanceof Response ? [] : moduleRecordScope.accessibleDomainIds;
   const [moduleRecordRows, datedModuleRecordRows, assessmentRows, datedAssessmentRows] = await Promise.all([
-    listRecentModuleRecordOpsRows(ctx.env, tenantId),
-    listDatedModuleRecordOpsRows(ctx.env, tenantId),
+    listRecentModuleRecordOpsRows(ctx.env, tenantId, moduleRecordAccessibleDomainIds),
+    listDatedModuleRecordOpsRows(ctx.env, tenantId, moduleRecordAccessibleDomainIds),
     listRecentAssessmentOpsRows(ctx.env, tenantId),
     listDatedAssessmentOpsRows(ctx.env, tenantId),
   ]);
@@ -5729,7 +5776,14 @@ export async function handleOpsRoutes(
       return workbenchPermission;
     }
 
-    return json({ data: await buildWorkbenchSnapshot(ctx.env, ctx.tenantId) });
+    const moduleRecordScope = await loadScopedPermissionContext(ctx, MODULE_RECORD_OPS_SCOPE_PERMISSIONS);
+    if (moduleRecordScope instanceof Response) {
+      return moduleRecordScope;
+    }
+
+    return json({
+      data: await buildWorkbenchSnapshot(ctx.env, ctx.tenantId, moduleRecordScope.accessibleDomainIds),
+    });
   }
 
   if (resource === 'news-feed' && ctx.request.method === 'GET') {
