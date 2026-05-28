@@ -219,6 +219,40 @@ function pickFolder(foldersPayload) {
   return domainFolder;
 }
 
+function buildModuleRecordData(moduleKey, title, extra = {}) {
+  const base = {
+    title,
+    validationMarker: SUFFIX,
+    description: 'Created by the production scale-module validation smoke.',
+    accountabilityStatus: 'Validated',
+    ...extra,
+  };
+
+  if (moduleKey === 'assets') {
+    return {
+      ...base,
+      asset_id: `asset-${SUFFIX}`,
+      name: title,
+    };
+  }
+
+  if (moduleKey === 'supply-chain') {
+    return {
+      ...base,
+      vendor_name: `Vendor ${SUFFIX}`,
+    };
+  }
+
+  if (moduleKey === 'exceptions') {
+    return {
+      ...base,
+      requested_at: '2026-05-28',
+    };
+  }
+
+  return base;
+}
+
 async function exerciseSharedModuleRecords(cookie, folderId) {
   const results = [];
   for (const moduleKey of SHARED_WORKSPACE_EXEMPLARS) {
@@ -231,12 +265,7 @@ async function exerciseSharedModuleRecords(cookie, folderId) {
       dueOn: '2026-06-28',
       reviewOn: '2026-07-28',
       expiresOn: '2026-12-31',
-      data: {
-        title,
-        validationMarker: SUFFIX,
-        description: 'Created by the production scale-module validation smoke.',
-        accountabilityStatus: 'Validated',
-      },
+      data: buildModuleRecordData(moduleKey, title),
       links: [
         {
           id: crypto.randomUUID(),
@@ -260,11 +289,7 @@ async function exerciseSharedModuleRecords(cookie, folderId) {
       title: `${title} updated`,
       status: 'In Review',
       finishOn: '2026-07-15',
-      data: {
-        title: `${title} updated`,
-        validationMarker: SUFFIX,
-        updateValidated: true,
-      },
+      data: buildModuleRecordData(moduleKey, `${title} updated`, { updateValidated: true }),
       note: 'Updated during production live validation.',
     });
     assert(updated?.data?.status === 'In Review', `Updating a ${moduleKey} record did not persist status.`);
