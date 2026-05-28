@@ -373,27 +373,49 @@ function finishSuite(suite) {
 }
 
 async function jsonRequest(request, method, route, body, options = {}) {
-  const response = await request.fetch(absoluteUrl(apiRoute(route)), {
-    method,
-    headers: {
-      accept: 'application/json',
-      'content-type': 'application/json',
-      'user-agent': USER_AGENT,
-    },
-    data: body ?? undefined,
-  });
-  const text = await response.text();
-  let payload = null;
-  try {
-    payload = text ? JSON.parse(text) : null;
-  } catch {
-    payload = text;
-  }
+  const retries = options.retries ?? (method === 'GET' ? 3 : 1);
   const allowedStatuses = options.allowStatuses ?? [];
-  if (!response.ok() && !allowedStatuses.includes(response.status())) {
-    throw new Error(`${method} ${apiRoute(route)} failed with ${response.status()}: ${text.slice(0, 500)}`);
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= retries; attempt += 1) {
+    try {
+      const response = await request.fetch(absoluteUrl(apiRoute(route)), {
+        method,
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          'user-agent': USER_AGENT,
+        },
+        data: body ?? undefined,
+      });
+      const text = await response.text();
+      let payload = null;
+      try {
+        payload = text ? JSON.parse(text) : null;
+      } catch {
+        payload = text;
+      }
+      const retryableStatus = response.status() === 429 || response.status() >= 500;
+      if (!response.ok() && !allowedStatuses.includes(response.status())) {
+        const error = new Error(`${method} ${apiRoute(route)} failed with ${response.status()}: ${text.slice(0, 500)}`);
+        if (attempt < retries && retryableStatus) {
+          lastError = error;
+          await new Promise((resolve) => setTimeout(resolve, 750 * attempt));
+          continue;
+        }
+        throw error;
+      }
+      return payload;
+    } catch (error) {
+      lastError = error;
+      if (attempt < retries) {
+        await new Promise((resolve) => setTimeout(resolve, 750 * attempt));
+        continue;
+      }
+    }
   }
-  return payload;
+
+  throw lastError ?? new Error(`${method} ${apiRoute(route)} failed without a response.`);
 }
 
 async function bootstrapSession(context) {
