@@ -34,6 +34,8 @@ DRY_RUN="${CLI_DRY_RUN:-${DRY_RUN:-0}}"
 CLOUDFLARE_WORKER_ENV="${CLI_CLOUDFLARE_WORKER_ENV:-${CLOUDFLARE_WORKER_ENV:-production}}"
 REGOVISE_WORKER_SERVICE_NAME="${REGOVISE_WORKER_SERVICE_NAME:-ciso-assistant-edge-production}"
 export REGOVISE_WORKER_SERVICE_NAME
+REGOVISE_PROD_BASE_URL="${REGOVISE_PROD_BASE_URL:-${APP_ORIGIN:-https://regovise.com}}"
+export REGOVISE_PROD_BASE_URL
 
 cf_step "Cloudflare Workers deploy access preflight"
 cf_verify_workers_deploy_access
