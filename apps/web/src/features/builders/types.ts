@@ -26,6 +26,14 @@ export type QuestionnaireQuestion = {
   enableUpload?: boolean;
   maxScore?: number | null;
   answerScores?: Record<string, number> | null;
+  tableColumns?: Array<{
+    id: string;
+    title: string;
+    dataType: 'text' | 'number' | 'date' | 'dropdown';
+    required: boolean;
+    score: number;
+    options?: Array<{ value: string; score?: number | null }>;
+  }>;
 };
 
 export type QuestionnaireRule = {
@@ -134,7 +142,16 @@ export type RuleTestRun = {
   result: {
     matchedRules: string[];
     visibleQuestions: string[];
+    hiddenQuestions: string[];
+    disabledQuestions: string[];
+    requiredQuestions: string[];
+    displayOptions: Record<string, boolean | string>;
+    validationErrors: Array<{ ref: string; message: string }>;
+    answerUpdates: Record<string, unknown>;
     score: number;
+    maxScore: number;
+    percentComplete: number;
+    passingStatus: string;
     grade: string;
   };
   createdByUserId: string | null;
@@ -186,6 +203,14 @@ export type QuestionnaireInstance = {
   grade: string | null;
   percentComplete: number;
   passingStatus: string;
+  runtime?: {
+    visibleQuestions: string[];
+    hiddenQuestions: string[];
+    disabledQuestions: string[];
+    requiredQuestions: string[];
+    displayOptions: Record<string, boolean | string>;
+    validationErrors: Array<{ ref: string; message: string }>;
+  };
   submittedAt: string | null;
   reviewedAt: string | null;
   archived: boolean;

@@ -12,6 +12,7 @@ type PublicQuestionnaireShell = {
   dueDate: string | null;
   loginRequired: boolean;
   questions: Array<Pick<QuestionnaireQuestion, 'ref' | 'prompt' | 'type' | 'section' | 'required' | 'options' | 'helpText' | 'evidenceHint' | 'enableUpload'>>;
+  runtime?: QuestionnaireInstance['runtime'];
 };
 
 export function QuestionnaireResponsePage() {
@@ -70,9 +71,13 @@ export function QuestionnaireResponsePage() {
         uploads,
       });
       setInstance(response.data);
+      setAnswers(response.data.answers ?? {});
+      setUploads(response.data.uploads ?? {});
       if (submit) {
         const submitted = await client.post<{ data: QuestionnaireInstance }>(`/builders/questionnaire-access/${shareToken}/submit`, { accessCode });
         setInstance(submitted.data);
+        setAnswers(submitted.data.answers ?? {});
+        setUploads(submitted.data.uploads ?? {});
         setNotice('Questionnaire submitted. Answers are now locked for review.');
       } else {
         setNotice('Progress saved.');
@@ -118,38 +123,63 @@ export function QuestionnaireResponsePage() {
         </section>
       ) : (
         <section className="panel space-y-5">
+          {(() => {
+            const runtime = instance.runtime ?? shell.runtime;
+            const hiddenQuestions = new Set(runtime?.hiddenQuestions ?? []);
+            const disabledQuestions = new Set(runtime?.disabledQuestions ?? []);
+            const requiredQuestions = new Set(runtime?.requiredQuestions ?? []);
+            const validationErrors = runtime?.validationErrors ?? [];
+            const renderedQuestions = shell.questions.filter((question) => !hiddenQuestions.has(question.ref));
+            return (
+              <>
           <div className="flex flex-wrap gap-2">
             <span className="badge-neutral">{instance.status}</span>
             <span className="badge-neutral">{Math.round(instance.percentComplete)}% complete</span>
             <span className="badge-success">{instance.passingStatus}</span>
+            {runtime?.displayOptions?.displayscore ? <span className="badge-neutral">Score {instance.score}/{instance.maxScore}</span> : null}
+            {runtime?.displayOptions?.displaygrade ? <span className="badge-neutral">Grade {instance.grade ?? 'Pending'}</span> : null}
           </div>
+          {validationErrors.length > 0 ? (
+            <div className="notice-error">
+              {validationErrors.map((validation) => (
+                <div key={`${validation.ref}-${validation.message}`}>{validation.message}</div>
+              ))}
+            </div>
+          ) : null}
           <div className="grid gap-4 md:grid-cols-2">
-            {shell.questions.map((question) => (
+            {renderedQuestions.map((question) => {
+              const locked = !['Open', 'RequestChanges'].includes(instance.status) || disabledQuestions.has(question.ref);
+              const required = requiredQuestions.has(question.ref);
+              return (
               <div className="rounded-3xl border border-white/10 bg-slate-950/50 p-4" key={question.ref}>
-                <div className="font-medium text-white">{question.prompt}</div>
+                <div className="font-medium text-white">
+                  {question.prompt}
+                  {required ? <span className="ml-1 text-rose-300">*</span> : null}
+                </div>
                 <div className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">{question.section}</div>
                 {question.helpText ? <p className="mt-3 text-sm text-slate-400">{question.helpText}</p> : null}
                 <div className="mt-4">
                   {question.type === 'boolean' ? (
-                    <select className="input" disabled={!['Open', 'RequestChanges'].includes(instance.status)} value={String(answers[question.ref] ?? false)} onChange={(event) => setAnswers((current) => ({ ...current, [question.ref]: event.target.value === 'true' }))}>
+                    <select className="input" disabled={locked} value={String(answers[question.ref] ?? false)} onChange={(event) => setAnswers((current) => ({ ...current, [question.ref]: event.target.value === 'true' }))}>
                       <option value="false">No</option>
                       <option value="true">Yes</option>
                     </select>
                   ) : question.type === 'single-select' ? (
-                    <select className="input" disabled={!['Open', 'RequestChanges'].includes(instance.status)} value={String(answers[question.ref] ?? '')} onChange={(event) => setAnswers((current) => ({ ...current, [question.ref]: event.target.value }))}>
+                    <select className="input" disabled={locked} value={String(answers[question.ref] ?? '')} onChange={(event) => setAnswers((current) => ({ ...current, [question.ref]: event.target.value }))}>
                       {(question.options ?? []).map((option) => <option key={option} value={option}>{option}</option>)}
                     </select>
                   ) : question.type === 'instructional' ? (
                     <div className="rounded-2xl border border-cyan-300/10 bg-cyan-400/[0.04] p-3 text-sm text-slate-300">{question.evidenceHint ?? question.prompt}</div>
                   ) : (
-                    <textarea className="input min-h-[88px]" disabled={!['Open', 'RequestChanges'].includes(instance.status)} value={String(answers[question.ref] ?? '')} onChange={(event) => setAnswers((current) => ({ ...current, [question.ref]: event.target.value }))} />
+                    <textarea className="input min-h-[88px]" disabled={locked} value={String(answers[question.ref] ?? '')} onChange={(event) => setAnswers((current) => ({ ...current, [question.ref]: event.target.value }))} />
                   )}
                 </div>
                 {(question.enableUpload || question.type === 'file-upload') && (
-                  <textarea className="input mt-4 min-h-[72px]" disabled={!['Open', 'RequestChanges'].includes(instance.status)} value={String(uploads[question.ref] ?? '')} onChange={(event) => setUploads((current) => ({ ...current, [question.ref]: event.target.value }))} placeholder="Evidence file name, URL, or artifact reference" />
+                  <textarea className="input mt-4 min-h-[72px]" disabled={locked} value={String(uploads[question.ref] ?? '')} onChange={(event) => setUploads((current) => ({ ...current, [question.ref]: event.target.value }))} placeholder="Evidence file name, URL, or artifact reference" />
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
           <div className="flex flex-wrap gap-2">
             <button className="button-secondary" disabled={saving || !['Open', 'RequestChanges'].includes(instance.status)} onClick={() => void saveResponses(false)} type="button">
@@ -159,6 +189,9 @@ export function QuestionnaireResponsePage() {
               Submit
             </button>
           </div>
+              </>
+            );
+          })()}
         </section>
       )}
     </div>

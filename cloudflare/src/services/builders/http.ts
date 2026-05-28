@@ -197,7 +197,7 @@ type UpdateRuleSetInput = {
 
 type RunRuleTestInput = {
   scenarioName?: string;
-  answers?: Record<string, string | number | boolean | string[]>;
+  answers?: Record<string, unknown>;
   draftRules?: QuestionnaireRule[];
   draftQuestions?: QuestionnaireQuestion[];
 };
@@ -379,7 +379,16 @@ type RuleTestRun = {
   result: {
     matchedRules: string[];
     visibleQuestions: string[];
+    hiddenQuestions: string[];
+    disabledQuestions: string[];
+    requiredQuestions: string[];
+    displayOptions: Record<string, boolean | string>;
+    validationErrors: Array<{ ref: string; message: string }>;
+    answerUpdates: Record<string, unknown>;
     score: number;
+    maxScore: number;
+    percentComplete: number;
+    passingStatus: string;
     grade: string;
   };
   createdByUserId: string | null;
@@ -414,6 +423,14 @@ type QuestionnaireInstance = {
   grade: string | null;
   percentComplete: number;
   passingStatus: string;
+  runtime?: {
+    visibleQuestions: string[];
+    hiddenQuestions: string[];
+    disabledQuestions: string[];
+    requiredQuestions: string[];
+    displayOptions: Record<string, boolean | string>;
+    validationErrors: Array<{ ref: string; message: string }>;
+  };
   submittedAt: string | null;
   reviewedAt: string | null;
   archived: boolean;
@@ -459,8 +476,43 @@ function asRecord(value: unknown): Record<string, unknown> {
 }
 
 function parseQuestionRefFromExpression(expression: string): string | null {
-  const match = expression.match(/"([^"]+)"/);
-  return match?.[1] ?? null;
+  return parseQuotedValues(expression)[0] ?? null;
+}
+
+function parseQuotedValues(expression: string): string[] {
+  return Array.from(expression.matchAll(/"([^"]*)"/g)).map((match) => match[1]);
+}
+
+function parseQuestionRefsFromExpression(expression: string): string[] {
+  const first = parseQuestionRefFromExpression(expression);
+  return first
+    ? first
+        .split(',')
+        .map((ref) => ref.trim())
+        .filter(Boolean)
+    : [];
+}
+
+function parseRuleNumber(expression: string): number | null {
+  const match = expression.match(/(-?\d+(?:\.\d+)?)/);
+  const value = Number(match?.[1]);
+  return Number.isFinite(value) ? value : null;
+}
+
+function parseDisplayOptions(expression: string): Record<string, boolean | string> {
+  const payload = parseQuotedValues(expression)[0] ?? expression.replace(/^SET_DISPLAY_OPTIONS/i, '').trim();
+  return Object.fromEntries(
+    payload
+      .split(/[;,]/)
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+      .map((entry) => {
+        const [rawKey, rawValue = 'true'] = entry.split('=').map((part) => part.trim());
+        const key = rawKey.replace(/[-_\s]/g, '').toLowerCase();
+        const normalizedValue = rawValue.toLowerCase();
+        return [key, normalizedValue === 'true' ? true : normalizedValue === 'false' ? false : rawValue];
+      }),
+  );
 }
 
 function normalizeTemplateKind(value: unknown): QuestionnaireTemplateKind {
@@ -585,8 +637,14 @@ function buildRuleDiagnostics(
       });
     }
 
+    const conditionRefs = new Set(
+      rule.conditions
+        .map((condition) => condition.match(/^Question "([^"]+)"/)?.[1])
+        .filter((ref): ref is string => Boolean(ref)),
+    );
+
     for (const action of rule.actions) {
-      const knownAction = /SHOW_QUESTIONS|HIDE_QUESTIONS|ENABLE_QUESTIONS|DISABLE_QUESTIONS|SET_ANSWER|CLEAR_ANSWER|SET_SCORE|ADD_TO_SCORE|CALCULATE_TOTAL_SCORE|SET_GRADE|REPEAT_QUESTIONS|SET_DISPLAY_OPTIONS/.test(action);
+      const knownAction = /SHOW_QUESTIONS|HIDE_QUESTIONS|ENABLE_QUESTIONS|DISABLE_QUESTIONS|REQUIRE_QUESTIONS|NOT_REQUIRE_QUESTIONS|SET_ANSWER|CLEAR_ANSWER|SET_SCORE|ADD_TO_SCORE|CALCULATE_TOTAL_SCORE|SET_GRADE|REPEAT_QUESTIONS|SET_DISPLAY_OPTIONS/.test(action);
       if (!knownAction) {
         diagnostics.push({
           id: `${rule.id}-action-${diagnostics.length}`,
@@ -594,17 +652,45 @@ function buildRuleDiagnostics(
           message: `Rule "${rule.name || 'Untitled'}" uses an unrecognized action "${action}".`,
         });
       }
-      const ref = parseQuestionRefFromExpression(action);
+      const refs = parseQuestionRefsFromExpression(action);
       if (
-        ref &&
-        /SHOW_QUESTIONS|HIDE_QUESTIONS|ENABLE_QUESTIONS|DISABLE_QUESTIONS|SET_ANSWER|CLEAR_ANSWER|REPEAT_QUESTIONS/.test(action) &&
-        !knownQuestionRefs.has(ref)
+        refs.length > 0 &&
+        /SHOW_QUESTIONS|HIDE_QUESTIONS|ENABLE_QUESTIONS|DISABLE_QUESTIONS|REQUIRE_QUESTIONS|NOT_REQUIRE_QUESTIONS|SET_ANSWER|CLEAR_ANSWER|REPEAT_QUESTIONS/.test(action)
       ) {
+        for (const ref of refs) {
+          if (!knownQuestionRefs.has(ref)) {
+            diagnostics.push({
+              id: `${rule.id}-${ref}`,
+              severity: 'warning',
+              message: `Rule "${rule.name || 'Untitled'}" references unknown question ref "${ref}".`,
+            });
+          }
+        }
+      }
+      if (/SET_ANSWER/.test(action) && parseQuotedValues(action).length < 2) {
         diagnostics.push({
-          id: `${rule.id}-${ref}`,
+          id: `${rule.id}-set-answer-${diagnostics.length}`,
           severity: 'warning',
-          message: `Rule "${rule.name || 'Untitled'}" references unknown question ref "${ref}".`,
+          message: `Rule "${rule.name || 'Untitled'}" sets an answer without a value.`,
         });
+      }
+      if ((/SET_SCORE|ADD_TO_SCORE/.test(action)) && parseRuleNumber(action) === null) {
+        diagnostics.push({
+          id: `${rule.id}-score-${diagnostics.length}`,
+          severity: 'warning',
+          message: `Rule "${rule.name || 'Untitled'}" uses a score action without a numeric value.`,
+        });
+      }
+      if (/SET_ANSWER|CLEAR_ANSWER/.test(action)) {
+        for (const ref of refs) {
+          if (conditionRefs.has(ref)) {
+            diagnostics.push({
+              id: `${rule.id}-circular-${ref}`,
+              severity: 'warning',
+              message: `Rule "${rule.name || 'Untitled'}" both reads and mutates "${ref}"; verify this is not circular.`,
+            });
+          }
+        }
       }
     }
 
@@ -648,7 +734,7 @@ function buildRuleDiagnostics(
 
 function evaluateCondition(
   condition: string,
-  answers: Record<string, string | number | boolean | string[]>,
+  answers: Record<string, unknown>,
   context: { score?: number; grade?: string; isNewRecord?: boolean } = {},
 ): boolean {
   const normalized = condition.trim();
@@ -731,12 +817,23 @@ function compareRuleValues(operator: string, actual: unknown, expected: unknown)
 function calculateQuestionnaireScore(
   questions: QuestionnaireQuestion[],
   answers: Record<string, unknown>,
+  runtime: {
+    hiddenQuestions?: Set<string>;
+    requiredQuestions?: Set<string>;
+    optionalQuestions?: Set<string>;
+    scoreDelta?: number;
+    scoreOverride?: number | null;
+    gradeOverride?: string | null;
+  } = {},
 ): { score: number; maxScore: number; percentComplete: number; passingStatus: string; grade: string } {
-  const scorableQuestions = questions.filter((question) => question.type !== 'instructional');
-  const requiredQuestions = scorableQuestions.filter((question) => question.required);
+  const hiddenQuestions = runtime.hiddenQuestions ?? new Set<string>();
+  const requiredByRules = runtime.requiredQuestions ?? new Set<string>();
+  const optionalByRules = runtime.optionalQuestions ?? new Set<string>();
+  const scorableQuestions = questions.filter((question) => question.type !== 'instructional' && !hiddenQuestions.has(question.ref));
+  const requiredQuestions = scorableQuestions.filter((question) => requiredByRules.has(question.ref) || (question.required && !optionalByRules.has(question.ref)));
   const answeredRequired = requiredQuestions.filter((question) => hasQuestionAnswer(answers[question.ref])).length;
   const maxScore = scorableQuestions.reduce((total, question) => total + (question.maxScore ?? question.weight ?? 0), 0);
-  const score = scorableQuestions.reduce((total, question) => {
+  const calculatedScore = scorableQuestions.reduce((total, question) => {
     const answer = answers[question.ref];
     if (!hasQuestionAnswer(answer)) {
       return total;
@@ -757,24 +854,81 @@ function calculateQuestionnaireScore(
     }
     return total + max;
   }, 0);
+  const score = Math.max(0, runtime.scoreOverride ?? calculatedScore + (runtime.scoreDelta ?? 0));
   const percentComplete = requiredQuestions.length === 0 ? 100 : Math.round((answeredRequired / requiredQuestions.length) * 100);
   const scorePercent = maxScore > 0 ? (score / maxScore) * 100 : percentComplete;
   const passingStatus = percentComplete < 100 ? 'Incomplete' : scorePercent >= 70 ? 'Passing' : 'Needs Review';
-  const grade = scorePercent >= 90 ? 'Excellent' : scorePercent >= 70 ? 'Pass' : scorePercent >= 50 ? 'Needs Review' : 'Fail';
+  const grade = runtime.gradeOverride ?? (scorePercent >= 90 ? 'Excellent' : scorePercent >= 70 ? 'Pass' : scorePercent >= 50 ? 'Needs Review' : 'Fail');
   return { score, maxScore, percentComplete, passingStatus, grade };
 }
 
-function evaluateRuleSet(
+function coerceRuleAnswerValue(question: QuestionnaireQuestion | undefined, value: string): unknown {
+  if (!question) {
+    return value;
+  }
+  if (question.type === 'boolean') {
+    return /^(true|yes|1)$/i.test(value);
+  }
+  if (question.type === 'number') {
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : value;
+  }
+  if (question.type === 'multi-select') {
+    return value.split(',').map((entry) => entry.trim()).filter(Boolean);
+  }
+  if (question.type === 'table') {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : value;
+    } catch {
+      return value;
+    }
+  }
+  return value;
+}
+
+function buildQuestionValidationErrors(
+  questions: QuestionnaireQuestion[],
+  answers: Record<string, unknown>,
+  requiredQuestions: Set<string>,
+  hiddenQuestions: Set<string>,
+): Array<{ ref: string; message: string }> {
+  const errors: Array<{ ref: string; message: string }> = [];
+  for (const question of questions) {
+    if (hiddenQuestions.has(question.ref) || question.type === 'instructional') {
+      continue;
+    }
+    if (requiredQuestions.has(question.ref) && !hasQuestionAnswer(answers[question.ref])) {
+      errors.push({ ref: question.ref, message: `${question.prompt} is required by questionnaire rules.` });
+    }
+    if (question.type === 'email' && hasQuestionAnswer(answers[question.ref]) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(answers[question.ref]))) {
+      errors.push({ ref: question.ref, message: `${question.prompt} must be a valid email address.` });
+    }
+    if (question.type === 'date' && hasQuestionAnswer(answers[question.ref]) && Number.isNaN(new Date(String(answers[question.ref])).getTime())) {
+      errors.push({ ref: question.ref, message: `${question.prompt} must be a valid date.` });
+    }
+  }
+  return errors;
+}
+
+function evaluateQuestionnaireRuntime(
+  questions: QuestionnaireQuestion[],
   rules: QuestionnaireRule[],
-  answers: Record<string, string | number | boolean | string[]>,
-): RuleTestRun['result'] & { executionLog: string[] } {
+  answers: Record<string, unknown>,
+): RuleTestRun['result'] & { answers: Record<string, unknown>; executionLog: string[] } {
   const executionLog: string[] = [];
   const matchedRules: string[] = [];
+  const questionByRef = new Map(questions.map((question) => [question.ref, question]));
+  const runtimeAnswers = { ...answers };
   const visibleQuestions = new Set<string>();
   const hiddenQuestions = new Set<string>();
   const disabledQuestions = new Set<string>();
-  let score = 60;
-  let grade = 'Pending';
+  const requiredQuestions = new Set(questions.filter((question) => question.required).map((question) => question.ref));
+  const optionalQuestions = new Set<string>();
+  const displayOptions: Record<string, boolean | string> = {};
+  let scoreDelta = 0;
+  let scoreOverride: number | null = null;
+  let gradeOverride: string | null = null;
 
   for (const rule of rules) {
     if (!rule.active) {
@@ -782,8 +936,18 @@ function evaluateRuleSet(
       continue;
     }
 
-    const evaluations = rule.conditions.map((condition) => evaluateCondition(condition, answers, { score, grade }));
-    const matched = rule.logic === 'AND' ? evaluations.every(Boolean) : evaluations.some(Boolean);
+    const currentScore = calculateQuestionnaireScore(questions, runtimeAnswers, {
+      hiddenQuestions,
+      requiredQuestions,
+      optionalQuestions,
+      scoreDelta,
+      scoreOverride,
+      gradeOverride,
+    });
+    const evaluations = rule.conditions.map((condition) =>
+      evaluateCondition(condition, runtimeAnswers, { score: currentScore.score, grade: currentScore.grade }),
+    );
+    const matched = rule.conditions.length === 0 ? rule.logic === 'AND' : rule.logic === 'AND' ? evaluations.every(Boolean) : evaluations.some(Boolean);
     executionLog.push(`Rule "${rule.name}" ${matched ? 'EXECUTED' : 'SKIPPED'}`);
 
     if (!matched) {
@@ -793,28 +957,214 @@ function evaluateRuleSet(
     matchedRules.push(rule.name);
     for (const action of rule.actions) {
       executionLog.push(`Action ${action} fired`);
-      const ref = parseQuestionRefFromExpression(action);
-      if (ref && (action.includes('SHOW_QUESTIONS') || action.includes('ENABLE_QUESTIONS'))) {
-        visibleQuestions.add(ref);
-        hiddenQuestions.delete(ref);
+      const refs = parseQuestionRefsFromExpression(action);
+      if (action.includes('SHOW_QUESTIONS')) {
+        for (const ref of refs) {
+          visibleQuestions.add(ref);
+          hiddenQuestions.delete(ref);
+        }
       }
-      if (ref && action.includes('HIDE_QUESTIONS')) {
-        hiddenQuestions.add(ref);
-        visibleQuestions.delete(ref);
+      if (action.includes('HIDE_QUESTIONS')) {
+        for (const ref of refs) {
+          hiddenQuestions.add(ref);
+          visibleQuestions.delete(ref);
+        }
       }
-      if (ref && action.includes('DISABLE_QUESTIONS')) {
-        disabledQuestions.add(ref);
+      if (action.includes('ENABLE_QUESTIONS')) {
+        for (const ref of refs) {
+          disabledQuestions.delete(ref);
+        }
+      }
+      if (action.includes('DISABLE_QUESTIONS')) {
+        for (const ref of refs) {
+          disabledQuestions.add(ref);
+        }
+      }
+      if (action.includes('REQUIRE_QUESTIONS')) {
+        for (const ref of refs) {
+          requiredQuestions.add(ref);
+          optionalQuestions.delete(ref);
+        }
+      }
+      if (action.includes('NOT_REQUIRE_QUESTIONS')) {
+        for (const ref of refs) {
+          optionalQuestions.add(ref);
+          requiredQuestions.delete(ref);
+        }
+      }
+      if (action.includes('SET_ANSWER')) {
+        const quoted = parseQuotedValues(action);
+        const [ref, value = ''] = quoted;
+        if (ref) {
+          runtimeAnswers[ref] = coerceRuleAnswerValue(questionByRef.get(ref), value);
+        }
+      }
+      if (action.includes('CLEAR_ANSWER')) {
+        for (const ref of refs) {
+          const question = questionByRef.get(ref);
+          runtimeAnswers[ref] = question ? defaultAnswerForQuestion(question) : '';
+        }
       }
       if (action.includes('SET_SCORE')) {
-        const match = action.match(/SET_SCORE\s+(-?\d+(?:\.\d+)?)/);
-        if (match) {
-          score = Number(match[1]);
+        const value = parseRuleNumber(action);
+        if (value !== null) {
+          scoreOverride = value;
         }
       }
       if (action.includes('ADD_TO_SCORE')) {
-        const match = action.match(/ADD_TO_SCORE\s+(-?\d+(?:\.\d+)?)/);
+        const value = parseRuleNumber(action);
+        if (value !== null) {
+          scoreDelta += value;
+        }
+      }
+      if (action.includes('CALCULATE_TOTAL_SCORE')) {
+        scoreOverride = null;
+      }
+      if (action.includes('SET_GRADE')) {
+        const match = action.match(/SET_GRADE\s+"([^"]+)"/);
         if (match) {
-          score += Number(match[1]);
+          gradeOverride = match[1];
+        }
+      }
+      if (action.includes('SET_DISPLAY_OPTIONS')) {
+        Object.assign(displayOptions, parseDisplayOptions(action));
+      }
+      if (action.includes('REPEAT_QUESTIONS')) {
+        for (const ref of refs) {
+          const answer = runtimeAnswers[ref];
+          displayOptions[`repeat:${ref}`] = String(Array.isArray(answer) ? answer.length : answer ?? '');
+        }
+      }
+    }
+  }
+
+  for (const ref of hiddenQuestions) {
+    requiredQuestions.delete(ref);
+  }
+
+  const finalScore = calculateQuestionnaireScore(questions, runtimeAnswers, {
+    hiddenQuestions,
+    requiredQuestions,
+    optionalQuestions,
+    scoreDelta,
+    scoreOverride,
+    gradeOverride,
+  });
+  const validationErrors = buildQuestionValidationErrors(questions, runtimeAnswers, requiredQuestions, hiddenQuestions);
+  const answerUpdates = Object.fromEntries(
+    Object.entries(runtimeAnswers).filter(([ref, value]) => JSON.stringify(value) !== JSON.stringify(answers[ref])),
+  );
+
+  executionLog.push(`Final score: ${finalScore.score}`);
+  executionLog.push(`Final grade: "${finalScore.grade}"`);
+  if (hiddenQuestions.size > 0) {
+    executionLog.push(`Hidden questions: ${Array.from(hiddenQuestions).join(', ')}`);
+  }
+  if (disabledQuestions.size > 0) {
+    executionLog.push(`Disabled questions: ${Array.from(disabledQuestions).join(', ')}`);
+  }
+  if (requiredQuestions.size > 0) {
+    executionLog.push(`Required questions: ${Array.from(requiredQuestions).join(', ')}`);
+  }
+  if (validationErrors.length > 0) {
+    executionLog.push(`Validation errors: ${validationErrors.map((error) => error.ref).join(', ')}`);
+  }
+
+  return {
+    matchedRules,
+    visibleQuestions: Array.from(visibleQuestions),
+    hiddenQuestions: Array.from(hiddenQuestions),
+    disabledQuestions: Array.from(disabledQuestions),
+    requiredQuestions: Array.from(requiredQuestions),
+    displayOptions,
+    validationErrors,
+    answerUpdates,
+    score: finalScore.score,
+    maxScore: finalScore.maxScore,
+    percentComplete: finalScore.percentComplete,
+    passingStatus: finalScore.passingStatus,
+    grade: finalScore.grade,
+    answers: runtimeAnswers,
+    executionLog,
+  };
+}
+
+function evaluateRuleSet(
+  rules: QuestionnaireRule[],
+  answers: Record<string, unknown>,
+  questions: QuestionnaireQuestion[] = [],
+): RuleTestRun['result'] & { answers: Record<string, unknown>; executionLog: string[] } {
+  if (questions.length > 0) {
+    return evaluateQuestionnaireRuntime(questions, rules, answers);
+  }
+
+  const executionLog: string[] = [];
+  const matchedRules: string[] = [];
+  const visibleQuestions = new Set<string>();
+  const hiddenQuestions = new Set<string>();
+  const disabledQuestions = new Set<string>();
+  const requiredQuestions = new Set<string>();
+  const displayOptions: Record<string, boolean | string> = {};
+  const runtimeAnswers = { ...answers };
+  let score = 60;
+  let grade = 'Pending';
+
+  for (const rule of rules) {
+    if (!rule.active) {
+      executionLog.push(`Rule "${rule.name}" skipped because it is inactive`);
+      continue;
+    }
+
+    const evaluations = rule.conditions.map((condition) => evaluateCondition(condition, runtimeAnswers, { score, grade }));
+    const matched = rule.conditions.length === 0 ? rule.logic === 'AND' : rule.logic === 'AND' ? evaluations.every(Boolean) : evaluations.some(Boolean);
+    executionLog.push(`Rule "${rule.name}" ${matched ? 'EXECUTED' : 'SKIPPED'}`);
+
+    if (!matched) {
+      continue;
+    }
+
+    matchedRules.push(rule.name);
+    for (const action of rule.actions) {
+      executionLog.push(`Action ${action} fired`);
+      const refs = parseQuestionRefsFromExpression(action);
+      for (const ref of refs) {
+        if (action.includes('SHOW_QUESTIONS') || action.includes('ENABLE_QUESTIONS')) {
+        visibleQuestions.add(ref);
+        hiddenQuestions.delete(ref);
+      }
+        if (action.includes('HIDE_QUESTIONS')) {
+        hiddenQuestions.add(ref);
+        visibleQuestions.delete(ref);
+      }
+        if (action.includes('DISABLE_QUESTIONS')) {
+        disabledQuestions.add(ref);
+      }
+        if (action.includes('REQUIRE_QUESTIONS')) {
+          requiredQuestions.add(ref);
+        }
+        if (action.includes('NOT_REQUIRE_QUESTIONS')) {
+          requiredQuestions.delete(ref);
+        }
+        if (action.includes('CLEAR_ANSWER')) {
+          runtimeAnswers[ref] = '';
+        }
+      }
+      if (action.includes('SET_ANSWER')) {
+        const [ref, value = ''] = parseQuotedValues(action);
+        if (ref) {
+          runtimeAnswers[ref] = value;
+        }
+      }
+      if (action.includes('SET_SCORE')) {
+        const value = parseRuleNumber(action);
+        if (value !== null) {
+          score = value;
+        }
+      }
+      if (action.includes('ADD_TO_SCORE')) {
+        const value = parseRuleNumber(action);
+        if (value !== null) {
+          score += value;
         }
       }
       if (action.includes('SET_GRADE')) {
@@ -822,6 +1172,9 @@ function evaluateRuleSet(
         if (match) {
           grade = match[1];
         }
+      }
+      if (action.includes('SET_DISPLAY_OPTIONS')) {
+        Object.assign(displayOptions, parseDisplayOptions(action));
       }
     }
   }
@@ -843,8 +1196,20 @@ function evaluateRuleSet(
   return {
     matchedRules,
     visibleQuestions: Array.from(visibleQuestions),
+    hiddenQuestions: Array.from(hiddenQuestions),
+    disabledQuestions: Array.from(disabledQuestions),
+    requiredQuestions: Array.from(requiredQuestions),
+    displayOptions,
+    validationErrors: [],
+    answerUpdates: Object.fromEntries(
+      Object.entries(runtimeAnswers).filter(([ref, value]) => JSON.stringify(value) !== JSON.stringify(answers[ref])),
+    ),
     score,
+    maxScore: 100,
+    percentComplete: 100,
+    passingStatus: score >= 70 ? 'Passing' : 'Needs Review',
     grade,
+    answers: runtimeAnswers,
     executionLog,
   };
 }
@@ -1280,7 +1645,16 @@ async function listRuleTestRuns(
     result: asJson<RuleTestRun['result']>(row.result_json, {
       matchedRules: [],
       visibleQuestions: [],
+      hiddenQuestions: [],
+      disabledQuestions: [],
+      requiredQuestions: [],
+      displayOptions: {},
+      validationErrors: [],
+      answerUpdates: {},
       score: 0,
+      maxScore: 0,
+      percentComplete: 0,
+      passingStatus: 'Incomplete',
       grade: 'Pending',
     }),
     createdByUserId: row.created_by_user_id,
@@ -1358,10 +1732,11 @@ async function getQuestionnaireDetail(
 
 function buildPreviewTestRun(args: {
   scenarioName: string;
-  answers: Record<string, string | number | boolean | string[]>;
+  answers: Record<string, unknown>;
   rules: QuestionnaireRule[];
+  questions: QuestionnaireQuestion[];
 }): RuleTestRun {
-  const evaluation = evaluateRuleSet(args.rules, args.answers);
+  const evaluation = evaluateRuleSet(args.rules, args.answers, args.questions);
   return {
     id: `preview-${crypto.randomUUID()}`,
     scenarioName: args.scenarioName,
@@ -1371,7 +1746,16 @@ function buildPreviewTestRun(args: {
     result: {
       matchedRules: evaluation.matchedRules,
       visibleQuestions: evaluation.visibleQuestions,
+      hiddenQuestions: evaluation.hiddenQuestions,
+      disabledQuestions: evaluation.disabledQuestions,
+      requiredQuestions: evaluation.requiredQuestions,
+      displayOptions: evaluation.displayOptions,
+      validationErrors: evaluation.validationErrors,
+      answerUpdates: evaluation.answerUpdates,
       score: evaluation.score,
+      maxScore: evaluation.maxScore,
+      percentComplete: evaluation.percentComplete,
+      passingStatus: evaluation.passingStatus,
       grade: evaluation.grade,
     },
     createdByUserId: null,
@@ -1472,6 +1856,30 @@ function toQuestionnaireInstance(row: QuestionnaireInstanceRow, templateName: st
   };
 }
 
+function runtimeStateFromEvaluation(evaluation: ReturnType<typeof evaluateQuestionnaireRuntime>): NonNullable<QuestionnaireInstance['runtime']> {
+  return {
+    visibleQuestions: evaluation.visibleQuestions,
+    hiddenQuestions: evaluation.hiddenQuestions,
+    disabledQuestions: evaluation.disabledQuestions,
+    requiredQuestions: evaluation.requiredQuestions,
+    displayOptions: evaluation.displayOptions,
+    validationErrors: evaluation.validationErrors,
+  };
+}
+
+function attachQuestionnaireRuntime(
+  instance: QuestionnaireInstance,
+  questions: QuestionnaireQuestion[],
+  rules: QuestionnaireRule[],
+): QuestionnaireInstance {
+  const evaluation = evaluateQuestionnaireRuntime(questions, rules, instance.answers);
+  return {
+    ...instance,
+    answers: evaluation.answers,
+    runtime: runtimeStateFromEvaluation(evaluation),
+  };
+}
+
 async function listQuestionnaireInstances(
   env: WorkerRequestContext['env'],
   tenantId: string,
@@ -1566,12 +1974,14 @@ async function createQuestionnaireInstance(args: {
   dueDate?: string | null;
   recurrence?: Record<string, unknown> | null;
   loginRequired?: boolean;
+  rules?: QuestionnaireRule[];
   userId: string | null;
 }): Promise<QuestionnaireInstance> {
   const timestamp = nowIso();
   const instanceId = crypto.randomUUID();
-  const answers = buildInitialAnswers(args.template.questions);
-  const score = calculateQuestionnaireScore(args.template.questions, answers);
+  const initialAnswers = buildInitialAnswers(args.template.questions);
+  const runtime = evaluateQuestionnaireRuntime(args.template.questions, args.rules ?? [], initialAnswers);
+  const answers = runtime.answers;
   const shareToken = crypto.randomUUID();
   await args.env.D1_MAIN.prepare(
     `INSERT INTO questionnaire_instances (
@@ -1604,11 +2014,11 @@ async function createQuestionnaireInstance(args: {
       JSON.stringify({}),
       JSON.stringify([]),
       args.recurrence ? JSON.stringify(args.recurrence) : null,
-      score.score,
-      score.maxScore,
-      score.grade,
-      score.percentComplete,
-      score.passingStatus,
+      runtime.score,
+      runtime.maxScore,
+      runtime.grade,
+      runtime.percentComplete,
+      runtime.passingStatus,
       args.userId,
       args.userId,
       0,
@@ -1628,7 +2038,7 @@ async function createQuestionnaireInstance(args: {
   if (!row) {
     throw new Error('Questionnaire instance creation failed.');
   }
-  return toQuestionnaireInstance(row, args.template.name);
+  return attachQuestionnaireRuntime(toQuestionnaireInstance(row, args.template.name), args.template.questions, args.rules ?? []);
 }
 
 async function updateQuestionnaireInstanceState(args: {
@@ -1692,8 +2102,10 @@ async function handlePublicQuestionnaireAccess(
     return json({ error: 'not_found', message: 'Questionnaire response link was not found.' }, { status: 404 });
   }
   const templateRow = await getQuestionnaireTemplateRow(ctx.env, row.tenant_id, row.questionnaire_template_id);
-  const templateDetail = (await getQuestionnaireDetail(ctx.env, row.tenant_id, row.questionnaire_template_id)).template;
+  const detail = await getQuestionnaireDetail(ctx.env, row.tenant_id, row.questionnaire_template_id);
+  const templateDetail = detail.template;
   const instance = toQuestionnaireInstance(row, templateRow.name);
+  const runtime = evaluateQuestionnaireRuntime(templateDetail.questions, detail.ruleSet.rules, instance.answers);
 
   if (!action && ctx.request.method === 'GET') {
     return json({
@@ -1714,6 +2126,7 @@ async function handlePublicQuestionnaireAccess(
           evidenceHint: question.evidenceHint ?? null,
           enableUpload: Boolean(question.enableUpload || question.type === 'file-upload'),
         })),
+        runtime: runtimeStateFromEvaluation(runtime),
       },
     });
   }
@@ -1724,16 +2137,17 @@ async function handlePublicQuestionnaireAccess(
   }
 
   if (action === 'validate' && ctx.request.method === 'POST') {
-    return json({ data: instance });
+    return json({ data: attachQuestionnaireRuntime(instance, templateDetail.questions, detail.ruleSet.rules) });
   }
 
   if (action === 'responses' && ctx.request.method === 'PUT') {
     if (!['Open', 'RequestChanges'].includes(row.status)) {
       return json({ error: 'locked_response', message: 'Submitted or closed questionnaire responses are locked.' }, { status: 409 });
     }
-    const answers = { ...asJson<Record<string, unknown>>(row.answers_json, {}), ...asRecord(body.answers) };
+    const mergedAnswers = { ...asJson<Record<string, unknown>>(row.answers_json, {}), ...asRecord(body.answers) };
+    const responseRuntime = evaluateQuestionnaireRuntime(templateDetail.questions, detail.ruleSet.rules, mergedAnswers);
+    const answers = responseRuntime.answers;
     const uploads = { ...asJson<Record<string, unknown>>(row.uploads_json, {}), ...asRecord(body.uploads) };
-    const score = calculateQuestionnaireScore(templateDetail.questions, answers);
     await ctx.env.D1_MAIN.prepare(
       `UPDATE questionnaire_instances
           SET answers_json = ?, uploads_json = ?, score = ?, max_score = ?, grade = ?,
@@ -1743,11 +2157,11 @@ async function handlePublicQuestionnaireAccess(
       .bind(
         JSON.stringify(answers),
         JSON.stringify(uploads),
-        score.score,
-        score.maxScore,
-        score.grade,
-        score.percentComplete,
-        score.passingStatus,
+        responseRuntime.score,
+        responseRuntime.maxScore,
+        responseRuntime.grade,
+        responseRuntime.percentComplete,
+        responseRuntime.passingStatus,
         nowIso(),
         shareToken,
       )
@@ -1761,10 +2175,24 @@ async function handlePublicQuestionnaireAccess(
       answers,
     });
     const updated = await getQuestionnaireInstanceByToken(ctx.env, shareToken);
-    return updated ? json({ data: toQuestionnaireInstance(updated, templateRow.name) }) : json({ error: 'not_found' }, { status: 404 });
+    return updated
+      ? json({ data: attachQuestionnaireRuntime(toQuestionnaireInstance(updated, templateRow.name), templateDetail.questions, detail.ruleSet.rules) })
+      : json({ error: 'not_found' }, { status: 404 });
   }
 
   if (action === 'submit' && ctx.request.method === 'POST') {
+    const submitRuntime = evaluateQuestionnaireRuntime(templateDetail.questions, detail.ruleSet.rules, asJson<Record<string, unknown>>(row.answers_json, {}));
+    if (submitRuntime.percentComplete < 100 || submitRuntime.validationErrors.length > 0) {
+      return json(
+        {
+          error: 'validation_failed',
+          message: 'Questionnaire responses must satisfy required questions and rule validations before submission.',
+          validationErrors: submitRuntime.validationErrors,
+          percentComplete: submitRuntime.percentComplete,
+        },
+        { status: 409 },
+      );
+    }
     await updateQuestionnaireInstanceState({
       env: ctx.env,
       tenantId: row.tenant_id,
@@ -1781,7 +2209,9 @@ async function handlePublicQuestionnaireAccess(
       },
     });
     const updated = await getQuestionnaireInstanceByToken(ctx.env, shareToken);
-    return updated ? json({ data: toQuestionnaireInstance(updated, templateRow.name) }) : json({ error: 'not_found' }, { status: 404 });
+    return updated
+      ? json({ data: attachQuestionnaireRuntime(toQuestionnaireInstance(updated, templateRow.name), templateDetail.questions, detail.ruleSet.rules) })
+      : json({ error: 'not_found' }, { status: 404 });
   }
 
   return methodNotAllowed(['GET', 'POST', 'PUT']);
@@ -2233,6 +2663,7 @@ export async function handleBuilderRoutes(
                 }
               : null,
           loginRequired,
+          rules: detail.ruleSet.rules,
           userId: userIdOrResponse,
         }),
       );
@@ -2290,7 +2721,7 @@ export async function handleBuilderRoutes(
 
     if (!instanceAction) {
       if (ctx.request.method === 'GET') {
-        return json({ data: toQuestionnaireInstance(row, detail.template.name) });
+        return json({ data: attachQuestionnaireRuntime(toQuestionnaireInstance(row, detail.template.name), detail.template.questions, detail.ruleSet.rules) });
       }
       if (ctx.request.method === 'DELETE') {
         await ctx.env.D1_MAIN.prepare(`DELETE FROM questionnaire_response_properties WHERE tenant_id = ? AND questionnaire_instance_id = ?`)
@@ -2316,7 +2747,9 @@ export async function handleBuilderRoutes(
         return json({ error: 'locked_response', message: 'Submitted or accepted questionnaire responses are locked.' }, { status: 409 });
       }
       const body = await readJson<ResponseUpdateInput>(ctx.request);
-      const answers = { ...asJson<Record<string, unknown>>(row.answers_json, {}), ...asRecord(body.answers) };
+      const mergedAnswers = { ...asJson<Record<string, unknown>>(row.answers_json, {}), ...asRecord(body.answers) };
+      const responseRuntime = evaluateQuestionnaireRuntime(detail.template.questions, detail.ruleSet.rules, mergedAnswers);
+      const answers = responseRuntime.answers;
       const uploads = { ...asJson<Record<string, unknown>>(row.uploads_json, {}), ...asRecord(body.uploads) };
       const headerValues = { ...asJson<Record<string, unknown>>(row.header_values_json, {}), ...asRecord(body.headerValues) };
       const collaboration = asJson<QuestionnaireInstance['collaboration']>(row.collaboration_json, []);
@@ -2329,7 +2762,6 @@ export async function handleBuilderRoutes(
           createdAt: nowIso(),
         });
       }
-      const score = calculateQuestionnaireScore(detail.template.questions, answers);
       await ctx.env.D1_MAIN.prepare(
         `UPDATE questionnaire_instances
             SET answers_json = ?, uploads_json = ?, header_values_json = ?, collaboration_json = ?,
@@ -2342,11 +2774,11 @@ export async function handleBuilderRoutes(
           JSON.stringify(uploads),
           JSON.stringify(headerValues),
           JSON.stringify(collaboration),
-          score.score,
-          score.maxScore,
-          score.grade,
-          score.percentComplete,
-          score.passingStatus,
+          responseRuntime.score,
+          responseRuntime.maxScore,
+          responseRuntime.grade,
+          responseRuntime.percentComplete,
+          responseRuntime.passingStatus,
           userIdOrResponse,
           nowIso(),
           tenantId,
@@ -2363,7 +2795,9 @@ export async function handleBuilderRoutes(
         answers,
       });
       const updated = await getQuestionnaireInstanceRow(ctx.env, tenantId, id, instanceId);
-      return updated ? json({ data: toQuestionnaireInstance(updated, detail.template.name) }) : json({ error: 'not_found' }, { status: 404 });
+      return updated
+        ? json({ data: attachQuestionnaireRuntime(toQuestionnaireInstance(updated, detail.template.name), detail.template.questions, detail.ruleSet.rules) })
+        : json({ error: 'not_found' }, { status: 404 });
     }
 
     if (['submit', 'accept', 'reject', 'reopen', 'close', 'feedback'].includes(instanceAction) && ctx.request.method === 'POST') {
@@ -2386,6 +2820,20 @@ export async function handleBuilderRoutes(
                   : body.sendEmail
                     ? 'RequestChanges'
                     : row.status;
+      if (status === 'Submitted') {
+        const submitRuntime = evaluateQuestionnaireRuntime(detail.template.questions, detail.ruleSet.rules, asJson<Record<string, unknown>>(row.answers_json, {}));
+        if (submitRuntime.percentComplete < 100 || submitRuntime.validationErrors.length > 0) {
+          return json(
+            {
+              error: 'validation_failed',
+              message: 'Questionnaire responses must satisfy required questions and rule validations before submission.',
+              validationErrors: submitRuntime.validationErrors,
+              percentComplete: submitRuntime.percentComplete,
+            },
+            { status: 409 },
+          );
+        }
+      }
       await updateQuestionnaireInstanceState({
         env: ctx.env,
         tenantId,
@@ -2404,7 +2852,9 @@ export async function handleBuilderRoutes(
         },
       });
       const updated = await getQuestionnaireInstanceRow(ctx.env, tenantId, id, instanceId);
-      return updated ? json({ data: toQuestionnaireInstance(updated, detail.template.name) }) : json({ error: 'not_found' }, { status: 404 });
+      return updated
+        ? json({ data: attachQuestionnaireRuntime(toQuestionnaireInstance(updated, detail.template.name), detail.template.questions, detail.ruleSet.rules) })
+        : json({ error: 'not_found' }, { status: 404 });
     }
 
     if (instanceAction === 'export' && ctx.request.method === 'GET') {
@@ -2501,7 +2951,7 @@ export async function handleBuilderRoutes(
         RISK_LEVEL: 'High',
         HAS_SOC2: false,
       };
-      const evaluation = evaluateRuleSet(detail.ruleSet.rules, answers);
+      const evaluation = evaluateRuleSet(detail.ruleSet.rules, answers, detail.template.questions);
       const runId = crypto.randomUUID();
       const timestamp = nowIso();
 
@@ -2522,7 +2972,16 @@ export async function handleBuilderRoutes(
           JSON.stringify({
             matchedRules: evaluation.matchedRules,
             visibleQuestions: evaluation.visibleQuestions,
+            hiddenQuestions: evaluation.hiddenQuestions,
+            disabledQuestions: evaluation.disabledQuestions,
+            requiredQuestions: evaluation.requiredQuestions,
+            displayOptions: evaluation.displayOptions,
+            validationErrors: evaluation.validationErrors,
+            answerUpdates: evaluation.answerUpdates,
             score: evaluation.score,
+            maxScore: evaluation.maxScore,
+            percentComplete: evaluation.percentComplete,
+            passingStatus: evaluation.passingStatus,
             grade: evaluation.grade,
           }),
           'completed',
@@ -2575,6 +3034,7 @@ export async function handleBuilderRoutes(
           scenarioName: body.scenarioName?.trim() || 'Preview run',
           answers,
           rules,
+          questions,
         }),
       });
     }
