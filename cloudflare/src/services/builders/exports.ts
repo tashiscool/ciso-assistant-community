@@ -10,10 +10,20 @@ type RenderType =
   | 'RTF / HTML'
   | 'Date (MM/DD/YYYY)'
   | 'Date (YYYY-MM-DD)'
+  | 'Date (MMMM d yyyy)'
+  | 'Date Time'
+  | 'UTC Date'
+  | 'Relative Date'
   | 'Checkbox'
   | 'Checkbox YES/NO'
+  | 'Boolean Yes/No'
+  | 'Number'
+  | 'Decimal'
   | 'File Name'
-  | 'Image';
+  | 'Image'
+  | 'Multi Selection'
+  | 'DataObject JSON'
+  | 'DataObject Table';
 
 type TemplateAnalysis = {
   fileName: string;
@@ -130,6 +140,14 @@ type ExportBuilderTestRun = {
     mappedTags: number;
     unmappedTags: number;
     repeatedTags: number;
+    filtersApplied: number;
+    filterExpressionValid: boolean;
+    filterDiagnostics: string[];
+    subTemplates: number;
+    renderTypes: string[];
+    dataSources: string[];
+    generationMode: string;
+    masterAssessmentMode: boolean;
     previewLines: string[];
     generatedArtifactName: string;
   };
@@ -276,6 +294,18 @@ const fieldCatalog: FieldCatalogNode[] = [
           { id: 'field-evidence-count', name: 'Evidence Count', path: 'Control Implementation.Evidence Count', fieldType: 'Number', helper: 'Useful for evidence-coverage summaries.' },
         ],
       },
+      {
+        id: 'security-plan-component-implementations',
+        name: 'Component Control Implementations',
+        children: [
+          { id: 'field-component-name', name: 'Component Name', path: 'Component.Name', fieldType: 'Text', helper: 'Linked component name used in SSP control implementation rollups.' },
+          { id: 'field-component-type', name: 'Component Type', path: 'Component.Type', fieldType: 'Text', helper: 'Hardware, software, service, policy, or process classification.' },
+          { id: 'field-component-control-id', name: 'Component Control Id', path: 'Component.Control Implementation.Control Id', fieldType: 'Text', helper: 'Control identifier from a mapped component implementation.' },
+          { id: 'field-component-control-status', name: 'Component Implementation Status', path: 'Component.Control Implementation.Status', fieldType: 'Text', helper: 'Component-specific implementation status for shared controls.' },
+          { id: 'field-component-control-statement', name: 'Component Implementation Statement', path: 'Component.Control Implementation.Statement', fieldType: 'RTF / HTML', helper: 'Component implementation narrative for mapped SSP controls.' },
+          { id: 'field-component-security-plans', name: 'Linked Security Plans', path: 'Component.Security Plan Cross References', fieldType: 'Multi Selection', helper: 'Cross-referenced plans that consume this component data.' },
+        ],
+      },
     ],
   },
   {
@@ -361,14 +391,26 @@ const fieldCatalog: FieldCatalogNode[] = [
           { id: 'field-boundary-image', name: 'Authorization Boundary Image', path: 'Files.Authorization Boundary.Image', fieldType: 'Image', helper: 'Best rendered inside a Word image placeholder.' },
         ],
       },
+      {
+        id: 'supporting-dataobjects',
+        name: 'DataObjects',
+        children: [
+          { id: 'field-dataobject-risk-rollup', name: 'Risk Rollup', path: 'DataObject.Risk Rollup', fieldType: 'DataObject Table', helper: 'Computed risk summary table for advanced exports.' },
+          { id: 'field-dataobject-control-summary', name: 'Control Implementation Summary', path: 'DataObject.Control Implementation Summary', fieldType: 'DataObject Table', helper: 'Calculated control implementation summary used in appendices.' },
+          { id: 'field-dataobject-evidence-coverage', name: 'Evidence Coverage', path: 'DataObject.Evidence Coverage', fieldType: 'DataObject JSON', helper: 'Computed evidence coverage object for dashboards, exports, and summaries.' },
+        ],
+      },
     ],
   },
 ];
 
 const starterTemplates: StarterTemplate[] = [
   { id: 'starter-fedramp-ssp', title: 'FedRAMP Rev 5 SSP', module: 'Security Plans', exportGroup: 'FedRAMP Deliverables', exportType: 'DOCX', description: 'Narrative Security Plan export with system metadata and implementation sections.', kind: 'system', defaultFileName: 'fedramp-rev5-ssp.docx', defaultTags: ['{{system_name}}', '{{authorization_date}}', '{{system_owner.name}}', '{{categorization}}', '{{implementation_statement}}', '{{control_id}}', '{{control_title}}'] },
+  { id: 'starter-doe-ssp', title: 'DOE SSP', module: 'Security Plans', exportGroup: 'SSP Templates', exportType: 'DOCX', description: 'Department of Energy-oriented System Security Plan starter with ownership, categorization, and control implementation sections.', kind: 'system', defaultFileName: 'doe-ssp.docx', defaultTags: ['{{systemname}}', '{{authorizationDateYYYYMMDD}}', '{{systemowner.name}}', '{{categorization}}', '{{component.controlImplementation.status}}', '{{implementation_statement}}'] },
+  { id: 'starter-cmmc-ssp', title: 'CMMC SSP', module: 'Security Plans', exportGroup: 'SSP Templates', exportType: 'DOCX', description: 'Cybersecurity Maturity Model Certification SSP starter with component, evidence, and control responsibility mappings.', kind: 'system', defaultFileName: 'cmmc-ssp.docx', defaultTags: ['{{system_name}}', '{{system_owner.name}}', '{{control_id}}', '{{control_title}}', '{{component_name}}', '{{evidence_count}}'] },
   { id: 'starter-fedramp-sap', title: 'FedRAMP Rev 5 SAP', module: 'Master Assessments', exportGroup: 'Assessment Deliverables', exportType: 'DOCX', description: 'Assessment-context plan document with master-assessment routing.', kind: 'system', defaultFileName: 'fedramp-rev5-sap.docx', defaultTags: ['{{masterAssessment.id}}', '{{masterAssessment.title}}', '{{masterAssessment.items.dateLastUpdated}}', '{{system_name}}', '{{system_owner.name}}'] },
   { id: 'starter-fedramp-sar', title: 'FedRAMP Rev 5 SAR', module: 'Master Assessments', exportGroup: 'Assessment Deliverables', exportType: 'DOCX', description: 'Security assessment report package with narrative and control findings sections.', kind: 'system', defaultFileName: 'fedramp-rev5-sar.docx', defaultTags: ['{{masterAssessment.title}}', '{{masterAssessment.items.dateLastUpdated}}', '{{control_id}}', '{{control_title}}', '{{implementation_statement}}'] },
+  { id: 'starter-fedramp-appendix-q', title: 'FedRAMP Rev 5 Appendix Q', module: 'Security Plans', exportGroup: 'Appendices', exportType: 'XLSX', description: 'Control implementation summary and customer responsibility matrix with component and DataObject support.', kind: 'system', defaultFileName: 'fedramp-rev5-appendix-q.xlsx', defaultTags: ['{{control_id}}', '{{control_title}}', '{{component_name}}', '{{component_control_status}}', '{{dataObject.controlSummary}}', '{{evidence_count}}'] },
   { id: 'starter-fedramp-appendix-a', title: 'FedRAMP Rev 5 Appendix A', module: 'Security Plans', exportGroup: 'Appendices', exportType: 'XLSX', description: 'Worksheet-oriented appendix for control, ownership, and evidence summaries.', kind: 'system', defaultFileName: 'fedramp-rev5-appendix-a.xlsx', defaultTags: ['{{asset_name}}', '{{asset_ip}}', '{{asset_owner}}', '{{evidence_count}}'] },
   { id: 'starter-fedramp-separation', title: 'FedRAMP Rev 5 Separation of Duties Matrix', module: 'Security Plans', exportGroup: 'Appendices', exportType: 'XLSX', description: 'Responsibility matrix for teams, controls, and approval roles.', kind: 'system', defaultFileName: 'fedramp-rev5-separation-of-duties.xlsx', defaultTags: ['{{system_owner.name}}', '{{control_id}}', '{{control_title}}'] },
   { id: 'starter-labs-ssp', title: 'LABS SSP', module: 'Security Plans', exportGroup: 'Starter Templates', exportType: 'DOCX', description: 'Internal starter narrative package for solution labs and early drafts.', kind: 'system', defaultFileName: 'labs-ssp.docx', defaultTags: ['{{system_name}}', '{{system_owner.name}}', '{{implementation_statement}}'] },
@@ -462,11 +504,39 @@ const mergedStarterTemplates = [
 const flatFieldCatalog = flattenFieldCatalog(mergedFieldCatalog);
 
 function normalize(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  return value
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/([a-zA-Z])([0-9])/g, '$1 $2')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
 }
 
 function tokenize(value: string) {
   return normalize(value).split(/\s+/).filter(Boolean);
+}
+
+function expandTemplateTagForMatching(tag: string) {
+  const cleanedTag = tag.replace(/[{}]/g, '').trim();
+  const tagParts = cleanedTag.split('|').pop() ?? cleanedTag;
+  const compact = tagParts.toLowerCase().replace(/[^a-z0-9]+/g, '');
+  const aliases: Record<string, string> = {
+    authorizationdate: 'authorization date',
+    authorizationdatemmddyyyy: 'authorization date',
+    authorizationdateyyyymmdd: 'authorization date',
+    chkboxyn01: 'checkbox yes no',
+    checkboxyesno: 'checkbox yes no',
+    systemname: 'system name',
+    systemownername: 'system owner name',
+    implementationstatus: 'implementation status',
+    componentcontrolstatus: 'component control implementation status',
+    componentcontrolimplementationstatus: 'component control implementation status',
+    dataobjectcontrolsummary: 'data object control implementation summary',
+    dataobjectriskrollup: 'data object risk rollup',
+    authorizationboundaryfilename: 'authorization boundary file name',
+    authorizationboundaryimage: 'authorization boundary image',
+  };
+  return aliases[compact] ?? tagParts;
 }
 
 function renderTypeForFieldType(fieldType: string): RenderType {
@@ -475,19 +545,29 @@ function renderTypeForFieldType(fieldType: string): RenderType {
       return 'RTF / HTML';
     case 'Date':
       return 'Date (MM/DD/YYYY)';
+    case 'Date Time':
+      return 'Date Time';
     case 'Image':
       return 'Image';
     case 'File Name':
       return 'File Name';
+    case 'Number':
+    case 'Whole Number':
+    case 'Dollar':
+      return 'Number';
+    case 'Multi Selection':
+      return 'Multi Selection';
+    case 'DataObject JSON':
+      return 'DataObject JSON';
+    case 'DataObject Table':
+      return 'DataObject Table';
     default:
       return 'Text';
   }
 }
 
 function scoreFieldMatch(tag: string, field: FlatFieldNode): number {
-  const cleanedTag = tag.replace(/[{}]/g, '');
-  const tagParts = cleanedTag.split('|').pop() ?? cleanedTag;
-  const tagTokens = tokenize(tagParts.replace(/[._-]+/g, ' '));
+  const tagTokens = tokenize(expandTemplateTagForMatching(tag).replace(/[._-]+/g, ' '));
   const fieldTokens = tokenize(field.path);
   if (tagTokens.length === 0 || fieldTokens.length === 0) {
     return 0;
@@ -509,6 +589,12 @@ function scoreFieldMatch(tag: string, field: FlatFieldNode): number {
   if (tagJoined.includes('masterassessment') && fieldJoined.includes('master assessment')) {
     score += 10;
   }
+  if (tagJoined.includes('data object') && fieldJoined.includes('data object')) {
+    score += 12;
+  }
+  if (tagJoined.includes('component') && fieldJoined.includes('component')) {
+    score += 12;
+  }
   return Math.min(score, 98);
 }
 
@@ -519,6 +605,12 @@ function tableRegionForTag(tag: string): string {
   }
   if (lower.includes('risk')) {
     return 'Risk Register';
+  }
+  if (lower.includes('component')) {
+    return 'Component Control Implementations';
+  }
+  if (lower.includes('dataobject') || lower.includes('data_object')) {
+    return 'DataObject Output';
   }
   if (lower.includes('control')) {
     return 'Control Matrix';
@@ -587,10 +679,12 @@ function analyzeTemplateInput(
   fileName: string,
   content?: string,
 ): { analysis: TemplateAnalysis; mappings: MappingRow[] } {
-  const extractedTags = uniqueTags(Array.from(content?.matchAll(/{{\s*([^{}]+)\s*}}/g) ?? []).map((match) => `{{${match[1].trim()}}}`));
+  const allExtractedTags = Array.from(content?.matchAll(/{{\s*([^{}]+)\s*}}/g) ?? []).map((match) => `{{${match[1].trim()}}}`);
+  const extractedTags = uniqueTags(allExtractedTags);
   const tags = extractedTags.length > 0 ? extractedTags : fallbackTagsFor(module, exportType, fileName);
   const mappings = autoMapTags(tags);
-  const repeatedTags = tags.length - uniqueTags(tags).length;
+  const repeatedTags =
+    allExtractedTags.length > 0 ? allExtractedTags.length - extractedTags.length : tags.length - uniqueTags(tags).length;
   const issues: string[] = [];
   let extractionMode: TemplateAnalysis['extractionMode'] = 'content-scan';
   if (extractedTags.length === 0) {
@@ -743,7 +837,7 @@ async function listTestRuns(env: WorkerRequestContext['env'], tenantId: string, 
     id: row.id,
     scenarioName: row.scenario_name,
     status: row.status,
-    result: asJson<ExportBuilderTestRun['result']>(row.result_json, { mappedTags: 0, unmappedTags: 0, repeatedTags: 0, previewLines: [], generatedArtifactName: 'preview.docx' }),
+    result: parseTestRunResult(row.result_json),
     createdByUserId: row.created_by_user_id,
     createdAt: row.created_at,
   }));
@@ -753,6 +847,37 @@ async function getExportRow(env: WorkerRequestContext['env'], tenantId: string, 
   return env.D1_MAIN.prepare(`SELECT * FROM export_builder_exports WHERE tenant_id = ? AND id = ? LIMIT 1`)
     .bind(tenantId, exportId)
     .first<ExportBuilderRow>();
+}
+
+function defaultTestRunResult(): ExportBuilderTestRun['result'] {
+  return {
+    mappedTags: 0,
+    unmappedTags: 0,
+    repeatedTags: 0,
+    filtersApplied: 0,
+    filterExpressionValid: true,
+    filterDiagnostics: [],
+    subTemplates: 0,
+    renderTypes: [],
+    dataSources: [],
+    generationMode: 'semantic-preview-package',
+    masterAssessmentMode: false,
+    previewLines: [],
+    generatedArtifactName: 'preview.docx',
+  };
+}
+
+function parseTestRunResult(value: string | null | undefined): ExportBuilderTestRun['result'] {
+  const fallback = defaultTestRunResult();
+  const parsed = asJson<Partial<ExportBuilderTestRun['result']>>(value, {});
+  return {
+    ...fallback,
+    ...parsed,
+    filterDiagnostics: Array.isArray(parsed.filterDiagnostics) ? parsed.filterDiagnostics : fallback.filterDiagnostics,
+    renderTypes: Array.isArray(parsed.renderTypes) ? parsed.renderTypes : fallback.renderTypes,
+    dataSources: Array.isArray(parsed.dataSources) ? parsed.dataSources : fallback.dataSources,
+    previewLines: Array.isArray(parsed.previewLines) ? parsed.previewLines : fallback.previewLines,
+  };
 }
 
 async function toDetail(env: WorkerRequestContext['env'], tenantId: string, row: ExportBuilderRow): Promise<ExportBuilderDetail> {
@@ -782,6 +907,26 @@ async function toDetail(env: WorkerRequestContext['env'], tenantId: string, row:
 
 function validateMappings(analysis: TemplateAnalysis, mappings: MappingRow[]) {
   const diagnostics: string[] = [];
+  const supportedRenderTypes = new Set<RenderType>([
+    'Text',
+    'RTF / HTML',
+    'Date (MM/DD/YYYY)',
+    'Date (YYYY-MM-DD)',
+    'Date (MMMM d yyyy)',
+    'Date Time',
+    'UTC Date',
+    'Relative Date',
+    'Checkbox',
+    'Checkbox YES/NO',
+    'Boolean Yes/No',
+    'Number',
+    'Decimal',
+    'File Name',
+    'Image',
+    'Multi Selection',
+    'DataObject JSON',
+    'DataObject Table',
+  ]);
   if (analysis.tagsFound === 0) {
     diagnostics.push('No template tags are currently available for mapping.');
   }
@@ -791,7 +936,90 @@ function validateMappings(analysis: TemplateAnalysis, mappings: MappingRow[]) {
   if (mappings.some((mapping) => mapping.fieldPath && !flatFieldCatalog.some((field) => field.path === mapping.fieldPath))) {
     diagnostics.push('One or more mapped Regovise field paths are not available in the canonical field catalog.');
   }
+  if (mappings.some((mapping) => !supportedRenderTypes.has(mapping.renderType))) {
+    diagnostics.push('One or more mappings use an unsupported render/data type.');
+  }
   return diagnostics;
+}
+
+function validateFilterExpression(filterRows: FilterRow[], expression: string | null | undefined) {
+  const diagnostics: string[] = [];
+  const trimmed = expression?.trim() || (filterRows.length > 0 ? '1' : '');
+  if (!trimmed) {
+    return { valid: true, diagnostics, normalizedExpression: '' };
+  }
+
+  const tokens = trimmed.match(/\d+|AND|OR|\(|\)/gi) ?? [];
+  const reconstructed = tokens.join(' ').replace(/\s+([)])/g, '$1').replace(/([(])\s+/g, '$1');
+  const compactExpected = trimmed.replace(/\s+/g, '').toUpperCase();
+  const compactActual = reconstructed.replace(/\s+/g, '').toUpperCase();
+  if (compactActual !== compactExpected) {
+    diagnostics.push('Filter logic can only contain filter numbers, AND, OR, and parentheses.');
+  }
+
+  let depth = 0;
+  let previous: string | null = null;
+  for (const rawToken of tokens) {
+    const token = rawToken.toUpperCase();
+    const isNumber = /^\d+$/.test(token);
+    if (token === '(') {
+      depth += 1;
+      if (previous && /^\d+$/.test(previous)) {
+        diagnostics.push('A boolean operator is required before an opening parenthesis.');
+      }
+    } else if (token === ')') {
+      depth -= 1;
+      if (depth < 0) {
+        diagnostics.push('Filter logic has an unmatched closing parenthesis.');
+        depth = 0;
+      }
+      if (!previous || previous === 'AND' || previous === 'OR' || previous === '(') {
+        diagnostics.push('Filter logic has an empty or incomplete parenthesized expression.');
+      }
+    } else if (token === 'AND' || token === 'OR') {
+      if (!previous || previous === 'AND' || previous === 'OR' || previous === '(') {
+        diagnostics.push(`Filter logic has a misplaced ${token} operator.`);
+      }
+    } else if (isNumber) {
+      const index = Number.parseInt(token, 10);
+      if (index < 1 || index > filterRows.length) {
+        diagnostics.push(`Filter logic references filter ${index}, but only ${filterRows.length} filter(s) exist.`);
+      }
+      if (previous && (/^\d+$/.test(previous) || previous === ')')) {
+        diagnostics.push('Adjacent filter numbers must be joined by AND or OR.');
+      }
+    }
+    previous = token;
+  }
+  if (depth > 0) {
+    diagnostics.push('Filter logic has an unmatched opening parenthesis.');
+  }
+  if (previous === 'AND' || previous === 'OR' || previous === '(') {
+    diagnostics.push('Filter logic ends before the final condition is complete.');
+  }
+
+  return {
+    valid: diagnostics.length === 0,
+    diagnostics: uniqueTags(diagnostics),
+    normalizedExpression: trimmed,
+  };
+}
+
+function dataSourcesForMappings(mappings: MappingRow[]) {
+  const sources = new Set<string>();
+  for (const mapping of mappings) {
+    const path = mapping.fieldPath ?? '';
+    if (path.startsWith('masterAssessment.')) {
+      sources.add('Master Assessment');
+    } else if (path.startsWith('Component.')) {
+      sources.add('Component Control Implementations');
+    } else if (path.startsWith('DataObject.')) {
+      sources.add('DataObjects');
+    } else if (path.includes('.')) {
+      sources.add(path.split('.')[0]);
+    }
+  }
+  return Array.from(sources).sort();
 }
 
 export async function handleExportBuilderRoutes(segments: string[], ctx: WorkerRequestContext): Promise<Response> {
@@ -885,7 +1113,11 @@ export async function handleExportBuilderRoutes(segments: string[], ctx: WorkerR
       const body = await readJson<SaveExportInput>(ctx.request);
       const templateAnalysis = body.templateAnalysis ?? asJson<TemplateAnalysis>(current.template_analysis_json, defaultAnalysis(current.template_file_name ?? 'template.docx', current.export_type as ExportType));
       const mappings = body.mappings ?? asJson<MappingRow[]>(current.mappings_json, []);
+      const filterRows = body.filterRows ?? asJson<FilterRow[]>(current.filter_rows_json, []);
+      const filterExpression = body.filterExpression ?? current.filter_expression ?? '1';
       const diagnostics = validateMappings(templateAnalysis, mappings);
+      const filterValidation = validateFilterExpression(filterRows, filterExpression);
+      diagnostics.push(...filterValidation.diagnostics.map((message) => `Filter logic: ${message}`));
       if (diagnostics.length > 0) {
         templateAnalysis.issues = uniqueTags([...templateAnalysis.issues, ...diagnostics]);
       }
@@ -908,8 +1140,8 @@ export async function handleExportBuilderRoutes(segments: string[], ctx: WorkerR
           body.templateFileName ?? current.template_file_name,
           JSON.stringify(templateAnalysis),
           JSON.stringify(mappings),
-          JSON.stringify(body.filterRows ?? asJson<FilterRow[]>(current.filter_rows_json, [])),
-          body.filterExpression ?? current.filter_expression ?? '1',
+          JSON.stringify(filterRows),
+          filterValidation.normalizedExpression || '1',
           JSON.stringify(body.subTemplates ?? asJson<SubTemplate[]>(current.sub_templates_json, [])),
           userIdOrResponse,
           nowIso(),
@@ -951,7 +1183,14 @@ export async function handleExportBuilderRoutes(segments: string[], ctx: WorkerR
     if (!fileName) {
       return json({ error: 'invalid_template', message: 'fileName is required for template analysis.' }, { status: 400 });
     }
-    const exportType = (fileName.toLowerCase().endsWith('.xlsx') ? 'XLSX' : 'DOCX') as ExportType;
+    const lowerFileName = fileName.toLowerCase();
+    if (!lowerFileName.endsWith('.docx') && !lowerFileName.endsWith('.xlsx')) {
+      return json({ error: 'invalid_template', message: 'Only DOCX and XLSX templates can be analyzed.' }, { status: 400 });
+    }
+    const exportType = (lowerFileName.endsWith('.xlsx') ? 'XLSX' : 'DOCX') as ExportType;
+    if (body.subTemplateId && exportType !== 'DOCX') {
+      return json({ error: 'invalid_subtemplate', message: 'Sub templates currently require DOCX files.' }, { status: 400 });
+    }
     const analyzed = analyzeTemplateInput(current.module as ExportModule, exportType, fileName, body.content);
     const subTemplates = asJson<SubTemplate[]>(current.sub_templates_json, []);
 
@@ -993,8 +1232,13 @@ export async function handleExportBuilderRoutes(segments: string[], ctx: WorkerR
     const body = await readJson<AutoMapInput>(ctx.request);
     const currentMappings = body.mappings ?? asJson<MappingRow[]>(current.mappings_json, []);
     const remapped = autoMapTags(currentMappings.map((mapping) => mapping.tag));
-    await ctx.env.D1_MAIN.prepare(`UPDATE export_builder_exports SET mappings_json = ?, updated_by_user_id = ?, updated_at = ? WHERE tenant_id = ? AND id = ?`)
-      .bind(JSON.stringify(remapped), userIdOrResponse, nowIso(), tenantId, id)
+    const analysis = asJson<TemplateAnalysis>(current.template_analysis_json, defaultAnalysis(current.template_file_name ?? 'template.docx', current.export_type as ExportType));
+    analysis.mappedTags = remapped.filter((mapping) => mapping.fieldPath).length;
+    analysis.unmappedTags = Math.max(analysis.tagsFound - analysis.mappedTags, 0);
+    const diagnostics = validateMappings(analysis, remapped);
+    analysis.issues = diagnostics.length > 0 ? uniqueTags([...analysis.issues, ...diagnostics]) : analysis.issues;
+    await ctx.env.D1_MAIN.prepare(`UPDATE export_builder_exports SET mappings_json = ?, template_analysis_json = ?, updated_by_user_id = ?, updated_at = ? WHERE tenant_id = ? AND id = ?`)
+      .bind(JSON.stringify(remapped), JSON.stringify(analysis), userIdOrResponse, nowIso(), tenantId, id)
       .run();
     const updated = await getExportRow(ctx.env, tenantId, id);
     return updated ? json({ data: await toDetail(ctx.env, tenantId, updated) }) : json({ error: 'not_found' }, { status: 404 });
@@ -1016,11 +1260,20 @@ export async function handleExportBuilderRoutes(segments: string[], ctx: WorkerR
     const templateAnalysis = asJson<TemplateAnalysis>(current.template_analysis_json, defaultAnalysis(current.template_file_name ?? 'template.docx', current.export_type as ExportType));
     const incomingMappings = body.mappings ?? [];
     const diagnostics = validateMappings(templateAnalysis, incomingMappings);
+    const knownTags = new Set(asJson<MappingRow[]>(current.mappings_json, []).map((mapping) => mapping.tag));
+    const compatibleMappings = incomingMappings.filter((mapping) => knownTags.size === 0 || knownTags.has(mapping.tag));
+    if (compatibleMappings.length < incomingMappings.length) {
+      diagnostics.push(`${incomingMappings.length - compatibleMappings.length} imported mapping(s) were skipped because their placeholders are not present in the current template.`);
+    }
+    const filterRows = body.filterRows ?? asJson<FilterRow[]>(current.filter_rows_json, []);
+    const filterValidation = validateFilterExpression(filterRows, body.filterExpression ?? current.filter_expression ?? '1');
+    diagnostics.push(...filterValidation.diagnostics.map((message) => `Filter logic: ${message}`));
     if (incomingMappings.length === 0 || diagnostics.some((message) => message.includes('No template tags'))) {
       return json({ error: 'invalid_import', message: 'Imported mappings failed validation.', diagnostics }, { status: 400 });
     }
-    templateAnalysis.mappedTags = incomingMappings.filter((mapping) => mapping.fieldPath).length;
+    templateAnalysis.mappedTags = compatibleMappings.filter((mapping) => mapping.fieldPath).length;
     templateAnalysis.unmappedTags = Math.max(templateAnalysis.tagsFound - templateAnalysis.mappedTags, 0);
+    templateAnalysis.issues = diagnostics.length > 0 ? uniqueTags([...templateAnalysis.issues, ...diagnostics]) : templateAnalysis.issues;
     await ctx.env.D1_MAIN.prepare(
       `UPDATE export_builder_exports
           SET mappings_json = ?, filter_rows_json = ?, filter_expression = ?, template_analysis_json = ?,
@@ -1028,9 +1281,9 @@ export async function handleExportBuilderRoutes(segments: string[], ctx: WorkerR
         WHERE tenant_id = ? AND id = ?`,
     )
       .bind(
-        JSON.stringify(incomingMappings),
-        JSON.stringify(body.filterRows ?? asJson<FilterRow[]>(current.filter_rows_json, [])),
-        body.filterExpression ?? current.filter_expression ?? '1',
+        JSON.stringify(compatibleMappings),
+        JSON.stringify(filterRows),
+        filterValidation.normalizedExpression || '1',
         JSON.stringify(templateAnalysis),
         userIdOrResponse,
         nowIso(),
@@ -1105,11 +1358,28 @@ export async function handleExportBuilderRoutes(segments: string[], ctx: WorkerR
     }
     const body = await readJson<TestExportInput>(ctx.request);
     const detail = await toDetail(ctx.env, tenantId, current);
+    const filterValidation = validateFilterExpression(detail.filterRows, detail.filterExpression);
+    const renderTypes = uniqueTags(detail.mappings.map((mapping) => mapping.renderType)).sort();
+    const dataSources = dataSourcesForMappings(detail.mappings);
     const result = {
       mappedTags: detail.mappings.filter((mapping) => mapping.fieldPath).length,
       unmappedTags: detail.mappings.filter((mapping) => !mapping.fieldPath).length,
       repeatedTags: detail.mappings.filter((mapping) => mapping.repeated).length,
-      previewLines: detail.mappings.slice(0, 4).map((mapping) => `${mapping.tag} -> ${mapping.fieldPath ?? 'UNMAPPED'}`),
+      filtersApplied: detail.filterRows.length,
+      filterExpressionValid: filterValidation.valid,
+      filterDiagnostics: filterValidation.diagnostics,
+      subTemplates: detail.subTemplates.length,
+      renderTypes,
+      dataSources,
+      generationMode: 'semantic-preview-package',
+      masterAssessmentMode:
+        detail.module === 'Master Assessments' ||
+        detail.mappings.some((mapping) => mapping.fieldPath?.startsWith('masterAssessment.')),
+      previewLines: [
+        ...detail.mappings.slice(0, 4).map((mapping) => `${mapping.tag} -> ${mapping.fieldPath ?? 'UNMAPPED'} [${mapping.renderType}]`),
+        `Filters: ${filterValidation.normalizedExpression || 'none'} (${filterValidation.valid ? 'valid' : 'invalid'})`,
+        `Data sources: ${dataSources.length > 0 ? dataSources.join(', ') : 'none'}`,
+      ],
       generatedArtifactName: `${detail.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.${detail.exportType.toLowerCase()}`,
     };
     const runId = crypto.randomUUID();
@@ -1134,6 +1404,9 @@ export async function handleExportBuilderRoutes(segments: string[], ctx: WorkerR
     const current = await getExportRow(ctx.env, tenantId, id);
     if (!current) {
       return json({ error: 'not_found' }, { status: 404 });
+    }
+    if (current.export_type !== 'DOCX') {
+      return json({ error: 'invalid_subtemplate', message: 'Sub templates are only supported for DOCX export configurations.' }, { status: 400 });
     }
     const body = await readJson<{ title?: string; fileName?: string; content?: string }>(ctx.request);
     const fileName = body.fileName?.trim();

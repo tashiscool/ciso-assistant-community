@@ -6,10 +6,20 @@ export type RenderType =
   | 'RTF / HTML'
   | 'Date (MM/DD/YYYY)'
   | 'Date (YYYY-MM-DD)'
+  | 'Date (MMMM d yyyy)'
+  | 'Date Time'
+  | 'UTC Date'
+  | 'Relative Date'
   | 'Checkbox'
   | 'Checkbox YES/NO'
+  | 'Boolean Yes/No'
+  | 'Number'
+  | 'Decimal'
   | 'File Name'
-  | 'Image';
+  | 'Image'
+  | 'Multi Selection'
+  | 'DataObject JSON'
+  | 'DataObject Table';
 
 export type TemplateAnalysis = {
   fileName: string;
@@ -94,6 +104,14 @@ export type ExportBuilderTestRun = {
     mappedTags: number;
     unmappedTags: number;
     repeatedTags: number;
+    filtersApplied: number;
+    filterExpressionValid: boolean;
+    filterDiagnostics: string[];
+    subTemplates: number;
+    renderTypes: string[];
+    dataSources: string[];
+    generationMode: string;
+    masterAssessmentMode: boolean;
     previewLines: string[];
     generatedArtifactName: string;
   };

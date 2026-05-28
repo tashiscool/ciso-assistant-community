@@ -56,13 +56,23 @@ const renderTypes: RenderType[] = [
   'RTF / HTML',
   'Date (MM/DD/YYYY)',
   'Date (YYYY-MM-DD)',
+  'Date (MMMM d yyyy)',
+  'Date Time',
+  'UTC Date',
+  'Relative Date',
   'Checkbox',
   'Checkbox YES/NO',
+  'Boolean Yes/No',
+  'Number',
+  'Decimal',
   'File Name',
   'Image',
+  'Multi Selection',
+  'DataObject JSON',
+  'DataObject Table',
 ];
 
-const exportModules: ExportModule[] = ['Security Plans', 'Security Controls', 'Risks', 'Assets', 'Master Assessments', 'Evidence'];
+const defaultExportModules: ExportModule[] = ['Security Plans', 'Security Controls', 'Risks', 'Assets', 'Master Assessments', 'Evidence'];
 
 const filterFieldOptions = [
   'status',
@@ -152,6 +162,102 @@ function moduleContextCopy(module: ExportModule) {
   }
 }
 
+function decodeXmlEntities(value: string) {
+  return value
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'");
+}
+
+function xmlToSearchableText(xml: string) {
+  return decodeXmlEntities(xml.replace(/<[^>]+>/g, ''));
+}
+
+async function inflateRaw(bytes: Uint8Array) {
+  if ('DecompressionStream' in globalThis) {
+    const arrayBuffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+    const stream = new Blob([arrayBuffer]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  }
+  return bytes;
+}
+
+function findEndOfCentralDirectory(view: DataView) {
+  for (let offset = view.byteLength - 22; offset >= 0; offset -= 1) {
+    if (view.getUint32(offset, true) === 0x06054b50) {
+      return offset;
+    }
+  }
+  return -1;
+}
+
+async function extractZipXmlText(buffer: ArrayBuffer, format: ExportType) {
+  const view = new DataView(buffer);
+  const eocdOffset = findEndOfCentralDirectory(view);
+  if (eocdOffset < 0) {
+    return '';
+  }
+
+  const decoder = new TextDecoder();
+  const centralDirectorySize = view.getUint32(eocdOffset + 12, true);
+  const centralDirectoryOffset = view.getUint32(eocdOffset + 16, true);
+  const xmlTexts: string[] = [];
+  let cursor = centralDirectoryOffset;
+  const end = centralDirectoryOffset + centralDirectorySize;
+
+  while (cursor < end && view.getUint32(cursor, true) === 0x02014b50) {
+    const compressionMethod = view.getUint16(cursor + 10, true);
+    const compressedSize = view.getUint32(cursor + 20, true);
+    const fileNameLength = view.getUint16(cursor + 28, true);
+    const extraLength = view.getUint16(cursor + 30, true);
+    const commentLength = view.getUint16(cursor + 32, true);
+    const localHeaderOffset = view.getUint32(cursor + 42, true);
+    const fileNameBytes = new Uint8Array(buffer, cursor + 46, fileNameLength);
+    const fileName = decoder.decode(fileNameBytes);
+    const isDocxXml =
+      format === 'DOCX' &&
+      /^word\/(document|header\d*|footer\d*|footnotes|endnotes)\.xml$/i.test(fileName);
+    const isXlsxXml =
+      format === 'XLSX' &&
+      /^xl\/(sharedStrings|worksheets\/sheet\d+|tables\/table\d+)\.xml$/i.test(fileName);
+
+    if ((isDocxXml || isXlsxXml) && view.getUint32(localHeaderOffset, true) === 0x04034b50) {
+      const localFileNameLength = view.getUint16(localHeaderOffset + 26, true);
+      const localExtraLength = view.getUint16(localHeaderOffset + 28, true);
+      const dataOffset = localHeaderOffset + 30 + localFileNameLength + localExtraLength;
+      const compressedBytes = new Uint8Array(buffer, dataOffset, compressedSize);
+      const xmlBytes =
+        compressionMethod === 8 ? await inflateRaw(compressedBytes) : compressionMethod === 0 ? compressedBytes : null;
+      if (xmlBytes) {
+        const xml = decoder.decode(xmlBytes);
+        xmlTexts.push(xml, xmlToSearchableText(xml));
+      }
+    }
+
+    cursor += 46 + fileNameLength + extraLength + commentLength;
+  }
+
+  return xmlTexts.join('\n');
+}
+
+async function readTemplateContent(file: File) {
+  const lowerName = file.name.toLowerCase();
+  const format = lowerName.endsWith('.xlsx') ? 'XLSX' : lowerName.endsWith('.docx') ? 'DOCX' : null;
+  if (format) {
+    try {
+      const xmlText = await extractZipXmlText(await file.arrayBuffer(), format);
+      if (xmlText.trim()) {
+        return xmlText;
+      }
+    } catch {
+      // Fall back to text mode so tests and hand-authored lightweight fixtures still work.
+    }
+  }
+  return file.text();
+}
+
 export function ExportBuilderWorkspace() {
   const { identity } = useEdgeIdentity();
   const [exports, setExports] = useState<ExportBuilderSummary[]>([]);
@@ -164,6 +270,7 @@ export function ExportBuilderWorkspace() {
   const [newExportTitle, setNewExportTitle] = useState('');
   const [newStarterTemplateId, setNewStarterTemplateId] = useState('');
   const [newSubTemplateTitle, setNewSubTemplateTitle] = useState('');
+  const [pendingSubTemplateId, setPendingSubTemplateId] = useState<string | null>(null);
   const [testScenarioName, setTestScenarioName] = useState('FedRAMP readiness review');
   const [selectedMappingId, setSelectedMappingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<PrimaryTab>('setup');
@@ -271,6 +378,18 @@ export function ExportBuilderWorkspace() {
 
   const flatFields = useMemo(() => flattenFieldCatalog(draft?.fieldCatalog ?? fieldCatalog), [draft, fieldCatalog]);
 
+  const exportModules = useMemo(
+    () =>
+      Array.from(
+        new Set([
+          ...defaultExportModules,
+          ...starterTemplates.map((template) => template.module),
+          ...(draft?.module ? [draft.module] : []),
+        ]),
+      ).sort(),
+    [draft?.module, starterTemplates],
+  );
+
   const selectedMapping = useMemo(
     () => draft?.mappings.find((mapping) => mapping.id === selectedMappingId) ?? draft?.mappings[0] ?? null,
     [draft, selectedMappingId],
@@ -377,7 +496,7 @@ export function ExportBuilderWorkspace() {
       setBusyAction(subTemplateId ? `subtemplate:${subTemplateId}` : 'analyze-template');
       setError(null);
       setNotice(null);
-      const content = await file.text();
+      const content = await readTemplateContent(file);
       const analyzed = await analyzeExportBuilderTemplate(draft.id, {
         fileName: file.name,
         content,
@@ -395,6 +514,7 @@ export function ExportBuilderWorkspace() {
       setError(err instanceof Error ? err.message : 'Unable to analyze template.');
     } finally {
       setBusyAction(null);
+      setPendingSubTemplateId(null);
       if (templateUploadRef.current) {
         templateUploadRef.current.value = '';
       }
@@ -482,7 +602,7 @@ export function ExportBuilderWorkspace() {
       setBusyAction('add-subtemplate');
       setError(null);
       setNotice(null);
-      const content = await file.text();
+      const content = await readTemplateContent(file);
       const updated = await addExportBuilderSubTemplate(draft.id, {
         title: newSubTemplateTitle || undefined,
         fileName: file.name,
@@ -580,7 +700,7 @@ export function ExportBuilderWorkspace() {
         ref={templateUploadRef}
         className="hidden"
         type="file"
-        accept=".docx,.xlsx,.txt,.json"
+        accept=".docx,.xlsx"
         onChange={(event) => {
           const file = event.target.files?.[0];
           if (file) {
@@ -604,11 +724,15 @@ export function ExportBuilderWorkspace() {
         ref={subTemplateUploadRef}
         className="hidden"
         type="file"
-        accept=".docx,.txt,.json"
+        accept=".docx"
         onChange={(event) => {
           const file = event.target.files?.[0];
           if (file) {
-            void handleAddSubTemplate(file);
+            if (pendingSubTemplateId) {
+              void handleAnalyzeTemplate(file, pendingSubTemplateId);
+            } else {
+              void handleAddSubTemplate(file);
+            }
           }
         }}
       />
@@ -841,6 +965,9 @@ export function ExportBuilderWorkspace() {
                         value={draft.exportGroup}
                         onChange={(event) => setDraft({ ...draft, exportGroup: event.target.value })}
                       />
+                      <div className="mt-2 text-xs text-slate-500">
+                        Type a new value here to create a custom group, equivalent to "Add New Group" in classic RegScale.
+                      </div>
                     </div>
                     <div>
                       <label className="label">Export Type</label>
@@ -908,6 +1035,8 @@ export function ExportBuilderWorkspace() {
                           <span className="badge-neutral">Control matrices</span>
                           <span className="badge-neutral">Risk registers</span>
                           <span className="badge-neutral">Asset inventories</span>
+                          <span className="badge-neutral">Component Control Implementations</span>
+                          <span className="badge-neutral">DataObjects</span>
                         </div>
                         <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-slate-400">
                           {moduleContextCopy(draft.module)}
@@ -926,8 +1055,9 @@ export function ExportBuilderWorkspace() {
                             <div className="eyebrow">Template Upload</div>
                             <h3 className="mt-2 text-lg font-semibold text-white">Analyze placeholders</h3>
                             <p className="mt-2 text-sm leading-6 text-slate-300">
-                              Upload a DOCX or XLSX template to extract <code>{'{{field_name}}'}</code>{' '}
-                              placeholders, detect table regions, and prepare mapping suggestions.
+                              Upload or browse for a DOCX or XLSX template to extract <code>{'{{field_name}}'}</code>{' '}
+                              placeholders, detect table regions, and prepare mapping suggestions. The tag delimiter is
+                              always double curly braces; other file types are rejected.
                             </p>
                           </div>
                           <div className="flex flex-wrap gap-2">
@@ -1193,7 +1323,15 @@ export function ExportBuilderWorkspace() {
                           value={newSubTemplateTitle}
                           onChange={(event) => setNewSubTemplateTitle(event.target.value)}
                         />
-                        <button className="button-secondary" onClick={() => subTemplateUploadRef.current?.click()} type="button">
+                        <button
+                          className="button-secondary"
+                          disabled={draft.exportType !== 'DOCX'}
+                          onClick={() => {
+                            setPendingSubTemplateId(null);
+                            subTemplateUploadRef.current?.click();
+                          }}
+                          type="button"
+                        >
                           <Upload className="mr-2 h-4 w-4" />
                           {busyAction === 'add-subtemplate' ? 'Adding...' : 'Add Sub Template'}
                         </button>
@@ -1202,6 +1340,12 @@ export function ExportBuilderWorkspace() {
                   </div>
 
                   <div className="space-y-4">
+                    {draft.exportType !== 'DOCX' && (
+                      <div className="panel-subtle text-sm text-amber-100">
+                        Sub Templates are only supported for DOCX export configurations. Switch the export type to DOCX
+                        before adding appendices or companion narrative sections.
+                      </div>
+                    )}
                     {draft.subTemplates.map((template) => (
                       <div key={template.id} className="panel-subtle">
                         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
@@ -1217,6 +1361,7 @@ export function ExportBuilderWorkspace() {
                               className="button-secondary"
                               onClick={() => {
                                 setNewSubTemplateTitle(template.title);
+                                setPendingSubTemplateId(template.id);
                                 subTemplateUploadRef.current?.click();
                               }}
                               type="button"
@@ -1375,8 +1520,39 @@ export function ExportBuilderWorkspace() {
                                 <span className="badge-success">{run.status}</span>
                                 <span className="badge-neutral">{run.result.mappedTags} mapped</span>
                                 <span className="badge-neutral">{run.result.unmappedTags} unmapped</span>
+                                <span className={run.result.filterExpressionValid ? 'badge-success' : 'badge-danger'}>
+                                  filters {run.result.filterExpressionValid ? 'valid' : 'invalid'}
+                                </span>
+                                <span className="badge-neutral">{run.result.subTemplates} sub templates</span>
                               </div>
                             </div>
+                            <div className="mt-4 grid gap-3 md:grid-cols-2">
+                              <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-sm text-slate-300">
+                                <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Generation Mode</div>
+                                <div className="mt-2">{run.result.generationMode}</div>
+                              </div>
+                              <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-sm text-slate-300">
+                                <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Data Sources</div>
+                                <div className="mt-2">
+                                  {run.result.dataSources.length > 0 ? run.result.dataSources.join(', ') : 'No mapped sources yet'}
+                                </div>
+                              </div>
+                              <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-sm text-slate-300">
+                                <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Render Types</div>
+                                <div className="mt-2">
+                                  {run.result.renderTypes.length > 0 ? run.result.renderTypes.join(', ') : 'No render types'}
+                                </div>
+                              </div>
+                              <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-sm text-slate-300">
+                                <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Master Assessment Mode</div>
+                                <div className="mt-2">{run.result.masterAssessmentMode ? 'Enabled' : 'Not used'}</div>
+                              </div>
+                            </div>
+                            {run.result.filterDiagnostics.length > 0 && (
+                              <div className="mt-4 rounded-2xl border border-amber-300/20 bg-amber-400/10 p-3 text-sm text-amber-100">
+                                {run.result.filterDiagnostics.join(' ')}
+                              </div>
+                            )}
                             <div className="mt-4 space-y-2">
                               {run.result.previewLines.map((line) => (
                                 <div key={line} className="rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-sm text-slate-300">

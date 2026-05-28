@@ -175,7 +175,9 @@ export function ExportBuilderDocxGuidePage() {
                 <tbody className="divide-y divide-white/10 text-slate-300">
                   {[
                     ['Text', '{{systemname}}', 'Direct system metadata and headings'],
-                    ['Date', '{{authorizationDateYYYYMMDD}}', 'Formatted dates in cover sheets and approvals'],
+                    ['Date (MM/DD/YYYY)', '{{authorizationDate}}', 'UTC date output for approvals and cover sheets'],
+                    ['Date (YYYY-MM-DD)', '{{authorizationDateYYYYMMDD}}', 'ISO-style date output for worksheets and machine-readable packages'],
+                    ['Checkbox', '{{checkbox}}', 'Boolean field rendered as a checked or unchecked box'],
                     ['Checkbox', '{{checkboxYESNO}}', 'Yes/No checkbox rendering'],
                     ['File Name', '{{authorization-boundaryfilename}}', 'File labels and appendix references'],
                     ['Image', '{{authorization-boundaryimage}}', 'Rendered inside Word textboxes'],
@@ -190,6 +192,36 @@ export function ExportBuilderDocxGuidePage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          <div className="panel-subtle">
+            <div className="eyebrow">Tables, Lists, And Checkbox Patterns</div>
+            <div className="mt-4 space-y-4 text-sm text-slate-300">
+              <div>
+                <div className="font-medium text-white">Static table</div>
+                <div className="mt-2 rounded-2xl border border-white/10 bg-slate-950/60 p-3 font-mono">
+                  Security Plan ID: {'{{securityplanid}}'} · System Name: {'{{systemname}}'} · Categorization: {'{{categorization}}'}
+                </div>
+              </div>
+              <div>
+                <div className="font-medium text-white">Repeating table row</div>
+                <div className="mt-2 rounded-2xl border border-white/10 bg-slate-950/60 p-3 font-mono">
+                  {'{{issueid}}'} | {'{{title}}'} | {'{{severity}}'} | {'{{issueowner}}'}
+                </div>
+              </div>
+              <div>
+                <div className="font-medium text-white">Bullet list</div>
+                <div className="mt-2 rounded-2xl border border-white/10 bg-slate-950/60 p-3 font-mono">
+                  • {'{{levauthtitle}}'}
+                </div>
+              </div>
+              <div>
+                <div className="font-medium text-white">Standard and Yes/No checkboxes</div>
+                <div className="mt-2 rounded-2xl border border-white/10 bg-slate-950/60 p-3 font-mono">
+                  {'{{chkbox-01}}'} Authorization · {'{{chkbox-02}}'} Capture · {'{{chkboxYN-01}}'} Yes/No
+                </div>
+              </div>
             </div>
           </div>
 

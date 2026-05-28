@@ -737,6 +737,19 @@ function trackModuleRecord(moduleKey, record) {
   });
 }
 
+function trackExportBuilderConfig(config) {
+  return trackArtifact({
+    type: 'export-builder-config',
+    id: config.id,
+    title: config.title,
+    route: '/builders/export-builder',
+    cleanupMethod: 'delete',
+    cleanup: async (context) => {
+      await jsonRequest(context.request, 'DELETE', `/builders/exports/${config.id}`, null, { allowStatuses: [404] });
+    },
+  });
+}
+
 async function createModuleRecordFixture(context, entry, folderId) {
   const title = `${MARKER} ${entry.pluralName} fixture`;
   const created = await jsonRequest(context.request, 'POST', `/core/modules/${entry.moduleKey}/records`, {
@@ -1074,6 +1087,192 @@ async function validateBuilderSurfaces(page, modules) {
   assert(rulesText.includes('Allow external value'), 'Rules Builder did not expose SET_VALUE external override control.');
 }
 
+async function validateExportBuilderWorkflow(context, page) {
+  const listPayload = await jsonRequest(context.request, 'GET', '/builders/exports');
+  const starters = asArray(listPayload?.data?.starterTemplates);
+  const fieldCatalogText = JSON.stringify(listPayload?.data?.fieldCatalog ?? {});
+  for (const title of [
+    'LABS SSP',
+    'DOE SSP',
+    'CMMC SSP',
+    'FedRAMP Rev 5 SSP',
+    'FedRAMP Rev 5 SAP',
+    'FedRAMP Rev 5 SAR',
+    'FedRAMP Rev 5 Appendix Q',
+    'FedRAMP Rev 5 Appendix A',
+    'FedRAMP Rev 5 Separation of Duties Matrix',
+  ]) {
+    assert(starters.some((template) => template.title === title), `Export Builder missing starter template: ${title}`);
+  }
+  assert(fieldCatalogText.includes('Component Control Implementations'), 'Export Builder field catalog is missing component implementation data.');
+  assert(fieldCatalogText.includes('DataObjects'), 'Export Builder field catalog is missing DataObjects.');
+
+  const createdPayload = await jsonRequest(context.request, 'POST', '/builders/exports', {
+    title: `${MARKER} Export Builder`,
+    starterTemplateId: 'starter-fedramp-ssp',
+  });
+  const created = createdPayload?.data;
+  assert(created?.id, 'Export Builder config creation failed.');
+  trackExportBuilderConfig(created);
+
+  const templateContent = [
+    'System Name {{systemname}}',
+    'Authorization Date {{authorizationDateYYYYMMDD}}',
+    'Owner {{systemowner.name}}',
+    'Control {{control_id}} {{control_title}}',
+    'Component {{component.controlImplementation.status}}',
+    'Component detail {{component.controlImplementation.statement}}',
+    'DataObject {{dataObject.controlSummary}}',
+    'Boundary {{authorization-boundaryfilename}}',
+    'Checkbox {{checkboxYESNO}}',
+    'Repeat {{control_id}}',
+  ].join('\n');
+
+  const analyzedPayload = await jsonRequest(
+    context.request,
+    'POST',
+    `/builders/exports/${created.id}/analyze-template`,
+    {
+      fileName: `${slug(RUN_ID)}-export-builder.docx`,
+      content: templateContent,
+    },
+  );
+  const analyzed = analyzedPayload?.data;
+  assert(analyzed?.templateAnalysis?.tagsFound >= 9, 'Template analysis did not extract DOCX placeholders.');
+  assert(analyzed.templateAnalysis.repeatedTags >= 1, 'Template analysis did not detect repeated placeholders.');
+
+  const remappedPayload = await jsonRequest(context.request, 'POST', `/builders/exports/${created.id}/auto-map`, {
+    mappings: analyzed.mappings,
+  });
+  const remapped = remappedPayload?.data;
+  const mappings = asArray(remapped?.mappings).map((mapping) => {
+    const tag = String(mapping.tag).toLowerCase();
+    if (tag.includes('authorizationdate')) {
+      return { ...mapping, renderType: 'Date (YYYY-MM-DD)', accepted: Boolean(mapping.fieldPath) };
+    }
+    if (tag.includes('checkbox')) {
+      return { ...mapping, renderType: 'Checkbox YES/NO', accepted: true };
+    }
+    if (tag.includes('dataobject')) {
+      return { ...mapping, renderType: 'DataObject Table', accepted: Boolean(mapping.fieldPath) };
+    }
+    if (tag.includes('statement')) {
+      return { ...mapping, renderType: 'RTF / HTML', accepted: Boolean(mapping.fieldPath) };
+    }
+    return { ...mapping, accepted: Boolean(mapping.fieldPath) };
+  });
+  const mappingText = JSON.stringify(mappings);
+  assert(mappingText.includes('Component.Control Implementation.Status'), 'Auto-map did not resolve component control implementation status.');
+  assert(mappingText.includes('DataObject.Control Implementation Summary'), 'Auto-map did not resolve DataObject control summary.');
+
+  const filterRows = [
+    { id: crypto.randomUUID(), field: 'status', operator: 'Equals', value: 'Active' },
+    { id: crypto.randomUUID(), field: 'owner', operator: 'Equals', value: 'Current User' },
+    { id: crypto.randomUUID(), field: 'lastUpdated', operator: 'Within Last', value: '30 days' },
+  ];
+  const savedPayload = await jsonRequest(context.request, 'PUT', `/builders/exports/${created.id}`, {
+    title: created.title,
+    status: 'Active',
+    module: 'Security Plans',
+    exportGroup: 'E2E Export Builder',
+    exportType: 'DOCX',
+    description: `${MARKER} validates template upload, mapping, filters, subtemplates, and preview generation.`,
+    templateFileName: analyzed.templateFileName,
+    templateAnalysis: analyzed.templateAnalysis,
+    mappings,
+    filterRows,
+    filterExpression: '1 AND (2 OR 3)',
+    subTemplates: [],
+  });
+  const saved = savedPayload?.data;
+  assert(saved?.filterExpression === '1 AND (2 OR 3)', 'Export Builder did not persist advanced filter logic.');
+
+  const subTemplatePayload = await jsonRequest(context.request, 'POST', `/builders/exports/${created.id}/sub-templates`, {
+    title: `${MARKER} Appendix`,
+    fileName: `${slug(RUN_ID)}-appendix.docx`,
+    content: 'Appendix {{control_id}} {{control_title}} {{component.controlImplementation.status}}',
+  });
+  const withSubTemplate = subTemplatePayload?.data;
+  assert(asArray(withSubTemplate?.subTemplates).length === 1, 'DOCX sub-template was not created.');
+  assert(
+    JSON.stringify(withSubTemplate.subTemplates).includes('Component.Control Implementation.Status'),
+    'Sub-template mappings did not include component implementation data.',
+  );
+
+  const importedPayload = await jsonRequest(context.request, 'POST', `/builders/exports/${created.id}/import-mappings`, {
+    mappings: withSubTemplate.mappings,
+    filterRows,
+    filterExpression: '1 AND (2 OR 3)',
+  });
+  assert(importedPayload?.data?.templateAnalysis?.mappedTags >= 1, 'Import Field Mappings did not validate compatible mappings.');
+
+  const testPayload = await jsonRequest(context.request, 'POST', `/builders/exports/${created.id}/test`, {
+    scenarioName: `${MARKER} SAP SAR preview`,
+  });
+  const testResult = testPayload?.data?.result;
+  assert(testResult?.filterExpressionValid === true, 'Export Builder preview did not validate filter expression.');
+  assert(testResult?.subTemplates === 1, 'Export Builder preview did not include sub-template count.');
+  assert(asArray(testResult?.renderTypes).includes('Checkbox YES/NO'), 'Export Builder preview did not include checkbox render type.');
+  assert(asArray(testResult?.dataSources).includes('DataObjects'), 'Export Builder preview did not include DataObject data source.');
+  assert(testResult?.generatedArtifactName?.endsWith('.docx'), 'Export Builder preview did not produce a DOCX artifact name.');
+
+  await page.goto(absoluteUrl('/builders/export-builder'));
+  await waitForSettledPage(page);
+  await page.getByPlaceholder(/Search exports/i).fill(MARKER);
+  await page.getByText(created.title, { exact: false }).first().waitFor({ state: 'visible', timeout: 12000 });
+  await page.getByText(created.title, { exact: false }).first().click();
+  let bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  for (const marker of [
+    'Create New Export',
+    'Export Mappings',
+    'Sub Templates',
+    'Template Gallery',
+    'Preview & Tests',
+    'Auto Map Fields',
+    'DataObject',
+    'Component Control',
+  ]) {
+    assert(bodyText.toLowerCase().includes(marker.toLowerCase()), `Export Builder UI did not expose ${marker}.`);
+  }
+  await page.getByRole('tab', { name: /Export Mappings/i }).click();
+  bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  for (const marker of [
+    'Import Field Mappings',
+    'Export Field Mappings',
+    'Advanced Filters',
+    'Filter Logic Expression',
+    'Tag delimiter',
+  ]) {
+    assert(bodyText.toLowerCase().includes(marker.toLowerCase()), `Export Builder UI did not expose ${marker}.`);
+  }
+  await page.getByRole('tab', { name: /Template Gallery/i }).click();
+  bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  for (const marker of ['DOE SSP', 'CMMC SSP', 'FedRAMP Rev 5 Appendix Q', 'Copy & Customize']) {
+    assert(bodyText.includes(marker), `Export Builder template gallery missing ${marker}.`);
+  }
+  await page.getByRole('tab', { name: /Preview/i }).click();
+  bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  assert(bodyText.includes('Generation Mode'), 'Export Builder preview did not expose generation diagnostics.');
+  assert(bodyText.includes('Data Sources'), 'Export Builder preview did not expose data-source diagnostics.');
+
+  await page.goto(absoluteUrl('/builders/export-builder/docx-template'));
+  await waitForSettledPage(page);
+  const guideText = await page.locator('body').innerText({ timeout: 12000 });
+  for (const marker of [
+    'Creating an Export Builder DOCX Template',
+    '{{field_name}}',
+    'Static table',
+    'Repeating table',
+    'Standard and Yes/No checkboxes',
+    '{{authorizationDateYYYYMMDD}}',
+    '{{authorization-boundaryimage}}',
+  ]) {
+    assert(guideText.includes(marker), `DOCX template guide missing ${marker}.`);
+  }
+
+  return { exportBuilderConfigId: created.id, mappedTags: testResult.mappedTags, subTemplates: testResult.subTemplates };
+}
+
 async function validateIamMutation(context, page, tenantContext) {
   const email = `${RUN_ID}@example.invalid`.toLowerCase();
   const userPayload = await jsonRequest(context.request, 'POST', '/iam/users', {
@@ -1203,6 +1402,13 @@ async function verifyNoIamResidue(context) {
   return { activeResidues: residues.length };
 }
 
+async function verifyNoExportBuilderResidue(context) {
+  const payload = await jsonRequest(context.request, 'GET', '/builders/exports');
+  const residues = asArray(payload?.data?.exports).filter((item) => JSON.stringify(item).includes(RUN_ID));
+  assert(residues.length === 0, `Export Builder test-owned configs remain: ${JSON.stringify(residues)}`);
+  return { activeResidues: residues.length };
+}
+
 async function cleanupArtifacts(context) {
   for (const artifact of cleanupStack.reverse()) {
     const startedAt = new Date().toISOString();
@@ -1303,6 +1509,14 @@ async function main() {
     await runCheck(seededData, 'template and assessment surfaces', () => validateTemplateAndAssessmentSurfaces(context, page, tenantContext));
     await runCheck(seededData, 'catalogue import subfeature surface', () => validateCatalogueAndImportSurfaces(page));
     await runCheck(seededData, 'builder surfaces', () => validateBuilderSurfaces(page, modules));
+    if (!READ_ONLY) {
+      await runCheck(seededData, 'export builder semantic workflow', () => validateExportBuilderWorkflow(context, page));
+    } else {
+      report.skips.push({
+        suite: 'seeded data and module directory',
+        reason: 'E2E_READ_ONLY=1 was set; Export Builder mutation workflow was skipped.',
+      });
+    }
     finishSuite(seededData);
 
     if (READ_ONLY) {
@@ -1345,6 +1559,7 @@ async function main() {
       await runCheck(cleanupSuite, 'cleanup tracked artifacts', () => cleanupArtifacts(context));
       await runCheck(cleanupSuite, 'verify no active module residue', () => verifyNoActiveModuleResidue(context));
       await runCheck(cleanupSuite, 'verify no IAM residue', () => verifyNoIamResidue(context));
+      await runCheck(cleanupSuite, 'verify no Export Builder residue', () => verifyNoExportBuilderResidue(context));
     } else {
       report.skips.push({
         suite: 'cleanup verification',
