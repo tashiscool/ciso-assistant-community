@@ -1441,7 +1441,8 @@ async function validateWayfinderBuilderWorkflow(context, page) {
   await page.goto(absoluteUrl('/builders/wayfinder-builder'));
   await waitForSettledPage(page);
   await page.getByPlaceholder(/Search templates/i).fill(MARKER);
-  await page.getByText(created.title, { exact: false }).first().waitFor({ state: 'visible', timeout: 12000 });
+  const createdCard = page.locator('aside .panel-subtle').filter({ hasText: created.title }).filter({ hasText: 'ACTIVE' }).first();
+  await createdCard.waitFor({ state: 'visible', timeout: 12000 });
   let bodyText = await page.locator('body').innerText({ timeout: 12000 });
   for (const marker of [
     'Template Selector',
@@ -1459,15 +1460,32 @@ async function validateWayfinderBuilderWorkflow(context, page) {
     assert(bodyText.toLowerCase().includes(marker.toLowerCase()), `Wayfinder Builder UI did not expose ${marker}.`);
   }
 
-  await page.locator('.panel-subtle').filter({ hasText: created.title }).getByRole('button', { name: /View/i }).click();
-  await page.getByDisplayValue(created.title).waitFor({ state: 'visible', timeout: 12000 });
-  await page.getByText(`${MARKER} Intake`, { exact: false }).waitFor({ state: 'visible', timeout: 12000 });
-  await page.getByText(`${MARKER} Confirm scope`, { exact: false }).waitFor({ state: 'visible', timeout: 12000 });
+  await createdCard.getByRole('button', { name: /View/i }).click();
+  await page.waitForFunction(
+    (title) => Array.from(document.querySelectorAll('input, textarea'))
+      .some((field) => field.value === title),
+    created.title,
+    { timeout: 12000 },
+  );
+  await page.getByText(`${MARKER} Intake`, { exact: false }).first().waitFor({ state: 'visible', timeout: 12000 });
+  await page.getByText(`${MARKER} Confirm scope`, { exact: false }).first().waitFor({ state: 'visible', timeout: 12000 });
   await page.getByRole('button', { name: /Add Documentation Link/i }).first().waitFor({ state: 'visible', timeout: 12000 });
+  for (const documentationLabel of [
+    'Security Plan Workspace',
+    'Internal Process Guide',
+    'Evidence Workspace',
+    'Workbench',
+  ]) {
+    await page.waitForFunction(
+      (expectedLabel) => Array.from(document.querySelectorAll('input, textarea'))
+        .some((field) => field.value === expectedLabel),
+      documentationLabel,
+      { timeout: 12000 },
+    );
+  }
   bodyText = await page.locator('body').innerText({ timeout: 12000 });
   assert(bodyText.includes('Manual Activity'), 'Wayfinder activity type was not visible.');
   assert(bodyText.includes('Evidence Activity'), 'Wayfinder evidence activity type was not visible.');
-  assert(bodyText.includes('Security Plan Workspace'), 'Wayfinder documentation link label was not visible.');
 
   return {
     templateId: created.id,
