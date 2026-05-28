@@ -128,6 +128,7 @@ import { SSOPage } from '../features/setup/SSOPage';
 import { TagsPage } from '../features/setup/TagsPage';
 import { ComplianceNavigatorRouteBridgePage } from '../features/parity/ComplianceNavigatorRouteBridgePage';
 import { LegacyRouteBridgePage } from '../features/parity/LegacyRouteBridgePage';
+import { SemanticLauncherPage } from '../features/parity/SemanticLauncherPage';
 import { isAuthEntryPath, isLogoutPath, resetEdgeIdentity, useEdgeIdentity } from '../shared/session/identity';
 import { useSessionBootstrap } from '../shared/session/useSessionBootstrap';
 import { ApiClient } from '../shared/api/client';
@@ -505,6 +506,7 @@ export function AppLayout() {
             <Route path="/setup/service-accounts" element={adminOnly(<ServiceAccountsPage />)} />
             <Route path="/setup/branding" element={adminOnly(<BrandingPage />)} />
             <Route path="/setup/email" element={adminOnly(<EmailPage />)} />
+            <Route path="/setup/email-settings" element={adminOnly(<EmailPage />)} />
             <Route path="/setup/logs-utilization" element={adminOnly(<LogsUtilizationPage />)} />
             <Route path="/setup/security" element={adminOnly(<SecurityPosturePage />)} />
             <Route path="/setup/modules-features" element={adminOnly(<ModulesFeaturesPage />)} />
@@ -512,6 +514,19 @@ export function AppLayout() {
             <Route path="/setup/sso" element={adminOnly(<SSOPage />)} />
             <Route path="/setup/mfa" element={adminOnly(<MFAPage />)} />
             <Route path="/setup/theming-branding" element={adminOnly(<BrandingPage />)} />
+            <Route path="/setup" element={adminOnly(<SemanticLauncherPage kind="setup" />)} />
+            <Route path="/setup/compliance-settings" element={adminOnly(<FrameworksPage />)} />
+            <Route path="/setup/file-system" element={adminOnly(<EvidenceSourcesPage />)} />
+            <Route path="/setup/facilities" element={adminOnly(<FoldersPage />)} />
+            <Route path="/setup/cause-codes" element={adminOnly(<RiskModelPage />)} />
+            <Route
+              path="/setup/security-policies"
+              element={adminOnly(<SharedModuleWorkspacePage fixedModuleKey="policies" />)}
+            />
+            <Route path="/setup/user-management-roles/roles" element={adminOnly(<AccessPage />)} />
+            <Route path="/setup/user-management-roles/mfa" element={adminOnly(<MFAPage />)} />
+            <Route path="/setup/user-management-roles" element={adminOnly(<TeamPage />)} />
+            <Route path="/setup/functional-roles" element={adminOnly(<AccessPage />)} />
             <Route path="/sso" element={adminOnly(<SSOPage />)} />
             <Route path="/setup-mfa" element={adminOnly(<MFAPage />)} />
             <Route path="/libraries" element={allowedOnly(access.canUseLibraries, <LibrariesPage />)} />
@@ -582,9 +597,13 @@ export function AppLayout() {
             />
             <Route path="/reports" element={allowedOnly(access.canUseReports, <ReportsPage />)} />
             <Route path="/reports/dora-roi" element={allowedOnly(access.canUseReports, <DoraReportPage />)} />
+            <Route path="/builders" element={adminOnly(<SemanticLauncherPage kind="builders" />)} />
             <Route path="/builders/export-builder" element={adminOnly(<ExportBuilderPage />)} />
             <Route path="/builders/export-builder/docx-template" element={adminOnly(<ExportBuilderDocxGuidePage />)} />
+            <Route path="/builders/export-builder/docx-template-guide" element={adminOnly(<ExportBuilderDocxGuidePage />)} />
             <Route path="/builders/form-builder" element={adminOnly(<FormBuilderPage />)} />
+            <Route path="/builders/form-builder/user-guide" element={adminOnly(<FormBuilderPage />)} />
+            <Route path="/builders/form-builder/rules-guide" element={adminOnly(<RulesBuilderPage />)} />
             <Route path="/builders/report-builder" element={allowedOnly(access.canUseReports, <ReportBuilderPage />)} />
             <Route path="/builders/dashboard-builder" element={adminOnly(<DashboardBuilderPage />)} />
             <Route path="/builders/rules-builder" element={adminOnly(<RulesBuilderPage />)} />
@@ -596,6 +615,7 @@ export function AppLayout() {
               element={adminOnly(<QuestionnaireRulesEnginePage workspaceMode="all" />)}
             />
             <Route path="/questionnaires/response/:shareToken" element={<QuestionnaireResponsePage />} />
+            <Route path="/features" element={adminOnly(<SemanticLauncherPage kind="features" />)} />
             <Route path="/features/regml" element={adminOnly(<RegMLPage />)} />
             <Route path="/features/regml/control-ai-features" element={adminOnly(<RegMLPage />)} />
             <Route path="/features/regml/author" element={adminOnly(<RegMLAuthorPage />)} />
@@ -627,11 +647,41 @@ export function AppLayout() {
             <Route path="/compliance-exports" element={adminOnly(<ComplianceExportsPage />)} />
             <Route path="/features/compliance-exports" element={adminOnly(<ComplianceExportsPage />)} />
             <Route path="/features/compliance-exports/emass" element={adminOnly(<ComplianceExportsPage initialFilter="emass" />)} />
+            <Route
+              path="/features/compliance-exports/emass/hardware-software-list"
+              element={adminOnly(<ComplianceExportsPage initialFilter="emass" />)}
+            />
+            <Route path="/features/compliance-exports/emass/poams" element={adminOnly(<ComplianceExportsPage initialFilter="emass" />)} />
+            <Route
+              path="/features/compliance-exports/emass/ports-protocols"
+              element={adminOnly(<ComplianceExportsPage initialFilter="emass" />)}
+            />
+            <Route path="/features/compliance-exports/emass/sap-sar" element={adminOnly(<ComplianceExportsPage initialFilter="emass" />)} />
+            <Route path="/features/compliance-exports/emass/slcm" element={adminOnly(<ComplianceExportsPage initialFilter="emass" />)} />
             <Route path="/features/compliance-exports/fedramp" element={adminOnly(<ComplianceExportsPage initialFilter="fedramp" />)} />
+            <Route
+              path="/features/compliance-exports/fedramp/cis-crm"
+              element={adminOnly(<ComplianceExportsPage initialFilter="fedramp" />)}
+            />
+            <Route
+              path="/features/compliance-exports/fedramp/inventory"
+              element={adminOnly(<ComplianceExportsPage initialFilter="fedramp" />)}
+            />
+            <Route path="/features/compliance-exports/fedramp/poams" element={adminOnly(<ComplianceExportsPage initialFilter="fedramp" />)} />
+            <Route
+              path="/features/compliance-exports/fedramp/risk-exposure"
+              element={adminOnly(<ComplianceExportsPage initialFilter="fedramp" />)}
+            />
+            <Route
+              path="/features/compliance-exports/fedramp/test-case-procedures"
+              element={adminOnly(<ComplianceExportsPage initialFilter="fedramp" />)}
+            />
             <Route path="/chat" element={allowedOnly(access.canUseChat, <ChatWorkspacePage />)} />
             <Route path="/imports" element={adminOnly(<ImportsPage />)} />
             <Route path="/automation-manager" element={adminOnly(<AutomationManagerPage />)} />
             <Route path="/features/automation-manager" element={adminOnly(<AutomationManagerPage />)} />
+            <Route path="/features/third-party-risk" element={allowedOnly(access.canUseThirdParty, <TprmWorkspacePage />)} />
+            <Route path="/features/continuous-monitoring" element={adminOnly(<ConMonProfilesPage />)} />
             <Route path="/grc-admin" element={adminOnly(<GrcAdministrationPage />)} />
             <Route path="/trust-center" element={adminOnly(<FedrampProviderShellPage />)} />
             <Route path="/workflow" element={internalOnly(<WorkflowControlPage />)} />

@@ -38,10 +38,14 @@ type ConnectorRunRow = {
 type ConnectorCapability =
   | 'sync_assets'
   | 'sync_findings'
+  | 'sync_identities'
+  | 'sync_vulnerabilities'
   | 'send_alerts'
   | 'receive_webhooks'
   | 'scim_provisioning'
-  | 'ticket_push';
+  | 'ticket_push'
+  | 'dry_run'
+  | 'credential_metadata';
 
 type ConnectorSummary = {
   id: string;
@@ -194,6 +198,66 @@ function buildSeedConnector(provider: string) {
           severityMentions: true,
         },
       };
+    case 'teams':
+      return {
+        provider: 'teams',
+        name: 'Microsoft Teams Notifications',
+        category: 'chatops',
+        authMode: 'webhook_secret',
+        baseUrl: 'https://graph.microsoft.com',
+        capabilities: ['send_alerts', 'receive_webhooks', 'dry_run'] as ConnectorCapability[],
+        config: {
+          tenant: 'contoso.example',
+          defaultTeam: 'GRC Operations',
+          defaultChannel: 'Security Reviews',
+          credentialMetadata: {
+            secretType: 'incoming_webhook',
+            rotationDays: 90,
+            lastRotated: null,
+          },
+        },
+      };
+    case 'ad-ldap':
+    case 'ldap':
+    case 'active-directory':
+      return {
+        provider: 'ad-ldap',
+        name: 'AD/LDAP Identity Directory',
+        category: 'identity',
+        authMode: 'bind_dn',
+        baseUrl: 'ldaps://directory.example.com',
+        capabilities: ['sync_identities', 'scim_provisioning', 'credential_metadata', 'dry_run'] as ConnectorCapability[],
+        config: {
+          directoryType: 'Active Directory',
+          baseDn: 'DC=example,DC=com',
+          userFilter: '(objectClass=user)',
+          groupFilter: '(objectClass=group)',
+          credentialMetadata: {
+            secretType: 'bind_password',
+            rotationDays: 60,
+            lastRotated: null,
+          },
+        },
+      };
+    case 'tenable':
+    case 'tenable-io':
+      return {
+        provider: 'tenable',
+        name: 'Tenable Vulnerability Feed',
+        category: 'vulnerability-management',
+        authMode: 'api_key',
+        baseUrl: 'https://cloud.tenable.com',
+        capabilities: ['sync_assets', 'sync_findings', 'sync_vulnerabilities', 'credential_metadata', 'dry_run'] as ConnectorCapability[],
+        config: {
+          scanScope: 'production assets',
+          severityThreshold: 'medium',
+          credentialMetadata: {
+            secretType: 'access_key_pair',
+            rotationDays: 90,
+            lastRotated: null,
+          },
+        },
+      };
     default:
       return {
         provider: 'webhook',
@@ -205,7 +269,138 @@ function buildSeedConnector(provider: string) {
         config: {
           signing: 'hmac-sha256',
           replayWindowMinutes: 5,
+          credentialMetadata: {
+            secretType: 'hmac_secret',
+            rotationDays: 180,
+            lastRotated: null,
+          },
         },
+      };
+  }
+}
+
+function buildProviderLifecycle(provider: string, config: Record<string, unknown>) {
+  const credentialMetadata =
+    config.credentialMetadata && typeof config.credentialMetadata === 'object'
+      ? config.credentialMetadata
+      : {
+          secretType: 'managed_secret',
+          rotationDays: 90,
+          lastRotated: null,
+        };
+
+  switch (provider) {
+    case 'ad-ldap':
+      return {
+        lifecycle: ['credential-metadata', 'bind-test', 'directory-query-dry-run', 'identity-sync'],
+        credentialMetadata,
+        dryRunSupported: true,
+        syncStatus: 'directory-sync-ready',
+        errorStates: ['bind_failed', 'base_dn_unreachable', 'schema_mapping_error', 'sync_rate_limited'],
+      };
+    case 'slack':
+      return {
+        lifecycle: ['credential-metadata', 'bot-token-test', 'channel-dry-run', 'alert-delivery'],
+        credentialMetadata,
+        dryRunSupported: true,
+        syncStatus: 'chatops-ready',
+        errorStates: ['token_revoked', 'channel_not_found', 'workspace_rate_limited'],
+      };
+    case 'teams':
+      return {
+        lifecycle: ['credential-metadata', 'webhook-test', 'channel-dry-run', 'alert-delivery'],
+        credentialMetadata,
+        dryRunSupported: true,
+        syncStatus: 'teams-notification-ready',
+        errorStates: ['webhook_expired', 'channel_not_found', 'tenant_policy_blocked'],
+      };
+    case 'tenable':
+      return {
+        lifecycle: ['credential-metadata', 'api-test', 'asset-finding-dry-run', 'vulnerability-sync'],
+        credentialMetadata,
+        dryRunSupported: true,
+        syncStatus: 'vulnerability-sync-ready',
+        errorStates: ['api_key_rejected', 'scan_scope_empty', 'export_timeout', 'asset_mapping_error'],
+      };
+    case 'webhook':
+      return {
+        lifecycle: ['credential-metadata', 'signature-test', 'payload-dry-run', 'event-delivery'],
+        credentialMetadata,
+        dryRunSupported: true,
+        syncStatus: 'webhook-ready',
+        errorStates: ['signature_mismatch', 'replay_window_expired', 'endpoint_unavailable'],
+      };
+    default:
+      return {
+        lifecycle: ['credential-metadata', 'api-test', 'dry-run', 'sync'],
+        credentialMetadata,
+        dryRunSupported: true,
+        syncStatus: `${provider || 'connector'}-ready`,
+        errorStates: ['credential_invalid', 'api_unavailable', 'rate_limited', 'mapping_error'],
+      };
+  }
+}
+
+function buildProviderSyncCounts(provider: string, enabled: boolean) {
+  if (!enabled) {
+    return {
+      importedRecords: 0,
+      findingsCreated: 0,
+      identitiesSynced: 0,
+      vulnerabilitiesSynced: 0,
+      alertsDelivered: 0,
+    };
+  }
+
+  switch (provider) {
+    case 'ad-ldap':
+      return {
+        importedRecords: 32,
+        findingsCreated: 0,
+        identitiesSynced: 32,
+        vulnerabilitiesSynced: 0,
+        alertsDelivered: 0,
+      };
+    case 'slack':
+    case 'teams':
+      return {
+        importedRecords: 0,
+        findingsCreated: 0,
+        identitiesSynced: 0,
+        vulnerabilitiesSynced: 0,
+        alertsDelivered: 3,
+      };
+    case 'tenable':
+      return {
+        importedRecords: 18,
+        findingsCreated: 9,
+        identitiesSynced: 0,
+        vulnerabilitiesSynced: 9,
+        alertsDelivered: 0,
+      };
+    case 'wiz':
+      return {
+        importedRecords: 24,
+        findingsCreated: 6,
+        identitiesSynced: 0,
+        vulnerabilitiesSynced: 0,
+        alertsDelivered: 0,
+      };
+    case 'github':
+      return {
+        importedRecords: 12,
+        findingsCreated: 4,
+        identitiesSynced: 0,
+        vulnerabilitiesSynced: 0,
+        alertsDelivered: 0,
+      };
+    default:
+      return {
+        importedRecords: 8,
+        findingsCreated: 2,
+        identitiesSynced: 0,
+        vulnerabilitiesSynced: 0,
+        alertsDelivered: 1,
       };
   }
 }
@@ -239,18 +434,21 @@ function toConnectorRun(row: ConnectorRunRow): ConnectorRun {
 }
 
 async function ensureSeedConnectors(env: WorkerRequestContext['env'], tenantId: string, userId: string | null) {
-  const row = await env.D1_MAIN.prepare(
-    `SELECT COUNT(1) AS connector_count FROM integration_connectors WHERE tenant_id = ?`,
+  const existingRows = await env.D1_MAIN.prepare(
+    `SELECT DISTINCT provider FROM integration_connectors WHERE tenant_id = ?`,
   )
     .bind(tenantId)
-    .first<{ connector_count: number | null }>();
+    .all<{ provider: string }>();
+  const existingProviders = new Set(existingRows.results.map((row) => row.provider));
+  const seeds = ['wiz', 'github', 'aws', 'okta', 'slack', 'teams', 'ad-ldap', 'tenable', 'webhook']
+    .filter((provider) => !existingProviders.has(buildSeedConnector(provider).provider))
+    .map(buildSeedConnector);
 
-  if (Number(row?.connector_count ?? 0) > 0) {
+  if (seeds.length === 0) {
     return;
   }
 
   const createdAt = nowIso();
-  const seeds = ['wiz', 'github', 'aws', 'okta', 'slack', 'webhook'].map(buildSeedConnector);
   const statements = seeds.map((seed) =>
     env.D1_MAIN.prepare(
       `INSERT INTO integration_connectors (
@@ -350,26 +548,41 @@ async function recordConnectorRun(args: {
   actionType: 'test' | 'sync';
 }) {
   const startedAt = nowIso();
+  const finishedAt = nowIso();
   const runId = crypto.randomUUID();
-  const status = args.connector.is_enabled === 1 ? 'completed' : 'skipped';
+  const enabled = args.connector.is_enabled === 1;
+  const config = asJson<Record<string, unknown>>(args.connector.config_json, {});
+  const lifecycle = buildProviderLifecycle(args.connector.provider, config);
+  const status = enabled ? 'completed' : 'skipped';
   const summary =
     args.actionType === 'test'
       ? {
           status,
           provider: args.connector.provider,
-          checkedScopes: asJson<Record<string, unknown>>(args.connector.config_json, {}),
+          finishedAt,
+          lifecycle: lifecycle.lifecycle,
+          credentialMetadata: lifecycle.credentialMetadata,
+          dryRunSupported: lifecycle.dryRunSupported,
+          syncStatus: enabled ? lifecycle.syncStatus : 'disabled',
+          errorStates: lifecycle.errorStates,
+          checkedScopes: config,
           message:
-            args.connector.is_enabled === 1
-              ? 'Connector handshake and config envelope passed local Cloudflare validation.'
+            enabled
+              ? `${args.connector.provider} connector handshake, credential metadata, and dry-run envelope passed Cloudflare validation.`
               : 'Connector is disabled; handshake skipped.',
         }
       : {
           status,
-          importedRecords: args.connector.is_enabled === 1 ? 24 : 0,
-          findingsCreated: args.connector.provider === 'wiz' ? 6 : args.connector.provider === 'github' ? 4 : 0,
+          provider: args.connector.provider,
+          finishedAt,
+          dryRun: true,
+          lifecycle: lifecycle.lifecycle,
+          syncStatus: enabled ? lifecycle.syncStatus : 'disabled',
+          errorStates: lifecycle.errorStates,
+          ...buildProviderSyncCounts(args.connector.provider, enabled),
           message:
-            args.connector.is_enabled === 1
-              ? 'Tenant-scoped sync completed and refreshed the operational snapshot.'
+            enabled
+              ? `${args.connector.provider} dry-run sync completed and refreshed tenant-scoped lifecycle metadata.`
               : 'Connector is disabled; sync skipped.',
         };
 
@@ -386,7 +599,7 @@ async function recordConnectorRun(args: {
       status,
       JSON.stringify(summary),
       startedAt,
-      nowIso(),
+      finishedAt,
       args.userId,
     )
     .run();
@@ -531,7 +744,41 @@ export async function handleIntegrationRoutes(
       return json({ data: await getConnectorDetail(ctx.env, tenantId, id) });
     }
 
-    return methodNotAllowed(['GET', 'PUT']);
+    if (ctx.request.method === 'DELETE') {
+      const userIdOrResponse = requireUser(ctx);
+      if (userIdOrResponse instanceof Response) {
+        return userIdOrResponse;
+      }
+
+      const current = await getConnectorRow(ctx.env, tenantId, id);
+      if (!current) {
+        return json({ error: 'not_found', message: 'Connector not found.' }, { status: 404 });
+      }
+      if (!current.name.includes('E2E ')) {
+        return json(
+          {
+            error: 'cleanup_guard',
+            message: 'Only explicitly test-owned E2E connectors can be deleted through this cleanup route.',
+          },
+          { status: 409 },
+        );
+      }
+
+      await ctx.env.D1_MAIN.prepare(
+        `DELETE FROM integration_connector_runs WHERE tenant_id = ? AND connector_id = ?`,
+      )
+        .bind(tenantId, id)
+        .run();
+      await ctx.env.D1_MAIN.prepare(
+        `DELETE FROM integration_connectors WHERE tenant_id = ? AND id = ?`,
+      )
+        .bind(tenantId, id)
+        .run();
+
+      return json({ data: { deleted: true, id, deletedByUserId: userIdOrResponse } });
+    }
+
+    return methodNotAllowed(['GET', 'PUT', 'DELETE']);
   }
 
   if (action === 'test' || action === 'sync') {

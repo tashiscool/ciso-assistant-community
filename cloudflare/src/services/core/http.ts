@@ -11174,15 +11174,23 @@ export async function handleCoreRoutes(
         return methodNotAllowed(['GET']);
       }
 
+      const catalogAccess = await loadScopedPermissionContext(ctx, [
+        ...CORE_OVERVIEW_READ_PERMISSIONS,
+        ...EVIDENCE_READ_PERMISSIONS,
+      ]);
+      if (catalogAccess instanceof Response) {
+        return catalogAccess;
+      }
+      const accessiblePredicate = buildAccessibleDomainPredicate('folder_id', catalogAccess);
       const countRows = await ctx.env.D1_MAIN.prepare(
         `
         SELECT module_key, COUNT(*) AS record_count
         FROM module_records
-        WHERE tenant_id = ? AND archived = 0
+        WHERE tenant_id = ? AND archived = 0 AND ${accessiblePredicate.clause}
         GROUP BY module_key
         `,
       )
-        .bind(ctx.tenantId)
+        .bind(ctx.tenantId, ...accessiblePredicate.bindings)
         .all<{ module_key: string; record_count: number | null }>();
 
       const countsByKey = new Map(
@@ -11224,10 +11232,10 @@ export async function handleCoreRoutes(
         `
         SELECT COUNT(*) AS record_count
         FROM module_records
-        WHERE tenant_id = ? AND module_key = ? AND archived = 0
+        WHERE tenant_id = ? AND module_key = ? AND archived = 0 AND ${buildAccessibleDomainPredicate('folder_id', access).clause}
         `,
       )
-        .bind(ctx.tenantId, entry.moduleKey)
+        .bind(ctx.tenantId, entry.moduleKey, ...buildAccessibleDomainPredicate('folder_id', access).bindings)
         .first<{ record_count: number | null }>();
 
       return json({

@@ -14,10 +14,14 @@ import type { ConnectorCapability, ConnectorDetail, ConnectorSummary } from './t
 const capabilityOptions: ConnectorCapability[] = [
   'sync_assets',
   'sync_findings',
+  'sync_identities',
+  'sync_vulnerabilities',
   'send_alerts',
   'receive_webhooks',
   'scim_provisioning',
   'ticket_push',
+  'dry_run',
+  'credential_metadata',
 ];
 
 function formatDate(value: string | null) {
@@ -210,9 +214,9 @@ export function AutomationManagerPage() {
           <div className="eyebrow">Automation Manager</div>
           <h1 className="mt-2 text-3xl font-semibold text-white">Connectors and Automation</h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-            Manage connector posture for platforms like Wiz, GitHub, Slack, and webhooks from the
+            Manage connector posture for platforms like Wiz, GitHub, Slack, Teams, AD/LDAP, Tenable, and webhooks from the
             canonical Cloudflare stack. This replaces the old parity-only surface with real D1-backed
-            connector state, tests, syncs, and recent run history.
+            connector state, credential metadata, dry-run tests, sync status, error states, and recent run history.
           </p>
         </div>
         <form
@@ -236,7 +240,10 @@ export function AutomationManagerPage() {
             <select className="input" onChange={(event) => setNewProvider(event.target.value)} value={newProvider}>
               <option value="wiz">Wiz</option>
               <option value="github">GitHub</option>
+              <option value="ad-ldap">AD/LDAP</option>
               <option value="slack">Slack</option>
+              <option value="teams">Teams</option>
+              <option value="tenable">Tenable</option>
               <option value="webhook">Webhook</option>
             </select>
           </label>
@@ -312,8 +319,8 @@ export function AutomationManagerPage() {
                   <div className="eyebrow">Connector Detail</div>
                   <h2 className="mt-2 text-2xl font-semibold text-white">{draft.name}</h2>
                   <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
-                    Configure auth posture, endpoint scope, enabled capabilities, and recent test/sync state for this
-                    automation integration.
+                    Configure auth posture, credential metadata, endpoint scope, enabled capabilities, dry-run behavior,
+                    sync status, and recent error states for this automation integration.
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -465,6 +472,21 @@ export function AutomationManagerPage() {
                     <div className="eyebrow">Runtime Signals</div>
                       <div className="mt-4 space-y-3 text-sm text-slate-300">
                         <div className="flex items-center justify-between">
+                          <span>Lifecycle</span>
+                          <span className="font-medium text-white">
+                            {(() => {
+                              const lifecycle = draft.lastTest?.lifecycle;
+                              return Array.isArray(lifecycle) ? `${lifecycle.length} stages` : 'Not tested';
+                            })()}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Sync status</span>
+                          <span className="font-medium text-white">
+                            {String(draft.lastSync?.syncStatus ?? draft.lastTest?.syncStatus ?? 'Not tested')}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
                           <span>Created</span>
                           <span className="font-medium text-white">{formatDate(draft.createdAt)}</span>
                         </div>
@@ -514,8 +536,9 @@ export function AutomationManagerPage() {
         <div className="eyebrow">Prompt-Pack Alignment</div>
         <div className="mt-3 text-sm leading-6 text-slate-300">
           This canonical slice covers the prompt-pack&apos;s `Automation Manager` family with a real Cloudflare-backed
-          integration workspace. The next connectors to deepen beyond this baseline are Teams, AD/LDAP, and Tenable,
-          followed by provider-specific sync semantics and credential exchange flows.
+          integration workspace. Provider-specific lifecycle semantics are available for AD/LDAP, Slack, Teams,
+          webhooks, Tenable-style vulnerability feeds, credential metadata, dry-run/test, sync status, and explicit
+          error states.
         </div>
       </section>
     </div>

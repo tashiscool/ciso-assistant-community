@@ -86,6 +86,7 @@ function resolveComplianceNavigatorPath(area: ComplianceNavigatorRouteBridgePage
   }
 
   if (area === 'features') {
+    const path = segments.join('/');
     switch (slug) {
       case 'ai':
         return '/features/regml';
@@ -98,16 +99,65 @@ function resolveComplianceNavigatorPath(area: ComplianceNavigatorRouteBridgePage
       case 'risk-management':
         return '/risk-scenarios';
       case 'third-party-risk':
-        return '/third-party';
+        return '/features/third-party-risk';
       case 'evidence-management':
-        return '/evidence-management';
+        return '/features/evidence-management';
+      case 'compliance-exports':
+        if (path.startsWith('compliance-exports/emass/hardware-software-list')) {
+          return '/features/compliance-exports/emass/hardware-software-list';
+        }
+        if (path.startsWith('compliance-exports/emass/poams')) {
+          return '/features/compliance-exports/emass/poams';
+        }
+        if (path.startsWith('compliance-exports/emass/ports-protocols')) {
+          return '/features/compliance-exports/emass/ports-protocols';
+        }
+        if (path.startsWith('compliance-exports/emass/sap-sar')) {
+          return '/features/compliance-exports/emass/sap-sar';
+        }
+        if (path.startsWith('compliance-exports/emass/slcm')) {
+          return '/features/compliance-exports/emass/slcm';
+        }
+        if (path.startsWith('compliance-exports/fedramp/cis-crm')) {
+          return '/features/compliance-exports/fedramp/cis-crm';
+        }
+        if (path.startsWith('compliance-exports/fedramp/inventory')) {
+          return '/features/compliance-exports/fedramp/inventory';
+        }
+        if (path.startsWith('compliance-exports/fedramp/poams')) {
+          return '/features/compliance-exports/fedramp/poams';
+        }
+        if (path.startsWith('compliance-exports/fedramp/risk-exposure')) {
+          return '/features/compliance-exports/fedramp/risk-exposure';
+        }
+        if (path.startsWith('compliance-exports/fedramp/test-case-procedures')) {
+          return '/features/compliance-exports/fedramp/test-case-procedures';
+        }
+        if (path.startsWith('compliance-exports/emass')) {
+          return '/features/compliance-exports/emass';
+        }
+        if (path.startsWith('compliance-exports/fedramp')) {
+          return '/features/compliance-exports/fedramp';
+        }
+        return '/features/compliance-exports';
       default:
-        return '/features/regml';
+        return '/features';
     }
   }
 
   if (area === 'builders') {
+    const path = segments.join('/');
     switch (slug) {
+      case 'form-builder':
+        if (path.endsWith('rules-guide')) {
+          return '/builders/rules-builder';
+        }
+        return '/builders/form-builder';
+      case 'export-builder':
+        if (path.endsWith('docx-template-guide')) {
+          return '/builders/export-builder/docx-template';
+        }
+        return '/builders/export-builder';
       case 'form':
         return '/builders/form-builder';
       case 'export':
@@ -121,30 +171,51 @@ function resolveComplianceNavigatorPath(area: ComplianceNavigatorRouteBridgePage
       case 'wayfinder':
         return '/builders/wayfinder-builder';
       default:
-        return '/builders/form-builder';
+        return '/builders';
     }
   }
 
   if (area === 'setup') {
+    const path = segments.join('/');
     switch (slug) {
       case 'general':
         return '/setup/general';
+      case 'compliance-settings':
+        return '/setup/compliance-settings';
+      case 'file-system':
+        return '/setup/file-system';
+      case 'facilities':
+        return '/setup/facilities';
+      case 'cause-codes':
+        return '/setup/cause-codes';
       case 'users':
         return '/workspace/team';
       case 'roles':
         return '/workspace/access';
+      case 'user-management-roles':
+        if (path.endsWith('/roles')) {
+          return '/setup/user-management-roles/roles';
+        }
+        if (path.endsWith('/mfa')) {
+          return '/setup/user-management-roles/mfa';
+        }
+        return '/setup/user-management-roles';
+      case 'functional-roles':
+        return '/setup/functional-roles';
       case 'sso':
         return '/setup/sso';
       case 'security-policies':
-        return '/setup/security';
+        return '/setup/security-policies';
       case 'theming':
+      case 'theming-branding':
         return '/setup/branding';
       case 'email':
+      case 'email-settings':
         return '/setup/email';
       case 'modules':
         return '/setup/modules-features';
       default:
-        return '/setup/general';
+        return '/setup';
     }
   }
 

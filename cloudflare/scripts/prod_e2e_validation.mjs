@@ -5,6 +5,10 @@ import fs from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  OPENREGSCALE_ROUTE_COMPATIBILITY,
+  buildSemanticGapMatrix,
+} from './semantic_gap_matrix.mjs';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const frontendRequire = createRequire(path.resolve(scriptDir, '../../frontend/package.json'));
@@ -155,6 +159,17 @@ const ROUTE_CHECKS = [
   { group: 'workspace', path: '/workspace/domains', expectAny: ['Domains', 'Folders'] },
   { group: 'workspace', path: '/workspace/team', expectAny: ['Team', 'Users'] },
   { group: 'workspace', path: '/workspace/access', expectAny: ['Access', 'Roles'] },
+  { group: 'setup', path: '/setup', expectAny: ['Setup Launcher', 'Workspace Setup'] },
+  { group: 'setup', path: '/setup/compliance-settings', expectAny: ['Catalog', 'Framework', 'Compliance'] },
+  { group: 'setup', path: '/setup/file-system', expectAny: ['Evidence', 'Sources', 'File'] },
+  { group: 'setup', path: '/setup/facilities', expectAny: ['Domains', 'Folders', 'Facilities'] },
+  { group: 'setup', path: '/setup/cause-codes', expectAny: ['Risk Model', 'Cause'] },
+  { group: 'setup', path: '/setup/security-policies', expectAny: ['Policies', 'Security'] },
+  { group: 'setup', path: '/setup/user-management-roles/roles', expectAny: ['Access', 'Roles'] },
+  { group: 'setup', path: '/setup/user-management-roles/mfa', expectAny: ['MFA', 'Multi'] },
+  { group: 'setup', path: '/setup/user-management-roles', expectAny: ['Team', 'Users', 'Roles'] },
+  { group: 'setup', path: '/setup/functional-roles', expectAny: ['Access', 'Roles'] },
+  { group: 'setup', path: '/setup/email-settings', expectAny: ['Email'] },
   { group: 'setup', path: '/setup/tags', expectAny: ['Tags'] },
   { group: 'setup', path: '/setup/general', expectAny: ['General', 'Organization'] },
   { group: 'setup', path: '/setup/classification', expectAny: ['Classification'] },
@@ -181,16 +196,22 @@ const ROUTE_CHECKS = [
   { group: 'assessments', path: '/applied-controls/flash-mode', expectAny: ['Flash', 'Controls'] },
   { group: 'templates', path: '/assessment-plans', expectAny: ['Assessment Plan', 'Plans'] },
   { group: 'templates', path: '/questionnaires', expectAny: ['Questionnaire'] },
+  { group: 'builders', path: '/builders', expectAny: ['Builder Launcher', 'Builder Control Plane'] },
   { group: 'builders', path: '/builders/form-builder', expectAny: ['Form Builder', 'Form'] },
+  { group: 'builders', path: '/builders/form-builder/user-guide', expectAny: ['Form Builder', 'Form'] },
+  { group: 'builders', path: '/builders/form-builder/rules-guide', expectAny: ['Rules Builder', 'Rules'] },
   { group: 'builders', path: '/builders/export-builder', expectAny: ['Export Builder', 'Export'] },
   { group: 'builders', path: '/builders/export-builder/docx-template', expectAny: ['DOCX', 'Template'] },
+  { group: 'builders', path: '/builders/export-builder/docx-template-guide', expectAny: ['DOCX', 'Template'] },
   { group: 'builders', path: '/builders/report-builder', expectAny: ['Report Builder', 'Report'] },
   { group: 'builders', path: '/builders/dashboard-builder', expectAny: ['Dashboard Builder', 'Dashboard'] },
   { group: 'builders', path: '/builders/rules-builder', expectAny: ['Rules Builder', 'Rules'] },
   { group: 'builders', path: '/builders/wayfinder-builder', expectAny: ['Wayfinder'] },
   { group: 'builders', path: '/builders/questionnaire-builder', expectAny: ['Questionnaire Builder', 'Questionnaire'] },
   { group: 'builders', path: '/builders/questionnaire-builder/overview', expectAny: ['Questionnaire', 'Overview'] },
+  { group: 'features', path: '/features', expectAny: ['Feature Launcher', 'Feature Workspaces'] },
   { group: 'tprm', path: '/third-party', expectAny: ['Third', 'Vendor', 'Entity'] },
+  { group: 'tprm', path: '/features/third-party-risk', expectAny: ['Third', 'Vendor', 'Entity'] },
   { group: 'tprm', path: '/entities', expectAny: ['Third', 'Vendor', 'Entity'] },
   { group: 'tprm', path: '/contracts', expectAny: ['Third', 'Contract', 'Vendor'] },
   { group: 'privacy', path: '/privacy', expectAny: ['Privacy'] },
@@ -209,6 +230,19 @@ const ROUTE_CHECKS = [
   { group: 'ai', path: '/response-automation', expectAny: ['Response', 'Automation'] },
   { group: 'ai', path: '/evidence-mapping', expectAny: ['Evidence', 'Mapping'] },
   { group: 'ai', path: '/compliance-exports', expectAny: ['Compliance', 'Export'] },
+  { group: 'ai', path: '/features/compliance-exports', expectAny: ['Compliance', 'Export'] },
+  { group: 'ai', path: '/features/compliance-exports/emass', expectAny: ['eMASS', 'Export'] },
+  { group: 'ai', path: '/features/compliance-exports/emass/hardware-software-list', expectAny: ['eMASS', 'Hardware', 'Software'] },
+  { group: 'ai', path: '/features/compliance-exports/emass/poams', expectAny: ['eMASS', 'POA'] },
+  { group: 'ai', path: '/features/compliance-exports/emass/ports-protocols', expectAny: ['eMASS', 'Ports', 'Protocols'] },
+  { group: 'ai', path: '/features/compliance-exports/emass/sap-sar', expectAny: ['SAP', 'SAR', 'eMASS'] },
+  { group: 'ai', path: '/features/compliance-exports/emass/slcm', expectAny: ['SLCM', 'eMASS'] },
+  { group: 'ai', path: '/features/compliance-exports/fedramp', expectAny: ['FedRAMP', 'Export'] },
+  { group: 'ai', path: '/features/compliance-exports/fedramp/cis-crm', expectAny: ['FedRAMP', 'CIS', 'CRM'] },
+  { group: 'ai', path: '/features/compliance-exports/fedramp/inventory', expectAny: ['FedRAMP', 'Inventory'] },
+  { group: 'ai', path: '/features/compliance-exports/fedramp/poams', expectAny: ['FedRAMP', 'POA'] },
+  { group: 'ai', path: '/features/compliance-exports/fedramp/risk-exposure', expectAny: ['FedRAMP', 'Risk'] },
+  { group: 'ai', path: '/features/compliance-exports/fedramp/test-case-procedures', expectAny: ['FedRAMP', 'Test'] },
   { group: 'ops', path: '/imports', expectAny: ['Import'] },
   { group: 'ops', path: '/automation-manager', expectAny: ['Automation'] },
   { group: 'ops', path: '/grc-admin', expectAny: ['GRC', 'Administration'] },
@@ -242,6 +276,7 @@ const ROUTE_CHECKS = [
   { group: 'assurance', path: '/assurance/reviews', expectAny: ['Reviews'] },
   { group: 'assurance', path: '/assurance/agent-runs', expectAny: ['Agent'] },
   { group: 'conmon', path: '/conmon/profiles', expectAny: ['ConMon', 'Continuous'] },
+  { group: 'conmon', path: '/features/continuous-monitoring', expectAny: ['ConMon', 'Continuous'] },
   { group: 'conmon', path: '/conmon/executions', expectAny: ['ConMon', 'Executions'] },
   { group: 'legacy', path: '/folders', expectAny: ['Domains', 'Folders'] },
   { group: 'legacy', path: '/users', expectAny: ['Team', 'Users'] },
@@ -628,6 +663,36 @@ async function validateScaleMdSemanticSurfaceCoverage(modules) {
     specialSemanticSurfaces: SCALE_MD_SEMANTIC_SURFACES.size,
     sharedWorkspaceModules: EXPECTED_SCALE_MODULE_KEYS.length - SCALE_MD_SEMANTIC_SURFACES.size,
   };
+}
+
+async function validateSemanticGapMatrix() {
+  const matrix = await buildSemanticGapMatrix({ cwd: path.resolve(scriptDir, '../..') });
+  assert(
+    matrix.summary.scaleMdUnmappedHeadings === 0,
+    `Semantic matrix has unmapped scale.md headings: ${matrix.sources.scaleMd.unmappedHeadings.join(', ')}`,
+  );
+  assert(
+    matrix.summary.unresolvedRequired === 0,
+    `Semantic matrix has unresolved required mappings: ${matrix.unresolvedRequired
+      .map((entry) => entry.semanticKey ?? entry.sourceRoute ?? entry.canonicalRoute)
+      .join(', ')}`,
+  );
+  report.app.semanticGapMatrix = {
+    generatedAt: matrix.generatedAt,
+    summary: matrix.summary,
+    unresolvedRequired: matrix.unresolvedRequired,
+  };
+  return matrix.summary;
+}
+
+function semanticCompatibilityRouteChecks() {
+  return OPENREGSCALE_ROUTE_COMPATIBILITY
+    .filter((entry) => entry.required && entry.canonicalRoute && !entry.sourceRoute.includes('*') && entry.sourceRoute !== '/404')
+    .map((entry) => ({
+      group: `openregscale-${entry.group}`,
+      path: entry.sourceRoute,
+      expectAny: entry.expectAny,
+    }));
 }
 
 async function loadTenantContext(context) {
@@ -1102,6 +1167,77 @@ async function validateSeededOperationalContent(page) {
     await waitForSettledPage(page);
     const bodyText = await page.locator('body').innerText({ timeout: 12000 });
     assert(check.text.test(bodyText), `${check.path} did not show seeded/expected product content.`);
+  }
+}
+
+async function validateConnectorLifecycleSemantics(context, page) {
+  const providers = ['ad-ldap', 'slack', 'teams', 'tenable', 'webhook'];
+  const created = [];
+
+  try {
+    for (const provider of providers) {
+      const payload = await jsonRequest(context.request, 'POST', '/integrations/connectors', {
+        name: `${MARKER} ${provider} connector`,
+        provider,
+      });
+      const connector = payload?.data;
+      assert(connector?.id, `${provider} connector was not created.`);
+      created.push(connector);
+
+      const testRun = await jsonRequest(context.request, 'POST', `/integrations/connectors/${connector.id}/test`);
+      const testSummary = testRun?.data?.summary ?? {};
+      assert(testRun?.data?.status === 'completed', `${provider} test did not complete.`);
+      assert(Array.isArray(testSummary.lifecycle) && testSummary.lifecycle.length >= 4, `${provider} test did not expose lifecycle stages.`);
+      assert(testSummary.credentialMetadata && typeof testSummary.credentialMetadata === 'object', `${provider} test did not expose credential metadata.`);
+      assert(testSummary.dryRunSupported === true, `${provider} test did not expose dry-run support.`);
+      assert(Array.isArray(testSummary.errorStates) && testSummary.errorStates.length > 0, `${provider} test did not expose error states.`);
+
+      const syncRun = await jsonRequest(context.request, 'POST', `/integrations/connectors/${connector.id}/sync`);
+      const syncSummary = syncRun?.data?.summary ?? {};
+      assert(syncRun?.data?.status === 'completed', `${provider} sync did not complete.`);
+      assert(syncSummary.dryRun === true, `${provider} sync did not run as a dry-run.`);
+      assert(typeof syncSummary.syncStatus === 'string' && syncSummary.syncStatus.length > 0, `${provider} sync did not expose sync status.`);
+      assert(Array.isArray(syncSummary.errorStates) && syncSummary.errorStates.length > 0, `${provider} sync did not expose error states.`);
+    }
+
+    await page.goto(absoluteUrl('/features/automation-manager'));
+    await waitForSettledPage(page);
+    const bodyText = await page.locator('body').innerText({ timeout: 12000 });
+    for (const expected of ['AD/LDAP', 'Teams', 'Tenable', 'credential metadata', 'dry-run', 'error states']) {
+      assert(bodyText.toLowerCase().includes(expected.toLowerCase()), `Automation Manager UI did not mention ${expected}.`);
+    }
+
+    return {
+      providers: providers.length,
+      connectorsCreated: created.length,
+    };
+  } finally {
+    for (const connector of created.reverse()) {
+      await jsonRequest(
+        context.request,
+        'DELETE',
+        `/integrations/connectors/${connector.id}`,
+        null,
+        { allowStatuses: [404] },
+      ).then((payload) => {
+        report.cleanup.push({
+          type: 'integration-connector',
+          id: connector.id,
+          title: connector.name,
+          method: 'delete',
+          ok: payload?.data?.deleted !== false,
+        });
+      }).catch((error) => {
+        report.cleanup.push({
+          type: 'integration-connector',
+          id: connector.id,
+          title: connector.name,
+          method: 'delete',
+          ok: false,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      });
+    }
   }
 }
 
@@ -2910,12 +3046,14 @@ async function main() {
     await runCheck(preflight, 'bootstrap admin session', () => bootstrapSession(context), { critical: true });
     modules = await runCheck(preflight, 'load scale module catalog', () => loadLiveCatalog(context), { critical: true }) ?? [];
     await runCheck(preflight, 'scale.md semantic surface coverage', () => validateScaleMdSemanticSurfaceCoverage(modules), { critical: true });
+    await runCheck(preflight, 'semantic gap matrix', () => validateSemanticGapMatrix(), { critical: true });
     tenantContext = await runCheck(preflight, 'load seeded tenant context', () => loadTenantContext(context), { critical: true });
     finishSuite(preflight);
 
     const routeSweep = makeSuite('all-route sweep');
     const routeChecks = [
       ...ROUTE_CHECKS,
+      ...semanticCompatibilityRouteChecks(),
       ...modules.map((entry) => ({
         group: 'scale-modules',
         path: entry.canonicalRoute,
@@ -2949,6 +3087,7 @@ async function main() {
       await runCheck(seededData, 'dashboard builder semantic workflow', () => validateDashboardBuilderWorkflow(context, page));
       await runCheck(seededData, 'questionnaire builder semantic workflow', () => validateQuestionnaireBuilderWorkflow(context, page, tenantContext));
       await runCheck(seededData, 'form builder live rule lifecycle', () => validateFormBuilderRuleLifecycle(context, page, tenantContext));
+      await runCheck(seededData, 'automation connector lifecycle semantics', () => validateConnectorLifecycleSemantics(context, page));
     } else {
       report.skips.push({
         suite: 'seeded data and module directory',

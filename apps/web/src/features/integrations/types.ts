@@ -1,10 +1,14 @@
 export type ConnectorCapability =
   | 'sync_assets'
   | 'sync_findings'
+  | 'sync_identities'
+  | 'sync_vulnerabilities'
   | 'send_alerts'
   | 'receive_webhooks'
   | 'scim_provisioning'
-  | 'ticket_push';
+  | 'ticket_push'
+  | 'dry_run'
+  | 'credential_metadata';
 
 export type ConnectorSummary = {
   id: string;
