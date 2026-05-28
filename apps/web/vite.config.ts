@@ -33,6 +33,15 @@ function manualChunks(id: string): string | undefined {
   if (normalized.includes('/apps/web/src/features/advanced-risk/')) {
     return 'advanced-risk';
   }
+  if (normalized.includes('/apps/web/src/features/modules/')) {
+    return 'scale-modules';
+  }
+  if (
+    normalized.includes('/apps/web/src/features/grc/') ||
+    normalized.includes('/apps/web/src/features/fedramp/')
+  ) {
+    return 'grc-governance';
+  }
   if (
     normalized.includes('/apps/web/src/features/builders/') ||
     normalized.includes('/apps/web/src/features/ai/')
