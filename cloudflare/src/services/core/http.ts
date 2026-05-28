@@ -1610,6 +1610,7 @@ async function applyFormBuilderRuntimeToModuleRecord(
   options: {
     isNewRecord: boolean;
     existingData?: Record<string, unknown>;
+    existingStatus?: string | null;
   },
 ): Promise<SaveModuleRecordInput | Response> {
   if (!ctx.tenantId) {
@@ -1621,11 +1622,32 @@ async function applyFormBuilderRuntimeToModuleRecord(
     return body;
   }
 
+  const submittedData = body.data ?? {};
+  const existingData = options.existingData ?? {};
   const candidateData = {
-    ...(options.existingData ?? {}),
-    ...(body.data ?? {}),
+    ...existingData,
+    ...submittedData,
   };
-  const runtime = evaluateFormRuntime(schema, candidateData, {
+  const firstRuntime = evaluateFormRuntime(schema, candidateData, {
+    isNewRecord: options.isNewRecord,
+    enabledModules: MODULE_CATALOG.map((module) => module.moduleKey),
+  });
+  const sanitizedData = { ...candidateData };
+
+  for (const [fieldName, state] of Object.entries(firstRuntime.fields)) {
+    if (state.editable || !Object.prototype.hasOwnProperty.call(submittedData, fieldName)) {
+      continue;
+    }
+
+    if (!options.isNewRecord && Object.prototype.hasOwnProperty.call(existingData, fieldName)) {
+      sanitizedData[fieldName] = existingData[fieldName];
+      continue;
+    }
+
+    delete sanitizedData[fieldName];
+  }
+
+  const runtime = evaluateFormRuntime(schema, sanitizedData, {
     isNewRecord: options.isNewRecord,
     enabledModules: MODULE_CATALOG.map((module) => module.moduleKey),
   });
@@ -1641,9 +1663,12 @@ async function applyFormBuilderRuntimeToModuleRecord(
     );
   }
 
+  const statusReadOnly = runtime.fields.status?.editable === false;
   const nextStatus = typeof runtime.data.status === 'string' && runtime.data.status.trim()
     ? runtime.data.status.trim()
-    : body.status;
+    : statusReadOnly && !options.isNewRecord
+      ? options.existingStatus ?? body.status
+      : body.status;
 
   return {
     ...body,
@@ -11428,6 +11453,7 @@ export async function handleCoreRoutes(
       const runtimeBodyOrResponse = await applyFormBuilderRuntimeToModuleRecord(ctx, entry, body, {
         isNewRecord: false,
         existingData: asJson<Record<string, unknown>>(existing.data_json, {}),
+        existingStatus: existing.status,
       });
       if (runtimeBodyOrResponse instanceof Response) {
         return runtimeBodyOrResponse;

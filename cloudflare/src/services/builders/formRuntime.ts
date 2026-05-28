@@ -97,8 +97,13 @@ export type FormRuntimeSchema = {
 type FieldState = {
   visible: boolean;
   required: boolean;
+  editable: boolean;
   validations: FormRuleAction[];
   errors: string[];
+};
+
+type SectionState = {
+  visible: boolean;
 };
 
 type RuntimeContext = {
@@ -110,6 +115,8 @@ type RuntimeContext = {
 
 export type FormRuntimeResult = {
   data: Record<string, unknown>;
+  fields: Record<string, FieldState>;
+  sections: Record<string, SectionState>;
   errors: Array<{ field: string; message: string }>;
 };
 
@@ -301,7 +308,7 @@ export function evaluateFormRuntime(
   context: RuntimeContext,
 ): FormRuntimeResult {
   if (!schema) {
-    return { data, errors: [] };
+    return { data, fields: {}, sections: {}, errors: [] };
   }
 
   const now = context.now ?? new Date();
@@ -314,15 +321,16 @@ export function evaluateFormRuntime(
   const nextData = { ...data };
   const fields = buildFieldIndex(schema);
   const fieldStates: Record<string, FieldState> = {};
-  const sectionVisible: Record<string, boolean> = {};
+  const sectionStates: Record<string, SectionState> = {};
 
   for (const section of schema.sections) {
-    sectionVisible[section.id] = section.active;
-    sectionVisible[section.displayName] = section.active;
+    sectionStates[section.id] = { visible: section.active };
+    sectionStates[section.displayName] = sectionStates[section.id];
     for (const field of section.fields) {
       fieldStates[field.systemName] = {
         visible: section.active && field.active,
         required: field.required,
+        editable: field.editable,
         validations: [],
         errors: [],
       };
@@ -344,8 +352,12 @@ export function evaluateFormRuntime(
         continue;
       }
       if (action.targetType === 'Tab') {
-        if (action.actionType === 'SHOW') sectionVisible[action.target] = true;
-        if (action.actionType === 'HIDE') sectionVisible[action.target] = false;
+        const sectionState = sectionStates[action.target];
+        if (!sectionState) {
+          continue;
+        }
+        if (action.actionType === 'SHOW') sectionState.visible = true;
+        if (action.actionType === 'HIDE') sectionState.visible = false;
         continue;
       }
       const fieldState = fieldStates[action.target];
@@ -356,6 +368,8 @@ export function evaluateFormRuntime(
       if (action.actionType === 'HIDE') fieldState.visible = false;
       if (action.actionType === 'REQUIRE') fieldState.required = true;
       if (action.actionType === 'NOT_REQUIRE') fieldState.required = false;
+      if (action.actionType === 'ENABLE') fieldState.editable = true;
+      if (action.actionType === 'DISABLE') fieldState.editable = false;
       if (action.actionType === 'VALIDATE') fieldState.validations.push(action);
       if (action.actionType === 'SET_VALUE') {
         const currentValue = nextData[action.target];
@@ -368,10 +382,11 @@ export function evaluateFormRuntime(
 
   const errors: Array<{ field: string; message: string }> = [];
   for (const section of schema.sections) {
-    const visibleSection = sectionVisible[section.id] ?? section.active;
+    const visibleSection = sectionStates[section.id]?.visible ?? section.active;
     for (const field of section.fields) {
       const state = fieldStates[field.systemName];
       if (!visibleSection || !state?.visible) {
+        if (state) state.required = false;
         continue;
       }
       const value = nextData[field.systemName];
@@ -391,7 +406,12 @@ export function evaluateFormRuntime(
     }
   }
 
-  return { data: nextData, errors };
+  return {
+    data: nextData,
+    fields: fieldStates,
+    sections: sectionStates,
+    errors,
+  };
 }
 
 export async function loadFormRuntimeSchema(

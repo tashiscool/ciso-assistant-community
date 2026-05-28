@@ -584,12 +584,18 @@ function buildRenderableSections(
 ): RenderableSection[] {
   if (schema) {
     return schema.sections
-      .filter((section) => section.active && (runtime?.sections[section.id]?.visible ?? runtime?.sections[section.displayName]?.visible ?? true))
+      .filter((section) => {
+        const runtimeSection = runtime?.sections[section.id] ?? runtime?.sections[section.displayName];
+        return runtimeSection ? runtimeSection.visible : section.active;
+      })
       .map((section) => ({
         id: section.id,
         displayName: section.displayName,
         fields: section.fields
-          .filter((field) => field.active && (runtime?.fields[field.systemName]?.visible ?? true))
+          .filter((field) => {
+            const runtimeField = runtime?.fields[field.systemName];
+            return runtimeField ? runtimeField.visible : field.active;
+          })
           .filter(
             (field) =>
               field.fieldType !== 'Label' &&

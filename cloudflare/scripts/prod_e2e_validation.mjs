@@ -296,6 +296,14 @@ function asArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
+function deepClone(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function absoluteUrl(route) {
   return `${BASE_URL}${route.startsWith('/') ? route : `/${route}`}`;
 }
@@ -856,6 +864,42 @@ function trackQuestionnaireInstance(questionnaireId, instance) {
   });
 }
 
+function formBuilderSavePayload(moduleDetail) {
+  return {
+    moduleName: moduleDetail.moduleName,
+    pluralName: moduleDetail.pluralName,
+    tabSort: moduleDetail.tabSort,
+    status: moduleDetail.status,
+    description: moduleDetail.description,
+    sections: moduleDetail.sections,
+    rules: moduleDetail.rules,
+  };
+}
+
+async function restoreFormBuilderModule(context, moduleDetail) {
+  await jsonRequest(
+    context.request,
+    'PUT',
+    `/builders/forms/${moduleDetail.id}`,
+    formBuilderSavePayload(moduleDetail),
+    { retries: 3 },
+  );
+}
+
+function trackFormBuilderSnapshot(moduleDetail) {
+  const snapshot = deepClone(moduleDetail);
+  return trackArtifact({
+    type: 'form-builder-module-snapshot',
+    id: snapshot.id,
+    title: `${snapshot.moduleName} Form Builder snapshot`,
+    route: `/builders/form-builder?moduleKey=${snapshot.moduleKey}`,
+    cleanupMethod: 'restore',
+    cleanup: async (context) => {
+      await restoreFormBuilderModule(context, snapshot);
+    },
+  });
+}
+
 async function createModuleRecordFixture(context, entry, folderId) {
   const title = `${MARKER} ${entry.pluralName} fixture`;
   const created = await jsonRequest(context.request, 'POST', `/core/modules/${entry.moduleKey}/records`, {
@@ -1191,6 +1235,316 @@ async function validateBuilderSurfaces(page, modules) {
   rulesText = await page.locator('body').innerText({ timeout: 12000 });
   assert(rulesText.includes('Bypass existing value'), 'Rules Builder did not expose SET_VALUE overwrite control.');
   assert(rulesText.includes('Allow external value'), 'Rules Builder did not expose SET_VALUE external override control.');
+}
+
+function buildE2EFormField(sectionId, displayName, systemName, fieldType, overrides = {}) {
+  return {
+    id: crypto.randomUUID(),
+    displayName,
+    systemName,
+    fieldType,
+    required: false,
+    active: true,
+    editable: true,
+    helpText: `${MARKER} Form Builder lifecycle coverage field.`,
+    pattern: null,
+    min: null,
+    max: null,
+    selectType: null,
+    sectionId,
+    choices: [],
+    validations: [],
+    lockedType: false,
+    ...overrides,
+  };
+}
+
+function buildFormBuilderRuleLifecycleConfig(original) {
+  const suffix = slug(RUN_ID).replace(/-/g, '_').slice(-16);
+  const labels = {
+    trigger: `E2E Trigger ${suffix}`,
+    notes: `E2E Rule Notes ${suffix}`,
+    auto: `E2E Auto Value ${suffix}`,
+    locked: `E2E Locked Value ${suffix}`,
+    due: `E2E Due Date ${suffix}`,
+  };
+  const fields = {
+    trigger: `e2e_${suffix}_trigger`,
+    notes: `e2e_${suffix}_notes`,
+    auto: `e2e_${suffix}_auto`,
+    locked: `e2e_${suffix}_locked`,
+    due: `e2e_${suffix}_due`,
+  };
+  const fieldNameSet = new Set(Object.values(fields));
+  const sections = deepClone(original.sections).map((section) => ({
+    ...section,
+    fields: asArray(section.fields).filter((field) => !fieldNameSet.has(field.systemName)),
+  }));
+  const targetSectionIndex = Math.max(
+    0,
+    sections.findIndex((section) => section.active),
+  );
+  const section = sections[targetSectionIndex];
+  section.fields = [
+    ...asArray(section.fields),
+    buildE2EFormField(section.id, labels.trigger, fields.trigger, 'Select', {
+      choices: [
+        { id: crypto.randomUUID(), label: 'Low', value: 'low', active: true },
+        { id: crypto.randomUUID(), label: 'High', value: 'high', active: true },
+      ],
+    }),
+    buildE2EFormField(section.id, labels.notes, fields.notes, 'Text Area', {
+      active: false,
+    }),
+    buildE2EFormField(section.id, labels.auto, fields.auto, 'Text Field'),
+    buildE2EFormField(section.id, labels.locked, fields.locked, 'Text Field'),
+    buildE2EFormField(section.id, labels.due, fields.due, 'Date'),
+  ];
+
+  const autoValue = `${MARKER} server applied value`;
+  const rules = [
+    ...asArray(original.rules).filter((rule) => !String(rule.name || '').includes(RUN_ID)),
+    {
+      id: crypto.randomUUID(),
+      name: `${MARKER} Form Builder live rule lifecycle`,
+      active: true,
+      logic: 'AND',
+      conditions: [
+        {
+          id: crypto.randomUUID(),
+          conditionType: 'Field',
+          target: fields.trigger,
+          operator: 'EQUALS',
+          valueSource: 'constant',
+          value: 'high',
+        },
+      ],
+      actions: [
+        { id: crypto.randomUUID(), actionType: 'SHOW', targetType: 'Field', target: fields.notes },
+        { id: crypto.randomUUID(), actionType: 'REQUIRE', targetType: 'Field', target: fields.notes },
+        {
+          id: crypto.randomUUID(),
+          actionType: 'SET_VALUE',
+          targetType: 'Field',
+          target: fields.auto,
+          operator: 'EQUALS',
+          value: autoValue,
+          bypassExistingValue: true,
+          allowExternalValue: false,
+        },
+        { id: crypto.randomUUID(), actionType: 'DISABLE', targetType: 'Field', target: fields.locked },
+        {
+          id: crypto.randomUUID(),
+          actionType: 'VALIDATE',
+          targetType: 'Field',
+          target: fields.due,
+          operator: 'WITHIN_NEXT',
+          value: '30',
+        },
+      ],
+    },
+  ];
+
+  return { suffix, labels, fields, sections, rules, autoValue };
+}
+
+function buildFormBuilderLifecycleAssetData(title, lifecycle) {
+  return {
+    title,
+    name: title,
+    asset_id: `ASSET-${lifecycle.suffix}`,
+    type: 'Application',
+    platform: 'Regovise production validation',
+    location: 'regovise.com',
+    custodian: 'Regovise E2E Custodian',
+    classification: 'Confidential',
+    status: 'Active',
+    lifecycle_status: 'Active',
+    inventory_status: 'Verified',
+    purchase_date: todayIso(0),
+    end_of_life_date: todayIso(180),
+    description: `${MARKER} validates Form Builder live rules and Cloudflare API parity.`,
+  };
+}
+
+async function validateFormBuilderRuleLifecycle(context, page, tenantContext) {
+  const formsPayload = await jsonRequest(context.request, 'GET', '/builders/forms');
+  const assetFormSummary = asArray(formsPayload?.data?.modules).find((module) => module.moduleKey === 'assets');
+  assert(assetFormSummary?.id, 'Unable to find Assets Form Builder package.');
+  const detailPayload = await jsonRequest(context.request, 'GET', `/builders/forms/${assetFormSummary.id}`);
+  const original = detailPayload?.data;
+  assert(original?.id, 'Unable to load Assets Form Builder detail.');
+  trackFormBuilderSnapshot(original);
+
+  const lifecycle = buildFormBuilderRuleLifecycleConfig(original);
+  const patched = {
+    ...deepClone(original),
+    sections: lifecycle.sections,
+    rules: lifecycle.rules,
+  };
+
+  try {
+    const validationPayload = await jsonRequest(context.request, 'POST', `/builders/forms/${original.id}/validate`, {
+      sections: patched.sections,
+      rules: patched.rules,
+    });
+    const validationErrors = asArray(validationPayload?.data?.diagnostics).filter((diagnostic) => diagnostic.severity === 'error');
+    assert(validationErrors.length === 0, `Injected Form Builder lifecycle config has validation errors: ${JSON.stringify(validationErrors)}`);
+
+    await jsonRequest(context.request, 'PUT', `/builders/forms/${original.id}`, formBuilderSavePayload(patched));
+
+    const title = `${MARKER} Form Builder Rule Asset`;
+    const lowData = {
+      ...buildFormBuilderLifecycleAssetData(title, lifecycle),
+      [lifecycle.fields.trigger]: 'low',
+      [lifecycle.fields.locked]: `${MARKER} original locked value`,
+      [lifecycle.fields.due]: todayIso(10),
+    };
+    const createdPayload = await jsonRequest(context.request, 'POST', '/core/modules/assets/records', {
+      folderId: tenantContext.folder.id,
+      title,
+      status: 'Active',
+      data: lowData,
+      note: `${MARKER} created for Form Builder rule lifecycle validation.`,
+    });
+    const created = createdPayload?.data;
+    assert(created?.id, 'Form Builder lifecycle asset was not created.');
+    trackModuleRecord('assets', created);
+    assert(created.data?.[lifecycle.fields.locked] === lowData[lifecycle.fields.locked], 'Low-trigger create did not preserve editable value.');
+
+    const invalidPayload = await jsonRequest(
+      context.request,
+      'POST',
+      `/core/modules/assets/records/${created.id}`,
+      {
+        folderId: created.folderId,
+        title,
+        status: 'Active',
+        data: {
+          ...created.data,
+          [lifecycle.fields.trigger]: 'high',
+          [lifecycle.fields.notes]: '',
+          [lifecycle.fields.locked]: `${MARKER} tampered locked value`,
+          [lifecycle.fields.due]: todayIso(45),
+        },
+        note: `${MARKER} expected validation failure.`,
+      },
+      { allowStatuses: [400] },
+    );
+    assert(
+      invalidPayload?.error === 'form_rule_validation_failed',
+      'Cloudflare module-record update did not reject missing/invalid Form Builder rule data.',
+    );
+    const invalidDiagnostics = JSON.stringify(invalidPayload?.diagnostics ?? []);
+    assert(
+      invalidDiagnostics.includes(lifecycle.fields.notes) || invalidDiagnostics.includes(lifecycle.labels.notes),
+      'Required rule diagnostic did not mention the conditional notes field.',
+    );
+    assert(
+      invalidDiagnostics.includes(lifecycle.fields.due) || invalidDiagnostics.includes('WITHIN_NEXT'),
+      'Validation rule diagnostic did not mention the conditional due date field.',
+    );
+
+    const validPayload = await jsonRequest(context.request, 'POST', `/core/modules/assets/records/${created.id}`, {
+      folderId: created.folderId,
+      title,
+      status: 'Active',
+      data: {
+        ...created.data,
+        [lifecycle.fields.trigger]: 'high',
+        [lifecycle.fields.notes]: `${MARKER} required notes satisfied.`,
+        [lifecycle.fields.locked]: `${MARKER} tampered locked value`,
+        [lifecycle.fields.due]: todayIso(10),
+      },
+      note: `${MARKER} expected successful rule update.`,
+    });
+    const updated = validPayload?.data;
+    assert(updated?.data?.[lifecycle.fields.auto] === lifecycle.autoValue, 'SET_VALUE rule did not apply in the Cloudflare API.');
+    assert(
+      updated?.data?.[lifecycle.fields.locked] === lowData[lifecycle.fields.locked],
+      'DISABLE rule did not preserve the existing read-only field value in the Cloudflare API.',
+    );
+
+    const uiTitle = `${MARKER} Form Builder UI Asset`;
+    await page.goto(absoluteUrl('/modules/assets'));
+    await waitForSettledPage(page);
+    await page.getByRole('button', { name: /New Asset/i }).click();
+    await page.locator('.eyebrow').filter({ hasText: 'Create Record' }).waitFor({ state: 'visible', timeout: 12000 });
+    const domainSelect = page.getByLabel(/^Domain$/i);
+    if ((await domainSelect.inputValue().catch(() => '')) === '') {
+      await domainSelect.selectOption({ index: 1 }).catch(() => undefined);
+    }
+    await page.getByLabel(/Asset ID/i).fill(`ASSET-UI-${lifecycle.suffix}`);
+    await page.getByLabel(/^Name/i).fill(uiTitle);
+    await page.getByLabel(/^Type/i).selectOption({ label: 'Application' }).catch(async () => {
+      await page.getByLabel(/^Type/i).selectOption('Application');
+    });
+    await page.getByLabel(/Custodian/i).fill('Regovise E2E Custodian').catch(() => undefined);
+    await page.getByLabel(/Classification/i).selectOption({ label: 'Confidential' }).catch(async () => {
+      await page.getByLabel(/Classification/i).selectOption('Confidential');
+    });
+    await page.getByLabel(/Platform/i).fill('Regovise production validation');
+    await page.getByLabel(/Location/i).fill('regovise.com');
+    await page.getByLabel(/Purchase Date/i).fill(todayIso(0));
+    await page.getByLabel(/End of Life Date/i).fill(todayIso(180));
+    await page.getByLabel(/Description/i).fill(`${MARKER} browser-created asset validates live Form Builder runtime behavior.`);
+
+    const triggerLabel = new RegExp(escapeRegExp(lifecycle.labels.trigger), 'i');
+    const notesLabel = new RegExp(escapeRegExp(lifecycle.labels.notes), 'i');
+    const autoLabel = new RegExp(escapeRegExp(lifecycle.labels.auto), 'i');
+    const lockedLabel = new RegExp(escapeRegExp(lifecycle.labels.locked), 'i');
+    const dueLabel = new RegExp(escapeRegExp(lifecycle.labels.due), 'i');
+
+    await page.getByLabel(triggerLabel).selectOption('high');
+    await page.getByLabel(notesLabel).waitFor({ state: 'visible', timeout: 12000 });
+    const notesLabelText = await page.locator('label').filter({ hasText: lifecycle.labels.notes }).locator('span.label').first().innerText();
+    assert(notesLabelText.includes('*'), 'Live rule did not mark the conditional notes field as required in the UI.');
+    await page.waitForTimeout(500);
+    assert(await page.getByLabel(lockedLabel).isDisabled(), 'Live DISABLE rule did not mark the locked field read-only in the UI.');
+    assert(
+      (await page.getByLabel(autoLabel).inputValue()) === lifecycle.autoValue,
+      'Live SET_VALUE rule did not populate the auto field in the UI.',
+    );
+    await page.getByLabel(notesLabel).fill(`${MARKER} UI required notes satisfied.`);
+    await page.getByLabel(dueLabel).fill(todayIso(45));
+    await page.getByText(/Form Builder validation issue/i).waitFor({ state: 'visible', timeout: 12000 });
+    await page.getByText(new RegExp(`${escapeRegExp(lifecycle.labels.due)} failed WITHIN_NEXT`, 'i')).waitFor({
+      state: 'visible',
+      timeout: 12000,
+    });
+    await page.getByLabel(dueLabel).fill(todayIso(10));
+    await page.getByRole('button', { name: /^Create Record$/i }).click();
+    await page.getByText('Asset record created.', { exact: false }).waitFor({ state: 'visible', timeout: 15000 });
+
+    const uiCreatedPayload = await jsonRequest(
+      context.request,
+      'GET',
+      `/core/modules/assets/records?q=${encodeURIComponent(RUN_ID)}&includeArchived=true`,
+    );
+    const uiCreated = asArray(uiCreatedPayload?.data?.records).find((record) => record.title === uiTitle);
+    assert(uiCreated?.id, 'Unable to find UI-created Form Builder lifecycle asset.');
+    trackModuleRecord('assets', uiCreated);
+    assert(uiCreated.data?.[lifecycle.fields.auto] === lifecycle.autoValue, 'UI-created record did not persist SET_VALUE output.');
+
+    const resetPayload = await jsonRequest(context.request, 'POST', `/builders/forms/${original.id}/reset`);
+    const resetFields = asArray(resetPayload?.data?.sections).flatMap((section) =>
+      asArray(section.fields).map((field) => ({ ...field, sectionActive: section.active, sectionName: section.displayName })),
+    );
+    const preserved = Object.values(lifecycle.fields).map((fieldName) => resetFields.find((field) => field.systemName === fieldName));
+    assert(preserved.every(Boolean), 'Factory reset did not preserve injected custom fields.');
+    assert(
+      preserved.every((field) => field.active === false || field.sectionActive === false),
+      'Factory reset preserved custom fields but did not deactivate them.',
+    );
+
+    return {
+      apiRecordId: created.id,
+      uiRecordId: uiCreated.id,
+      checkedFields: Object.keys(lifecycle.fields).length,
+    };
+  } finally {
+    await restoreFormBuilderModule(context, original);
+  }
 }
 
 async function validateReportBuilderWorkflow(context, page) {
@@ -2563,6 +2917,7 @@ async function main() {
       await runCheck(seededData, 'wayfinder builder semantic workflow', () => validateWayfinderBuilderWorkflow(context, page));
       await runCheck(seededData, 'dashboard builder semantic workflow', () => validateDashboardBuilderWorkflow(context, page));
       await runCheck(seededData, 'questionnaire builder semantic workflow', () => validateQuestionnaireBuilderWorkflow(context, page, tenantContext));
+      await runCheck(seededData, 'form builder live rule lifecycle', () => validateFormBuilderRuleLifecycle(context, page, tenantContext));
     } else {
       report.skips.push({
         suite: 'seeded data and module directory',
