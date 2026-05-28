@@ -66,6 +66,7 @@ import { ReportBuilderPage } from '../features/builders/ReportBuilderPage';
 import { DashboardBuilderPage } from '../features/builders/DashboardBuilderPage';
 import { QuestionnaireBuilderPage } from '../features/builders/QuestionnaireBuilderPage';
 import { QuestionnaireOverviewPage } from '../features/builders/QuestionnaireOverviewPage';
+import { QuestionnaireResponsePage } from '../features/builders/QuestionnaireResponsePage';
 import { QuestionnaireRulesEnginePage } from '../features/builders/QuestionnaireRulesEnginePage';
 import { RulesBuilderPage } from '../features/builders/RulesBuilderPage';
 import { WayfinderBuilderPage } from '../features/builders/WayfinderBuilderPage';
@@ -205,6 +206,10 @@ const legacyBridgeModels = [
 ] as const;
 
 const client = new ApiClient();
+
+function isPublicQuestionnaireResponsePath(pathname: string | null | undefined): boolean {
+  return /^\/questionnaires\/response\/[^/]+\/?$/.test(pathname ?? '');
+}
 
 type BootstrapStatusResponse = {
   data: {
@@ -385,6 +390,16 @@ export function AppLayout() {
           <div className="w-full max-w-4xl space-y-6">
             <SessionExitScreen />
           </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (!showWorkspaceShell && isPublicQuestionnaireResponsePath(location.pathname)) {
+    return (
+      <div className="min-h-screen bg-transparent text-slate-50">
+        <main className="mx-auto w-full max-w-6xl px-6 py-10">
+          <QuestionnaireResponsePage />
         </main>
       </div>
     );
@@ -580,6 +595,7 @@ export function AppLayout() {
               path="/builders/questionnaire-builder/rules-engine"
               element={adminOnly(<QuestionnaireRulesEnginePage workspaceMode="all" />)}
             />
+            <Route path="/questionnaires/response/:shareToken" element={<QuestionnaireResponsePage />} />
             <Route path="/features/regml" element={adminOnly(<RegMLPage />)} />
             <Route path="/features/regml/control-ai-features" element={adminOnly(<RegMLPage />)} />
             <Route path="/features/regml/author" element={adminOnly(<RegMLAuthorPage />)} />

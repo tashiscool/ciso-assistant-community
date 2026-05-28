@@ -11,7 +11,18 @@ type QuestionnaireQuestion = {
   id: string;
   ref: string;
   prompt: string;
-  type: 'single-select' | 'multi-select' | 'text' | 'number' | 'boolean';
+  type:
+    | 'single-select'
+    | 'multi-select'
+    | 'text'
+    | 'number'
+    | 'boolean'
+    | 'date'
+    | 'email'
+    | 'phone'
+    | 'table'
+    | 'instructional'
+    | 'file-upload';
   section: string;
   required: boolean;
   weight: number;
@@ -19,6 +30,17 @@ type QuestionnaireQuestion = {
   helpText?: string | null;
   requirementRef?: string | null;
   evidenceHint?: string | null;
+  enableUpload?: boolean;
+  maxScore?: number | null;
+  answerScores?: Record<string, number> | null;
+  tableColumns?: Array<{
+    id: string;
+    title: string;
+    dataType: 'text' | 'number' | 'date' | 'dropdown';
+    required: boolean;
+    score: number;
+    options?: Array<{ value: string; score?: number | null }>;
+  }>;
 };
 
 type QuestionnaireTemplateKind = 'assessment-plan' | 'questionnaire';
@@ -77,6 +99,42 @@ type QuestionnaireTestRunRow = {
   created_at: string;
 };
 
+type QuestionnaireInstanceRow = {
+  id: string;
+  tenant_id: string;
+  questionnaire_template_id: string;
+  title: string;
+  assignment_type: string;
+  assignee_user_id: string | null;
+  assignee_email: string | null;
+  reviewer_user_id: string | null;
+  parent_module: string | null;
+  parent_record_id: string | null;
+  status: string;
+  due_date: string | null;
+  access_code: string;
+  share_token: string;
+  login_required: number;
+  answers_json: string;
+  uploads_json: string;
+  header_values_json: string;
+  feedback_json: string;
+  collaboration_json: string;
+  recurrence_json: string | null;
+  score: number;
+  max_score: number;
+  grade: string | null;
+  percent_complete: number;
+  passing_status: string;
+  submitted_at: string | null;
+  reviewed_at: string | null;
+  created_by_user_id: string | null;
+  updated_by_user_id: string | null;
+  archived: number;
+  created_at: string;
+  updated_at: string;
+};
+
 type CreateQuestionnaireInput = {
   name?: string;
   description?: string | null;
@@ -93,6 +151,14 @@ type CreateQuestionnaireInput = {
   fileUploadGuidance?: string | null;
   exportMode?: string | null;
   distributionCadence?: string | null;
+  ownerUserId?: string | null;
+  ownerName?: string | null;
+  profile?: string | null;
+  instructions?: string | null;
+  allowPublicUrl?: boolean;
+  loginRequired?: boolean;
+  enableScoring?: boolean;
+  enableQuestionAssignment?: boolean;
 };
 
 type UpdateQuestionnaireInput = {
@@ -113,6 +179,14 @@ type UpdateQuestionnaireInput = {
   fileUploadGuidance?: string | null;
   exportMode?: string | null;
   distributionCadence?: string | null;
+  ownerUserId?: string | null;
+  ownerName?: string | null;
+  profile?: string | null;
+  instructions?: string | null;
+  allowPublicUrl?: boolean;
+  loginRequired?: boolean;
+  enableScoring?: boolean;
+  enableQuestionAssignment?: boolean;
   questions?: QuestionnaireQuestion[];
 };
 
@@ -126,6 +200,38 @@ type RunRuleTestInput = {
   answers?: Record<string, string | number | boolean | string[]>;
   draftRules?: QuestionnaireRule[];
   draftQuestions?: QuestionnaireQuestion[];
+};
+
+type AssignmentInput = {
+  assignmentType?: 'user' | 'email' | 'module' | 'self' | 'recurring' | 'bulk';
+  title?: string;
+  assigneeUserId?: string | null;
+  assigneeEmail?: string | null;
+  assigneeEmails?: string[];
+  bulkCsv?: string | null;
+  reviewerUserId?: string | null;
+  parentModule?: string | null;
+  parentRecordId?: string | null;
+  dueDate?: string | null;
+  recurrenceType?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  loginRequired?: boolean;
+};
+
+type ResponseUpdateInput = {
+  answers?: Record<string, unknown>;
+  uploads?: Record<string, unknown>;
+  headerValues?: Record<string, unknown>;
+  comment?: string | null;
+  accessCode?: string | null;
+};
+
+type ReviewInput = {
+  feedback?: Record<string, { rating?: string | null; comment?: string | null }>;
+  reviewerComments?: string | null;
+  sendEmail?: boolean;
+  accessCode?: string | null;
 };
 
 type ValidateQuestionnaireInput = {
@@ -155,7 +261,17 @@ type QuestionnaireTemplateSummary = {
   fileUploadGuidance: string | null;
   exportMode: string | null;
   distributionCadence: string | null;
+  ownerUserId: string | null;
+  ownerName: string | null;
+  profile: string | null;
+  instructions: string | null;
+  allowPublicUrl: boolean;
+  loginRequired: boolean;
+  enableScoring: boolean;
+  enableQuestionAssignment: boolean;
   mappedRequirementCount: number;
+  instanceCount: number;
+  submittedCount: number;
   updatedAt: string;
 };
 
@@ -181,6 +297,14 @@ type QuestionnaireTemplateDetail = {
   fileUploadGuidance: string | null;
   exportMode: string | null;
   distributionCadence: string | null;
+  ownerUserId: string | null;
+  ownerName: string | null;
+  profile: string | null;
+  instructions: string | null;
+  allowPublicUrl: boolean;
+  loginRequired: boolean;
+  enableScoring: boolean;
+  enableQuestionAssignment: boolean;
   mappedRequirementCount: number;
   updatedAt: string;
   createdAt: string;
@@ -202,6 +326,14 @@ type QuestionnaireTemplateMetadata = {
   fileUploadGuidance?: string | null;
   exportMode?: string | null;
   distributionCadence?: string | null;
+  ownerUserId?: string | null;
+  ownerName?: string | null;
+  profile?: string | null;
+  instructions?: string | null;
+  allowPublicUrl?: boolean;
+  loginRequired?: boolean;
+  enableScoring?: boolean;
+  enableQuestionAssignment?: boolean;
 };
 
 type QuestionnaireSeedDefinition = {
@@ -254,6 +386,41 @@ type RuleTestRun = {
   createdAt: string;
 };
 
+type QuestionnaireInstance = {
+  id: string;
+  questionnaireId: string;
+  templateName: string;
+  title: string;
+  assignmentType: string;
+  assigneeUserId: string | null;
+  assigneeEmail: string | null;
+  reviewerUserId: string | null;
+  parentModule: string | null;
+  parentRecordId: string | null;
+  status: string;
+  dueDate: string | null;
+  accessCode: string;
+  shareToken: string;
+  shareLink: string;
+  loginRequired: boolean;
+  answers: Record<string, unknown>;
+  uploads: Record<string, unknown>;
+  headerValues: Record<string, unknown>;
+  feedback: Record<string, { rating?: string | null; comment?: string | null }>;
+  collaboration: Array<{ id: string; authorUserId: string | null; message: string; action: string; createdAt: string; emailQueued?: boolean }>;
+  recurrence: Record<string, unknown> | null;
+  score: number;
+  maxScore: number;
+  grade: string | null;
+  percentComplete: number;
+  passingStatus: string;
+  submittedAt: string | null;
+  reviewedAt: string | null;
+  archived: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 function nowIso() {
   return new Date().toISOString();
 }
@@ -283,6 +450,14 @@ function requireUser(ctx: WorkerRequestContext): string | Response {
   return ctx.userId;
 }
 
+function cleanString(value: unknown, fallback = '') {
+  return typeof value === 'string' && value.trim() ? value.trim() : fallback;
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
+}
+
 function parseQuestionRefFromExpression(expression: string): string | null {
   const match = expression.match(/"([^"]+)"/);
   return match?.[1] ?? null;
@@ -309,6 +484,14 @@ function buildTemplateMetadata(args: {
   fileUploadGuidance?: string | null;
   exportMode?: string | null;
   distributionCadence?: string | null;
+  ownerUserId?: string | null;
+  ownerName?: string | null;
+  profile?: string | null;
+  instructions?: string | null;
+  allowPublicUrl?: boolean;
+  loginRequired?: boolean;
+  enableScoring?: boolean;
+  enableQuestionAssignment?: boolean;
 }): QuestionnaireTemplateMetadata {
   return {
     ...(args.current ?? {}),
@@ -327,6 +510,14 @@ function buildTemplateMetadata(args: {
     ...(args.fileUploadGuidance !== undefined ? { fileUploadGuidance: args.fileUploadGuidance } : {}),
     ...(args.exportMode !== undefined ? { exportMode: args.exportMode } : {}),
     ...(args.distributionCadence !== undefined ? { distributionCadence: args.distributionCadence } : {}),
+    ...(args.ownerUserId !== undefined ? { ownerUserId: args.ownerUserId } : {}),
+    ...(args.ownerName !== undefined ? { ownerName: args.ownerName } : {}),
+    ...(args.profile !== undefined ? { profile: args.profile } : {}),
+    ...(args.instructions !== undefined ? { instructions: args.instructions } : {}),
+    ...(args.allowPublicUrl !== undefined ? { allowPublicUrl: args.allowPublicUrl } : {}),
+    ...(args.loginRequired !== undefined ? { loginRequired: args.loginRequired } : {}),
+    ...(args.enableScoring !== undefined ? { enableScoring: args.enableScoring } : {}),
+    ...(args.enableQuestionAssignment !== undefined ? { enableQuestionAssignment: args.enableQuestionAssignment } : {}),
   };
 }
 
@@ -352,6 +543,14 @@ function summarizeTemplateMetadata(
     fileUploadGuidance: normalized.fileUploadGuidance?.trim() || null,
     exportMode: normalized.exportMode?.trim() || null,
     distributionCadence: normalized.distributionCadence?.trim() || null,
+    ownerUserId: normalized.ownerUserId?.trim() || null,
+    ownerName: normalized.ownerName?.trim() || null,
+    profile: normalized.profile?.trim() || null,
+    instructions: normalized.instructions?.trim() || null,
+    allowPublicUrl: Boolean(normalized.allowPublicUrl),
+    loginRequired: Boolean(normalized.loginRequired),
+    enableScoring: normalized.enableScoring !== false,
+    enableQuestionAssignment: Boolean(normalized.enableQuestionAssignment),
     mappedRequirementCount: mappedRequirementCount(questions),
   };
 }
@@ -387,15 +586,50 @@ function buildRuleDiagnostics(
     }
 
     for (const action of rule.actions) {
-      if (!action.includes('SHOW_QUESTIONS') && !action.includes('ENABLE_QUESTIONS')) {
-        continue;
+      const knownAction = /SHOW_QUESTIONS|HIDE_QUESTIONS|ENABLE_QUESTIONS|DISABLE_QUESTIONS|SET_ANSWER|CLEAR_ANSWER|SET_SCORE|ADD_TO_SCORE|CALCULATE_TOTAL_SCORE|SET_GRADE|REPEAT_QUESTIONS|SET_DISPLAY_OPTIONS/.test(action);
+      if (!knownAction) {
+        diagnostics.push({
+          id: `${rule.id}-action-${diagnostics.length}`,
+          severity: 'warning',
+          message: `Rule "${rule.name || 'Untitled'}" uses an unrecognized action "${action}".`,
+        });
       }
       const ref = parseQuestionRefFromExpression(action);
-      if (ref && !knownQuestionRefs.has(ref)) {
+      if (
+        ref &&
+        /SHOW_QUESTIONS|HIDE_QUESTIONS|ENABLE_QUESTIONS|DISABLE_QUESTIONS|SET_ANSWER|CLEAR_ANSWER|REPEAT_QUESTIONS/.test(action) &&
+        !knownQuestionRefs.has(ref)
+      ) {
         diagnostics.push({
           id: `${rule.id}-${ref}`,
           severity: 'warning',
           message: `Rule "${rule.name || 'Untitled'}" references unknown question ref "${ref}".`,
+        });
+      }
+    }
+
+    for (const condition of rule.conditions) {
+      const ref = condition.match(/^Question "([^"]+)"/)?.[1];
+      if (ref && !knownQuestionRefs.has(ref)) {
+        diagnostics.push({
+          id: `${rule.id}-condition-${ref}`,
+          severity: 'warning',
+          message: `Rule "${rule.name || 'Untitled'}" condition references unknown question ref "${ref}".`,
+        });
+      }
+      const knownCondition =
+        condition === 'NO_CONDITION' ||
+        condition === 'NO_PARENT' ||
+        /^Question "/.test(condition) ||
+        /^Score /.test(condition) ||
+        /^Grade /.test(condition) ||
+        /^SYSTEM /.test(condition) ||
+        /^System "/.test(condition);
+      if (!knownCondition) {
+        diagnostics.push({
+          id: `${rule.id}-condition-${diagnostics.length}`,
+          severity: 'warning',
+          message: `Rule "${rule.name || 'Untitled'}" uses an unrecognized condition "${condition}".`,
         });
       }
     }
@@ -415,21 +649,119 @@ function buildRuleDiagnostics(
 function evaluateCondition(
   condition: string,
   answers: Record<string, string | number | boolean | string[]>,
+  context: { score?: number; grade?: string; isNewRecord?: boolean } = {},
 ): boolean {
-  if (condition === 'NO_CONDITION') {
+  const normalized = condition.trim();
+  if (normalized === 'NO_CONDITION' || normalized === 'SYSTEM NO_CONDITION' || normalized === 'System "NO_CONDITION"') {
     return true;
   }
-  const match = condition.match(/^Question "([^"]+)" equals "([^"]+)"$/);
+  if (normalized === 'NO_PARENT' || normalized === 'SYSTEM NO_PARENT' || normalized === 'System "NO_PARENT"') {
+    return Boolean(context.isNewRecord);
+  }
+
+  const scoreMatch = normalized.match(/^Score (equals|not equals|greater than|less than|greater than or equal|less than or equal) "?([^"]+)"?$/i);
+  if (scoreMatch) {
+    return compareRuleValues(scoreMatch[1], context.score ?? 0, scoreMatch[2]);
+  }
+
+  const gradeMatch = normalized.match(/^Grade (equals|not equals|contains) "([^"]*)"$/i);
+  if (gradeMatch) {
+    return compareRuleValues(gradeMatch[1], context.grade ?? '', gradeMatch[2]);
+  }
+
+  const emptyMatch = normalized.match(/^Question "([^"]+)" (is empty|is not empty|has value|no value)$/i);
+  if (emptyMatch) {
+    const actual = answers[emptyMatch[1]];
+    const hasAnswer = hasQuestionAnswer(actual);
+    return /not empty|has value/i.test(emptyMatch[2]) ? hasAnswer : !hasAnswer;
+  }
+
+  const match = normalized.match(/^Question "([^"]+)" (equals|not equals|contains|not contains|greater than|less than|greater than or equal|less than or equal|before|after|in|not in) "([^"]*)"$/i);
   if (!match) {
     return false;
   }
 
-  const [, ref, expected] = match;
+  const [, ref, operator, expected] = match;
   const actual = answers[ref];
   if (Array.isArray(actual)) {
-    return actual.includes(expected);
+    const values = expected.split(',').map((value) => value.trim()).filter(Boolean);
+    if (/not in|not contains|not equals/i.test(operator)) {
+      return !actual.some((value) => values.includes(String(value)));
+    }
+    return actual.some((value) => values.includes(String(value)));
   }
-  return String(actual ?? '') === expected;
+  return compareRuleValues(operator, actual, expected);
+}
+
+function hasQuestionAnswer(value: unknown): boolean {
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+  if (value && typeof value === 'object') {
+    return Object.keys(value as Record<string, unknown>).length > 0;
+  }
+  return value !== null && value !== undefined && String(value).trim() !== '';
+}
+
+function compareRuleValues(operator: string, actual: unknown, expected: unknown): boolean {
+  const op = operator.trim().toLowerCase();
+  const actualText = String(actual ?? '');
+  const expectedText = String(expected ?? '');
+  if (op === 'equals') return actualText === expectedText;
+  if (op === 'not equals') return actualText !== expectedText;
+  if (op === 'contains') return actualText.toLowerCase().includes(expectedText.toLowerCase());
+  if (op === 'not contains') return !actualText.toLowerCase().includes(expectedText.toLowerCase());
+  if (op === 'in') return expectedText.split(',').map((value) => value.trim()).includes(actualText);
+  if (op === 'not in') return !expectedText.split(',').map((value) => value.trim()).includes(actualText);
+
+  const actualNumber = Number(actualText);
+  const expectedNumber = Number(expectedText);
+  if (op === 'greater than') return Number.isFinite(actualNumber) && Number.isFinite(expectedNumber) && actualNumber > expectedNumber;
+  if (op === 'less than') return Number.isFinite(actualNumber) && Number.isFinite(expectedNumber) && actualNumber < expectedNumber;
+  if (op === 'greater than or equal') return Number.isFinite(actualNumber) && Number.isFinite(expectedNumber) && actualNumber >= expectedNumber;
+  if (op === 'less than or equal') return Number.isFinite(actualNumber) && Number.isFinite(expectedNumber) && actualNumber <= expectedNumber;
+
+  const actualDate = new Date(actualText);
+  const expectedDate = new Date(expectedText);
+  if (op === 'before') return !Number.isNaN(actualDate.getTime()) && !Number.isNaN(expectedDate.getTime()) && actualDate < expectedDate;
+  if (op === 'after') return !Number.isNaN(actualDate.getTime()) && !Number.isNaN(expectedDate.getTime()) && actualDate > expectedDate;
+  return false;
+}
+
+function calculateQuestionnaireScore(
+  questions: QuestionnaireQuestion[],
+  answers: Record<string, unknown>,
+): { score: number; maxScore: number; percentComplete: number; passingStatus: string; grade: string } {
+  const scorableQuestions = questions.filter((question) => question.type !== 'instructional');
+  const requiredQuestions = scorableQuestions.filter((question) => question.required);
+  const answeredRequired = requiredQuestions.filter((question) => hasQuestionAnswer(answers[question.ref])).length;
+  const maxScore = scorableQuestions.reduce((total, question) => total + (question.maxScore ?? question.weight ?? 0), 0);
+  const score = scorableQuestions.reduce((total, question) => {
+    const answer = answers[question.ref];
+    if (!hasQuestionAnswer(answer)) {
+      return total;
+    }
+    const max = question.maxScore ?? question.weight ?? 0;
+    if (question.answerScores && typeof answer === 'string' && question.answerScores[answer] !== undefined) {
+      return total + Number(question.answerScores[answer] ?? 0);
+    }
+    if (Array.isArray(answer) && question.answerScores) {
+      return total + answer.reduce((inner, value) => inner + Number(question.answerScores?.[String(value)] ?? 0), 0);
+    }
+    if (question.type === 'boolean') {
+      return total + (String(answer) === 'true' || answer === true ? max : 0);
+    }
+    if (question.type === 'number') {
+      const numeric = Number(answer);
+      return total + (Number.isFinite(numeric) ? Math.min(max || numeric, numeric) : 0);
+    }
+    return total + max;
+  }, 0);
+  const percentComplete = requiredQuestions.length === 0 ? 100 : Math.round((answeredRequired / requiredQuestions.length) * 100);
+  const scorePercent = maxScore > 0 ? (score / maxScore) * 100 : percentComplete;
+  const passingStatus = percentComplete < 100 ? 'Incomplete' : scorePercent >= 70 ? 'Passing' : 'Needs Review';
+  const grade = scorePercent >= 90 ? 'Excellent' : scorePercent >= 70 ? 'Pass' : scorePercent >= 50 ? 'Needs Review' : 'Fail';
+  return { score, maxScore, percentComplete, passingStatus, grade };
 }
 
 function evaluateRuleSet(
@@ -439,6 +771,10 @@ function evaluateRuleSet(
   const executionLog: string[] = [];
   const matchedRules: string[] = [];
   const visibleQuestions = new Set<string>();
+  const hiddenQuestions = new Set<string>();
+  const disabledQuestions = new Set<string>();
+  let score = 60;
+  let grade = 'Pending';
 
   for (const rule of rules) {
     if (!rule.active) {
@@ -446,7 +782,7 @@ function evaluateRuleSet(
       continue;
     }
 
-    const evaluations = rule.conditions.map((condition) => evaluateCondition(condition, answers));
+    const evaluations = rule.conditions.map((condition) => evaluateCondition(condition, answers, { score, grade }));
     const matched = rule.logic === 'AND' ? evaluations.every(Boolean) : evaluations.some(Boolean);
     executionLog.push(`Rule "${rule.name}" ${matched ? 'EXECUTED' : 'SKIPPED'}`);
 
@@ -460,15 +796,49 @@ function evaluateRuleSet(
       const ref = parseQuestionRefFromExpression(action);
       if (ref && (action.includes('SHOW_QUESTIONS') || action.includes('ENABLE_QUESTIONS'))) {
         visibleQuestions.add(ref);
+        hiddenQuestions.delete(ref);
+      }
+      if (ref && action.includes('HIDE_QUESTIONS')) {
+        hiddenQuestions.add(ref);
+        visibleQuestions.delete(ref);
+      }
+      if (ref && action.includes('DISABLE_QUESTIONS')) {
+        disabledQuestions.add(ref);
+      }
+      if (action.includes('SET_SCORE')) {
+        const match = action.match(/SET_SCORE\s+(-?\d+(?:\.\d+)?)/);
+        if (match) {
+          score = Number(match[1]);
+        }
+      }
+      if (action.includes('ADD_TO_SCORE')) {
+        const match = action.match(/ADD_TO_SCORE\s+(-?\d+(?:\.\d+)?)/);
+        if (match) {
+          score += Number(match[1]);
+        }
+      }
+      if (action.includes('SET_GRADE')) {
+        const match = action.match(/SET_GRADE\s+"([^"]+)"/);
+        if (match) {
+          grade = match[1];
+        }
       }
     }
   }
 
-  const score = Math.max(35, Math.min(100, 60 + matchedRules.length * 12));
-  const grade = score >= 85 ? 'Pass' : score >= 70 ? 'Needs Review' : 'Fail';
+  score = Math.max(0, Math.min(100, score + matchedRules.length * 8));
+  if (grade === 'Pending') {
+    grade = score >= 85 ? 'Pass' : score >= 70 ? 'Needs Review' : 'Fail';
+  }
 
   executionLog.push(`Final score: ${score}`);
   executionLog.push(`Final grade: "${grade}"`);
+  if (hiddenQuestions.size > 0) {
+    executionLog.push(`Hidden questions: ${Array.from(hiddenQuestions).join(', ')}`);
+  }
+  if (disabledQuestions.size > 0) {
+    executionLog.push(`Disabled questions: ${Array.from(disabledQuestions).join(', ')}`);
+  }
 
   return {
     matchedRules,
@@ -504,6 +874,7 @@ function buildQuestionnaireSeedQuestions(): QuestionnaireQuestion[] {
       weight: 15,
       requirementRef: null,
       evidenceHint: 'Reference the latest assurance report or supporting evidence.',
+      enableUpload: true,
     },
     {
       id: crypto.randomUUID(),
@@ -526,6 +897,18 @@ function buildQuestionnaireSeedQuestions(): QuestionnaireQuestion[] {
       weight: 0,
       requirementRef: null,
       evidenceHint: 'Capture reviewer commentary and escalation context.',
+    },
+    {
+      id: crypto.randomUUID(),
+      ref: 'SUPPORTING_FILES',
+      prompt: 'Upload or reference supporting evidence for this questionnaire response.',
+      type: 'file-upload',
+      section: 'Evidence',
+      required: false,
+      weight: 0,
+      requirementRef: null,
+      evidenceHint: 'Use Manage Uploads to attach SOC reports, policies, diagrams, or other evidence.',
+      enableUpload: true,
     },
   ];
 }
@@ -727,6 +1110,16 @@ async function ensureSeedQuestionnaires(
             fileUploadGuidance: seed.fileUploadGuidance ?? null,
             exportMode: seed.exportMode ?? null,
             distributionCadence: seed.distributionCadence ?? null,
+            ownerName: seed.ownerTeam,
+            profile: seed.templateKind === 'assessment-plan' ? 'Control Assessment Profile' : 'Vendor Security Profile',
+            instructions:
+              seed.templateKind === 'assessment-plan'
+                ? 'Use these lines of inquiry to complete manual assessment fieldwork and record observations.'
+                : 'Complete each required question, attach supporting evidence where requested, and submit for reviewer feedback.',
+            allowPublicUrl: seed.templateKind === 'questionnaire',
+            loginRequired: false,
+            enableScoring: true,
+            enableQuestionAssignment: false,
           }),
         ),
         userId,
@@ -772,7 +1165,16 @@ async function listQuestionnaireSummaries(
        template.questions_json,
        template.metadata_json,
        template.updated_at,
-       rules.rules_json
+       rules.rules_json,
+       (SELECT COUNT(1) FROM questionnaire_instances instance
+          WHERE instance.tenant_id = template.tenant_id
+            AND instance.questionnaire_template_id = template.id
+            AND instance.archived = 0) AS instance_count,
+       (SELECT COUNT(1) FROM questionnaire_instances instance
+          WHERE instance.tenant_id = template.tenant_id
+            AND instance.questionnaire_template_id = template.id
+            AND instance.status IN ('Submitted', 'Accepted')
+            AND instance.archived = 0) AS submitted_count
      FROM questionnaire_templates template
      LEFT JOIN questionnaire_rule_sets rules
        ON rules.questionnaire_template_id = template.id
@@ -781,7 +1183,7 @@ async function listQuestionnaireSummaries(
      ORDER BY template.updated_at DESC`,
   )
     .bind(tenantId)
-    .all<QuestionnaireTemplateRow & { rules_json: string | null }>();
+    .all<QuestionnaireTemplateRow & { rules_json: string | null; instance_count: number | null; submitted_count: number | null }>();
 
   return rows.results.map((row) => {
     const questions = asJson<QuestionnaireQuestion[]>(row.questions_json, []);
@@ -809,7 +1211,17 @@ async function listQuestionnaireSummaries(
       fileUploadGuidance: summary.fileUploadGuidance,
       exportMode: summary.exportMode,
       distributionCadence: summary.distributionCadence,
+      ownerUserId: summary.ownerUserId,
+      ownerName: summary.ownerName,
+      profile: summary.profile,
+      instructions: summary.instructions,
+      allowPublicUrl: summary.allowPublicUrl,
+      loginRequired: summary.loginRequired,
+      enableScoring: summary.enableScoring,
+      enableQuestionAssignment: summary.enableQuestionAssignment,
       mappedRequirementCount: summary.mappedRequirementCount,
+      instanceCount: Number(row.instance_count ?? 0),
+      submittedCount: Number(row.submitted_count ?? 0),
       updatedAt: row.updated_at,
     };
   });
@@ -919,6 +1331,14 @@ async function getQuestionnaireDetail(
       fileUploadGuidance: summary.fileUploadGuidance,
       exportMode: summary.exportMode,
       distributionCadence: summary.distributionCadence,
+      ownerUserId: summary.ownerUserId,
+      ownerName: summary.ownerName,
+      profile: summary.profile,
+      instructions: summary.instructions,
+      allowPublicUrl: summary.allowPublicUrl,
+      loginRequired: summary.loginRequired,
+      enableScoring: summary.enableScoring,
+      enableQuestionAssignment: summary.enableQuestionAssignment,
       mappedRequirementCount: summary.mappedRequirementCount,
       createdAt: templateRow.created_at,
       updatedAt: templateRow.updated_at,
@@ -959,10 +1379,422 @@ function buildPreviewTestRun(args: {
   };
 }
 
+function generateAccessCode() {
+  return String(Math.floor(100000000 + Math.random() * 900000000));
+}
+
+function defaultAnswerForQuestion(question: QuestionnaireQuestion): unknown {
+  if (question.type === 'boolean') return false;
+  if (question.type === 'number') return '';
+  if (question.type === 'multi-select') return [];
+  if (question.type === 'table') return [];
+  return '';
+}
+
+function buildInitialAnswers(questions: QuestionnaireQuestion[]) {
+  return Object.fromEntries(questions.map((question) => [question.ref, defaultAnswerForQuestion(question)]));
+}
+
+function parseBulkEmails(input: AssignmentInput): string[] {
+  const direct = Array.isArray(input.assigneeEmails) ? input.assigneeEmails : [];
+  const fromCsv = (input.bulkCsv ?? '')
+    .split(/\r?\n|,/)
+    .map((value) => value.trim())
+    .filter((value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
+  const single = input.assigneeEmail ? [input.assigneeEmail] : [];
+  return Array.from(new Set([...direct, ...fromCsv, ...single].map((value) => value.trim()).filter(Boolean)));
+}
+
+function publicShareLink(shareToken: string) {
+  return `/questionnaires/response/${shareToken}`;
+}
+
+async function getQuestionnaireInstanceRow(
+  env: WorkerRequestContext['env'],
+  tenantId: string,
+  templateId: string,
+  instanceId: string,
+): Promise<QuestionnaireInstanceRow | null> {
+  return env.D1_MAIN.prepare(
+    `SELECT * FROM questionnaire_instances
+      WHERE tenant_id = ? AND questionnaire_template_id = ? AND id = ?
+      LIMIT 1`,
+  )
+    .bind(tenantId, templateId, instanceId)
+    .first<QuestionnaireInstanceRow>();
+}
+
+async function getQuestionnaireInstanceByToken(
+  env: WorkerRequestContext['env'],
+  shareToken: string,
+): Promise<QuestionnaireInstanceRow | null> {
+  return env.D1_MAIN.prepare(
+    `SELECT * FROM questionnaire_instances WHERE share_token = ? AND archived = 0 LIMIT 1`,
+  )
+    .bind(shareToken)
+    .first<QuestionnaireInstanceRow>();
+}
+
+function toQuestionnaireInstance(row: QuestionnaireInstanceRow, templateName: string): QuestionnaireInstance {
+  return {
+    id: row.id,
+    questionnaireId: row.questionnaire_template_id,
+    templateName,
+    title: row.title,
+    assignmentType: row.assignment_type,
+    assigneeUserId: row.assignee_user_id,
+    assigneeEmail: row.assignee_email,
+    reviewerUserId: row.reviewer_user_id,
+    parentModule: row.parent_module,
+    parentRecordId: row.parent_record_id,
+    status: row.status,
+    dueDate: row.due_date,
+    accessCode: row.access_code,
+    shareToken: row.share_token,
+    shareLink: publicShareLink(row.share_token),
+    loginRequired: Boolean(row.login_required),
+    answers: asJson<Record<string, unknown>>(row.answers_json, {}),
+    uploads: asJson<Record<string, unknown>>(row.uploads_json, {}),
+    headerValues: asJson<Record<string, unknown>>(row.header_values_json, {}),
+    feedback: asJson<Record<string, { rating?: string | null; comment?: string | null }>>(row.feedback_json, {}),
+    collaboration: asJson<QuestionnaireInstance['collaboration']>(row.collaboration_json, []),
+    recurrence: asJson<Record<string, unknown> | null>(row.recurrence_json, null),
+    score: Number(row.score ?? 0),
+    maxScore: Number(row.max_score ?? 0),
+    grade: row.grade,
+    percentComplete: Number(row.percent_complete ?? 0),
+    passingStatus: row.passing_status,
+    submittedAt: row.submitted_at,
+    reviewedAt: row.reviewed_at,
+    archived: Boolean(row.archived),
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+async function listQuestionnaireInstances(
+  env: WorkerRequestContext['env'],
+  tenantId: string,
+  templateId: string,
+): Promise<QuestionnaireInstance[]> {
+  const template = await getQuestionnaireTemplateRow(env, tenantId, templateId);
+  const rows = await env.D1_MAIN.prepare(
+    `SELECT * FROM questionnaire_instances
+      WHERE tenant_id = ? AND questionnaire_template_id = ? AND archived = 0
+      ORDER BY updated_at DESC`,
+  )
+    .bind(tenantId, templateId)
+    .all<QuestionnaireInstanceRow>();
+  return rows.results.map((row) => toQuestionnaireInstance(row, template.name));
+}
+
+async function writeQuestionnaireHistory(args: {
+  env: WorkerRequestContext['env'];
+  tenantId: string;
+  instanceId: string;
+  discriminator: string;
+  payload: unknown;
+  userId: string | null;
+}) {
+  await args.env.D1_MAIN.prepare(
+    `INSERT INTO questionnaire_history_entries (
+      id, tenant_id, questionnaire_instance_id, discriminator, json_data, created_by_user_id, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+  )
+    .bind(
+      crypto.randomUUID(),
+      args.tenantId,
+      args.instanceId,
+      args.discriminator,
+      JSON.stringify(args.payload),
+      args.userId,
+      nowIso(),
+    )
+    .run();
+}
+
+async function upsertQuestionnaireProperties(args: {
+  env: WorkerRequestContext['env'];
+  tenantId: string;
+  templateId: string;
+  instanceId: string;
+  questions: QuestionnaireQuestion[];
+  answers: Record<string, unknown>;
+}) {
+  const timestamp = nowIso();
+  const statements = args.questions
+    .filter((question) => question.type !== 'instructional')
+    .map((question) =>
+      args.env.D1_MAIN.prepare(
+        `INSERT INTO questionnaire_response_properties (
+          id, tenant_id, questionnaire_instance_id, questionnaire_template_id, key, label, value,
+          secondary_id, secondary_module, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(tenant_id, questionnaire_instance_id, key)
+        DO UPDATE SET label = excluded.label, value = excluded.value, secondary_id = excluded.secondary_id,
+                      secondary_module = excluded.secondary_module, updated_at = excluded.updated_at`,
+      ).bind(
+        crypto.randomUUID(),
+        args.tenantId,
+        args.instanceId,
+        args.templateId,
+        question.ref,
+        question.prompt,
+        JSON.stringify(args.answers[question.ref] ?? null),
+        question.requirementRef ?? null,
+        question.requirementRef ? 'security-controls' : null,
+        timestamp,
+        timestamp,
+      ),
+    );
+  if (statements.length > 0) {
+    await args.env.D1_MAIN.batch(statements);
+  }
+}
+
+async function createQuestionnaireInstance(args: {
+  env: WorkerRequestContext['env'];
+  tenantId: string;
+  template: QuestionnaireTemplateDetail;
+  assignmentType: string;
+  title: string;
+  assigneeUserId?: string | null;
+  assigneeEmail?: string | null;
+  reviewerUserId?: string | null;
+  parentModule?: string | null;
+  parentRecordId?: string | null;
+  dueDate?: string | null;
+  recurrence?: Record<string, unknown> | null;
+  loginRequired?: boolean;
+  userId: string | null;
+}): Promise<QuestionnaireInstance> {
+  const timestamp = nowIso();
+  const instanceId = crypto.randomUUID();
+  const answers = buildInitialAnswers(args.template.questions);
+  const score = calculateQuestionnaireScore(args.template.questions, answers);
+  const shareToken = crypto.randomUUID();
+  await args.env.D1_MAIN.prepare(
+    `INSERT INTO questionnaire_instances (
+      id, tenant_id, questionnaire_template_id, title, assignment_type, assignee_user_id, assignee_email,
+      reviewer_user_id, parent_module, parent_record_id, status, due_date, access_code, share_token,
+      login_required, answers_json, uploads_json, header_values_json, feedback_json, collaboration_json,
+      recurrence_json, score, max_score, grade, percent_complete, passing_status, created_by_user_id,
+      updated_by_user_id, archived, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  )
+    .bind(
+      instanceId,
+      args.tenantId,
+      args.template.id,
+      args.title,
+      args.assignmentType,
+      args.assigneeUserId ?? null,
+      args.assigneeEmail ?? null,
+      args.reviewerUserId ?? null,
+      args.parentModule ?? null,
+      args.parentRecordId ?? null,
+      'Open',
+      args.dueDate ?? null,
+      generateAccessCode(),
+      shareToken,
+      args.loginRequired ? 1 : 0,
+      JSON.stringify(answers),
+      JSON.stringify({}),
+      JSON.stringify({}),
+      JSON.stringify({}),
+      JSON.stringify([]),
+      args.recurrence ? JSON.stringify(args.recurrence) : null,
+      score.score,
+      score.maxScore,
+      score.grade,
+      score.percentComplete,
+      score.passingStatus,
+      args.userId,
+      args.userId,
+      0,
+      timestamp,
+      timestamp,
+    )
+    .run();
+  await upsertQuestionnaireProperties({
+    env: args.env,
+    tenantId: args.tenantId,
+    templateId: args.template.id,
+    instanceId,
+    questions: args.template.questions,
+    answers,
+  });
+  const row = await getQuestionnaireInstanceRow(args.env, args.tenantId, args.template.id, instanceId);
+  if (!row) {
+    throw new Error('Questionnaire instance creation failed.');
+  }
+  return toQuestionnaireInstance(row, args.template.name);
+}
+
+async function updateQuestionnaireInstanceState(args: {
+  env: WorkerRequestContext['env'];
+  tenantId: string;
+  template: QuestionnaireTemplateDetail;
+  row: QuestionnaireInstanceRow;
+  status: string;
+  userId: string | null;
+  feedback?: Record<string, { rating?: string | null; comment?: string | null }>;
+  collaborationEntry?: QuestionnaireInstance['collaboration'][number] | null;
+}) {
+  const timestamp = nowIso();
+  const collaboration = asJson<QuestionnaireInstance['collaboration']>(args.row.collaboration_json, []);
+  if (args.collaborationEntry) {
+    collaboration.push(args.collaborationEntry);
+  }
+  const feedback = args.feedback ?? asJson<Record<string, { rating?: string | null; comment?: string | null }>>(args.row.feedback_json, {});
+  await args.env.D1_MAIN.prepare(
+    `UPDATE questionnaire_instances
+        SET status = ?, feedback_json = ?, collaboration_json = ?, submitted_at = ?,
+            reviewed_at = ?, updated_by_user_id = ?, updated_at = ?
+      WHERE tenant_id = ? AND questionnaire_template_id = ? AND id = ?`,
+  )
+    .bind(
+      args.status,
+      JSON.stringify(feedback),
+      JSON.stringify(collaboration),
+      args.status === 'Submitted' ? timestamp : args.row.submitted_at,
+      args.status === 'Accepted' || args.status === 'RequestChanges' || args.status === 'Closed' ? timestamp : args.row.reviewed_at,
+      args.userId,
+      timestamp,
+      args.tenantId,
+      args.template.id,
+      args.row.id,
+    )
+    .run();
+  const next = await getQuestionnaireInstanceRow(args.env, args.tenantId, args.template.id, args.row.id);
+  if (next) {
+    await writeQuestionnaireHistory({
+      env: args.env,
+      tenantId: args.tenantId,
+      instanceId: args.row.id,
+      discriminator: args.status,
+      payload: toQuestionnaireInstance(next, args.template.name),
+      userId: args.userId,
+    });
+  }
+}
+
+async function handlePublicQuestionnaireAccess(
+  segments: string[],
+  ctx: WorkerRequestContext,
+): Promise<Response> {
+  const [, shareToken, action] = segments;
+  if (!shareToken) {
+    return json({ error: 'missing_share_token', message: 'Questionnaire response link is incomplete.' }, { status: 400 });
+  }
+  const row = await getQuestionnaireInstanceByToken(ctx.env, shareToken);
+  if (!row) {
+    return json({ error: 'not_found', message: 'Questionnaire response link was not found.' }, { status: 404 });
+  }
+  const templateRow = await getQuestionnaireTemplateRow(ctx.env, row.tenant_id, row.questionnaire_template_id);
+  const templateDetail = (await getQuestionnaireDetail(ctx.env, row.tenant_id, row.questionnaire_template_id)).template;
+  const instance = toQuestionnaireInstance(row, templateRow.name);
+
+  if (!action && ctx.request.method === 'GET') {
+    return json({
+      data: {
+        title: instance.title,
+        templateName: instance.templateName,
+        status: instance.status,
+        dueDate: instance.dueDate,
+        loginRequired: instance.loginRequired,
+        questions: templateDetail.questions.map((question) => ({
+          ref: question.ref,
+          prompt: question.prompt,
+          type: question.type,
+          section: question.section,
+          required: question.required,
+          options: question.options ?? [],
+          helpText: question.helpText ?? null,
+          evidenceHint: question.evidenceHint ?? null,
+          enableUpload: Boolean(question.enableUpload || question.type === 'file-upload'),
+        })),
+      },
+    });
+  }
+
+  const body = await readJson<ResponseUpdateInput>(ctx.request);
+  if (body.accessCode?.trim() !== row.access_code) {
+    return json({ error: 'invalid_access_code', message: 'The access code did not match this questionnaire response.' }, { status: 403 });
+  }
+
+  if (action === 'validate' && ctx.request.method === 'POST') {
+    return json({ data: instance });
+  }
+
+  if (action === 'responses' && ctx.request.method === 'PUT') {
+    if (!['Open', 'RequestChanges'].includes(row.status)) {
+      return json({ error: 'locked_response', message: 'Submitted or closed questionnaire responses are locked.' }, { status: 409 });
+    }
+    const answers = { ...asJson<Record<string, unknown>>(row.answers_json, {}), ...asRecord(body.answers) };
+    const uploads = { ...asJson<Record<string, unknown>>(row.uploads_json, {}), ...asRecord(body.uploads) };
+    const score = calculateQuestionnaireScore(templateDetail.questions, answers);
+    await ctx.env.D1_MAIN.prepare(
+      `UPDATE questionnaire_instances
+          SET answers_json = ?, uploads_json = ?, score = ?, max_score = ?, grade = ?,
+              percent_complete = ?, passing_status = ?, updated_at = ?
+        WHERE share_token = ?`,
+    )
+      .bind(
+        JSON.stringify(answers),
+        JSON.stringify(uploads),
+        score.score,
+        score.maxScore,
+        score.grade,
+        score.percentComplete,
+        score.passingStatus,
+        nowIso(),
+        shareToken,
+      )
+      .run();
+    await upsertQuestionnaireProperties({
+      env: ctx.env,
+      tenantId: row.tenant_id,
+      templateId: row.questionnaire_template_id,
+      instanceId: row.id,
+      questions: templateDetail.questions,
+      answers,
+    });
+    const updated = await getQuestionnaireInstanceByToken(ctx.env, shareToken);
+    return updated ? json({ data: toQuestionnaireInstance(updated, templateRow.name) }) : json({ error: 'not_found' }, { status: 404 });
+  }
+
+  if (action === 'submit' && ctx.request.method === 'POST') {
+    await updateQuestionnaireInstanceState({
+      env: ctx.env,
+      tenantId: row.tenant_id,
+      template: templateDetail,
+      row,
+      status: 'Submitted',
+      userId: null,
+      collaborationEntry: {
+        id: crypto.randomUUID(),
+        authorUserId: null,
+        action: 'submit',
+        message: 'External respondent submitted the questionnaire by access code.',
+        createdAt: nowIso(),
+      },
+    });
+    const updated = await getQuestionnaireInstanceByToken(ctx.env, shareToken);
+    return updated ? json({ data: toQuestionnaireInstance(updated, templateRow.name) }) : json({ error: 'not_found' }, { status: 404 });
+  }
+
+  return methodNotAllowed(['GET', 'POST', 'PUT']);
+}
+
 export async function handleBuilderRoutes(
   segments: string[],
   ctx: WorkerRequestContext,
 ): Promise<Response> {
+  if (segments[0] === 'questionnaire-access') {
+    return handlePublicQuestionnaireAccess(segments, ctx);
+  }
+
   const builderAccess = await requireAnyPermission(
     ctx,
     ctx.request.method === 'GET'
@@ -1009,6 +1841,94 @@ export async function handleBuilderRoutes(
 
   await ensureSeedQuestionnaires(ctx.env, tenantId, ctx.userId);
 
+  if (id === 'import') {
+    if (ctx.request.method !== 'POST') {
+      return methodNotAllowed(['POST']);
+    }
+    const userIdOrResponse = requireUser(ctx);
+    if (userIdOrResponse instanceof Response) {
+      return userIdOrResponse;
+    }
+    const body = await readJson<{ template?: Partial<UpdateQuestionnaireInput> & { name?: string }; rules?: QuestionnaireRule[] }>(ctx.request);
+    const templateKind = normalizeTemplateKind(body.template?.templateKind);
+    const questions = Array.isArray(body.template?.questions) && body.template.questions.length > 0
+      ? body.template.questions
+      : templateKind === 'assessment-plan'
+        ? buildAssessmentPlanSeedQuestions()
+        : buildQuestionnaireSeedQuestions();
+    const rules = Array.isArray(body.rules) ? body.rules : templateKind === 'assessment-plan' ? buildAssessmentPlanSeedRules() : buildQuestionnaireSeedRules();
+    const timestamp = nowIso();
+    const templateId = crypto.randomUUID();
+    const ruleSetId = crypto.randomUUID();
+    const metadata = buildTemplateMetadata({
+      templateKind,
+      sourceFramework: body.template?.sourceFramework?.trim() || null,
+      usageNotes: body.template?.usageNotes?.trim() || 'Imported from Questionnaire Builder JSON.',
+      ownerTeam: 'Imported',
+      source: 'user-import',
+      questionnaireType: body.template?.questionnaireType?.trim() || (templateKind === 'questionnaire' ? 'Imported' : null),
+      assignmentModel: body.template?.assignmentModel?.trim() || (templateKind === 'questionnaire' ? 'User assignment' : null),
+      relatedWorkflow: body.template?.relatedWorkflow?.trim() || null,
+      attestationScope: body.template?.attestationScope?.trim() || null,
+      responseOwnerModel: body.template?.responseOwnerModel?.trim() || null,
+      evidenceCollectionMode: body.template?.evidenceCollectionMode?.trim() || null,
+      fileUploadGuidance: body.template?.fileUploadGuidance?.trim() || null,
+      exportMode: body.template?.exportMode?.trim() || null,
+      distributionCadence: body.template?.distributionCadence?.trim() || null,
+      ownerUserId: body.template?.ownerUserId?.trim() || userIdOrResponse,
+      ownerName: body.template?.ownerName?.trim() || null,
+      profile: body.template?.profile?.trim() || null,
+      instructions: body.template?.instructions?.trim() || null,
+      allowPublicUrl: Boolean(body.template?.allowPublicUrl),
+      loginRequired: Boolean(body.template?.loginRequired),
+      enableScoring: body.template?.enableScoring ?? true,
+      enableQuestionAssignment: Boolean(body.template?.enableQuestionAssignment),
+    });
+    const diagnostics = buildRuleDiagnostics(rules, questions);
+    await ctx.env.D1_MAIN.batch([
+      ctx.env.D1_MAIN.prepare(
+        `INSERT INTO questionnaire_templates (
+          id, tenant_id, name, description, status, scoring_mode, audience, version,
+          questions_json, metadata_json, created_by_user_id, updated_by_user_id, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ).bind(
+        templateId,
+        tenantId,
+        body.template?.name?.trim() || 'Imported Questionnaire',
+        body.template?.description?.trim() || null,
+        body.template?.status?.trim() || 'draft',
+        body.template?.scoringMode?.trim() || 'weighted',
+        body.template?.audience?.trim() || null,
+        1,
+        JSON.stringify(questions),
+        JSON.stringify(metadata),
+        userIdOrResponse,
+        userIdOrResponse,
+        timestamp,
+        timestamp,
+      ),
+      ctx.env.D1_MAIN.prepare(
+        `INSERT INTO questionnaire_rule_sets (
+          id, tenant_id, questionnaire_template_id, name, engine_version, rules_json, diagnostics_json,
+          created_by_user_id, updated_by_user_id, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ).bind(
+        ruleSetId,
+        tenantId,
+        templateId,
+        'Imported rule set',
+        '1.0',
+        JSON.stringify(rules),
+        JSON.stringify(diagnostics),
+        userIdOrResponse,
+        userIdOrResponse,
+        timestamp,
+        timestamp,
+      ),
+    ]);
+    return json({ data: await getQuestionnaireDetail(ctx.env, tenantId, templateId) }, { status: 201 });
+  }
+
   if (!id) {
     if (ctx.request.method === 'GET') {
       const templates = await listQuestionnaireSummaries(ctx.env, tenantId);
@@ -1052,6 +1972,18 @@ export async function handleBuilderRoutes(
         fileUploadGuidance: body.fileUploadGuidance?.trim() || null,
         exportMode: body.exportMode?.trim() || (templateKind === 'questionnaire' ? 'Spreadsheet-ready' : null),
         distributionCadence: body.distributionCadence?.trim() || (templateKind === 'questionnaire' ? 'As needed' : null),
+        ownerUserId: body.ownerUserId?.trim() || userIdOrResponse,
+        ownerName: body.ownerName?.trim() || null,
+        profile: body.profile?.trim() || (templateKind === 'questionnaire' ? 'General Questionnaire Profile' : 'Assessment Plan Profile'),
+        instructions:
+          body.instructions?.trim() ||
+          (templateKind === 'questionnaire'
+            ? 'Complete required questions, add evidence where requested, and submit for review.'
+            : 'Use each line of inquiry to guide assessment fieldwork and reviewer follow-up.'),
+        allowPublicUrl: body.allowPublicUrl ?? templateKind === 'questionnaire',
+        loginRequired: Boolean(body.loginRequired),
+        enableScoring: body.enableScoring ?? true,
+        enableQuestionAssignment: Boolean(body.enableQuestionAssignment),
       });
 
       await ctx.env.D1_MAIN.batch([
@@ -1135,6 +2067,14 @@ export async function handleBuilderRoutes(
         exportMode: body.exportMode !== undefined ? body.exportMode?.trim() || null : undefined,
         distributionCadence:
           body.distributionCadence !== undefined ? body.distributionCadence?.trim() || null : undefined,
+        ownerUserId: body.ownerUserId !== undefined ? body.ownerUserId?.trim() || null : undefined,
+        ownerName: body.ownerName !== undefined ? body.ownerName?.trim() || null : undefined,
+        profile: body.profile !== undefined ? body.profile?.trim() || null : undefined,
+        instructions: body.instructions !== undefined ? body.instructions?.trim() || null : undefined,
+        allowPublicUrl: body.allowPublicUrl,
+        loginRequired: body.loginRequired,
+        enableScoring: body.enableScoring,
+        enableQuestionAssignment: body.enableQuestionAssignment,
       });
 
       await ctx.env.D1_MAIN.prepare(
@@ -1171,7 +2111,313 @@ export async function handleBuilderRoutes(
       return json({ data: await getQuestionnaireDetail(ctx.env, tenantId, id) });
     }
 
-    return methodNotAllowed(['GET', 'PUT']);
+    if (ctx.request.method === 'DELETE') {
+      const userIdOrResponse = requireUser(ctx);
+      if (userIdOrResponse instanceof Response) {
+        return userIdOrResponse;
+      }
+
+      const current = await ctx.env.D1_MAIN.prepare(
+        `SELECT id FROM questionnaire_templates WHERE tenant_id = ? AND id = ? LIMIT 1`,
+      )
+        .bind(tenantId, id)
+        .first<{ id: string }>();
+      if (!current) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+      const instanceRows = await ctx.env.D1_MAIN.prepare(
+        `SELECT id FROM questionnaire_instances WHERE tenant_id = ? AND questionnaire_template_id = ?`,
+      )
+        .bind(tenantId, id)
+        .all<{ id: string }>();
+      const instanceIds = instanceRows.results.map((row) => row.id);
+      const statements = [
+        ctx.env.D1_MAIN.prepare(
+          `DELETE FROM questionnaire_response_properties WHERE tenant_id = ? AND questionnaire_template_id = ?`,
+        ).bind(tenantId, id),
+        ctx.env.D1_MAIN.prepare(
+          `DELETE FROM questionnaire_recurring_assignments WHERE tenant_id = ? AND questionnaire_template_id = ?`,
+        ).bind(tenantId, id),
+        ctx.env.D1_MAIN.prepare(
+          `DELETE FROM questionnaire_rule_test_runs WHERE tenant_id = ? AND questionnaire_template_id = ?`,
+        ).bind(tenantId, id),
+        ctx.env.D1_MAIN.prepare(
+          `DELETE FROM questionnaire_rule_sets WHERE tenant_id = ? AND questionnaire_template_id = ?`,
+        ).bind(tenantId, id),
+      ];
+      for (const instanceId of instanceIds) {
+        statements.push(
+          ctx.env.D1_MAIN.prepare(
+            `DELETE FROM questionnaire_history_entries WHERE tenant_id = ? AND questionnaire_instance_id = ?`,
+          ).bind(tenantId, instanceId),
+        );
+      }
+      statements.push(
+        ctx.env.D1_MAIN.prepare(
+          `DELETE FROM questionnaire_instances WHERE tenant_id = ? AND questionnaire_template_id = ?`,
+        ).bind(tenantId, id),
+        ctx.env.D1_MAIN.prepare(`DELETE FROM questionnaire_templates WHERE tenant_id = ? AND id = ?`).bind(
+          tenantId,
+          id,
+        ),
+      );
+      await ctx.env.D1_MAIN.batch(statements);
+      return json({ data: { deleted: true, id: current.id } });
+    }
+
+    return methodNotAllowed(['GET', 'PUT', 'DELETE']);
+  }
+
+  if (subresource === 'export') {
+    if (ctx.request.method !== 'GET') {
+      return methodNotAllowed(['GET']);
+    }
+    const detail = await getQuestionnaireDetail(ctx.env, tenantId, id);
+    const instances = await listQuestionnaireInstances(ctx.env, tenantId, id);
+    return json({
+      data: {
+        exportedAt: nowIso(),
+        template: detail.template,
+        rules: detail.ruleSet.rules,
+        instances: instances.map((instance) => ({
+          id: instance.id,
+          title: instance.title,
+          status: instance.status,
+          percentComplete: instance.percentComplete,
+          score: instance.score,
+          grade: instance.grade,
+        })),
+      },
+    });
+  }
+
+  if (subresource === 'assignments') {
+    if (ctx.request.method !== 'POST') {
+      return methodNotAllowed(['POST']);
+    }
+    const userIdOrResponse = requireUser(ctx);
+    if (userIdOrResponse instanceof Response) {
+      return userIdOrResponse;
+    }
+    const body = await readJson<AssignmentInput>(ctx.request);
+    const detail = await getQuestionnaireDetail(ctx.env, tenantId, id);
+    const assignmentType = body.assignmentType ?? 'user';
+    const title = body.title?.trim() || `${detail.template.name} assignment`;
+    const loginRequired = body.loginRequired ?? detail.template.loginRequired;
+    const emails = assignmentType === 'bulk' ? parseBulkEmails(body) : body.assigneeEmail ? [body.assigneeEmail] : [];
+    const recipients =
+      assignmentType === 'bulk'
+        ? emails.map((email) => ({ assigneeEmail: email, assigneeUserId: null }))
+        : [{ assigneeEmail: body.assigneeEmail?.trim() || null, assigneeUserId: body.assigneeUserId?.trim() || null }];
+    const created: QuestionnaireInstance[] = [];
+    for (const [index, recipient] of recipients.entries()) {
+      created.push(
+        await createQuestionnaireInstance({
+          env: ctx.env,
+          tenantId,
+          template: detail.template,
+          assignmentType,
+          title: recipients.length > 1 ? `${title} ${index + 1}` : title,
+          assigneeUserId: recipient.assigneeUserId,
+          assigneeEmail: recipient.assigneeEmail,
+          reviewerUserId: body.reviewerUserId?.trim() || userIdOrResponse,
+          parentModule: body.parentModule?.trim() || null,
+          parentRecordId: body.parentRecordId?.trim() || null,
+          dueDate: body.dueDate?.trim() || null,
+          recurrence:
+            assignmentType === 'recurring'
+              ? {
+                  recurrenceType: body.recurrenceType?.trim() || 'Monthly',
+                  startDate: body.startDate?.trim() || nowIso().slice(0, 10),
+                  endDate: body.endDate?.trim() || null,
+                }
+              : null,
+          loginRequired,
+          userId: userIdOrResponse,
+        }),
+      );
+    }
+
+    if (assignmentType === 'recurring') {
+      const timestamp = nowIso();
+      await ctx.env.D1_MAIN.prepare(
+        `INSERT INTO questionnaire_recurring_assignments (
+          id, tenant_id, questionnaire_template_id, title, recipient_user_id, recipient_email, reviewer_user_id,
+          recurrence_type, start_date, end_date, last_sent_at, next_send_at, status, created_by_user_id,
+          updated_by_user_id, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+        .bind(
+          crypto.randomUUID(),
+          tenantId,
+          id,
+          title,
+          body.assigneeUserId?.trim() || null,
+          body.assigneeEmail?.trim() || null,
+          body.reviewerUserId?.trim() || userIdOrResponse,
+          body.recurrenceType?.trim() || 'Monthly',
+          body.startDate?.trim() || nowIso().slice(0, 10),
+          body.endDate?.trim() || null,
+          timestamp,
+          body.startDate?.trim() || nowIso().slice(0, 10),
+          'Active',
+          userIdOrResponse,
+          userIdOrResponse,
+          timestamp,
+          timestamp,
+        )
+        .run();
+    }
+
+    return json({ data: { instances: created } }, { status: 201 });
+  }
+
+  if (subresource === 'instances') {
+    const instanceId = segments[3];
+    const instanceAction = segments[4];
+    if (!instanceId) {
+      if (ctx.request.method === 'GET') {
+        return json({ data: { instances: await listQuestionnaireInstances(ctx.env, tenantId, id) } });
+      }
+      return methodNotAllowed(['GET']);
+    }
+
+    const detail = await getQuestionnaireDetail(ctx.env, tenantId, id);
+    const row = await getQuestionnaireInstanceRow(ctx.env, tenantId, id, instanceId);
+    if (!row) {
+      return json({ error: 'not_found', message: 'Questionnaire response instance not found.' }, { status: 404 });
+    }
+
+    if (!instanceAction) {
+      if (ctx.request.method === 'GET') {
+        return json({ data: toQuestionnaireInstance(row, detail.template.name) });
+      }
+      if (ctx.request.method === 'DELETE') {
+        await ctx.env.D1_MAIN.prepare(`DELETE FROM questionnaire_response_properties WHERE tenant_id = ? AND questionnaire_instance_id = ?`)
+          .bind(tenantId, instanceId)
+          .run();
+        await ctx.env.D1_MAIN.prepare(`DELETE FROM questionnaire_history_entries WHERE tenant_id = ? AND questionnaire_instance_id = ?`)
+          .bind(tenantId, instanceId)
+          .run();
+        await ctx.env.D1_MAIN.prepare(`DELETE FROM questionnaire_instances WHERE tenant_id = ? AND questionnaire_template_id = ? AND id = ?`)
+          .bind(tenantId, id, instanceId)
+          .run();
+        return json({ data: { deleted: true } });
+      }
+      return methodNotAllowed(['GET', 'DELETE']);
+    }
+
+    if (instanceAction === 'responses' && ctx.request.method === 'PUT') {
+      const userIdOrResponse = requireUser(ctx);
+      if (userIdOrResponse instanceof Response) {
+        return userIdOrResponse;
+      }
+      if (!['Open', 'RequestChanges'].includes(row.status)) {
+        return json({ error: 'locked_response', message: 'Submitted or accepted questionnaire responses are locked.' }, { status: 409 });
+      }
+      const body = await readJson<ResponseUpdateInput>(ctx.request);
+      const answers = { ...asJson<Record<string, unknown>>(row.answers_json, {}), ...asRecord(body.answers) };
+      const uploads = { ...asJson<Record<string, unknown>>(row.uploads_json, {}), ...asRecord(body.uploads) };
+      const headerValues = { ...asJson<Record<string, unknown>>(row.header_values_json, {}), ...asRecord(body.headerValues) };
+      const collaboration = asJson<QuestionnaireInstance['collaboration']>(row.collaboration_json, []);
+      if (body.comment?.trim()) {
+        collaboration.push({
+          id: crypto.randomUUID(),
+          authorUserId: userIdOrResponse,
+          action: 'save',
+          message: body.comment.trim(),
+          createdAt: nowIso(),
+        });
+      }
+      const score = calculateQuestionnaireScore(detail.template.questions, answers);
+      await ctx.env.D1_MAIN.prepare(
+        `UPDATE questionnaire_instances
+            SET answers_json = ?, uploads_json = ?, header_values_json = ?, collaboration_json = ?,
+                score = ?, max_score = ?, grade = ?, percent_complete = ?, passing_status = ?,
+                updated_by_user_id = ?, updated_at = ?
+          WHERE tenant_id = ? AND questionnaire_template_id = ? AND id = ?`,
+      )
+        .bind(
+          JSON.stringify(answers),
+          JSON.stringify(uploads),
+          JSON.stringify(headerValues),
+          JSON.stringify(collaboration),
+          score.score,
+          score.maxScore,
+          score.grade,
+          score.percentComplete,
+          score.passingStatus,
+          userIdOrResponse,
+          nowIso(),
+          tenantId,
+          id,
+          instanceId,
+        )
+        .run();
+      await upsertQuestionnaireProperties({
+        env: ctx.env,
+        tenantId,
+        templateId: id,
+        instanceId,
+        questions: detail.template.questions,
+        answers,
+      });
+      const updated = await getQuestionnaireInstanceRow(ctx.env, tenantId, id, instanceId);
+      return updated ? json({ data: toQuestionnaireInstance(updated, detail.template.name) }) : json({ error: 'not_found' }, { status: 404 });
+    }
+
+    if (['submit', 'accept', 'reject', 'reopen', 'close', 'feedback'].includes(instanceAction) && ctx.request.method === 'POST') {
+      const userIdOrResponse = requireUser(ctx);
+      if (userIdOrResponse instanceof Response) {
+        return userIdOrResponse;
+      }
+      const body = await readJson<ReviewInput>(ctx.request);
+      const status =
+        instanceAction === 'submit'
+          ? 'Submitted'
+          : instanceAction === 'accept'
+            ? 'Accepted'
+            : instanceAction === 'reject'
+              ? 'RequestChanges'
+              : instanceAction === 'reopen'
+                ? 'Open'
+                : instanceAction === 'close'
+                  ? 'Closed'
+                  : body.sendEmail
+                    ? 'RequestChanges'
+                    : row.status;
+      await updateQuestionnaireInstanceState({
+        env: ctx.env,
+        tenantId,
+        template: detail.template,
+        row,
+        status,
+        userId: userIdOrResponse,
+        feedback: body.feedback,
+        collaborationEntry: {
+          id: crypto.randomUUID(),
+          authorUserId: userIdOrResponse,
+          action: instanceAction,
+          message: body.reviewerComments?.trim() || `${instanceAction} action recorded.`,
+          createdAt: nowIso(),
+          emailQueued: Boolean(body.sendEmail),
+        },
+      });
+      const updated = await getQuestionnaireInstanceRow(ctx.env, tenantId, id, instanceId);
+      return updated ? json({ data: toQuestionnaireInstance(updated, detail.template.name) }) : json({ error: 'not_found' }, { status: 404 });
+    }
+
+    if (instanceAction === 'export' && ctx.request.method === 'GET') {
+      return json({
+        data: {
+          exportedAt: nowIso(),
+          template: detail.template,
+          instance: toQuestionnaireInstance(row, detail.template.name),
+        },
+      });
+    }
+
+    return methodNotAllowed(['GET', 'PUT', 'POST', 'DELETE']);
   }
 
   if (subresource === 'rules') {

@@ -4,7 +4,18 @@ export type QuestionnaireQuestion = {
   id: string;
   ref: string;
   prompt: string;
-  type: 'single-select' | 'multi-select' | 'text' | 'number' | 'boolean';
+  type:
+    | 'single-select'
+    | 'multi-select'
+    | 'text'
+    | 'number'
+    | 'boolean'
+    | 'date'
+    | 'email'
+    | 'phone'
+    | 'table'
+    | 'instructional'
+    | 'file-upload';
   section: string;
   required: boolean;
   weight: number;
@@ -12,6 +23,9 @@ export type QuestionnaireQuestion = {
   helpText?: string | null;
   requirementRef?: string | null;
   evidenceHint?: string | null;
+  enableUpload?: boolean;
+  maxScore?: number | null;
+  answerScores?: Record<string, number> | null;
 };
 
 export type QuestionnaireRule = {
@@ -52,7 +66,17 @@ export type QuestionnaireTemplateSummary = {
   fileUploadGuidance: string | null;
   exportMode: string | null;
   distributionCadence: string | null;
+  ownerUserId: string | null;
+  ownerName: string | null;
+  profile: string | null;
+  instructions: string | null;
+  allowPublicUrl: boolean;
+  loginRequired: boolean;
+  enableScoring: boolean;
+  enableQuestionAssignment: boolean;
   mappedRequirementCount: number;
+  instanceCount: number;
+  submittedCount: number;
   updatedAt: string;
 };
 
@@ -78,6 +102,14 @@ export type QuestionnaireTemplateDetail = {
   fileUploadGuidance: string | null;
   exportMode: string | null;
   distributionCadence: string | null;
+  ownerUserId: string | null;
+  ownerName: string | null;
+  profile: string | null;
+  instructions: string | null;
+  allowPublicUrl: boolean;
+  loginRequired: boolean;
+  enableScoring: boolean;
+  enableQuestionAssignment: boolean;
   mappedRequirementCount: number;
   updatedAt: string;
   createdAt: string;
@@ -117,4 +149,46 @@ export type QuestionnaireBuilderDetailResponse = {
   template: QuestionnaireTemplateDetail;
   ruleSet: RuleSetDetail;
   testRuns: RuleTestRun[];
+};
+
+export type QuestionnaireInstance = {
+  id: string;
+  questionnaireId: string;
+  templateName: string;
+  title: string;
+  assignmentType: string;
+  assigneeUserId: string | null;
+  assigneeEmail: string | null;
+  reviewerUserId: string | null;
+  parentModule: string | null;
+  parentRecordId: string | null;
+  status: string;
+  dueDate: string | null;
+  accessCode: string;
+  shareToken: string;
+  shareLink: string;
+  loginRequired: boolean;
+  answers: Record<string, unknown>;
+  uploads: Record<string, unknown>;
+  headerValues: Record<string, unknown>;
+  feedback: Record<string, { rating?: string | null; comment?: string | null }>;
+  collaboration: Array<{
+    id: string;
+    authorUserId: string | null;
+    message: string;
+    action: string;
+    createdAt: string;
+    emailQueued?: boolean;
+  }>;
+  recurrence: Record<string, unknown> | null;
+  score: number;
+  maxScore: number;
+  grade: string | null;
+  percentComplete: number;
+  passingStatus: string;
+  submittedAt: string | null;
+  reviewedAt: string | null;
+  archived: boolean;
+  createdAt: string;
+  updatedAt: string;
 };

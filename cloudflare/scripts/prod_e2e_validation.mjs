@@ -811,6 +811,51 @@ function trackReportExport(exportArtifact) {
   });
 }
 
+function trackDashboardBuilderDashboard(dashboard) {
+  return trackArtifact({
+    type: 'dashboard-builder-dashboard',
+    id: dashboard.id,
+    title: dashboard.title,
+    route: '/builders/dashboard-builder',
+    cleanupMethod: 'delete',
+    cleanup: async (context) => {
+      await jsonRequest(context.request, 'DELETE', `/builders/dashboards/${dashboard.id}`, null, { allowStatuses: [404] });
+    },
+  });
+}
+
+function trackQuestionnaireTemplate(template) {
+  return trackArtifact({
+    type: 'questionnaire-builder-template',
+    id: template.id,
+    title: template.name ?? template.title ?? template.id,
+    route: '/builders/questionnaire-builder',
+    cleanupMethod: 'delete',
+    cleanup: async (context) => {
+      await jsonRequest(context.request, 'DELETE', `/builders/questionnaires/${template.id}`, null, { allowStatuses: [404] });
+    },
+  });
+}
+
+function trackQuestionnaireInstance(questionnaireId, instance) {
+  return trackArtifact({
+    type: 'questionnaire-instance',
+    id: instance.id,
+    title: instance.title,
+    route: `/questionnaires/response/${instance.shareToken}`,
+    cleanupMethod: 'delete',
+    cleanup: async (context) => {
+      await jsonRequest(
+        context.request,
+        'DELETE',
+        `/builders/questionnaires/${questionnaireId}/instances/${instance.id}`,
+        null,
+        { allowStatuses: [404] },
+      );
+    },
+  });
+}
+
 async function createModuleRecordFixture(context, entry, folderId) {
   const title = `${MARKER} ${entry.pluralName} fixture`;
   const created = await jsonRequest(context.request, 'POST', `/core/modules/${entry.moduleKey}/records`, {
@@ -1705,6 +1750,544 @@ async function validateWayfinderBuilderWorkflow(context, page) {
   };
 }
 
+async function validateDashboardBuilderWorkflow(context, page) {
+  const listPayload = await jsonRequest(context.request, 'GET', '/builders/dashboards');
+  const seededDashboards = asArray(listPayload?.data?.dashboards);
+  assert(seededDashboards.some((item) => item.title === 'Security Operations Overview'), 'Dashboard Builder missing seeded Security Operations Overview.');
+  assert(seededDashboards.some((item) => item.title === 'Audit Readiness Board'), 'Dashboard Builder missing seeded Audit Readiness Board.');
+
+  const createdPayload = await jsonRequest(
+    context.request,
+    'POST',
+    '/builders/dashboards',
+    {
+      title: `${MARKER} Dashboard Builder`,
+      access: 'Private',
+      groups: ['Regovise E2E Dashboard Group'],
+    },
+    { retries: 3 },
+  );
+  const created = createdPayload?.data;
+  assert(created?.id, 'Dashboard Builder dashboard creation failed.');
+  trackDashboardBuilderDashboard(created);
+
+  const availableItems = asArray(created.availableItems).length > 0
+    ? asArray(created.availableItems)
+    : asArray(listPayload?.data?.availableItems);
+  const widget = availableItems.find((item) => item.type === 'Widget' && item.tab === 'Widgets') ?? availableItems[0];
+  const moduleWidget =
+    availableItems.find((item) => item.tab === 'By Module' && item.templateId !== widget?.templateId) ??
+    availableItems.find((item) => item.templateId !== widget?.templateId);
+  assert(widget?.templateId && moduleWidget?.templateId, 'Dashboard Builder palette did not include enough widgets for layout validation.');
+
+  const leftItem = { ...widget, instanceId: crypto.randomUUID(), column: 'left' };
+  const rightItem = { ...moduleWidget, instanceId: crypto.randomUUID(), column: 'right' };
+  const savedPayload = await jsonRequest(
+    context.request,
+    'PUT',
+    `/builders/dashboards/${created.id}`,
+    {
+      title: `${MARKER} Dashboard Builder Updated`,
+      access: 'Private',
+      groups: ['Regovise E2E Dashboard Group', 'Audit Team'],
+      items: [leftItem, rightItem],
+      layout: {
+        left: [leftItem.instanceId],
+        right: [rightItem.instanceId],
+      },
+    },
+    { retries: 3 },
+  );
+  const saved = savedPayload?.data;
+  assert(saved?.items?.length === 2, 'Dashboard Builder layout did not persist two tiles.');
+  assert(saved.layout?.left?.includes(leftItem.instanceId), 'Dashboard Builder left column layout was not persisted.');
+  assert(saved.layout?.right?.includes(rightItem.instanceId), 'Dashboard Builder right column layout was not persisted.');
+
+  const favoritedPayload = await jsonRequest(context.request, 'POST', `/builders/dashboards/${created.id}/favorite`, {}, { retries: 3 });
+  assert(favoritedPayload?.data?.favorite === true, 'Dashboard Builder favorite action did not persist.');
+  const publishedPayload = await jsonRequest(context.request, 'POST', `/builders/dashboards/${created.id}/publish`, {}, { retries: 3 });
+  assert(publishedPayload?.data?.published === true, 'Dashboard Builder publish action did not persist.');
+
+  const detailPayload = await jsonRequest(context.request, 'GET', `/builders/dashboards/${created.id}`);
+  const detail = detailPayload?.data;
+  assert(detail?.title === `${MARKER} Dashboard Builder Updated`, 'Dashboard Builder detail did not reflect saved title.');
+  assert(detail?.access === 'Private', 'Dashboard Builder detail did not reflect private access level.');
+  assert(asArray(detail?.groups).includes('Audit Team'), 'Dashboard Builder did not persist private group assignments.');
+
+  await page.goto(absoluteUrl('/builders/dashboard-builder'));
+  await waitForSettledPage(page);
+  await page.getByPlaceholder(/Search dashboards/i).fill(MARKER);
+  const dashboardCard = page
+    .locator('aside button')
+    .filter({ hasText: `${MARKER} Dashboard Builder Updated` })
+    .first();
+  await dashboardCard.waitFor({ state: 'visible', timeout: 12000 });
+  await dashboardCard.click();
+  let bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  for (const marker of [
+    'Manage Dashboards',
+    'Select Dashboard',
+    'Create New Dashboard',
+    'Dashboard Summary',
+    'More Actions',
+    'Preview Dashboard',
+    '+ Left',
+    '+ Right',
+  ]) {
+    assert(bodyText.toLowerCase().includes(marker.toLowerCase()), `Dashboard Builder UI did not expose ${marker}.`);
+  }
+
+  await page.getByRole('button', { name: /More Actions/i }).click();
+  bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  for (const marker of ['Edit', 'Preview', 'Favorite', 'Delete']) {
+    assert(bodyText.toLowerCase().includes(marker.toLowerCase()), `Dashboard Builder More Actions menu missing ${marker}.`);
+  }
+  await page.getByRole('button', { name: /^Preview$/i }).click();
+  bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  assert(/publish\s+summary/i.test(bodyText), 'Dashboard Builder preview mode did not expose publish summary.');
+  assert(/live\s+preview\s+tile/i.test(bodyText), 'Dashboard Builder preview mode did not expose live preview tiles.');
+
+  return {
+    dashboardId: created.id,
+    tiles: detail.items.length,
+    published: detail.published,
+    favorite: detail.favorite,
+  };
+}
+
+async function validateQuestionnaireBuilderWorkflow(context, page, tenantContext) {
+  const listPayload = await jsonRequest(context.request, 'GET', '/builders/questionnaires');
+  const seededTemplates = asArray(listPayload?.data?.templates);
+  assert(seededTemplates.some((item) => item.name === 'Third-Party Security Review'), 'Questionnaire Builder missing seeded questionnaire template.');
+  assert(seededTemplates.some((item) => item.name === 'Manual Control Assessment Plan'), 'Questionnaire Builder missing seeded assessment-plan template.');
+
+  const createdPayload = await jsonRequest(
+    context.request,
+    'POST',
+    '/builders/questionnaires',
+    {
+      name: `${MARKER} Questionnaire Builder`,
+      description: `${MARKER} validates questionnaire creation, assignment, response, review, scoring, exports, public access, and cleanup.`,
+      templateKind: 'questionnaire',
+      audience: 'E2E respondents',
+      ownerName: 'Regovise E2E Owner',
+      ownerUserId: tenantContext.user.id,
+      profile: 'E2E Control Profile',
+      instructions: `${MARKER} complete every required prompt and attach evidence references.`,
+      allowPublicUrl: true,
+      loginRequired: false,
+      enableScoring: true,
+      enableQuestionAssignment: true,
+    },
+    { retries: 3 },
+  );
+  const createdDetail = createdPayload?.data;
+  const template = createdDetail?.template;
+  assert(template?.id, 'Questionnaire Builder template creation failed.');
+  trackQuestionnaireTemplate(template);
+
+  const questions = [
+    {
+      id: crypto.randomUUID(),
+      ref: 'RISK_LEVEL',
+      prompt: `${MARKER} What is the questionnaire risk level?`,
+      type: 'single-select',
+      section: 'Risk',
+      required: true,
+      weight: 30,
+      maxScore: 30,
+      options: ['Low', 'Moderate', 'High', 'Critical'],
+      answerScores: { Low: 10, Moderate: 20, High: 30, Critical: 30 },
+      helpText: 'Drives visual rule testing and scoring.',
+      requirementRef: tenantContext.controls[0]?.id ?? 'AC-2',
+      evidenceHint: 'Use seeded control context as a semantic mapping target.',
+    },
+    {
+      id: crypto.randomUUID(),
+      ref: 'HAS_EVIDENCE',
+      prompt: `${MARKER} Has supporting evidence been provided?`,
+      type: 'boolean',
+      section: 'Evidence',
+      required: true,
+      weight: 20,
+      maxScore: 20,
+      enableUpload: true,
+      helpText: 'Requires Manage Uploads support.',
+      requirementRef: null,
+      evidenceHint: 'Attach evidence references or upload notes.',
+    },
+    {
+      id: crypto.randomUUID(),
+      ref: 'REMEDIATION_DATE',
+      prompt: `${MARKER} Target remediation date`,
+      type: 'date',
+      section: 'Schedule',
+      required: true,
+      weight: 10,
+      maxScore: 10,
+      helpText: 'Exercises date style responses and relative reporting fields.',
+      requirementRef: null,
+      evidenceHint: 'Capture follow-up schedule.',
+    },
+    {
+      id: crypto.randomUUID(),
+      ref: 'CONTACT_EMAIL',
+      prompt: `${MARKER} Respondent contact email`,
+      type: 'email',
+      section: 'Respondent',
+      required: true,
+      weight: 10,
+      maxScore: 10,
+      requirementRef: null,
+      evidenceHint: 'Tracks the respondent identity for review.',
+    },
+    {
+      id: crypto.randomUUID(),
+      ref: 'SUPPORTING_FILES',
+      prompt: `${MARKER} Supporting file references`,
+      type: 'file-upload',
+      section: 'Evidence',
+      required: false,
+      weight: 0,
+      maxScore: 0,
+      enableUpload: true,
+      requirementRef: null,
+      evidenceHint: 'Manage Uploads accepts filenames, URLs, or artifact identifiers.',
+    },
+    {
+      id: crypto.randomUUID(),
+      ref: 'REVIEW_GUIDANCE',
+      prompt: `${MARKER} Instructional guidance for reviewers`,
+      type: 'instructional',
+      section: 'Guidance',
+      required: false,
+      weight: 0,
+      maxScore: 0,
+      requirementRef: null,
+      evidenceHint: 'Display-only guidance should not count against completion.',
+    },
+  ];
+
+  const savedPayload = await jsonRequest(
+    context.request,
+    'PUT',
+    `/builders/questionnaires/${template.id}`,
+    {
+      name: `${MARKER} Questionnaire Builder Updated`,
+      description: `${MARKER} updated template with sections, question types, scoring, uploads, and public URL support.`,
+      status: 'active',
+      templateKind: 'questionnaire',
+      audience: 'Internal and external E2E respondents',
+      scoringMode: 'weighted',
+      ownerName: 'Regovise E2E Owner',
+      ownerUserId: tenantContext.user.id,
+      profile: 'E2E Control Profile',
+      instructions: `${MARKER} updated instructions for respondent workflow validation.`,
+      allowPublicUrl: true,
+      loginRequired: false,
+      enableScoring: true,
+      enableQuestionAssignment: true,
+      questions,
+    },
+    { retries: 3 },
+  );
+  const savedTemplate = savedPayload?.data?.template;
+  assert(savedTemplate?.name === `${MARKER} Questionnaire Builder Updated`, 'Questionnaire Builder template update did not persist title.');
+  assert(asArray(savedTemplate.questions).length === questions.length, 'Questionnaire Builder did not persist all custom questions.');
+  assert(savedTemplate.allowPublicUrl === true, 'Questionnaire Builder did not persist self-assignment URL flag.');
+  assert(savedTemplate.enableQuestionAssignment === true, 'Questionnaire Builder did not persist per-question assignment flag.');
+
+  const rules = [
+    {
+      id: crypto.randomUUID(),
+      name: `${MARKER} Show evidence on high risk`,
+      description: 'Show and enable evidence prompts for elevated risk.',
+      logic: 'AND',
+      active: true,
+      conditions: ['Question "RISK_LEVEL" equals "High"'],
+      actions: [
+        'SHOW_QUESTIONS "SUPPORTING_FILES"',
+        'ENABLE_QUESTIONS "SUPPORTING_FILES"',
+        'ADD_TO_SCORE 5',
+        'SET_GRADE "Needs Review"',
+      ],
+    },
+    {
+      id: crypto.randomUUID(),
+      name: `${MARKER} Display score and grade`,
+      description: 'Always expose score/grade display options in the questionnaire runtime.',
+      logic: 'AND',
+      active: true,
+      conditions: ['NO_CONDITION'],
+      actions: ['SET_DISPLAY_OPTIONS "displayscore=true;displaygrade=true"', 'SHOW_QUESTIONS "REVIEW_GUIDANCE"'],
+    },
+  ];
+
+  const savedRulesPayload = await jsonRequest(
+    context.request,
+    'PUT',
+    `/builders/questionnaires/${template.id}/rules`,
+    { name: `${MARKER} Rule Set`, rules },
+    { retries: 3 },
+  );
+  assert(asArray(savedRulesPayload?.data?.rules).length === rules.length, 'Questionnaire Builder rules were not saved.');
+  const validatePayload = await jsonRequest(context.request, 'POST', `/builders/questionnaires/${template.id}/validate`, { questions, rules });
+  assert(
+    asArray(validatePayload?.data?.diagnostics).some((diagnostic) => diagnostic.severity === 'info'),
+    'Questionnaire Builder validation did not return a passing diagnostic.',
+  );
+  const previewPayload = await jsonRequest(context.request, 'POST', `/builders/questionnaires/${template.id}/test-preview`, {
+    scenarioName: `${MARKER} Preview`,
+    draftQuestions: questions,
+    draftRules: rules,
+    answers: { RISK_LEVEL: 'High', HAS_EVIDENCE: true, REMEDIATION_DATE: todayIso(20), CONTACT_EMAIL: 'e2e@example.invalid' },
+  });
+  assert(asArray(previewPayload?.data?.result?.matchedRules).length >= 1, 'Questionnaire Builder preview did not execute visual rules.');
+  const testRunPayload = await jsonRequest(context.request, 'POST', `/builders/questionnaires/${template.id}/test-runs`, {
+    scenarioName: `${MARKER} Persisted Rule Test`,
+    answers: { RISK_LEVEL: 'High', HAS_EVIDENCE: true, REMEDIATION_DATE: todayIso(20), CONTACT_EMAIL: 'e2e@example.invalid' },
+  });
+  assert(testRunPayload?.data?.status === 'completed', 'Questionnaire Builder persisted rule test did not complete.');
+
+  const assignmentTypes = [
+    {
+      assignmentType: 'user',
+      title: `${MARKER} User Assignment`,
+      assigneeUserId: tenantContext.user.id,
+      reviewerUserId: tenantContext.user.id,
+      dueDate: todayIso(14),
+    },
+    {
+      assignmentType: 'email',
+      title: `${MARKER} Email Assignment`,
+      assigneeEmail: `vendor-${RUN_ID}@example.invalid`,
+      reviewerUserId: tenantContext.user.id,
+      dueDate: todayIso(15),
+    },
+    {
+      assignmentType: 'module',
+      title: `${MARKER} Module Assignment`,
+      assigneeUserId: tenantContext.user.id,
+      reviewerUserId: tenantContext.user.id,
+      parentModule: 'assets',
+      parentRecordId: `asset-${RUN_ID}`,
+      dueDate: todayIso(16),
+    },
+    {
+      assignmentType: 'recurring',
+      title: `${MARKER} Recurring Assignment`,
+      assigneeEmail: `recurring-${RUN_ID}@example.invalid`,
+      reviewerUserId: tenantContext.user.id,
+      recurrenceType: 'Monthly',
+      startDate: todayIso(1),
+      endDate: todayIso(31),
+      dueDate: todayIso(17),
+    },
+    {
+      assignmentType: 'bulk',
+      title: `${MARKER} Bulk Assignment`,
+      reviewerUserId: tenantContext.user.id,
+      bulkCsv: `bulk-a-${RUN_ID}@example.invalid\nbulk-b-${RUN_ID}@example.invalid`,
+      dueDate: todayIso(18),
+    },
+    {
+      assignmentType: 'self',
+      title: `${MARKER} Self Assignment`,
+      reviewerUserId: tenantContext.user.id,
+      dueDate: todayIso(19),
+      loginRequired: false,
+    },
+  ];
+
+  const createdInstances = [];
+  for (const assignment of assignmentTypes) {
+    const assignmentPayload = await jsonRequest(
+      context.request,
+      'POST',
+      `/builders/questionnaires/${template.id}/assignments`,
+      assignment,
+      { retries: 3 },
+    );
+    const instances = asArray(assignmentPayload?.data?.instances);
+    assert(instances.length > 0, `Questionnaire ${assignment.assignmentType} assignment did not create instances.`);
+    for (const instance of instances) {
+      trackQuestionnaireInstance(template.id, instance);
+      createdInstances.push(instance);
+    }
+  }
+  assert(createdInstances.length >= 7, 'Questionnaire Builder did not create all assignment styles, including bulk rows.');
+
+  const responseInstance =
+    createdInstances.find((instance) => instance.assignmentType === 'self') ??
+    createdInstances.find((instance) => instance.assignmentType === 'email') ??
+    createdInstances[0];
+  const answers = {
+    RISK_LEVEL: 'High',
+    HAS_EVIDENCE: true,
+    REMEDIATION_DATE: todayIso(20),
+    CONTACT_EMAIL: `respondent-${RUN_ID}@example.invalid`,
+    SUPPORTING_FILES: `${MARKER} evidence-index.txt`,
+  };
+  const uploads = {
+    HAS_EVIDENCE: `${MARKER} SOC2-report.pdf`,
+    SUPPORTING_FILES: `${MARKER} policy-evidence.zip`,
+  };
+  const savedResponsePayload = await jsonRequest(
+    context.request,
+    'PUT',
+    `/builders/questionnaires/${template.id}/instances/${responseInstance.id}/responses`,
+    {
+      answers,
+      uploads,
+      headerValues: { projectCode: RUN_ID, department: 'E2E' },
+      comment: `${MARKER} saved by production validation.`,
+    },
+    { retries: 3 },
+  );
+  assert(savedResponsePayload?.data?.percentComplete === 100, 'Questionnaire response did not reach 100% completion.');
+  assert(savedResponsePayload?.data?.passingStatus === 'Passing', 'Questionnaire response did not calculate passing status.');
+
+  const publicShellPayload = await jsonRequest(
+    context.request,
+    'GET',
+    `/builders/questionnaire-access/${responseInstance.shareToken}`,
+  );
+  assert(publicShellPayload?.data?.title?.includes(MARKER), 'Public questionnaire shell did not resolve by share token.');
+  const accessPayload = await jsonRequest(
+    context.request,
+    'POST',
+    `/builders/questionnaire-access/${responseInstance.shareToken}/validate`,
+    { accessCode: responseInstance.accessCode },
+  );
+  assert(accessPayload?.data?.id === responseInstance.id, 'Public questionnaire access-code validation failed.');
+
+  const submittedPayload = await jsonRequest(
+    context.request,
+    'POST',
+    `/builders/questionnaires/${template.id}/instances/${responseInstance.id}/submit`,
+    { reviewerComments: `${MARKER} submitted for review.` },
+    { retries: 3 },
+  );
+  assert(submittedPayload?.data?.status === 'Submitted', 'Questionnaire submit workflow did not move to Submitted.');
+  const rejectedPayload = await jsonRequest(
+    context.request,
+    'POST',
+    `/builders/questionnaires/${template.id}/instances/${responseInstance.id}/reject`,
+    {
+      reviewerComments: `${MARKER} request changes for evidence detail.`,
+      sendEmail: true,
+      feedback: {
+        HAS_EVIDENCE: { rating: 'Partially Acceptable', comment: `${MARKER} add more detail.` },
+      },
+    },
+    { retries: 3 },
+  );
+  assert(rejectedPayload?.data?.status === 'RequestChanges', 'Questionnaire reject workflow did not reopen for changes.');
+  const resavedPayload = await jsonRequest(
+    context.request,
+    'PUT',
+    `/builders/questionnaires/${template.id}/instances/${responseInstance.id}/responses`,
+    {
+      answers: { ...answers, SUPPORTING_FILES: `${MARKER} evidence-index-v2.txt` },
+      uploads,
+      comment: `${MARKER} response updated after request changes.`,
+    },
+    { retries: 3 },
+  );
+  assert(resavedPayload?.data?.answers?.SUPPORTING_FILES?.includes('v2'), 'Questionnaire response changes after rejection were not persisted.');
+  await jsonRequest(
+    context.request,
+    'POST',
+    `/builders/questionnaires/${template.id}/instances/${responseInstance.id}/submit`,
+    { reviewerComments: `${MARKER} resubmitted.` },
+    { retries: 3 },
+  );
+  const acceptedPayload = await jsonRequest(
+    context.request,
+    'POST',
+    `/builders/questionnaires/${template.id}/instances/${responseInstance.id}/accept`,
+    {
+      reviewerComments: `${MARKER} accepted by production validation.`,
+      feedback: {
+        HAS_EVIDENCE: { rating: 'Acceptable', comment: `${MARKER} evidence accepted.` },
+      },
+    },
+    { retries: 3 },
+  );
+  assert(acceptedPayload?.data?.status === 'Accepted', 'Questionnaire accept workflow did not move to Accepted.');
+
+  const instancesPayload = await jsonRequest(context.request, 'GET', `/builders/questionnaires/${template.id}/instances`);
+  assert(asArray(instancesPayload?.data?.instances).length >= createdInstances.length, 'Questionnaire instance listing did not include created assignments.');
+  const templateExport = await jsonRequest(context.request, 'GET', `/builders/questionnaires/${template.id}/export`);
+  assert(templateExport?.data?.template?.id === template.id, 'Questionnaire template export did not include the created template.');
+  const instanceExport = await jsonRequest(context.request, 'GET', `/builders/questionnaires/${template.id}/instances/${responseInstance.id}/export`);
+  assert(instanceExport?.data?.instance?.id === responseInstance.id, 'Questionnaire response export did not include the selected instance.');
+
+  await page.goto(absoluteUrl('/builders/questionnaire-builder'));
+  await waitForSettledPage(page);
+  const createdTemplateCard = page
+    .locator('aside button')
+    .filter({ hasText: `${MARKER} Questionnaire Builder Updated` })
+    .first();
+  await createdTemplateCard.waitFor({ state: 'visible', timeout: 12000 });
+  await createdTemplateCard.click();
+  await page.getByRole('tab', { name: /Overview/i }).click();
+  let bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  for (const marker of [
+    'Questionnaire Builder',
+    'Assignments',
+    'Responses',
+    'Visual Rules Engine',
+    'Scoring System',
+  ]) {
+    assert(bodyText.toLowerCase().includes(marker.toLowerCase()), `Questionnaire Builder UI did not expose ${marker}.`);
+  }
+  await page.getByRole('tab', { name: /^Builder$/i }).click();
+  bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  for (const marker of [
+    'Generate self-assignment URL',
+    'Add Section',
+    'Add Question',
+    'Enable Upload / Manage Uploads',
+  ]) {
+    assert(bodyText.toLowerCase().includes(marker.toLowerCase()), `Questionnaire Builder UI did not expose ${marker}.`);
+  }
+  await page.getByRole('tab', { name: /Assignments/i }).click();
+  bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  for (const marker of ['Assign to User', 'Assign by Email', 'Assign by Module', 'Assign Recurring', 'Bulk Assignment', 'Self-Assignment URL', 'Bulk CSV Emails', 'Import / Export JSON']) {
+    assert(bodyText.toLowerCase().includes(marker.toLowerCase()), `Questionnaire assignment UI missing ${marker}.`);
+  }
+  await page.getByRole('tab', { name: /Responses/i }).click();
+  await page.getByText(responseInstance.title, { exact: false }).first().waitFor({ state: 'visible', timeout: 12000 });
+  await page.getByText(responseInstance.title, { exact: false }).first().click();
+  bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  for (const marker of ['Access Code', 'Manage Uploads', 'Reviewer Feedback', 'Save Progress', 'Submit', 'Send Email & Reject', 'Accept', 'Passing Status']) {
+    assert(bodyText.toLowerCase().includes(marker.toLowerCase()), `Questionnaire response UI missing ${marker}.`);
+  }
+  await page.getByRole('tab', { name: /Visual Rules Engine/i }).click();
+  bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  for (const marker of ['Visual Editor', 'JSON Editor', 'Validate Draft', 'Save Rules', 'Conditions', 'Actions']) {
+    assert(bodyText.toLowerCase().includes(marker.toLowerCase()), `Questionnaire rules UI missing ${marker}.`);
+  }
+  await page.getByRole('tab', { name: /Test Runs/i }).click();
+  bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  for (const marker of ['Run Rule Test', 'Preview Draft', 'Persist Saved Test', 'Execution Log']) {
+    assert(bodyText.toLowerCase().includes(marker.toLowerCase()), `Questionnaire test mode UI missing ${marker}.`);
+  }
+
+  await page.goto(absoluteUrl(`/questionnaires/response/${responseInstance.shareToken}`));
+  await waitForSettledPage(page);
+  bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  assert(/Questionnaire Response|Access Code|Response Progress/i.test(bodyText), 'Public questionnaire response route did not render.');
+
+  return {
+    templateId: template.id,
+    instances: createdInstances.length,
+    completedInstanceId: responseInstance.id,
+    percentComplete: acceptedPayload.data.percentComplete,
+  };
+}
+
 async function validateIamMutation(context, page, tenantContext) {
   const email = `${RUN_ID}@example.invalid`.toLowerCase();
   const userPayload = await jsonRequest(context.request, 'POST', '/iam/users', {
@@ -1860,6 +2443,20 @@ async function verifyNoReportBuilderResidue(context) {
   return { reportResidues: reportResidues.length, exportResidues: exportResidues.length };
 }
 
+async function verifyNoDashboardBuilderResidue(context) {
+  const payload = await jsonRequest(context.request, 'GET', '/builders/dashboards');
+  const residues = asArray(payload?.data?.dashboards).filter((item) => JSON.stringify(item).includes(RUN_ID));
+  assert(residues.length === 0, `Dashboard Builder test-owned dashboards remain: ${JSON.stringify(residues)}`);
+  return { activeResidues: residues.length };
+}
+
+async function verifyNoQuestionnaireBuilderResidue(context) {
+  const payload = await jsonRequest(context.request, 'GET', '/builders/questionnaires');
+  const residues = asArray(payload?.data?.templates).filter((item) => JSON.stringify(item).includes(RUN_ID));
+  assert(residues.length === 0, `Questionnaire Builder test-owned templates remain: ${JSON.stringify(residues)}`);
+  return { activeResidues: residues.length };
+}
+
 async function cleanupArtifacts(context) {
   for (const artifact of cleanupStack.reverse()) {
     const startedAt = new Date().toISOString();
@@ -1964,6 +2561,8 @@ async function main() {
       await runCheck(seededData, 'report builder semantic workflow', () => validateReportBuilderWorkflow(context, page));
       await runCheck(seededData, 'export builder semantic workflow', () => validateExportBuilderWorkflow(context, page));
       await runCheck(seededData, 'wayfinder builder semantic workflow', () => validateWayfinderBuilderWorkflow(context, page));
+      await runCheck(seededData, 'dashboard builder semantic workflow', () => validateDashboardBuilderWorkflow(context, page));
+      await runCheck(seededData, 'questionnaire builder semantic workflow', () => validateQuestionnaireBuilderWorkflow(context, page, tenantContext));
     } else {
       report.skips.push({
         suite: 'seeded data and module directory',
@@ -2015,6 +2614,8 @@ async function main() {
       await runCheck(cleanupSuite, 'verify no Export Builder residue', () => verifyNoExportBuilderResidue(context));
       await runCheck(cleanupSuite, 'verify no Wayfinder Builder residue', () => verifyNoWayfinderResidue(context));
       await runCheck(cleanupSuite, 'verify no Report Builder residue', () => verifyNoReportBuilderResidue(context));
+      await runCheck(cleanupSuite, 'verify no Dashboard Builder residue', () => verifyNoDashboardBuilderResidue(context));
+      await runCheck(cleanupSuite, 'verify no Questionnaire Builder residue', () => verifyNoQuestionnaireBuilderResidue(context));
     } else {
       report.skips.push({
         suite: 'cleanup verification',

@@ -81,6 +81,8 @@ export function DashboardBuilderWorkspace() {
   const [search, setSearch] = useState('');
   const [paletteSearch, setPaletteSearch] = useState('');
   const [paletteTab, setPaletteTab] = useState<PaletteTab>('Widgets');
+  const [previewMode, setPreviewMode] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newAccess, setNewAccess] = useState<DashboardAccess>('Public');
   const [newGroups, setNewGroups] = useState('');
@@ -334,7 +336,7 @@ export function DashboardBuilderWorkspace() {
     setDraft((current) => (current ? normalizeDraft({ ...current, ...patch }) : current));
   }
 
-  function addPaletteItem(item: DashboardTemplateItem) {
+  function addPaletteItem(item: DashboardTemplateItem, column: 'left' | 'right' = item.defaultColumn) {
     setDraft((current) => {
       if (!current) {
         return current;
@@ -343,14 +345,14 @@ export function DashboardBuilderWorkspace() {
       const added: DashboardLayoutItem = {
         ...item,
         instanceId,
-        column: item.defaultColumn,
+        column,
       };
       return normalizeDraft({
         ...current,
         items: [...current.items, added],
         layout: {
           ...current.layout,
-          [item.defaultColumn]: [...current.layout[item.defaultColumn], instanceId],
+          [column]: [...current.layout[column], instanceId],
         },
       });
     });
@@ -442,6 +444,9 @@ export function DashboardBuilderWorkspace() {
               <LayoutDashboard className="mr-2 h-4 w-4" />
               {busyAction === 'publish' ? 'Publishing...' : draft?.published ? 'Published' : 'Publish'}
             </button>
+            <button className="button-secondary" onClick={() => setPreviewMode((current) => !current)} type="button">
+              {previewMode ? 'Edit Layout' : 'Preview Dashboard'}
+            </button>
             <button className="button-primary" disabled={saving} onClick={() => void handleSave()} type="button">
               <Save className="mr-2 h-4 w-4" />
               {saving ? 'Saving...' : 'Save Layout'}
@@ -467,11 +472,25 @@ export function DashboardBuilderWorkspace() {
         <aside className="panel space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <div className="eyebrow">Dashboard Library</div>
+              <div className="eyebrow">Manage Dashboards</div>
               <h2 className="mt-2 text-xl font-semibold text-white">Canvases</h2>
             </div>
             <LayoutDashboard className="h-5 w-5 text-cyan-300" />
           </div>
+          <label className="space-y-2">
+            <span className="label">Select Dashboard</span>
+            <select
+              className="input"
+              value={selectedId ?? ''}
+              onChange={(event) => setSelectedId(event.target.value || null)}
+            >
+              {dashboards.map((dashboard) => (
+                <option key={dashboard.id} value={dashboard.id}>
+                  {dashboard.title}
+                </option>
+              ))}
+            </select>
+          </label>
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-500" />
             <input
@@ -573,11 +592,33 @@ export function DashboardBuilderWorkspace() {
                     <Trash2 className="mr-2 h-4 w-4" />
                     {busyAction === 'delete' ? 'Deleting...' : 'Delete'}
                   </button>
+                  <div className="relative">
+                    <button className="button-secondary" onClick={() => setMenuOpen((current) => !current)} type="button">
+                      More Actions
+                    </button>
+                    {menuOpen ? (
+                      <div className="absolute right-0 z-10 mt-2 w-56 rounded-2xl border border-white/10 bg-slate-950 p-2 shadow-xl">
+                        <button className="w-full rounded-xl px-3 py-2 text-left text-sm text-slate-200 hover:bg-white/10" onClick={() => { setPreviewMode(false); setMenuOpen(false); }} type="button">
+                          Edit
+                        </button>
+                        <button className="w-full rounded-xl px-3 py-2 text-left text-sm text-slate-200 hover:bg-white/10" onClick={() => { setPreviewMode(true); setMenuOpen(false); }} type="button">
+                          Preview
+                        </button>
+                        <button className="w-full rounded-xl px-3 py-2 text-left text-sm text-slate-200 hover:bg-white/10" onClick={() => { setMenuOpen(false); void handleFavorite(); }} type="button">
+                          {draft.favorite ? 'Remove Favorite' : 'Favorite'}
+                        </button>
+                        <button className="w-full rounded-xl px-3 py-2 text-left text-sm text-rose-200 hover:bg-rose-500/10" onClick={() => { setMenuOpen(false); void handleDelete(); }} type="button">
+                          Delete
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
               </div>
 
               <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]">
                 <div className="space-y-6">
+                  {!previewMode ? (
                   <div className="panel-subtle">
                     <div className="eyebrow">Settings</div>
                     <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -618,13 +659,16 @@ export function DashboardBuilderWorkspace() {
                       </label>
                     </div>
                   </div>
+                  ) : null}
 
                   <div className="panel-subtle">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <div className="eyebrow">Canvas</div>
+                        <div className="eyebrow">{previewMode ? 'Preview' : 'Canvas'}</div>
                         <p className="mt-2 text-sm text-slate-400">
-                          Arrange tiles across left and right columns. Items can be moved between columns and reordered before saving.
+                          {previewMode
+                            ? 'Preview how this dashboard will display once published or selected by an operator.'
+                            : 'Arrange tiles across left and right columns. Items can be moved between columns and reordered before saving.'}
                         </p>
                       </div>
                       <span className="badge-neutral">{draft.items.length} active tiles</span>
@@ -646,6 +690,7 @@ export function DashboardBuilderWorkspace() {
                                     <div className="mt-2 text-sm text-slate-400">{item.description}</div>
                                   </div>
                                 </div>
+                                {!previewMode ? (
                                 <div className="mt-4 flex flex-wrap gap-2">
                                   <button className="button-secondary" onClick={() => moveItem(item.instanceId, 'up')} type="button">
                                     <ArrowUp className="mr-2 h-4 w-4" />
@@ -664,6 +709,11 @@ export function DashboardBuilderWorkspace() {
                                     Remove
                                   </button>
                                 </div>
+                                ) : (
+                                  <div className="mt-4 rounded-2xl border border-cyan-300/10 bg-cyan-400/[0.04] p-3 text-sm text-slate-300">
+                                    Live preview tile sourced from {item.sourceLabel}. Report tiles open drill-in data through Report Builder.
+                                  </div>
+                                )}
                               </div>
                             ))}
                             {column.items.length === 0 && (
@@ -678,6 +728,7 @@ export function DashboardBuilderWorkspace() {
                   </div>
                 </div>
 
+                {!previewMode ? (
                 <div className="space-y-6">
                   <div className="panel-subtle">
                     <div className="eyebrow">Palette</div>
@@ -717,16 +768,35 @@ export function DashboardBuilderWorkspace() {
                               <div className="mt-2 text-sm font-medium text-white">{item.title}</div>
                               <div className="mt-2 text-sm text-slate-400">{item.description}</div>
                             </div>
-                            <button className="button-secondary" onClick={() => addPaletteItem(item)} type="button">
-                              <Plus className="mr-2 h-4 w-4" />
-                              Add
-                            </button>
+                            <div className="flex flex-col gap-2">
+                              <button className="button-secondary" onClick={() => addPaletteItem(item, 'left')} type="button">
+                                <Plus className="mr-2 h-4 w-4" />
+                                + Left
+                              </button>
+                              <button className="button-secondary" onClick={() => addPaletteItem(item, 'right')} type="button">
+                                <Plus className="mr-2 h-4 w-4" />
+                                + Right
+                              </button>
+                            </div>
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
                 </div>
+                ) : (
+                  <aside className="panel-subtle">
+                    <div className="eyebrow">Publish Summary</div>
+                    <div className="mt-3 text-lg font-semibold text-white">{draft.title}</div>
+                    <div className="mt-3 space-y-2 text-sm text-slate-300">
+                      <div>Access: {draft.access}</div>
+                      <div>Groups: {draft.groups.length > 0 ? draft.groups.join(', ') : 'All users with access'}</div>
+                      <div>Status: {draft.published ? 'Published' : 'Draft'}</div>
+                      <div>Reports included: {draft.items.filter((item) => item.type === 'Report').length}</div>
+                      <div>Widgets included: {draft.items.filter((item) => item.type === 'Widget').length}</div>
+                    </div>
+                  </aside>
+                )}
               </div>
             </div>
           )}
