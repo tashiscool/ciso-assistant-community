@@ -1470,45 +1470,67 @@ async function listFrameworksInternal(ctx: WorkerRequestContext): Promise<Framew
     `,
   ).all<FrameworkListRow>();
 
-  const scfStatus = await getScfStatus(ctx.env);
+  const [scfStatus, documentCounts, crosswalkCounts] = await Promise.all([
+    getScfStatus(ctx.env),
+    ctx.env.D1_MAIN.prepare(
+      `
+      SELECT framework_id AS label, COUNT(*) AS total_count
+      FROM grc_content_documents
+      GROUP BY framework_id
+      `,
+    ).all<LabelCountRow>(),
+    ctx.env.D1_MAIN.prepare(
+      `
+      SELECT framework_id AS label, COUNT(*) AS total_count
+      FROM grc_scf_crosswalks
+      GROUP BY framework_id
+      `,
+    ).all<LabelCountRow>(),
+  ]);
 
-  return Promise.all(
-    rows.results.map(async (row) => {
-      const documentCount = await ctx.env.D1_MAIN.prepare(
-        `SELECT COUNT(*) AS total_count FROM grc_content_documents WHERE framework_id = ?`,
-      )
-        .bind(row.id)
-        .first<CountRow>();
-
-      const crosswalkReady =
-        Boolean(row.scf_framework_id) && scfStatus.version !== null
-          ? Number(
-              (
-                await ctx.env.D1_MAIN.prepare(
-                  `SELECT COUNT(*) AS total_count FROM grc_scf_crosswalks WHERE framework_id = ?`,
-                )
-                  .bind(row.scf_framework_id)
-                  .first<CountRow>()
-              )?.total_count ?? 0,
-            ) > 0
-          : false;
-
-      return {
-        id: row.id,
-        slug: row.slug,
-        frameworkKey: row.framework_key,
-        name: row.name,
-        description: row.description,
-        version: row.version,
-        category: row.category,
-        tags: asJson<string[]>(row.tags_json, []),
-        scfFrameworkId: row.scf_framework_id,
-        crosswalkReady,
-        documentCount: Number(documentCount?.total_count ?? 0),
-        updatedAt: row.imported_at,
-      };
-    }),
+  const documentCountsByFrameworkId = new Map(
+    documentCounts.results.map((row) => [row.label ?? '', Number(row.total_count ?? 0)]),
   );
+  const crosswalkCountsByScfFrameworkId = new Map(
+    crosswalkCounts.results.map((row) => [row.label ?? '', Number(row.total_count ?? 0)]),
+  );
+
+  return rows.results.map((row) => ({
+    id: row.id,
+    slug: row.slug,
+    frameworkKey: row.framework_key,
+    name: row.name,
+    description: row.description,
+    version: row.version,
+    category: row.category,
+    tags: asJson<string[]>(row.tags_json, []),
+    scfFrameworkId: row.scf_framework_id,
+    crosswalkReady:
+      Boolean(row.scf_framework_id) &&
+      scfStatus.version !== null &&
+      (crosswalkCountsByScfFrameworkId.get(row.scf_framework_id ?? '') ?? 0) > 0,
+    documentCount: documentCountsByFrameworkId.get(row.id) ?? 0,
+    updatedAt: row.imported_at,
+  }));
+}
+
+async function getGrcOverviewCounts(ctx: WorkerRequestContext, tenantId: string) {
+  const row = await ctx.env.D1_MAIN.prepare(
+    `
+    SELECT
+      (SELECT COUNT(*) FROM grc_findings WHERE tenant_id = ?) AS findings,
+      (SELECT COUNT(*) FROM grc_gap_assessments WHERE tenant_id = ?) AS assessments,
+      (SELECT COUNT(*) FROM grc_report_bundles WHERE tenant_id = ?) AS report_bundles
+    `,
+  )
+    .bind(tenantId, tenantId, tenantId)
+    .first<{ findings: number | null; assessments: number | null; report_bundles: number | null }>();
+
+  return {
+    findings: Number(row?.findings ?? 0),
+    assessments: Number(row?.assessments ?? 0),
+    reportBundles: Number(row?.report_bundles ?? 0),
+  };
 }
 
 async function getFrameworkByToken(ctx: WorkerRequestContext, token: string): Promise<FrameworkKnowledgeDetail | null> {
@@ -3257,12 +3279,17 @@ export async function handleGrcRoutes(
   }
 
   if (!resource) {
+    const [frameworks, counts] = await Promise.all([
+      listFrameworksInternal(ctx),
+      getGrcOverviewCounts(ctx, tenantId),
+    ]);
+
     return json({
       data: {
-        frameworks: await listFrameworksInternal(ctx),
-        findings: (await listFindingRows(ctx, tenantId)).findings.length,
-        assessments: (await listAssessmentsInternal(ctx, tenantId)).length,
-        reportBundles: (await listReportBundlesInternal(ctx, tenantId)).length,
+        frameworks,
+        findings: counts.findings,
+        assessments: counts.assessments,
+        reportBundles: counts.reportBundles,
       },
     });
   }

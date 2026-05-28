@@ -37,3 +37,6 @@ cli/db_backup
 /openregscale/
 /vendor/
 /frontend/tests/results-*/
+/.agents/
+/frontend/project.inlang/
+/tools/domain_codegen.js
