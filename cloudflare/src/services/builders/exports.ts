@@ -1423,8 +1423,17 @@ export async function handleExportBuilderRoutes(segments: string[], ctx: WorkerR
       analysis: analyzed.analysis,
       mappings: analyzed.mappings,
     };
+    const existingIndex = subTemplates.findIndex(
+      (template) => template.fileName === nextSubTemplate.fileName || template.title === nextSubTemplate.title,
+    );
+    const nextSubTemplates =
+      existingIndex >= 0
+        ? subTemplates.map((template, index) =>
+            index === existingIndex ? { ...nextSubTemplate, id: template.id, status: 'Ready' } : template,
+          )
+        : [...subTemplates, nextSubTemplate];
     await ctx.env.D1_MAIN.prepare(`UPDATE export_builder_exports SET sub_templates_json = ?, updated_by_user_id = ?, updated_at = ? WHERE tenant_id = ? AND id = ?`)
-      .bind(JSON.stringify([...subTemplates, nextSubTemplate]), userIdOrResponse, nowIso(), tenantId, id)
+      .bind(JSON.stringify(nextSubTemplates), userIdOrResponse, nowIso(), tenantId, id)
       .run();
     const updated = await getExportRow(ctx.env, tenantId, id);
     return updated ? json({ data: await toDetail(ctx.env, tenantId, updated) }, { status: 201 }) : json({ error: 'not_found' }, { status: 404 });

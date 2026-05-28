@@ -1158,6 +1158,7 @@ async function validateExportBuilderWorkflow(context, page) {
       fileName: `${slug(RUN_ID)}-export-builder.docx`,
       content: templateContent,
     },
+    { retries: 3 },
   );
   const analyzed = analyzedPayload?.data;
   assert(analyzed?.templateAnalysis?.tagsFound >= 9, 'Template analysis did not extract DOCX placeholders.');
@@ -1165,7 +1166,7 @@ async function validateExportBuilderWorkflow(context, page) {
 
   const remappedPayload = await jsonRequest(context.request, 'POST', `/builders/exports/${created.id}/auto-map`, {
     mappings: analyzed.mappings,
-  });
+  }, { retries: 3 });
   const remapped = remappedPayload?.data;
   const mappings = asArray(remapped?.mappings).map((mapping) => {
     const tag = String(mapping.tag).toLowerCase();
@@ -1205,7 +1206,7 @@ async function validateExportBuilderWorkflow(context, page) {
     filterRows,
     filterExpression: '1 AND (2 OR 3)',
     subTemplates: [],
-  });
+  }, { retries: 3 });
   const saved = savedPayload?.data;
   assert(saved?.filterExpression === '1 AND (2 OR 3)', 'Export Builder did not persist advanced filter logic.');
 
@@ -1213,7 +1214,7 @@ async function validateExportBuilderWorkflow(context, page) {
     title: `${MARKER} Appendix`,
     fileName: `${slug(RUN_ID)}-appendix.docx`,
     content: 'Appendix {{control_id}} {{control_title}} {{component.controlImplementation.status}}',
-  });
+  }, { retries: 3 });
   const withSubTemplate = subTemplatePayload?.data;
   assert(asArray(withSubTemplate?.subTemplates).length === 1, 'DOCX sub-template was not created.');
   assert(
@@ -1225,7 +1226,7 @@ async function validateExportBuilderWorkflow(context, page) {
     mappings: withSubTemplate.mappings,
     filterRows,
     filterExpression: '1 AND (2 OR 3)',
-  });
+  }, { retries: 3 });
   assert(importedPayload?.data?.templateAnalysis?.mappedTags >= 1, 'Import Field Mappings did not validate compatible mappings.');
 
   const testPayload = await jsonRequest(context.request, 'POST', `/builders/exports/${created.id}/test`, {
