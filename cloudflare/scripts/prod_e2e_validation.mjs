@@ -1275,8 +1275,8 @@ async function validateExportBuilderWorkflow(context, page) {
   }
   await page.getByRole('tab', { name: /Preview/i }).click();
   bodyText = await page.locator('body').innerText({ timeout: 12000 });
-  assert(bodyText.includes('Generation Mode'), 'Export Builder preview did not expose generation diagnostics.');
-  assert(bodyText.includes('Data Sources'), 'Export Builder preview did not expose data-source diagnostics.');
+  assert(/generation\s+mode/i.test(bodyText), 'Export Builder preview did not expose generation diagnostics.');
+  assert(/data\s+sources/i.test(bodyText), 'Export Builder preview did not expose data-source diagnostics.');
 
   await page.goto(absoluteUrl('/builders/export-builder/docx-template'));
   await waitForSettledPage(page);
