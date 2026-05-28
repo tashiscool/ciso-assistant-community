@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { getFormBuilderModule, listFormBuilderModules } from '../builders/formApi';
+import { evaluateFormRuntime, type FormRuntimeResult } from '../builders/formRules';
 import type { FormBuilderDetail, FormField, FormSection } from '../builders/formTypes';
 import type { WorkspaceFolder } from '../iam/types';
 import { ApiClient } from '../../shared/api/client';
@@ -31,8 +32,10 @@ type RenderableField = {
   systemName: string;
   fieldType: string;
   required: boolean;
+  editable: boolean;
   helpText?: string | null;
   choices: string[];
+  errors: string[];
 };
 
 type RenderableSection = {
@@ -577,15 +580,16 @@ function normalizeText(value: unknown) {
 function buildRenderableSections(
   entry: ModuleCatalogEntry | null,
   schema: FormBuilderDetail | null,
+  runtime: FormRuntimeResult | null = null,
 ): RenderableSection[] {
   if (schema) {
     return schema.sections
-      .filter((section) => section.active)
+      .filter((section) => section.active && (runtime?.sections[section.id]?.visible ?? runtime?.sections[section.displayName]?.visible ?? true))
       .map((section) => ({
         id: section.id,
         displayName: section.displayName,
         fields: section.fields
-          .filter((field) => field.active && field.editable)
+          .filter((field) => field.active && (runtime?.fields[field.systemName]?.visible ?? true))
           .filter(
             (field) =>
               field.fieldType !== 'Label' &&
@@ -598,9 +602,11 @@ function buildRenderableSections(
             displayName: field.displayName,
             systemName: field.systemName,
             fieldType: field.fieldType,
-            required: field.required,
+            required: runtime?.fields[field.systemName]?.required ?? field.required,
+            editable: runtime?.fields[field.systemName]?.editable ?? field.editable,
             helpText: field.helpText ?? null,
             choices: field.choices.filter((choice) => choice.active).map((choice) => choice.value || choice.label),
+            errors: runtime?.fields[field.systemName]?.errors ?? [],
           })),
       }))
       .filter((section) => section.fields.length > 0);
@@ -621,8 +627,10 @@ function buildRenderableSections(
         systemName: field.systemName,
         fieldType: field.fieldType,
         required: Boolean(field.required),
+        editable: true,
         helpText: field.helpText ?? null,
         choices: field.choices ?? [],
+        errors: [],
       })),
     },
   ];
@@ -633,11 +641,11 @@ function isTextAreaField(field: RenderableField) {
 }
 
 function isSelectField(field: RenderableField) {
-  return field.fieldType === 'Select';
+  return field.fieldType === 'Select' || field.choices.length > 0;
 }
 
 function isDateField(field: RenderableField) {
-  return field.fieldType === 'Date' || field.fieldType === 'Date Time Hour';
+  return field.fieldType === 'Date' || field.fieldType === 'Date Time Hour' || field.fieldType === 'Date Label';
 }
 
 function isNumericField(field: RenderableField) {
@@ -645,6 +653,7 @@ function isNumericField(field: RenderableField) {
     field.fieldType === 'Whole Number' ||
     field.fieldType === 'Number' ||
     field.fieldType === 'Dollar' ||
+    field.fieldType === 'Currency Label' ||
     field.fieldType === 'Range' ||
     field.fieldType === 'Risk Probability' ||
     field.fieldType === 'Risk Consequence'
@@ -3586,7 +3595,7 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
   });
   const [draft, setDraft] = useState<ModuleDraft | null>(null);
 
-  const renderableSections = useMemo(
+  const baseRenderableSections = useMemo(
     () => buildRenderableSections(moduleEntry, schema),
     [moduleEntry, schema],
   );
@@ -3597,6 +3606,20 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
   const selectedRecord = useMemo(
     () => records.find((record) => record.id === selectedRecordId) ?? null,
     [records, selectedRecordId],
+  );
+  const activeRuntimeData = draft?.data ?? selectedRecord?.data ?? {};
+  const formRuntime = useMemo(
+    () =>
+      evaluateFormRuntime(schema, activeRuntimeData, {
+        isNewRecord: isCreating || !selectedRecord,
+        enabledModules: moduleEntry ? [moduleEntry.moduleKey, ...moduleEntry.relatedModules] : [],
+      }),
+    [activeRuntimeData, isCreating, moduleEntry, schema, selectedRecord],
+  );
+  const runtimeDataSignature = useMemo(() => JSON.stringify(formRuntime.data), [formRuntime.data]);
+  const renderableSections = useMemo(
+    () => buildRenderableSections(moduleEntry, schema, formRuntime),
+    [formRuntime, moduleEntry, schema],
   );
   const moduleGuidance = moduleEntry ? MODULE_WORKSPACE_GUIDANCE[moduleEntry.moduleKey] ?? null : null;
   const activeRecordData = draft?.data ?? selectedRecord?.data ?? {};
@@ -3682,17 +3705,40 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
 
   useEffect(() => {
     if (isCreating) {
-      setDraft(createBlankDraft(moduleEntry, renderableSections, domainFolders[0]?.id ?? ''));
+      setDraft(createBlankDraft(moduleEntry, baseRenderableSections, domainFolders[0]?.id ?? ''));
       return;
     }
     if (selectedRecord) {
-      setDraft(buildDraftFromRecord(moduleEntry, selectedRecord, renderableSections));
+      setDraft(buildDraftFromRecord(moduleEntry, selectedRecord, baseRenderableSections));
     } else if (moduleEntry) {
-      setDraft(createBlankDraft(moduleEntry, renderableSections, domainFolders[0]?.id ?? ''));
+      setDraft(createBlankDraft(moduleEntry, baseRenderableSections, domainFolders[0]?.id ?? ''));
     } else {
       setDraft(null);
     }
-  }, [isCreating, selectedRecord, moduleEntry, renderableSections, domainFolders]);
+  }, [isCreating, selectedRecord, moduleEntry, baseRenderableSections, domainFolders]);
+
+  useEffect(() => {
+    if (!draft) {
+      return;
+    }
+    setDraft((current) => {
+      if (!current) {
+        return current;
+      }
+      if (JSON.stringify(current.data) === runtimeDataSignature) {
+        return current;
+      }
+      const nextStatus =
+        typeof formRuntime.data.status === 'string' && formRuntime.data.status.trim()
+          ? formRuntime.data.status.trim()
+          : current.status;
+      return {
+        ...current,
+        status: nextStatus,
+        data: formRuntime.data,
+      };
+    });
+  }, [draft, formRuntime.data, runtimeDataSignature]);
 
   async function saveRecord() {
     if (!moduleEntry || !draft) {
@@ -3702,7 +3748,17 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
       setBusy(true);
       setError(null);
       setNotice(null);
-      const payload = buildPayloadFromDraft(draft);
+      if (formRuntime.errors.length > 0) {
+        throw new Error(`Resolve Form Builder validation before saving: ${formRuntime.errors[0].message}`);
+      }
+      const payload = buildPayloadFromDraft({
+        ...draft,
+        status:
+          typeof formRuntime.data.status === 'string' && formRuntime.data.status.trim()
+            ? formRuntime.data.status.trim()
+            : draft.status,
+        data: formRuntime.data,
+      });
       if (!payload.folderId) {
         throw new Error('Select a domain before saving this record.');
       }
@@ -3997,6 +4053,11 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                 </button>
               </div>
             </div>
+            {formRuntime.errors.length > 0 ? (
+              <div className="notice-error mt-4">
+                {formRuntime.errors.length} Form Builder validation issue{formRuntime.errors.length === 1 ? '' : 's'} must be resolved before saving.
+              </div>
+            ) : null}
 
             {draft ? (
               <div className="mt-5 space-y-6">
@@ -4045,6 +4106,7 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                           {isSelectField(field) ? (
                             <select
                               className="input"
+                              disabled={!field.editable}
                               onChange={(event) =>
                                 setDraft((current) =>
                                   current
@@ -4072,6 +4134,7 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                           ) : isTextAreaField(field) ? (
                             <textarea
                               className="input min-h-[120px]"
+                              disabled={!field.editable}
                               onChange={(event) =>
                                 setDraft((current) =>
                                   current
@@ -4091,6 +4154,7 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                             <label className="mt-3 flex items-center gap-3 text-sm text-slate-300">
                               <input
                                 checked={Boolean(draft.data[field.systemName])}
+                                disabled={!field.editable}
                                 onChange={(event) =>
                                   setDraft((current) =>
                                     current
@@ -4111,6 +4175,7 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                           ) : (
                             <input
                               className="input"
+                              disabled={!field.editable}
                               onChange={(event) =>
                                 setDraft((current) =>
                                   current
@@ -4141,6 +4206,12 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                             />
                           )}
                           {field.helpText ? <div className="text-xs text-slate-500">{field.helpText}</div> : null}
+                          {!field.editable ? <div className="text-xs text-slate-500">Read-only by Form Builder rule.</div> : null}
+                          {field.errors.map((message) => (
+                            <div className="text-xs text-rose-200" key={`${field.systemName}-${message}`}>
+                              {message}
+                            </div>
+                          ))}
                         </label>
                       ))}
                     </div>

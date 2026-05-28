@@ -45,9 +45,11 @@ type FormField = {
     | 'Number'
     | 'Whole Number'
     | 'Dollar'
+    | 'Currency Label'
     | 'Range'
     | 'Date'
     | 'Date Time Hour'
+    | 'Date Label'
     | 'Select'
     | 'Users'
     | 'Organizations'
@@ -119,6 +121,7 @@ type FormRuleAction = {
 type FormRule = {
   id: string;
   name: string;
+  active?: boolean;
   logic: 'AND' | 'OR';
   conditions: FormRuleCondition[];
   actions: FormRuleAction[];
@@ -9571,6 +9574,76 @@ function mergeSeedRules(existingRules: FormRule[], seedRules: FormRule[]): FormR
   return merged;
 }
 
+function cloneSectionsWithFreshIds(sections: FormSection[]): FormSection[] {
+  return sections.map((section) => {
+    const nextSection = cloneSection(section);
+    nextSection.fields = section.fields.map((field) => cloneField(field, nextSection.id));
+    return nextSection;
+  });
+}
+
+function collectNonSeedFields(currentSections: FormSection[], seedSections: FormSection[]): FormField[] {
+  const seedFieldNames = new Set(seedSections.flatMap((section) => section.fields.map((field) => field.systemName)));
+  return currentSections.flatMap((section) =>
+    section.fields.filter((field) => !seedFieldNames.has(field.systemName) && field.lockedType === false),
+  );
+}
+
+function resetSectionsPreservingCustomFields(currentSections: FormSection[], seedSections: FormSection[]): FormSection[] {
+  const resetSections = cloneSectionsWithFreshIds(seedSections);
+  const customFields = collectNonSeedFields(currentSections, seedSections);
+  if (customFields.length === 0) {
+    return resetSections;
+  }
+
+  const preservedSection = sectionWithFields('Preserved Custom Fields', {
+    isDefault: false,
+    isSystem: false,
+  });
+  preservedSection.active = false;
+  preservedSection.fields = customFields.map((field) => ({
+    ...cloneField(field, preservedSection.id),
+    active: false,
+    required: false,
+    editable: true,
+    lockedType: false,
+  }));
+  return [...resetSections, preservedSection];
+}
+
+function mergeImportedSections(currentSections: FormSection[], importedSections: FormSection[]): FormSection[] {
+  const nextSections = cloneSectionsWithFreshIds(importedSections);
+  const importedFieldNames = new Set(nextSections.flatMap((section) => section.fields.map((field) => field.systemName)));
+  const localFields = currentSections.flatMap((section) =>
+    section.fields.filter((field) => field.lockedType === false && !importedFieldNames.has(field.systemName)),
+  );
+
+  if (localFields.length === 0) {
+    return nextSections;
+  }
+
+  const localSection = sectionWithFields('Local Custom Fields', {
+    isDefault: false,
+    isSystem: false,
+  });
+  localSection.fields = localFields.map((field) => ({
+    ...cloneField(field, localSection.id),
+    lockedType: false,
+  }));
+  return [...nextSections, localSection];
+}
+
+function mergeImportedRules(currentRules: FormRule[], importedRules: FormRule[]): FormRule[] {
+  return [
+    ...currentRules.map((rule) => ({
+      ...rule,
+      conditions: rule.conditions.map((condition) => ({ ...condition })),
+      actions: rule.actions.map((action) => ({ ...action })),
+    })),
+    ...importedRules.map(cloneRule),
+  ];
+}
+
 function countFields(sections: FormSection[]) {
   return sections.reduce((total, section) => total + section.fields.length, 0);
 }
@@ -9580,6 +9653,14 @@ function buildFormDiagnostics(sections: FormSection[], rules: FormRule[]): FormB
   const fieldNames = new Set<string>();
   const sectionIds = new Set(sections.map((section) => section.id));
   const fieldSystemNames = new Set<string>();
+
+  if (sections.length === 0) {
+    diagnostics.push({
+      id: 'sections-required',
+      severity: 'error',
+      message: 'A module configuration must include at least one section.',
+    });
+  }
 
   for (const section of sections) {
     if (!section.displayName.trim()) {
@@ -9929,6 +10010,17 @@ export async function handleFormBuilderRoutes(
       const body = await readJson<SaveFormModuleInput>(ctx.request);
       const sections = body.sections ?? asJson<FormSection[]>(current.sections_json, []);
       const rules = body.rules ?? asJson<FormRule[]>(current.rules_json, []);
+      const diagnostics = buildFormDiagnostics(sections, rules);
+      if (diagnostics.some((diagnostic) => diagnostic.severity === 'error')) {
+        return json(
+          {
+            error: 'invalid_form_builder_module',
+            message: 'Form Builder configuration failed validation.',
+            diagnostics,
+          },
+          { status: 400 },
+        );
+      }
 
       await ctx.env.D1_MAIN.prepare(
         `UPDATE form_builder_modules
@@ -9990,8 +10082,10 @@ export async function handleFormBuilderRoutes(
     }
 
     const body = await readJson<SaveFormModuleInput>(ctx.request);
-    const sections = body.sections ?? [];
-    const rules = body.rules ?? [];
+    const currentSections = asJson<FormSection[]>(current.sections_json, []);
+    const currentRules = asJson<FormRule[]>(current.rules_json, []);
+    const sections = mergeImportedSections(currentSections, body.sections ?? []);
+    const rules = mergeImportedRules(currentRules, body.rules ?? []);
     const diagnostics = buildFormDiagnostics(sections, rules);
     if (diagnostics.some((diagnostic) => diagnostic.severity === 'error')) {
       return json(
@@ -10045,7 +10139,9 @@ export async function handleFormBuilderRoutes(
     }
 
     const seed = buildSeedModules().find((module) => module.moduleKey === current.module_key);
-    const sections = seed?.sections ?? [sectionWithFields('General', { isDefault: true, isSystem: false })];
+    const currentSections = asJson<FormSection[]>(current.sections_json, []);
+    const seedSections = seed?.sections ?? [sectionWithFields('General', { isDefault: true, isSystem: false })];
+    const sections = resetSectionsPreservingCustomFields(currentSections, seedSections);
     const rules = seed?.rules ?? [];
 
     await ctx.env.D1_MAIN.prepare(

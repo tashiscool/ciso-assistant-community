@@ -41,9 +41,11 @@ export type FormField = {
     | 'Number'
     | 'Whole Number'
     | 'Dollar'
+    | 'Currency Label'
     | 'Range'
     | 'Date'
     | 'Date Time Hour'
+    | 'Date Label'
     | 'Select'
     | 'Users'
     | 'Organizations'
@@ -115,6 +117,7 @@ export type FormRuleAction = {
 export type FormRule = {
   id: string;
   name: string;
+  active?: boolean;
   logic: 'AND' | 'OR';
   conditions: FormRuleCondition[];
   actions: FormRuleAction[];

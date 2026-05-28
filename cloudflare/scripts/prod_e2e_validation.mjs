@@ -1023,6 +1023,55 @@ async function validateBuilderSurfaces(page, modules) {
     const bodyText = await page.locator('body').innerText({ timeout: 12000 });
     assert(bodyText.includes(check.marker), `${check.path} did not show ${check.marker}.`);
   }
+
+  await page.goto(absoluteUrl('/builders/form-builder'));
+  await waitForSettledPage(page);
+  let builderText = await page.locator('body').innerText({ timeout: 12000 });
+  for (const marker of [
+    'Module Display Settings',
+    'Section Layout',
+    'Field Properties',
+    'Field Type',
+    'Active / Show',
+    'Editable',
+    'Validations',
+    'Factory Reset',
+    'Import',
+    'Export',
+  ]) {
+    assert(builderText.includes(marker), `Form Builder did not expose ${marker}.`);
+  }
+  await page.getByRole('button', { name: /Add Validation/i }).first().click();
+  builderText = await page.locator('body').innerText({ timeout: 12000 });
+  assert(builderText.includes('Constant value'), 'Form Builder validation value source was not visible.');
+  assert(builderText.includes('Field reference'), 'Form Builder validation field-reference source was not visible.');
+
+  await page.goto(absoluteUrl('/builders/rules-builder'));
+  await waitForSettledPage(page);
+  await page.getByRole('button', { name: /Add Rule/i }).click();
+  let rulesText = await page.locator('body').innerText({ timeout: 12000 });
+  for (const marker of [
+    'Rules Builder',
+    'Conditional Logic',
+    'Active',
+    'Conditions',
+    'Actions',
+    'Add Condition',
+    'Add Action',
+    'Select a field',
+    'Constant value',
+    'Field reference',
+  ]) {
+    assert(rulesText.includes(marker), `Rules Builder did not expose ${marker}.`);
+  }
+  const actionTypeSelect = page
+    .locator('select')
+    .filter({ has: page.locator('option[value="SET_VALUE"]') })
+    .last();
+  await actionTypeSelect.selectOption('SET_VALUE');
+  rulesText = await page.locator('body').innerText({ timeout: 12000 });
+  assert(rulesText.includes('Bypass existing value'), 'Rules Builder did not expose SET_VALUE overwrite control.');
+  assert(rulesText.includes('Allow external value'), 'Rules Builder did not expose SET_VALUE external override control.');
 }
 
 async function validateIamMutation(context, page, tenantContext) {

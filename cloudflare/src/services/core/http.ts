@@ -41,8 +41,13 @@ import { json, methodNotAllowed, readJson } from '../../utils/http';
 import {
   findModuleCatalogEntry,
   listScaleModuleCatalogEntries,
+  MODULE_CATALOG,
   type ModuleCatalogEntry,
 } from './moduleRegistry';
+import {
+  evaluateFormRuntime,
+  loadFormRuntimeSchema,
+} from '../builders/formRuntime';
 
 function nowIso() {
   return new Date().toISOString();
@@ -1596,6 +1601,55 @@ function deriveModuleRecordStatus(body: SaveModuleRecordInput): string {
   ];
 
   return candidates.find((value) => typeof value === 'string' && value.trim())?.trim() ?? 'planned';
+}
+
+async function applyFormBuilderRuntimeToModuleRecord(
+  ctx: WorkerRequestContext,
+  entry: ModuleCatalogEntry,
+  body: SaveModuleRecordInput,
+  options: {
+    isNewRecord: boolean;
+    existingData?: Record<string, unknown>;
+  },
+): Promise<SaveModuleRecordInput | Response> {
+  if (!ctx.tenantId) {
+    return body;
+  }
+
+  const schema = await loadFormRuntimeSchema(ctx.env, ctx.tenantId, entry.moduleKey);
+  if (!schema) {
+    return body;
+  }
+
+  const candidateData = {
+    ...(options.existingData ?? {}),
+    ...(body.data ?? {}),
+  };
+  const runtime = evaluateFormRuntime(schema, candidateData, {
+    isNewRecord: options.isNewRecord,
+    enabledModules: MODULE_CATALOG.map((module) => module.moduleKey),
+  });
+
+  if (runtime.errors.length > 0) {
+    return json(
+      {
+        error: 'form_rule_validation_failed',
+        message: 'The record failed Form Builder validation rules.',
+        diagnostics: runtime.errors,
+      },
+      { status: 400 },
+    );
+  }
+
+  const nextStatus = typeof runtime.data.status === 'string' && runtime.data.status.trim()
+    ? runtime.data.status.trim()
+    : body.status;
+
+  return {
+    ...body,
+    status: nextStatus,
+    data: runtime.data,
+  };
 }
 
 const DEMO_LIBRARIES = [
@@ -11231,18 +11285,25 @@ export async function handleCoreRoutes(
           );
         }
 
-        const title = deriveModuleRecordTitle(entry, body);
-        const status = deriveModuleRecordStatus(body);
-        const links = sanitizeModuleLinks(body.links);
+        const runtimeBodyOrResponse = await applyFormBuilderRuntimeToModuleRecord(ctx, entry, body, {
+          isNewRecord: true,
+        });
+        if (runtimeBodyOrResponse instanceof Response) {
+          return runtimeBodyOrResponse;
+        }
+        const runtimeBody = runtimeBodyOrResponse;
+        const title = deriveModuleRecordTitle(entry, runtimeBody);
+        const status = deriveModuleRecordStatus(runtimeBody);
+        const links = sanitizeModuleLinks(runtimeBody.links);
         let activity = appendModuleActivity([], {
           type: 'created',
           message: `Created ${entry.moduleName.toLowerCase()} record.`,
           createdByUserId: ctx.userId,
         });
-        if (body.note?.trim()) {
+        if (runtimeBody.note?.trim()) {
           activity = appendModuleActivity(activity, {
             type: 'note',
-            message: body.note.trim(),
+            message: runtimeBody.note.trim(),
             createdByUserId: ctx.userId,
           });
         }
@@ -11265,14 +11326,14 @@ export async function handleCoreRoutes(
             folderId,
             title,
             status,
-            body.ownerUserId?.trim() || null,
-            body.assigneeUserId?.trim() || null,
-            normalizeOptionalDateString(body.startOn),
-            normalizeOptionalDateString(body.finishOn),
-            normalizeOptionalDateString(body.dueOn),
-            normalizeOptionalDateString(body.reviewOn),
-            normalizeOptionalDateString(body.expiresOn),
-            JSON.stringify(body.data ?? {}),
+            runtimeBody.ownerUserId?.trim() || null,
+            runtimeBody.assigneeUserId?.trim() || null,
+            normalizeOptionalDateString(runtimeBody.startOn),
+            normalizeOptionalDateString(runtimeBody.finishOn),
+            normalizeOptionalDateString(runtimeBody.dueOn),
+            normalizeOptionalDateString(runtimeBody.reviewOn),
+            normalizeOptionalDateString(runtimeBody.expiresOn),
+            JSON.stringify(runtimeBody.data ?? {}),
             JSON.stringify(links),
             JSON.stringify(activity),
             ctx.userId,
@@ -11364,16 +11425,24 @@ export async function handleCoreRoutes(
         );
       }
 
+      const runtimeBodyOrResponse = await applyFormBuilderRuntimeToModuleRecord(ctx, entry, body, {
+        isNewRecord: false,
+        existingData: asJson<Record<string, unknown>>(existing.data_json, {}),
+      });
+      if (runtimeBodyOrResponse instanceof Response) {
+        return runtimeBodyOrResponse;
+      }
+      const runtimeBody = runtimeBodyOrResponse;
       const currentActivity = asJson<ModuleRecordActivity[]>(existing.activity_json, []);
       let nextActivity = appendModuleActivity(currentActivity, {
         type: 'updated',
         message: `Updated ${entry.moduleName.toLowerCase()} record.`,
         createdByUserId: ctx.userId,
       });
-      if (body.note?.trim()) {
+      if (runtimeBody.note?.trim()) {
         nextActivity = appendModuleActivity(nextActivity, {
           type: 'note',
-          message: body.note.trim(),
+          message: runtimeBody.note.trim(),
           createdByUserId: ctx.userId,
         });
       }
@@ -11398,20 +11467,20 @@ export async function handleCoreRoutes(
             updated_at = (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
         WHERE tenant_id = ? AND id = ?
         `,
-      )
+          )
         .bind(
           nextFolderId,
-          deriveModuleRecordTitle(entry, body),
-          deriveModuleRecordStatus(body),
-          body.ownerUserId?.trim() || existing.owner_user_id,
-          body.assigneeUserId?.trim() || existing.assignee_user_id,
-          normalizeOptionalDateString(body.startOn) ?? existing.start_on,
-          normalizeOptionalDateString(body.finishOn) ?? existing.finish_on,
-          normalizeOptionalDateString(body.dueOn) ?? existing.due_on,
-          normalizeOptionalDateString(body.reviewOn) ?? existing.review_on,
-          normalizeOptionalDateString(body.expiresOn) ?? existing.expires_on,
-          JSON.stringify(body.data ?? asJson<Record<string, unknown>>(existing.data_json, {})),
-          JSON.stringify(body.links ? sanitizeModuleLinks(body.links) : asJson<ModuleRecordLink[]>(existing.links_json, [])),
+          deriveModuleRecordTitle(entry, runtimeBody),
+          deriveModuleRecordStatus(runtimeBody),
+          runtimeBody.ownerUserId?.trim() || existing.owner_user_id,
+          runtimeBody.assigneeUserId?.trim() || existing.assignee_user_id,
+          normalizeOptionalDateString(runtimeBody.startOn) ?? existing.start_on,
+          normalizeOptionalDateString(runtimeBody.finishOn) ?? existing.finish_on,
+          normalizeOptionalDateString(runtimeBody.dueOn) ?? existing.due_on,
+          normalizeOptionalDateString(runtimeBody.reviewOn) ?? existing.review_on,
+          normalizeOptionalDateString(runtimeBody.expiresOn) ?? existing.expires_on,
+          JSON.stringify(runtimeBody.data ?? asJson<Record<string, unknown>>(existing.data_json, {})),
+          JSON.stringify(runtimeBody.links ? sanitizeModuleLinks(runtimeBody.links) : asJson<ModuleRecordLink[]>(existing.links_json, [])),
           JSON.stringify(nextActivity),
           ctx.userId,
           ctx.tenantId,

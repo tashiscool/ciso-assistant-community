@@ -60,9 +60,11 @@ const fieldTypes: FormField['fieldType'][] = [
   'Number',
   'Whole Number',
   'Dollar',
+  'Currency Label',
   'Range',
   'Date',
   'Date Time Hour',
+  'Date Label',
   'Select',
   'Users',
   'Organizations',
@@ -212,7 +214,7 @@ function emptyAction(): FormRuleAction {
     actionType: 'SHOW',
     targetType: 'Field',
     target: '',
-    operator: '',
+    operator: 'EQUALS',
     value: '',
     bypassExistingValue: false,
     allowExternalValue: false,
@@ -223,6 +225,7 @@ function emptyRule(): FormRule {
   return {
     id: crypto.randomUUID(),
     name: 'New rule',
+    active: true,
     logic: 'AND',
     conditions: [emptyCondition()],
     actions: [emptyAction()],
@@ -509,8 +512,8 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
     if (!draft) {
       return;
     }
-    const confirmation = window.prompt(`Type "${draft.moduleName}" to confirm factory reset.`);
-    if (confirmation !== draft.moduleName) {
+    const confirmation = window.prompt('Type "RESET" to confirm factory reset. Custom fields are preserved but deactivated.');
+    if (confirmation !== 'RESET') {
       setNotice('Factory reset cancelled.');
       return;
     }
@@ -555,6 +558,37 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
         : current,
     );
   }
+
+  function updateDraftRule(ruleId: string, updater: (rule: FormRule) => FormRule) {
+    setDraft((current) =>
+      current
+        ? {
+            ...current,
+            rules: current.rules.map((rule) => (rule.id === ruleId ? updater(rule) : rule)),
+          }
+        : current,
+    );
+  }
+
+  const fieldOptions = useMemo(
+    () =>
+      draft?.sections.flatMap((section) =>
+        section.fields.map((field) => ({
+          value: field.systemName,
+          label: `${field.displayName} (${field.systemName})`,
+        })),
+      ) ?? [],
+    [draft],
+  );
+
+  const tabOptions = useMemo(
+    () =>
+      draft?.sections.map((section) => ({
+        value: section.displayName,
+        label: section.displayName,
+      })) ?? [],
+    [draft],
+  );
 
   if (loading) {
     return <div className="panel p-6 text-sm text-slate-300">Loading Form Builder...</div>;
@@ -1177,7 +1211,7 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                   onChange={(event) =>
                                     updateDraftField(selectedField.id, (field) => ({
                                       ...field,
-                                      min: Number(event.target.value) || 0,
+                                      min: event.target.value === '' ? null : Number(event.target.value),
                                     }))
                                   }
                                   type="number"
@@ -1191,7 +1225,7 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                   onChange={(event) =>
                                     updateDraftField(selectedField.id, (field) => ({
                                       ...field,
-                                      max: Number(event.target.value) || 0,
+                                      max: event.target.value === '' ? null : Number(event.target.value),
                                     }))
                                   }
                                   type="number"
@@ -1219,33 +1253,95 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                   </button>
                                 </div>
                                 <div className="mt-3 space-y-3">
-                                  {selectedField.choices.map((choice) => (
+                                  {selectedField.choices.map((choice, choiceIndex) => (
                                     <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3" key={choice.id}>
+                                      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                                        <label className="flex items-center gap-2 text-sm text-slate-300">
+                                          <input
+                                            checked={choice.active}
+                                            className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                            onChange={(event) =>
+                                              updateDraftField(selectedField.id, (field) => ({
+                                                ...field,
+                                                choices: field.choices.map((entry) =>
+                                                  entry.id === choice.id ? { ...entry, active: event.target.checked } : entry,
+                                                ),
+                                              }))
+                                            }
+                                            type="checkbox"
+                                          />
+                                          Active
+                                        </label>
+                                        <div className="flex gap-2">
+                                          <button
+                                            className="button-secondary px-3 py-2"
+                                            onClick={() =>
+                                              updateDraftField(selectedField.id, (field) => ({
+                                                ...field,
+                                                choices: reorder(field.choices, choiceIndex, 'up'),
+                                              }))
+                                            }
+                                            type="button"
+                                          >
+                                            <ArrowUp className="h-4 w-4" />
+                                          </button>
+                                          <button
+                                            className="button-secondary px-3 py-2"
+                                            onClick={() =>
+                                              updateDraftField(selectedField.id, (field) => ({
+                                                ...field,
+                                                choices: reorder(field.choices, choiceIndex, 'down'),
+                                              }))
+                                            }
+                                            type="button"
+                                          >
+                                            <ArrowDown className="h-4 w-4" />
+                                          </button>
+                                          <button
+                                            className="button-secondary px-3 py-2 text-rose-200"
+                                            onClick={() =>
+                                              updateDraftField(selectedField.id, (field) => ({
+                                                ...field,
+                                                choices: field.choices.filter((entry) => entry.id !== choice.id),
+                                              }))
+                                            }
+                                            type="button"
+                                          >
+                                            <X className="h-4 w-4" />
+                                          </button>
+                                        </div>
+                                      </div>
                                       <div className="grid gap-3 md:grid-cols-2">
-                                        <input
-                                          className="input"
-                                          onChange={(event) =>
-                                            updateDraftField(selectedField.id, (field) => ({
-                                              ...field,
-                                              choices: field.choices.map((entry) =>
-                                                entry.id === choice.id ? { ...entry, label: event.target.value } : entry,
-                                              ),
-                                            }))
-                                          }
-                                          value={choice.label}
-                                        />
-                                        <input
-                                          className="input"
-                                          onChange={(event) =>
-                                            updateDraftField(selectedField.id, (field) => ({
-                                              ...field,
-                                              choices: field.choices.map((entry) =>
-                                                entry.id === choice.id ? { ...entry, value: event.target.value } : entry,
-                                              ),
-                                            }))
-                                          }
-                                          value={choice.value}
-                                        />
+                                        <label className="space-y-1">
+                                          <span className="label">Label</span>
+                                          <input
+                                            className="input"
+                                            onChange={(event) =>
+                                              updateDraftField(selectedField.id, (field) => ({
+                                                ...field,
+                                                choices: field.choices.map((entry) =>
+                                                  entry.id === choice.id ? { ...entry, label: event.target.value } : entry,
+                                                ),
+                                              }))
+                                            }
+                                            value={choice.label}
+                                          />
+                                        </label>
+                                        <label className="space-y-1">
+                                          <span className="label">Value</span>
+                                          <input
+                                            className="input"
+                                            onChange={(event) =>
+                                              updateDraftField(selectedField.id, (field) => ({
+                                                ...field,
+                                                choices: field.choices.map((entry) =>
+                                                  entry.id === choice.id ? { ...entry, value: event.target.value } : entry,
+                                                ),
+                                              }))
+                                            }
+                                            value={choice.value}
+                                          />
+                                        </label>
                                       </div>
                                     </div>
                                   ))}
@@ -1273,6 +1369,20 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                               <div className="mt-3 space-y-3">
                                 {selectedField.validations.map((validation) => (
                                   <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3" key={validation.id}>
+                                    <div className="mb-3 flex justify-end">
+                                      <button
+                                        className="button-secondary px-3 py-2 text-rose-200"
+                                        onClick={() =>
+                                          updateDraftField(selectedField.id, (field) => ({
+                                            ...field,
+                                            validations: field.validations.filter((entry) => entry.id !== validation.id),
+                                          }))
+                                        }
+                                        type="button"
+                                      >
+                                        <X className="h-4 w-4" />
+                                      </button>
+                                    </div>
                                     <div className="grid gap-3">
                                       <select
                                         className="input"
@@ -1297,19 +1407,58 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                           </option>
                                         ))}
                                       </select>
-                                      <input
+                                      <select
                                         className="input"
                                         onChange={(event) =>
                                           updateDraftField(selectedField.id, (field) => ({
                                             ...field,
                                             validations: field.validations.map((entry) =>
-                                              entry.id === validation.id ? { ...entry, value: event.target.value } : entry,
+                                              entry.id === validation.id
+                                                ? { ...entry, valueSource: event.target.value as FormFieldValidation['valueSource'] }
+                                                : entry,
                                             ),
                                           }))
                                         }
-                                        placeholder="Constant value or field reference"
-                                        value={validation.value}
-                                      />
+                                        value={validation.valueSource}
+                                      >
+                                        <option value="constant">Constant value</option>
+                                        <option value="field">Field reference</option>
+                                      </select>
+                                      {validation.valueSource === 'field' ? (
+                                        <select
+                                          className="input"
+                                          onChange={(event) =>
+                                            updateDraftField(selectedField.id, (field) => ({
+                                              ...field,
+                                              validations: field.validations.map((entry) =>
+                                                entry.id === validation.id ? { ...entry, value: event.target.value } : entry,
+                                              ),
+                                            }))
+                                          }
+                                          value={validation.value}
+                                        >
+                                          <option value="">Select a field</option>
+                                          {fieldOptions.map((option) => (
+                                            <option key={option.value} value={option.value}>
+                                              {option.label}
+                                            </option>
+                                          ))}
+                                        </select>
+                                      ) : (
+                                        <input
+                                          className="input"
+                                          onChange={(event) =>
+                                            updateDraftField(selectedField.id, (field) => ({
+                                              ...field,
+                                              validations: field.validations.map((entry) =>
+                                                entry.id === validation.id ? { ...entry, value: event.target.value } : entry,
+                                              ),
+                                            }))
+                                          }
+                                          placeholder="Constant value, TODAY, NOW, or @field"
+                                          value={validation.value}
+                                        />
+                                      )}
                                       <input
                                         className="input"
                                         onChange={(event) =>
@@ -1406,18 +1555,16 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                         </div>
 
                         <div className="mt-4 grid gap-4">
-                          <div className="grid gap-4 md:grid-cols-2">
+                          <div className="grid gap-4 md:grid-cols-3">
                             <div>
                               <label className="label">Rule Name</label>
                               <input
                                 className="input mt-2"
                                 onChange={(event) =>
-                                  setDraft({
-                                    ...draft,
-                                    rules: draft.rules.map((entry) =>
-                                      entry.id === rule.id ? { ...entry, name: event.target.value } : entry,
-                                    ),
-                                  })
+                                  updateDraftRule(rule.id, (entry) => ({
+                                    ...entry,
+                                    name: event.target.value,
+                                  }))
                                 }
                                 value={rule.name}
                               />
@@ -1427,12 +1574,10 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                               <select
                                 className="input mt-2"
                                 onChange={(event) =>
-                                  setDraft({
-                                    ...draft,
-                                    rules: draft.rules.map((entry) =>
-                                      entry.id === rule.id ? { ...entry, logic: event.target.value as FormRule['logic'] } : entry,
-                                    ),
-                                  })
+                                  updateDraftRule(rule.id, (entry) => ({
+                                    ...entry,
+                                    logic: event.target.value as FormRule['logic'],
+                                  }))
                                 }
                                 value={rule.logic}
                               >
@@ -1440,6 +1585,20 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                 <option value="OR">OR</option>
                               </select>
                             </div>
+                            <label className="flex items-center gap-2 pt-8 text-sm text-slate-300">
+                              <input
+                                checked={rule.active !== false}
+                                className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                onChange={(event) =>
+                                  updateDraftRule(rule.id, (entry) => ({
+                                    ...entry,
+                                    active: event.target.checked,
+                                  }))
+                                }
+                                type="checkbox"
+                              />
+                              Active
+                            </label>
                           </div>
 
                           <div className="grid gap-4 xl:grid-cols-2">
@@ -1449,14 +1608,10 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                 <button
                                   className="button-secondary"
                                   onClick={() =>
-                                    setDraft({
-                                      ...draft,
-                                      rules: draft.rules.map((entry) =>
-                                        entry.id === rule.id
-                                          ? { ...entry, conditions: [...entry.conditions, emptyCondition()] }
-                                          : entry,
-                                      ),
-                                    })
+                                    updateDraftRule(rule.id, (entry) => ({
+                                      ...entry,
+                                      conditions: [...entry.conditions, emptyCondition()],
+                                    }))
                                   }
                                   type="button"
                                 >
@@ -1467,28 +1622,35 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                               <div className="mt-3 space-y-3">
                                 {rule.conditions.map((condition) => (
                                   <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3" key={condition.id}>
+                                    <div className="mb-3 flex justify-end">
+                                      <button
+                                        className="button-secondary px-3 py-2 text-rose-200"
+                                        onClick={() =>
+                                          updateDraftRule(rule.id, (entry) => ({
+                                            ...entry,
+                                            conditions: entry.conditions.filter((item) => item.id !== condition.id),
+                                          }))
+                                        }
+                                        type="button"
+                                      >
+                                        <X className="h-4 w-4" />
+                                      </button>
+                                    </div>
                                     <div className="grid gap-3">
                                       <select
                                         className="input"
                                         onChange={(event) =>
-                                          setDraft({
-                                            ...draft,
-                                            rules: draft.rules.map((entry) =>
-                                              entry.id === rule.id
+                                          updateDraftRule(rule.id, (entry) => ({
+                                            ...entry,
+                                            conditions: entry.conditions.map((item) =>
+                                              item.id === condition.id
                                                 ? {
-                                                    ...entry,
-                                                    conditions: entry.conditions.map((item) =>
-                                                      item.id === condition.id
-                                                        ? {
-                                                            ...item,
-                                                            conditionType: event.target.value as FormRuleCondition['conditionType'],
-                                                          }
-                                                        : item,
-                                                    ),
+                                                    ...item,
+                                                    conditionType: event.target.value as FormRuleCondition['conditionType'],
                                                   }
-                                                : entry,
+                                                : item,
                                             ),
-                                          })
+                                          }))
                                         }
                                         value={condition.conditionType}
                                       >
@@ -1498,44 +1660,55 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                           </option>
                                         ))}
                                       </select>
-                                      <input
-                                        className="input"
-                                        onChange={(event) =>
-                                          setDraft({
-                                            ...draft,
-                                            rules: draft.rules.map((entry) =>
-                                              entry.id === rule.id
-                                                ? {
-                                                    ...entry,
-                                                    conditions: entry.conditions.map((item) =>
-                                                      item.id === condition.id ? { ...item, target: event.target.value } : item,
-                                                    ),
-                                                  }
-                                                : entry,
-                                            ),
-                                          })
-                                        }
-                                        placeholder="Field, feature, or module target"
-                                        value={condition.target}
-                                      />
+                                      {condition.conditionType === 'Field' ? (
+                                        <select
+                                          className="input"
+                                          onChange={(event) =>
+                                            updateDraftRule(rule.id, (entry) => ({
+                                              ...entry,
+                                              conditions: entry.conditions.map((item) =>
+                                                item.id === condition.id ? { ...item, target: event.target.value } : item,
+                                              ),
+                                            }))
+                                          }
+                                          value={condition.target}
+                                        >
+                                          <option value="">Select a field</option>
+                                          {fieldOptions.map((option) => (
+                                            <option key={option.value} value={option.value}>
+                                              {option.label}
+                                            </option>
+                                          ))}
+                                        </select>
+                                      ) : condition.conditionType === 'System - NO_PARENT' ||
+                                        condition.conditionType === 'System - NO_CONDITION' ? (
+                                        <input className="input" disabled value="System condition" />
+                                      ) : (
+                                        <input
+                                          className="input"
+                                          onChange={(event) =>
+                                            updateDraftRule(rule.id, (entry) => ({
+                                              ...entry,
+                                              conditions: entry.conditions.map((item) =>
+                                                item.id === condition.id ? { ...item, target: event.target.value } : item,
+                                              ),
+                                            }))
+                                          }
+                                          placeholder="Feature or module key"
+                                          value={condition.target}
+                                        />
+                                      )}
                                       <select
                                         className="input"
                                         onChange={(event) =>
-                                          setDraft({
-                                            ...draft,
-                                            rules: draft.rules.map((entry) =>
-                                              entry.id === rule.id
-                                                ? {
-                                                    ...entry,
-                                                    conditions: entry.conditions.map((item) =>
-                                                      item.id === condition.id
-                                                        ? { ...item, operator: event.target.value as FormRuleCondition['operator'] }
-                                                        : item,
-                                                    ),
-                                                  }
-                                                : entry,
+                                          updateDraftRule(rule.id, (entry) => ({
+                                            ...entry,
+                                            conditions: entry.conditions.map((item) =>
+                                              item.id === condition.id
+                                                ? { ...item, operator: event.target.value as FormRuleCondition['operator'] }
+                                                : item,
                                             ),
-                                          })
+                                          }))
                                         }
                                         value={condition.operator}
                                       >
@@ -1545,26 +1718,58 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                           </option>
                                         ))}
                                       </select>
-                                      <input
+                                      <select
                                         className="input"
                                         onChange={(event) =>
-                                          setDraft({
-                                            ...draft,
-                                            rules: draft.rules.map((entry) =>
-                                              entry.id === rule.id
-                                                ? {
-                                                    ...entry,
-                                                    conditions: entry.conditions.map((item) =>
-                                                      item.id === condition.id ? { ...item, value: event.target.value } : item,
-                                                    ),
-                                                  }
-                                                : entry,
+                                          updateDraftRule(rule.id, (entry) => ({
+                                            ...entry,
+                                            conditions: entry.conditions.map((item) =>
+                                              item.id === condition.id
+                                                ? { ...item, valueSource: event.target.value as FormRuleCondition['valueSource'] }
+                                                : item,
                                             ),
-                                          })
+                                          }))
                                         }
-                                        placeholder="Constant value or @FieldName"
-                                        value={condition.value}
-                                      />
+                                        value={condition.valueSource}
+                                      >
+                                        <option value="constant">Constant value</option>
+                                        <option value="field">Field reference</option>
+                                      </select>
+                                      {condition.valueSource === 'field' ? (
+                                        <select
+                                          className="input"
+                                          onChange={(event) =>
+                                            updateDraftRule(rule.id, (entry) => ({
+                                              ...entry,
+                                              conditions: entry.conditions.map((item) =>
+                                                item.id === condition.id ? { ...item, value: event.target.value } : item,
+                                              ),
+                                            }))
+                                          }
+                                          value={condition.value}
+                                        >
+                                          <option value="">Select comparison field</option>
+                                          {fieldOptions.map((option) => (
+                                            <option key={option.value} value={option.value}>
+                                              {option.label}
+                                            </option>
+                                          ))}
+                                        </select>
+                                      ) : (
+                                        <input
+                                          className="input"
+                                          onChange={(event) =>
+                                            updateDraftRule(rule.id, (entry) => ({
+                                              ...entry,
+                                              conditions: entry.conditions.map((item) =>
+                                                item.id === condition.id ? { ...item, value: event.target.value } : item,
+                                              ),
+                                            }))
+                                          }
+                                          placeholder="Constant value, TODAY, NOW, or @field"
+                                          value={condition.value}
+                                        />
+                                      )}
                                     </div>
                                   </div>
                                 ))}
@@ -1577,12 +1782,10 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                 <button
                                   className="button-secondary"
                                   onClick={() =>
-                                    setDraft({
-                                      ...draft,
-                                      rules: draft.rules.map((entry) =>
-                                        entry.id === rule.id ? { ...entry, actions: [...entry.actions, emptyAction()] } : entry,
-                                      ),
-                                    })
+                                    updateDraftRule(rule.id, (entry) => ({
+                                      ...entry,
+                                      actions: [...entry.actions, emptyAction()],
+                                    }))
                                   }
                                   type="button"
                                 >
@@ -1593,25 +1796,32 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                               <div className="mt-3 space-y-3">
                                 {rule.actions.map((action) => (
                                   <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3" key={action.id}>
+                                    <div className="mb-3 flex justify-end">
+                                      <button
+                                        className="button-secondary px-3 py-2 text-rose-200"
+                                        onClick={() =>
+                                          updateDraftRule(rule.id, (entry) => ({
+                                            ...entry,
+                                            actions: entry.actions.filter((item) => item.id !== action.id),
+                                          }))
+                                        }
+                                        type="button"
+                                      >
+                                        <X className="h-4 w-4" />
+                                      </button>
+                                    </div>
                                     <div className="grid gap-3">
                                       <select
                                         className="input"
                                         onChange={(event) =>
-                                          setDraft({
-                                            ...draft,
-                                            rules: draft.rules.map((entry) =>
-                                              entry.id === rule.id
-                                                ? {
-                                                    ...entry,
-                                                    actions: entry.actions.map((item) =>
-                                                      item.id === action.id
-                                                        ? { ...item, actionType: event.target.value as FormRuleAction['actionType'] }
-                                                        : item,
-                                                    ),
-                                                  }
-                                                : entry,
+                                          updateDraftRule(rule.id, (entry) => ({
+                                            ...entry,
+                                            actions: entry.actions.map((item) =>
+                                              item.id === action.id
+                                                ? { ...item, actionType: event.target.value as FormRuleAction['actionType'] }
+                                                : item,
                                             ),
-                                          })
+                                          }))
                                         }
                                         value={action.actionType}
                                       >
@@ -1624,67 +1834,112 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                       <select
                                         className="input"
                                         onChange={(event) =>
-                                          setDraft({
-                                            ...draft,
-                                            rules: draft.rules.map((entry) =>
-                                              entry.id === rule.id
-                                                ? {
-                                                    ...entry,
-                                                    actions: entry.actions.map((item) =>
-                                                      item.id === action.id
-                                                        ? { ...item, targetType: event.target.value as FormRuleAction['targetType'] }
-                                                        : item,
-                                                    ),
-                                                  }
-                                                : entry,
+                                          updateDraftRule(rule.id, (entry) => ({
+                                            ...entry,
+                                            actions: entry.actions.map((item) =>
+                                              item.id === action.id
+                                                ? { ...item, targetType: event.target.value as FormRuleAction['targetType'] }
+                                                : item,
                                             ),
-                                          })
+                                          }))
                                         }
                                         value={action.targetType}
                                       >
                                         <option value="Field">Field</option>
                                         <option value="Tab">Tab</option>
                                       </select>
-                                      <input
+                                      <select
                                         className="input"
                                         onChange={(event) =>
-                                          setDraft({
-                                            ...draft,
-                                            rules: draft.rules.map((entry) =>
-                                              entry.id === rule.id
-                                                ? {
-                                                    ...entry,
-                                                    actions: entry.actions.map((item) =>
-                                                      item.id === action.id ? { ...item, target: event.target.value } : item,
-                                                    ),
-                                                  }
-                                                : entry,
+                                          updateDraftRule(rule.id, (entry) => ({
+                                            ...entry,
+                                            actions: entry.actions.map((item) =>
+                                              item.id === action.id ? { ...item, target: event.target.value } : item,
                                             ),
-                                          })
+                                          }))
                                         }
-                                        placeholder="Field system name or tab name"
                                         value={action.target}
-                                      />
+                                      >
+                                        <option value="">Select a {action.targetType.toLowerCase()}</option>
+                                        {(action.targetType === 'Field' ? fieldOptions : tabOptions).map((option) => (
+                                          <option key={option.value} value={option.value}>
+                                            {option.label}
+                                          </option>
+                                        ))}
+                                      </select>
+                                      {(action.actionType === 'SET_VALUE' || action.actionType === 'VALIDATE') && (
+                                        <select
+                                          className="input"
+                                          onChange={(event) =>
+                                            updateDraftRule(rule.id, (entry) => ({
+                                              ...entry,
+                                              actions: entry.actions.map((item) =>
+                                                item.id === action.id ? { ...item, operator: event.target.value } : item,
+                                              ),
+                                            }))
+                                          }
+                                          value={action.operator || 'EQUALS'}
+                                        >
+                                          {validationOperators.map((operator) => (
+                                            <option key={operator} value={operator}>
+                                              {operator}
+                                            </option>
+                                          ))}
+                                        </select>
+                                      )}
                                       <input
                                         className="input"
                                         onChange={(event) =>
-                                          setDraft({
-                                            ...draft,
-                                            rules: draft.rules.map((entry) =>
-                                              entry.id === rule.id
-                                                ? {
-                                                    ...entry,
-                                                    actions: entry.actions.map((item) =>
-                                                      item.id === action.id ? { ...item, value: event.target.value } : item,
-                                                    ),
-                                                  }
-                                                : entry,
+                                          updateDraftRule(rule.id, (entry) => ({
+                                            ...entry,
+                                            actions: entry.actions.map((item) =>
+                                              item.id === action.id ? { ...item, value: event.target.value } : item,
                                             ),
-                                          })
+                                          }))
                                         }
                                         placeholder="Value, TODAY, NOW, or @FieldName"
                                         value={action.value ?? ''}
                                       />
+                                      {action.actionType === 'SET_VALUE' && (
+                                        <div className="grid gap-3 md:grid-cols-2">
+                                          <label className="flex items-center gap-2 text-sm text-slate-300">
+                                            <input
+                                              checked={Boolean(action.bypassExistingValue)}
+                                              className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                              onChange={(event) =>
+                                                updateDraftRule(rule.id, (entry) => ({
+                                                  ...entry,
+                                                  actions: entry.actions.map((item) =>
+                                                    item.id === action.id
+                                                      ? { ...item, bypassExistingValue: event.target.checked }
+                                                      : item,
+                                                  ),
+                                                }))
+                                              }
+                                              type="checkbox"
+                                            />
+                                            Bypass existing value
+                                          </label>
+                                          <label className="flex items-center gap-2 text-sm text-slate-300">
+                                            <input
+                                              checked={Boolean(action.allowExternalValue)}
+                                              className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                              onChange={(event) =>
+                                                updateDraftRule(rule.id, (entry) => ({
+                                                  ...entry,
+                                                  actions: entry.actions.map((item) =>
+                                                    item.id === action.id
+                                                      ? { ...item, allowExternalValue: event.target.checked }
+                                                      : item,
+                                                  ),
+                                                }))
+                                              }
+                                              type="checkbox"
+                                            />
+                                            Allow external value
+                                          </label>
+                                        </div>
+                                      )}
                                     </div>
                                   </div>
                                 ))}
