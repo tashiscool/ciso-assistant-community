@@ -44,12 +44,19 @@ export function ReportsPage() {
   return (
     <div className="space-y-6">
       <section className="panel">
-        <div className="eyebrow">Reports</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Reports and Export Flows</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-          Run regulatory and operating exports from the same workspace data model, then keep the
-          generated packages close to the evidence and assessment record.
-        </p>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <div className="eyebrow">Reports</div>
+            <h1 className="mt-2 text-3xl font-semibold text-white">Reports and Export Flows</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+              Run regulatory and operating exports from the same workspace data model, then keep the
+              generated packages close to the evidence and assessment record.
+            </p>
+          </div>
+          <Link className="button-primary" to="/builders/report-builder">
+            Create New Report
+          </Link>
+        </div>
       </section>
 
       {error && <div className="notice-error">{error}</div>}
@@ -69,15 +76,21 @@ export function ReportsPage() {
                     <div className="text-lg font-semibold text-white">{item.title}</div>
                     <div className="mt-2 text-sm leading-6 text-slate-300">{item.description}</div>
                   </div>
-                  <span className="badge-neutral">Ready</span>
+                  <span className={item.status === 'Active' ? 'badge-success' : 'badge-neutral'}>
+                    {item.status ?? 'Ready'}
+                  </span>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
+                  {item.source && <span className="badge-success">{item.source}</span>}
                   {item.tags.map((tag) => (
                     <span key={tag} className="badge-neutral">
                       {tag}
                     </span>
                   ))}
                 </div>
+                {item.lastUpdated && (
+                  <div className="mt-3 text-xs text-slate-500">Updated {formatDate(item.lastUpdated)}</div>
+                )}
               </Link>
             ))}
           </div>

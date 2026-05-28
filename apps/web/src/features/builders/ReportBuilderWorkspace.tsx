@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
+  ArrowDown,
+  ArrowUp,
   BarChart3,
   Download,
   FileSpreadsheet,
@@ -13,6 +15,7 @@ import {
   Table2,
   Trash2,
 } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   createReportBuilderReport,
   createReportBuilderSubscription,
@@ -56,6 +59,26 @@ function toggleValue(values: string[], value: string) {
   return values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
 }
 
+function addValue(values: string[], value: string) {
+  const trimmed = value.trim();
+  return trimmed && !values.includes(trimmed) ? [...values, trimmed] : values;
+}
+
+function removeValue(values: string[], value: string) {
+  return values.filter((item) => item !== value);
+}
+
+function moveValue(values: string[], index: number, direction: -1 | 1) {
+  const nextIndex = index + direction;
+  if (nextIndex < 0 || nextIndex >= values.length) {
+    return values;
+  }
+  const next = [...values];
+  const [item] = next.splice(index, 1);
+  next.splice(nextIndex, 0, item);
+  return next;
+}
+
 function reportPayload(draft: ReportBuilderDetail) {
   return {
     title: draft.title,
@@ -77,8 +100,8 @@ const filterOperators = [
   'Less Than',
   'Before',
   'After',
-  'Within Last',
-  'Within Next',
+  'Within the Last X Days',
+  'Next X Days',
 ];
 
 const recipientTypes = ['user', 'group', 'external'];
@@ -86,6 +109,8 @@ const recurrenceTypes: RecurrenceType[] = ['Daily', 'Weekly', 'Monthly'];
 
 export function ReportBuilderWorkspace() {
   const { identity } = useEdgeIdentity();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedReportId = searchParams.get('reportId');
   const [reports, setReports] = useState<ReportBuilderSummary[]>([]);
   const [modules, setModules] = useState<string[]>([]);
   const [displayFields, setDisplayFields] = useState<string[]>([]);
@@ -96,6 +121,8 @@ export function ReportBuilderWorkspace() {
   const [search, setSearch] = useState('');
   const [newReportTitle, setNewReportTitle] = useState('');
   const [newReportOwner, setNewReportOwner] = useState('Regovise Operator');
+  const [newReportChartType, setNewReportChartType] = useState<ReportBuilderDetail['chartType']>('List');
+  const [newReportModule, setNewReportModule] = useState('Security Plans');
   const [shareRecipients, setShareRecipients] = useState('security-ops@regovise.com, audit@regovise.com');
   const [subscriptionEmail, setSubscriptionEmail] = useState('security-ops@regovise.com');
   const [subscriptionType, setSubscriptionType] = useState('user');
@@ -116,7 +143,7 @@ export function ReportBuilderWorkspace() {
       setReports(next.reports);
       setModules(next.modules);
       setDisplayFields(next.displayFields);
-      setSelectedId((current) => current ?? next.reports[0]?.id ?? null);
+      setSelectedId((current) => requestedReportId ?? current ?? next.reports[0]?.id ?? null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to load Report Builder library.');
     } finally {
@@ -141,7 +168,13 @@ export function ReportBuilderWorkspace() {
 
   useEffect(() => {
     void loadReports();
-  }, [identity.tenantId, identity.userId]);
+  }, [identity.tenantId, identity.userId, requestedReportId]);
+
+  useEffect(() => {
+    if (!newReportModule && modules[0]) {
+      setNewReportModule(modules[0]);
+    }
+  }, [modules, newReportModule]);
 
   useEffect(() => {
     if (selectedId) {
@@ -199,6 +232,18 @@ export function ReportBuilderWorkspace() {
     );
   }
 
+  function selectReport(reportId: string) {
+    setSelectedId(reportId);
+    setSearchParams({ reportId });
+  }
+
+  function updateFieldList(
+    key: 'displayFields' | 'selectedFields' | 'drillDownFields' | 'sortingFields',
+    values: string[],
+  ) {
+    updateConfig({ [key]: values } as Partial<ReportConfig>);
+  }
+
   const metrics = useMemo(() => {
     return [
       {
@@ -224,27 +269,6 @@ export function ReportBuilderWorkspace() {
     ];
   }, [draft, reports]);
 
-  const fieldGroups = useMemo(
-    () => [
-      {
-        label: 'Displayed',
-        values: draft?.config.displayFields ?? [],
-        setValues: (values: string[]) => updateConfig({ displayFields: values }),
-      },
-      {
-        label: 'Selected',
-        values: draft?.config.selectedFields ?? [],
-        setValues: (values: string[]) => updateConfig({ selectedFields: values }),
-      },
-      {
-        label: 'Drill Down',
-        values: draft?.config.drillDownFields ?? [],
-        setValues: (values: string[]) => updateConfig({ drillDownFields: values }),
-      },
-    ],
-    [draft],
-  );
-
   async function handleCreateReport() {
     try {
       setSaving(true);
@@ -253,11 +277,31 @@ export function ReportBuilderWorkspace() {
       const created = await createReportBuilderReport({
         title: newReportTitle || undefined,
         owner: newReportOwner || undefined,
+        chartType: newReportChartType,
+        module: newReportModule || undefined,
+        config: {
+          reportTitle: newReportTitle || 'New Report',
+          chartType: newReportChartType,
+          module: newReportModule || 'Security Plans',
+          groupBy: 'Status',
+          aggregateField: 'Status',
+          aggregationType: 'Count',
+          selectedFields: ['Title', 'Status', 'Owner', 'Last Updated'],
+          displayFields: ['Title', 'Status', 'Owner', 'Last Updated'],
+          drillDownFields: ['Owner'],
+          sortingFields: ['Last Updated'],
+          filterLogic: '1 AND (2 OR 3)',
+          filters: [
+            { id: crypto.randomUUID(), field: 'Status', operator: 'Equals', value: 'Active' },
+            { id: crypto.randomUUID(), field: 'Due Date', operator: 'Next X Days', value: '30 days' },
+            { id: crypto.randomUUID(), field: 'Owner', operator: 'Equals', value: 'Current User' },
+          ],
+        },
       });
       setNewReportTitle('');
       setNewReportOwner('Regovise Operator');
       await loadReports();
-      setSelectedId(created.id);
+      selectReport(created.id);
       setNotice('New report definition created in the canonical Report Builder service.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to create report definition.');
@@ -361,7 +405,11 @@ export function ReportBuilderWorkspace() {
       setError(null);
       setNotice(null);
       const result = await exportReportBuilderReport(draft.id);
-      setNotice(`Export queued as ${result.artifactName}.`);
+      setNotice(
+        result.downloadPath
+          ? `Export generated as ${result.artifactName}. Download path: ${result.downloadPath}`
+          : `Export queued as ${result.artifactName}.`,
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to queue report export.');
     } finally {
@@ -431,6 +479,9 @@ export function ReportBuilderWorkspace() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <Link className="button-secondary" to="/reports">
+              Done
+            </Link>
             <button className="button-secondary" onClick={() => void handleShare()} type="button">
               <Share2 className="mr-2 h-4 w-4" />
               {busyAction === 'share' ? 'Sharing...' : 'Share'}
@@ -441,7 +492,7 @@ export function ReportBuilderWorkspace() {
             </button>
             <button className="button-secondary" onClick={() => void handlePreview()} type="button">
               <FileSpreadsheet className="mr-2 h-4 w-4" />
-              {busyAction === 'preview' ? 'Previewing...' : 'Preview'}
+              {busyAction === 'preview' ? 'Generating...' : 'Generate Report'}
             </button>
             <button className="button-primary" disabled={saving} onClick={() => void handleSave()} type="button">
               <Save className="mr-2 h-4 w-4" />
@@ -501,6 +552,29 @@ export function ReportBuilderWorkspace() {
               value={newReportOwner}
               onChange={(event) => setNewReportOwner(event.target.value)}
             />
+            <select
+              className="input"
+              aria-label="New report chart type"
+              value={newReportChartType}
+              onChange={(event) => setNewReportChartType(event.target.value as ReportBuilderDetail['chartType'])}
+            >
+              <option value="List">List</option>
+              <option value="Bar">Bar</option>
+              <option value="Line">Line</option>
+              <option value="Pie">Pie</option>
+            </select>
+            <select
+              className="input"
+              aria-label="New report module"
+              value={newReportModule}
+              onChange={(event) => setNewReportModule(event.target.value)}
+            >
+              {modules.map((module) => (
+                <option key={module} value={module}>
+                  {module}
+                </option>
+              ))}
+            </select>
             <button className="button-secondary w-full" disabled={saving} type="submit">
               <Plus className="mr-2 h-4 w-4" />
               Create New Report
@@ -522,7 +596,7 @@ export function ReportBuilderWorkspace() {
                   className={`panel-subtle w-full text-left transition ${
                     selectedId === report.id ? 'border-cyan-300/30 bg-cyan-400/[0.04]' : 'hover:border-cyan-300/20'
                   }`}
-                  onClick={() => setSelectedId(report.id)}
+                  onClick={() => selectReport(report.id)}
                   type="button"
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -646,19 +720,31 @@ export function ReportBuilderWorkspace() {
                       </label>
                       <label className="space-y-2">
                         <span className="text-sm font-medium text-slate-200">Group By</span>
-                        <input
+                        <select
                           className="input"
                           value={draft.config.groupBy}
                           onChange={(event) => updateConfig({ groupBy: event.target.value })}
-                        />
+                        >
+                          {fieldOptions.map((field) => (
+                            <option key={`group-${field}`} value={field}>
+                              {field}
+                            </option>
+                          ))}
+                        </select>
                       </label>
                       <label className="space-y-2">
                         <span className="text-sm font-medium text-slate-200">Aggregate Field</span>
-                        <input
+                        <select
                           className="input"
                           value={draft.config.aggregateField}
                           onChange={(event) => updateConfig({ aggregateField: event.target.value })}
-                        />
+                        >
+                          {fieldOptions.map((field) => (
+                            <option key={`aggregate-${field}`} value={field}>
+                              {field}
+                            </option>
+                          ))}
+                        </select>
                       </label>
                       <label className="space-y-2">
                         <span className="text-sm font-medium text-slate-200">Aggregation Type</span>
@@ -695,34 +781,144 @@ export function ReportBuilderWorkspace() {
                       </div>
                       <span className="badge-neutral">{fieldOptions.length} fields</span>
                     </div>
-                    <div className="mt-4 grid gap-4 lg:grid-cols-3">
-                      {fieldGroups.map((group) => (
+                    <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                      {[
+                        {
+                          label: 'Select Fields',
+                          help: 'Add one or more module fields used by list reports and exports.',
+                          key: 'selectedFields' as const,
+                          values: draft.config.selectedFields,
+                        },
+                        {
+                          label: 'Sorting Fields',
+                          help: 'Choose ordered fields that control the display order of report results.',
+                          key: 'sortingFields' as const,
+                          values: draft.config.sortingFields,
+                        },
+                      ].map((group) => (
                         <div className="rounded-2xl border border-white/10 bg-black/20 p-4" key={group.label}>
                           <div className="text-sm font-medium text-slate-200">{group.label}</div>
-                          <div className="mt-3 flex flex-wrap gap-2">
+                          <div className="mt-1 text-xs text-slate-500">{group.help}</div>
+                          <select
+                            className="input mt-3"
+                            aria-label={`Add ${group.label}`}
+                            value=""
+                            onChange={(event) => {
+                              updateFieldList(group.key, addValue(group.values, event.target.value));
+                              event.target.value = '';
+                            }}
+                          >
+                            <option value="">Add field...</option>
                             {fieldOptions.map((field) => (
-                              <button
-                                key={`${group.label}-${field}`}
-                                className={group.values.includes(field) ? 'badge-success' : 'badge-neutral'}
-                                onClick={() => group.setValues(toggleValue(group.values, field))}
-                                type="button"
-                              >
+                              <option key={`${group.key}-${field}`} value={field}>
                                 {field}
-                              </button>
+                              </option>
+                            ))}
+                          </select>
+                          <div className="mt-3 space-y-2">
+                            {group.values.map((field, index) => (
+                              <div
+                                className="flex items-center justify-between gap-2 rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2"
+                                key={`${group.key}-selected-${field}`}
+                              >
+                                <span className="text-sm text-slate-200">{field}</span>
+                                <div className="flex gap-1">
+                                  <button
+                                    className="button-secondary px-2 py-1"
+                                    disabled={index === 0}
+                                    onClick={() => updateFieldList(group.key, moveValue(group.values, index, -1))}
+                                    type="button"
+                                  >
+                                    <ArrowUp className="h-3 w-3" />
+                                  </button>
+                                  <button
+                                    className="button-secondary px-2 py-1"
+                                    disabled={index === group.values.length - 1}
+                                    onClick={() => updateFieldList(group.key, moveValue(group.values, index, 1))}
+                                    type="button"
+                                  >
+                                    <ArrowDown className="h-3 w-3" />
+                                  </button>
+                                  <button
+                                    className="button-secondary px-2 py-1"
+                                    onClick={() => updateFieldList(group.key, removeValue(group.values, field))}
+                                    type="button"
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </button>
+                                </div>
+                              </div>
                             ))}
                           </div>
                         </div>
                       ))}
                     </div>
                     <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-                      <div className="text-sm font-medium text-slate-200">Sorting Fields</div>
+                      <div className="text-sm font-medium text-slate-200">Display Fields</div>
+                      <div className="mt-1 text-xs text-slate-500">
+                        Reorder or remove the fields shown in list previews. These mirror selected fields by default.
+                      </div>
+                      <select
+                        className="input mt-3"
+                        aria-label="Add display field"
+                        value=""
+                        onChange={(event) => {
+                          updateFieldList('displayFields', addValue(draft.config.displayFields, event.target.value));
+                          event.target.value = '';
+                        }}
+                      >
+                        <option value="">Add display field...</option>
+                        {fieldOptions.map((field) => (
+                          <option key={`display-add-${field}`} value={field}>
+                            {field}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="mt-3 space-y-2">
+                        {draft.config.displayFields.map((field, index) => (
+                          <div
+                            className="flex items-center justify-between gap-2 rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2"
+                            key={`display-selected-${field}`}
+                          >
+                            <span className="text-sm text-slate-200">{field}</span>
+                            <div className="flex gap-1">
+                              <button
+                                className="button-secondary px-2 py-1"
+                                disabled={index === 0}
+                                onClick={() => updateFieldList('displayFields', moveValue(draft.config.displayFields, index, -1))}
+                                type="button"
+                              >
+                                <ArrowUp className="h-3 w-3" />
+                              </button>
+                              <button
+                                className="button-secondary px-2 py-1"
+                                disabled={index === draft.config.displayFields.length - 1}
+                                onClick={() => updateFieldList('displayFields', moveValue(draft.config.displayFields, index, 1))}
+                                type="button"
+                              >
+                                <ArrowDown className="h-3 w-3" />
+                              </button>
+                              <button
+                                className="button-secondary px-2 py-1"
+                                onClick={() => updateFieldList('displayFields', removeValue(draft.config.displayFields, field))}
+                                type="button"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+                      <div className="text-sm font-medium text-slate-200">Drill-Down Fields</div>
                       <div className="mt-3 flex flex-wrap gap-2">
                         {fieldOptions.map((field) => (
                           <button
-                            key={`sorting-${field}`}
-                            className={draft.config.sortingFields.includes(field) ? 'badge-success' : 'badge-neutral'}
+                            key={`drilldown-${field}`}
+                            className={draft.config.drillDownFields.includes(field) ? 'badge-success' : 'badge-neutral'}
                             onClick={() =>
-                              updateConfig({ sortingFields: toggleValue(draft.config.sortingFields, field) })
+                              updateConfig({ drillDownFields: toggleValue(draft.config.drillDownFields, field) })
                             }
                             type="button"
                           >
@@ -757,42 +953,61 @@ export function ReportBuilderWorkspace() {
                         value={draft.config.filterLogic}
                         onChange={(event) => updateConfig({ filterLogic: event.target.value })}
                       />
+                      <span className="text-xs text-slate-500">
+                        Supports AND/OR and parentheses, for example <code>1 AND (2 OR 3)</code>.
+                      </span>
                     </label>
                     <div className="mt-4 space-y-3">
-                      {draft.config.filters.map((filter) => (
+                      {draft.config.filters.map((filter, filterIndex) => (
                         <div
                           className="grid gap-3 rounded-2xl border border-white/10 bg-black/20 p-4 md:grid-cols-[1fr_1fr_1fr_auto]"
                           key={filter.id}
                         >
-                          <input
-                            className="input"
-                            value={filter.field}
-                            onChange={(event) =>
-                              updateConfig({
-                                filters: draft.config.filters.map((item) =>
-                                  item.id === filter.id ? { ...item, field: event.target.value } : item,
-                                ),
-                              })
-                            }
-                          />
-                          <select
-                            className="input"
-                            value={filter.operator}
-                            onChange={(event) =>
-                              updateConfig({
-                                filters: draft.config.filters.map((item) =>
-                                  item.id === filter.id ? { ...item, operator: event.target.value } : item,
-                                ),
-                              })
-                            }
-                          >
-                            {filterOperators.map((operator) => (
-                              <option key={operator} value={operator}>
-                                {operator}
-                              </option>
-                            ))}
-                          </select>
-                          <input
+                          <label className="space-y-1">
+                            <span className="text-xs uppercase tracking-[0.14em] text-slate-500">
+                              Filter {filterIndex + 1} Field
+                            </span>
+                            <select
+                              className="input"
+                              value={filter.field}
+                              onChange={(event) =>
+                                updateConfig({
+                                  filters: draft.config.filters.map((item) =>
+                                    item.id === filter.id ? { ...item, field: event.target.value } : item,
+                                  ),
+                                })
+                              }
+                            >
+                              {fieldOptions.map((field) => (
+                                <option key={`filter-field-${filter.id}-${field}`} value={field}>
+                                  {field}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <label className="space-y-1">
+                            <span className="text-xs uppercase tracking-[0.14em] text-slate-500">Operator</span>
+                            <select
+                              className="input"
+                              value={filter.operator}
+                              onChange={(event) =>
+                                updateConfig({
+                                  filters: draft.config.filters.map((item) =>
+                                    item.id === filter.id ? { ...item, operator: event.target.value } : item,
+                                  ),
+                                })
+                              }
+                            >
+                              {filterOperators.map((operator) => (
+                                <option key={operator} value={operator}>
+                                  {operator}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <label className="space-y-1">
+                            <span className="text-xs uppercase tracking-[0.14em] text-slate-500">Value</span>
+                            <input
                             className="input"
                             value={filter.value}
                             onChange={(event) =>
@@ -803,6 +1018,25 @@ export function ReportBuilderWorkspace() {
                               })
                             }
                           />
+                            <div className="mt-2 flex flex-wrap gap-1">
+                              {['Current User', 'My Organization', '30 days', '90 days'].map((value) => (
+                                <button
+                                  className="badge-neutral"
+                                  key={`${filter.id}-${value}`}
+                                  onClick={() =>
+                                    updateConfig({
+                                      filters: draft.config.filters.map((item) =>
+                                        item.id === filter.id ? { ...item, value } : item,
+                                      ),
+                                    })
+                                  }
+                                  type="button"
+                                >
+                                  {value}
+                                </button>
+                              ))}
+                            </div>
+                          </label>
                           <button
                             className="button-secondary"
                             onClick={() =>
@@ -828,7 +1062,7 @@ export function ReportBuilderWorkspace() {
                     </p>
                     <button className="button-secondary mt-4 w-full" onClick={() => void handlePreview()} type="button">
                       <FileSpreadsheet className="mr-2 h-4 w-4" />
-                      {busyAction === 'preview' ? 'Refreshing Preview...' : 'Refresh Preview'}
+                      {busyAction === 'preview' ? 'Generating Report...' : 'Generate Report'}
                     </button>
                     <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
                       {!preview ? (
@@ -837,9 +1071,13 @@ export function ReportBuilderWorkspace() {
                         </div>
                       ) : preview.kind === 'table' ? (
                         <div className="space-y-3">
-                          <div className="flex items-center gap-2 text-slate-200">
+                          <div className="flex flex-wrap items-center gap-2 text-slate-200">
                             <Table2 className="h-4 w-4" />
                             <span className="text-sm font-medium">Table Preview</span>
+                            <span className="badge-neutral">{preview.recordCount ?? preview.rows.length} records</span>
+                            <span className={preview.filterExpressionValid === false ? 'badge-neutral' : 'badge-success'}>
+                              Filter logic {preview.filterExpressionValid === false ? 'needs review' : 'valid'}
+                            </span>
                           </div>
                           <div className="overflow-x-auto">
                             <table className="min-w-full text-left text-sm">
@@ -868,9 +1106,13 @@ export function ReportBuilderWorkspace() {
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          <div className="flex items-center gap-2 text-slate-200">
+                          <div className="flex flex-wrap items-center gap-2 text-slate-200">
                             {draft.chartType === 'Pie' ? <PieChart className="h-4 w-4" /> : <BarChart3 className="h-4 w-4" />}
                             <span className="text-sm font-medium">{draft.chartType} Preview</span>
+                            <span className="badge-neutral">{preview.recordCount ?? preview.labels.length} records</span>
+                            <span className={preview.filterExpressionValid === false ? 'badge-neutral' : 'badge-success'}>
+                              Filter logic {preview.filterExpressionValid === false ? 'needs review' : 'valid'}
+                            </span>
                           </div>
                           <div className="space-y-3">
                             {preview.labels.map((label, index) => {
@@ -893,6 +1135,32 @@ export function ReportBuilderWorkspace() {
                           </div>
                         </div>
                       )}
+                    </div>
+                  </div>
+
+                  <div className="panel-subtle">
+                    <div className="eyebrow">More Tools</div>
+                    <p className="mt-2 text-sm text-slate-400">
+                      Use the same actions exposed from existing Report Builder reports: Edit, Export, Subscriptions,
+                      and Delete.
+                    </p>
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      <button className="button-secondary" onClick={() => void handleSave()} type="button">
+                        <Save className="mr-2 h-4 w-4" />
+                        Edit / Save
+                      </button>
+                      <button className="button-secondary" onClick={() => void handleExport()} type="button">
+                        <Download className="mr-2 h-4 w-4" />
+                        Export CSV
+                      </button>
+                      <a className="button-secondary" href="#report-subscriptions">
+                        <Mail className="mr-2 h-4 w-4" />
+                        Subscriptions
+                      </a>
+                      <button className="button-secondary" onClick={() => void handleDelete()} type="button">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </button>
                     </div>
                   </div>
 
@@ -921,7 +1189,7 @@ export function ReportBuilderWorkspace() {
                     </div>
                   </div>
 
-                  <div className="panel-subtle">
+                  <div className="panel-subtle" id="report-subscriptions">
                     <div className="eyebrow">Subscriptions</div>
                     <p className="mt-2 text-sm text-slate-400">
                       Configure recurring delivery for the active report output.

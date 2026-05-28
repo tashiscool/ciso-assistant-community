@@ -17,6 +17,11 @@ export async function listReportBuilderReports(): Promise<ReportLibraryResponse>
 export async function createReportBuilderReport(body?: {
   title?: string;
   owner?: string;
+  chartType?: ReportBuilderDetail['chartType'];
+  module?: string;
+  status?: ReportBuilderDetail['status'];
+  description?: string | null;
+  config?: ReportConfig;
 }): Promise<ReportBuilderDetail> {
   const response = await client.post<{ data: ReportBuilderDetail }>('/builders/reports', body ?? {});
   return response.data;
@@ -79,8 +84,8 @@ export async function shareReportBuilderReport(
 
 export async function exportReportBuilderReport(
   reportId: string,
-): Promise<{ format: string; artifactName: string }> {
-  const response = await client.post<{ data: { format: string; artifactName: string } }>(
+): Promise<{ format: string; artifactName: string; exportId?: string; downloadPath?: string }> {
+  const response = await client.post<{ data: { format: string; artifactName: string; exportId?: string; downloadPath?: string } }>(
     `/builders/reports/${reportId}/export`,
   );
   return response.data;

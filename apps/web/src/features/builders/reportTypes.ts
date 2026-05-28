@@ -66,11 +66,15 @@ export type ReportPreview =
       kind: 'table';
       columns: string[];
       rows: string[][];
+      recordCount?: number;
+      filterExpressionValid?: boolean;
     }
   | {
       kind: 'series';
       labels: string[];
       values: number[];
+      recordCount?: number;
+      filterExpressionValid?: boolean;
     };
 
 export type ReportLibraryResponse = {

@@ -570,7 +570,7 @@ export function AppLayout() {
             <Route path="/builders/export-builder" element={adminOnly(<ExportBuilderPage />)} />
             <Route path="/builders/export-builder/docx-template" element={adminOnly(<ExportBuilderDocxGuidePage />)} />
             <Route path="/builders/form-builder" element={adminOnly(<FormBuilderPage />)} />
-            <Route path="/builders/report-builder" element={adminOnly(<ReportBuilderPage />)} />
+            <Route path="/builders/report-builder" element={allowedOnly(access.canUseReports, <ReportBuilderPage />)} />
             <Route path="/builders/dashboard-builder" element={adminOnly(<DashboardBuilderPage />)} />
             <Route path="/builders/rules-builder" element={adminOnly(<RulesBuilderPage />)} />
             <Route path="/builders/wayfinder-builder" element={adminOnly(<WayfinderBuilderPage />)} />

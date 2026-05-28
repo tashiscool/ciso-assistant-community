@@ -785,6 +785,32 @@ function trackWayfinderTemplate(template) {
   });
 }
 
+function trackReportBuilderReport(reportDefinition) {
+  return trackArtifact({
+    type: 'report-builder-report',
+    id: reportDefinition.id,
+    title: reportDefinition.title,
+    route: '/builders/report-builder',
+    cleanupMethod: 'delete',
+    cleanup: async (context) => {
+      await jsonRequest(context.request, 'DELETE', `/builders/reports/${reportDefinition.id}`, null, { allowStatuses: [404] });
+    },
+  });
+}
+
+function trackReportExport(exportArtifact) {
+  return trackArtifact({
+    type: 'report-export',
+    id: exportArtifact.id,
+    title: exportArtifact.name ?? exportArtifact.artifactName ?? exportArtifact.id,
+    route: '/reports',
+    cleanupMethod: 'delete',
+    cleanup: async (context) => {
+      await jsonRequest(context.request, 'DELETE', `/ops/reports/exports/${exportArtifact.id}`, null, { allowStatuses: [404] });
+    },
+  });
+}
+
 async function createModuleRecordFixture(context, entry, folderId) {
   const title = `${MARKER} ${entry.pluralName} fixture`;
   const created = await jsonRequest(context.request, 'POST', `/core/modules/${entry.moduleKey}/records`, {
@@ -972,7 +998,7 @@ async function validateSeededOperationalContent(page) {
   ];
 
   for (const check of checks) {
-    await page.goto(absoluteUrl(check.path));
+    await page.goto(absoluteUrl(check.path), { waitUntil: 'domcontentloaded', timeout: 60000 });
     await waitForSettledPage(page);
     const bodyText = await page.locator('body').innerText({ timeout: 12000 });
     assert(check.text.test(bodyText), `${check.path} did not show seeded/expected product content.`);
@@ -1120,6 +1146,190 @@ async function validateBuilderSurfaces(page, modules) {
   rulesText = await page.locator('body').innerText({ timeout: 12000 });
   assert(rulesText.includes('Bypass existing value'), 'Rules Builder did not expose SET_VALUE overwrite control.');
   assert(rulesText.includes('Allow external value'), 'Rules Builder did not expose SET_VALUE external override control.');
+}
+
+async function validateReportBuilderWorkflow(context, page) {
+  const libraryPayload = await jsonRequest(context.request, 'GET', '/builders/reports');
+  const seededReports = asArray(libraryPayload?.data?.reports);
+  for (const title of ['Open POAM Aging Review', 'Residual Risk Heatmap', 'Control Coverage Summary']) {
+    assert(seededReports.some((item) => item.title === title), `Report Builder missing seeded report: ${title}`);
+  }
+  const chartTypes = new Set(seededReports.map((item) => item.chartType));
+  for (const chartType of ['List', 'Bar', 'Pie']) {
+    assert(chartTypes.has(chartType), `Report Builder seeded reports missing ${chartType} coverage.`);
+  }
+
+  const createdPayload = await jsonRequest(context.request, 'POST', '/builders/reports', {
+    title: `${MARKER} Report Builder`,
+    owner: 'Regovise E2E Owner',
+    chartType: 'List',
+    module: 'Risks',
+    description: `${MARKER} validates list reports, chart reports, filters, sorting, exports, sharing, and subscriptions.`,
+  });
+  const created = createdPayload?.data;
+  assert(created?.id, 'Report Builder report creation failed.');
+  trackReportBuilderReport(created);
+
+  const listConfig = {
+    reportTitle: created.title,
+    chartType: 'List',
+    module: 'Risks',
+    groupBy: 'Status',
+    aggregateField: 'Residual Risk',
+    aggregationType: 'Count',
+    selectedFields: ['Title', 'Status', 'Owner', 'Due Date', 'Severity'],
+    displayFields: ['Title', 'Severity', 'Status', 'Owner', 'Due Date'],
+    drillDownFields: ['Owner', 'Program'],
+    sortingFields: ['Severity', 'Due Date'],
+    filterLogic: '1 AND (2 OR 3)',
+    filters: [
+      { id: crypto.randomUUID(), field: 'Status', operator: 'Does Not Equal', value: 'Archived' },
+      { id: crypto.randomUUID(), field: 'Due Date', operator: 'Next X Days', value: '90 days' },
+      { id: crypto.randomUUID(), field: 'Owner', operator: 'Equals', value: 'Current User' },
+    ],
+  };
+  const savedListPayload = await jsonRequest(context.request, 'PUT', `/builders/reports/${created.id}`, {
+    title: created.title,
+    chartType: 'List',
+    module: 'Risks',
+    owner: 'Regovise E2E Owner',
+    status: 'Active',
+    description: `${MARKER} active list report definition.`,
+    config: listConfig,
+  });
+  const savedList = savedListPayload?.data;
+  assert(savedList?.status === 'Active', 'Report Builder list report did not save as Active.');
+  assert(JSON.stringify(savedList.config).includes('Current User'), 'Report Builder did not persist dynamic user filter.');
+  assert(JSON.stringify(savedList.config).includes('Next X Days'), 'Report Builder did not persist relative date filter.');
+
+  const listPreviewPayload = await jsonRequest(context.request, 'POST', `/builders/reports/${created.id}/preview`, {
+    title: created.title,
+    chartType: 'List',
+    module: 'Risks',
+    owner: 'Regovise E2E Owner',
+    status: 'Active',
+    description: savedList.description,
+    config: listConfig,
+  });
+  const listPreview = listPreviewPayload?.data?.preview;
+  assert(listPreview?.kind === 'table', 'Report Builder list preview did not return a table.');
+  assert(asArray(listPreview.columns).includes('Severity'), 'Report Builder list preview missing selected display fields.');
+  assert(listPreview.filterExpressionValid === true, 'Report Builder list preview did not validate filter logic.');
+
+  const chartConfig = {
+    ...listConfig,
+    chartType: 'Bar',
+    groupBy: 'Status',
+    aggregateField: 'Residual Risk',
+    aggregationType: 'Average',
+    drillDownFields: ['Owner', 'Severity'],
+  };
+  await jsonRequest(context.request, 'PUT', `/builders/reports/${created.id}`, {
+    title: created.title,
+    chartType: 'Bar',
+    module: 'Risks',
+    owner: 'Regovise E2E Owner',
+    status: 'Active',
+    description: `${MARKER} active chart report definition.`,
+    config: chartConfig,
+  });
+  const chartPreviewPayload = await jsonRequest(context.request, 'POST', `/builders/reports/${created.id}/preview`, {
+    title: created.title,
+    chartType: 'Bar',
+    module: 'Risks',
+    owner: 'Regovise E2E Owner',
+    status: 'Active',
+    description: `${MARKER} active chart report definition.`,
+    config: chartConfig,
+  });
+  const chartPreview = chartPreviewPayload?.data?.preview;
+  assert(chartPreview?.kind === 'series', 'Report Builder chart preview did not return a series.');
+  assert(asArray(chartPreview.labels).length > 0, 'Report Builder chart preview did not return grouped labels.');
+
+  const sharePayload = await jsonRequest(context.request, 'POST', `/builders/reports/${created.id}/share`, {
+    recipients: ['security-ops@regovise.com', 'audit@regovise.com'],
+  });
+  assert(asArray(sharePayload?.data?.recipients).length === 2, 'Report Builder share did not record recipients.');
+
+  const subscriptionPayload = await jsonRequest(context.request, 'POST', `/builders/reports/${created.id}/subscriptions`, {
+    recipientEmail: `${slug(RUN_ID)}@regovise.example`,
+    recipientType: 'user',
+    startDate: todayIso(1),
+    recurrenceType: 'Weekly',
+  });
+  const subscriptionId = subscriptionPayload?.data?.id;
+  assert(subscriptionId, 'Report Builder subscription creation failed.');
+  let detailPayload = await jsonRequest(context.request, 'GET', `/builders/reports/${created.id}`);
+  assert(
+    asArray(detailPayload?.data?.subscriptions).some((subscription) => subscription.id === subscriptionId),
+    'Report Builder subscription was not visible in detail.',
+  );
+  await jsonRequest(context.request, 'DELETE', `/builders/reports/${created.id}/subscriptions/${subscriptionId}`);
+  detailPayload = await jsonRequest(context.request, 'GET', `/builders/reports/${created.id}`);
+  assert(
+    !asArray(detailPayload?.data?.subscriptions).some((subscription) => subscription.id === subscriptionId),
+    'Report Builder subscription delete did not remove the subscription.',
+  );
+
+  const exportPayload = await jsonRequest(context.request, 'POST', `/builders/reports/${created.id}/export`);
+  const exportResult = exportPayload?.data;
+  assert(exportResult?.exportId && exportResult?.downloadPath, 'Report Builder export did not create a downloadable CSV artifact.');
+  trackReportExport({
+    id: exportResult.exportId,
+    name: exportResult.artifactName,
+  });
+
+  const opsReportsPayload = await jsonRequest(context.request, 'GET', '/ops/reports');
+  const catalog = asArray(opsReportsPayload?.data?.catalog);
+  const exports = asArray(opsReportsPayload?.data?.exports);
+  assert(catalog.some((item) => item.title === 'Create New Report'), 'Reports page catalog missing Create New Report entry.');
+  assert(catalog.some((item) => item.title === created.title && item.source === 'Report Builder'), 'Reports catalog missing saved Report Builder definition.');
+  assert(exports.some((item) => item.id === exportResult.exportId), 'Reports exports table missing Report Builder CSV artifact.');
+
+  await page.goto(absoluteUrl('/reports'));
+  await waitForSettledPage(page);
+  let bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  assert(bodyText.includes('Create New Report'), 'Reports page did not expose Create New Report.');
+  assert(bodyText.includes(created.title), 'Reports page did not list the saved Report Builder definition.');
+  assert(bodyText.includes('Report Builder'), 'Reports page did not expose Report Builder source.');
+  assert(bodyText.includes(`${created.title} CSV export`), 'Reports page did not list the generated Report Builder export.');
+
+  await page.goto(absoluteUrl(`/builders/report-builder?reportId=${encodeURIComponent(created.id)}`));
+  await waitForSettledPage(page);
+  await page.waitForFunction(
+    (title) => Array.from(document.querySelectorAll('input, textarea')).some((field) => field.value === title),
+    created.title,
+    { timeout: 12000 },
+  );
+  bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  for (const marker of [
+    'Report Builder',
+    'Create New Report',
+    'Report Title',
+    'Chart Type',
+    'Select Fields',
+    'Display Fields',
+    'Sorting Fields',
+    'Drill-Down Fields',
+    'Filters',
+    'Filter Logic',
+    'Current User',
+    'My Organization',
+    'Next X Days',
+    'Generate Report',
+    'More Tools',
+    'Share',
+    'Subscriptions',
+    'Export CSV',
+    'Done',
+  ]) {
+    assert(bodyText.toLowerCase().includes(marker.toLowerCase()), `Report Builder UI did not expose ${marker}.`);
+  }
+  await page.getByRole('button', { name: /Generate Report/i }).first().click();
+  await page.getByText('Preview generated from the canonical Report Builder service.', { exact: false })
+    .waitFor({ state: 'visible', timeout: 15000 });
+
+  return { reportId: created.id, exportId: exportResult.exportId };
 }
 
 async function validateExportBuilderWorkflow(context, page) {
@@ -1638,6 +1848,18 @@ async function verifyNoWayfinderResidue(context) {
   return { activeResidues: residues.length };
 }
 
+async function verifyNoReportBuilderResidue(context) {
+  const builderPayload = await jsonRequest(context.request, 'GET', '/builders/reports');
+  const reportResidues = asArray(builderPayload?.data?.reports).filter((item) => JSON.stringify(item).includes(RUN_ID));
+  const opsPayload = await jsonRequest(context.request, 'GET', '/ops/reports');
+  const exportResidues = asArray(opsPayload?.data?.exports).filter((item) => JSON.stringify(item).includes(RUN_ID));
+  assert(
+    reportResidues.length === 0 && exportResidues.length === 0,
+    `Report Builder residues remain: ${JSON.stringify({ reportResidues, exportResidues })}`,
+  );
+  return { reportResidues: reportResidues.length, exportResidues: exportResidues.length };
+}
+
 async function cleanupArtifacts(context) {
   for (const artifact of cleanupStack.reverse()) {
     const startedAt = new Date().toISOString();
@@ -1739,6 +1961,7 @@ async function main() {
     await runCheck(seededData, 'catalogue import subfeature surface', () => validateCatalogueAndImportSurfaces(page));
     await runCheck(seededData, 'builder surfaces', () => validateBuilderSurfaces(page, modules));
     if (!READ_ONLY) {
+      await runCheck(seededData, 'report builder semantic workflow', () => validateReportBuilderWorkflow(context, page));
       await runCheck(seededData, 'export builder semantic workflow', () => validateExportBuilderWorkflow(context, page));
       await runCheck(seededData, 'wayfinder builder semantic workflow', () => validateWayfinderBuilderWorkflow(context, page));
     } else {
@@ -1791,6 +2014,7 @@ async function main() {
       await runCheck(cleanupSuite, 'verify no IAM residue', () => verifyNoIamResidue(context));
       await runCheck(cleanupSuite, 'verify no Export Builder residue', () => verifyNoExportBuilderResidue(context));
       await runCheck(cleanupSuite, 'verify no Wayfinder Builder residue', () => verifyNoWayfinderResidue(context));
+      await runCheck(cleanupSuite, 'verify no Report Builder residue', () => verifyNoReportBuilderResidue(context));
     } else {
       report.skips.push({
         suite: 'cleanup verification',

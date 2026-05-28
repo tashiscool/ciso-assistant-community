@@ -42,6 +42,17 @@ type ReportExportRow = {
   updated_at: string;
 };
 
+type ReportBuilderCatalogRow = {
+  id: string;
+  title: string;
+  chart_type: string;
+  module_name: string;
+  status: string;
+  source: string;
+  description: string | null;
+  updated_at: string;
+};
+
 type ImportJobRow = {
   id: string;
   tenant_id: string;
@@ -2662,6 +2673,31 @@ async function listReportExports(env: EnvBindings, tenantId: string) {
     .all<ReportExportRow>();
 
   return results.map(toReportExportResponse);
+}
+
+async function listReportBuilderCatalogItems(env: EnvBindings, tenantId: string) {
+  const rows = await env.D1_MAIN.prepare(
+    `
+    SELECT id, title, chart_type, module_name, status, source, description, updated_at
+    FROM report_builder_reports
+    WHERE tenant_id = ?
+    ORDER BY updated_at DESC, title ASC
+    LIMIT 50
+    `,
+  )
+    .bind(tenantId)
+    .all<ReportBuilderCatalogRow>();
+
+  return rows.results.map((row) => ({
+    id: `report-builder:${row.id}`,
+    title: row.title,
+    description: row.description ?? `${row.chart_type} report over ${row.module_name} data.`,
+    href: `/builders/report-builder?reportId=${encodeURIComponent(row.id)}`,
+    tags: ['Report Builder', row.chart_type, row.module_name, row.status],
+    source: row.source || 'Report Builder',
+    status: row.status,
+    lastUpdated: row.updated_at,
+  }));
 }
 
 async function listImports(env: EnvBindings, tenantId: string) {
@@ -5722,9 +5758,20 @@ export async function handleOpsRoutes(
     }
 
     if (!id && ctx.request.method === 'GET') {
+      const reportBuilderCatalog = await listReportBuilderCatalogItems(ctx.env, ctx.tenantId);
       return json({
         data: {
           catalog: [
+            {
+              id: 'report-builder-create',
+              title: 'Create New Report',
+              description:
+                'Open Report Builder to define list, bar, line, or pie reports with filters, sorting, exports, and subscriptions.',
+              href: '/builders/report-builder',
+              tags: ['Report Builder', 'Create', 'Custom'],
+              source: 'Report Builder',
+            },
+            ...reportBuilderCatalog,
             {
               id: 'dora-roi',
               title: 'DORA Register of Information',

@@ -4,6 +4,9 @@ export type ReportCatalogItem = {
   description: string;
   href: string;
   tags: string[];
+  source?: string;
+  status?: string;
+  lastUpdated?: string;
 };
 
 export type ReportExport = {
