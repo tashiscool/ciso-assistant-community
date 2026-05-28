@@ -27,6 +27,7 @@
     "smoke:production": "node ./scripts/prod_smoke.mjs",
     "smoke:production:modules": "node ./scripts/prod_module_validation.mjs",
     "smoke:production:playwright": "node ./scripts/prod_playwright_validation.mjs",
+    "smoke:production:e2e": "node ./scripts/prod_e2e_validation.mjs",
     "verify:production-token": "bash ./scripts/verify_cloudflare_token.sh",
     "sync:grc-snapshot": "node ./scripts/sync_grc_vendor_snapshot.mjs",
     "validate:grc-contracts": "node ./scripts/validate_grc_contracts.mjs"

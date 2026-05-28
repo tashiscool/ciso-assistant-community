@@ -30,6 +30,7 @@ cli/db_backup
 /.claude
 /.cursor/
 /.playwright-mcp/
+/.playwright-regovise/
 /.tmp_webhooksite_token.json
 /*.png
 /claude-grc-engineering/
