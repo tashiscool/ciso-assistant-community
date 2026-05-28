@@ -61,7 +61,8 @@ export function SearchControlRoomPage({ access }: SearchControlRoomPageProps) {
             <div className="eyebrow">Workspace Search</div>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Search</h1>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-              Search across the current workspace so teams can move quickly between program, evidence, and assurance records without guessing where something lives.
+              Search across the current workspace so teams can move quickly between module records, assessments, evidence,
+              program work, and assurance workflows without guessing where something lives.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -94,7 +95,7 @@ export function SearchControlRoomPage({ access }: SearchControlRoomPageProps) {
             <input
               className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300/40"
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search frameworks, assessments, evidence, studies, assignments, and more..."
+              placeholder="Search modules, assessments, evidence, studies, assignments, and more..."
               type="search"
               value={query}
             />

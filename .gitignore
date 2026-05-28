@@ -28,3 +28,12 @@ charts/ciso-assistant-next/custom.yaml
 __pycache__
 cli/db_backup
 /.claude
+/.cursor/
+/.playwright-mcp/
+/.tmp_webhooksite_token.json
+/*.png
+/claude-grc-engineering/
+/generated/
+/openregscale/
+/vendor/
+/frontend/tests/results-*/

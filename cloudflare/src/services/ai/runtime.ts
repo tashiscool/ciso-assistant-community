@@ -1,9 +1,10 @@
 import type { AiBinding, EnvBindings, VectorizeBinding, VectorizeMatchRecord } from '../../types/env';
+import { resolveAiBackend } from '../grc-engine/aiBackend';
 
 const TEXT_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 const EMBEDDING_MODEL = '@cf/baai/bge-base-en-v1.5';
 
-type AiRuntimeProvider = 'cloudflare-workers-ai' | 'deterministic-fallback';
+type AiRuntimeProvider = 'cloudflare-workers-ai' | 'openai-responses' | 'deterministic-fallback';
 
 export type AiRuntimeStatus = {
   provider: AiRuntimeProvider;
@@ -154,7 +155,7 @@ function normalizeSimilarityScore(score: number) {
   return Math.max(0, Math.min(100, Math.round(score)));
 }
 
-export async function getAiRuntimeStatus(env: EnvBindings): Promise<AiRuntimeStatus> {
+export async function getAiRuntimeStatus(env: EnvBindings, tenantId?: string | null): Promise<AiRuntimeStatus> {
   const ai = getAiBinding(env);
   const vectorIndex = getVectorizeBinding(env);
   const notices: string[] = [];
@@ -179,13 +180,17 @@ export async function getAiRuntimeStatus(env: EnvBindings): Promise<AiRuntimeSta
     }
   }
 
+  const backend = tenantId ? await resolveAiBackend(env, tenantId) : null;
+  const provider = backend?.provider ?? (ai ? 'cloudflare-workers-ai' : 'deterministic-fallback');
+  const backendAvailable = backend ? backend.provider !== 'deterministic-fallback' : !!ai;
+
   return {
-    provider: ai ? 'cloudflare-workers-ai' : 'deterministic-fallback',
-    textGenerationAvailable: !!ai,
-    embeddingsAvailable: !!ai,
+    provider,
+    textGenerationAvailable: backendAvailable,
+    embeddingsAvailable: backendAvailable,
     vectorizeAvailable,
     vectorCount,
-    environmentHealthy: !!ai,
+    environmentHealthy: backendAvailable,
     notices,
   };
 }
@@ -193,7 +198,12 @@ export async function getAiRuntimeStatus(env: EnvBindings): Promise<AiRuntimeSta
 export async function generateTextWithAi(
   env: EnvBindings,
   input: GenerateTextInput,
+  tenantId?: string | null,
 ): Promise<string | null> {
+  if (tenantId) {
+    const backend = await resolveAiBackend(env, tenantId);
+    return backend.generateText(input);
+  }
   const ai = getAiBinding(env);
   if (!ai) {
     return null;
@@ -219,7 +229,12 @@ export async function generateTextWithAi(
 export async function generateJsonWithAi<T>(
   env: EnvBindings,
   input: GenerateTextInput,
+  tenantId?: string | null,
 ): Promise<T | null> {
+  if (tenantId) {
+    const backend = await resolveAiBackend(env, tenantId);
+    return backend.generateJson<T>(input);
+  }
   const ai = getAiBinding(env);
   if (!ai) {
     return null;
@@ -266,7 +281,12 @@ export async function generateJsonWithAi<T>(
 export async function embedTextWithAi(
   env: EnvBindings,
   text: string,
+  tenantId?: string | null,
 ): Promise<number[] | null> {
+  if (tenantId) {
+    const backend = await resolveAiBackend(env, tenantId);
+    return backend.embed(text);
+  }
   const ai = getAiBinding(env);
   if (!ai || !text.trim()) {
     return null;
@@ -289,6 +309,7 @@ export async function upsertVectorDocuments(
   env: EnvBindings,
   namespace: string,
   documents: VectorDocument[],
+  tenantId?: string | null,
 ): Promise<boolean> {
   const vectorIndex = getVectorizeBinding(env);
   if (!vectorIndex || documents.length === 0) {
@@ -297,7 +318,7 @@ export async function upsertVectorDocuments(
 
   const vectors = [];
   for (const document of documents) {
-    const embedding = await embedTextWithAi(env, document.text);
+    const embedding = await embedTextWithAi(env, document.text, tenantId);
     if (!embedding) {
       continue;
     }
@@ -328,13 +349,14 @@ export async function queryVectorDocuments(
   namespace: string,
   query: string,
   topK = 6,
+  tenantId?: string | null,
 ): Promise<VectorMatch[]> {
   const vectorIndex = getVectorizeBinding(env);
   if (!vectorIndex) {
     return [];
   }
 
-  const embedding = await embedTextWithAi(env, query);
+  const embedding = await embedTextWithAi(env, query, tenantId);
   if (!embedding) {
     return [];
   }

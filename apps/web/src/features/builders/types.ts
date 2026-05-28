@@ -1,3 +1,5 @@
+export type QuestionnaireTemplateKind = 'assessment-plan' | 'questionnaire';
+
 export type QuestionnaireQuestion = {
   id: string;
   ref: string;
@@ -8,6 +10,8 @@ export type QuestionnaireQuestion = {
   weight: number;
   options?: string[];
   helpText?: string | null;
+  requirementRef?: string | null;
+  evidenceHint?: string | null;
 };
 
 export type QuestionnaireRule = {
@@ -31,11 +35,24 @@ export type QuestionnaireTemplateSummary = {
   name: string;
   description: string | null;
   status: string;
+  templateKind: QuestionnaireTemplateKind;
   audience: string | null;
   scoringMode: string;
   version: number;
   questionCount: number;
   ruleCount: number;
+  sourceFramework: string | null;
+  usageNotes: string | null;
+  questionnaireType: string | null;
+  assignmentModel: string | null;
+  relatedWorkflow: string | null;
+  attestationScope: string | null;
+  responseOwnerModel: string | null;
+  evidenceCollectionMode: string | null;
+  fileUploadGuidance: string | null;
+  exportMode: string | null;
+  distributionCadence: string | null;
+  mappedRequirementCount: number;
   updatedAt: string;
 };
 
@@ -44,11 +61,24 @@ export type QuestionnaireTemplateDetail = {
   name: string;
   description: string | null;
   status: string;
+  templateKind: QuestionnaireTemplateKind;
   scoringMode: string;
   audience: string | null;
   version: number;
   questions: QuestionnaireQuestion[];
   metadata: Record<string, unknown> | null;
+  sourceFramework: string | null;
+  usageNotes: string | null;
+  questionnaireType: string | null;
+  assignmentModel: string | null;
+  relatedWorkflow: string | null;
+  attestationScope: string | null;
+  responseOwnerModel: string | null;
+  evidenceCollectionMode: string | null;
+  fileUploadGuidance: string | null;
+  exportMode: string | null;
+  distributionCadence: string | null;
+  mappedRequirementCount: number;
   updatedAt: string;
   createdAt: string;
 };

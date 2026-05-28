@@ -1,3 +1,5 @@
+import type { EnvBindings } from '../../types/env';
+
 export type AuthProtocol = 'none' | 'oidc' | 'saml' | 'cloudflare-access';
 
 export type OidcConfigRecord = {
@@ -151,6 +153,48 @@ export function isRunnableOidcConfig(config: OidcConfigRecord | null | undefined
       config.metadataUrl?.trim() &&
       config.callbackUrl?.trim(),
   );
+}
+
+function readEnvString(env: EnvBindings, name: keyof EnvBindings): string | null {
+  const raw = env[name];
+  if (typeof raw !== 'string') {
+    return null;
+  }
+  const trimmed = raw.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+export function oidcProviderRequiresClientSecret(config: OidcConfigRecord | null | undefined): boolean {
+  if (!config) {
+    return false;
+  }
+
+  const provider = config.providerType?.trim().toLowerCase() ?? '';
+  const metadataUrl = config.metadataUrl?.trim().toLowerCase() ?? '';
+  const clientId = config.clientId?.trim().toLowerCase() ?? '';
+
+  return (
+    provider.includes('google') ||
+    metadataUrl.includes('accounts.google.com') ||
+    clientId.endsWith('.apps.googleusercontent.com')
+  );
+}
+
+export function resolveOidcClientSecret(
+  env: EnvBindings,
+  config: OidcConfigRecord | null | undefined,
+): string | null {
+  const genericSecret =
+    readEnvString(env, 'OIDC_CLIENT_SECRET') ?? readEnvString(env, 'SSO_OIDC_CLIENT_SECRET');
+  if (genericSecret) {
+    return genericSecret;
+  }
+
+  if (!oidcProviderRequiresClientSecret(config)) {
+    return null;
+  }
+
+  return readEnvString(env, 'GOOGLE_OIDC_CLIENT_SECRET') ?? readEnvString(env, 'GOOGLE_CLIENT_SECRET');
 }
 
 export function randomBase64Url(byteLength = 32): string {
@@ -373,6 +417,7 @@ function validateAudience(payload: Record<string, unknown>, clientId: string): v
 }
 
 export async function completeOidcCodeExchange(
+  env: EnvBindings,
   config: OidcConfigRecord,
   transaction: OidcAuthTransactionRecord,
   code: string,
@@ -382,19 +427,31 @@ export async function completeOidcCodeExchange(
   }
 
   const discovery = await loadDiscoveryDocument(config.metadataUrl.trim());
+  const clientSecret = resolveOidcClientSecret(env, config);
+  if (oidcProviderRequiresClientSecret(config) && !clientSecret) {
+    throw new Error(
+      'The OIDC provider requires a client secret for token exchange, but no runtime secret is configured.',
+    );
+  }
+
+  const tokenRequestBody = new URLSearchParams({
+    grant_type: 'authorization_code',
+    code,
+    client_id: config.clientId.trim(),
+    redirect_uri: transaction.redirectUri,
+    code_verifier: transaction.codeVerifier,
+  });
+  if (clientSecret) {
+    tokenRequestBody.set('client_secret', clientSecret);
+  }
+
   const tokenResponse = await fetch(discovery.token_endpoint, {
     method: 'POST',
     headers: {
       'content-type': 'application/x-www-form-urlencoded',
       accept: 'application/json',
     },
-    body: new URLSearchParams({
-      grant_type: 'authorization_code',
-      code,
-      client_id: config.clientId.trim(),
-      redirect_uri: transaction.redirectUri,
-      code_verifier: transaction.codeVerifier,
-    }),
+    body: tokenRequestBody,
   });
 
   const tokenPayload = (await tokenResponse.json().catch(() => null)) as

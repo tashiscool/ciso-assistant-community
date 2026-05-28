@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0.0",
+  "metric_id": "automation.coverage_pct",
+  "label": "Automation Coverage",
+  "description": "Share of in-scope controls with automated evidence collection for the period.",
+  "recorded_at": "2026-04-18T13:00:00Z",
+  "value": 62,
+  "unit": "%",
+  "aggregation": "percentage",
+  "window": {
+    "start": "2026-04-11T00:00:00Z",
+    "end": "2026-04-18T00:00:00Z",
+    "label": "2026-W16"
+  },
+  "dimensions": {
+    "framework": "soc2",
+    "source": "github-inspector",
+    "audience": "ciso-weekly"
+  },
+  "source": "grc-data/manual",
+  "subject": {
+    "kind": "framework",
+    "id": "soc2"
+  },
+  "metadata": {
+    "notes": "Captured after the weekly evidence automation review."
+  }
+}

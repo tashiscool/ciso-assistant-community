@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/GRCEngClub/claude-grc-engineering/schemas/exception.schema.json",
+  "title": "GRC Exception",
+  "description": "Canonical contract for policy or control exceptions stored in grc-data.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "exception_id",
+    "control_id",
+    "control_framework",
+    "status",
+    "rationale",
+    "owner",
+    "created_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "exception_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]+$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "control_framework": {
+      "type": "string",
+      "description": "Framework identifier, such as SCF or SOC2-TSC-2017."
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "requested",
+        "approved",
+        "rejected",
+        "expired",
+        "closed"
+      ]
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "compensating_controls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "owner": {
+      "$ref": "#/$defs/person_ref"
+    },
+    "approved_by": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/person_ref"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "linked_findings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "person_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "team": {
+          "type": "string"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "name"
+          ]
+        },
+        {
+          "required": [
+            "team"
+          ]
+        },
+        {
+          "required": [
+            "email"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,5 +1,9 @@
 import { QuestionnaireBuilderWorkspace } from './QuestionnaireBuilderWorkspace';
 
-export function QuestionnaireOverviewPage() {
-  return <QuestionnaireBuilderWorkspace initialTab="overview" />;
+type QuestionnaireOverviewPageProps = {
+  workspaceMode?: 'all' | 'assessment-plans' | 'questionnaires';
+};
+
+export function QuestionnaireOverviewPage({ workspaceMode = 'all' }: QuestionnaireOverviewPageProps) {
+  return <QuestionnaireBuilderWorkspace initialTab="overview" workspaceMode={workspaceMode} />;
 }

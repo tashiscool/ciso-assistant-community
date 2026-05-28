@@ -1,0 +1,48 @@
+{
+  "schema_version": "finding/v1",
+  "source": "github",
+  "source_version": "2026-05-15",
+  "run_id": "github-sample-run-001",
+  "collected_at": "2026-05-15T00:00:00.000Z",
+  "resource": {
+    "type": "github_repository",
+    "id": "regovise/platform-api",
+    "region": "global",
+    "account_id": "github-org-regovise"
+  },
+  "evidence_refs": [
+    "github://regovise/platform-api/settings/branch_protection"
+  ],
+  "evaluations": [
+    {
+      "control_framework": "soc2",
+      "control_id": "CC6.1",
+      "status": "fail",
+      "severity": "high",
+      "title": "Default branch is missing required review protection",
+      "message": "The default branch allows direct pushes without mandatory peer review.",
+      "evidence_refs": [
+        "github://regovise/platform-api/settings/branch_protection"
+      ],
+      "remediation": {
+        "summary": "Require pull request reviews and prevent force pushes on the default branch.",
+        "ref": "playbook://github/branch-protection"
+      }
+    },
+    {
+      "control_framework": "nist-800-53",
+      "control_id": "CM-3",
+      "status": "fail",
+      "severity": "medium",
+      "title": "Change control protections are incomplete",
+      "message": "Repository changes can reach production branches without approved pull request checks.",
+      "evidence_refs": [
+        "github://regovise/platform-api/settings/branch_protection"
+      ],
+      "remediation": {
+        "summary": "Enforce required pull request approvals and status checks before merge.",
+        "ref": "playbook://github/change-control"
+      }
+    }
+  ]
+}

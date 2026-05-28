@@ -79,8 +79,8 @@ export function WorkbenchControlPage() {
             <div className="eyebrow">Operations</div>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Workbench</h1>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-              Review cross-module operational work from applied controls, portal assignments, imports, exports, and
-              monitoring runs in one canonical Worker-backed queue.
+              Review cross-module operational work from shared module records, assessments, applied controls, portal
+              assignments, imports, exports, and monitoring runs in one canonical Worker-backed queue.
             </p>
           </div>
           <button className="button-primary" onClick={() => void load()} type="button">
@@ -181,7 +181,7 @@ export function WorkbenchControlPage() {
         <section className="panel overflow-hidden p-0">
           <div className="border-b border-white/10 px-6 py-4">
             <div className="eyebrow">Operational queue</div>
-            <p className="mt-1 text-sm text-slate-400">Live work derived from canonical Worker tables.</p>
+            <p className="mt-1 text-sm text-slate-400">Live work derived from canonical Worker tables and tenant-facing module records.</p>
           </div>
           <div className="divide-y divide-white/6">
             {filteredItems.map((item) => (

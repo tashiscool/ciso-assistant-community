@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ApiClient } from '../../shared/api/client';
 import { useEdgeIdentity } from '../../shared/session/identity';
-import type { WorkspaceFolder } from '../iam/types';
-import type { Framework } from '../core/types';
+import type { WorkspaceFolder, WorkspaceUser, WorkspaceUserGroup } from '../iam/types';
+import type { Framework, FrameworkControl } from '../core/types';
+import { listQuestionnaireTemplates } from '../builders/api';
+import type { QuestionnaireTemplateSummary } from '../builders/types';
 import type {
   ComplianceAssessment,
   Perimeter,
@@ -18,7 +20,11 @@ export function AssessmentsPage() {
   const [folders, setFolders] = useState<WorkspaceFolder[]>([]);
   const [perimeters, setPerimeters] = useState<Perimeter[]>([]);
   const [frameworks, setFrameworks] = useState<Framework[]>([]);
+  const [frameworkControls, setFrameworkControls] = useState<FrameworkControl[]>([]);
+  const [assessmentPlanTemplates, setAssessmentPlanTemplates] = useState<QuestionnaireTemplateSummary[]>([]);
   const [registers, setRegisters] = useState<RiskRegister[]>([]);
+  const [users, setUsers] = useState<WorkspaceUser[]>([]);
+  const [groups, setGroups] = useState<WorkspaceUserGroup[]>([]);
   const [riskAssessments, setRiskAssessments] = useState<RiskAssessment[]>([]);
   const [complianceAssessments, setComplianceAssessments] = useState<ComplianceAssessment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,16 +51,30 @@ export function AssessmentsPage() {
 
   const [compliancePerimeterId, setCompliancePerimeterId] = useState('');
   const [complianceFrameworkId, setComplianceFrameworkId] = useState('');
+  const [complianceAssessmentKind, setComplianceAssessmentKind] = useState('manual');
   const [complianceRefId, setComplianceRefId] = useState('');
   const [complianceName, setComplianceName] = useState('');
   const [complianceVersion, setComplianceVersion] = useState('1.0');
   const [complianceStatus, setComplianceStatus] = useState('planned');
+  const [leadAssessorUserId, setLeadAssessorUserId] = useState('');
+  const [complianceInstructions, setComplianceInstructions] = useState('');
+  const [plannedStartOn, setPlannedStartOn] = useState('');
+  const [plannedFinishOn, setPlannedFinishOn] = useState('');
+  const [processInfo, setProcessInfo] = useState('');
+  const [assignmentPrincipalType, setAssignmentPrincipalType] = useState<'user' | 'group'>('user');
+  const [assignmentPrincipalId, setAssignmentPrincipalId] = useState('');
+  const [recurrenceEnabled, setRecurrenceEnabled] = useState(false);
+  const [recurrenceRepeatUntil, setRecurrenceRepeatUntil] = useState('');
+  const [recurrenceFrequency, setRecurrenceFrequency] = useState('monthly');
+  const [sourceSecurityPlanId, setSourceSecurityPlanId] = useState('');
+  const [selectedAssessmentPlanId, setSelectedAssessmentPlanId] = useState('');
   const [complianceObservation, setComplianceObservation] = useState('');
-  const [controlsTotal, setControlsTotal] = useState('20');
-  const [controlsAssessed, setControlsAssessed] = useState('0');
   const [maturityScore, setMaturityScore] = useState('3');
+  const [selectedControlIds, setSelectedControlIds] = useState<string[]>([]);
 
   const selectableFolders = folders.filter((folder) => folder.contentType === 'domain');
+  const selectedAssessmentPlan =
+    assessmentPlanTemplates.find((template) => template.id === selectedAssessmentPlanId) ?? null;
 
   async function loadAssessmentWorkspace() {
     try {
@@ -65,6 +85,9 @@ export function AssessmentsPage() {
         perimeterResponse,
         frameworkResponse,
         registerResponse,
+        userResponse,
+        groupResponse,
+        questionnaireTemplateResponse,
         riskAssessmentResponse,
         complianceAssessmentResponse,
       ] = await Promise.all([
@@ -72,6 +95,9 @@ export function AssessmentsPage() {
         client.get<{ data: Perimeter[] }>('/core/perimeters'),
         client.get<{ data: Framework[] }>('/core/frameworks'),
         client.get<{ data: RiskRegister[] }>('/core/risk-registers'),
+        client.get<{ data: WorkspaceUser[] }>('/iam/users'),
+        client.get<{ data: WorkspaceUserGroup[] }>('/iam/user-groups'),
+        listQuestionnaireTemplates(),
         client.get<{ data: RiskAssessment[] }>('/core/risk-assessments'),
         client.get<{ data: ComplianceAssessment[] }>('/core/compliance-assessments'),
       ]);
@@ -80,6 +106,11 @@ export function AssessmentsPage() {
       setPerimeters(perimeterResponse.data);
       setFrameworks(frameworkResponse.data);
       setRegisters(registerResponse.data);
+      setUsers(userResponse.data);
+      setGroups(groupResponse.data);
+      setAssessmentPlanTemplates(
+        questionnaireTemplateResponse.filter((template) => template.templateKind === 'assessment-plan'),
+      );
       setRiskAssessments(riskAssessmentResponse.data);
       setComplianceAssessments(complianceAssessmentResponse.data);
 
@@ -98,6 +129,18 @@ export function AssessmentsPage() {
       if (!complianceFrameworkId && frameworkResponse.data[0]?.id) {
         setComplianceFrameworkId(frameworkResponse.data[0].id);
       }
+      if (!leadAssessorUserId && userResponse.data[0]?.id) {
+        setLeadAssessorUserId(userResponse.data[0].id);
+      }
+      if (!assignmentPrincipalId && userResponse.data[0]?.id) {
+        setAssignmentPrincipalId(userResponse.data[0].id);
+      }
+      if (!selectedAssessmentPlanId) {
+        const firstPlan = questionnaireTemplateResponse.find((template) => template.templateKind === 'assessment-plan');
+        if (firstPlan?.id) {
+          setSelectedAssessmentPlanId(firstPlan.id);
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
@@ -108,6 +151,63 @@ export function AssessmentsPage() {
   useEffect(() => {
     void loadAssessmentWorkspace();
   }, [identity.tenantId, identity.userId]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!complianceFrameworkId) {
+      setFrameworkControls([]);
+      return;
+    }
+
+    void (async () => {
+      try {
+        const response = await client.get<{ data: FrameworkControl[] }>(
+          `/core/frameworks/${complianceFrameworkId}/controls`,
+        );
+        if (!cancelled) {
+          setFrameworkControls(response.data);
+        }
+      } catch {
+        if (!cancelled) {
+          setFrameworkControls([]);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [complianceFrameworkId]);
+
+  useEffect(() => {
+    if (assignmentPrincipalType === 'user' && users[0]?.id) {
+      setAssignmentPrincipalId((current) => current || users[0].id);
+      return;
+    }
+    if (assignmentPrincipalType === 'group' && groups[0]?.id) {
+      setAssignmentPrincipalId((current) => current || groups[0].id);
+    }
+  }, [assignmentPrincipalType, users, groups]);
+
+  useEffect(() => {
+    if (!selectedAssessmentPlan || complianceAssessmentKind !== 'manual') {
+      return;
+    }
+
+    setComplianceInstructions((current) => current || selectedAssessmentPlan.description || '');
+    setProcessInfo((current) => {
+      if (current) {
+        return current;
+      }
+      const fragments = [
+        `Assessment plan: ${selectedAssessmentPlan.name}`,
+        selectedAssessmentPlan.sourceFramework ? `Source: ${selectedAssessmentPlan.sourceFramework}` : '',
+        selectedAssessmentPlan.usageNotes ?? '',
+      ].filter(Boolean);
+      return fragments.join(' · ');
+    });
+  }, [complianceAssessmentKind, selectedAssessmentPlan]);
 
   async function createPerimeter() {
     try {
@@ -169,33 +269,84 @@ export function AssessmentsPage() {
       setComplianceBusy(true);
       setError(null);
       setNotice(null);
+      const planReference =
+        selectedAssessmentPlan && complianceAssessmentKind === 'manual'
+          ? [
+              `Assessment plan: ${selectedAssessmentPlan.name}`,
+              selectedAssessmentPlan.sourceFramework ? `Source: ${selectedAssessmentPlan.sourceFramework}` : '',
+            ]
+              .filter(Boolean)
+              .join(' · ')
+          : '';
+      const nextProcessInfo =
+        processInfo || planReference || null;
+      const nextInstructions =
+        complianceInstructions || (selectedAssessmentPlan && complianceAssessmentKind === 'manual'
+          ? selectedAssessmentPlan.description || null
+          : null);
       await client.post('/core/compliance-assessments', {
         perimeterId: compliancePerimeterId,
         frameworkId: complianceFrameworkId,
+        assessmentKind: complianceAssessmentKind,
+        assessmentPlanTemplateId: selectedAssessmentPlanId || null,
         refId: complianceRefId,
         name: complianceName,
         version: complianceVersion,
         status: complianceStatus,
+        leadAssessorUserId: leadAssessorUserId || null,
+        instructions: nextInstructions,
+        plannedStartOn: plannedStartOn || null,
+        plannedFinishOn: plannedFinishOn || null,
+        processInfo: nextProcessInfo,
+        assignmentPrincipalType,
+        assignmentPrincipalId: assignmentPrincipalId || null,
+        sourceSecurityPlanId: sourceSecurityPlanId || null,
+        controlIds: selectedControlIds,
+        recurrence: recurrenceEnabled
+          ? {
+              firstPlannedStart: plannedStartOn || null,
+              firstPlannedFinish: plannedFinishOn || null,
+              repeatUntil: recurrenceRepeatUntil || null,
+              assignmentPrincipalType,
+              assignmentPrincipalId: assignmentPrincipalId || null,
+              frequency: recurrenceFrequency,
+            }
+          : null,
         observation: complianceObservation,
-        controlsTotal: Number(controlsTotal),
-        controlsAssessed: Number(controlsAssessed),
         maturityScore: Number(maturityScore),
       });
+      setComplianceAssessmentKind('manual');
       setComplianceRefId('');
       setComplianceName('');
       setComplianceVersion('1.0');
       setComplianceStatus('planned');
+      setComplianceInstructions('');
+      setPlannedStartOn('');
+      setPlannedFinishOn('');
+      setProcessInfo('');
+      setRecurrenceEnabled(false);
+      setRecurrenceRepeatUntil('');
+      setRecurrenceFrequency('monthly');
+      setSourceSecurityPlanId('');
+      setSelectedAssessmentPlanId('');
       setComplianceObservation('');
-      setControlsTotal('20');
-      setControlsAssessed('0');
       setMaturityScore('3');
-      setNotice('Compliance assessment created.');
+      setSelectedControlIds([]);
+      setNotice('Assessment created with scoped controls and manual-review context.');
       await loadAssessmentWorkspace();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setComplianceBusy(false);
     }
+  }
+
+  function toggleScopedControl(controlId: string) {
+    setSelectedControlIds((current) =>
+      current.includes(controlId)
+        ? current.filter((value) => value !== controlId)
+        : [...current, controlId],
+    );
   }
 
   if (loading) {
@@ -421,7 +572,7 @@ export function AssessmentsPage() {
           </section>
 
           <section className="panel">
-            <div className="eyebrow">New Compliance Assessment</div>
+            <div className="eyebrow">Manual and Compliance Assessments</div>
             <form
               className="mt-4 space-y-3"
               onSubmit={(event) => {
@@ -429,7 +580,34 @@ export function AssessmentsPage() {
                 void createComplianceAssessment();
               }}
             >
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <label className="space-y-1">
+                  <span className="label">Assessment type</span>
+                  <select
+                    className="input"
+                    onChange={(event) => setComplianceAssessmentKind(event.target.value)}
+                    value={complianceAssessmentKind}
+                  >
+                    <option value="manual">Manual audit</option>
+                    <option value="compliance">Compliance review</option>
+                    <option value="risk">Risk-informed review</option>
+                  </select>
+                </label>
+                <label className="space-y-1">
+                  <span className="label">Assessment plan</span>
+                  <select
+                    className="input"
+                    onChange={(event) => setSelectedAssessmentPlanId(event.target.value)}
+                    value={selectedAssessmentPlanId}
+                  >
+                    <option value="">No reusable plan</option>
+                    {assessmentPlanTemplates.map((template) => (
+                      <option key={template.id} value={template.id}>
+                        {template.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <label className="space-y-1">
                   <span className="label">Perimeter</span>
                   <select
@@ -454,6 +632,46 @@ export function AssessmentsPage() {
                     {frameworks.map((framework) => (
                       <option key={framework.id} value={framework.id}>
                         {framework.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="sm:col-span-3 rounded-2xl border border-cyan-400/15 bg-cyan-400/[0.04] px-4 py-3 text-sm text-slate-300">
+                  {selectedAssessmentPlan ? (
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <div className="font-medium text-white">{selectedAssessmentPlan.name}</div>
+                        <div className="mt-1 text-xs text-cyan-200">
+                          {selectedAssessmentPlan.mappedRequirementCount} mapped requirements · {selectedAssessmentPlan.questionCount} lines of inquiry
+                          {selectedAssessmentPlan.sourceFramework ? ` · ${selectedAssessmentPlan.sourceFramework}` : ''}
+                        </div>
+                      </div>
+                      <Link className="button-secondary" to="/assessment-plans">
+                        Open Assessment Plans
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <span>
+                        Assessment plans are reusable lines of inquiry you can prepare once and then reuse across manual audits.
+                      </span>
+                      <Link className="button-secondary" to="/assessment-plans">
+                        Browse Assessment Plans
+                      </Link>
+                    </div>
+                  )}
+                </div>
+                <label className="space-y-1">
+                  <span className="label">Lead assessor</span>
+                  <select
+                    className="input"
+                    onChange={(event) => setLeadAssessorUserId(event.target.value)}
+                    value={leadAssessorUserId}
+                  >
+                    <option value="">Unassigned</option>
+                    {users.map((user) => (
+                      <option key={user.id} value={user.id}>
+                        {user.displayName || user.email}
                       </option>
                     ))}
                   </select>
@@ -496,31 +714,49 @@ export function AssessmentsPage() {
                 <input
                   className="input"
                   onChange={(event) => setComplianceName(event.target.value)}
-                  placeholder="ISO 27001 Annual Audit"
+                  placeholder="FedHR manual control review"
                   value={complianceName}
                 />
               </label>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="space-y-1">
+                  <span className="label">Planned start</span>
+                  <input
+                    className="input"
+                    onChange={(event) => setPlannedStartOn(event.target.value)}
+                    type="date"
+                    value={plannedStartOn}
+                  />
+                </label>
+                <label className="space-y-1">
+                  <span className="label">Planned finish</span>
+                  <input
+                    className="input"
+                    onChange={(event) => setPlannedFinishOn(event.target.value)}
+                    type="date"
+                    value={plannedFinishOn}
+                  />
+                </label>
+              </div>
+              <label className="space-y-1">
+                <span className="label">Instructions</span>
+                <textarea
+                  className="input min-h-[92px]"
+                  onChange={(event) => setComplianceInstructions(event.target.value)}
+                  placeholder="Describe what reviewers should test, document, and validate."
+                  value={complianceInstructions}
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="label">Process info</span>
+                <textarea
+                  className="input min-h-[92px]"
+                  onChange={(event) => setProcessInfo(event.target.value)}
+                  placeholder="Capture methodology, references, or notes about how the review will be performed."
+                  value={processInfo}
+                />
+              </label>
               <div className="grid gap-3 sm:grid-cols-3">
-                <label className="space-y-1">
-                  <span className="label">Controls total</span>
-                  <input
-                    className="input"
-                    min="0"
-                    onChange={(event) => setControlsTotal(event.target.value)}
-                    type="number"
-                    value={controlsTotal}
-                  />
-                </label>
-                <label className="space-y-1">
-                  <span className="label">Controls assessed</span>
-                  <input
-                    className="input"
-                    min="0"
-                    onChange={(event) => setControlsAssessed(event.target.value)}
-                    type="number"
-                    value={controlsAssessed}
-                  />
-                </label>
                 <label className="space-y-1">
                   <span className="label">Maturity score</span>
                   <input
@@ -533,7 +769,124 @@ export function AssessmentsPage() {
                     value={maturityScore}
                   />
                 </label>
+                <label className="space-y-1">
+                  <span className="label">Assignment type</span>
+                  <select
+                    className="input"
+                    onChange={(event) => setAssignmentPrincipalType(event.target.value as 'user' | 'group')}
+                    value={assignmentPrincipalType}
+                  >
+                    <option value="user">User</option>
+                    <option value="group">Group</option>
+                  </select>
+                </label>
+                <label className="space-y-1">
+                  <span className="label">Assignment</span>
+                  <select
+                    className="input"
+                    onChange={(event) => setAssignmentPrincipalId(event.target.value)}
+                    value={assignmentPrincipalId}
+                  >
+                    <option value="">Unassigned</option>
+                    {(assignmentPrincipalType === 'user' ? users : groups).map((principal) => (
+                      <option key={principal.id} value={principal.id}>
+                        {'displayName' in principal ? principal.displayName || principal.email : principal.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
               </div>
+              <label className="space-y-1">
+                <span className="label">Source security plan reference</span>
+                <input
+                  className="input"
+                  onChange={(event) => setSourceSecurityPlanId(event.target.value)}
+                  placeholder="Optional security plan id or reference"
+                  value={sourceSecurityPlanId}
+                />
+              </label>
+              <div className="panel-subtle">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <div className="eyebrow">Controls in Scope</div>
+                    <div className="mt-2 text-sm text-slate-300">
+                      {selectedAssessmentPlan && complianceAssessmentKind === 'manual'
+                        ? 'Leave all controls unselected to execute the linked assessment plan only, or select specific controls to add scoped control reviews alongside the lines of inquiry.'
+                        : 'Leave all controls unselected to include the full framework. Select specific controls to create a scoped manual audit.'}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      className="button-secondary"
+                      onClick={() => setSelectedControlIds(frameworkControls.map((control) => control.id))}
+                      type="button"
+                    >
+                      Select all
+                    </button>
+                    <button className="button-secondary" onClick={() => setSelectedControlIds([])} type="button">
+                      Clear
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-4 max-h-56 space-y-2 overflow-auto pr-1">
+                  {frameworkControls.map((control) => (
+                    <label
+                      className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-sm text-slate-300"
+                      key={control.id}
+                    >
+                      <input
+                        checked={selectedControlIds.includes(control.id)}
+                        onChange={() => toggleScopedControl(control.id)}
+                        type="checkbox"
+                      />
+                      <span>
+                        <span className="font-mono text-xs uppercase tracking-[0.18em] text-cyan-200">{control.ref}</span>
+                        <span className="mt-1 block text-white">{control.title}</span>
+                      </span>
+                    </label>
+                  ))}
+                  {frameworkControls.length === 0 ? (
+                    <div className="text-sm text-slate-400">No framework controls are loaded for the selected framework.</div>
+                  ) : null}
+                </div>
+              </div>
+              <label className="flex items-center gap-3 text-sm text-slate-300">
+                <input
+                  checked={recurrenceEnabled}
+                  onChange={(event) => setRecurrenceEnabled(event.target.checked)}
+                  type="checkbox"
+                />
+                Enable recurring assessment generation
+              </label>
+              {recurrenceEnabled ? (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="space-y-1">
+                    <span className="label">Repeat until</span>
+                    <input
+                      className="input"
+                      onChange={(event) => setRecurrenceRepeatUntil(event.target.value)}
+                      type="date"
+                      value={recurrenceRepeatUntil}
+                    />
+                  </label>
+                  <label className="space-y-1">
+                    <span className="label">Frequency</span>
+                    <select
+                      className="input"
+                      onChange={(event) => setRecurrenceFrequency(event.target.value)}
+                      value={recurrenceFrequency}
+                    >
+                      <option value="daily">Daily</option>
+                      <option value="weekly">Weekly</option>
+                      <option value="bi-weekly">Bi-weekly</option>
+                      <option value="monthly">Monthly</option>
+                      <option value="quarterly">Quarterly</option>
+                      <option value="bi-annually">Bi-annually</option>
+                      <option value="annually">Annually</option>
+                    </select>
+                  </label>
+                </div>
+              ) : null}
               <label className="space-y-1">
                 <span className="label">Observation</span>
                 <textarea
@@ -547,7 +900,7 @@ export function AssessmentsPage() {
                 disabled={complianceBusy || perimeters.length === 0 || frameworks.length === 0}
                 type="submit"
               >
-                {complianceBusy ? 'Saving...' : 'Create Compliance Assessment'}
+                {complianceBusy ? 'Saving...' : 'Create Assessment'}
               </button>
             </form>
           </section>
@@ -592,6 +945,7 @@ export function AssessmentsPage() {
             <thead className="border-b border-white/10 bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
               <tr>
                 <th className="px-4 py-3">Compliance assessment</th>
+                <th className="px-4 py-3">Type</th>
                 <th className="px-4 py-3">Framework</th>
                 <th className="px-4 py-3">Perimeter</th>
                 <th className="px-4 py-3">Progress</th>
@@ -608,14 +962,19 @@ export function AssessmentsPage() {
                       {assessment.name}
                     </Link>
                     <div className="mt-1 text-xs text-cyan-200">{assessment.status}</div>
+                    {assessment.assessmentPlanName ? (
+                      <div className="mt-2 text-xs text-cyan-100">Plan: {assessment.assessmentPlanName}</div>
+                    ) : null}
                     <div className="mt-2 text-xs text-slate-500">Version {assessment.version}</div>
                   </td>
+                  <td className="px-4 py-4 text-slate-300">{assessment.assessmentKind.replace(/_/g, ' ')}</td>
                   <td className="px-4 py-4 text-slate-300">{assessment.frameworkName}</td>
                   <td className="px-4 py-4 text-slate-300">{assessment.perimeterName ?? 'n/a'}</td>
                   <td className="px-4 py-4 text-slate-300">
                     <div>{assessment.progressPercent}%</div>
                     <div className="mt-1 text-xs text-slate-500">
-                      {assessment.controlsAssessed}/{assessment.controlsTotal} controls
+                      {assessment.controlsAssessed}/{assessment.controlsTotal}{' '}
+                      {assessment.assessmentPlanTemplateId ? 'review items' : 'controls'}
                     </div>
                   </td>
                 </tr>

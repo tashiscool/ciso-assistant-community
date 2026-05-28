@@ -1,0 +1,49 @@
+{
+  "schema_version": "finding/v1",
+  "source": "wiz",
+  "source_version": "2026-05-15",
+  "run_id": "wiz-sample-run-001",
+  "collected_at": "2026-05-15T00:05:00.000Z",
+  "resource": {
+    "type": "aws_s3_bucket",
+    "id": "regovise-public-evidence-temp",
+    "arn": "arn:aws:s3:::regovise-public-evidence-temp",
+    "region": "us-east-1",
+    "account_id": "123456789012"
+  },
+  "evidence_refs": [
+    "wiz://findings/public-storage/regovise-public-evidence-temp"
+  ],
+  "evaluations": [
+    {
+      "control_framework": "fedramp-rev5",
+      "control_id": "AC-3",
+      "status": "fail",
+      "severity": "critical",
+      "title": "Publicly accessible storage bucket",
+      "message": "The bucket policy allows anonymous read access to evidence artifacts.",
+      "evidence_refs": [
+        "wiz://findings/public-storage/regovise-public-evidence-temp"
+      ],
+      "remediation": {
+        "summary": "Remove anonymous principals and restrict bucket access to approved workload identities only.",
+        "ref": "playbook://aws/s3-public-access"
+      }
+    },
+    {
+      "control_framework": "soc2",
+      "control_id": "CC6.6",
+      "status": "fail",
+      "severity": "high",
+      "title": "Sensitive evidence storage lacks access restrictions",
+      "message": "Evidence artifacts can be downloaded publicly instead of through managed authorization checks.",
+      "evidence_refs": [
+        "wiz://findings/public-storage/regovise-public-evidence-temp"
+      ],
+      "remediation": {
+        "summary": "Move the bucket behind managed access controls and enable public access blocks.",
+        "ref": "playbook://aws/evidence-storage-hardening"
+      }
+    }
+  ]
+}

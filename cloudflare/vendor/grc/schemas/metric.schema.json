@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/GRCEngClub/claude-grc-engineering/schemas/metric.schema.json",
+  "title": "GRC Metric",
+  "description": "Canonical contract for user-owned KPI/KRI and time-series measurements stored alongside grc-data.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "metric_id",
+    "recorded_at",
+    "value"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "Semver of this schema. Consumers pin a major version."
+    },
+    "metric_id": {
+      "type": "string",
+      "description": "Stable metric identifier.",
+      "pattern": "^[a-z][a-z0-9._-]*$",
+      "examples": [
+        "automation.coverage_pct",
+        "findings.open_critical",
+        "risk.residual_total"
+      ]
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable display label."
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional narrative that explains the metric."
+    },
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the value was observed."
+    },
+    "value": {
+      "type": "number",
+      "description": "Observed metric value."
+    },
+    "unit": {
+      "type": ["string", "null"],
+      "description": "Unit label such as %, controls, hours, USD, or count."
+    },
+    "aggregation": {
+      "type": ["string", "null"],
+      "enum": [
+        "gauge",
+        "counter",
+        "count",
+        "percentage",
+        "ratio",
+        "currency",
+        "duration"
+      ],
+      "description": "How this metric should be interpreted over time."
+    },
+    "window": {
+      "type": ["object", "null"],
+      "description": "Optional period this metric summarizes.",
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "label": {
+          "type": "string",
+          "examples": [
+            "2026-W16",
+            "2026-Q1"
+          ]
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ]
+    },
+    "dimensions": {
+      "type": "object",
+      "description": "Dimensions that slice the metric, such as framework, source, audience, or business unit.",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "source": {
+      "type": ["string", "null"],
+      "description": "Source of truth used to compute the metric."
+    },
+    "subject": {
+      "type": ["object", "null"],
+      "description": "Optional entity the metric is attached to.",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "examples": [
+            "framework",
+            "program",
+            "vendor",
+            "connector"
+          ]
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ]
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional free-form provenance or explanatory metadata.",
+      "additionalProperties": true
+    }
+  }
+}

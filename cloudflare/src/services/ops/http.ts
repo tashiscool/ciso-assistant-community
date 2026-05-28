@@ -3,6 +3,7 @@ import type { EnvBindings } from '../../types/env';
 import { loadPermissionContext, requireAnyPermission } from '../../authorization';
 import { getAiRuntimeStatus } from '../ai/runtime';
 import { buildWorkspaceChatReply } from '../ai/workspaceGuidance';
+import { MODULE_CATALOG, findModuleCatalogEntry, type ModuleCatalogEntry } from '../core/moduleRegistry';
 import {
   sendPortalAssignmentSubmittedEmail,
   sendReportExportReadyEmail,
@@ -296,6 +297,84 @@ type WorkbenchItemRow = {
   created_at: string;
   route: string;
   detail: string;
+};
+
+type ModuleRecordOpsRow = {
+  id: string;
+  module_key: string;
+  title: string;
+  status: string;
+  folder_id: string | null;
+  owner_user_id: string | null;
+  assignee_user_id: string | null;
+  start_on: string | null;
+  finish_on: string | null;
+  due_on: string | null;
+  review_on: string | null;
+  expires_on: string | null;
+  data_json: string | null;
+  updated_at: string;
+  created_at: string;
+  owner_display_name: string | null;
+  owner_first_name: string | null;
+  owner_last_name: string | null;
+  owner_email: string | null;
+  assignee_display_name: string | null;
+  assignee_first_name: string | null;
+  assignee_last_name: string | null;
+  assignee_email: string | null;
+};
+
+type AssessmentOpsRow = {
+  id: string;
+  name: string;
+  status: string;
+  assessment_kind: string | null;
+  lead_assessor_user_id: string | null;
+  lead_assessor_display_name: string | null;
+  lead_assessor_first_name: string | null;
+  lead_assessor_last_name: string | null;
+  lead_assessor_email: string | null;
+  planned_start_on: string | null;
+  planned_finish_on: string | null;
+  instructions: string | null;
+  process_info: string | null;
+  source_security_plan_id: string | null;
+  updated_at: string;
+  created_at: string;
+};
+
+type ModuleRecordOpsItem = {
+  id: string;
+  moduleKey: string;
+  moduleLabel: string;
+  title: string;
+  subtitle: string;
+  status: string;
+  detail: string;
+  owner: string;
+  route: string;
+  keywords: string[];
+  startOn: string | null;
+  finishOn: string | null;
+  dueOn: string | null;
+  reviewOn: string | null;
+  expiresOn: string | null;
+  lastActivity: string;
+};
+
+type AssessmentOpsItem = {
+  id: string;
+  title: string;
+  subtitle: string;
+  status: string;
+  detail: string;
+  owner: string;
+  route: string;
+  keywords: string[];
+  plannedStartOn: string | null;
+  plannedFinishOn: string | null;
+  lastActivity: string;
 };
 
 type NewsFeedEvent = {
@@ -1063,6 +1142,220 @@ function parseJsonObject<T>(value: string | null | undefined, fallback: T): T {
   } catch {
     return fallback;
   }
+}
+
+function formatOpsUserName(
+  displayName: string | null | undefined,
+  firstName: string | null | undefined,
+  lastName: string | null | undefined,
+  email: string | null | undefined,
+  fallback = 'Unassigned',
+) {
+  const trimmedDisplayName = displayName?.trim();
+  if (trimmedDisplayName) {
+    return trimmedDisplayName;
+  }
+
+  const fullName = [firstName?.trim(), lastName?.trim()].filter(Boolean).join(' ');
+  if (fullName) {
+    return fullName;
+  }
+
+  const trimmedEmail = email?.trim();
+  if (trimmedEmail) {
+    return trimmedEmail;
+  }
+
+  return fallback;
+}
+
+function buildModuleRecordRoute(entry: ModuleCatalogEntry, recordId: string) {
+  const baseRoute = entry.directRoute || entry.canonicalRoute;
+  const separator = baseRoute.includes('?') ? '&' : '?';
+  return `${baseRoute}${separator}record=${encodeURIComponent(recordId)}`;
+}
+
+function pickFirstTextValue(
+  data: Record<string, unknown>,
+  candidates: string[],
+) {
+  for (const candidate of candidates) {
+    const value = data[candidate];
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+    if (typeof value === 'number') {
+      return String(value);
+    }
+  }
+  return '';
+}
+
+function buildModuleRecordOwnerLabel(row: ModuleRecordOpsRow, data: Record<string, unknown>) {
+  const assignee = formatOpsUserName(
+    row.assignee_display_name,
+    row.assignee_first_name,
+    row.assignee_last_name,
+    row.assignee_email,
+    '',
+  );
+  if (assignee) {
+    return assignee;
+  }
+
+  const owner = formatOpsUserName(
+    row.owner_display_name,
+    row.owner_first_name,
+    row.owner_last_name,
+    row.owner_email,
+    '',
+  );
+  if (owner) {
+    return owner;
+  }
+
+  const fallbackOwner = pickFirstTextValue(data, [
+    'owner',
+    'custodian',
+    'evidence_owner',
+    'requested_to',
+    'vendor_name',
+    'source_owner',
+  ]);
+  return fallbackOwner || 'Unassigned';
+}
+
+function buildModuleRecordDetail(
+  entry: ModuleCatalogEntry,
+  row: ModuleRecordOpsRow,
+  data: Record<string, unknown>,
+  ownerLabel: string,
+) {
+  const parts = [
+    pickFirstTextValue(data, [
+      'type',
+      'policy_type',
+      'incident_type',
+      'exception_type',
+      'request_type',
+      'project_type',
+      'component_type',
+      'threat_type',
+      'framework_name',
+      'driver',
+      'objective',
+      'business_outcome',
+    ]),
+    ownerLabel && ownerLabel !== 'Unassigned' ? `Owner ${ownerLabel}` : '',
+    row.due_on ? `Due ${row.due_on}` : '',
+    row.review_on ? `Review ${row.review_on}` : '',
+    row.expires_on ? `Expires ${row.expires_on}` : '',
+    row.finish_on ? `Finish ${row.finish_on}` : '',
+  ].filter(Boolean);
+
+  return parts.join(' · ') || entry.description;
+}
+
+function toModuleRecordOpsItem(row: ModuleRecordOpsRow): ModuleRecordOpsItem | null {
+  const entry = findModuleCatalogEntry(row.module_key);
+  if (!entry) {
+    return null;
+  }
+
+  const data = parseJsonObject<Record<string, unknown>>(row.data_json, {});
+  const ownerLabel = buildModuleRecordOwnerLabel(row, data);
+  const subtitle =
+    pickFirstTextValue(data, [
+      'type',
+      'policy_type',
+      'incident_type',
+      'severity',
+      'component_type',
+      'project_type',
+      'vendor_name',
+      'requirement_id',
+      'asset_id',
+      'control_id',
+      'plan_name',
+      'risk_id',
+      'contract_id',
+      'threat_type',
+      'change_type',
+    ]) ||
+    (ownerLabel !== 'Unassigned' ? ownerLabel : entry.coverageBadge);
+
+  const keywordCandidates = [
+    entry.moduleKey,
+    entry.moduleName,
+    entry.pluralName,
+    row.status,
+    subtitle,
+    ownerLabel,
+    pickFirstTextValue(data, [
+      'classification',
+      'lifecycle_status',
+      'inventory_status',
+      'approval_status',
+      'implementation_status',
+      'mitigation_status',
+    ]),
+  ];
+
+  return {
+    id: row.id,
+    moduleKey: entry.moduleKey,
+    moduleLabel: entry.pluralName,
+    title: row.title,
+    subtitle,
+    status: row.status,
+    detail: buildModuleRecordDetail(entry, row, data, ownerLabel),
+    owner: ownerLabel,
+    route: buildModuleRecordRoute(entry, row.id),
+    keywords: [...new Set(keywordCandidates.filter((value) => value && value.trim()))],
+    startOn: row.start_on,
+    finishOn: row.finish_on,
+    dueOn: row.due_on,
+    reviewOn: row.review_on,
+    expiresOn: row.expires_on,
+    lastActivity: row.updated_at,
+  };
+}
+
+function toAssessmentOpsItem(row: AssessmentOpsRow): AssessmentOpsItem {
+  const ownerLabel = formatOpsUserName(
+    row.lead_assessor_display_name,
+    row.lead_assessor_first_name,
+    row.lead_assessor_last_name,
+    row.lead_assessor_email,
+    'Lead assessor unassigned',
+  );
+  const kindLabel =
+    row.assessment_kind === 'manual'
+      ? 'Manual assessment'
+      : row.assessment_kind === 'risk'
+        ? 'Risk assessment'
+        : row.assessment_kind === 'compliance'
+          ? 'Compliance assessment'
+          : 'Assessment';
+
+  return {
+    id: row.id,
+    title: row.name,
+    subtitle: kindLabel,
+    status: row.status,
+    detail:
+      row.instructions?.trim() ||
+      row.process_info?.trim() ||
+      (row.source_security_plan_id?.trim()
+        ? `Scoped to security plan reference ${row.source_security_plan_id.trim()}.`
+        : 'Scoped tenant assessment.'),
+    owner: ownerLabel,
+    route: `/compliance-assessments/${row.id}`,
+    keywords: [...new Set([kindLabel, row.status, ownerLabel].filter((value) => value && value.trim()))],
+    plannedStartOn: row.planned_start_on,
+    plannedFinishOn: row.planned_finish_on,
+    lastActivity: row.updated_at,
+  };
 }
 
 function normalizeNamedReference(value: unknown): NamedReference | null {
@@ -2701,8 +2994,182 @@ async function getUserRecipient(
     .first<UserRecipientRow>();
 }
 
+async function listRecentModuleRecordOpsRows(env: EnvBindings, tenantId: string, limit = 120) {
+  const result = await env.D1_MAIN.prepare(
+    `
+    SELECT
+      record.id,
+      record.module_key,
+      record.title,
+      record.status,
+      record.folder_id,
+      record.owner_user_id,
+      record.assignee_user_id,
+      record.start_on,
+      record.finish_on,
+      record.due_on,
+      record.review_on,
+      record.expires_on,
+      record.data_json,
+      record.updated_at,
+      record.created_at,
+      owner.display_name AS owner_display_name,
+      owner.first_name AS owner_first_name,
+      owner.last_name AS owner_last_name,
+      owner.email AS owner_email,
+      assignee.display_name AS assignee_display_name,
+      assignee.first_name AS assignee_first_name,
+      assignee.last_name AS assignee_last_name,
+      assignee.email AS assignee_email
+    FROM module_records AS record
+    LEFT JOIN users AS owner
+      ON owner.tenant_id = record.tenant_id AND owner.id = record.owner_user_id
+    LEFT JOIN users AS assignee
+      ON assignee.tenant_id = record.tenant_id AND assignee.id = record.assignee_user_id
+    WHERE record.tenant_id = ? AND record.archived = 0
+    ORDER BY record.updated_at DESC
+    LIMIT ?
+    `,
+  )
+    .bind(tenantId, limit)
+    .all<ModuleRecordOpsRow>();
+
+  return result.results ?? [];
+}
+
+async function listDatedModuleRecordOpsRows(env: EnvBindings, tenantId: string, limit = 120) {
+  const result = await env.D1_MAIN.prepare(
+    `
+    SELECT
+      record.id,
+      record.module_key,
+      record.title,
+      record.status,
+      record.folder_id,
+      record.owner_user_id,
+      record.assignee_user_id,
+      record.start_on,
+      record.finish_on,
+      record.due_on,
+      record.review_on,
+      record.expires_on,
+      record.data_json,
+      record.updated_at,
+      record.created_at,
+      owner.display_name AS owner_display_name,
+      owner.first_name AS owner_first_name,
+      owner.last_name AS owner_last_name,
+      owner.email AS owner_email,
+      assignee.display_name AS assignee_display_name,
+      assignee.first_name AS assignee_first_name,
+      assignee.last_name AS assignee_last_name,
+      assignee.email AS assignee_email
+    FROM module_records AS record
+    LEFT JOIN users AS owner
+      ON owner.tenant_id = record.tenant_id AND owner.id = record.owner_user_id
+    LEFT JOIN users AS assignee
+      ON assignee.tenant_id = record.tenant_id AND assignee.id = record.assignee_user_id
+    WHERE record.tenant_id = ?
+      AND record.archived = 0
+      AND (
+        record.start_on IS NOT NULL OR
+        record.finish_on IS NOT NULL OR
+        record.due_on IS NOT NULL OR
+        record.review_on IS NOT NULL OR
+        record.expires_on IS NOT NULL
+      )
+    ORDER BY COALESCE(record.due_on, record.review_on, record.expires_on, record.finish_on, record.start_on) ASC
+    LIMIT ?
+    `,
+  )
+    .bind(tenantId, limit)
+    .all<ModuleRecordOpsRow>();
+
+  return result.results ?? [];
+}
+
+async function listRecentAssessmentOpsRows(env: EnvBindings, tenantId: string, limit = 40) {
+  const result = await env.D1_MAIN.prepare(
+    `
+    SELECT
+      assessment.id,
+      assessment.name,
+      assessment.status,
+      assessment.assessment_kind,
+      assessment.lead_assessor_user_id,
+      lead.display_name AS lead_assessor_display_name,
+      lead.first_name AS lead_assessor_first_name,
+      lead.last_name AS lead_assessor_last_name,
+      lead.email AS lead_assessor_email,
+      assessment.planned_start_on,
+      assessment.planned_finish_on,
+      assessment.instructions,
+      assessment.process_info,
+      assessment.source_security_plan_id,
+      assessment.updated_at,
+      assessment.created_at
+    FROM compliance_assessments AS assessment
+    LEFT JOIN users AS lead
+      ON lead.tenant_id = assessment.tenant_id AND lead.id = assessment.lead_assessor_user_id
+    WHERE assessment.tenant_id = ?
+    ORDER BY assessment.updated_at DESC
+    LIMIT ?
+    `,
+  )
+    .bind(tenantId, limit)
+    .all<AssessmentOpsRow>();
+
+  return result.results ?? [];
+}
+
+async function listDatedAssessmentOpsRows(env: EnvBindings, tenantId: string, limit = 40) {
+  const result = await env.D1_MAIN.prepare(
+    `
+    SELECT
+      assessment.id,
+      assessment.name,
+      assessment.status,
+      assessment.assessment_kind,
+      assessment.lead_assessor_user_id,
+      lead.display_name AS lead_assessor_display_name,
+      lead.first_name AS lead_assessor_first_name,
+      lead.last_name AS lead_assessor_last_name,
+      lead.email AS lead_assessor_email,
+      assessment.planned_start_on,
+      assessment.planned_finish_on,
+      assessment.instructions,
+      assessment.process_info,
+      assessment.source_security_plan_id,
+      assessment.updated_at,
+      assessment.created_at
+    FROM compliance_assessments AS assessment
+    LEFT JOIN users AS lead
+      ON lead.tenant_id = assessment.tenant_id AND lead.id = assessment.lead_assessor_user_id
+    WHERE assessment.tenant_id = ?
+      AND (assessment.planned_start_on IS NOT NULL OR assessment.planned_finish_on IS NOT NULL)
+    ORDER BY COALESCE(assessment.planned_start_on, assessment.planned_finish_on) ASC
+    LIMIT ?
+    `,
+  )
+    .bind(tenantId, limit)
+    .all<AssessmentOpsRow>();
+
+  return result.results ?? [];
+}
+
 async function buildWorkbenchSnapshot(env: EnvBindings, tenantId: string) {
-  const [usersResult, exports, imports, assignments, controlRows, conmonRows] = await Promise.all([
+  const [
+    usersResult,
+    exports,
+    imports,
+    assignments,
+    controlRows,
+    conmonRows,
+    grcJobRows,
+    grcReportRows,
+    moduleRecordRows,
+    assessmentRows,
+  ] = await Promise.all([
     env.D1_MAIN.prepare(
       `
       SELECT id, email, display_name, first_name, last_name
@@ -2770,7 +3237,124 @@ async function buildWorkbenchSnapshot(env: EnvBindings, tenantId: string) {
     )
       .bind(tenantId)
       .all<WorkbenchItemRow>(),
+    env.D1_MAIN.prepare(
+      `
+      SELECT
+        job.id,
+        job.job_type,
+        job.source_ref,
+        job.status,
+        COALESCE(job.finished_at, job.started_at, job.updated_at, job.created_at) AS activity_at,
+        job.result_json,
+        job.diagnostics_json
+      FROM grc_job_runs AS job
+      WHERE job.tenant_id = ?
+      ORDER BY COALESCE(job.finished_at, job.started_at, job.updated_at, job.created_at) DESC
+      LIMIT 10
+      `,
+    )
+      .bind(tenantId)
+      .all<{
+        id: string;
+        job_type: string;
+        source_ref: string | null;
+        status: string;
+        activity_at: string;
+        result_json: string;
+        diagnostics_json: string;
+      }>(),
+    env.D1_MAIN.prepare(
+      `
+      SELECT
+        snapshot.id,
+        snapshot.report_kind,
+        snapshot.title,
+        snapshot.status,
+        snapshot.updated_at
+      FROM grc_report_snapshots AS snapshot
+      WHERE snapshot.tenant_id = ?
+      ORDER BY snapshot.updated_at DESC
+      LIMIT 8
+      `,
+    )
+      .bind(tenantId)
+      .all<{
+        id: string;
+        report_kind: string;
+        title: string;
+        status: string;
+        updated_at: string;
+      }>(),
+    listRecentModuleRecordOpsRows(env, tenantId),
+    listRecentAssessmentOpsRows(env, tenantId),
   ]);
+
+  const moduleWorkbenchItems = moduleRecordRows
+    .map(toModuleRecordOpsItem)
+    .filter((item): item is ModuleRecordOpsItem => Boolean(item))
+    .map((item) => {
+      const normalizedStatus = normalizeWorkbenchStatus(item.status);
+      const actionableDate = item.dueOn ?? item.reviewOn ?? item.expiresOn ?? item.finishOn ?? item.startOn;
+      return {
+        id: item.id,
+        title: item.title,
+        module: item.moduleLabel,
+        status: normalizedStatus,
+        owner: item.owner,
+        priority:
+          normalizedStatus === 'Action Needed'
+            ? 'High'
+            : actionableDate
+              ? 'Watch'
+              : 'Medium',
+        dueDate: actionableDate,
+        route: item.route,
+        summary: item.detail,
+        lastActivity: item.lastActivity,
+        progress:
+          normalizedStatus === 'Done'
+            ? 100
+            : normalizedStatus === 'In Review'
+              ? 75
+              : normalizedStatus === 'In Progress'
+                ? 55
+                : normalizedStatus === 'Action Needed'
+                  ? 35
+                  : 20,
+      };
+    });
+
+  const assessmentWorkbenchItems = assessmentRows.map((row) => {
+    const item = toAssessmentOpsItem(row);
+    const normalizedStatus = normalizeWorkbenchStatus(item.status);
+    return {
+      id: item.id,
+      title: item.title,
+      module: 'Assessments',
+      status: normalizedStatus,
+      owner: item.owner,
+      priority:
+        item.plannedFinishOn && normalizedStatus !== 'Done'
+          ? 'High'
+          : normalizedStatus === 'Action Needed'
+            ? 'High'
+            : 'Medium',
+      dueDate: item.plannedFinishOn,
+      route: item.route,
+      summary: item.detail,
+      lastActivity: item.lastActivity,
+      progress:
+        normalizedStatus === 'Done'
+          ? 100
+          : normalizedStatus === 'In Review'
+            ? 75
+            : normalizedStatus === 'In Progress'
+              ? 55
+              : normalizedStatus === 'Action Needed'
+                ? 35
+                : 20,
+    };
+  });
 
   const items = [
     ...(controlRows.results ?? []).map((row) => ({
@@ -2854,6 +3438,37 @@ async function buildWorkbenchSnapshot(env: EnvBindings, tenantId: string) {
             ? 30
             : 60,
     })),
+    ...(grcJobRows.results ?? []).map((row) => ({
+      id: row.id,
+      title: row.job_type.replace(/-/g, ' '),
+      module: 'GRC Engine',
+      status: normalizeWorkbenchStatus(row.status),
+      owner: row.source_ref ?? 'Tenant-wide',
+      priority: row.status === 'failed' ? 'High' : 'Medium',
+      dueDate: null,
+      route: '/grc-admin',
+      summary:
+        row.status === 'failed'
+          ? `Background GRC job failed: ${row.job_type}.`
+          : `Background GRC job ${row.job_type.replace(/-/g, ' ')} ${row.status}.`,
+      lastActivity: row.activity_at,
+      progress: row.status === 'completed' ? 100 : row.status === 'failed' ? 35 : 60,
+    })),
+    ...(grcReportRows.results ?? []).map((row) => ({
+      id: row.id,
+      title: row.title,
+      module: 'GRC Reports',
+      status: normalizeWorkbenchStatus(row.status),
+      owner: row.report_kind,
+      priority: 'Watch',
+      dueDate: null,
+      route: '/report-bundles',
+      summary: `${row.report_kind.replace(/-/g, ' ')} snapshot is available for downstream delivery surfaces.`,
+      lastActivity: row.updated_at,
+      progress: row.status === 'ready' ? 100 : 65,
+    })),
+    ...moduleWorkbenchItems,
+    ...assessmentWorkbenchItems,
   ].sort((a, b) => b.lastActivity.localeCompare(a.lastActivity));
 
   const activeItems = items.filter((item) => item.status !== 'Done');
@@ -2912,7 +3527,7 @@ async function buildWorkbenchSnapshot(env: EnvBindings, tenantId: string) {
 }
 
 async function buildNewsFeedSnapshot(env: EnvBindings, tenantId: string) {
-  const [exports, imports, assignments, sessions, evidenceJobsResult] = await Promise.all([
+  const [exports, imports, assignments, sessions, evidenceJobsResult, grcJobRows, grcReportRows] = await Promise.all([
     listReportExports(env, tenantId),
     listImports(env, tenantId),
     listPortalAssignments(env, tenantId),
@@ -2942,6 +3557,50 @@ async function buildNewsFeedSnapshot(env: EnvBindings, tenantId: string) {
         status: string;
         occurred_at: string | null;
         status_detail: string | null;
+      }>(),
+    env.D1_MAIN.prepare(
+      `
+      SELECT
+        job.id,
+        job.job_type,
+        job.source_ref,
+        job.status,
+        COALESCE(job.finished_at, job.started_at, job.updated_at, job.created_at) AS occurred_at
+      FROM grc_job_runs AS job
+      WHERE job.tenant_id = ?
+      ORDER BY COALESCE(job.finished_at, job.started_at, job.updated_at, job.created_at) DESC
+      LIMIT 8
+      `,
+    )
+      .bind(tenantId)
+      .all<{
+        id: string;
+        job_type: string;
+        source_ref: string | null;
+        status: string;
+        occurred_at: string;
+      }>(),
+    env.D1_MAIN.prepare(
+      `
+      SELECT
+        snapshot.id,
+        snapshot.report_kind,
+        snapshot.title,
+        snapshot.status,
+        snapshot.updated_at
+      FROM grc_report_snapshots AS snapshot
+      WHERE snapshot.tenant_id = ?
+      ORDER BY snapshot.updated_at DESC
+      LIMIT 8
+      `,
+    )
+      .bind(tenantId)
+      .all<{
+        id: string;
+        report_kind: string;
+        title: string;
+        status: string;
+        updated_at: string;
       }>(),
   ]);
 
@@ -3004,6 +3663,32 @@ async function buildNewsFeedSnapshot(env: EnvBindings, tenantId: string) {
       summary: job.status_detail || `${job.provider} collection job ${job.status.replace(/_/g, ' ')}.`,
       route: '/evidence/jobs',
       occurredAt: job.occurred_at ?? nowIso(),
+      actor: null,
+    })),
+    ...(grcJobRows.results ?? []).map((job) => ({
+      id: job.id,
+      title: job.job_type.replace(/-/g, ' '),
+      module: 'GRC Engine',
+      type: 'Workflow',
+      priority: job.status === 'failed' ? 'Action' : 'Watch',
+      status: job.status,
+      summary: job.source_ref
+        ? `${job.job_type.replace(/-/g, ' ')} executed for ${job.source_ref}.`
+        : `${job.job_type.replace(/-/g, ' ')} executed for the tenant scope.`,
+      route: '/grc-admin',
+      occurredAt: job.occurred_at,
+      actor: null,
+    })),
+    ...(grcReportRows.results ?? []).map((item) => ({
+      id: item.id,
+      title: item.title,
+      module: 'GRC Reports',
+      type: 'Report',
+      priority: 'Info',
+      status: item.status,
+      summary: `${item.report_kind.replace(/-/g, ' ')} snapshot is ready for reports and compliance exports.`,
+      route: '/report-bundles',
+      occurredAt: item.updated_at,
       actor: null,
     })),
   ]
@@ -3768,6 +4453,20 @@ async function getQuantitativeHypothesisDetail(
 
 async function buildParityOverview(ctx: WorkerRequestContext, access: OpsSurfaceAccessProfile) {
   const tenantId = ctx.tenantId as string;
+  const [moduleRecordRows, datedModuleRecordRows, assessmentRows, datedAssessmentRows] = await Promise.all([
+    listRecentModuleRecordOpsRows(ctx.env, tenantId),
+    listDatedModuleRecordOpsRows(ctx.env, tenantId),
+    listRecentAssessmentOpsRows(ctx.env, tenantId),
+    listDatedAssessmentOpsRows(ctx.env, tenantId),
+  ]);
+  const moduleRecordItems = moduleRecordRows
+    .map(toModuleRecordOpsItem)
+    .filter((item): item is ModuleRecordOpsItem => Boolean(item));
+  const datedModuleRecordItems = datedModuleRecordRows
+    .map(toModuleRecordOpsItem)
+    .filter((item): item is ModuleRecordOpsItem => Boolean(item));
+  const assessmentItems = assessmentRows.map(toAssessmentOpsItem);
+  const datedAssessmentItems = datedAssessmentRows.map(toAssessmentOpsItem);
 
   const assetRows = await ctx.env.D1_MAIN.prepare(
     `
@@ -3780,16 +4479,28 @@ async function buildParityOverview(ctx: WorkerRequestContext, access: OpsSurface
     .bind(tenantId)
     .all<{ id: string; name: string; asset_assessments_json: string }>();
 
-  const assets = assetRows.results.flatMap((analysis) =>
-    parseJsonArray<BiaAssetAssessment>(analysis.asset_assessments_json).map((asset) => ({
-      id: `${analysis.id}-${asset.id}`,
-      title: asset.assetName,
-      subtitle: analysis.name,
-      status: asset.recoveryTargetsMet ? 'targets_met' : 'needs_review',
-      detail: `${asset.dependencies.length} dependencies · ${asset.associatedControls.length} controls`,
-      route: `/resilience/business-impact-analyses/${analysis.id}`,
-    })),
-  );
+  const assets = [
+    ...moduleRecordItems
+      .filter((item) => item.moduleKey === 'assets')
+      .map((item) => ({
+        id: item.id,
+        title: item.title,
+        subtitle: item.subtitle,
+        status: item.status,
+        detail: item.detail,
+        route: item.route,
+      })),
+    ...assetRows.results.flatMap((analysis) =>
+      parseJsonArray<BiaAssetAssessment>(analysis.asset_assessments_json).map((asset) => ({
+        id: `${analysis.id}-${asset.id}`,
+        title: asset.assetName,
+        subtitle: analysis.name,
+        status: asset.recoveryTargetsMet ? 'targets_met' : 'needs_review',
+        detail: `${asset.dependencies.length} dependencies · ${asset.associatedControls.length} controls`,
+        route: `/resilience/business-impact-analyses/${analysis.id}`,
+      })),
+    ),
+  ];
 
   const actorUsers = await ctx.env.D1_MAIN.prepare(
     `
@@ -3857,14 +4568,26 @@ async function buildParityOverview(ctx: WorkerRequestContext, access: OpsSurface
   )
     .bind(tenantId)
     .all<{ id: string; name: string; key: string; control_count: number }>();
-  const policies = frameworkRows.results.map((row) => ({
-    id: row.id,
-    title: row.name,
-    subtitle: row.key,
-    status: row.control_count > 0 ? 'active' : 'draft',
-    detail: `${row.control_count} mapped controls`,
-    route: `/frameworks/${row.id}`,
-  }));
+  const policies = [
+    ...moduleRecordItems
+      .filter((item) => item.moduleKey === 'policies')
+      .map((item) => ({
+        id: item.id,
+        title: item.title,
+        subtitle: item.subtitle,
+        status: item.status,
+        detail: item.detail,
+        route: item.route,
+      })),
+    ...frameworkRows.results.map((row) => ({
+      id: row.id,
+      title: row.name,
+      subtitle: row.key,
+      status: row.control_count > 0 ? 'active' : 'draft',
+      detail: `${row.control_count} mapped controls`,
+      route: `/frameworks/${row.id}`,
+    })),
+  ];
 
   const breachRows = await ctx.env.D1_MAIN.prepare(
     `
@@ -3877,14 +4600,26 @@ async function buildParityOverview(ctx: WorkerRequestContext, access: OpsSurface
   )
     .bind(tenantId)
     .all<{ id: string; name: string; status: string; risk_level: string; discovered_on: string }>();
-  const incidents = breachRows.results.map((row) => ({
-    id: row.id,
-    title: row.name,
-    subtitle: row.risk_level,
-    status: row.status,
-    detail: `Opened ${row.discovered_on}`,
-    route: '/privacy',
-  }));
+  const incidents = [
+    ...moduleRecordItems
+      .filter((item) => item.moduleKey === 'incidents')
+      .map((item) => ({
+        id: item.id,
+        title: item.title,
+        subtitle: item.subtitle,
+        status: item.status,
+        detail: item.detail,
+        route: item.route,
+      })),
+    ...breachRows.results.map((row) => ({
+      id: row.id,
+      title: row.name,
+      subtitle: row.risk_level,
+      status: row.status,
+      detail: `Opened ${row.discovered_on}`,
+      route: '/privacy',
+    })),
+  ];
 
   const exceptionRows = await ctx.env.D1_MAIN.prepare(
     `
@@ -3914,14 +4649,26 @@ async function buildParityOverview(ctx: WorkerRequestContext, access: OpsSurface
       assessment_id: string;
       assessment_name: string;
     }>();
-  const exceptions = exceptionRows.results.map((row) => ({
-    id: row.id,
-    title: `${row.control_ref} ${row.control_title}`,
-    subtitle: row.assessment_name,
-    status: row.result,
-    detail: 'Tracked as an exception candidate from compliance review.',
-    route: `/compliance-assessments/${row.assessment_id}`,
-  }));
+  const exceptions = [
+    ...moduleRecordItems
+      .filter((item) => item.moduleKey === 'exceptions')
+      .map((item) => ({
+        id: item.id,
+        title: item.title,
+        subtitle: item.subtitle,
+        status: item.status,
+        detail: item.detail,
+        route: item.route,
+      })),
+    ...exceptionRows.results.map((row) => ({
+      id: row.id,
+      title: `${row.control_ref} ${row.control_title}`,
+      subtitle: row.assessment_name,
+      status: row.result,
+      detail: 'Tracked as an exception candidate from compliance review.',
+      route: `/compliance-assessments/${row.assessment_id}`,
+    })),
+  ];
 
   const counts = await Promise.all([
     getTenantCount(ctx.env, 'frameworks', tenantId),
@@ -3942,7 +4689,42 @@ async function buildParityOverview(ctx: WorkerRequestContext, access: OpsSurface
     { id: 'quant', label: 'Quant studies', value: counts[6], detail: 'Economic loss models' },
   ];
 
+  const moduleCalendar = datedModuleRecordItems.flatMap((item) =>
+    [
+      { label: 'Start', value: item.startOn },
+      { label: 'Finish', value: item.finishOn },
+      { label: 'Due', value: item.dueOn },
+      { label: 'Review', value: item.reviewOn },
+      { label: 'Expires', value: item.expiresOn },
+    ]
+      .filter((entry) => Boolean(entry.value))
+      .map((entry) => ({
+        id: `${item.id}-${entry.label.toLowerCase()}`,
+        title: item.title,
+        date: entry.value as string,
+        detail: `${item.moduleLabel} ${entry.label.toLowerCase()} milestone`,
+        route: item.route,
+      })),
+  );
+
+  const assessmentCalendar = datedAssessmentItems.flatMap((item) =>
+    [
+      { label: 'Start', value: item.plannedStartOn },
+      { label: 'Finish', value: item.plannedFinishOn },
+    ]
+      .filter((entry) => Boolean(entry.value))
+      .map((entry) => ({
+        id: `${item.id}-assessment-${entry.label.toLowerCase()}`,
+        title: item.title,
+        date: entry.value as string,
+        detail: `${item.subtitle} ${entry.label.toLowerCase()} window`,
+        route: item.route,
+      })),
+  );
+
   const calendar = [
+    ...moduleCalendar,
+    ...assessmentCalendar,
     ...actorAssignments
       .filter((assignment) => assignment.dueDate)
       .map((assignment) => ({
@@ -4012,12 +4794,48 @@ async function buildParityOverview(ctx: WorkerRequestContext, access: OpsSurface
     },
   ];
 
+  const moduleDirectorySearchIndex = MODULE_CATALOG.map((entry) => ({
+    id: `module-${entry.moduleKey}`,
+    title: entry.pluralName,
+    subtitle: entry.coverageBadge,
+    section: 'Modules',
+    route: entry.implementationType === 'shared-workspace' ? entry.directRoute || entry.canonicalRoute : entry.canonicalRoute,
+    keywords: [entry.implementationType, ...entry.relatedModules],
+  }));
+
+  const moduleRecordSearchIndex = moduleRecordItems.map((item) => ({
+    id: item.id,
+    title: item.title,
+    subtitle: item.subtitle,
+    section: item.moduleLabel,
+    route: item.route,
+    keywords: item.keywords,
+  }));
+
+  const assessmentSearchIndex = assessmentItems.map((item) => ({
+    id: item.id,
+    title: item.title,
+    subtitle: item.subtitle,
+    section: 'Assessments',
+    route: item.route,
+    keywords: item.keywords,
+  }));
+
   const searchIndex = [
-    ...policies.map((item) => ({ ...item, section: 'Policies', keywords: ['policy', item.subtitle] })),
-    ...assets.map((item) => ({ ...item, section: 'Assets', keywords: ['asset', item.subtitle] })),
+    ...moduleDirectorySearchIndex,
+    ...moduleRecordSearchIndex,
+    ...assessmentSearchIndex,
+    ...policies
+      .filter((item) => item.route.startsWith('/frameworks'))
+      .map((item) => ({ ...item, section: 'Policies', keywords: ['policy', item.subtitle] })),
+    ...assets
+      .filter((item) => item.route.startsWith('/resilience/'))
+      .map((item) => ({ ...item, section: 'Assets', keywords: ['asset', item.subtitle] })),
     ...actors.map((item) => ({ ...item, section: 'Actors', keywords: ['actor', item.subtitle] })),
     ...vulnerabilities.map((item) => ({ ...item, section: 'Vulnerabilities', keywords: ['risk', item.subtitle] })),
-    ...incidents.map((item) => ({ ...item, section: 'Incidents', keywords: ['incident', item.subtitle] })),
+    ...incidents
+      .filter((item) => item.route.startsWith('/privacy'))
+      .map((item) => ({ ...item, section: 'Incidents', keywords: ['incident', item.subtitle] })),
     ...(await listEbiosStudies(ctx.env, tenantId)).map((study) => ({
       id: study.id,
       title: study.name,
@@ -4067,14 +4885,26 @@ async function buildParityOverview(ctx: WorkerRequestContext, access: OpsSurface
   )
     .bind(tenantId)
     .all<{ id: string; name: string; status: string; owner_name: string | null; eta: string | null }>();
-  const tasks = taskRows.results.map((row) => ({
-    id: row.id,
-    title: row.name,
-    subtitle: row.owner_name ?? 'Unassigned',
-    status: row.status,
-    detail: row.eta ? `ETA ${row.eta}` : 'No ETA set',
-    route: '/applied-controls/kanban-mode',
-  }));
+  const tasks = [
+    ...moduleRecordItems
+      .filter((item) => item.moduleKey === 'tasks')
+      .map((item) => ({
+        id: item.id,
+        title: item.title,
+        subtitle: item.subtitle,
+        status: item.status,
+        detail: item.detail,
+        route: item.route,
+      })),
+    ...taskRows.results.map((row) => ({
+      id: row.id,
+      title: row.name,
+      subtitle: row.owner_name ?? 'Unassigned',
+      status: row.status,
+      detail: row.eta ? `ETA ${row.eta}` : 'No ETA set',
+      route: '/applied-controls/kanban-mode',
+    })),
+  ];
 
   const dashboards = analytics.map((item) => ({
     id: item.id,
@@ -4129,10 +4959,14 @@ async function buildParityOverview(ctx: WorkerRequestContext, access: OpsSurface
     },
   ];
 
+  const visibleAssets = filterRouteItems(assets, access);
   const visibleActors = filterRouteItems(actors, access);
   const visiblePolicies = filterRouteItems(policies, access);
   const visibleVulnerabilities = filterRouteItems(vulnerabilities, access);
   const visibleIncidents = filterRouteItems(incidents, access);
+  const visibleExceptions = filterRouteItems(exceptions, access);
+  const visibleCalendar = filterRouteItems(calendar, access);
+  const visibleTasks = filterRouteItems(tasks, access);
   const visibleQuickStart = access.canViewAdminNavigation ? filterRouteItems(quickStart, access) : [];
   const visibleSearchIndex = filterRouteItems(searchIndex, access);
   const visibleValidationFlows = filterRouteItems(validationFlows, access);
@@ -4149,14 +4983,14 @@ async function buildParityOverview(ctx: WorkerRequestContext, access: OpsSurface
 
   return {
     tenantId,
-    assets,
+    assets: visibleAssets,
     actors: visibleActors,
     vulnerabilities: visibleVulnerabilities,
     policies: visiblePolicies,
     incidents: visibleIncidents,
-    exceptions,
+    exceptions: visibleExceptions,
     analytics,
-    calendar,
+    calendar: visibleCalendar,
     backupRestore: visibleBackupRestore,
     quickStart: visibleQuickStart,
     searchIndex: visibleSearchIndex,
@@ -4167,7 +5001,7 @@ async function buildParityOverview(ctx: WorkerRequestContext, access: OpsSurface
       appEnv: access.canViewInternalTools ? ctx.env.APP_ENV : 'workspace',
     },
     libraryOperations,
-    tasks,
+    tasks: visibleTasks,
     dashboards,
     validationFlows: visibleValidationFlows,
     xRays: visibleXRays,
@@ -4898,6 +5732,30 @@ export async function handleOpsRoutes(
                 'Validate entity and contract completeness, then generate a tenant-level DORA export package.',
               href: '/reports/dora-roi',
               tags: ['DORA', 'Exports', 'Authorities'],
+            },
+            {
+              id: 'grc-exec-summary',
+              title: 'GRC Executive Summary',
+              description:
+                'Generate executive and board-ready narratives from normalized findings, mapped controls, and gap assessments.',
+              href: '/gap-assessments',
+              tags: ['GRC', 'Executive', 'Narrative'],
+            },
+            {
+              id: 'grc-program-health',
+              title: 'Program Health Snapshot',
+              description:
+                'Summarize risk, vendor, policy, incident, and exception posture from the canonical GRC engine.',
+              href: '/report-bundles',
+              tags: ['GRC', 'Program', 'Health'],
+            },
+            {
+              id: 'grc-automation-coverage',
+              title: 'Automation Coverage Snapshot',
+              description:
+                'Track native collector readiness and evidence automation coverage across GitHub, Wiz, AWS, and Okta.',
+              href: '/grc-admin',
+              tags: ['GRC', 'Automation', 'Collectors'],
             },
           ],
           exports: await listReportExports(ctx.env, ctx.tenantId),

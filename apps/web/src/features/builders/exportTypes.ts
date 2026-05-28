@@ -1,5 +1,5 @@
 export type ExportStatus = 'Active' | 'Inactive';
-export type ExportModule = 'Security Plans' | 'Master Assessments' | 'Evidence';
+export type ExportModule = string;
 export type ExportType = 'DOCX' | 'XLSX';
 export type RenderType =
   | 'Text'

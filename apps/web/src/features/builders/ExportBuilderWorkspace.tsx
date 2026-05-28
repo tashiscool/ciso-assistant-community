@@ -62,6 +62,8 @@ const renderTypes: RenderType[] = [
   'Image',
 ];
 
+const exportModules: ExportModule[] = ['Security Plans', 'Security Controls', 'Risks', 'Assets', 'Master Assessments', 'Evidence'];
+
 const filterFieldOptions = [
   'status',
   'owner',
@@ -130,6 +132,24 @@ function emptyFilterRow(): FilterRow {
     operator: 'Equals',
     value: 'Active',
   };
+}
+
+function moduleContextCopy(module: ExportModule) {
+  switch (module) {
+    case 'Master Assessments':
+      return 'Assessment-context mode is active. Use master-assessment fields when you need SAP, SAR, or assessment-aware package generation.';
+    case 'Security Controls':
+      return 'Control-register mode is active. Focus mappings on implementation status, responsible roles, assessment posture, and evidence-ready control details.';
+    case 'Risks':
+      return 'Risk-register mode is active. Focus mappings on scoring, ownership, mitigation, and due-date rollups.';
+    case 'Assets':
+      return 'Asset-inventory mode is active. Focus mappings on asset identity, platform details, ownership, location, and classification.';
+    case 'Evidence':
+      return 'Evidence mode is active. Use evidence-centric tags, files, and supporting artifacts for export generation.';
+    case 'Security Plans':
+    default:
+      return 'Security-plan mode is active. Use plan metadata, system-owner details, and implementation narrative fields for narrative document generation.';
+  }
 }
 
 export function ExportBuilderWorkspace() {
@@ -807,9 +827,11 @@ export function ExportBuilderWorkspace() {
                           setDraft({ ...draft, module: event.target.value as ExportModule })
                         }
                       >
-                        <option value="Security Plans">Security Plans</option>
-                        <option value="Master Assessments">Master Assessments</option>
-                        <option value="Evidence">Evidence</option>
+                        {exportModules.map((module) => (
+                          <option key={module} value={module}>
+                            {module}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div>
@@ -875,21 +897,20 @@ export function ExportBuilderWorkspace() {
                     </div>
 
                     <div className="panel-subtle">
-                      <div className="eyebrow">Master Assessment Mode</div>
+                      <div className="eyebrow">Module Context</div>
                       <div className="mt-4 space-y-3 text-sm text-slate-300">
                         <div>
-                          Use this mode when the export should route through a master assessment context
-                          for SAP, SAR, and assessment-aware package generation.
+                          Export Builder now supports security plan, security control, risk, asset,
+                          master assessment, and evidence-oriented output models from the same mapping surface.
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          <span className="badge-neutral">masterAssessmentId</span>
-                          <span className="badge-neutral">SAP / SAR routing</span>
-                          <span className="badge-neutral">Related file subsystem</span>
+                          <span className="badge-neutral">Narrative packages</span>
+                          <span className="badge-neutral">Control matrices</span>
+                          <span className="badge-neutral">Risk registers</span>
+                          <span className="badge-neutral">Asset inventories</span>
                         </div>
                         <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-slate-400">
-                          {draft.module === 'Master Assessments'
-                            ? 'This export is currently configured in assessment-context mode.'
-                            : 'Switch the module to Master Assessments when you need SAP / SAR document generation.'}
+                          {moduleContextCopy(draft.module)}
                         </div>
                       </div>
                     </div>

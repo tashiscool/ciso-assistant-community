@@ -12,6 +12,7 @@ import {
   type WorkflowRunRecord,
   type WorkflowRunStatus,
 } from '../../utils/workflows';
+import { publishAssurancePackageToFedrampShell } from '../fedramp/runtime';
 import {
   buildAssuranceExplanation,
   loadPackageArtifactPreview,
@@ -2544,8 +2545,13 @@ export async function handleAssuranceRoutes(
           }),
           new Date().toISOString(),
           new Date().toISOString(),
-        )
+      )
         .run();
+      await publishAssurancePackageToFedrampShell(ctx.env, {
+        tenantId: access.tenantId,
+        userId: access.userId,
+        packageJobId,
+      });
       await patchWorkflowRun(ctx, access.tenantId, {
         runId: workflowRunId,
         status: artifacts.reviewRecommendations.length > 0 ? 'Awaiting Review' : 'Done',
@@ -2859,8 +2865,13 @@ export async function handleAssuranceRoutes(
           }),
           new Date().toISOString(),
           new Date().toISOString(),
-        )
+      )
         .run();
+      await publishAssurancePackageToFedrampShell(ctx.env, {
+        tenantId: access.tenantId,
+        userId: access.userId,
+        packageJobId,
+      });
       await patchWorkflowRun(ctx, access.tenantId, {
         runId: packageJobId,
         status: artifacts.reviewRecommendations.length > 0 ? 'Awaiting Review' : 'Done',

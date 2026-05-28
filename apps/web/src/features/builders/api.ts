@@ -3,6 +3,7 @@ import type {
   QuestionnaireBuilderDetailResponse,
   QuestionnaireQuestion,
   QuestionnaireRule,
+  QuestionnaireTemplateKind,
   QuestionnaireTemplateSummary,
   RuleValidationResult,
   RuleSetDetail,
@@ -20,6 +21,18 @@ export async function createQuestionnaireTemplate(body?: {
   name?: string;
   description?: string | null;
   audience?: string | null;
+  templateKind?: QuestionnaireTemplateKind;
+  sourceFramework?: string | null;
+  usageNotes?: string | null;
+  questionnaireType?: string | null;
+  assignmentModel?: string | null;
+  relatedWorkflow?: string | null;
+  attestationScope?: string | null;
+  responseOwnerModel?: string | null;
+  evidenceCollectionMode?: string | null;
+  fileUploadGuidance?: string | null;
+  exportMode?: string | null;
+  distributionCadence?: string | null;
 }): Promise<QuestionnaireBuilderDetailResponse> {
   const response = await client.post<{ data: QuestionnaireBuilderDetailResponse }>('/builders/questionnaires', body ?? {});
   return response.data;
@@ -36,8 +49,20 @@ export async function saveQuestionnaireTemplate(
     name: string;
     description: string | null;
     status: string;
+    templateKind: QuestionnaireTemplateKind;
     scoringMode: string;
     audience: string | null;
+    sourceFramework?: string | null;
+    usageNotes?: string | null;
+    questionnaireType?: string | null;
+    assignmentModel?: string | null;
+    relatedWorkflow?: string | null;
+    attestationScope?: string | null;
+    responseOwnerModel?: string | null;
+    evidenceCollectionMode?: string | null;
+    fileUploadGuidance?: string | null;
+    exportMode?: string | null;
+    distributionCadence?: string | null;
     questions: QuestionnaireQuestion[];
   },
 ): Promise<QuestionnaireBuilderDetailResponse> {

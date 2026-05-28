@@ -1,11 +1,13 @@
 import { TenantWorkflowCoordinator } from './durable-objects/TenantWorkflowCoordinator';
 import { consumeConMonQueue } from './queues/conmon';
 import { consumeEvidenceQueue } from './queues/evidence';
+import { consumeGrcQueue } from './queues/grc';
 import { handleRequest } from './router';
 import type {
   ConMonJobMessage,
   EnvBindings,
   EvidenceJobMessage,
+  GrcQueueMessage,
   QueueMessagePayload,
 } from './types/env';
 import { json, serveApplicationAsset } from './utils/http';
@@ -45,6 +47,13 @@ export default {
         return;
       case 'ciso-assistant-conmon-jobs':
         await consumeConMonQueue(batch as MessageBatch<ConMonJobMessage>, env, ctx);
+        return;
+      case 'ciso-assistant-grc-content-import':
+      case 'ciso-assistant-grc-scf-refresh':
+      case 'ciso-assistant-grc-finding-ingest':
+      case 'ciso-assistant-grc-gap-report':
+      case 'ciso-assistant-grc-ai-enrich':
+        await consumeGrcQueue(batch as unknown as MessageBatch<GrcQueueMessage>, env, ctx);
         return;
       default:
         console.warn(`No queue consumer registered for ${batch.queue}`);

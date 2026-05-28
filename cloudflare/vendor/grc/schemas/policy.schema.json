@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/GRCEngClub/claude-grc-engineering/schemas/policy.schema.json",
+  "title": "GRC Policy Lifecycle Record",
+  "description": "Canonical contract for policy metadata and lifecycle state stored in grc-data.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "policy_id",
+    "title",
+    "status",
+    "version",
+    "owner",
+    "document_path"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "policy_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]+$"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "in_review",
+        "approved",
+        "retired"
+      ]
+    },
+    "version": {
+      "type": "string",
+      "description": "Document or policy version."
+    },
+    "owner": {
+      "$ref": "#/$defs/person_ref"
+    },
+    "approvers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/person_ref"
+      }
+    },
+    "document_path": {
+      "type": "string",
+      "description": "Path to the policy source document in the user's repo."
+    },
+    "effective_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "next_review_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "review_interval_days": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "framework_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "control_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "person_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "team": {
+          "type": "string"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "name"
+          ]
+        },
+        {
+          "required": [
+            "team"
+          ]
+        },
+        {
+          "required": [
+            "email"
+          ]
+        }
+      ]
+    }
+  }
+}

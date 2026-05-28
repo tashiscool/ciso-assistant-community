@@ -1,8 +1,9 @@
 import type { WorkerRequestContext } from '../../router';
 import { json, methodNotAllowed, readJson } from '../../utils/http';
+import { MODULE_CATALOG } from '../core/moduleRegistry';
 
 type ExportStatus = 'Active' | 'Inactive';
-type ExportModule = 'Security Plans' | 'Master Assessments' | 'Evidence';
+type ExportModule = string;
 type ExportType = 'DOCX' | 'XLSX';
 type RenderType =
   | 'Text'
@@ -245,11 +246,24 @@ const fieldCatalog: FieldCatalogNode[] = [
         id: 'security-plan-core',
         name: 'Core Metadata',
         children: [
+          { id: 'field-plan-name', name: 'Plan Name', path: 'Security Plan.Plan Name', fieldType: 'Text', helper: 'Reusable plan title for registers, coversheets, and document indexes.' },
           { id: 'field-system-name', name: 'System Name', path: 'Security Plan.System Name', fieldType: 'Text', helper: 'Canonical title used in narrative exports.' },
+          { id: 'field-other-identifier', name: 'Other Identifier', path: 'Security Plan.Other Identifier', fieldType: 'Text', helper: 'Supports alternate IDs, package codes, and external system references.' },
+          { id: 'field-plan-status', name: 'Status', path: 'Security Plan.Status', fieldType: 'Text', helper: 'Lifecycle state for plan summaries and cover sheets.' },
+          { id: 'field-system-type', name: 'System Type', path: 'Security Plan.System Type', fieldType: 'Text', helper: 'Commonly used in SSP system overview sections.' },
+          { id: 'field-risk-maturity-level', name: 'Risk Maturity Level', path: 'Security Plan.Risk Maturity Level', fieldType: 'Text', helper: 'Semantic parity with imported plan rollups and dashboards.' },
+          { id: 'field-facility', name: 'Facility', path: 'Security Plan.Facility', fieldType: 'Text', helper: 'Facility or location reference attached to the plan.' },
+          { id: 'field-organization', name: 'Organization', path: 'Security Plan.Organization', fieldType: 'Text', helper: 'Owning business unit or organization label.' },
+          { id: 'field-description', name: 'Description', path: 'Security Plan.Description', fieldType: 'Text', helper: 'Narrative summary of the system or boundary.' },
           { id: 'field-authorization-date', name: 'Authorization Date', path: 'Security Plan.Authorization Date', fieldType: 'Date', helper: 'Supports formatted date rendering.' },
+          { id: 'field-ato-date', name: 'ATO Date', path: 'Security Plan.ATO Date', fieldType: 'Date', helper: 'Common authorization shorthand used in system registers.' },
+          { id: 'field-ato-expiration', name: 'ATO Expiration', path: 'Security Plan.ATO Expiration', fieldType: 'Date', helper: 'Expiration or reauthorization due date for exports.' },
+          { id: 'field-fips-category', name: 'FIPS Category', path: 'Security Plan.FIPS Category', fieldType: 'Text', helper: 'Categorization alias used in some plan templates.' },
           { id: 'field-categorization', name: 'Categorization', path: 'Security Plan.System Categorization', fieldType: 'Text', helper: 'Required by FedRAMP narrative packages.' },
           { id: 'field-owner-name', name: 'System Owner Name', path: 'Security Plan.System Owner.Name', fieldType: 'Person', helper: 'Supports person-display formatting.' },
           { id: 'field-owner-email', name: 'System Owner Email', path: 'Security Plan.System Owner.Email', fieldType: 'Text', helper: 'Useful for signatures and cover pages.' },
+          { id: 'field-created-at', name: 'Created At', path: 'Security Plan.Created At', fieldType: 'Date', helper: 'System-maintained creation timestamp for audit-ready exports.' },
+          { id: 'field-updated-at', name: 'Updated At', path: 'Security Plan.Updated At', fieldType: 'Date', helper: 'System-maintained last updated timestamp for audit-ready exports.' },
         ],
       },
       {
@@ -260,6 +274,30 @@ const fieldCatalog: FieldCatalogNode[] = [
           { id: 'field-control-id', name: 'Control Id', path: 'Control Implementation.Control Id', fieldType: 'Text', helper: 'Repeating table key for appendix rows.' },
           { id: 'field-control-title', name: 'Control Title', path: 'Control Implementation.Title', fieldType: 'Text', helper: 'Human-readable control caption.' },
           { id: 'field-evidence-count', name: 'Evidence Count', path: 'Control Implementation.Evidence Count', fieldType: 'Number', helper: 'Useful for evidence-coverage summaries.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'security-controls',
+    name: 'Security Controls',
+    helper: 'Reusable control register fields for control catalogs, matrices, and implementation summaries.',
+    children: [
+      {
+        id: 'security-controls-core',
+        name: 'Control Register',
+        children: [
+          { id: 'field-sc-control-id', name: 'Control Id', path: 'Security Controls.Control Id', fieldType: 'Text', helper: 'Primary control key for matrices and control worksheets.' },
+          { id: 'field-sc-title', name: 'Title', path: 'Security Controls.Title', fieldType: 'Text', helper: 'Human-readable control caption.' },
+          { id: 'field-sc-family', name: 'Family', path: 'Security Controls.Family', fieldType: 'Text', helper: 'Control family or domain label.' },
+          { id: 'field-sc-implementation-status', name: 'Implementation Status', path: 'Security Controls.Implementation Status', fieldType: 'Text', helper: 'Implemented / partial / planned style status output.' },
+          { id: 'field-sc-responsible-role', name: 'Responsible Role', path: 'Security Controls.Responsible Role', fieldType: 'Text', helper: 'Role or owner responsible for the control implementation.' },
+          { id: 'field-sc-description', name: 'Description', path: 'Security Controls.Description', fieldType: 'Text', helper: 'Narrative description for export-ready control detail.' },
+          { id: 'field-sc-guidance', name: 'Guidance', path: 'Security Controls.Guidance', fieldType: 'RTF / HTML', helper: 'Framework notes or internal control guidance.' },
+          { id: 'field-sc-test-procedure', name: 'Test Procedure', path: 'Security Controls.Test Procedure', fieldType: 'RTF / HTML', helper: 'Reusable assessor steps and verification guidance.' },
+          { id: 'field-sc-assessment-status', name: 'Assessment Status', path: 'Security Controls.Assessment Status', fieldType: 'Text', helper: 'Satisfied / not assessed / other than satisfied.' },
+          { id: 'field-sc-last-assessed', name: 'Last Assessed', path: 'Security Controls.Last Assessed', fieldType: 'Date', helper: 'Most recent assessment date for the control.' },
+          { id: 'field-sc-evidence-count', name: 'Evidence Count', path: 'Security Controls.Evidence Count', fieldType: 'Number', helper: 'Evidence coverage count for exports and matrices.' },
         ],
       },
     ],
@@ -283,15 +321,36 @@ const fieldCatalog: FieldCatalogNode[] = [
   {
     id: 'supporting-data',
     name: 'Supporting Data',
-    helper: 'Assets, files, and related record collections.',
+    helper: 'Assets, risks, files, and related record collections.',
     children: [
       {
         id: 'supporting-assets',
         name: 'Assets',
         children: [
+          { id: 'field-asset-id', name: 'Asset Id', path: 'Assets.Asset Id', fieldType: 'Text', helper: 'Inventory key used in export tables and worksheets.' },
           { id: 'field-asset-name', name: 'Asset Name', path: 'Assets.Name', fieldType: 'Text', helper: 'Inventory and worksheet exports.' },
-          { id: 'field-asset-ip', name: 'IP Address', path: 'Assets.IPAddress', fieldType: 'Text', helper: 'Supports infrastructure inventory outputs.' },
+          { id: 'field-asset-type', name: 'Asset Type', path: 'Assets.Type', fieldType: 'Text', helper: 'Server, application, service, or platform type.' },
+          { id: 'field-asset-ip', name: 'IP Address', path: 'Assets.IP Address', fieldType: 'Text', helper: 'Supports infrastructure inventory outputs.' },
+          { id: 'field-asset-os', name: 'Operating System', path: 'Assets.Operating System', fieldType: 'Text', helper: 'Operating system or platform version.' },
+          { id: 'field-asset-location', name: 'Location', path: 'Assets.Location', fieldType: 'Text', helper: 'Facility or deployment location label.' },
           { id: 'field-asset-owner', name: 'Asset Owner', path: 'Assets.Owner.Name', fieldType: 'Person', helper: 'Owner columns in inventory worksheets.' },
+          { id: 'field-asset-classification', name: 'Classification', path: 'Assets.Classification', fieldType: 'Text', helper: 'Sensitivity or handling classification.' },
+          { id: 'field-asset-status', name: 'Status', path: 'Assets.Status', fieldType: 'Text', helper: 'Lifecycle state for inventory exports.' },
+        ],
+      },
+      {
+        id: 'supporting-risks',
+        name: 'Risks',
+        children: [
+          { id: 'field-risk-id', name: 'Risk Id', path: 'Risks.Risk Id', fieldType: 'Text', helper: 'Primary key for risk registers and treatment plans.' },
+          { id: 'field-risk-title', name: 'Title', path: 'Risks.Title', fieldType: 'Text', helper: 'Short risk label used in summaries and exports.' },
+          { id: 'field-risk-likelihood', name: 'Likelihood', path: 'Risks.Likelihood', fieldType: 'Text', helper: 'Likelihood or probability value from the configured model.' },
+          { id: 'field-risk-impact', name: 'Impact', path: 'Risks.Impact', fieldType: 'Text', helper: 'Impact or consequence value from the configured model.' },
+          { id: 'field-risk-level', name: 'Risk Level', path: 'Risks.Risk Level', fieldType: 'Text', helper: 'Calculated or assigned risk rating.' },
+          { id: 'field-risk-mitigation', name: 'Mitigation', path: 'Risks.Mitigation', fieldType: 'Text', helper: 'Primary mitigation or treatment narrative.' },
+          { id: 'field-risk-status', name: 'Status', path: 'Risks.Status', fieldType: 'Text', helper: 'Open, accepted, mitigating, or closed state.' },
+          { id: 'field-risk-owner', name: 'Owner', path: 'Risks.Owner.Name', fieldType: 'Person', helper: 'Owner display field for registers and accountability tables.' },
+          { id: 'field-risk-due-date', name: 'Due Date', path: 'Risks.Due Date', fieldType: 'Date', helper: 'Target date for mitigation or review completion.' },
         ],
       },
       {
@@ -313,7 +372,60 @@ const starterTemplates: StarterTemplate[] = [
   { id: 'starter-fedramp-appendix-a', title: 'FedRAMP Rev 5 Appendix A', module: 'Security Plans', exportGroup: 'Appendices', exportType: 'XLSX', description: 'Worksheet-oriented appendix for control, ownership, and evidence summaries.', kind: 'system', defaultFileName: 'fedramp-rev5-appendix-a.xlsx', defaultTags: ['{{asset_name}}', '{{asset_ip}}', '{{asset_owner}}', '{{evidence_count}}'] },
   { id: 'starter-fedramp-separation', title: 'FedRAMP Rev 5 Separation of Duties Matrix', module: 'Security Plans', exportGroup: 'Appendices', exportType: 'XLSX', description: 'Responsibility matrix for teams, controls, and approval roles.', kind: 'system', defaultFileName: 'fedramp-rev5-separation-of-duties.xlsx', defaultTags: ['{{system_owner.name}}', '{{control_id}}', '{{control_title}}'] },
   { id: 'starter-labs-ssp', title: 'LABS SSP', module: 'Security Plans', exportGroup: 'Starter Templates', exportType: 'DOCX', description: 'Internal starter narrative package for solution labs and early drafts.', kind: 'system', defaultFileName: 'labs-ssp.docx', defaultTags: ['{{system_name}}', '{{system_owner.name}}', '{{implementation_statement}}'] },
+  { id: 'starter-controls-matrix', title: 'Security Controls Matrix', module: 'Security Controls', exportGroup: 'Control Deliverables', exportType: 'XLSX', description: 'Control implementation matrix with ownership, assessment, and evidence coverage fields.', kind: 'system', defaultFileName: 'security-controls-matrix.xlsx', defaultTags: ['{{control_id}}', '{{control_title}}', '{{implementation_status}}', '{{responsible_role}}', '{{assessment_status}}', '{{evidence_count}}'] },
+  { id: 'starter-risk-register', title: 'Risk Register', module: 'Risks', exportGroup: 'Risk Deliverables', exportType: 'XLSX', description: 'Risk register export with scoring, ownership, mitigation, and due dates.', kind: 'system', defaultFileName: 'risk-register.xlsx', defaultTags: ['{{risk_id}}', '{{risk_title}}', '{{likelihood}}', '{{impact}}', '{{risk_level}}', '{{mitigation}}', '{{risk_owner}}', '{{due_date}}'] },
+  { id: 'starter-asset-inventory', title: 'Asset Inventory', module: 'Assets', exportGroup: 'Inventory Deliverables', exportType: 'XLSX', description: 'Asset inventory export with ownership, platform, and classification details.', kind: 'system', defaultFileName: 'asset-inventory.xlsx', defaultTags: ['{{asset_id}}', '{{asset_name}}', '{{asset_type}}', '{{asset_ip}}', '{{asset_os}}', '{{asset_location}}', '{{asset_owner}}', '{{asset_classification}}', '{{asset_status}}'] },
 ];
+
+function starterTemplateModuleName(moduleKey: string, pluralName: string): ExportModule {
+  switch (moduleKey) {
+    case 'catalogues':
+      return 'Catalogues';
+    case 'assessment-plans':
+      return 'Assessment Plans';
+    default:
+      return pluralName;
+  }
+}
+
+function buildGeneratedFieldCatalog(): FieldCatalogNode[] {
+  return MODULE_CATALOG.filter((entry) => Array.isArray(entry.starterFields) && entry.starterFields.length > 0)
+    .map((entry) => ({
+      id: `catalog-${entry.moduleKey}`,
+      name: entry.pluralName,
+      helper: entry.description,
+      children: [
+        {
+          id: `catalog-${entry.moduleKey}-core`,
+          name: `${entry.moduleName} Register`,
+          children: (entry.starterFields ?? []).map((field) => ({
+            id: `field-${entry.moduleKey}-${field.systemName}`,
+            name: field.displayName,
+            path: `${starterTemplateModuleName(entry.moduleKey, entry.pluralName)}.${field.displayName}`,
+            helper: field.helpText ?? `${field.displayName} field from the ${entry.pluralName.toLowerCase()} workspace.`,
+            fieldType: field.fieldType,
+          })),
+        },
+      ],
+    }))
+    .filter((node) => node.children?.[0]?.children?.length);
+}
+
+function buildGeneratedStarterTemplates(): StarterTemplate[] {
+  return MODULE_CATALOG.filter((entry) => entry.implementationType !== 'subfeature' && Array.isArray(entry.starterFields) && entry.starterFields.length > 0)
+    .map((entry) => ({
+      id: `starter-${entry.moduleKey}-register`,
+      title: `${entry.pluralName} Register`,
+      module: starterTemplateModuleName(entry.moduleKey, entry.pluralName),
+      exportGroup: `${entry.pluralName} Deliverables`,
+      exportType: 'XLSX' as ExportType,
+      description: `Register-style export starter for ${entry.pluralName.toLowerCase()} with seeded semantic data fields.`,
+      kind: 'system' as const,
+      defaultFileName: `${entry.moduleKey}-register.xlsx`,
+      defaultTags: (entry.starterFields ?? []).slice(0, 8).map((field) => `{{${field.systemName}}}`),
+    }))
+    .filter((template) => template.defaultTags.length > 0);
+}
 
 function flattenFieldCatalog(nodes: FieldCatalogNode[]): FlatFieldNode[] {
   const flat: FlatFieldNode[] = [];
@@ -333,7 +445,21 @@ function flattenFieldCatalog(nodes: FieldCatalogNode[]): FlatFieldNode[] {
   return flat;
 }
 
-const flatFieldCatalog = flattenFieldCatalog(fieldCatalog);
+const mergedFieldCatalog = [
+  ...fieldCatalog,
+  ...buildGeneratedFieldCatalog().filter(
+    (node) => !fieldCatalog.some((existing) => existing.name.toLowerCase() === node.name.toLowerCase()),
+  ),
+];
+
+const mergedStarterTemplates = [
+  ...starterTemplates,
+  ...buildGeneratedStarterTemplates().filter(
+    (template) => !starterTemplates.some((existing) => existing.id === template.id),
+  ),
+];
+
+const flatFieldCatalog = flattenFieldCatalog(mergedFieldCatalog);
 
 function normalize(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
@@ -391,6 +517,9 @@ function tableRegionForTag(tag: string): string {
   if (lower.includes('asset')) {
     return 'Assets Table';
   }
+  if (lower.includes('risk')) {
+    return 'Risk Register';
+  }
   if (lower.includes('control')) {
     return 'Control Matrix';
   }
@@ -425,7 +554,7 @@ function uniqueTags(tags: string[]) {
 
 function fallbackTagsFor(module: ExportModule, exportType: ExportType, fileName: string) {
   const lowerName = fileName.toLowerCase();
-  const byStarter = starterTemplates.find(
+  const byStarter = mergedStarterTemplates.find(
     (template) =>
       template.module === module &&
       template.exportType === exportType &&
@@ -436,6 +565,15 @@ function fallbackTagsFor(module: ExportModule, exportType: ExportType, fileName:
   }
   if (module === 'Master Assessments') {
     return ['{{masterAssessment.id}}', '{{masterAssessment.title}}', '{{masterAssessment.items.dateLastUpdated}}', '{{system_name}}', '{{control_id}}'];
+  }
+  if (module === 'Security Controls') {
+    return ['{{control_id}}', '{{control_title}}', '{{implementation_status}}', '{{responsible_role}}', '{{assessment_status}}', '{{evidence_count}}'];
+  }
+  if (module === 'Risks') {
+    return ['{{risk_id}}', '{{risk_title}}', '{{likelihood}}', '{{impact}}', '{{risk_level}}', '{{mitigation}}', '{{risk_owner}}', '{{due_date}}'];
+  }
+  if (module === 'Assets') {
+    return ['{{asset_id}}', '{{asset_name}}', '{{asset_type}}', '{{asset_ip}}', '{{asset_os}}', '{{asset_location}}', '{{asset_owner}}', '{{asset_classification}}', '{{asset_status}}'];
   }
   if (exportType === 'XLSX') {
     return ['{{asset_name}}', '{{asset_ip}}', '{{asset_owner}}', '{{evidence_count}}'];
@@ -497,7 +635,7 @@ function defaultFilterRows(): FilterRow[] {
 }
 
 function seedExportRows() {
-  return starterTemplates.slice(0, 3).map((template) => {
+  return mergedStarterTemplates.slice(0, 3).map((template) => {
     const analyzed = analyzeTemplateInput(template.module, template.exportType, template.defaultFileName, template.defaultTags.join('\n'));
     return {
       title: template.title,
@@ -634,8 +772,8 @@ async function toDetail(env: WorkerRequestContext['env'], tenantId: string, row:
     subTemplates: asJson<SubTemplate[]>(row.sub_templates_json, []),
     sourceTemplateId: row.source_template_id,
     sourceKind: (row.source_kind as 'system' | 'custom') || 'custom',
-    fieldCatalog,
-    starterTemplates,
+    fieldCatalog: mergedFieldCatalog,
+    starterTemplates: mergedStarterTemplates,
     testRuns: await listTestRuns(env, tenantId, row.id),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -675,7 +813,7 @@ export async function handleExportBuilderRoutes(segments: string[], ctx: WorkerR
       const rows = await ctx.env.D1_MAIN.prepare(`SELECT * FROM export_builder_exports WHERE tenant_id = ? ORDER BY updated_at DESC, title ASC`)
         .bind(tenantId)
         .all<ExportBuilderRow>();
-      return json({ data: { exports: rows.results.map(toSummary), starterTemplates, fieldCatalog } });
+      return json({ data: { exports: rows.results.map(toSummary), starterTemplates: mergedStarterTemplates, fieldCatalog: mergedFieldCatalog } });
     }
 
     if (ctx.request.method === 'POST') {
@@ -684,7 +822,7 @@ export async function handleExportBuilderRoutes(segments: string[], ctx: WorkerR
         return userIdOrResponse;
       }
       const body = await readJson<CreateExportInput>(ctx.request);
-      const starter = starterTemplates.find((template) => template.id === body.starterTemplateId);
+      const starter = mergedStarterTemplates.find((template) => template.id === body.starterTemplateId);
       const createdAt = nowIso();
       const exportId = crypto.randomUUID();
       const templateAnalysis = starter

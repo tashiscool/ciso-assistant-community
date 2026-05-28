@@ -906,10 +906,10 @@ function buildProfilesAndCatalogues(rows: ControlCatalogueRow[]) {
     const label = frameworkNames.get(frameworkId) ?? 'Security Profile';
     return {
       id: `profile-${frameworkId}`,
-      label: `${label} Core Set`,
-      description: `Derived from the loaded ${label} control catalogue for this tenant.`,
+      label: `${label} Security Profile`,
+      description: `Derived from the loaded ${label} control catalogue for this tenant and ready to seed baseline-driven security-plan or policy work.`,
       catalogues: [label],
-      controls: controls.slice(0, Math.min(controls.length, 6)),
+      controls,
     };
   });
 

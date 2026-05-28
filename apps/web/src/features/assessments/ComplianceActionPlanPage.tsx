@@ -184,6 +184,11 @@ export function ComplianceActionPlanPage() {
                       Linked requirement: {control.requirementAssessment.ref} {control.requirementAssessment.name}
                     </div>
                   )}
+                  {control.assessmentPlanItem && (
+                    <div className="mt-2 text-xs text-cyan-200">
+                      Linked line of inquiry: {control.assessmentPlanItem.ref} {control.assessmentPlanItem.prompt}
+                    </div>
+                  )}
                 </td>
                 <td className="px-4 py-4">
                   <div className="capitalize text-slate-300">{control.status.replace(/_/g, ' ')}</div>

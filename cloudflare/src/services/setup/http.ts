@@ -3,7 +3,13 @@ import type { WorkerRequestContext } from '../../router';
 import { getEmailRuntimeSummary } from '../../email';
 import type { EnvBindings } from '../../types/env';
 import { json, methodNotAllowed, readJson } from '../../utils/http';
-import { isRunnableOidcConfig, normalizeAuthProtocol, type OidcConfigRecord } from '../core/oidc';
+import {
+  isRunnableOidcConfig,
+  normalizeAuthProtocol,
+  oidcProviderRequiresClientSecret,
+  resolveOidcClientSecret,
+  type OidcConfigRecord,
+} from '../core/oidc';
 
 type SetupTagRow = {
   id: string;
@@ -533,7 +539,7 @@ function toSsoRuntimeConfig(
   };
 }
 
-function getSsoRuntimeStatus(config: OidcConfigRecord | null) {
+function getSsoRuntimeStatus(env: EnvBindings, config: OidcConfigRecord | null) {
   if (!config) {
     return {
       ready: false,
@@ -563,6 +569,14 @@ function getSsoRuntimeStatus(config: OidcConfigRecord | null) {
       ready: false,
       active: false,
       message: 'OIDC is selected, but discovery, client id, or callback settings are still incomplete.',
+    };
+  }
+
+  if (oidcProviderRequiresClientSecret(config) && !resolveOidcClientSecret(env, config)) {
+    return {
+      ready: false,
+      active: false,
+      message: 'OIDC metadata is configured, but this provider also requires a runtime client secret before sign-in can complete.',
     };
   }
 
@@ -1741,7 +1755,7 @@ async function buildSsoSnapshot(env: EnvBindings, tenantId: string) {
     .first<SetupSsoConfigRow>();
 
   const config = toSsoRuntimeConfig(env, tenantId, row);
-  const runtime = getSsoRuntimeStatus(config);
+  const runtime = getSsoRuntimeStatus(env, config);
 
   const providerCards = [
     {
@@ -1793,7 +1807,7 @@ async function buildSsoSnapshot(env: EnvBindings, tenantId: string) {
     providerCards,
     checklist: [
       'Register the callback URI on the provider exactly as shown here before testing sign-in.',
-      'Use a public-client OIDC app with PKCE. No client secret is required for the current worker flow.',
+      'Use PKCE for OIDC sign-in. Some providers, including Google web clients, also require a runtime client secret during token exchange.',
       'Map the roles claim to existing Regovise role names before enabling JIT provisioning or group sync.',
       'Test sign-in and sign-out with a non-admin account before enforcing tenant-wide access.',
     ],

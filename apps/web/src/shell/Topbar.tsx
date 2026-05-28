@@ -54,6 +54,8 @@ const ROUTE_LABELS: Record<string, string> = {
   libraries: 'Libraries',
   frameworks: 'Frameworks',
   assessments: 'Assessments',
+  'security-profiles': 'Security Profiles',
+  'threat-models': 'Threat Models',
   'risk-scenarios': 'Risk Scenarios',
   'third-party': 'Third Party',
   privacy: 'Privacy',

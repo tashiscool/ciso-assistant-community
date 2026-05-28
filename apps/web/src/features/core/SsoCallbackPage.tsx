@@ -21,6 +21,10 @@ export function SsoCallbackPage() {
   const navigate = useNavigate();
   const { setIdentity, setAuthMode } = useEdgeIdentity();
   const [error, setError] = useState<string | null>(null);
+  const roleMappingHint =
+    error && /no matching Regovise roles|same email address as the workspace account/i.test(error)
+      ? 'Check that you started sign-in for the correct workspace slug and used the same email address that the tenant administrator provisioned for your account.'
+      : null;
 
   useEffect(() => {
     let cancelled = false;
@@ -95,7 +99,14 @@ export function SsoCallbackPage() {
       </div>
 
       {error ? (
-        <div className="notice-warning">{error}</div>
+        <div className="space-y-3">
+          <div className="notice-warning">{error}</div>
+          {roleMappingHint ? (
+            <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+              {roleMappingHint}
+            </div>
+          ) : null}
+        </div>
       ) : (
         <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
           Validating the provider response and opening the tenant session...

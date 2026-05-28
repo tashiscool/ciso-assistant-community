@@ -1,5 +1,6 @@
 import type { WorkerRequestContext } from '../../router';
 import { json, methodNotAllowed, readJson } from '../../utils/http';
+import { MODULE_CATALOG } from '../core/moduleRegistry';
 
 type DashboardAccess = 'Public' | 'Private';
 type DashboardItemType = 'Widget' | 'Report';
@@ -116,6 +117,22 @@ const widgetTemplates: DashboardTemplateItem[] = [
   { templateId: 'tpl-module-security-plans', title: 'Security Plans by Program', type: 'Widget', tab: 'By Module', description: 'Module-level rollup for plans and lifecycle progress.', sourceLabel: 'Security Plans Module', defaultColumn: 'left' },
 ];
 
+const generatedModuleTemplates: DashboardTemplateItem[] = MODULE_CATALOG.filter(
+  (entry) => entry.implementationType !== 'subfeature',
+)
+  .map((entry) => ({
+    templateId: `tpl-module-${entry.moduleKey}`,
+    title: `${entry.pluralName} Overview`,
+    type: 'Widget' as const,
+    tab: 'By Module' as const,
+    description: `Tenant rollup for ${entry.pluralName.toLowerCase()} using the shared module registry and related workspaces.`,
+    sourceLabel: `${entry.pluralName} Module`,
+    defaultColumn: 'left' as const,
+  }))
+  .filter((template) => !widgetTemplates.some((existing) => existing.templateId === template.templateId));
+
+const allWidgetTemplates = [...widgetTemplates, ...generatedModuleTemplates];
+
 async function reportTemplates(env: WorkerRequestContext['env'], tenantId: string): Promise<DashboardTemplateItem[]> {
   const rows = await env.D1_MAIN.prepare(
     `SELECT id, title FROM report_builder_reports WHERE tenant_id = ? ORDER BY updated_at DESC, title ASC LIMIT 20`,
@@ -227,7 +244,7 @@ async function toDetail(env: WorkerRequestContext['env'], tenantId: string, row:
     published: Boolean(row.published),
     items: asJson<DashboardLayoutItem[]>(row.items_json, []),
     layout: asJson<{ left: string[]; right: string[] }>(row.layout_json, { left: [], right: [] }),
-    availableItems: [...widgetTemplates, ...(await reportTemplates(env, tenantId))],
+    availableItems: [...allWidgetTemplates, ...(await reportTemplates(env, tenantId))],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -256,7 +273,7 @@ export async function handleDashboardBuilderRoutes(
       )
         .bind(tenantId)
         .all<DashboardRow>();
-      return json({ data: { dashboards: rows.results.map(toSummary), availableItems: [...widgetTemplates, ...(await reportTemplates(ctx.env, tenantId))] } });
+      return json({ data: { dashboards: rows.results.map(toSummary), availableItems: [...allWidgetTemplates, ...(await reportTemplates(ctx.env, tenantId))] } });
     }
 
     if (ctx.request.method === 'POST') {

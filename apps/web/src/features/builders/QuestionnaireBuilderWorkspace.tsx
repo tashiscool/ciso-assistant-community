@@ -28,6 +28,7 @@ import type {
   QuestionnaireQuestion,
   QuestionnaireRule,
   QuestionnaireTemplateDetail,
+  QuestionnaireTemplateKind,
   QuestionnaireTemplateSummary,
   RuleDiagnostic,
   RuleSetDetail,
@@ -36,9 +37,11 @@ import type {
 
 type BuilderTab = 'overview' | 'builder' | 'rules' | 'tests';
 type RuleEditorMode = 'visual' | 'json';
+type WorkspaceMode = 'all' | 'assessment-plans' | 'questionnaires';
 
 type Props = {
   initialTab?: BuilderTab;
+  workspaceMode?: WorkspaceMode;
 };
 
 function formatDate(value: string) {
@@ -104,8 +107,102 @@ function severityClass(severity: RuleDiagnostic['severity']) {
   return 'badge-success';
 }
 
-export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props) {
+function templateKindForWorkspace(mode: WorkspaceMode): QuestionnaireTemplateKind | null {
+  if (mode === 'assessment-plans') {
+    return 'assessment-plan';
+  }
+  if (mode === 'questionnaires') {
+    return 'questionnaire';
+  }
+  return null;
+}
+
+function isQuestionnaireTemplate(kind: QuestionnaireTemplateKind) {
+  return kind === 'questionnaire';
+}
+
+function workspaceLabels(mode: WorkspaceMode) {
+  if (mode === 'assessment-plans') {
+    return {
+      pageTitle: 'Assessment Plans',
+      pageDescription:
+        'Build reusable assessment plans with lines of inquiry, audit criteria, requirement traceability, and reviewer guidance that can be reused across manual assessments.',
+      createLabel: 'New Assessment Plan',
+      saveLabel: 'Save Assessment Plan',
+      libraryLabel: 'Assessment Plan Library',
+      libraryTitle: 'Audit Plan Packages',
+      singularLabel: 'Assessment Plan',
+      questionLabel: 'Line of Inquiry',
+      questionSetLabel: 'Lines of Inquiry',
+      promptLabel: 'Question / Criteria',
+      overviewTitle: 'Assessment plan system overview',
+      conceptLabel: 'Assessment Plan Concepts',
+      builderEyebrow: 'Assessment Plans',
+      metadataNameLabel: 'Assessment Plan Name',
+      audienceLabel: 'Owner / Audience',
+      sourceFrameworkLabel: 'Source Framework or Process',
+      usageNotesLabel: 'Usage Notes',
+      openPrimaryLabel: 'Open Assessments',
+      openPrimaryRoute: '/assessments',
+    };
+  }
+
+  if (mode === 'questionnaires') {
+    return {
+      pageTitle: 'Questionnaires',
+      pageDescription:
+        'Build reusable questionnaires with assignment-ready prompts, attestation and evidence semantics, lifecycle posture, and rule-driven conditional behavior.',
+      createLabel: 'New Questionnaire',
+      saveLabel: 'Save Questionnaire',
+      libraryLabel: 'Questionnaire Library',
+      libraryTitle: 'Questionnaire Packages',
+      singularLabel: 'Questionnaire',
+      questionLabel: 'Question',
+      questionSetLabel: 'Questions',
+      promptLabel: 'Prompt',
+      overviewTitle: 'Questionnaire system overview',
+      conceptLabel: 'Questionnaire Concepts',
+      builderEyebrow: 'Questionnaires',
+      metadataNameLabel: 'Questionnaire Name',
+      audienceLabel: 'Audience',
+      sourceFrameworkLabel: 'Source Framework',
+      usageNotesLabel: 'Usage Notes',
+      openPrimaryLabel: 'Open Assessments',
+      openPrimaryRoute: '/assessments',
+    };
+  }
+
+  return {
+    pageTitle: 'Questionnaire Builder',
+    pageDescription:
+      'Build reusable questionnaires and assessment-plan templates with question packages, scoring posture, and a real visual rules engine backed by D1.',
+    createLabel: 'New Template',
+    saveLabel: 'Save Builder',
+    libraryLabel: 'Template Library',
+    libraryTitle: 'Authoring Packages',
+    singularLabel: 'Template',
+    questionLabel: 'Question',
+    questionSetLabel: 'Questions',
+    promptLabel: 'Prompt',
+    overviewTitle: 'Enterprise questionnaire system overview',
+    conceptLabel: 'Core Concepts',
+    builderEyebrow: 'Builders',
+    metadataNameLabel: 'Template Name',
+    audienceLabel: 'Audience',
+    sourceFrameworkLabel: 'Source Framework',
+    usageNotesLabel: 'Usage Notes',
+    openPrimaryLabel: 'Open Assessments',
+    openPrimaryRoute: '/assessments',
+  };
+}
+
+export function QuestionnaireBuilderWorkspace({
+  initialTab = 'builder',
+  workspaceMode = 'all',
+}: Props) {
   const { identity } = useEdgeIdentity();
+  const scopedTemplateKind = templateKindForWorkspace(workspaceMode);
+  const labels = workspaceLabels(workspaceMode);
   const [templates, setTemplates] = useState<QuestionnaireTemplateSummary[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [templateDetail, setTemplateDetail] = useState<QuestionnaireTemplateDetail | null>(null);
@@ -141,7 +238,7 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
       setTemplates(nextTemplates);
       setSelectedId((current) => current ?? nextTemplates[0]?.id ?? null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to load questionnaire builders.');
+      setError(err instanceof Error ? err.message : 'Unable to load template packages.');
     } finally {
       setLoading(false);
     }
@@ -163,7 +260,7 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
       setPreviewRun(null);
       setTestAnswers(buildDefaultAnswers(detail.template));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to load questionnaire detail.');
+      setError(err instanceof Error ? err.message : 'Unable to load template detail.');
     } finally {
       setDetailLoading(false);
     }
@@ -179,19 +276,44 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
     }
   }, [selectedId]);
 
+  const visibleTemplates = useMemo(
+    () =>
+      scopedTemplateKind
+        ? templates.filter((template) => template.templateKind === scopedTemplateKind)
+        : templates,
+    [scopedTemplateKind, templates],
+  );
+
+  useEffect(() => {
+    setSelectedId((current) => {
+      if (current && visibleTemplates.some((template) => template.id === current)) {
+        return current;
+      }
+      return visibleTemplates[0]?.id ?? null;
+    });
+  }, [visibleTemplates]);
+
   const metrics = useMemo(() => {
     const currentTemplate = draftTemplate ?? templateDetail;
     const currentRuleSet = draftRuleSet ?? ruleSet;
     return [
       {
-        label: 'Templates',
-        value: templates.length,
-        detail: 'Canonical questionnaire packages in the tenant',
+        label: workspaceMode === 'assessment-plans' ? 'Plans' : workspaceMode === 'questionnaires' ? 'Questionnaires' : 'Templates',
+        value: visibleTemplates.length,
+        detail:
+          workspaceMode === 'assessment-plans'
+            ? 'Reusable assessment plans in the tenant'
+            : workspaceMode === 'questionnaires'
+              ? 'Reusable questionnaires in the tenant'
+              : 'Canonical questionnaire packages in the tenant',
       },
       {
-        label: 'Questions',
+        label: labels.questionSetLabel,
         value: currentTemplate?.questions.length ?? 0,
-        detail: 'Prompt fields wired into scoring and automation',
+        detail:
+          workspaceMode === 'assessment-plans'
+            ? 'Lines of inquiry wired into repeatable audit execution'
+            : 'Prompt fields wired into scoring and automation',
       },
       {
         label: 'Rules',
@@ -204,24 +326,55 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
         detail: 'Persisted simulation runs stored in D1',
       },
     ];
-  }, [draftRuleSet, draftTemplate, ruleSet, templateDetail, templates.length, testRuns.length]);
+  }, [draftRuleSet, draftTemplate, labels.questionSetLabel, ruleSet, templateDetail, testRuns.length, visibleTemplates.length, workspaceMode]);
 
   async function handleCreateTemplate() {
     try {
       setSaving(true);
       setError(null);
       setNotice(null);
+      const nextKind = scopedTemplateKind ?? 'questionnaire';
       const created = await createQuestionnaireTemplate({
-        name: `Questionnaire ${templates.length + 1}`,
-        description: 'New canonical questionnaire package.',
-        audience: 'Internal reviewers',
+        name:
+          nextKind === 'assessment-plan'
+            ? `Assessment Plan ${visibleTemplates.length + 1}`
+            : `Questionnaire ${visibleTemplates.length + 1}`,
+        description:
+          nextKind === 'assessment-plan'
+            ? 'New assessment plan with reusable lines of inquiry.'
+            : 'New canonical questionnaire package.',
+        audience: nextKind === 'assessment-plan' ? 'Internal assessors' : 'Internal reviewers',
+        templateKind: nextKind,
+        sourceFramework: nextKind === 'assessment-plan' ? 'Framework or process reference' : null,
+        usageNotes:
+          nextKind === 'assessment-plan'
+            ? 'Use this assessment plan to preload lines of inquiry into manual reviews.'
+            : null,
+        questionnaireType: nextKind === 'questionnaire' ? 'Compliance Intake' : null,
+        assignmentModel: nextKind === 'questionnaire' ? 'User assignment' : null,
+        relatedWorkflow: nextKind === 'questionnaire' ? 'Risk and compliance intake' : null,
+        attestationScope: nextKind === 'questionnaire' ? 'Requirements, controls, or supporting audit inputs' : null,
+        responseOwnerModel: nextKind === 'questionnaire' ? 'Internal control owner or external respondent' : null,
+        evidenceCollectionMode: nextKind === 'questionnaire' ? 'Supporting evidence requested' : null,
+        exportMode: nextKind === 'questionnaire' ? 'Spreadsheet-ready' : null,
+        distributionCadence: nextKind === 'questionnaire' ? 'As needed' : null,
       });
       await loadTemplates();
       setSelectedId(created.template.id);
       setActiveTab('builder');
-      setNotice('New questionnaire template created in the canonical builder service.');
+      setNotice(
+        nextKind === 'assessment-plan'
+          ? 'New assessment plan created in the canonical template service.'
+          : 'New questionnaire template created in the canonical builder service.',
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to create questionnaire template.');
+      setError(
+        err instanceof Error
+          ? err.message
+          : workspaceMode === 'assessment-plans'
+            ? 'Unable to create assessment plan.'
+            : 'Unable to create questionnaire template.',
+      );
     } finally {
       setSaving(false);
     }
@@ -239,8 +392,20 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
         name: draftTemplate.name,
         description: draftTemplate.description,
         status: draftTemplate.status,
+        templateKind: draftTemplate.templateKind,
         scoringMode: draftTemplate.scoringMode,
         audience: draftTemplate.audience,
+        sourceFramework: draftTemplate.sourceFramework,
+        usageNotes: draftTemplate.usageNotes,
+        questionnaireType: draftTemplate.questionnaireType,
+        assignmentModel: draftTemplate.assignmentModel,
+        relatedWorkflow: draftTemplate.relatedWorkflow,
+        attestationScope: draftTemplate.attestationScope,
+        responseOwnerModel: draftTemplate.responseOwnerModel,
+        evidenceCollectionMode: draftTemplate.evidenceCollectionMode,
+        fileUploadGuidance: draftTemplate.fileUploadGuidance,
+        exportMode: draftTemplate.exportMode,
+        distributionCadence: draftTemplate.distributionCadence,
         questions: draftTemplate.questions,
       });
       setTemplateDetail(saved.template);
@@ -249,10 +414,20 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
       setDraftTemplate(saved.template);
       setDraftRuleSet(saved.ruleSet);
       setRuleJsonDraft(JSON.stringify(saved.ruleSet.rules, null, 2));
-      setNotice('Questionnaire builder saved.');
+      setNotice(
+        draftTemplate.templateKind === 'assessment-plan'
+          ? 'Assessment plan saved.'
+          : 'Questionnaire builder saved.',
+      );
       await loadTemplates();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to save questionnaire template.');
+      setError(
+        err instanceof Error
+          ? err.message
+          : draftTemplate.templateKind === 'assessment-plan'
+            ? 'Unable to save assessment plan.'
+            : 'Unable to save questionnaire template.',
+      );
     } finally {
       setSaving(false);
     }
@@ -341,7 +516,11 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
         questions: draftTemplate.questions,
       });
       setDraftRuleSet((current) => (current ? { ...current, diagnostics: validation.diagnostics } : current));
-      setNotice('Draft rules validated against the current questionnaire package.');
+      setNotice(
+        workspaceMode === 'assessment-plans'
+          ? 'Draft rules validated against the current assessment plan.'
+          : 'Draft rules validated against the current questionnaire package.',
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to validate draft rules.');
     } finally {
@@ -366,7 +545,11 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
       });
       setPreviewRun(preview);
       setActiveTab('tests');
-      setNotice('Draft preview executed against unsaved questionnaire rules.');
+      setNotice(
+        workspaceMode === 'assessment-plans'
+          ? 'Draft preview executed against unsaved assessment-plan rules.'
+          : 'Draft preview executed against unsaved questionnaire rules.',
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to preview draft rules.');
     } finally {
@@ -383,34 +566,32 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
       <section className="panel">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
-            <div className="eyebrow">Builders</div>
-            <h1 className="mt-2 text-3xl font-semibold text-white">Questionnaire Builder</h1>
+            <div className="eyebrow">{labels.builderEyebrow}</div>
+            <h1 className="mt-2 text-3xl font-semibold text-white">{labels.pageTitle}</h1>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-              Build reusable questionnaires with question packages, scoring posture, and a real visual
-              rules engine backed by D1. This is now part of the canonical Regovise stack, not the
-              `openregscale` reference sandbox.
+              {labels.pageDescription}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Link className="button-secondary" to="/builders/questionnaire-builder/overview">
+            <button className="button-secondary" onClick={() => setActiveTab('overview')} type="button">
               <Sparkles className="mr-2 h-4 w-4" />
               Overview
-            </Link>
-            <Link className="button-secondary" to="/builders/questionnaire-builder">
+            </button>
+            <button className="button-secondary" onClick={() => setActiveTab('builder')} type="button">
               <ClipboardList className="mr-2 h-4 w-4" />
               Builder
-            </Link>
-            <Link className="button-secondary" to="/builders/questionnaire-builder/rules-engine">
+            </button>
+            <button className="button-secondary" onClick={() => setActiveTab('rules')} type="button">
               <SlidersHorizontal className="mr-2 h-4 w-4" />
               Visual Rules Engine
-            </Link>
+            </button>
             <button className="button-secondary" onClick={() => void handleCreateTemplate()} type="button">
               <Plus className="mr-2 h-4 w-4" />
-              New Template
+              {labels.createLabel}
             </button>
             <button className="button-primary" disabled={saving} onClick={() => void handleSaveTemplate()} type="button">
               <Save className="mr-2 h-4 w-4" />
-              Save Builder
+              {labels.saveLabel}
             </button>
           </div>
         </div>
@@ -433,13 +614,13 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
         <aside className="panel space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <div className="eyebrow">Template Library</div>
-              <h2 className="mt-2 text-xl font-semibold text-white">Authoring Packages</h2>
+              <div className="eyebrow">{labels.libraryLabel}</div>
+              <h2 className="mt-2 text-xl font-semibold text-white">{labels.libraryTitle}</h2>
             </div>
             <Sparkles className="h-5 w-5 text-cyan-300" />
           </div>
           <div className="space-y-3">
-            {templates.map((template) => (
+            {visibleTemplates.map((template) => (
               <button
                 key={template.id}
                 className={`panel-subtle w-full text-left transition ${
@@ -456,6 +637,15 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                   <ChevronRight className="mt-0.5 h-4 w-4 text-slate-500" />
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
+                  <span className="badge-neutral">
+                    {template.templateKind === 'assessment-plan' ? 'Assessment Plan' : 'Questionnaire'}
+                  </span>
+                  {template.templateKind === 'questionnaire' && template.questionnaireType ? (
+                    <span className="badge-neutral">{template.questionnaireType}</span>
+                  ) : null}
+                  {template.templateKind === 'questionnaire' && template.assignmentModel ? (
+                    <span className="badge-neutral">{template.assignmentModel}</span>
+                  ) : null}
                   <span className="badge-neutral">{template.status}</span>
                   <span className="badge-neutral">{template.questionCount} questions</span>
                   <span className="badge-neutral">{template.ruleCount} rules</span>
@@ -468,7 +658,9 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
 
         <section className="panel">
           {detailLoading || !draftTemplate || !draftRuleSet ? (
-            <div className="text-sm text-slate-300">Loading questionnaire detail...</div>
+            <div className="text-sm text-slate-300">
+              Loading {workspaceMode === 'assessment-plans' ? 'assessment plan' : 'template'} detail...
+            </div>
           ) : (
             <Tabs onValueChange={(value) => setActiveTab(value as BuilderTab)} value={activeTab}>
               <TabsList className="mb-6 w-fit rounded-2xl border border-white/10 bg-slate-950/70">
@@ -482,34 +674,53 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                 <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
                   <div className="space-y-6">
                     <div className="panel-subtle">
-                      <div className="eyebrow">Questionnaire Overview</div>
-                      <h3 className="mt-2 text-xl font-semibold text-white">Enterprise questionnaire system overview</h3>
+                      <div className="eyebrow">{labels.pageTitle} Overview</div>
+                      <h3 className="mt-2 text-xl font-semibold text-white">{labels.overviewTitle}</h3>
                       <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-300">
-                        Understand the template, instance, scoring, workflow, and assignment model behind the canonical questionnaire platform. This overview stays connected to the live builder and rules engine instead of drifting into disconnected documentation.
+                        {workspaceMode === 'assessment-plans'
+                          ? 'Understand how reusable audit criteria, lines of inquiry, requirement mappings, and reviewer guidance come together in one assessment-plan library. This overview stays connected to the live builder and rules engine instead of drifting into disconnected documentation.'
+                          : 'Understand the template, assignment, attestation, evidence, and export model behind the canonical questionnaire platform. This overview stays connected to the live builder and rules engine instead of drifting into disconnected documentation.'}
                       </p>
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="panel-subtle">
-                        <div className="eyebrow">Core Concepts</div>
+                        <div className="eyebrow">{labels.conceptLabel}</div>
                         <div className="mt-4 space-y-3 text-sm text-slate-300">
-                          <div>Template vs instance separation keeps design-time structures distinct from distributed assignments and responses.</div>
-                          <div>Questions carry stable refs, sections, required flags, help text, and weighting for reusable scoring posture.</div>
-                          <div>Rules, scoring, and tests are versioned so the authoring surface stays aligned with the execution engine.</div>
+                          {workspaceMode === 'assessment-plans' ? (
+                            <>
+                              <div>Assessment plans are reusable audit packages that carry stable lines of inquiry, requirement traceability, and reviewer guidance.</div>
+                              <div>Each line of inquiry can map to a contractual clause, framework control, or internal business-process check for repeatable manual audits.</div>
+                              <div>Rules, scoring, and tests stay versioned so the authoring surface remains aligned with downstream assessment execution.</div>
+                            </>
+                          ) : (
+                            <>
+                              <div>Template vs instance separation keeps authoring packages distinct from assigned questionnaires, respondent submissions, and reviewer follow-up.</div>
+                              <div>Questions carry stable refs, ordered sections, required flags, help text, evidence hints, and weighting for reusable scoring or attestation posture.</div>
+                              <div>Template metadata captures assignment model, response ownership, evidence expectations, file-upload guidance, and export posture for downstream operations.</div>
+                            </>
+                          )}
                         </div>
                       </div>
                       <div className="panel-subtle">
-                        <div className="eyebrow">Assignment Options</div>
+                        <div className="eyebrow">{workspaceMode === 'assessment-plans' ? 'How Plans Are Used' : 'Assignment Options'}</div>
                         <div className="mt-4 space-y-2 text-sm text-slate-300">
-                          {[
-                            'User-based assignments',
-                            'Email-based assignments',
-                            'Module-based launches',
-                            'Self-assignment / public links',
-                            'Recurring distribution',
-                            'Bulk spreadsheet assignment',
-                            'Per-question routing',
-                          ].map((item) => (
+                          {(workspaceMode === 'assessment-plans'
+                            ? [
+                                'Select an assessment plan while preparing a manual assessment',
+                                'Reuse the same lines of inquiry across recurring review cycles',
+                                'Track completion progress by line of inquiry',
+                                'Open follow-up work when a check fails',
+                                'Map audit criteria back to requirements for traceability',
+                              ]
+                            : [
+                                'Assigned to internal control owners',
+                                'Distributed to vendors and partners',
+                                'Launched from audits and assessments',
+                                'Used to support data calls and evidence collection',
+                                'Routed for reviewer follow-up and attestation',
+                                'Repeated on recurring collection cadences',
+                              ]).map((item) => (
                             <div key={item} className="rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2">
                               {item}
                             </div>
@@ -522,30 +733,29 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                       <div className="panel-subtle">
                         <div className="eyebrow">Workflow & States</div>
                         <div className="mt-4 grid gap-3 md:grid-cols-2">
-                          {['Open', 'Submitted', 'Accepted', 'Request Changes', 'Closed'].map((state) => (
+                          {(workspaceMode === 'assessment-plans'
+                            ? ['Open', 'Submitted', 'Accepted', 'Request Changes', 'Closed']
+                            : ['Draft', 'Assigned', 'In Progress', 'Submitted', 'In Review', 'Accepted', 'Request Changes', 'Closed']).map((state) => (
                             <div key={state} className="rounded-2xl border border-white/10 bg-slate-950/50 px-4 py-3 text-sm text-slate-300">
                               {state}
                             </div>
                           ))}
                         </div>
                         <div className="mt-4 text-sm text-slate-400">
-                          Persisted test runs, saved questionnaires, and downstream report integrations all inherit from this lifecycle posture.
+                          {workspaceMode === 'assessment-plans'
+                            ? 'Persisted test runs, saved plans, and downstream assessment execution all inherit from this lifecycle posture.'
+                            : 'Persisted test runs, saved questionnaires, and downstream report integrations all inherit from this lifecycle posture.'}
                         </div>
                       </div>
                       <div className="panel-subtle">
                         <div className="eyebrow">Question Types</div>
                         <div className="mt-4 grid gap-3 md:grid-cols-2 text-sm text-slate-300">
                           {[
-                            'Text',
-                            'Number',
-                            'Date',
-                            'Email',
-                            'Phone',
-                            'Multiple choice',
-                            'Checkboxes',
-                            'Dropdown',
-                            'Table',
-                            'Instructional',
+                            'Text response',
+                            'Number response',
+                            'Boolean / attestation',
+                            'Single select',
+                            'Multi-select',
                           ].map((item) => (
                             <div key={item} className="rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2">
                               {item}
@@ -567,16 +777,27 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                       <div className="panel-subtle">
                         <div className="eyebrow">Key Features</div>
                         <div className="mt-4 space-y-2 text-sm text-slate-300">
-                          {[
-                            'Section management',
-                            'Control mappings',
-                            'Dual storage / reporting model',
-                            'Anonymous access',
-                            'Import / export',
-                            'Metadata headers',
-                            'Recurring assignments',
-                            'Report Builder integration',
-                          ].map((item) => (
+                          {(workspaceMode === 'assessment-plans'
+                            ? [
+                                'Lines of inquiry',
+                                'Requirement traceability',
+                                'Reviewer guidance',
+                                'Scored or boolean completion posture',
+                                'Reusable audit criteria',
+                                'Recurring manual assessment support',
+                                'Issue and follow-up generation',
+                                'Assessment progress visibility',
+                              ]
+                            : [
+                                'Dynamic question ordering',
+                                'Assignment and lifecycle tracking model',
+                                'Contract, audit, and risk-assessment linkage',
+                                'Evidence guidance and upload expectations',
+                                'Conditional rules engine',
+                                'Spreadsheet-friendly exports',
+                                'Scoring and attestation posture',
+                                'Recurring distribution semantics',
+                              ]).map((item) => (
                             <div key={item} className="rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2">
                               {item}
                             </div>
@@ -589,7 +810,7 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                       <div className="eyebrow">Technical Architecture</div>
                       <div className="mt-4 grid gap-4 md:grid-cols-3">
                         {[
-                          ['Templates', `${templates.length}`, 'Reusable questionnaire packages in the tenant'],
+                          [workspaceMode === 'assessment-plans' ? 'Plans' : 'Templates', `${visibleTemplates.length}`, workspaceMode === 'assessment-plans' ? 'Reusable assessment plans in the tenant' : 'Reusable questionnaire packages in the tenant'],
                           ['Rules', `${draftRuleSet.rules.length}`, 'Visual rules and validation diagnostics'],
                           ['History', `${testRuns.length}`, 'Persisted execution history for review and auditability'],
                         ].map(([label, value, detail]) => (
@@ -610,6 +831,17 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                       <div className="mt-2 text-sm text-slate-400">
                         Version {draftTemplate.version} · Updated {formatDate(draftTemplate.updatedAt)}
                       </div>
+                      {draftTemplate.sourceFramework ? (
+                        <div className="mt-3 text-sm text-slate-300">Source: {draftTemplate.sourceFramework}</div>
+                      ) : null}
+                      {isQuestionnaireTemplate(draftTemplate.templateKind) ? (
+                        <div className="mt-4 space-y-2 text-sm text-slate-300">
+                          {draftTemplate.questionnaireType ? <div>Type: {draftTemplate.questionnaireType}</div> : null}
+                          {draftTemplate.assignmentModel ? <div>Assignment: {draftTemplate.assignmentModel}</div> : null}
+                          {draftTemplate.evidenceCollectionMode ? <div>Evidence: {draftTemplate.evidenceCollectionMode}</div> : null}
+                          {draftTemplate.exportMode ? <div>Export: {draftTemplate.exportMode}</div> : null}
+                        </div>
+                      ) : null}
                     </div>
                     <div className="panel-subtle">
                       <div className="eyebrow">Live Alignment</div>
@@ -627,6 +859,10 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                     <div className="panel-subtle">
                       <div className="eyebrow">Open Next</div>
                       <div className="mt-4 flex flex-col gap-2">
+                        <Link className="button-secondary justify-start" to={labels.openPrimaryRoute}>
+                          <ClipboardList className="mr-2 h-4 w-4" />
+                          {labels.openPrimaryLabel}
+                        </Link>
                         <button className="button-secondary justify-start" onClick={() => setActiveTab('builder')} type="button">
                           <ClipboardList className="mr-2 h-4 w-4" />
                           Open Builder
@@ -652,7 +888,7 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                       <div className="eyebrow">Metadata</div>
                       <div className="mt-4 grid gap-4 md:grid-cols-2">
                         <div>
-                          <label className="label">Template Name</label>
+                          <label className="label">{labels.metadataNameLabel}</label>
                           <input
                             className="input mt-2"
                             onChange={(event) =>
@@ -661,8 +897,27 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                             value={draftTemplate.name}
                           />
                         </div>
+                        {workspaceMode === 'all' ? (
+                          <div>
+                            <label className="label">Template Kind</label>
+                            <select
+                              className="input mt-2"
+                              onChange={(event) =>
+                                setDraftTemplate((current) =>
+                                  current
+                                    ? { ...current, templateKind: event.target.value as QuestionnaireTemplateKind }
+                                    : current,
+                                )
+                              }
+                              value={draftTemplate.templateKind}
+                            >
+                              <option value="questionnaire">Questionnaire</option>
+                              <option value="assessment-plan">Assessment Plan</option>
+                            </select>
+                          </div>
+                        ) : null}
                         <div>
-                          <label className="label">Audience</label>
+                          <label className="label">{labels.audienceLabel}</label>
                           <input
                             className="input mt-2"
                             onChange={(event) =>
@@ -673,6 +928,62 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                             value={draftTemplate.audience ?? ''}
                           />
                         </div>
+                        {isQuestionnaireTemplate(draftTemplate.templateKind) ? (
+                          <div>
+                            <label className="label">Questionnaire Type</label>
+                            <select
+                              className="input mt-2"
+                              onChange={(event) =>
+                                setDraftTemplate((current) =>
+                                  current ? { ...current, questionnaireType: event.target.value } : current,
+                                )
+                              }
+                              value={draftTemplate.questionnaireType ?? ''}
+                            >
+                              <option value="">Select type</option>
+                              <option value="Attestation">Attestation</option>
+                              <option value="Vendor Risk">Vendor Risk</option>
+                              <option value="Audit Support">Audit Support</option>
+                              <option value="Data Call">Data Call</option>
+                              <option value="Risk Intake">Risk Intake</option>
+                              <option value="Compliance Intake">Compliance Intake</option>
+                              <option value="Other">Other</option>
+                            </select>
+                          </div>
+                        ) : null}
+                        <div>
+                          <label className="label">{labels.sourceFrameworkLabel}</label>
+                          <input
+                            className="input mt-2"
+                            onChange={(event) =>
+                              setDraftTemplate((current) =>
+                                current ? { ...current, sourceFramework: event.target.value } : current,
+                              )
+                            }
+                            value={draftTemplate.sourceFramework ?? ''}
+                          />
+                        </div>
+                        {isQuestionnaireTemplate(draftTemplate.templateKind) ? (
+                          <div>
+                            <label className="label">Assignment Model</label>
+                            <select
+                              className="input mt-2"
+                              onChange={(event) =>
+                                setDraftTemplate((current) =>
+                                  current ? { ...current, assignmentModel: event.target.value } : current,
+                                )
+                              }
+                              value={draftTemplate.assignmentModel ?? ''}
+                            >
+                              <option value="">Select model</option>
+                              <option value="User assignment">User assignment</option>
+                              <option value="External respondent">External respondent</option>
+                              <option value="Assessment support">Assessment support</option>
+                              <option value="Data call support">Data call support</option>
+                              <option value="Recurring distribution">Recurring distribution</option>
+                            </select>
+                          </div>
+                        ) : null}
                         <div>
                           <label className="label">Status</label>
                           <select
@@ -687,6 +998,26 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                             <option value="review">In Review</option>
                           </select>
                         </div>
+                        {isQuestionnaireTemplate(draftTemplate.templateKind) ? (
+                          <div>
+                            <label className="label">Evidence Collection Mode</label>
+                            <select
+                              className="input mt-2"
+                              onChange={(event) =>
+                                setDraftTemplate((current) =>
+                                  current ? { ...current, evidenceCollectionMode: event.target.value } : current,
+                                )
+                              }
+                              value={draftTemplate.evidenceCollectionMode ?? ''}
+                            >
+                              <option value="">Select mode</option>
+                              <option value="Supporting evidence requested">Supporting evidence requested</option>
+                              <option value="Structured evidence collection">Structured evidence collection</option>
+                              <option value="Attestation only">Attestation only</option>
+                              <option value="Optional evidence">Optional evidence</option>
+                            </select>
+                          </div>
+                        ) : null}
                         <div>
                           <label className="label">Scoring Mode</label>
                           <select
@@ -703,6 +1034,25 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                             <option value="maturity">Maturity</option>
                           </select>
                         </div>
+                        {isQuestionnaireTemplate(draftTemplate.templateKind) ? (
+                          <div>
+                            <label className="label">Export Mode</label>
+                            <select
+                              className="input mt-2"
+                              onChange={(event) =>
+                                setDraftTemplate((current) =>
+                                  current ? { ...current, exportMode: event.target.value } : current,
+                                )
+                              }
+                              value={draftTemplate.exportMode ?? ''}
+                            >
+                              <option value="">Select export posture</option>
+                              <option value="Spreadsheet-ready">Spreadsheet-ready</option>
+                              <option value="Reviewer workbook">Reviewer workbook</option>
+                              <option value="Score summary">Score summary</option>
+                            </select>
+                          </div>
+                        ) : null}
                         <div className="md:col-span-2">
                           <label className="label">Description</label>
                           <textarea
@@ -715,14 +1065,92 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                             value={draftTemplate.description ?? ''}
                           />
                         </div>
+                        {isQuestionnaireTemplate(draftTemplate.templateKind) ? (
+                          <>
+                            <div>
+                              <label className="label">Related Workflow</label>
+                              <input
+                                className="input mt-2"
+                                onChange={(event) =>
+                                  setDraftTemplate((current) =>
+                                    current ? { ...current, relatedWorkflow: event.target.value } : current,
+                                  )
+                                }
+                                value={draftTemplate.relatedWorkflow ?? ''}
+                              />
+                            </div>
+                            <div>
+                              <label className="label">Distribution Cadence</label>
+                              <input
+                                className="input mt-2"
+                                onChange={(event) =>
+                                  setDraftTemplate((current) =>
+                                    current ? { ...current, distributionCadence: event.target.value } : current,
+                                  )
+                                }
+                                value={draftTemplate.distributionCadence ?? ''}
+                              />
+                            </div>
+                            <div>
+                              <label className="label">Attestation Scope</label>
+                              <input
+                                className="input mt-2"
+                                onChange={(event) =>
+                                  setDraftTemplate((current) =>
+                                    current ? { ...current, attestationScope: event.target.value } : current,
+                                  )
+                                }
+                                value={draftTemplate.attestationScope ?? ''}
+                              />
+                            </div>
+                            <div>
+                              <label className="label">Response Owner Model</label>
+                              <input
+                                className="input mt-2"
+                                onChange={(event) =>
+                                  setDraftTemplate((current) =>
+                                    current ? { ...current, responseOwnerModel: event.target.value } : current,
+                                  )
+                                }
+                                value={draftTemplate.responseOwnerModel ?? ''}
+                              />
+                            </div>
+                          </>
+                        ) : null}
+                        <div className="md:col-span-2">
+                          <label className="label">{labels.usageNotesLabel}</label>
+                          <textarea
+                            className="input mt-2 min-h-[96px]"
+                            onChange={(event) =>
+                              setDraftTemplate((current) =>
+                                current ? { ...current, usageNotes: event.target.value } : current,
+                              )
+                            }
+                            value={draftTemplate.usageNotes ?? ''}
+                          />
+                        </div>
+                        {isQuestionnaireTemplate(draftTemplate.templateKind) ? (
+                          <div className="md:col-span-2">
+                            <label className="label">File Upload Guidance</label>
+                            <textarea
+                              className="input mt-2 min-h-[96px]"
+                              onChange={(event) =>
+                                setDraftTemplate((current) =>
+                                  current ? { ...current, fileUploadGuidance: event.target.value } : current,
+                                )
+                              }
+                              value={draftTemplate.fileUploadGuidance ?? ''}
+                            />
+                          </div>
+                        ) : null}
                       </div>
                     </div>
 
                     <div className="panel-subtle">
                       <div className="flex items-center justify-between gap-3">
                         <div>
-                          <div className="eyebrow">Questions</div>
-                          <h3 className="mt-2 text-lg font-semibold text-white">Question Set</h3>
+                          <div className="eyebrow">{labels.questionSetLabel}</div>
+                          <h3 className="mt-2 text-lg font-semibold text-white">{labels.questionSetLabel}</h3>
                         </div>
                         <button
                           className="button-secondary"
@@ -739,14 +1167,16 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                           type="button"
                         >
                           <Plus className="mr-2 h-4 w-4" />
-                          Add Question
+                          Add {labels.questionLabel}
                         </button>
                       </div>
                       <div className="mt-4 space-y-4">
                         {draftTemplate.questions.map((question, index) => (
                           <div className="rounded-3xl border border-white/10 bg-slate-950/60 p-4" key={question.id}>
                             <div className="flex items-center justify-between gap-3">
-                              <div className="text-sm font-medium text-white">Question {index + 1}</div>
+                              <div className="text-sm font-medium text-white">
+                                {labels.questionLabel} {index + 1}
+                              </div>
                               <button
                                 className="text-xs uppercase tracking-[0.18em] text-rose-300 transition hover:text-rose-200"
                                 onClick={() =>
@@ -785,7 +1215,7 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                                 />
                               </div>
                               <div>
-                                <label className="label">Section</label>
+                                <label className="label">Section / Domain</label>
                                 <input
                                   className="input mt-2"
                                   onChange={(event) =>
@@ -804,7 +1234,7 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                                 />
                               </div>
                               <div className="md:col-span-2">
-                                <label className="label">Prompt</label>
+                                <label className="label">{labels.promptLabel}</label>
                                 <textarea
                                   className="input mt-2 min-h-[88px]"
                                   onChange={(event) =>
@@ -872,6 +1302,48 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                                 />
                               </div>
                               <div className="md:col-span-2">
+                                <label className="label">Requirement Reference</label>
+                                <input
+                                  className="input mt-2"
+                                  onChange={(event) =>
+                                    setDraftTemplate((current) =>
+                                      current
+                                        ? {
+                                            ...current,
+                                            questions: current.questions.map((entry) =>
+                                              entry.id === question.id
+                                                ? { ...entry, requirementRef: event.target.value }
+                                                : entry,
+                                            ),
+                                          }
+                                        : current,
+                                    )
+                                  }
+                                  value={question.requirementRef ?? ''}
+                                />
+                              </div>
+                              <div className="md:col-span-2">
+                                <label className="label">Evidence Guidance</label>
+                                <textarea
+                                  className="input mt-2 min-h-[88px]"
+                                  onChange={(event) =>
+                                    setDraftTemplate((current) =>
+                                      current
+                                        ? {
+                                            ...current,
+                                            questions: current.questions.map((entry) =>
+                                              entry.id === question.id
+                                                ? { ...entry, evidenceHint: event.target.value }
+                                                : entry,
+                                            ),
+                                          }
+                                        : current,
+                                    )
+                                  }
+                                  value={question.evidenceHint ?? ''}
+                                />
+                              </div>
+                              <div className="md:col-span-2">
                                 <label className="label">Options</label>
                                 <textarea
                                   className="input mt-2 min-h-[88px]"
@@ -918,7 +1390,7 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                       <div className="eyebrow">Coverage</div>
                       <div className="mt-4 space-y-3 text-sm text-slate-300">
                         <div className="flex items-center justify-between">
-                          <span>Required questions</span>
+                          <span>Required {labels.questionSetLabel.toLowerCase()}</span>
                           <span className="font-medium text-white">
                             {draftTemplate.questions.filter((question) => question.required).length}
                           </span>
@@ -927,6 +1399,12 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                           <span>Sections</span>
                           <span className="font-medium text-white">
                             {new Set(draftTemplate.questions.map((question) => question.section)).size}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Mapped requirements</span>
+                          <span className="font-medium text-white">
+                            {draftTemplate.questions.filter((question) => question.requirementRef?.trim()).length}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
@@ -948,8 +1426,9 @@ export function QuestionnaireBuilderWorkspace({ initialTab = 'builder' }: Props)
                     <h3 className="mt-2 text-xl font-semibold text-white">Visual Rule Graph</h3>
                     <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
                       Persisted rule definitions now live in Cloudflare D1 and drive the same scoring and visibility
-                      flows your questionnaire package uses in test runs. Draft validation and preview execution now
-                      hit the canonical Worker too, so you can verify behavior before committing a save.
+                      flows your {workspaceMode === 'assessment-plans' ? 'assessment plan' : 'questionnaire package'} uses
+                      in test runs. Draft validation and preview execution now hit the canonical Worker too, so you can
+                      verify behavior before committing a save.
                     </p>
                   </div>
                   <div className="flex gap-2">

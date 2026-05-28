@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0.0",
+  "source": "aws-inspector",
+  "source_version": "0.1.0-fixture",
+  "run_id": "fixture-0002",
+  "collected_at": "2026-04-13T15:10:00Z",
+  "resource": {
+    "type": "aws_s3_bucket",
+    "id": "acme-prod-audit-logs",
+    "arn": "arn:aws:s3:::acme-prod-audit-logs",
+    "region": "us-east-1",
+    "account_id": "123456789012"
+  },
+  "evaluations": [
+    {
+      "control_framework": "SCF",
+      "control_id": "CRY-05",
+      "status": "fail",
+      "severity": "high",
+      "message": "Bucket has no default server-side encryption configured.",
+      "remediation": {
+        "summary": "Enable SSE-KMS with a customer-managed KMS key and rotation enabled.",
+        "ref": "grc-engineer://generate-implementation/encryption_at_rest/aws",
+        "effort_hours": 1,
+        "automation": "auto_fixable"
+      }
+    }
+  ]
+}

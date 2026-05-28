@@ -272,6 +272,11 @@ export function AppliedControlsFlashPage() {
               Requirement: {current.requirementAssessment.ref} {current.requirementAssessment.name}
             </div>
           )}
+          {current.assessmentPlanItem && (
+            <div className="ml-auto text-xs text-cyan-200">
+              Line of inquiry: {current.assessmentPlanItem.ref} {current.assessmentPlanItem.prompt}
+            </div>
+          )}
         </div>
       </div>
     </div>

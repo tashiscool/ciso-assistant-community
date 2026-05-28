@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   AlertTriangle,
   ArrowDown,
@@ -259,6 +259,7 @@ function exportPayload(module: FormBuilderDetail) {
 
 export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
   const { identity } = useEdgeIdentity();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [modules, setModules] = useState<FormBuilderSummary[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<FormBuilderDetail | null>(null);
@@ -279,13 +280,26 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
     setActiveTab(initialTab);
   }, [initialTab]);
 
+  const requestedModuleKey = searchParams.get('moduleKey')?.trim().toLowerCase() ?? null;
+
   async function loadModules() {
     try {
       setLoading(true);
       setError(null);
       const next = await listFormBuilderModules();
       setModules(next);
-      setSelectedId((current) => current ?? next[0]?.id ?? null);
+      setSelectedId((current) => {
+        const requested = requestedModuleKey
+          ? next.find((module) => module.moduleKey.toLowerCase() === requestedModuleKey)?.id ?? null
+          : null;
+        if (requested) {
+          return requested;
+        }
+        if (current && next.some((module) => module.id === current)) {
+          return current;
+        }
+        return next[0]?.id ?? null;
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to load Form Builder modules.');
     } finally {
@@ -318,6 +332,29 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
       void loadDetail(selectedId);
     }
   }, [selectedId]);
+
+  useEffect(() => {
+    if (!requestedModuleKey) {
+      return;
+    }
+    const requested = modules.find((module) => module.moduleKey.toLowerCase() === requestedModuleKey);
+    if (requested && requested.id !== selectedId) {
+      setSelectedId(requested.id);
+    }
+  }, [modules, requestedModuleKey, selectedId]);
+
+  useEffect(() => {
+    const selectedModule = modules.find((module) => module.id === selectedId);
+    if (!selectedModule) {
+      return;
+    }
+    if (selectedModule.moduleKey === searchParams.get('moduleKey')) {
+      return;
+    }
+    const next = new URLSearchParams(searchParams);
+    next.set('moduleKey', selectedModule.moduleKey);
+    setSearchParams(next, { replace: true });
+  }, [modules, searchParams, selectedId, setSearchParams]);
 
   const hasUnsavedChanges = useMemo(() => {
     if (!detail || !draft) {

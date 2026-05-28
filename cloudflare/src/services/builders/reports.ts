@@ -1,5 +1,6 @@
 import type { WorkerRequestContext } from '../../router';
 import { json, methodNotAllowed, readJson } from '../../utils/http';
+import { MODULE_CATALOG } from '../core/moduleRegistry';
 
 type ReportChartType = 'List' | 'Bar' | 'Line' | 'Pie';
 type ReportStatus = 'Active' | 'Draft';
@@ -142,8 +143,26 @@ function requireUser(ctx: WorkerRequestContext): string | Response {
   return ctx.userId;
 }
 
-const modules = ['Security Plans', 'Risks', 'Issues', 'Evidence', 'Assessments'];
-const displayFields = ['Title', 'Status', 'Owner', 'Last Updated', 'Due Date', 'Severity', 'Program', 'Framework'];
+const modules = Array.from(
+  new Set([
+    ...MODULE_CATALOG.filter((entry) => entry.implementationType !== 'subfeature').map((entry) => entry.pluralName),
+    'Issues',
+    'Evidence',
+  ]),
+);
+const displayFields = Array.from(
+  new Set([
+    'Title',
+    'Status',
+    'Owner',
+    'Last Updated',
+    'Due Date',
+    'Severity',
+    'Program',
+    'Framework',
+    ...MODULE_CATALOG.flatMap((entry) => (entry.starterFields ?? []).map((field) => field.displayName)),
+  ]),
+);
 
 function defaultConfig(title = 'Quarterly Control Status Rollup'): ReportConfig {
   return {

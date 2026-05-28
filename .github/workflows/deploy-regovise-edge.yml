@@ -138,6 +138,10 @@ jobs:
           REGOVISE_PROD_BASE_URL: ${{ env.REGOVISE_PROD_BASE_URL }}
           PROD_SMOKE_TENANT_ID: ${{ secrets.PROD_SMOKE_TENANT_ID }}
           PROD_SMOKE_USER_ID: ${{ secrets.PROD_SMOKE_USER_ID }}
+          BOOTSTRAP_SETUP_SECRET: ${{ secrets.BOOTSTRAP_SETUP_SECRET }}
+          REGOVISE_VERIFY_TENANT_SLUG: regovise
+          REGOVISE_VERIFY_EMAIL: admin@regovise.com
+          PROD_SMOKE_REQUIRE_SESSION: '1'
         run: npm run smoke:production
         working-directory: cloudflare
 

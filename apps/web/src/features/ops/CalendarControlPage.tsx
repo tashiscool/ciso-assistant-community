@@ -28,7 +28,8 @@ export function CalendarControlPage() {
             <div className="eyebrow">Operational Timeline</div>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Calendar</h1>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-              The canonical operational calendar now comes from live portal deadlines and privacy obligations surfaced by the Worker rather than a standalone calendar-only module.
+              The canonical operational calendar now combines live module lifecycle dates, manual assessment schedules,
+              portal deadlines, and privacy obligations surfaced by the Worker.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -50,12 +51,12 @@ export function CalendarControlPage() {
         <div className="metric-card">
           <div className="metric-label">Upcoming events</div>
           <div className="metric-value">{overview.calendar.length}</div>
-          <div className="mt-2 text-xs text-slate-500">Dated portal and privacy commitments currently visible in the tenant.</div>
+          <div className="mt-2 text-xs text-slate-500">Module, assessment, portal, and privacy commitments currently visible in the tenant.</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Next due</div>
           <div className="metric-value text-lg">{nextEvent ? formatDate(nextEvent.date) : 'None'}</div>
-          <div className="mt-2 text-xs text-slate-500">Earliest operational due date known to the Worker.</div>
+          <div className="mt-2 text-xs text-slate-500">Earliest dated module or operational milestone known to the Worker.</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Portal load</div>
@@ -75,10 +76,10 @@ export function CalendarControlPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-400/10 text-emerald-300">
               <CalendarDays className="h-5 w-5" />
             </div>
-            <div>
-              <h2 className="text-lg font-semibold text-white">Scheduled events</h2>
-              <p className="text-sm text-slate-400">The canonical time-ordered queue of portal deadlines and privacy response dates.</p>
-            </div>
+              <div>
+                <h2 className="text-lg font-semibold text-white">Scheduled events</h2>
+              <p className="text-sm text-slate-400">The canonical time-ordered queue of module milestones, assessment windows, portal deadlines, and privacy response dates.</p>
+              </div>
           </div>
           <div className="mt-5 space-y-3">
             {overview.calendar.length === 0 ? (
@@ -145,7 +146,7 @@ export function CalendarControlPage() {
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-white">Deadline context</h2>
-                <p className="text-sm text-slate-400">Searchable records that most often produce dated work in the canonical platform.</p>
+                <p className="text-sm text-slate-400">Searchable module and workflow records that most often produce dated work in the canonical platform.</p>
               </div>
             </div>
             <div className="mt-5 space-y-3">

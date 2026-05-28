@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/GRCEngClub/claude-grc-engineering/schemas/risk.schema.json",
+  "title": "GRC Risk Register Entry",
+  "description": "Canonical contract for user-owned risk register records stored in grc-data.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "risk_id",
+    "title",
+    "status",
+    "owner",
+    "treatment",
+    "created_at",
+    "updated_at",
+    "inherent"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "risk_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]+$",
+      "description": "Stable identifier for the risk."
+    },
+    "title": {
+      "type": "string"
+    },
+    "statement": {
+      "type": "string",
+      "description": "Clear description of the risk scenario and what could go wrong."
+    },
+    "category": {
+      "type": ["string", "null"],
+      "description": "Broad risk category such as Security, Compliance, Privacy, or Operational."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "watching",
+        "mitigating",
+        "accepted",
+        "transferred",
+        "closed"
+      ]
+    },
+    "owner": {
+      "$ref": "#/$defs/person_ref"
+    },
+    "treatment": {
+      "type": "string",
+      "enum": [
+        "mitigate",
+        "accept",
+        "transfer",
+        "avoid",
+        "monitor"
+      ]
+    },
+    "treatment_plan": {
+      "type": ["string", "null"]
+    },
+    "inherent": {
+      "$ref": "#/$defs/risk_score"
+    },
+    "residual": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/risk_score"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "linked_findings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "linked_controls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reviewed_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "target_close_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "person_ref": {
+      "type": "object",
+      "description": "Reference to an accountable person or team.",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "team": {
+          "type": "string"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "name"
+          ]
+        },
+        {
+          "required": [
+            "team"
+          ]
+        },
+        {
+          "required": [
+            "email"
+          ]
+        }
+      ]
+    },
+    "risk_score": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "likelihood": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "impact": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "score": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 25
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "likelihood",
+        "impact"
+      ]
+    }
+  }
+}

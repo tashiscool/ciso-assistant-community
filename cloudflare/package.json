@@ -16,6 +16,8 @@
     "migrate:production": "wrangler d1 migrations apply D1_MAIN --env production --remote",
     "migrate:production:script": "bash ./scripts/apply_d1_migrations_remote.sh",
     "smoke:local": "node ./scripts/local-smoke.mjs",
+    "smoke:local:grc": "node ./scripts/smoke_grc_engine_local.mjs",
+    "smoke:local:fedramp": "node ./scripts/smoke_fedramp_provider_shell_local.mjs",
     "verify:aws-live-local": "node ./scripts/verify_live_aws_regovise.mjs",
     "smoke:local:email": "node ./scripts/assert_email_logs.mjs",
     "smoke:local:full": "node ./scripts/local-smoke.mjs && node ./scripts/assert_email_logs.mjs",
@@ -23,7 +25,10 @@
     "ensure:observable-production": "node ./scripts/ensure_observable_parity_dataset.mjs",
     "verify:observable-production": "node ./scripts/verify_observable_parity.mjs",
     "smoke:production": "node ./scripts/prod_smoke.mjs",
-    "verify:production-token": "bash ./scripts/verify_cloudflare_token.sh"
+    "smoke:production:modules": "node ./scripts/prod_module_validation.mjs",
+    "verify:production-token": "bash ./scripts/verify_cloudflare_token.sh",
+    "sync:grc-snapshot": "node ./scripts/sync_grc_vendor_snapshot.mjs",
+    "validate:grc-contracts": "node ./scripts/validate_grc_contracts.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260305.1",
@@ -31,6 +36,8 @@
     "wrangler": "^4.56.0"
   },
   "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "aws4fetch": "^1.0.20",
     "fast-xml-parser": "^5.7.3"
   }

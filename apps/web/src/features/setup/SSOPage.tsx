@@ -133,6 +133,7 @@ export function SSOPage() {
   const isSaml = authProtocol === 'saml';
   const runtimeReady = snapshot?.config.runtimeReady ?? false;
   const runtimeMessage = snapshot?.config.runtimeMessage ?? '';
+  const tenantSsoOnly = isOidc && loginEnforced && !allowLocalFallback;
 
   return (
     <div className="space-y-6">
@@ -143,6 +144,8 @@ export function SSOPage() {
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
             Configure the enterprise identity path for Regovise. OIDC is the active sign-in method in this worker
             today. SAML can be documented here for planning, but it is not yet the interactive workspace sign-in path.
+            Providers that use confidential web clients, including Google Workspace, may also require a runtime client
+            secret in addition to PKCE.
           </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -171,6 +174,14 @@ export function SSOPage() {
       {runtimeMessage ? (
         <div className="rounded-3xl border border-white/10 bg-slate-950/40 px-5 py-4 text-sm text-slate-300">
           {runtimeMessage}
+        </div>
+      ) : null}
+
+      {isOidc ? (
+        <div className="rounded-3xl border border-cyan-300/15 bg-cyan-400/[0.06] px-5 py-4 text-sm text-cyan-100">
+          {tenantSsoOnly
+            ? 'This tenant is currently SSO-only for normal sign-in. Team-created users should normally be provisioned as SSO-managed accounts, and any local password or email-code path should be treated as break-glass only.'
+            : 'This tenant can combine enterprise SSO with selected local fallback accounts during rollout. Existing workspace users are matched by email on first successful SSO sign-in, and access is still governed by IAM role assignments.'}
         </div>
       ) : null}
 
@@ -337,7 +348,8 @@ export function SSOPage() {
               <div>
                 <div className="font-medium text-white">Allow just-in-time user provisioning</div>
                 <div className="mt-2 text-sm text-slate-400">
-                  Create a workspace account on first successful OIDC login if at least one mapped Regovise role is present.
+                  Create a workspace account on first successful OIDC login when no existing workspace account matches by
+                  email. New accounts still need mapped Regovise roles, unless the tenant uses the first-user bootstrap path.
                 </div>
               </div>
             </label>

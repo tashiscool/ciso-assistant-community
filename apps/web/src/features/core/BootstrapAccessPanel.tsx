@@ -340,12 +340,17 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
   const tenantEmailEnabled = tenantOptions?.local.emailCodeEnabled ?? canUseEmailSignIn;
   const tenantSsoReady = tenantOptions?.sso.ready ?? loginConfig?.sso.ready ?? false;
   const tenantSsoEnforced = tenantOptions?.sso.loginEnforced ?? loginConfig?.sso.loginEnforced ?? false;
+  const tenantSsoProvider =
+    tenantOptions?.sso.providerType?.trim() ||
+    loginConfig?.sso.providerType?.trim() ||
+    'SSO';
   const ssoButtonLabel =
     tenantOptions?.sso.buttonLabel?.trim() ||
     loginConfig?.sso.buttonLabel?.trim() ||
     'Continue with SSO';
   const signInPosture = [
-    tenantSsoReady ? `${tenantOptions?.sso.providerType || loginConfig?.sso.providerType || 'SSO'} ready` : null,
+    tenantSsoReady ? `${tenantSsoProvider} ready` : null,
+    tenantSsoEnforced ? 'SSO required' : null,
     tenantPasswordEnabled && tenantLocalAllowed ? 'Password sign-in ready' : null,
     tenantEmailEnabled && tenantLocalAllowed ? 'Email codes available' : null,
     tenantSlug || tenantSlugPlaceholder ? `Workspace ${tenantSlug || tenantSlugPlaceholder}` : null,
@@ -717,8 +722,9 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
             {loginMethod === 'sso' ? (
               <div className="mx-auto max-w-xl space-y-4">
                 <div className="rounded-2xl border border-cyan-300/15 bg-cyan-400/[0.06] px-4 py-4 text-sm text-cyan-100">
-                  Use the enterprise identity provider configured for this workspace. After the provider confirms the
-                  account, Regovise opens the tenant session and returns you here.
+                  {tenantSsoEnforced
+                    ? `${tenantSsoProvider} is required for this workspace. Sign in with the same email address your workspace account uses. Existing tenant records are linked on the first successful SSO sign-in, and Regovise returns you here with the tenant session open.`
+                    : `Use the enterprise identity provider configured for this workspace. After the provider confirms the account, Regovise opens the tenant session and returns you here.`}
                 </div>
                 <button
                   className="button-primary w-full justify-center"

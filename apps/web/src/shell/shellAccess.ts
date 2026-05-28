@@ -70,6 +70,7 @@ export type ShellAccessProfile = {
   canUseSearch: boolean;
   canUseAnalytics: boolean;
   canUseProgramWorkspace: boolean;
+  canUseModules: boolean;
   canUseLibraries: boolean;
   canUseFrameworks: boolean;
   canUseAssessmentWorkspace: boolean;
@@ -99,6 +100,7 @@ const ADMIN_ROUTE_PREFIXES = [
   '/features/response-automation',
   '/features/evidence-mapping',
   '/features/automation-manager',
+  '/grc-admin',
 ];
 
 const ADMIN_ROUTE_EXACT = new Set([
@@ -116,8 +118,8 @@ const ADMIN_ROUTE_EXACT = new Set([
   '/quick-start',
   '/conmon/profiles',
   '/evidence/sources',
-  '/policies',
   '/settings',
+  '/trust-center',
 ]);
 
 const INTERNAL_ROUTE_PREFIXES = [
@@ -138,12 +140,9 @@ const INTERNAL_ROUTE_PREFIXES = [
 ];
 
 const INTERNAL_ROUTE_EXACT = new Set([
-  '/assets',
   '/asset-assessments',
   '/actors',
   '/vulnerabilities',
-  '/incidents',
-  '/security-exceptions',
   '/backup-restore',
   '/calendar',
   '/dashboards',
@@ -197,6 +196,7 @@ export function deriveShellAccessProfile(payload: IamMePayload | null): ShellAcc
     canUseSearch: canUseOperations,
     canUseAnalytics: canUseOperations,
     canUseProgramWorkspace: canUseOperations,
+    canUseModules: canUseOperations,
     canUseLibraries: canUseFrameworks,
     canUseFrameworks,
     canUseAssessmentWorkspace: canUseFrameworks && canUseRiskAssessments,
@@ -220,8 +220,45 @@ function canAccessStandardRoute(route: string, access: ShellAccessProfile): bool
     [['/search'], access.canUseSearch],
     [['/analytics'], access.canUseAnalytics],
     [['/program'], access.canUseProgramWorkspace],
+    [
+      [
+        '/modules',
+        '/assets',
+        '/capabilities',
+        '/case-management',
+        '/causal-analysis',
+        '/changes',
+        '/components',
+        '/data-calls',
+        '/evidence-locker',
+        '/incidents',
+        '/interconnections',
+        '/issues',
+        '/policies',
+        '/programs',
+        '/projects',
+        '/requirements',
+        '/risks',
+        '/security-controls',
+        '/security-exceptions',
+        '/security-plans',
+        '/security-profiles',
+        '/supply-chain',
+        '/tasks',
+        '/threat-models',
+        '/threats',
+        '/catalogues',
+        '/assessment-plans',
+        '/questionnaires',
+      ],
+      access.canUseModules,
+    ],
     [['/libraries', '/loaded-libraries', '/mapping-libraries', '/stored-libraries'], access.canUseLibraries],
     [['/frameworks'], access.canUseFrameworks],
+    [['/framework-library'], access.canUseFrameworks],
+    [['/findings'], access.canUseFrameworks],
+    [['/gap-assessments'], access.canUseFrameworks],
+    [['/report-bundles'], access.canUseFrameworks],
     [['/assessments', '/compliance-assessments'], access.canUseAssessmentWorkspace],
     [['/applied-controls'], access.canUseComplianceAssessments],
     [['/risk-assessments', '/risk-scenarios'], access.canUseRiskAssessments],

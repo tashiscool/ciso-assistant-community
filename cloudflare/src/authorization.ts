@@ -379,7 +379,7 @@ export async function requireRootAdminAccess(
     );
   }
 
-  const permissionContext = await loadPermissionContext(ctx, { scopeFolderId: rootFolder.id });
+  const permissionContext = await loadPermissionContext(ctx);
   if (permissionContext instanceof Response) {
     return permissionContext;
   }

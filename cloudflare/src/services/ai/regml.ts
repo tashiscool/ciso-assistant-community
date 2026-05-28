@@ -400,6 +400,7 @@ function extractBulletLines(text: string | null, fallback: string[]) {
 
 async function buildRegmlPromptPlanWithAi(
   env: WorkerRequestContext['env'],
+  tenantId: string,
   mode: RegmlWorkspaceMode,
   prompt: string,
   workspaceContext: Awaited<ReturnType<typeof buildTenantAiContext>>,
@@ -417,7 +418,7 @@ async function buildRegmlPromptPlanWithAi(
     userPrompt: prompts.userPrompt,
     maxTokens: 360,
     temperature: 0.1,
-  });
+  }, tenantId);
 
   return {
     title: fallbackPlan.title,
@@ -534,6 +535,7 @@ function buildRegmlAttemptFromPrompt(
 
 async function buildRegmlAttemptFromPromptWithAi(
   env: WorkerRequestContext['env'],
+  tenantId: string,
   mode: RegmlWorkspaceMode,
   prompt: string,
   attemptIndex: number,
@@ -554,7 +556,7 @@ async function buildRegmlAttemptFromPromptWithAi(
     userPrompt: prompts.userPrompt,
     maxTokens: 520,
     temperature: 0.15,
-  });
+  }, tenantId);
 
   return {
     ...fallbackAttempt,
@@ -850,7 +852,7 @@ async function buildRegmlWorkspace(
 
   const [workspaceContext, runtime] = await Promise.all([
     buildTenantAiContext(env, tenantId),
-    getAiRuntimeStatus(env),
+    getAiRuntimeStatus(env, tenantId),
   ]);
   const sessions = Object.fromEntries(
     await Promise.all(
@@ -990,11 +992,11 @@ async function runRegmlPrompt(
   let selectedAttemptId: string | null = session.selected_attempt_id;
   const workspaceContext = await buildTenantAiContext(ctx.env, tenantId);
   const issueThreshold = workspaceContext.metrics.securityPlans > 0 ? 72 : null;
-  const runtime = await getAiRuntimeStatus(ctx.env);
+  const runtime = await getAiRuntimeStatus(ctx.env, tenantId);
 
   if (promptMode === 'Plan') {
     const plan = runtime.textGenerationAvailable
-      ? await buildRegmlPromptPlanWithAi(ctx.env, mode, prompt, workspaceContext, issueThreshold)
+      ? await buildRegmlPromptPlanWithAi(ctx.env, tenantId, mode, prompt, workspaceContext, issueThreshold)
       : buildRegmlPromptPlan(mode, prompt);
     await insertMessage(ctx.env, tenantId, session.id, mode, 'assistant', 'plan', plan, timestamp);
     await insertMessage(
@@ -1012,6 +1014,7 @@ async function runRegmlPrompt(
     const nextAttempt = runtime.textGenerationAvailable
       ? await buildRegmlAttemptFromPromptWithAi(
           ctx.env,
+          tenantId,
           mode,
           prompt,
           existingAttempts.length,

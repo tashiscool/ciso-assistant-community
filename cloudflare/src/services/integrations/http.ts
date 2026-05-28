@@ -154,6 +154,33 @@ function buildSeedConnector(provider: string) {
           alerts: ['dependabot', 'code-scanning'],
         },
       };
+    case 'aws':
+      return {
+        provider: 'aws',
+        name: 'AWS Security Baseline',
+        category: 'cloud-security',
+        authMode: 'access_key',
+        baseUrl: 'https://console.aws.amazon.com',
+        capabilities: ['sync_assets', 'sync_findings'] as ConnectorCapability[],
+        config: {
+          region: 'us-east-1',
+          bucket: 'regovise-prod-logs',
+          accountId: '123456789012',
+        },
+      };
+    case 'okta':
+      return {
+        provider: 'okta',
+        name: 'Okta Identity Posture',
+        category: 'identity',
+        authMode: 'api_token',
+        baseUrl: 'https://example.okta.com',
+        capabilities: ['sync_findings', 'scim_provisioning'] as ConnectorCapability[],
+        config: {
+          orgUrl: 'https://example.okta.com',
+          policyScope: 'privileged-admin',
+        },
+      };
     case 'slack':
       return {
         provider: 'slack',
@@ -223,7 +250,7 @@ async function ensureSeedConnectors(env: WorkerRequestContext['env'], tenantId: 
   }
 
   const createdAt = nowIso();
-  const seeds = ['wiz', 'github', 'slack', 'webhook'].map(buildSeedConnector);
+  const seeds = ['wiz', 'github', 'aws', 'okta', 'slack', 'webhook'].map(buildSeedConnector);
   const statements = seeds.map((seed) =>
     env.D1_MAIN.prepare(
       `INSERT INTO integration_connectors (

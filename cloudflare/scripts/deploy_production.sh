@@ -15,6 +15,14 @@ CLI_DRY_RUN="${DRY_RUN-}"
 CLI_CLOUDFLARE_WORKER_ENV="${CLOUDFLARE_WORKER_ENV-}"
 
 cf_load_prod_env "${1:-}"
+
+if [[ -z "${BOOTSTRAP_SETUP_SECRET-}" && -f "${ROOT_DIR}/.env-prod" ]]; then
+  set -a
+  # shellcheck disable=SC1091
+  source "${ROOT_DIR}/.env-prod"
+  set +a
+fi
+
 cf_prepare_wrangler_env
 cf_verify_cloudflare_token
 
@@ -35,6 +43,7 @@ if [[ "${RUN_PREDEPLOY_TESTS}" == "1" ]]; then
   npm --prefix "${WEB_DIR}" run typecheck
   npm --prefix "${WEB_DIR}" run build
   npm --prefix "${ROOT_DIR}" run typecheck
+  cd "${ROOT_DIR}"
   npx wrangler deploy --dry-run --env "${CLOUDFLARE_WORKER_ENV}"
 fi
 

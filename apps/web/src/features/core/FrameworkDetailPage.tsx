@@ -72,7 +72,7 @@ export function FrameworkDetailPage() {
       setRef('');
       setTitle('');
       setDescription('');
-      setNotice('Requirement added to the framework library.');
+      setNotice('Requirement added to the catalogue.');
       await loadFrameworkDetail();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -82,11 +82,11 @@ export function FrameworkDetailPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading framework workspace...</div>;
+    return <div className="panel p-6 text-sm text-slate-300">Loading catalogue workspace...</div>;
   }
 
   if (!framework) {
-    return <div className="notice-error">Framework not found for tenant {identity.tenantId}.</div>;
+    return <div className="notice-error">Catalogue not found for tenant {identity.tenantId}.</div>;
   }
 
   return (
@@ -94,13 +94,13 @@ export function FrameworkDetailPage() {
       <section className="panel grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <Link className="text-sm text-cyan-200 transition hover:text-cyan-100" to="/frameworks">
-            Back to frameworks
+            Back to catalogues
           </Link>
-          <div className="eyebrow mt-4">Governance</div>
+          <div className="eyebrow mt-4">Catalogues</div>
           <h1 className="mt-2 text-3xl font-semibold text-white">{framework.name}</h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-            Use this framework workspace to manage assessable requirements before running compliance
-            reviews against the standard.
+            Use this catalogue workspace to manage the requirement and control collection that
+            downstream assessments, plans, and governance artifacts will rely on.
           </p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div className="metric-card">
@@ -132,6 +132,13 @@ export function FrameworkDetailPage() {
               <div className="mt-2">{formatTimestamp(framework.updatedAt)}</div>
             </div>
           </div>
+          <div className="mt-5 panel-subtle">
+            <div className="label">Downstream use</div>
+            <div className="mt-3 space-y-2 text-sm leading-6 text-slate-300">
+              <div>- Flow requirements into security plans, policies, components, projects, and supply-chain records.</div>
+              <div>- Keep one tenant source of truth for the governing controls your builders and assessments reference.</div>
+            </div>
+          </div>
         </div>
 
         <form
@@ -141,7 +148,7 @@ export function FrameworkDetailPage() {
             void createControl();
           }}
         >
-          <div className="eyebrow">New Requirement</div>
+          <div className="eyebrow">Add Requirement</div>
           <label className="space-y-1">
             <span className="label">Reference</span>
             <input
@@ -192,7 +199,7 @@ export function FrameworkDetailPage() {
               <FrameworkTree nodes={tree} />
             ) : (
               <div className="panel-subtle text-sm text-slate-400">
-                Add your first requirement to build out the framework tree.
+                Add your first requirement to build out the catalogue tree.
               </div>
             )}
           </div>
@@ -225,7 +232,7 @@ export function FrameworkDetailPage() {
               {controls.length === 0 && (
                 <tr>
                   <td className="px-4 py-8 text-center text-slate-400" colSpan={3}>
-                    No requirements are loaded for this framework yet.
+                    No requirements are loaded for this catalogue yet.
                   </td>
                 </tr>
               )}

@@ -11,12 +11,15 @@ import {
   type ScopedPermissionContext,
 } from '../../authorization';
 import { getAiRuntimeStatus } from '../ai/runtime';
+import { refreshScfCrosswalks } from '../grc-engine/scf';
 import { seedDemoIamWorkspace } from '../iam/http';
 import { buildOpsOverviewCounts, seedDemoOpsWorkspace } from '../ops/http';
 import { seedDemoSetupWorkspace } from '../setup/http';
 import {
   buildOidcAuthorizationUrl,
   completeOidcCodeExchange,
+  oidcProviderRequiresClientSecret,
+  resolveOidcClientSecret,
   type OidcConfigRecord,
   type OidcIdentityClaims,
   randomBase64Url,
@@ -35,6 +38,26 @@ import {
 } from '../../session';
 import { getTenantWorkflowSnapshot } from '../../utils/workflows';
 import { json, methodNotAllowed, readJson } from '../../utils/http';
+import {
+  findModuleCatalogEntry,
+  listScaleModuleCatalogEntries,
+  type ModuleCatalogEntry,
+} from './moduleRegistry';
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
+function asJson<T>(value: string | null | undefined, fallback: T): T {
+  if (!value) {
+    return fallback;
+  }
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return fallback;
+  }
+}
 
 type OverviewCounts = {
   users: number;
@@ -237,6 +260,42 @@ type ControlRow = {
   updated_at: string;
 };
 
+type PackagedFrameworkRow = {
+  id: string;
+  slug: string;
+  framework_key: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  version: string | null;
+  scf_framework_id: string | null;
+};
+
+type LatestScfVersionRow = {
+  id: string;
+};
+
+type PackagedCrosswalkImportRow = {
+  framework_control_id: string;
+  scf_control_id: string;
+  scf_title: string | null;
+  scf_description: string | null;
+};
+
+type ImportedFrameworkControlSeed = {
+  ref: string;
+  title: string;
+  description: string | null;
+};
+
+type ParsedFrameworkImportPayload = {
+  key: string;
+  name: string;
+  version: string | null;
+  category: string | null;
+  controls: ImportedFrameworkControlSeed[];
+};
+
 type RiskRegisterRow = {
   id: string;
   tenant_id: string;
@@ -309,6 +368,19 @@ type ComplianceAssessmentRow = {
   name: string;
   version: string;
   status: string;
+  assessment_kind: string | null;
+  lead_assessor_user_id: string | null;
+  instructions: string | null;
+  planned_start_on: string | null;
+  planned_finish_on: string | null;
+  process_info: string | null;
+  assignment_principal_type: string | null;
+  assignment_principal_id: string | null;
+  recurrence_json: string | null;
+  source_security_plan_id: string | null;
+  assessment_plan_template_id: string | null;
+  assessment_plan_name: string | null;
+  recurrence_source_assessment_id: string | null;
   observation: string | null;
   controls_total: number;
   controls_assessed: number;
@@ -316,6 +388,15 @@ type ComplianceAssessmentRow = {
   maturity_score: number | null;
   created_at: string;
   updated_at: string;
+};
+
+type AssessmentPlanTemplateQuestion = {
+  id: string;
+  ref: string;
+  prompt: string;
+  section?: string | null;
+  requirementRef?: string | null;
+  evidenceHint?: string | null;
 };
 
 type RiskActionPlanItem = {
@@ -342,11 +423,43 @@ type ComplianceRequirementAssessmentRow = {
   control_ref: string;
   control_title: string;
   control_description: string | null;
+  in_scope: number | null;
+  sort_order: number | null;
   result: string;
   observation: string | null;
+  evidence_note: string | null;
+  gaps_differences: string | null;
+  likelihood: number | null;
+  impact: number | null;
+  auto_generate_follow_up: number | null;
   evidence_status: string;
   implementation_score: number | null;
   documentation_score: number | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type ComplianceAssessmentPlanItemRow = {
+  id: string;
+  tenant_id: string;
+  compliance_assessment_id: string;
+  assessment_plan_template_id: string;
+  assessment_plan_name: string | null;
+  template_question_id: string | null;
+  line_ref: string;
+  line_section: string | null;
+  line_prompt: string;
+  requirement_ref: string | null;
+  evidence_hint: string | null;
+  sort_order: number | null;
+  result: string;
+  observation: string | null;
+  evidence_note: string | null;
+  gaps_differences: string | null;
+  likelihood: number | null;
+  impact: number | null;
+  auto_generate_follow_up: number | null;
+  generated_follow_up_id: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -378,6 +491,7 @@ type AppliedControlRow = {
   tenant_id: string;
   compliance_assessment_id: string;
   requirement_assessment_id: string | null;
+  assessment_plan_item_id: string | null;
   folder_id: string;
   folder_name: string;
   ref_id: string | null;
@@ -398,6 +512,9 @@ type AppliedControlRow = {
   requirement_result: string | null;
   requirement_ref: string | null;
   requirement_name: string | null;
+  plan_item_ref: string | null;
+  plan_item_prompt: string | null;
+  plan_item_result: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -761,10 +878,29 @@ type CreateRiskAssessmentInput = {
 type CreateComplianceAssessmentInput = {
   perimeterId?: string;
   frameworkId?: string;
+  assessmentKind?: string;
+  sourceSecurityPlanId?: string | null;
+  assessmentPlanTemplateId?: string | null;
   refId?: string;
   name?: string;
   version?: string;
   status?: string;
+  leadAssessorUserId?: string | null;
+  instructions?: string | null;
+  plannedStartOn?: string | null;
+  plannedFinishOn?: string | null;
+  processInfo?: string | null;
+  assignmentPrincipalType?: 'user' | 'group' | null;
+  assignmentPrincipalId?: string | null;
+  recurrence?: {
+    firstPlannedStart?: string | null;
+    firstPlannedFinish?: string | null;
+    repeatUntil?: string | null;
+    assignmentPrincipalType?: 'user' | 'group' | null;
+    assignmentPrincipalId?: string | null;
+    frequency?: string | null;
+  } | null;
+  controlIds?: string[] | null;
   observation?: string;
   controlsTotal?: number;
   controlsAssessed?: number;
@@ -774,6 +910,11 @@ type CreateComplianceAssessmentInput = {
 type UpdateComplianceRequirementInput = {
   result?: string | null;
   observation?: string | null;
+  evidenceNote?: string | null;
+  gapsDifferences?: string | null;
+  likelihood?: number | null;
+  impact?: number | null;
+  autoGenerateFollowUp?: boolean | null;
   evidenceStatus?: string | null;
   implementationScore?: number | null;
   documentationScore?: number | null;
@@ -1035,6 +1176,8 @@ const PRIVACY_WRITE_PERMISSIONS = [
 ];
 const RESILIENCE_READ_PERMISSIONS = ['view_bia', 'add_bia', 'change_bia'];
 const RESILIENCE_WRITE_PERMISSIONS = ['add_bia', 'change_bia'];
+const EVIDENCE_READ_PERMISSIONS = ['view_evidence', 'collect_evidence'];
+const EVIDENCE_WRITE_PERMISSIONS = ['collect_evidence'];
 const CORE_OVERVIEW_READ_PERMISSIONS = [
   ...FOLDER_READ_PERMISSIONS,
   ...FRAMEWORK_READ_PERMISSIONS,
@@ -1248,6 +1391,211 @@ function filterRowsByAccessibleDomainScope<T extends { folder_id: string | null 
   access: ScopedPermissionContext,
 ): T[] {
   return rows.filter((row) => hasAccessibleDomainScope(access, row.folder_id));
+}
+
+type ModuleRecordLink = {
+  id: string;
+  relationType: string;
+  targetType: string;
+  targetId: string | null;
+  label: string;
+  route: string | null;
+};
+
+type ModuleRecordActivity = {
+  id: string;
+  type: 'created' | 'updated' | 'note' | 'archived';
+  message: string;
+  createdAt: string;
+  createdByUserId: string | null;
+};
+
+type ModuleRecordRow = {
+  id: string;
+  tenant_id: string;
+  module_key: string;
+  folder_id: string;
+  title: string;
+  status: string;
+  owner_user_id: string | null;
+  assignee_user_id: string | null;
+  start_on: string | null;
+  finish_on: string | null;
+  due_on: string | null;
+  review_on: string | null;
+  expires_on: string | null;
+  data_json: string;
+  links_json: string;
+  activity_json: string;
+  archived: number;
+  created_by_user_id: string | null;
+  updated_by_user_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type ModuleRecordResponse = {
+  id: string;
+  moduleKey: string;
+  folderId: string;
+  title: string;
+  status: string;
+  ownerUserId: string | null;
+  assigneeUserId: string | null;
+  startOn: string | null;
+  finishOn: string | null;
+  dueOn: string | null;
+  reviewOn: string | null;
+  expiresOn: string | null;
+  data: Record<string, unknown>;
+  links: ModuleRecordLink[];
+  activity: ModuleRecordActivity[];
+  archived: boolean;
+  createdByUserId: string | null;
+  updatedByUserId: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type SaveModuleRecordInput = {
+  folderId?: string;
+  title?: string;
+  status?: string;
+  ownerUserId?: string | null;
+  assigneeUserId?: string | null;
+  startOn?: string | null;
+  finishOn?: string | null;
+  dueOn?: string | null;
+  reviewOn?: string | null;
+  expiresOn?: string | null;
+  data?: Record<string, unknown>;
+  links?: ModuleRecordLink[];
+  note?: string | null;
+};
+
+function resolveModulePermissionFamilies(entry: ModuleCatalogEntry) {
+  switch (entry.permissionFamily) {
+    case 'risk':
+      return { read: RISK_READ_PERMISSIONS, write: RISK_WRITE_PERMISSIONS };
+    case 'third-party':
+      return { read: TPRM_READ_PERMISSIONS, write: TPRM_WRITE_PERMISSIONS };
+    case 'evidence':
+      return { read: EVIDENCE_READ_PERMISSIONS, write: EVIDENCE_WRITE_PERMISSIONS };
+    case 'operations':
+      return { read: CORE_OVERVIEW_READ_PERMISSIONS, write: FRAMEWORK_WRITE_PERMISSIONS };
+    case 'framework':
+    default:
+      return { read: FRAMEWORK_READ_PERMISSIONS, write: FRAMEWORK_WRITE_PERMISSIONS };
+  }
+}
+
+function sanitizeModuleLinks(value: unknown): ModuleRecordLink[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((item) => {
+      if (!item || typeof item !== 'object') {
+        return null;
+      }
+
+      const record = item as Record<string, unknown>;
+      const relationType = typeof record.relationType === 'string' ? record.relationType.trim() : '';
+      const label = typeof record.label === 'string' ? record.label.trim() : '';
+
+      if (!relationType || !label) {
+        return null;
+      }
+
+      return {
+        id:
+          typeof record.id === 'string' && record.id.trim()
+            ? record.id.trim()
+            : crypto.randomUUID(),
+        relationType,
+        targetType: typeof record.targetType === 'string' && record.targetType.trim() ? record.targetType.trim() : 'record',
+        targetId: typeof record.targetId === 'string' && record.targetId.trim() ? record.targetId.trim() : null,
+        label,
+        route: typeof record.route === 'string' && record.route.trim() ? record.route.trim() : null,
+      };
+    })
+    .filter((item): item is ModuleRecordLink => item !== null);
+}
+
+function appendModuleActivity(
+  current: ModuleRecordActivity[],
+  entry: Omit<ModuleRecordActivity, 'id' | 'createdAt'> & { createdAt?: string | null },
+) {
+  return [
+    ...current,
+    {
+      id: crypto.randomUUID(),
+      type: entry.type,
+      message: entry.message,
+      createdAt: entry.createdAt ?? nowIso(),
+      createdByUserId: entry.createdByUserId ?? null,
+    },
+  ];
+}
+
+function toModuleRecordResponse(row: ModuleRecordRow): ModuleRecordResponse {
+  return {
+    id: row.id,
+    moduleKey: row.module_key,
+    folderId: row.folder_id,
+    title: row.title,
+    status: row.status,
+    ownerUserId: row.owner_user_id,
+    assigneeUserId: row.assignee_user_id,
+    startOn: row.start_on,
+    finishOn: row.finish_on,
+    dueOn: row.due_on,
+    reviewOn: row.review_on,
+    expiresOn: row.expires_on,
+    data: asJson<Record<string, unknown>>(row.data_json, {}),
+    links: asJson<ModuleRecordLink[]>(row.links_json, []),
+    activity: asJson<ModuleRecordActivity[]>(row.activity_json, []),
+    archived: row.archived === 1,
+    createdByUserId: row.created_by_user_id,
+    updatedByUserId: row.updated_by_user_id,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+function normalizeOptionalDateString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+function deriveModuleRecordTitle(
+  entry: ModuleCatalogEntry,
+  body: SaveModuleRecordInput,
+): string {
+  const candidates = [
+    body.title,
+    typeof body.data?.title === 'string' ? body.data.title : null,
+    typeof body.data?.name === 'string' ? body.data.name : null,
+    typeof body.data?.vendor_name === 'string' ? body.data.vendor_name : null,
+    typeof body.data?.plan_name === 'string' ? body.data.plan_name : null,
+    typeof body.data?.system_name === 'string' ? body.data.system_name : null,
+  ];
+
+  return (
+    candidates.find((value) => typeof value === 'string' && value.trim())?.trim() ??
+    `New ${entry.moduleName}`
+  );
+}
+
+function deriveModuleRecordStatus(body: SaveModuleRecordInput): string {
+  const candidates = [
+    body.status,
+    typeof body.data?.status === 'string' ? body.data.status : null,
+    typeof body.data?.lifecycle_status === 'string' ? body.data.lifecycle_status : null,
+    typeof body.data?.approval_status === 'string' ? body.data.approval_status : null,
+  ];
+
+  return candidates.find((value) => typeof value === 'string' && value.trim())?.trim() ?? 'planned';
 }
 
 const DEMO_LIBRARIES = [
@@ -1617,6 +1965,19 @@ function toComplianceAssessmentResponse(row: ComplianceAssessmentRow) {
     name: row.name,
     version: row.version,
     status: row.status,
+    assessmentKind: row.assessment_kind ?? 'compliance',
+    leadAssessorUserId: row.lead_assessor_user_id,
+    instructions: row.instructions,
+    plannedStartOn: row.planned_start_on,
+    plannedFinishOn: row.planned_finish_on,
+    processInfo: row.process_info,
+    assignmentPrincipalType: row.assignment_principal_type,
+    assignmentPrincipalId: row.assignment_principal_id,
+    recurrence: asJson<Record<string, unknown> | null>(row.recurrence_json, null),
+    sourceSecurityPlanId: row.source_security_plan_id,
+    assessmentPlanTemplateId: row.assessment_plan_template_id,
+    assessmentPlanName: row.assessment_plan_name,
+    recurrenceSourceAssessmentId: row.recurrence_source_assessment_id,
     observation: row.observation,
     controlsTotal: row.controls_total,
     controlsAssessed: row.controls_assessed,
@@ -1638,11 +1999,45 @@ function toComplianceRequirementAssessmentResponse(row: ComplianceRequirementAss
     controlRef: row.control_ref,
     controlTitle: row.control_title,
     controlDescription: row.control_description,
+    inScope: row.in_scope !== 0,
+    sortOrder: row.sort_order ?? 0,
     result: row.result,
     observation: row.observation,
+    evidenceNote: row.evidence_note,
+    gapsDifferences: row.gaps_differences,
+    likelihood: row.likelihood,
+    impact: row.impact,
+    autoGenerateFollowUp: row.auto_generate_follow_up !== 0,
     evidenceStatus: row.evidence_status,
     implementationScore: row.implementation_score,
     documentationScore: row.documentation_score,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+function toComplianceAssessmentPlanItemResponse(row: ComplianceAssessmentPlanItemRow) {
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    complianceAssessmentId: row.compliance_assessment_id,
+    assessmentPlanTemplateId: row.assessment_plan_template_id,
+    assessmentPlanName: row.assessment_plan_name,
+    templateQuestionId: row.template_question_id,
+    lineRef: row.line_ref,
+    lineSection: row.line_section,
+    linePrompt: row.line_prompt,
+    requirementRef: row.requirement_ref,
+    evidenceHint: row.evidence_hint,
+    sortOrder: row.sort_order ?? 0,
+    result: row.result,
+    observation: row.observation,
+    evidenceNote: row.evidence_note,
+    gapsDifferences: row.gaps_differences,
+    likelihood: row.likelihood,
+    impact: row.impact,
+    autoGenerateFollowUp: row.auto_generate_follow_up !== 0,
+    generatedFollowUpId: row.generated_follow_up_id,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -1716,6 +2111,7 @@ function toAppliedControlResponse(row: AppliedControlRow) {
     tenantId: row.tenant_id,
     complianceAssessmentId: row.compliance_assessment_id,
     requirementAssessmentId: row.requirement_assessment_id,
+    assessmentPlanItemId: row.assessment_plan_item_id,
     folderId: row.folder_id,
     folderName: row.folder_name,
     refId: row.ref_id,
@@ -1740,6 +2136,15 @@ function toAppliedControlResponse(row: AppliedControlRow) {
             ref: row.requirement_ref,
             name: row.requirement_name,
             result: row.requirement_result,
+          }
+        : null,
+    assessmentPlanItem:
+      row.assessment_plan_item_id && row.plan_item_ref && row.plan_item_prompt
+        ? {
+            id: row.assessment_plan_item_id,
+            ref: row.plan_item_ref,
+            prompt: row.plan_item_prompt,
+            result: row.plan_item_result,
           }
         : null,
     createdAt: row.created_at,
@@ -2224,6 +2629,41 @@ function futureDate(daysFromNow: number) {
   return new Date(Date.now() + daysFromNow * 24 * 60 * 60 * 1000).toISOString();
 }
 
+function advanceRecurrenceIso(value: string, frequency: string | null | undefined) {
+  const current = new Date(value);
+  if (Number.isNaN(current.getTime())) {
+    return null;
+  }
+
+  switch ((frequency ?? '').trim().toLowerCase()) {
+    case 'daily':
+      current.setUTCDate(current.getUTCDate() + 1);
+      break;
+    case 'weekly':
+      current.setUTCDate(current.getUTCDate() + 7);
+      break;
+    case 'bi-weekly':
+      current.setUTCDate(current.getUTCDate() + 14);
+      break;
+    case 'monthly':
+      current.setUTCMonth(current.getUTCMonth() + 1);
+      break;
+    case 'quarterly':
+      current.setUTCMonth(current.getUTCMonth() + 3);
+      break;
+    case 'bi-annually':
+      current.setUTCMonth(current.getUTCMonth() + 6);
+      break;
+    case 'annually':
+      current.setUTCFullYear(current.getUTCFullYear() + 1);
+      break;
+    default:
+      return null;
+  }
+
+  return current.toISOString().slice(0, 10);
+}
+
 function buildFrameworkTree(controls: Array<ReturnType<typeof toControlResponse>>): FrameworkTreeNode[] {
   const rootNodes: FrameworkTreeNode[] = [];
 
@@ -2304,37 +2744,523 @@ async function listFrameworkControlRows(
   return results;
 }
 
+function asRecordValue(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null;
+  }
+  return value as Record<string, unknown>;
+}
+
+function readFirstString(record: Record<string, unknown>, keys: string[]): string | null {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+  }
+  return null;
+}
+
+function normalizeFrameworkImportKey(value: string | null | undefined): string | null {
+  const normalized = (value ?? '')
+    .trim()
+    .replace(/[^A-Za-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .toUpperCase();
+  return normalized || null;
+}
+
+function deriveFrameworkImportKey(
+  explicitKey: string | null,
+  name: string,
+  version: string | null,
+  fileName: string | null,
+): string | null {
+  const direct = normalizeFrameworkImportKey(explicitKey);
+  if (direct) {
+    return direct;
+  }
+
+  const derivedFromName = normalizeFrameworkImportKey([name, version].filter(Boolean).join('_'));
+  if (derivedFromName) {
+    return derivedFromName;
+  }
+
+  const fileStem = fileName?.replace(/\.[^.]+$/u, '') ?? null;
+  return normalizeFrameworkImportKey(fileStem);
+}
+
+function dedupeImportedControlSeeds(controls: ImportedFrameworkControlSeed[]): ImportedFrameworkControlSeed[] {
+  const seen = new Set<string>();
+  const deduped: ImportedFrameworkControlSeed[] = [];
+  for (const control of controls) {
+    const ref = control.ref.trim();
+    const title = control.title.trim();
+    if (!ref || !title) {
+      continue;
+    }
+    const token = ref.toLowerCase();
+    if (seen.has(token)) {
+      continue;
+    }
+    seen.add(token);
+    deduped.push({
+      ref,
+      title,
+      description: control.description?.trim() || null,
+    });
+  }
+  return deduped;
+}
+
+function parseImportedControlSeeds(value: unknown): ImportedFrameworkControlSeed[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  const parsed: ImportedFrameworkControlSeed[] = [];
+  for (const item of value) {
+    const record = asRecordValue(item);
+    if (!record) {
+      continue;
+    }
+    const ref = readFirstString(record, ['ref', 'controlId', 'requirementId', 'requirement_id', 'id', 'key', 'code']);
+    const title = readFirstString(record, ['title', 'name', 'label', 'displayName', 'display_name', 'prompt']);
+    if (!ref || !title) {
+      continue;
+    }
+    parsed.push({
+      ref,
+      title,
+      description: readFirstString(record, ['description', 'summary', 'details', 'text']),
+    });
+  }
+
+  return dedupeImportedControlSeeds(parsed);
+}
+
+function firstNonEmptyControlSeedArray(...values: unknown[]): ImportedFrameworkControlSeed[] {
+  for (const value of values) {
+    const parsed = parseImportedControlSeeds(value);
+    if (parsed.length > 0) {
+      return parsed;
+    }
+  }
+  return [];
+}
+
+function parseFrameworkImportPayload(source: unknown, fileName?: string | null): ParsedFrameworkImportPayload | null {
+  const root = asRecordValue(source);
+  if (!root) {
+    return null;
+  }
+
+  const metadata =
+    asRecordValue(root.framework) ??
+    asRecordValue(root.catalog) ??
+    asRecordValue(root.metadata) ??
+    asRecordValue(root.data) ??
+    root;
+  const nestedControls = firstNonEmptyControlSeedArray(
+    root.controls,
+    root.requirements,
+    root.items,
+    root.records,
+    metadata.controls,
+    metadata.requirements,
+    metadata.items,
+    root.data,
+  );
+
+  const name =
+    readFirstString(metadata, ['name', 'title', 'frameworkName', 'framework_name', 'catalogName', 'catalog_name']) ??
+    fileName?.replace(/\.[^.]+$/u, '')?.trim() ??
+    null;
+  if (!name) {
+    return null;
+  }
+
+  const version = readFirstString(metadata, ['version', 'revision', 'release']);
+  const key = deriveFrameworkImportKey(
+    readFirstString(metadata, ['key', 'frameworkKey', 'framework_key', 'catalogKey', 'catalog_key', 'slug', 'id']),
+    name,
+    version,
+    fileName ?? null,
+  );
+  if (!key) {
+    return null;
+  }
+
+  if (nestedControls.length === 0) {
+    return null;
+  }
+
+  return {
+    key,
+    name,
+    version,
+    category: readFirstString(metadata, ['category', 'type', 'domain']) ?? 'security',
+    controls: nestedControls,
+  };
+}
+
+async function loadFrameworkRowByTenantAndKey(
+  env: EnvBindings,
+  tenantId: string,
+  key: string,
+): Promise<FrameworkRow | null> {
+  return env.D1_MAIN.prepare(
+    `
+    SELECT
+      framework.id,
+      framework.tenant_id,
+      framework.key,
+      framework.name,
+      framework.version,
+      framework.category,
+      COUNT(control.id) AS control_count,
+      framework.created_at,
+      framework.updated_at
+    FROM frameworks AS framework
+    LEFT JOIN controls AS control
+      ON control.framework_id = framework.id
+    WHERE framework.tenant_id = ? AND framework.key = ?
+    GROUP BY framework.id
+    LIMIT 1
+    `,
+  )
+    .bind(tenantId, key)
+    .first<FrameworkRow>();
+}
+
+async function loadPackagedFrameworkRow(
+  env: EnvBindings,
+  frameworkToken: string,
+): Promise<PackagedFrameworkRow | null> {
+  return env.D1_MAIN.prepare(
+    `
+    SELECT id, slug, framework_key, name, description, category, version, scf_framework_id
+    FROM grc_frameworks
+    WHERE id = ? OR slug = ? OR framework_key = ? OR lower(name) = lower(?)
+    LIMIT 1
+    `,
+  )
+    .bind(frameworkToken, frameworkToken, frameworkToken, frameworkToken)
+    .first<PackagedFrameworkRow>();
+}
+
+async function ensurePackagedFrameworkCrosswalkVersion(
+  env: EnvBindings,
+  packagedFramework: PackagedFrameworkRow,
+): Promise<LatestScfVersionRow | null> {
+  if (!packagedFramework.scf_framework_id) {
+    return null;
+  }
+
+  let latestVersion = await env.D1_MAIN.prepare(
+    `
+    SELECT id
+    FROM grc_scf_versions
+    ORDER BY imported_at DESC
+    LIMIT 1
+    `,
+  ).first<LatestScfVersionRow>();
+
+  if (!latestVersion) {
+    await refreshScfCrosswalks(env, [packagedFramework.id]);
+    latestVersion = await env.D1_MAIN.prepare(
+      `
+      SELECT id
+      FROM grc_scf_versions
+      ORDER BY imported_at DESC
+      LIMIT 1
+      `,
+    ).first<LatestScfVersionRow>();
+  }
+
+  if (!latestVersion) {
+    return null;
+  }
+
+  const count = await env.D1_MAIN.prepare(
+    `
+    SELECT COUNT(*) AS total_count
+    FROM grc_scf_crosswalks
+    WHERE version_id = ? AND framework_id = ?
+    `,
+  )
+    .bind(latestVersion.id, packagedFramework.scf_framework_id)
+    .first<{ total_count: number }>();
+
+  if (Number(count?.total_count ?? 0) === 0) {
+    await refreshScfCrosswalks(env, [packagedFramework.id]);
+    latestVersion = await env.D1_MAIN.prepare(
+      `
+      SELECT id
+      FROM grc_scf_versions
+      ORDER BY imported_at DESC
+      LIMIT 1
+      `,
+    ).first<LatestScfVersionRow>();
+  }
+
+  return latestVersion;
+}
+
+async function buildPackagedFrameworkControlSeeds(
+  env: EnvBindings,
+  packagedFramework: PackagedFrameworkRow,
+): Promise<ImportedFrameworkControlSeed[]> {
+  const latestVersion = await ensurePackagedFrameworkCrosswalkVersion(env, packagedFramework);
+  if (!latestVersion || !packagedFramework.scf_framework_id) {
+    return [];
+  }
+
+  const { results } = await env.D1_MAIN.prepare(
+    `
+    SELECT
+      crosswalk.framework_control_id,
+      crosswalk.scf_control_id,
+      control.title AS scf_title,
+      control.description AS scf_description
+    FROM grc_scf_crosswalks AS crosswalk
+    LEFT JOIN grc_scf_controls AS control
+      ON control.version_id = crosswalk.version_id AND control.control_id = crosswalk.scf_control_id
+    WHERE crosswalk.version_id = ? AND crosswalk.framework_id = ?
+    ORDER BY crosswalk.framework_control_id ASC, crosswalk.scf_control_id ASC
+    `,
+  )
+    .bind(latestVersion.id, packagedFramework.scf_framework_id)
+    .all<PackagedCrosswalkImportRow>();
+
+  const grouped = new Map<
+    string,
+    { titles: string[]; descriptions: string[]; scfControlIds: string[] }
+  >();
+
+  for (const row of results) {
+    const ref = row.framework_control_id?.trim();
+    if (!ref) {
+      continue;
+    }
+    const existing = grouped.get(ref) ?? { titles: [], descriptions: [], scfControlIds: [] };
+    if (row.scf_title?.trim()) {
+      existing.titles.push(row.scf_title.trim());
+    }
+    if (row.scf_description?.trim()) {
+      existing.descriptions.push(row.scf_description.trim());
+    }
+    if (row.scf_control_id?.trim()) {
+      existing.scfControlIds.push(row.scf_control_id.trim());
+    }
+    grouped.set(ref, existing);
+  }
+
+  return dedupeImportedControlSeeds(
+    [...grouped.entries()].map(([ref, details]) => {
+      const uniqueScfIds = [...new Set(details.scfControlIds)];
+      const note = uniqueScfIds.length > 0 ? `Mapped SCF controls: ${uniqueScfIds.join(', ')}.` : null;
+      const summary = details.descriptions.find(Boolean) ?? null;
+      return {
+        ref,
+        title: details.titles.find(Boolean) ?? `${packagedFramework.name} control ${ref}`,
+        description: [note, summary].filter(Boolean).join(' ') || packagedFramework.description || null,
+      };
+    }),
+  );
+}
+
+async function importFrameworkIntoTenant(
+  env: EnvBindings,
+  tenantId: string,
+  payload: ParsedFrameworkImportPayload,
+): Promise<{ framework: FrameworkRow | null; importedControlCount: number }> {
+  const frameworkId = crypto.randomUUID();
+  const frameworkKey = normalizeFrameworkImportKey(payload.key) ?? payload.key;
+
+  await env.D1_MAIN.prepare(
+    `
+    INSERT INTO frameworks (id, tenant_id, key, name, version, category)
+    VALUES (?, ?, ?, ?, ?, ?)
+    `,
+  )
+    .bind(
+      frameworkId,
+      tenantId,
+      frameworkKey,
+      payload.name.trim(),
+      payload.version?.trim() || null,
+      payload.category?.trim() || 'security',
+    )
+    .run();
+
+  const controls = dedupeImportedControlSeeds(payload.controls);
+  if (controls.length > 0) {
+    await env.D1_MAIN.batch(
+      controls.map((control) =>
+        env.D1_MAIN.prepare(
+          `
+          INSERT INTO controls (id, tenant_id, framework_id, ref, title, description)
+          VALUES (?, ?, ?, ?, ?, ?)
+          `,
+        ).bind(
+          crypto.randomUUID(),
+          tenantId,
+          frameworkId,
+          control.ref,
+          control.title,
+          control.description,
+        ),
+      ),
+    );
+  }
+
+  const framework = await env.D1_MAIN.prepare(
+    `
+    SELECT
+      framework.id,
+      framework.tenant_id,
+      framework.key,
+      framework.name,
+      framework.version,
+      framework.category,
+      COUNT(control.id) AS control_count,
+      framework.created_at,
+      framework.updated_at
+    FROM frameworks AS framework
+    LEFT JOIN controls AS control
+      ON control.framework_id = framework.id
+    WHERE framework.id = ? AND framework.tenant_id = ?
+    GROUP BY framework.id
+    LIMIT 1
+    `,
+  )
+    .bind(frameworkId, tenantId)
+    .first<FrameworkRow>();
+
+  return {
+    framework,
+    importedControlCount: controls.length,
+  };
+}
+
+async function listAssessmentPlanTemplateQuestions(
+  env: EnvBindings,
+  tenantId: string,
+  assessmentPlanTemplateId: string,
+): Promise<AssessmentPlanTemplateQuestion[]> {
+  const template = await env.D1_MAIN.prepare(
+    `
+    SELECT questions_json, metadata_json
+    FROM questionnaire_templates
+    WHERE tenant_id = ? AND id = ?
+    LIMIT 1
+    `,
+  )
+    .bind(tenantId, assessmentPlanTemplateId)
+    .first<{ questions_json: string; metadata_json: string | null }>();
+
+  if (!template) {
+    return [];
+  }
+
+  const metadata = asJson<{ templateKind?: string | null } | null>(template.metadata_json, null);
+  if ((metadata?.templateKind ?? 'questionnaire') !== 'assessment-plan') {
+    return [];
+  }
+
+  return parseJsonArray<AssessmentPlanTemplateQuestion>(template.questions_json).filter(
+    (question) => question.id && question.ref && question.prompt,
+  );
+}
+
+async function listComplianceAssessmentPlanItemRows(
+  env: EnvBindings,
+  tenantId: string,
+  assessmentId: string,
+) {
+  const { results } = await env.D1_MAIN.prepare(
+    `
+    SELECT
+      item.id,
+      item.tenant_id,
+      item.compliance_assessment_id,
+      item.assessment_plan_template_id,
+      template.name AS assessment_plan_name,
+      item.template_question_id,
+      item.line_ref,
+      item.line_section,
+      item.line_prompt,
+      item.requirement_ref,
+      item.evidence_hint,
+      item.sort_order,
+      item.result,
+      item.observation,
+      item.evidence_note,
+      item.gaps_differences,
+      item.likelihood,
+      item.impact,
+      item.auto_generate_follow_up,
+      item.generated_follow_up_id,
+      item.created_at,
+      item.updated_at
+    FROM compliance_assessment_plan_items AS item
+    INNER JOIN questionnaire_templates AS template
+      ON template.id = item.assessment_plan_template_id
+    WHERE item.tenant_id = ? AND item.compliance_assessment_id = ?
+    ORDER BY COALESCE(item.sort_order, 999999) ASC, item.line_ref ASC
+    `,
+  )
+    .bind(tenantId, assessmentId)
+    .all<ComplianceAssessmentPlanItemRow>();
+
+  return results;
+}
+
 async function recalculateComplianceAssessmentMetrics(
   env: EnvBindings,
   tenantId: string,
   assessmentId: string,
 ) {
-  const summary = await env.D1_MAIN.prepare(
-    `
-    SELECT
-      COUNT(*) AS controls_total,
-      SUM(CASE WHEN result <> 'not_assessed' THEN 1 ELSE 0 END) AS controls_assessed,
-      AVG(implementation_score) AS maturity_score
-    FROM compliance_requirement_assessments
-    WHERE tenant_id = ? AND compliance_assessment_id = ?
-    `,
-  )
-    .bind(tenantId, assessmentId)
-    .first<{
-      controls_total: number | null;
-      controls_assessed: number | null;
-      maturity_score: number | null;
-    }>();
+  const [requirementSummary, planSummary] = await Promise.all([
+    env.D1_MAIN.prepare(
+      `
+      SELECT
+        COUNT(*) AS controls_total,
+        SUM(CASE WHEN result <> 'not_assessed' THEN 1 ELSE 0 END) AS controls_assessed,
+        AVG(implementation_score) AS maturity_score
+      FROM compliance_requirement_assessments
+      WHERE tenant_id = ? AND compliance_assessment_id = ? AND COALESCE(in_scope, 1) = 1
+      `,
+    )
+      .bind(tenantId, assessmentId)
+      .first<{
+        controls_total: number | null;
+        controls_assessed: number | null;
+        maturity_score: number | null;
+      }>(),
+    env.D1_MAIN.prepare(
+      `
+      SELECT
+        COUNT(*) AS items_total,
+        SUM(CASE WHEN result <> 'not_assessed' THEN 1 ELSE 0 END) AS items_assessed
+      FROM compliance_assessment_plan_items
+      WHERE tenant_id = ? AND compliance_assessment_id = ?
+      `,
+    )
+      .bind(tenantId, assessmentId)
+      .first<{
+        items_total: number | null;
+        items_assessed: number | null;
+      }>(),
+  ]);
 
-  const controlsTotal = summary?.controls_total ?? 0;
-
-  if (controlsTotal === 0) {
-    return;
-  }
-
-  const controlsAssessed = summary?.controls_assessed ?? 0;
-  const progressPercent = Math.min(Math.round((controlsAssessed / controlsTotal) * 100), 100);
-  const maturityScore = normalizeOptionalScore(summary?.maturity_score ?? null);
+  const controlsTotal = (requirementSummary?.controls_total ?? 0) + (planSummary?.items_total ?? 0);
+  const controlsAssessed =
+    (requirementSummary?.controls_assessed ?? 0) + (planSummary?.items_assessed ?? 0);
+  const progressPercent =
+    controlsTotal > 0 ? Math.min(Math.round((controlsAssessed / controlsTotal) * 100), 100) : 0;
+  const maturityScore = normalizeOptionalScore(requirementSummary?.maturity_score ?? null);
 
   await env.D1_MAIN.prepare(
     `
@@ -2358,19 +3284,30 @@ async function ensureComplianceRequirementAssessments(
   frameworkId: string,
   options: {
     assessedCount?: number;
+    controlIds?: string[];
     seedForIndex?: (
       index: number,
       control: ControlRow,
     ) => {
       result?: string | null;
       observation?: string | null;
+      evidenceNote?: string | null;
+      gapsDifferences?: string | null;
+      likelihood?: number | null;
+      impact?: number | null;
+      autoGenerateFollowUp?: boolean | null;
       evidenceStatus?: string | null;
       implementationScore?: number | null;
       documentationScore?: number | null;
     };
   } = {},
 ) {
-  const controls = await listFrameworkControlRows(env, tenantId, frameworkId);
+  const scopedIds = options.controlIds?.length
+    ? new Set(options.controlIds.map((value) => value.trim()).filter(Boolean))
+    : null;
+  const controls = (await listFrameworkControlRows(env, tenantId, frameworkId)).filter((control) =>
+    scopedIds ? scopedIds.has(control.id) : true,
+  );
 
   for (const [index, control] of controls.entries()) {
     const fallbackSeed =
@@ -2378,6 +3315,11 @@ async function ensureComplianceRequirementAssessments(
         ? {
             result: 'compliant',
             observation: 'Seeded baseline review completed for the migration workspace.',
+            evidenceNote: 'Seeded evidence note for the assessment workspace.',
+            gapsDifferences: null,
+            likelihood: null,
+            impact: null,
+            autoGenerateFollowUp: true,
             evidenceStatus: 'approved',
             implementationScore: 4,
             documentationScore: 4,
@@ -2385,6 +3327,11 @@ async function ensureComplianceRequirementAssessments(
         : {
             result: 'not_assessed',
             observation: null,
+            evidenceNote: null,
+            gapsDifferences: null,
+            likelihood: null,
+            impact: null,
+            autoGenerateFollowUp: false,
             evidenceStatus: 'missing',
             implementationScore: null,
             documentationScore: null,
@@ -2398,13 +3345,20 @@ async function ensureComplianceRequirementAssessments(
         tenant_id,
         compliance_assessment_id,
         control_id,
+        in_scope,
+        sort_order,
         result,
         observation,
+        evidence_note,
+        gaps_differences,
+        likelihood,
+        impact,
+        auto_generate_follow_up,
         evidence_status,
         implementation_score,
         documentation_score
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
     )
       .bind(
@@ -2412,11 +3366,79 @@ async function ensureComplianceRequirementAssessments(
         tenantId,
         assessmentId,
         control.id,
+        1,
+        index,
         normalizeComplianceResult(seeded.result),
         seeded.observation?.trim() || null,
+        seeded.evidenceNote?.trim() || null,
+        seeded.gapsDifferences?.trim() || null,
+        normalizeOptionalScore(seeded.likelihood ?? null),
+        normalizeOptionalScore(seeded.impact ?? null),
+        seeded.autoGenerateFollowUp === true ? 1 : 0,
         normalizeEvidenceStatus(seeded.evidenceStatus),
         normalizeOptionalScore(seeded.implementationScore),
         normalizeOptionalScore(seeded.documentationScore),
+      )
+      .run();
+  }
+
+  await recalculateComplianceAssessmentMetrics(env, tenantId, assessmentId);
+  await ensureAppliedControlsForComplianceAssessment(env, tenantId, assessmentId);
+}
+
+async function ensureComplianceAssessmentPlanItems(
+  env: EnvBindings,
+  tenantId: string,
+  assessmentId: string,
+  assessmentPlanTemplateId: string,
+) {
+  const questions = await listAssessmentPlanTemplateQuestions(env, tenantId, assessmentPlanTemplateId);
+
+  for (const [index, question] of questions.entries()) {
+    await env.D1_MAIN.prepare(
+      `
+      INSERT OR IGNORE INTO compliance_assessment_plan_items (
+        id,
+        tenant_id,
+        compliance_assessment_id,
+        assessment_plan_template_id,
+        template_question_id,
+        line_ref,
+        line_section,
+        line_prompt,
+        requirement_ref,
+        evidence_hint,
+        sort_order,
+        result,
+        observation,
+        evidence_note,
+        gaps_differences,
+        likelihood,
+        impact,
+        auto_generate_follow_up
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+    )
+      .bind(
+        crypto.randomUUID(),
+        tenantId,
+        assessmentId,
+        assessmentPlanTemplateId,
+        question.id,
+        question.ref.trim(),
+        question.section?.trim() || null,
+        question.prompt.trim(),
+        question.requirementRef?.trim() || null,
+        question.evidenceHint?.trim() || null,
+        index,
+        'not_assessed',
+        null,
+        null,
+        null,
+        null,
+        null,
+        1,
       )
       .run();
   }
@@ -2447,6 +3469,7 @@ async function listAppliedControlRows(
       applied_control.tenant_id,
       applied_control.compliance_assessment_id,
       applied_control.requirement_assessment_id,
+      applied_control.assessment_plan_item_id,
       applied_control.folder_id,
       folder_item.name AS folder_name,
       applied_control.ref_id,
@@ -2467,6 +3490,9 @@ async function listAppliedControlRows(
       requirement.result AS requirement_result,
       control.ref AS requirement_ref,
       control.title AS requirement_name,
+      plan_item.line_ref AS plan_item_ref,
+      plan_item.line_prompt AS plan_item_prompt,
+      plan_item.result AS plan_item_result,
       applied_control.created_at,
       applied_control.updated_at
     FROM applied_controls AS applied_control
@@ -2476,6 +3502,8 @@ async function listAppliedControlRows(
       ON requirement.id = applied_control.requirement_assessment_id
     LEFT JOIN controls AS control
       ON control.id = requirement.control_id
+    LEFT JOIN compliance_assessment_plan_items AS plan_item
+      ON plan_item.id = applied_control.assessment_plan_item_id
     WHERE ${predicates.join(' AND ')}
     ORDER BY folder_item.name ASC, applied_control.priority ASC, applied_control.updated_at DESC
     `,
@@ -2498,6 +3526,7 @@ async function syncGeneratedAppliedControlForRequirement(
       requirement.compliance_assessment_id,
       requirement.result,
       requirement.observation,
+      requirement.auto_generate_follow_up,
       assessment.folder_id,
       folder_item.name AS folder_name,
       framework_item.key AS framework_key,
@@ -2528,6 +3557,7 @@ async function syncGeneratedAppliedControlForRequirement(
       compliance_assessment_id: string;
       result: string;
       observation: string | null;
+      auto_generate_follow_up: number | null;
       folder_id: string;
       folder_name: string;
       framework_key: string;
@@ -2540,6 +3570,10 @@ async function syncGeneratedAppliedControlForRequirement(
     }>();
 
   if (!seed) {
+    return;
+  }
+
+  if (seed.auto_generate_follow_up === 0) {
     return;
   }
 
@@ -2664,24 +3698,374 @@ async function syncGeneratedAppliedControlForRequirement(
     .run();
 }
 
+async function syncGeneratedAppliedControlForAssessmentPlanItem(
+  env: EnvBindings,
+  tenantId: string,
+  assessmentPlanItemId: string,
+) {
+  const seed = await env.D1_MAIN.prepare(
+    `
+    SELECT
+      item.id AS assessment_plan_item_id,
+      item.compliance_assessment_id,
+      item.result,
+      item.observation,
+      item.auto_generate_follow_up,
+      item.generated_follow_up_id,
+      assessment.folder_id,
+      folder_item.name AS folder_name,
+      item.line_ref,
+      item.line_prompt,
+      item.requirement_ref,
+      existing.id AS applied_control_id,
+      existing.is_generated AS existing_is_generated
+    FROM compliance_assessment_plan_items AS item
+    INNER JOIN compliance_assessments AS assessment
+      ON assessment.id = item.compliance_assessment_id
+    INNER JOIN folders AS folder_item
+      ON folder_item.id = assessment.folder_id
+    LEFT JOIN applied_controls AS existing
+      ON existing.assessment_plan_item_id = item.id
+    WHERE item.tenant_id = ? AND item.id = ?
+    LIMIT 1
+    `,
+  )
+    .bind(tenantId, assessmentPlanItemId)
+    .first<{
+      assessment_plan_item_id: string;
+      compliance_assessment_id: string;
+      result: string;
+      observation: string | null;
+      auto_generate_follow_up: number | null;
+      generated_follow_up_id: string | null;
+      folder_id: string;
+      folder_name: string;
+      line_ref: string;
+      line_prompt: string;
+      requirement_ref: string | null;
+      applied_control_id: string | null;
+      existing_is_generated: number | null;
+    }>();
+
+  if (!seed) {
+    return;
+  }
+
+  if (seed.auto_generate_follow_up === 0) {
+    return;
+  }
+
+  if (seed.applied_control_id && seed.existing_is_generated === 0) {
+    return;
+  }
+
+  const priority = deriveAppliedControlPriorityFromRequirement(seed.result);
+  const status = deriveAppliedControlStatusFromRequirement(seed.result);
+  const impact = deriveAppliedControlImpactFromRequirement(seed.result);
+  const effort = deriveAppliedControlEffortFromRequirement(seed.result);
+  const eta =
+    priority === 'P1'
+      ? futureDate(30)
+      : priority === 'P2'
+        ? futureDate(60)
+        : priority === 'P3'
+          ? futureDate(90)
+          : futureDate(120);
+  const ownerName = 'Assessment Ops';
+  const notes =
+    seed.observation?.trim() ||
+    (seed.result === 'compliant'
+      ? 'Generated follow-up item retained for evidence freshness tracking.'
+      : 'Generated from an assessment plan line-of-inquiry finding.');
+  const name = seed.requirement_ref
+    ? `${seed.line_ref} ${seed.line_prompt}`
+    : seed.line_prompt;
+
+  if (!seed.applied_control_id) {
+    const appliedControlId = crypto.randomUUID();
+    await env.D1_MAIN.prepare(
+      `
+      INSERT INTO applied_controls (
+        id,
+        tenant_id,
+        compliance_assessment_id,
+        assessment_plan_item_id,
+        folder_id,
+        ref_id,
+        name,
+        description,
+        status,
+        priority,
+        category,
+        csf_function,
+        owner_name,
+        eta,
+        expiry_date,
+        control_impact,
+        effort,
+        annual_cost,
+        notes,
+        is_generated
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+      `,
+    )
+      .bind(
+        appliedControlId,
+        tenantId,
+        seed.compliance_assessment_id,
+        seed.assessment_plan_item_id,
+        seed.folder_id,
+        seed.line_ref,
+        name,
+        seed.requirement_ref
+          ? `Assessment plan line mapped to ${seed.requirement_ref}.`
+          : 'Assessment plan line of inquiry follow-up.',
+        status,
+        priority,
+        'security',
+        'govern',
+        ownerName,
+        eta,
+        futureDate(365),
+        impact,
+        effort,
+        deriveAppliedControlCost(priority),
+        notes,
+      )
+      .run();
+
+    await env.D1_MAIN.prepare(
+      `
+      UPDATE compliance_assessment_plan_items
+      SET generated_follow_up_id = ?,
+          updated_at = (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+      WHERE tenant_id = ? AND id = ?
+      `,
+    )
+      .bind(appliedControlId, tenantId, seed.assessment_plan_item_id)
+      .run();
+
+    return;
+  }
+
+  await env.D1_MAIN.prepare(
+    `
+    UPDATE applied_controls
+    SET ref_id = ?,
+        name = ?,
+        description = ?,
+        status = ?,
+        priority = ?,
+        category = ?,
+        csf_function = ?,
+        owner_name = ?,
+        eta = ?,
+        expiry_date = ?,
+        control_impact = ?,
+        effort = ?,
+        annual_cost = ?,
+        notes = ?,
+        updated_at = (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+    WHERE tenant_id = ? AND id = ?
+    `,
+  )
+    .bind(
+      seed.line_ref,
+      name,
+      seed.requirement_ref
+        ? `Assessment plan line mapped to ${seed.requirement_ref}.`
+        : 'Assessment plan line of inquiry follow-up.',
+      status,
+      priority,
+      'security',
+      'govern',
+      ownerName,
+      eta,
+      futureDate(365),
+      impact,
+      effort,
+      deriveAppliedControlCost(priority),
+      notes,
+      tenantId,
+      seed.applied_control_id,
+    )
+    .run();
+
+  await env.D1_MAIN.prepare(
+    `
+    UPDATE compliance_assessment_plan_items
+    SET generated_follow_up_id = ?,
+        updated_at = (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+    WHERE tenant_id = ? AND id = ?
+    `,
+  )
+    .bind(seed.applied_control_id, tenantId, seed.assessment_plan_item_id)
+    .run();
+}
+
 async function ensureAppliedControlsForComplianceAssessment(
   env: EnvBindings,
   tenantId: string,
   assessmentId: string,
 ) {
-  const { results } = await env.D1_MAIN.prepare(
-    `
-    SELECT id
-    FROM compliance_requirement_assessments
-    WHERE tenant_id = ? AND compliance_assessment_id = ?
-    ORDER BY created_at ASC
-    `,
-  )
-    .bind(tenantId, assessmentId)
-    .all<{ id: string }>();
+  const [requirements, planItems] = await Promise.all([
+    env.D1_MAIN.prepare(
+      `
+      SELECT id
+      FROM compliance_requirement_assessments
+      WHERE tenant_id = ? AND compliance_assessment_id = ?
+      ORDER BY created_at ASC
+      `,
+    )
+      .bind(tenantId, assessmentId)
+      .all<{ id: string }>(),
+    env.D1_MAIN.prepare(
+      `
+      SELECT id
+      FROM compliance_assessment_plan_items
+      WHERE tenant_id = ? AND compliance_assessment_id = ?
+      ORDER BY sort_order ASC, created_at ASC
+      `,
+    )
+      .bind(tenantId, assessmentId)
+      .all<{ id: string }>(),
+  ]);
 
-  for (const requirement of results) {
+  for (const requirement of requirements.results) {
     await syncGeneratedAppliedControlForRequirement(env, tenantId, requirement.id);
+  }
+
+  for (const item of planItems.results) {
+    await syncGeneratedAppliedControlForAssessmentPlanItem(env, tenantId, item.id);
+  }
+}
+
+async function createRecurringComplianceAssessments(
+  env: EnvBindings,
+  tenantId: string,
+  options: {
+    rootAssessmentId: string;
+    folderId: string;
+    perimeterId: string;
+    frameworkId: string;
+    refId: string | null;
+    name: string;
+    version: string;
+    status: string;
+    assessmentKind: string;
+    leadAssessorUserId: string | null;
+    instructions: string | null;
+    plannedStartOn: string | null;
+    plannedFinishOn: string | null;
+    processInfo: string | null;
+    assignmentPrincipalType: string | null;
+    assignmentPrincipalId: string | null;
+    recurrenceJson: string;
+    sourceSecurityPlanId: string | null;
+    assessmentPlanTemplateId: string | null;
+    observation: string | null;
+    seedFrameworkRequirements: boolean;
+    controlIds?: string[];
+  },
+) {
+  const recurrence = asJson<{
+    firstPlannedStart?: string | null;
+    firstPlannedFinish?: string | null;
+    repeatUntil?: string | null;
+    frequency?: string | null;
+  }>(options.recurrenceJson, {});
+  const repeatUntil = normalizeOptionalDateString(recurrence.repeatUntil);
+  const frequency = recurrence.frequency?.trim() ?? null;
+  let nextStart = normalizeOptionalDateString(options.plannedStartOn ?? recurrence.firstPlannedStart ?? null);
+  let nextFinish = normalizeOptionalDateString(options.plannedFinishOn ?? recurrence.firstPlannedFinish ?? null);
+
+  if (!repeatUntil || !frequency || !nextStart) {
+    return;
+  }
+
+  nextStart = advanceRecurrenceIso(nextStart, frequency);
+  nextFinish = nextFinish ? advanceRecurrenceIso(nextFinish, frequency) : null;
+
+  while (nextStart && nextStart <= repeatUntil) {
+    const assessmentId = crypto.randomUUID();
+    await env.D1_MAIN.prepare(
+      `
+      INSERT INTO compliance_assessments (
+        id,
+        tenant_id,
+        folder_id,
+        perimeter_id,
+        framework_id,
+        ref_id,
+        name,
+        version,
+        status,
+        assessment_kind,
+        lead_assessor_user_id,
+        instructions,
+        planned_start_on,
+        planned_finish_on,
+        process_info,
+        assignment_principal_type,
+        assignment_principal_id,
+        recurrence_json,
+        source_security_plan_id,
+        assessment_plan_template_id,
+        recurrence_source_assessment_id,
+        observation,
+        controls_total,
+        controls_assessed,
+        progress_percent,
+        maturity_score
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0, NULL)
+      `,
+    )
+      .bind(
+        assessmentId,
+        tenantId,
+        options.folderId,
+        options.perimeterId,
+        options.frameworkId,
+        options.refId,
+        `${options.name} (${nextStart})`,
+        options.version,
+        options.status,
+        options.assessmentKind,
+        options.leadAssessorUserId,
+        options.instructions,
+        nextStart,
+        nextFinish,
+        options.processInfo,
+        options.assignmentPrincipalType,
+        options.assignmentPrincipalId,
+        options.recurrenceJson,
+        options.sourceSecurityPlanId,
+        options.assessmentPlanTemplateId,
+        options.rootAssessmentId,
+        options.observation,
+      )
+      .run();
+
+    if (options.seedFrameworkRequirements) {
+      await ensureComplianceRequirementAssessments(env, tenantId, assessmentId, options.frameworkId, {
+        assessedCount: 0,
+        controlIds: options.controlIds,
+      });
+    }
+
+    if (options.assessmentPlanTemplateId) {
+      await ensureComplianceAssessmentPlanItems(
+        env,
+        tenantId,
+        assessmentId,
+        options.assessmentPlanTemplateId,
+      );
+    }
+
+    nextStart = advanceRecurrenceIso(nextStart, frequency);
+    nextFinish = nextFinish ? advanceRecurrenceIso(nextFinish, frequency) : null;
   }
 }
 
@@ -4481,6 +5865,26 @@ function buildSsoTenantMessage(config: OidcConfigRecord | null): string {
   return 'OIDC single sign-on is ready for this workspace alongside the local recovery paths.';
 }
 
+function isSsoRuntimeReady(env: EnvBindings, config: OidcConfigRecord | null | undefined): boolean {
+  if (!isActiveOidcConfig(config)) {
+    return false;
+  }
+
+  return !(oidcProviderRequiresClientSecret(config) && !resolveOidcClientSecret(env, config));
+}
+
+function buildSsoTenantRuntimeMessage(env: EnvBindings, config: OidcConfigRecord | null): string {
+  if (!config || config.authProtocol !== 'oidc' || !isActiveOidcConfig(config)) {
+    return buildSsoTenantMessage(config);
+  }
+
+  if (oidcProviderRequiresClientSecret(config) && !resolveOidcClientSecret(env, config)) {
+    return 'OIDC metadata is configured, but this provider also requires a runtime client secret before sign-in can complete.';
+  }
+
+  return buildSsoTenantMessage(config);
+}
+
 async function buildTenantLoginOptions(
   env: EnvBindings,
   tenantSlugRaw: string,
@@ -4564,7 +5968,7 @@ async function buildTenantLoginOptions(
   ]);
 
   const localEnabled = Number(localCountRow?.count ?? 0) > 0;
-  const ssoReady = isActiveOidcConfig(ssoConfig);
+  const ssoReady = isSsoRuntimeReady(env, ssoConfig);
   const loginEnforced = Boolean(ssoConfig?.loginEnforced && ssoReady);
   const localAllowed = !loginEnforced && (ssoConfig?.allowLocalFallback !== false || !ssoReady);
   const localMessage = loginEnforced
@@ -4593,24 +5997,24 @@ async function buildTenantLoginOptions(
         (ssoConfig?.providerType ? `Continue with ${ssoConfig.providerType}` : 'Continue with SSO'),
       loginEnforced,
       domainHint: ssoConfig?.domainHint ?? null,
-      message: buildSsoTenantMessage(ssoConfig),
+      message: buildSsoTenantRuntimeMessage(env, ssoConfig),
     },
   };
 }
 
-function buildSsoSummary(config: OidcConfigRecord | null): LoginConfigPayload['sso'] {
+function buildSsoSummary(env: EnvBindings, config: OidcConfigRecord | null): LoginConfigPayload['sso'] {
   return {
     configured: Boolean(config?.authProtocol && config.authProtocol !== 'none'),
-    ready: isActiveOidcConfig(config),
+    ready: isSsoRuntimeReady(env, config),
     protocol: config?.authProtocol ?? 'none',
     providerType: config?.providerType ?? null,
     buttonLabel:
       config?.buttonLabel?.trim() ||
       (config?.providerType ? `Continue with ${config.providerType}` : null),
-    loginEnforced: Boolean(config?.loginEnforced && isActiveOidcConfig(config)),
+    loginEnforced: Boolean(config?.loginEnforced && isSsoRuntimeReady(env, config)),
     allowLocalFallback: config?.allowLocalFallback !== false,
     callbackUrl: config?.callbackUrl ?? null,
-    message: buildSsoTenantMessage(config),
+    message: buildSsoTenantRuntimeMessage(env, config),
   };
 }
 
@@ -4768,10 +6172,22 @@ async function loadRootFolderId(env: EnvBindings, tenantId: string): Promise<str
   return row?.id ?? null;
 }
 
+function normalizeIdentityCandidates(values: Array<string | null | undefined>): string[] {
+  return Array.from(new Set(values.map((value) => normalizeEmail(value)).filter(Boolean)));
+}
+
+function describeSsoIdentity(claims: OidcIdentityClaims): string {
+  const identifiers = normalizeIdentityCandidates([claims.email, claims.preferredUsername]);
+  if (identifiers.length > 0) {
+    return identifiers.join(' / ');
+  }
+  return claims.subject.trim() || 'unknown identity';
+}
+
 async function loadUserByTenantEmailOrSubject(
   env: EnvBindings,
   tenantId: string,
-  email: string | null,
+  candidateEmails: string[],
   provider: string | null,
   subject: string,
 ): Promise<{
@@ -4785,7 +6201,6 @@ async function loadUserByTenantEmailOrSubject(
   auth_provider: string | null;
   auth_subject: string | null;
 } | null> {
-  const normalizedEmail = normalizeEmail(email);
   const bySubject =
     provider && subject
       ? await env.D1_MAIN.prepare(
@@ -4825,10 +6240,11 @@ async function loadUserByTenantEmailOrSubject(
     return bySubject;
   }
 
-  if (!normalizedEmail) {
+  if (candidateEmails.length === 0) {
     return null;
   }
 
+  const placeholders = candidateEmails.map(() => '?').join(', ');
   return env.D1_MAIN.prepare(
     `
     SELECT
@@ -4843,11 +6259,11 @@ async function loadUserByTenantEmailOrSubject(
       auth_subject
     FROM users
     WHERE tenant_id = ?
-      AND lower(email) = ?
+      AND lower(trim(email)) IN (${placeholders})
     LIMIT 1
     `,
   )
-    .bind(tenantId, normalizedEmail)
+    .bind(tenantId, ...candidateEmails)
     .first<{
       id: string;
       email: string;
@@ -4877,15 +6293,16 @@ async function upsertSsoUser(
   claims: OidcIdentityClaims,
 ): Promise<{ userId: string; email: string; created: boolean }> {
   const provider = config.providerType?.trim() || 'OIDC';
+  const candidateEmails = normalizeIdentityCandidates([claims.email, claims.preferredUsername]);
   const existing = await loadUserByTenantEmailOrSubject(
     env,
     config.tenantId,
-    claims.email,
+    candidateEmails,
     provider,
     claims.subject,
   );
 
-  const normalizedEmail = normalizeEmail(claims.email ?? claims.preferredUsername);
+  const normalizedEmail = candidateEmails[0] ?? '';
   if (existing) {
     if (existing.is_active !== 1) {
       throw new Error('This workspace account is inactive.');
@@ -5035,6 +6452,110 @@ async function syncSsoRoles(
   return { syncedRoleCount: roles.length };
 }
 
+async function countOtherSsoUsers(
+  env: EnvBindings,
+  tenantId: string,
+  userId: string,
+): Promise<number> {
+  const row = await env.D1_MAIN.prepare(
+    `
+    SELECT COUNT(1) AS count
+    FROM users
+    WHERE tenant_id = ?
+      AND id != ?
+      AND auth_provider IS NOT NULL
+      AND length(trim(auth_provider)) > 0
+      AND auth_subject IS NOT NULL
+      AND length(trim(auth_subject)) > 0
+    `,
+  )
+    .bind(tenantId, userId)
+    .first<{ count: number }>();
+
+  return Number(row?.count ?? 0);
+}
+
+async function assignRolesToUser(
+  env: EnvBindings,
+  tenantId: string,
+  userId: string,
+  roles: Array<{ id: string }>,
+): Promise<number> {
+  if (roles.length === 0) {
+    return 0;
+  }
+
+  const rootFolderId = await loadRootFolderId(env, tenantId);
+  if (!rootFolderId) {
+    return 0;
+  }
+
+  let assignedCount = 0;
+  for (const role of roles) {
+    const existingAssignment = await env.D1_MAIN.prepare(
+      `
+      SELECT id
+      FROM role_assignments
+      WHERE tenant_id = ?
+        AND role_id = ?
+        AND user_id = ?
+        AND group_id IS NULL
+        AND scope_folder_id = ?
+      LIMIT 1
+      `,
+    )
+      .bind(tenantId, role.id, userId, rootFolderId)
+      .first<{ id: string }>();
+
+    if (existingAssignment?.id) {
+      continue;
+    }
+
+    await env.D1_MAIN.prepare(
+      `
+      INSERT INTO role_assignments (
+        id,
+        tenant_id,
+        role_id,
+        user_id,
+        group_id,
+        scope_folder_id,
+        assigned_by_user_id,
+        is_recursive,
+        is_builtin
+      ) VALUES (?, ?, ?, ?, NULL, ?, ?, 1, 0)
+      `,
+    )
+      .bind(
+        crypto.randomUUID(),
+        tenantId,
+        role.id,
+        userId,
+        rootFolderId,
+        userId,
+      )
+      .run();
+
+    assignedCount += 1;
+  }
+
+  return assignedCount;
+}
+
+async function bootstrapFirstSsoAdministrator(
+  env: EnvBindings,
+  config: OidcConfigRecord,
+  userId: string,
+): Promise<number> {
+  const otherSsoUserCount = await countOtherSsoUsers(env, config.tenantId, userId);
+  if (otherSsoUserCount > 0) {
+    return 0;
+  }
+
+  const adminRoles = await loadBuiltinOrNamedRolesByNames(env, config.tenantId, ['Administrator']);
+  return assignRolesToUser(env, config.tenantId, userId, adminRoles);
+}
+
 async function finalizeSsoAuthentication(
   env: EnvBindings,
   request: Request,
@@ -5048,11 +6569,25 @@ async function finalizeSsoAuthentication(
 }> {
   const user = await upsertSsoUser(env, config, claims);
   const roleSync = await syncSsoRoles(env, config, user.userId, claims.roleNames);
+  const bootstrapAdminRoleCount =
+    user.created && roleSync.syncedRoleCount === 0
+      ? await bootstrapFirstSsoAdministrator(env, config, user.userId)
+      : 0;
 
-  if (user.created && roleSync.syncedRoleCount === 0) {
+  if (user.created && roleSync.syncedRoleCount === 0 && bootstrapAdminRoleCount === 0) {
+    const identitySummary = describeSsoIdentity(claims);
+    console.warn(
+      '[sso] JIT provisioning blocked because no matching role claims were mapped.',
+      JSON.stringify({
+        tenantSlug: config.tenantSlug,
+        providerType: config.providerType ?? 'OIDC',
+        identity: identitySummary,
+        roleNames: claims.roleNames,
+      }),
+    );
     await env.D1_MAIN.prepare(`DELETE FROM users WHERE id = ?`).bind(user.userId).run();
     throw new Error(
-      'The identity provider login succeeded, but no matching Regovise roles were found for just-in-time provisioning.',
+      `The identity provider login succeeded for ${identitySummary}, but no matching Regovise roles were found for workspace ${config.tenantSlug}. Sign in with the same email address as the workspace account, or ask an administrator to map SSO roles for this tenant.`,
     );
   }
 
@@ -5065,7 +6600,7 @@ async function finalizeSsoAuthentication(
     session,
     userId: user.userId,
     email: user.email,
-    syncedRoleCount: roleSync.syncedRoleCount,
+    syncedRoleCount: roleSync.syncedRoleCount + bootstrapAdminRoleCount,
   };
 }
 
@@ -5156,13 +6691,9 @@ async function buildLoginConfig(env: EnvBindings): Promise<LoginConfigPayload> {
       FROM users AS user_item
       INNER JOIN tenants AS tenant
         ON tenant.id = user_item.tenant_id
-      LEFT JOIN folders AS root_folder
-        ON root_folder.tenant_id = tenant.id
-       AND root_folder.content_type = 'root'
       LEFT JOIN role_assignments AS assignment
         ON assignment.tenant_id = tenant.id
        AND assignment.user_id = user_item.id
-       AND assignment.scope_folder_id = root_folder.id
       LEFT JOIN role_permissions AS permission
         ON permission.role_id = assignment.role_id
       WHERE user_item.is_active = 1
@@ -5184,7 +6715,7 @@ async function buildLoginConfig(env: EnvBindings): Promise<LoginConfigPayload> {
   const passwordConfiguredUserCount = Number(passwordConfiguredRow?.count ?? 0);
   const passwordSignInEnabled = bootstrap.initialized && Number(localLoginUserCount?.count ?? 0) > 0;
   const ssoConfig = coerceSsoRuntimeConfig(ssoRow, requestOrigin);
-  const ssoSummary = buildSsoSummary(ssoConfig);
+  const ssoSummary = buildSsoSummary(env, ssoConfig);
 
   let message = 'Email code sign-in is ready for users with local-login access.';
   if (!bootstrap.initialized) {
@@ -5571,13 +7102,9 @@ async function loadLocalLoginAdmin(
     FROM tenants AS tenant
     INNER JOIN users AS user_item
       ON user_item.tenant_id = tenant.id
-    INNER JOIN folders AS root_folder
-      ON root_folder.tenant_id = tenant.id
-     AND root_folder.content_type = 'root'
     INNER JOIN role_assignments AS assignment
       ON assignment.tenant_id = tenant.id
      AND assignment.user_id = user_item.id
-     AND assignment.scope_folder_id = root_folder.id
     INNER JOIN role_permissions AS permission
       ON permission.role_id = assignment.role_id
     WHERE tenant.slug = ?
@@ -5751,7 +7278,7 @@ export async function handleCoreRoutes(
   segments: string[],
   ctx: WorkerRequestContext,
 ): Promise<Response> {
-  const [resource, id, subresource, nestedId] = segments;
+  const [resource, id, subresource, nestedId, action] = segments;
 
   if (resource === 'bootstrap') {
     if (id === 'status' && ctx.request.method === 'GET') {
@@ -6373,7 +7900,7 @@ export async function handleCoreRoutes(
         );
       }
 
-      if (!isActiveOidcConfig(config)) {
+      if (!isSsoRuntimeReady(ctx.env, config)) {
         return json(
           {
             error: 'sso_not_ready',
@@ -6458,7 +7985,7 @@ export async function handleCoreRoutes(
         },
       );
 
-      if (!config || !isActiveOidcConfig(config)) {
+      if (!config || !isSsoRuntimeReady(ctx.env, config)) {
         await markSsoTransactionConsumed(ctx.env, transaction.id);
         return json(
           {
@@ -6470,6 +7997,7 @@ export async function handleCoreRoutes(
       }
 
       const claims = await completeOidcCodeExchange(
+        ctx.env,
         config,
         {
           id: transaction.id,
@@ -7129,6 +8657,106 @@ export async function handleCoreRoutes(
     );
     if (frameworkAccess instanceof Response) {
       return frameworkAccess;
+    }
+
+    if (id === 'import' && (subresource === 'system' || subresource === 'file')) {
+      if (ctx.request.method !== 'POST') {
+        return methodNotAllowed(['POST']);
+      }
+
+      if (subresource === 'system') {
+        const body = (await ctx.request.json()) as { sourceFrameworkId?: string; sourceToken?: string };
+        const sourceFrameworkId = body.sourceFrameworkId?.trim() || body.sourceToken?.trim() || '';
+        if (!sourceFrameworkId) {
+          return json(
+            { error: 'invalid_packaged_catalogue', message: 'A packaged catalogue identifier is required.' },
+            { status: 400 },
+          );
+        }
+
+        const packagedFramework = await loadPackagedFrameworkRow(ctx.env, sourceFrameworkId);
+        if (!packagedFramework) {
+          return json(
+            { error: 'packaged_catalogue_not_found', message: 'The selected packaged catalogue is not available.' },
+            { status: 404 },
+          );
+        }
+
+        const existing = await loadFrameworkRowByTenantAndKey(ctx.env, ctx.tenantId, packagedFramework.framework_key);
+        if (existing) {
+          return json(
+            {
+              error: 'framework_exists',
+              message: `${packagedFramework.name} is already installed in this workspace.`,
+              data: { framework: toFrameworkResponse(existing) },
+            },
+            { status: 409 },
+          );
+        }
+
+        const payload: ParsedFrameworkImportPayload = {
+          key: packagedFramework.framework_key,
+          name: packagedFramework.name,
+          version: packagedFramework.version,
+          category: packagedFramework.category ?? 'security',
+          controls: await buildPackagedFrameworkControlSeeds(ctx.env, packagedFramework),
+        };
+
+        const imported = await importFrameworkIntoTenant(ctx.env, ctx.tenantId, payload);
+        return json(
+          {
+            data: {
+              framework: imported.framework ? toFrameworkResponse(imported.framework) : null,
+              importedControlCount: imported.importedControlCount,
+              source: 'system',
+              packagedCatalogue: {
+                id: packagedFramework.id,
+                slug: packagedFramework.slug,
+                frameworkKey: packagedFramework.framework_key,
+                name: packagedFramework.name,
+              },
+            },
+          },
+          { status: 201 },
+        );
+      }
+
+      const body = (await ctx.request.json()) as { fileName?: string; payload?: unknown };
+      const parsed = parseFrameworkImportPayload(body.payload ?? body, body.fileName ?? null);
+      if (!parsed) {
+        return json(
+          {
+            error: 'invalid_catalogue_file',
+            message:
+              'The uploaded file must include a catalogue name, key or derivable file name, and at least one control or requirement.',
+          },
+          { status: 400 },
+        );
+      }
+
+      const existing = await loadFrameworkRowByTenantAndKey(ctx.env, ctx.tenantId, parsed.key);
+      if (existing) {
+        return json(
+          {
+            error: 'framework_exists',
+            message: `${parsed.name} is already installed in this workspace.`,
+            data: { framework: toFrameworkResponse(existing) },
+          },
+          { status: 409 },
+        );
+      }
+
+      const imported = await importFrameworkIntoTenant(ctx.env, ctx.tenantId, parsed);
+      return json(
+        {
+          data: {
+            framework: imported.framework ? toFrameworkResponse(imported.framework) : null,
+            importedControlCount: imported.importedControlCount,
+            source: 'file',
+          },
+        },
+        { status: 201 },
+      );
     }
 
     if (id) {
@@ -8657,6 +10285,19 @@ export async function handleCoreRoutes(
           assessment.name,
           assessment.version,
           assessment.status,
+          assessment.assessment_kind,
+          assessment.lead_assessor_user_id,
+          assessment.instructions,
+          assessment.planned_start_on,
+          assessment.planned_finish_on,
+          assessment.process_info,
+          assessment.assignment_principal_type,
+          assessment.assignment_principal_id,
+          assessment.recurrence_json,
+          assessment.source_security_plan_id,
+          assessment.assessment_plan_template_id,
+          assessment_plan.name AS assessment_plan_name,
+          assessment.recurrence_source_assessment_id,
           assessment.observation,
           assessment.controls_total,
           assessment.controls_assessed,
@@ -8671,6 +10312,8 @@ export async function handleCoreRoutes(
           ON perimeter_item.id = assessment.perimeter_id
         INNER JOIN frameworks AS framework_item
           ON framework_item.id = assessment.framework_id
+        LEFT JOIN questionnaire_templates AS assessment_plan
+          ON assessment_plan.id = assessment.assessment_plan_template_id
         WHERE assessment.tenant_id = ? AND assessment.id = ?
         LIMIT 1
         `,
@@ -8688,12 +10331,54 @@ export async function handleCoreRoutes(
         );
       }
 
-      await ensureComplianceRequirementAssessments(
-        ctx.env,
-        ctx.tenantId,
-        assessment.id,
-        assessment.framework_id,
-      );
+      const [existingRequirementCount, existingPlanItemCount] = await Promise.all([
+        ctx.env.D1_MAIN.prepare(
+          `
+          SELECT COUNT(*) AS count
+          FROM compliance_requirement_assessments
+          WHERE tenant_id = ? AND compliance_assessment_id = ?
+          `,
+        )
+          .bind(ctx.tenantId, assessment.id)
+          .first<{ count: number | null }>(),
+        assessment.assessment_plan_template_id
+          ? ctx.env.D1_MAIN.prepare(
+              `
+              SELECT COUNT(*) AS count
+              FROM compliance_assessment_plan_items
+              WHERE tenant_id = ? AND compliance_assessment_id = ?
+              `,
+            )
+              .bind(ctx.tenantId, assessment.id)
+              .first<{ count: number | null }>()
+          : Promise.resolve<{ count: number | null }>({ count: 0 }),
+      ]);
+
+      const shouldBackfillRequirements =
+        !assessment.assessment_plan_template_id || assessment.assessment_kind !== 'manual';
+
+      if ((existingRequirementCount?.count ?? 0) === 0 && shouldBackfillRequirements) {
+        await ensureComplianceRequirementAssessments(
+          ctx.env,
+          ctx.tenantId,
+          assessment.id,
+          assessment.framework_id,
+        );
+      }
+
+      if (
+        assessment.assessment_plan_template_id &&
+        (existingPlanItemCount?.count ?? 0) === 0
+      ) {
+        await ensureComplianceAssessmentPlanItems(
+          ctx.env,
+          ctx.tenantId,
+          assessment.id,
+          assessment.assessment_plan_template_id,
+        );
+      } else {
+        await recalculateComplianceAssessmentMetrics(ctx.env, ctx.tenantId, assessment.id);
+      }
 
       if (!subresource) {
         if (ctx.request.method !== 'GET') {
@@ -8715,6 +10400,19 @@ export async function handleCoreRoutes(
             assessment.name,
             assessment.version,
             assessment.status,
+            assessment.assessment_kind,
+            assessment.lead_assessor_user_id,
+            assessment.instructions,
+            assessment.planned_start_on,
+            assessment.planned_finish_on,
+            assessment.process_info,
+            assessment.assignment_principal_type,
+            assessment.assignment_principal_id,
+            assessment.recurrence_json,
+            assessment.source_security_plan_id,
+            assessment.assessment_plan_template_id,
+            assessment_plan.name AS assessment_plan_name,
+            assessment.recurrence_source_assessment_id,
             assessment.observation,
             assessment.controls_total,
             assessment.controls_assessed,
@@ -8729,6 +10427,8 @@ export async function handleCoreRoutes(
             ON perimeter_item.id = assessment.perimeter_id
           INNER JOIN frameworks AS framework_item
             ON framework_item.id = assessment.framework_id
+          LEFT JOIN questionnaire_templates AS assessment_plan
+            ON assessment_plan.id = assessment.assessment_plan_template_id
           WHERE assessment.tenant_id = ? AND assessment.id = ?
           LIMIT 1
           `,
@@ -8793,6 +10493,104 @@ export async function handleCoreRoutes(
         });
       }
 
+      if (subresource === 'assessment-plan-items' && !nestedId) {
+        if (ctx.request.method !== 'GET') {
+          return methodNotAllowed(['GET']);
+        }
+
+        if (assessment.assessment_plan_template_id) {
+          const existingCount = await ctx.env.D1_MAIN.prepare(
+            `
+            SELECT COUNT(*) AS count
+            FROM compliance_assessment_plan_items
+            WHERE tenant_id = ? AND compliance_assessment_id = ?
+            `,
+          )
+            .bind(ctx.tenantId, id)
+            .first<{ count: number | null }>();
+
+          if ((existingCount?.count ?? 0) === 0) {
+            await ensureComplianceAssessmentPlanItems(
+              ctx.env,
+              ctx.tenantId,
+              id,
+              assessment.assessment_plan_template_id,
+            );
+          }
+        }
+
+        const rows = await listComplianceAssessmentPlanItemRows(ctx.env, ctx.tenantId, id);
+        return json({
+          data: rows.map(toComplianceAssessmentPlanItemResponse),
+        });
+      }
+
+      if (subresource === 'assessment-plan-items' && nestedId) {
+        if (ctx.request.method !== 'POST') {
+          return methodNotAllowed(['POST']);
+        }
+
+        const body = (await ctx.request.json()) as UpdateComplianceRequirementInput;
+        const item = await ctx.env.D1_MAIN.prepare(
+          `
+          SELECT id
+          FROM compliance_assessment_plan_items
+          WHERE tenant_id = ? AND compliance_assessment_id = ? AND id = ?
+          LIMIT 1
+          `,
+        )
+          .bind(ctx.tenantId, id, nestedId)
+          .first<{ id: string }>();
+
+        if (!item) {
+          return json(
+            {
+              error: 'assessment_plan_item_not_found',
+              message: 'The selected assessment plan line of inquiry does not exist.',
+            },
+            { status: 404 },
+          );
+        }
+
+        await ctx.env.D1_MAIN.prepare(
+          `
+          UPDATE compliance_assessment_plan_items
+          SET result = ?,
+              observation = ?,
+              evidence_note = ?,
+              gaps_differences = ?,
+              likelihood = ?,
+              impact = ?,
+              auto_generate_follow_up = ?,
+              updated_at = (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+          WHERE tenant_id = ? AND compliance_assessment_id = ? AND id = ?
+          `,
+        )
+          .bind(
+            normalizeComplianceResult(body.result),
+            body.observation?.trim() || null,
+            body.evidenceNote?.trim() || null,
+            body.gapsDifferences?.trim() || null,
+            normalizeOptionalScore(body.likelihood),
+            normalizeOptionalScore(body.impact),
+            body.autoGenerateFollowUp === false ? 0 : 1,
+            ctx.tenantId,
+            id,
+            nestedId,
+          )
+          .run();
+
+        await recalculateComplianceAssessmentMetrics(ctx.env, ctx.tenantId, id);
+        await syncGeneratedAppliedControlForAssessmentPlanItem(ctx.env, ctx.tenantId, nestedId);
+
+        const refreshedRows = await listComplianceAssessmentPlanItemRows(ctx.env, ctx.tenantId, id);
+        const refreshed = refreshedRows.find((row) => row.id === nestedId) ?? null;
+
+        return json({
+          data: refreshed ? toComplianceAssessmentPlanItemResponse(refreshed) : null,
+        });
+      }
+
       if (subresource === 'requirements' && !nestedId) {
         if (ctx.request.method !== 'GET') {
           return methodNotAllowed(['GET']);
@@ -8810,8 +10608,15 @@ export async function handleCoreRoutes(
             control.ref AS control_ref,
             control.title AS control_title,
             control.description AS control_description,
+            requirement.in_scope,
+            requirement.sort_order,
             requirement.result,
             requirement.observation,
+            requirement.evidence_note,
+            requirement.gaps_differences,
+            requirement.likelihood,
+            requirement.impact,
+            requirement.auto_generate_follow_up,
             requirement.evidence_status,
             requirement.implementation_score,
             requirement.documentation_score,
@@ -8822,8 +10627,8 @@ export async function handleCoreRoutes(
             ON control.id = requirement.control_id
           INNER JOIN frameworks AS framework_item
             ON framework_item.id = control.framework_id
-          WHERE requirement.tenant_id = ? AND requirement.compliance_assessment_id = ?
-          ORDER BY control.ref ASC
+          WHERE requirement.tenant_id = ? AND requirement.compliance_assessment_id = ? AND COALESCE(requirement.in_scope, 1) = 1
+          ORDER BY COALESCE(requirement.sort_order, 999999) ASC, control.ref ASC
           `,
         )
           .bind(ctx.tenantId, id)
@@ -8867,6 +10672,11 @@ export async function handleCoreRoutes(
           UPDATE compliance_requirement_assessments
           SET result = ?,
               observation = ?,
+              evidence_note = ?,
+              gaps_differences = ?,
+              likelihood = ?,
+              impact = ?,
+              auto_generate_follow_up = ?,
               evidence_status = ?,
               implementation_score = ?,
               documentation_score = ?,
@@ -8877,6 +10687,11 @@ export async function handleCoreRoutes(
           .bind(
             normalizeComplianceResult(body.result),
             body.observation?.trim() || null,
+            body.evidenceNote?.trim() || null,
+            body.gapsDifferences?.trim() || null,
+            normalizeOptionalScore(body.likelihood),
+            normalizeOptionalScore(body.impact),
+            body.autoGenerateFollowUp === false ? 0 : 1,
             normalizeEvidenceStatus(body.evidenceStatus),
             normalizeOptionalScore(body.implementationScore),
             normalizeOptionalScore(body.documentationScore),
@@ -8901,8 +10716,15 @@ export async function handleCoreRoutes(
             control.ref AS control_ref,
             control.title AS control_title,
             control.description AS control_description,
+            requirement.in_scope,
+            requirement.sort_order,
             requirement.result,
             requirement.observation,
+            requirement.evidence_note,
+            requirement.gaps_differences,
+            requirement.likelihood,
+            requirement.impact,
+            requirement.auto_generate_follow_up,
             requirement.evidence_status,
             requirement.implementation_score,
             requirement.documentation_score,
@@ -8944,6 +10766,19 @@ export async function handleCoreRoutes(
           assessment.name,
           assessment.version,
           assessment.status,
+          assessment.assessment_kind,
+          assessment.lead_assessor_user_id,
+          assessment.instructions,
+          assessment.planned_start_on,
+          assessment.planned_finish_on,
+          assessment.process_info,
+          assessment.assignment_principal_type,
+          assessment.assignment_principal_id,
+          assessment.recurrence_json,
+          assessment.source_security_plan_id,
+          assessment.assessment_plan_template_id,
+          assessment_plan.name AS assessment_plan_name,
+          assessment.recurrence_source_assessment_id,
           assessment.observation,
           assessment.controls_total,
           assessment.controls_assessed,
@@ -8958,6 +10793,8 @@ export async function handleCoreRoutes(
           ON perimeter_item.id = assessment.perimeter_id
         INNER JOIN frameworks AS framework_item
           ON framework_item.id = assessment.framework_id
+        LEFT JOIN questionnaire_templates AS assessment_plan
+          ON assessment_plan.id = assessment.assessment_plan_template_id
         WHERE assessment.tenant_id = ?
         ORDER BY assessment.updated_at DESC
         `,
@@ -8974,6 +10811,8 @@ export async function handleCoreRoutes(
       const body = (await ctx.request.json()) as CreateComplianceAssessmentInput;
       const perimeterId = body.perimeterId?.trim();
       const frameworkId = body.frameworkId?.trim();
+      const assessmentKind = body.assessmentKind?.trim() || 'compliance';
+      const assessmentPlanTemplateId = body.assessmentPlanTemplateId?.trim() || null;
       const name = body.name?.trim();
 
       if (!perimeterId || !frameworkId || !name) {
@@ -8986,7 +10825,7 @@ export async function handleCoreRoutes(
         );
       }
 
-      const [perimeter, framework] = await Promise.all([
+      const [perimeter, framework, assessmentPlan] = await Promise.all([
         ctx.env.D1_MAIN.prepare(
           `
           SELECT id, folder_id
@@ -9007,6 +10846,18 @@ export async function handleCoreRoutes(
         )
           .bind(ctx.tenantId, frameworkId)
           .first<{ id: string }>(),
+        assessmentPlanTemplateId
+          ? ctx.env.D1_MAIN.prepare(
+              `
+              SELECT id, metadata_json
+              FROM questionnaire_templates
+              WHERE tenant_id = ? AND id = ?
+              LIMIT 1
+              `,
+            )
+              .bind(ctx.tenantId, assessmentPlanTemplateId)
+              .first<{ id: string; metadata_json: string | null }>()
+          : Promise.resolve(null),
       ]);
 
       if (!perimeter || !hasAccessibleDomainScope(access, perimeter.folder_id)) {
@@ -9023,20 +10874,49 @@ export async function handleCoreRoutes(
         );
       }
 
-      const controlSummary = await ctx.env.D1_MAIN.prepare(
-        `
-        SELECT COUNT(*) AS count
-        FROM controls
-        WHERE tenant_id = ? AND framework_id = ?
-        `,
-      )
-        .bind(ctx.tenantId, frameworkId)
-        .first<{ count: number }>();
-      const seededControlsTotal = controlSummary?.count ?? 0;
+      if (assessmentPlanTemplateId) {
+        const templateKind = asJson<{ templateKind?: string | null } | null>(
+          assessmentPlan?.metadata_json ?? null,
+          null,
+        )?.templateKind;
+        if (!assessmentPlan || templateKind !== 'assessment-plan') {
+          return json(
+            {
+              error: 'assessment_plan_not_found',
+              message: 'The selected assessment plan does not exist.',
+            },
+            { status: 404 },
+          );
+        }
+      }
+
+      const selectedControlIds = Array.isArray(body.controlIds)
+        ? body.controlIds.map((value) => value.trim()).filter(Boolean)
+        : [];
+      const seedFrameworkRequirements =
+        !(assessmentPlanTemplateId && assessmentKind === 'manual' && selectedControlIds.length === 0);
+
+      const controlSummary = seedFrameworkRequirements
+        ? await ctx.env.D1_MAIN.prepare(
+            `
+            SELECT COUNT(*) AS count
+            FROM controls
+            WHERE tenant_id = ? AND framework_id = ?
+            `,
+          )
+            .bind(ctx.tenantId, frameworkId)
+            .first<{ count: number }>()
+        : null;
+      const seededControlsTotal = seedFrameworkRequirements
+        ? selectedControlIds.length > 0
+          ? selectedControlIds.length
+          : controlSummary?.count ?? 0
+        : 0;
       const controlsTotal = seededControlsTotal || Math.max(body.controlsTotal ?? 0, 0);
       const controlsAssessed = Math.max(body.controlsAssessed ?? 0, 0);
       const progressPercent =
         controlsTotal > 0 ? Math.min(Math.round((controlsAssessed / controlsTotal) * 100), 100) : 0;
+      const recurrenceJson = body.recurrence ? JSON.stringify(body.recurrence) : null;
       const assessmentId = crypto.randomUUID();
 
       await ctx.env.D1_MAIN.prepare(
@@ -9051,13 +10931,24 @@ export async function handleCoreRoutes(
           name,
           version,
           status,
+          assessment_kind,
+          lead_assessor_user_id,
+          instructions,
+          planned_start_on,
+          planned_finish_on,
+          process_info,
+          assignment_principal_type,
+          assignment_principal_id,
+          recurrence_json,
+          source_security_plan_id,
+          assessment_plan_template_id,
           observation,
           controls_total,
           controls_assessed,
           progress_percent,
           maturity_score
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `,
       )
         .bind(
@@ -9070,6 +10961,17 @@ export async function handleCoreRoutes(
           name,
           body.version?.trim() || '1.0',
           body.status?.trim() || 'planned',
+          body.assessmentKind?.trim() || 'compliance',
+          body.leadAssessorUserId?.trim() || null,
+          body.instructions?.trim() || null,
+          normalizeOptionalDateString(body.plannedStartOn),
+          normalizeOptionalDateString(body.plannedFinishOn),
+          body.processInfo?.trim() || null,
+          body.assignmentPrincipalType?.trim() || body.recurrence?.assignmentPrincipalType?.trim() || null,
+          body.assignmentPrincipalId?.trim() || body.recurrence?.assignmentPrincipalId?.trim() || null,
+          recurrenceJson,
+          body.sourceSecurityPlanId?.trim() || null,
+          assessmentPlanTemplateId,
           body.observation?.trim() || null,
           controlsTotal,
           Math.min(controlsAssessed, controlsTotal),
@@ -9078,9 +10980,46 @@ export async function handleCoreRoutes(
         )
         .run();
 
-      if (seededControlsTotal > 0) {
+      if (seedFrameworkRequirements && seededControlsTotal > 0) {
         await ensureComplianceRequirementAssessments(ctx.env, ctx.tenantId, assessmentId, frameworkId, {
           assessedCount: Math.min(controlsAssessed, seededControlsTotal),
+          controlIds: selectedControlIds.length > 0 ? selectedControlIds : undefined,
+        });
+      }
+
+      if (assessmentPlanTemplateId) {
+        await ensureComplianceAssessmentPlanItems(
+          ctx.env,
+          ctx.tenantId,
+          assessmentId,
+          assessmentPlanTemplateId,
+        );
+      }
+
+      if (recurrenceJson) {
+        await createRecurringComplianceAssessments(ctx.env, ctx.tenantId, {
+          rootAssessmentId: assessmentId,
+          folderId: perimeter.folder_id,
+          perimeterId,
+          frameworkId,
+          refId: body.refId?.trim() || null,
+          name,
+          version: body.version?.trim() || '1.0',
+          status: body.status?.trim() || 'planned',
+          assessmentKind,
+          leadAssessorUserId: body.leadAssessorUserId?.trim() || null,
+          instructions: body.instructions?.trim() || null,
+          plannedStartOn: normalizeOptionalDateString(body.plannedStartOn),
+          plannedFinishOn: normalizeOptionalDateString(body.plannedFinishOn),
+          processInfo: body.processInfo?.trim() || null,
+          assignmentPrincipalType: body.assignmentPrincipalType?.trim() || body.recurrence?.assignmentPrincipalType?.trim() || null,
+          assignmentPrincipalId: body.assignmentPrincipalId?.trim() || body.recurrence?.assignmentPrincipalId?.trim() || null,
+          recurrenceJson,
+          sourceSecurityPlanId: body.sourceSecurityPlanId?.trim() || null,
+          assessmentPlanTemplateId,
+          observation: body.observation?.trim() || null,
+          seedFrameworkRequirements,
+          controlIds: selectedControlIds.length > 0 ? selectedControlIds : undefined,
         });
       }
 
@@ -9099,6 +11038,19 @@ export async function handleCoreRoutes(
           assessment.name,
           assessment.version,
           assessment.status,
+          assessment.assessment_kind,
+          assessment.lead_assessor_user_id,
+          assessment.instructions,
+          assessment.planned_start_on,
+          assessment.planned_finish_on,
+          assessment.process_info,
+          assessment.assignment_principal_type,
+          assessment.assignment_principal_id,
+          assessment.recurrence_json,
+          assessment.source_security_plan_id,
+          assessment.assessment_plan_template_id,
+          assessment_plan.name AS assessment_plan_name,
+          assessment.recurrence_source_assessment_id,
           assessment.observation,
           assessment.controls_total,
           assessment.controls_assessed,
@@ -9113,6 +11065,8 @@ export async function handleCoreRoutes(
           ON perimeter_item.id = assessment.perimeter_id
         INNER JOIN frameworks AS framework_item
           ON framework_item.id = assessment.framework_id
+        LEFT JOIN questionnaire_templates AS assessment_plan
+          ON assessment_plan.id = assessment.assessment_plan_template_id
         WHERE assessment.id = ? AND assessment.tenant_id = ?
         LIMIT 1
         `,
@@ -9126,6 +11080,352 @@ export async function handleCoreRoutes(
         },
         { status: 201 },
       );
+    }
+
+    return methodNotAllowed(['GET', 'POST']);
+  }
+
+  if (resource === 'modules') {
+    if (!ctx.tenantId) {
+      return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
+    }
+
+    if (!id || id === 'catalog') {
+      if (ctx.request.method !== 'GET') {
+        return methodNotAllowed(['GET']);
+      }
+
+      const countRows = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT module_key, COUNT(*) AS record_count
+        FROM module_records
+        WHERE tenant_id = ? AND archived = 0
+        GROUP BY module_key
+        `,
+      )
+        .bind(ctx.tenantId)
+        .all<{ module_key: string; record_count: number | null }>();
+
+      const countsByKey = new Map(
+        countRows.results.map((row) => [row.module_key, Number(row.record_count ?? 0)]),
+      );
+
+      return json({
+        data: {
+          modules: listScaleModuleCatalogEntries().map((entry) => ({
+            ...entry,
+            recordCount: countsByKey.get(entry.moduleKey) ?? 0,
+          })),
+        },
+      });
+    }
+
+    const entry = findModuleCatalogEntry(id);
+    if (!entry) {
+      return json({ error: 'module_not_found', message: 'The requested module does not exist.' }, { status: 404 });
+    }
+
+    const permissionFamilies = resolveModulePermissionFamilies(entry);
+    const access = await requireCorePermissionFamily(
+      ctx,
+      permissionFamilies.read,
+      permissionFamilies.write,
+      entry.moduleName,
+    );
+    if (access instanceof Response) {
+      return access;
+    }
+
+    if (!subresource) {
+      if (ctx.request.method !== 'GET') {
+        return methodNotAllowed(['GET']);
+      }
+
+      const countRow = await ctx.env.D1_MAIN.prepare(
+        `
+        SELECT COUNT(*) AS record_count
+        FROM module_records
+        WHERE tenant_id = ? AND module_key = ? AND archived = 0
+        `,
+      )
+        .bind(ctx.tenantId, entry.moduleKey)
+        .first<{ record_count: number | null }>();
+
+      return json({
+        data: {
+          ...entry,
+          recordCount: Number(countRow?.record_count ?? 0),
+        },
+      });
+    }
+
+    if (entry.implementationType !== 'shared-workspace' || subresource !== 'records') {
+      return json(
+        {
+          error: 'module_route_not_supported',
+          message: `${entry.pluralName} use a different tenant-facing workspace.`,
+          route: entry.canonicalRoute,
+        },
+        { status: 400 },
+      );
+    }
+
+    if (!nestedId) {
+      if (ctx.request.method === 'GET') {
+        const predicates = ['tenant_id = ?', 'module_key = ?'];
+        const bindings: unknown[] = [ctx.tenantId, entry.moduleKey];
+        const accessiblePredicate = buildAccessibleDomainPredicate('folder_id', access);
+        predicates.push(accessiblePredicate.clause);
+        bindings.push(...accessiblePredicate.bindings);
+
+        const query = ctx.url.searchParams.get('q')?.trim().toLowerCase();
+        const status = ctx.url.searchParams.get('status')?.trim();
+        const folderId = ctx.url.searchParams.get('folderId')?.trim();
+        const includeArchived = ctx.url.searchParams.get('includeArchived') === 'true';
+
+        if (!includeArchived) {
+          predicates.push('archived = 0');
+        }
+        if (query) {
+          predicates.push('(LOWER(title) LIKE ? OR LOWER(COALESCE(data_json, \'\')) LIKE ?)');
+          bindings.push(`%${query}%`, `%${query}%`);
+        }
+        if (status) {
+          predicates.push('status = ?');
+          bindings.push(status);
+        }
+        if (folderId && hasAccessibleDomainScope(access, folderId)) {
+          predicates.push('folder_id = ?');
+          bindings.push(folderId);
+        }
+
+        const rows = await ctx.env.D1_MAIN.prepare(
+          `
+          SELECT *
+          FROM module_records
+          WHERE ${predicates.join(' AND ')}
+          ORDER BY archived ASC, updated_at DESC, title ASC
+          `,
+        )
+          .bind(...bindings)
+          .all<ModuleRecordRow>();
+
+        return json({
+          data: {
+            module: entry,
+            records: rows.results.map(toModuleRecordResponse),
+          },
+        });
+      }
+
+      if (ctx.request.method === 'POST') {
+        const body = await readJson<SaveModuleRecordInput>(ctx.request);
+        const folderId = body.folderId?.trim() || '';
+        if (!folderId || !hasAccessibleDomainScope(access, folderId)) {
+          return json(
+            {
+              error: 'folder_not_found',
+              message: 'Select an accessible domain folder for the new record.',
+            },
+            { status: 404 },
+          );
+        }
+
+        const title = deriveModuleRecordTitle(entry, body);
+        const status = deriveModuleRecordStatus(body);
+        const links = sanitizeModuleLinks(body.links);
+        let activity = appendModuleActivity([], {
+          type: 'created',
+          message: `Created ${entry.moduleName.toLowerCase()} record.`,
+          createdByUserId: ctx.userId,
+        });
+        if (body.note?.trim()) {
+          activity = appendModuleActivity(activity, {
+            type: 'note',
+            message: body.note.trim(),
+            createdByUserId: ctx.userId,
+          });
+        }
+
+        const recordId = crypto.randomUUID();
+        await ctx.env.D1_MAIN.prepare(
+          `
+          INSERT INTO module_records (
+            id, tenant_id, module_key, folder_id, title, status, owner_user_id, assignee_user_id,
+            start_on, finish_on, due_on, review_on, expires_on, data_json, links_json, activity_json,
+            archived, created_by_user_id, updated_by_user_id
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+          `,
+        )
+          .bind(
+            recordId,
+            ctx.tenantId,
+            entry.moduleKey,
+            folderId,
+            title,
+            status,
+            body.ownerUserId?.trim() || null,
+            body.assigneeUserId?.trim() || null,
+            normalizeOptionalDateString(body.startOn),
+            normalizeOptionalDateString(body.finishOn),
+            normalizeOptionalDateString(body.dueOn),
+            normalizeOptionalDateString(body.reviewOn),
+            normalizeOptionalDateString(body.expiresOn),
+            JSON.stringify(body.data ?? {}),
+            JSON.stringify(links),
+            JSON.stringify(activity),
+            ctx.userId,
+            ctx.userId,
+          )
+          .run();
+
+        const created = await ctx.env.D1_MAIN.prepare(
+          `SELECT * FROM module_records WHERE tenant_id = ? AND id = ? LIMIT 1`,
+        )
+          .bind(ctx.tenantId, recordId)
+          .first<ModuleRecordRow>();
+
+        return json({ data: created ? toModuleRecordResponse(created) : null }, { status: 201 });
+      }
+
+      return methodNotAllowed(['GET', 'POST']);
+    }
+
+    const existing = await ctx.env.D1_MAIN.prepare(
+      `
+      SELECT *
+      FROM module_records
+      WHERE tenant_id = ? AND module_key = ? AND id = ?
+      LIMIT 1
+      `,
+    )
+      .bind(ctx.tenantId, entry.moduleKey, nestedId)
+      .first<ModuleRecordRow>();
+
+    if (!existing || !hasAccessibleDomainScope(access, existing.folder_id)) {
+      return json(
+        {
+          error: 'module_record_not_found',
+          message: 'The selected module record does not exist.',
+        },
+        { status: 404 },
+      );
+    }
+
+    if (action === 'archive') {
+      if (ctx.request.method !== 'POST') {
+        return methodNotAllowed(['POST']);
+      }
+
+      const currentActivity = asJson<ModuleRecordActivity[]>(existing.activity_json, []);
+      const nextActivity = appendModuleActivity(currentActivity, {
+        type: 'archived',
+        message: `Archived ${entry.moduleName.toLowerCase()} record.`,
+        createdByUserId: ctx.userId,
+      });
+
+      await ctx.env.D1_MAIN.prepare(
+        `
+        UPDATE module_records
+        SET archived = 1,
+            activity_json = ?,
+            updated_by_user_id = ?,
+            updated_at = (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+        WHERE tenant_id = ? AND id = ?
+        `,
+      )
+        .bind(JSON.stringify(nextActivity), ctx.userId, ctx.tenantId, nestedId)
+        .run();
+
+      const archived = await ctx.env.D1_MAIN.prepare(
+        `SELECT * FROM module_records WHERE tenant_id = ? AND id = ? LIMIT 1`,
+      )
+        .bind(ctx.tenantId, nestedId)
+        .first<ModuleRecordRow>();
+
+      return json({ data: archived ? toModuleRecordResponse(archived) : null });
+    }
+
+    if (ctx.request.method === 'GET') {
+      return json({ data: toModuleRecordResponse(existing) });
+    }
+
+    if (ctx.request.method === 'POST') {
+      const body = await readJson<SaveModuleRecordInput>(ctx.request);
+      const nextFolderId = body.folderId?.trim() || existing.folder_id;
+      if (!hasAccessibleDomainScope(access, nextFolderId)) {
+        return json(
+          {
+            error: 'folder_not_found',
+            message: 'Select an accessible domain folder for this record.',
+          },
+          { status: 404 },
+        );
+      }
+
+      const currentActivity = asJson<ModuleRecordActivity[]>(existing.activity_json, []);
+      let nextActivity = appendModuleActivity(currentActivity, {
+        type: 'updated',
+        message: `Updated ${entry.moduleName.toLowerCase()} record.`,
+        createdByUserId: ctx.userId,
+      });
+      if (body.note?.trim()) {
+        nextActivity = appendModuleActivity(nextActivity, {
+          type: 'note',
+          message: body.note.trim(),
+          createdByUserId: ctx.userId,
+        });
+      }
+
+      await ctx.env.D1_MAIN.prepare(
+        `
+        UPDATE module_records
+        SET folder_id = ?,
+            title = ?,
+            status = ?,
+            owner_user_id = ?,
+            assignee_user_id = ?,
+            start_on = ?,
+            finish_on = ?,
+            due_on = ?,
+            review_on = ?,
+            expires_on = ?,
+            data_json = ?,
+            links_json = ?,
+            activity_json = ?,
+            updated_by_user_id = ?,
+            updated_at = (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+        WHERE tenant_id = ? AND id = ?
+        `,
+      )
+        .bind(
+          nextFolderId,
+          deriveModuleRecordTitle(entry, body),
+          deriveModuleRecordStatus(body),
+          body.ownerUserId?.trim() || existing.owner_user_id,
+          body.assigneeUserId?.trim() || existing.assignee_user_id,
+          normalizeOptionalDateString(body.startOn) ?? existing.start_on,
+          normalizeOptionalDateString(body.finishOn) ?? existing.finish_on,
+          normalizeOptionalDateString(body.dueOn) ?? existing.due_on,
+          normalizeOptionalDateString(body.reviewOn) ?? existing.review_on,
+          normalizeOptionalDateString(body.expiresOn) ?? existing.expires_on,
+          JSON.stringify(body.data ?? asJson<Record<string, unknown>>(existing.data_json, {})),
+          JSON.stringify(body.links ? sanitizeModuleLinks(body.links) : asJson<ModuleRecordLink[]>(existing.links_json, [])),
+          JSON.stringify(nextActivity),
+          ctx.userId,
+          ctx.tenantId,
+          nestedId,
+        )
+        .run();
+
+      const updated = await ctx.env.D1_MAIN.prepare(
+        `SELECT * FROM module_records WHERE tenant_id = ? AND id = ? LIMIT 1`,
+      )
+        .bind(ctx.tenantId, nestedId)
+        .first<ModuleRecordRow>();
+
+      return json({ data: updated ? toModuleRecordResponse(updated) : null });
     }
 
     return methodNotAllowed(['GET', 'POST']);

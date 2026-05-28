@@ -40,10 +40,21 @@ export type EnvBindings = {
   R2_EVIDENCE: R2Bucket;
   QUEUE_EVIDENCE_JOBS: Queue<EvidenceJobMessage>;
   QUEUE_CONMON_JOBS: Queue<ConMonJobMessage>;
+  QUEUE_GRC_CONTENT_IMPORT?: Queue<GrcQueueMessage>;
+  QUEUE_GRC_SCF_REFRESH?: Queue<GrcQueueMessage>;
+  QUEUE_GRC_FINDING_INGEST?: Queue<GrcQueueMessage>;
+  QUEUE_GRC_GAP_REPORT?: Queue<GrcQueueMessage>;
+  QUEUE_GRC_AI_ENRICH?: Queue<GrcQueueMessage>;
   TENANT_WORKFLOW_COORDINATOR: DurableObjectNamespace<TenantWorkflowCoordinator>;
   AI?: AiBinding;
   EVIDENCE_VECTOR_INDEX?: VectorizeBinding;
   BOOTSTRAP_SETUP_SECRET?: string;
+  OIDC_CLIENT_SECRET?: string;
+  SSO_OIDC_CLIENT_SECRET?: string;
+  GOOGLE_OIDC_CLIENT_SECRET?: string;
+  GOOGLE_CLIENT_SECRET?: string;
+  OPENAI_API_KEY?: string;
+  OPENAI_API_BASE_URL?: string;
 };
 
 export type AuthStrategy = 'headers' | 'd1-session' | 'anonymous';
@@ -66,3 +77,54 @@ export type ConMonJobMessage = {
 };
 
 export type QueueMessagePayload = EvidenceJobMessage | ConMonJobMessage;
+
+export type GrcQueueMessage =
+  | {
+      type: 'grc.content.import';
+      tenantId: string;
+      requestedBy: string | null;
+      jobId?: string;
+    }
+  | {
+      type: 'grc.scf.refresh';
+      tenantId: string;
+      requestedBy: string | null;
+      frameworkIds?: string[];
+      jobId?: string;
+    }
+  | {
+      type: 'grc.finding.ingest';
+      tenantId: string;
+      requestedBy: string | null;
+      payloadId: string;
+      jobId?: string;
+    }
+  | {
+      type: 'grc.gap.report';
+      tenantId: string;
+      assessmentId?: string;
+      requestedBy: string | null;
+      reportKind?: string;
+      jobId?: string;
+    }
+  | {
+      type: 'grc.evidence.package';
+      tenantId: string;
+      assessmentId: string;
+      requestedBy: string | null;
+      jobId?: string;
+    }
+  | {
+      type: 'grc.ai.enrich';
+      tenantId: string;
+      bundleId: string;
+      requestedBy: string | null;
+      jobId?: string;
+    }
+  | {
+      type: 'grc.connector.collect';
+      tenantId: string;
+      source: string;
+      requestedBy: string | null;
+      jobId?: string;
+    };

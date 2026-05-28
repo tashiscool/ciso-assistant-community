@@ -17,7 +17,11 @@ type QuestionnaireQuestion = {
   weight: number;
   options?: string[];
   helpText?: string | null;
+  requirementRef?: string | null;
+  evidenceHint?: string | null;
 };
+
+type QuestionnaireTemplateKind = 'assessment-plan' | 'questionnaire';
 
 type QuestionnaireRule = {
   id: string;
@@ -77,14 +81,38 @@ type CreateQuestionnaireInput = {
   name?: string;
   description?: string | null;
   audience?: string | null;
+  templateKind?: QuestionnaireTemplateKind;
+  sourceFramework?: string | null;
+  usageNotes?: string | null;
+  questionnaireType?: string | null;
+  assignmentModel?: string | null;
+  relatedWorkflow?: string | null;
+  attestationScope?: string | null;
+  responseOwnerModel?: string | null;
+  evidenceCollectionMode?: string | null;
+  fileUploadGuidance?: string | null;
+  exportMode?: string | null;
+  distributionCadence?: string | null;
 };
 
 type UpdateQuestionnaireInput = {
   name?: string;
   description?: string | null;
   status?: string;
+  templateKind?: QuestionnaireTemplateKind;
   scoringMode?: string;
   audience?: string | null;
+  sourceFramework?: string | null;
+  usageNotes?: string | null;
+  questionnaireType?: string | null;
+  assignmentModel?: string | null;
+  relatedWorkflow?: string | null;
+  attestationScope?: string | null;
+  responseOwnerModel?: string | null;
+  evidenceCollectionMode?: string | null;
+  fileUploadGuidance?: string | null;
+  exportMode?: string | null;
+  distributionCadence?: string | null;
   questions?: QuestionnaireQuestion[];
 };
 
@@ -110,11 +138,24 @@ type QuestionnaireTemplateSummary = {
   name: string;
   description: string | null;
   status: string;
+  templateKind: QuestionnaireTemplateKind;
   audience: string | null;
   scoringMode: string;
   version: number;
   questionCount: number;
   ruleCount: number;
+  sourceFramework: string | null;
+  usageNotes: string | null;
+  questionnaireType: string | null;
+  assignmentModel: string | null;
+  relatedWorkflow: string | null;
+  attestationScope: string | null;
+  responseOwnerModel: string | null;
+  evidenceCollectionMode: string | null;
+  fileUploadGuidance: string | null;
+  exportMode: string | null;
+  distributionCadence: string | null;
+  mappedRequirementCount: number;
   updatedAt: string;
 };
 
@@ -123,13 +164,68 @@ type QuestionnaireTemplateDetail = {
   name: string;
   description: string | null;
   status: string;
+  templateKind: QuestionnaireTemplateKind;
   scoringMode: string;
   audience: string | null;
   version: number;
   questions: QuestionnaireQuestion[];
   metadata: Record<string, unknown> | null;
+  sourceFramework: string | null;
+  usageNotes: string | null;
+  questionnaireType: string | null;
+  assignmentModel: string | null;
+  relatedWorkflow: string | null;
+  attestationScope: string | null;
+  responseOwnerModel: string | null;
+  evidenceCollectionMode: string | null;
+  fileUploadGuidance: string | null;
+  exportMode: string | null;
+  distributionCadence: string | null;
+  mappedRequirementCount: number;
   updatedAt: string;
   createdAt: string;
+};
+
+type QuestionnaireTemplateMetadata = {
+  templateKind?: QuestionnaireTemplateKind;
+  sourceFramework?: string | null;
+  usageNotes?: string | null;
+  ownerTeam?: string | null;
+  source?: string | null;
+  seedKey?: string | null;
+  questionnaireType?: string | null;
+  assignmentModel?: string | null;
+  relatedWorkflow?: string | null;
+  attestationScope?: string | null;
+  responseOwnerModel?: string | null;
+  evidenceCollectionMode?: string | null;
+  fileUploadGuidance?: string | null;
+  exportMode?: string | null;
+  distributionCadence?: string | null;
+};
+
+type QuestionnaireSeedDefinition = {
+  seedKey: string;
+  templateKind: QuestionnaireTemplateKind;
+  name: string;
+  description: string;
+  audience: string;
+  ownerTeam: string;
+  sourceFramework?: string | null;
+  usageNotes?: string | null;
+  questionnaireType?: string | null;
+  assignmentModel?: string | null;
+  relatedWorkflow?: string | null;
+  attestationScope?: string | null;
+  responseOwnerModel?: string | null;
+  evidenceCollectionMode?: string | null;
+  fileUploadGuidance?: string | null;
+  exportMode?: string | null;
+  distributionCadence?: string | null;
+  scoringMode: string;
+  status: string;
+  questions: QuestionnaireQuestion[];
+  rules: QuestionnaireRule[];
 };
 
 type RuleSetDetail = {
@@ -190,6 +286,74 @@ function requireUser(ctx: WorkerRequestContext): string | Response {
 function parseQuestionRefFromExpression(expression: string): string | null {
   const match = expression.match(/"([^"]+)"/);
   return match?.[1] ?? null;
+}
+
+function normalizeTemplateKind(value: unknown): QuestionnaireTemplateKind {
+  return value === 'assessment-plan' ? 'assessment-plan' : 'questionnaire';
+}
+
+function buildTemplateMetadata(args: {
+  current?: QuestionnaireTemplateMetadata | null;
+  templateKind?: QuestionnaireTemplateKind;
+  sourceFramework?: string | null;
+  usageNotes?: string | null;
+  ownerTeam?: string | null;
+  source?: string | null;
+  seedKey?: string | null;
+  questionnaireType?: string | null;
+  assignmentModel?: string | null;
+  relatedWorkflow?: string | null;
+  attestationScope?: string | null;
+  responseOwnerModel?: string | null;
+  evidenceCollectionMode?: string | null;
+  fileUploadGuidance?: string | null;
+  exportMode?: string | null;
+  distributionCadence?: string | null;
+}): QuestionnaireTemplateMetadata {
+  return {
+    ...(args.current ?? {}),
+    ...(args.templateKind ? { templateKind: args.templateKind } : {}),
+    ...(args.sourceFramework !== undefined ? { sourceFramework: args.sourceFramework } : {}),
+    ...(args.usageNotes !== undefined ? { usageNotes: args.usageNotes } : {}),
+    ...(args.ownerTeam !== undefined ? { ownerTeam: args.ownerTeam } : {}),
+    ...(args.source !== undefined ? { source: args.source } : {}),
+    ...(args.seedKey !== undefined ? { seedKey: args.seedKey } : {}),
+    ...(args.questionnaireType !== undefined ? { questionnaireType: args.questionnaireType } : {}),
+    ...(args.assignmentModel !== undefined ? { assignmentModel: args.assignmentModel } : {}),
+    ...(args.relatedWorkflow !== undefined ? { relatedWorkflow: args.relatedWorkflow } : {}),
+    ...(args.attestationScope !== undefined ? { attestationScope: args.attestationScope } : {}),
+    ...(args.responseOwnerModel !== undefined ? { responseOwnerModel: args.responseOwnerModel } : {}),
+    ...(args.evidenceCollectionMode !== undefined ? { evidenceCollectionMode: args.evidenceCollectionMode } : {}),
+    ...(args.fileUploadGuidance !== undefined ? { fileUploadGuidance: args.fileUploadGuidance } : {}),
+    ...(args.exportMode !== undefined ? { exportMode: args.exportMode } : {}),
+    ...(args.distributionCadence !== undefined ? { distributionCadence: args.distributionCadence } : {}),
+  };
+}
+
+function mappedRequirementCount(questions: QuestionnaireQuestion[]) {
+  return questions.filter((question) => question.requirementRef?.trim()).length;
+}
+
+function summarizeTemplateMetadata(
+  metadata: QuestionnaireTemplateMetadata | null | undefined,
+  questions: QuestionnaireQuestion[],
+) {
+  const normalized = metadata ?? {};
+  return {
+    templateKind: normalizeTemplateKind(normalized.templateKind),
+    sourceFramework: normalized.sourceFramework?.trim() || null,
+    usageNotes: normalized.usageNotes?.trim() || null,
+    questionnaireType: normalized.questionnaireType?.trim() || null,
+    assignmentModel: normalized.assignmentModel?.trim() || null,
+    relatedWorkflow: normalized.relatedWorkflow?.trim() || null,
+    attestationScope: normalized.attestationScope?.trim() || null,
+    responseOwnerModel: normalized.responseOwnerModel?.trim() || null,
+    evidenceCollectionMode: normalized.evidenceCollectionMode?.trim() || null,
+    fileUploadGuidance: normalized.fileUploadGuidance?.trim() || null,
+    exportMode: normalized.exportMode?.trim() || null,
+    distributionCadence: normalized.distributionCadence?.trim() || null,
+    mappedRequirementCount: mappedRequirementCount(questions),
+  };
 }
 
 function buildRuleDiagnostics(
@@ -315,7 +479,7 @@ function evaluateRuleSet(
   };
 }
 
-function buildSeedQuestions(): QuestionnaireQuestion[] {
+function buildQuestionnaireSeedQuestions(): QuestionnaireQuestion[] {
   return [
     {
       id: crypto.randomUUID(),
@@ -327,6 +491,8 @@ function buildSeedQuestions(): QuestionnaireQuestion[] {
       weight: 20,
       options: ['Low', 'Moderate', 'High', 'Critical'],
       helpText: 'Used by the visual rules engine to reveal mitigation and review follow-up.',
+      requirementRef: null,
+      evidenceHint: 'Capture the supplier risk classification used for triage.',
     },
     {
       id: crypto.randomUUID(),
@@ -336,6 +502,8 @@ function buildSeedQuestions(): QuestionnaireQuestion[] {
       section: 'Assurance',
       required: true,
       weight: 15,
+      requirementRef: null,
+      evidenceHint: 'Reference the latest assurance report or supporting evidence.',
     },
     {
       id: crypto.randomUUID(),
@@ -345,6 +513,8 @@ function buildSeedQuestions(): QuestionnaireQuestion[] {
       section: 'Follow-up',
       required: false,
       weight: 0,
+      requirementRef: null,
+      evidenceHint: 'Summarize the mitigation commitments expected from the supplier.',
     },
     {
       id: crypto.randomUUID(),
@@ -354,11 +524,13 @@ function buildSeedQuestions(): QuestionnaireQuestion[] {
       section: 'Review',
       required: false,
       weight: 0,
+      requirementRef: null,
+      evidenceHint: 'Capture reviewer commentary and escalation context.',
     },
   ];
 }
 
-function buildSeedRules(): QuestionnaireRule[] {
+function buildQuestionnaireSeedRules(): QuestionnaireRule[] {
   return [
     {
       id: crypto.randomUUID(),
@@ -381,69 +553,207 @@ function buildSeedRules(): QuestionnaireRule[] {
   ];
 }
 
+function buildAssessmentPlanSeedQuestions(): QuestionnaireQuestion[] {
+  return [
+    {
+      id: crypto.randomUUID(),
+      ref: 'AC2_ACCESS_REVIEW',
+      prompt: 'Verify that user access is reviewed, approved, and periodically revalidated for the in-scope system.',
+      type: 'boolean',
+      section: 'Access Control',
+      required: true,
+      weight: 25,
+      helpText: 'Use this line of inquiry to test access-review evidence and role approval traceability.',
+      requirementRef: 'AC-2',
+      evidenceHint: 'Review access review reports, approvals, and any role certification evidence.',
+    },
+    {
+      id: crypto.randomUUID(),
+      ref: 'CM3_CHANGE_APPROVAL',
+      prompt: 'Confirm that production changes were approved, tested, and traceable to authorized change records.',
+      type: 'boolean',
+      section: 'Change Management',
+      required: true,
+      weight: 25,
+      helpText: 'This line of inquiry checks pre-implementation approval and traceability for sampled changes.',
+      requirementRef: 'CM-3',
+      evidenceHint: 'Collect change tickets, approval records, deployment logs, and test evidence.',
+    },
+    {
+      id: crypto.randomUUID(),
+      ref: 'AU6_LOG_REVIEW',
+      prompt: 'Determine whether audit logs are reviewed and retained in accordance with the control requirement.',
+      type: 'boolean',
+      section: 'Audit & Accountability',
+      required: true,
+      weight: 20,
+      helpText: 'Use for periodic review of log-monitoring coverage and retention posture.',
+      requirementRef: 'AU-6',
+      evidenceHint: 'Review sample log reviews, retention settings, and any exception handling notes.',
+    },
+    {
+      id: crypto.randomUUID(),
+      ref: 'LOI_OBSERVATIONS',
+      prompt: 'Document observations, gaps, and differences for this assessment plan execution.',
+      type: 'text',
+      section: 'Assessment Notes',
+      required: false,
+      weight: 0,
+      helpText: 'Use this line of inquiry to capture narrative observations when a check needs follow-up.',
+      requirementRef: null,
+      evidenceHint: 'Summarize exceptions, follow-up items, or issue-generation rationale.',
+    },
+  ];
+}
+
+function buildAssessmentPlanSeedRules(): QuestionnaireRule[] {
+  return [
+    {
+      id: crypto.randomUUID(),
+      name: 'Open observations when a line of inquiry fails',
+      description: 'Show the observations line whenever a sampled control check is not satisfied.',
+      logic: 'OR',
+      active: true,
+      conditions: [
+        'Question "AC2_ACCESS_REVIEW" equals "false"',
+        'Question "CM3_CHANGE_APPROVAL" equals "false"',
+        'Question "AU6_LOG_REVIEW" equals "false"',
+      ],
+      actions: ['SHOW_QUESTIONS "LOI_OBSERVATIONS"', 'ENABLE_QUESTIONS "LOI_OBSERVATIONS"'],
+    },
+  ];
+}
+
+function buildSeedTemplateDefinitions(): QuestionnaireSeedDefinition[] {
+  return [
+    {
+      seedKey: 'questionnaire-third-party-security-review',
+      templateKind: 'questionnaire',
+      name: 'Third-Party Security Review',
+      description: 'Canonical questionnaire template for supplier diligence, exception triage, and control follow-up.',
+      audience: 'Third-party reviewers',
+      ownerTeam: 'Vendor Risk',
+      sourceFramework: 'Vendor due diligence',
+      usageNotes: 'Use this questionnaire for supplier reviews, external evidence collection, and conditional follow-up.',
+      questionnaireType: 'Vendor Risk',
+      assignmentModel: 'External respondent',
+      relatedWorkflow: 'Supplier diligence and exception triage',
+      attestationScope: 'Supplier security and compliance posture',
+      responseOwnerModel: 'Vendor contact and internal reviewer',
+      evidenceCollectionMode: 'Structured evidence collection',
+      fileUploadGuidance: 'Collect SOC reports, policy excerpts, and supporting diligence artifacts during response handling.',
+      exportMode: 'Spreadsheet-ready',
+      distributionCadence: 'Recurring or event-driven',
+      scoringMode: 'weighted',
+      status: 'active',
+      questions: buildQuestionnaireSeedQuestions(),
+      rules: buildQuestionnaireSeedRules(),
+    },
+    {
+      seedKey: 'assessment-plan-manual-audit',
+      templateKind: 'assessment-plan',
+      name: 'Manual Control Assessment Plan',
+      description: 'Reusable lines of inquiry for manual control assessments inside scoped compliance reviews.',
+      audience: 'Internal assessors',
+      ownerTeam: 'Assessment Ops',
+      sourceFramework: 'NIST 800-53 Rev. 5',
+      usageNotes:
+        'Load these lines of inquiry into manual assessments to drive consistent audit checks, observations, and follow-up.',
+      scoringMode: 'boolean',
+      status: 'active',
+      questions: buildAssessmentPlanSeedQuestions(),
+      rules: buildAssessmentPlanSeedRules(),
+    },
+  ];
+}
+
 async function ensureSeedQuestionnaires(
   env: WorkerRequestContext['env'],
   tenantId: string,
   userId: string | null,
 ): Promise<void> {
-  const row = await env.D1_MAIN.prepare(
-    `SELECT COUNT(1) AS template_count FROM questionnaire_templates WHERE tenant_id = ?`,
+  const rows = await env.D1_MAIN.prepare(
+    `SELECT id, metadata_json FROM questionnaire_templates WHERE tenant_id = ?`,
   )
     .bind(tenantId)
-    .first<{ template_count: number | null }>();
+    .all<{ id: string; metadata_json: string | null }>();
 
-  if (Number(row?.template_count ?? 0) > 0) {
-    return;
+  const existingSeedKeys = new Set(
+    (rows.results ?? [])
+      .map((row) => asJson<QuestionnaireTemplateMetadata | null>(row.metadata_json, null)?.seedKey?.trim())
+      .filter(Boolean),
+  );
+
+  for (const seed of buildSeedTemplateDefinitions()) {
+    if (existingSeedKeys.has(seed.seedKey)) {
+      continue;
+    }
+
+    const createdAt = nowIso();
+    const templateId = crypto.randomUUID();
+    const ruleSetId = crypto.randomUUID();
+    const diagnostics = buildRuleDiagnostics(seed.rules, seed.questions);
+
+    await env.D1_MAIN.batch([
+      env.D1_MAIN.prepare(
+        `INSERT INTO questionnaire_templates (
+          id, tenant_id, name, description, status, scoring_mode, audience, version,
+          questions_json, metadata_json, created_by_user_id, updated_by_user_id, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ).bind(
+        templateId,
+        tenantId,
+        seed.name,
+        seed.description,
+        seed.status,
+        seed.scoringMode,
+        seed.audience,
+        1,
+        JSON.stringify(seed.questions),
+        JSON.stringify(
+          buildTemplateMetadata({
+            templateKind: seed.templateKind,
+            sourceFramework: seed.sourceFramework ?? null,
+            usageNotes: seed.usageNotes ?? null,
+            ownerTeam: seed.ownerTeam,
+            source: 'regovise-canonical-seed',
+            seedKey: seed.seedKey,
+            questionnaireType: seed.questionnaireType ?? null,
+            assignmentModel: seed.assignmentModel ?? null,
+            relatedWorkflow: seed.relatedWorkflow ?? null,
+            attestationScope: seed.attestationScope ?? null,
+            responseOwnerModel: seed.responseOwnerModel ?? null,
+            evidenceCollectionMode: seed.evidenceCollectionMode ?? null,
+            fileUploadGuidance: seed.fileUploadGuidance ?? null,
+            exportMode: seed.exportMode ?? null,
+            distributionCadence: seed.distributionCadence ?? null,
+          }),
+        ),
+        userId,
+        userId,
+        createdAt,
+        createdAt,
+      ),
+      env.D1_MAIN.prepare(
+        `INSERT INTO questionnaire_rule_sets (
+          id, tenant_id, questionnaire_template_id, name, engine_version, rules_json, diagnostics_json,
+          created_by_user_id, updated_by_user_id, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ).bind(
+        ruleSetId,
+        tenantId,
+        templateId,
+        seed.templateKind === 'assessment-plan' ? 'Assessment plan rule set' : 'Default rule set',
+        '1.0',
+        JSON.stringify(seed.rules),
+        JSON.stringify(diagnostics),
+        userId,
+        userId,
+        createdAt,
+        createdAt,
+      ),
+    ]);
   }
-
-  const createdAt = nowIso();
-  const templateId = crypto.randomUUID();
-  const ruleSetId = crypto.randomUUID();
-  const questions = buildSeedQuestions();
-  const rules = buildSeedRules();
-  const diagnostics = buildRuleDiagnostics(rules, questions);
-
-  await env.D1_MAIN.batch([
-    env.D1_MAIN.prepare(
-      `INSERT INTO questionnaire_templates (
-        id, tenant_id, name, description, status, scoring_mode, audience, version,
-        questions_json, metadata_json, created_by_user_id, updated_by_user_id, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    ).bind(
-      templateId,
-      tenantId,
-      'Third-Party Security Review',
-      'Canonical questionnaire template for supplier diligence, exception triage, and control follow-up.',
-      'active',
-      'weighted',
-      'Third-party reviewers',
-      1,
-      JSON.stringify(questions),
-      JSON.stringify({ ownerTeam: 'Vendor Risk', source: 'regovise-canonical-seed' }),
-      userId,
-      userId,
-      createdAt,
-      createdAt,
-    ),
-    env.D1_MAIN.prepare(
-      `INSERT INTO questionnaire_rule_sets (
-        id, tenant_id, questionnaire_template_id, name, engine_version, rules_json, diagnostics_json,
-        created_by_user_id, updated_by_user_id, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    ).bind(
-      ruleSetId,
-      tenantId,
-      templateId,
-      'Default rule set',
-      '1.0',
-      JSON.stringify(rules),
-      JSON.stringify(diagnostics),
-      userId,
-      userId,
-      createdAt,
-      createdAt,
-    ),
-  ]);
 }
 
 async function listQuestionnaireSummaries(
@@ -460,6 +770,7 @@ async function listQuestionnaireSummaries(
        template.audience,
        template.version,
        template.questions_json,
+       template.metadata_json,
        template.updated_at,
        rules.rules_json
      FROM questionnaire_templates template
@@ -472,18 +783,36 @@ async function listQuestionnaireSummaries(
     .bind(tenantId)
     .all<QuestionnaireTemplateRow & { rules_json: string | null }>();
 
-  return rows.results.map((row) => ({
-    id: row.id,
-    name: row.name,
-    description: row.description,
-    status: row.status,
-    audience: row.audience,
-    scoringMode: row.scoring_mode,
-    version: row.version,
-    questionCount: asJson<QuestionnaireQuestion[]>(row.questions_json, []).length,
-    ruleCount: asJson<QuestionnaireRule[]>(row.rules_json, []).length,
-    updatedAt: row.updated_at,
-  }));
+  return rows.results.map((row) => {
+    const questions = asJson<QuestionnaireQuestion[]>(row.questions_json, []);
+    const metadata = asJson<QuestionnaireTemplateMetadata | null>(row.metadata_json, null);
+    const summary = summarizeTemplateMetadata(metadata, questions);
+    return {
+      id: row.id,
+      name: row.name,
+      description: row.description,
+      status: row.status,
+      templateKind: summary.templateKind,
+      audience: row.audience,
+      scoringMode: row.scoring_mode,
+      version: row.version,
+      questionCount: questions.length,
+      ruleCount: asJson<QuestionnaireRule[]>(row.rules_json, []).length,
+      sourceFramework: summary.sourceFramework,
+      usageNotes: summary.usageNotes,
+      questionnaireType: summary.questionnaireType,
+      assignmentModel: summary.assignmentModel,
+      relatedWorkflow: summary.relatedWorkflow,
+      attestationScope: summary.attestationScope,
+      responseOwnerModel: summary.responseOwnerModel,
+      evidenceCollectionMode: summary.evidenceCollectionMode,
+      fileUploadGuidance: summary.fileUploadGuidance,
+      exportMode: summary.exportMode,
+      distributionCadence: summary.distributionCadence,
+      mappedRequirementCount: summary.mappedRequirementCount,
+      updatedAt: row.updated_at,
+    };
+  });
 }
 
 async function getQuestionnaireTemplateRow(
@@ -559,6 +888,8 @@ async function getQuestionnaireDetail(
   const templateRow = await getQuestionnaireTemplateRow(env, tenantId, questionnaireId);
   const ruleSetRow = await getRuleSetRow(env, tenantId, questionnaireId);
   const questions = asJson<QuestionnaireQuestion[]>(templateRow.questions_json, []);
+  const metadata = asJson<QuestionnaireTemplateMetadata | null>(templateRow.metadata_json, null);
+  const summary = summarizeTemplateMetadata(metadata, questions);
   const rules = asJson<QuestionnaireRule[]>(ruleSetRow?.rules_json ?? '[]', []);
   const diagnostics = asJson<RuleDiagnostic[]>(
     ruleSetRow?.diagnostics_json ?? '[]',
@@ -571,11 +902,24 @@ async function getQuestionnaireDetail(
       name: templateRow.name,
       description: templateRow.description,
       status: templateRow.status,
+      templateKind: summary.templateKind,
       scoringMode: templateRow.scoring_mode,
       audience: templateRow.audience,
       version: templateRow.version,
       questions,
-      metadata: asJson<Record<string, unknown> | null>(templateRow.metadata_json, null),
+      metadata: metadata as Record<string, unknown> | null,
+      sourceFramework: summary.sourceFramework,
+      usageNotes: summary.usageNotes,
+      questionnaireType: summary.questionnaireType,
+      assignmentModel: summary.assignmentModel,
+      relatedWorkflow: summary.relatedWorkflow,
+      attestationScope: summary.attestationScope,
+      responseOwnerModel: summary.responseOwnerModel,
+      evidenceCollectionMode: summary.evidenceCollectionMode,
+      fileUploadGuidance: summary.fileUploadGuidance,
+      exportMode: summary.exportMode,
+      distributionCadence: summary.distributionCadence,
+      mappedRequirementCount: summary.mappedRequirementCount,
       createdAt: templateRow.created_at,
       updatedAt: templateRow.updated_at,
     },
@@ -681,9 +1025,34 @@ export async function handleBuilderRoutes(
       const questionnaireId = crypto.randomUUID();
       const ruleSetId = crypto.randomUUID();
       const timestamp = nowIso();
-      const questions = buildSeedQuestions();
-      const rules = buildSeedRules();
+      const templateKind = normalizeTemplateKind(body.templateKind);
+      const questions =
+        templateKind === 'assessment-plan' ? buildAssessmentPlanSeedQuestions() : buildQuestionnaireSeedQuestions();
+      const rules =
+        templateKind === 'assessment-plan' ? buildAssessmentPlanSeedRules() : buildQuestionnaireSeedRules();
       const diagnostics = buildRuleDiagnostics(rules, questions);
+      const metadata = buildTemplateMetadata({
+        templateKind,
+        sourceFramework: body.sourceFramework?.trim() || null,
+        usageNotes: body.usageNotes?.trim() || null,
+        ownerTeam: templateKind === 'assessment-plan' ? 'Assessment Ops' : 'Questionnaire Ops',
+        source: 'user-created',
+        questionnaireType: body.questionnaireType?.trim() || (templateKind === 'questionnaire' ? 'Compliance Intake' : null),
+        assignmentModel: body.assignmentModel?.trim() || (templateKind === 'questionnaire' ? 'User assignment' : null),
+        relatedWorkflow: body.relatedWorkflow?.trim() || (templateKind === 'questionnaire' ? 'Risk and compliance intake' : null),
+        attestationScope:
+          body.attestationScope?.trim() ||
+          (templateKind === 'questionnaire' ? 'Requirements, controls, or supporting audit inputs' : null),
+        responseOwnerModel:
+          body.responseOwnerModel?.trim() ||
+          (templateKind === 'questionnaire' ? 'Internal control owner or external respondent' : null),
+        evidenceCollectionMode:
+          body.evidenceCollectionMode?.trim() ||
+          (templateKind === 'questionnaire' ? 'Supporting evidence requested' : null),
+        fileUploadGuidance: body.fileUploadGuidance?.trim() || null,
+        exportMode: body.exportMode?.trim() || (templateKind === 'questionnaire' ? 'Spreadsheet-ready' : null),
+        distributionCadence: body.distributionCadence?.trim() || (templateKind === 'questionnaire' ? 'As needed' : null),
+      });
 
       await ctx.env.D1_MAIN.batch([
         ctx.env.D1_MAIN.prepare(
@@ -694,14 +1063,14 @@ export async function handleBuilderRoutes(
         ).bind(
           questionnaireId,
           tenantId,
-          body.name?.trim() || 'Untitled Questionnaire',
+          body.name?.trim() || (templateKind === 'assessment-plan' ? 'Untitled Assessment Plan' : 'Untitled Questionnaire'),
           body.description?.trim() || null,
           'draft',
-          'weighted',
-          body.audience?.trim() || 'Internal reviewers',
+          templateKind === 'assessment-plan' ? 'boolean' : 'weighted',
+          body.audience?.trim() || (templateKind === 'assessment-plan' ? 'Internal assessors' : 'Internal reviewers'),
           1,
           JSON.stringify(questions),
-          JSON.stringify({ ownerTeam: 'Questionnaire Ops', source: 'user-created' }),
+          JSON.stringify(metadata),
           userIdOrResponse,
           userIdOrResponse,
           timestamp,
@@ -716,7 +1085,7 @@ export async function handleBuilderRoutes(
           ruleSetId,
           tenantId,
           questionnaireId,
-          'Default rule set',
+          templateKind === 'assessment-plan' ? 'Assessment plan rule set' : 'Default rule set',
           '1.0',
           JSON.stringify(rules),
           JSON.stringify(diagnostics),
@@ -746,10 +1115,31 @@ export async function handleBuilderRoutes(
       const body = await readJson<UpdateQuestionnaireInput>(ctx.request);
       const current = await getQuestionnaireTemplateRow(ctx.env, tenantId, id);
       const nextQuestions = body.questions ?? asJson<QuestionnaireQuestion[]>(current.questions_json, []);
+      const currentMetadata = asJson<QuestionnaireTemplateMetadata | null>(current.metadata_json, null);
+      const nextTemplateKind = normalizeTemplateKind(body.templateKind ?? currentMetadata?.templateKind);
+      const nextMetadata = buildTemplateMetadata({
+        current: currentMetadata,
+        templateKind: nextTemplateKind,
+        sourceFramework: body.sourceFramework !== undefined ? body.sourceFramework?.trim() || null : undefined,
+        usageNotes: body.usageNotes !== undefined ? body.usageNotes?.trim() || null : undefined,
+        questionnaireType: body.questionnaireType !== undefined ? body.questionnaireType?.trim() || null : undefined,
+        assignmentModel: body.assignmentModel !== undefined ? body.assignmentModel?.trim() || null : undefined,
+        relatedWorkflow: body.relatedWorkflow !== undefined ? body.relatedWorkflow?.trim() || null : undefined,
+        attestationScope: body.attestationScope !== undefined ? body.attestationScope?.trim() || null : undefined,
+        responseOwnerModel:
+          body.responseOwnerModel !== undefined ? body.responseOwnerModel?.trim() || null : undefined,
+        evidenceCollectionMode:
+          body.evidenceCollectionMode !== undefined ? body.evidenceCollectionMode?.trim() || null : undefined,
+        fileUploadGuidance:
+          body.fileUploadGuidance !== undefined ? body.fileUploadGuidance?.trim() || null : undefined,
+        exportMode: body.exportMode !== undefined ? body.exportMode?.trim() || null : undefined,
+        distributionCadence:
+          body.distributionCadence !== undefined ? body.distributionCadence?.trim() || null : undefined,
+      });
 
       await ctx.env.D1_MAIN.prepare(
         `UPDATE questionnaire_templates
-            SET name = ?, description = ?, status = ?, scoring_mode = ?, audience = ?, questions_json = ?,
+            SET name = ?, description = ?, status = ?, scoring_mode = ?, audience = ?, questions_json = ?, metadata_json = ?,
                 version = version + 1, updated_by_user_id = ?, updated_at = ?
           WHERE tenant_id = ? AND id = ?`,
       )
@@ -760,6 +1150,7 @@ export async function handleBuilderRoutes(
           body.scoringMode?.trim() || current.scoring_mode,
           body.audience?.trim() || current.audience,
           JSON.stringify(nextQuestions),
+          JSON.stringify(nextMetadata),
           userIdOrResponse,
           nowIso(),
           tenantId,

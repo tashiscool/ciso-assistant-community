@@ -26,6 +26,7 @@ import { FrameworkDetailPage } from '../features/core/FrameworkDetailPage';
 import { LibrariesPage } from '../features/libraries/LibrariesPage';
 import { LibraryDetailPage } from '../features/libraries/LibraryDetailPage';
 import { RiskScenariosPage } from '../features/risk/RiskScenariosPage';
+import { ThreatModelsPage } from '../features/risk/ThreatModelsPage';
 import { FoldersPage } from '../features/iam/FoldersPage';
 import { TeamPage } from '../features/iam/TeamPage';
 import { AccessPage } from '../features/iam/AccessPage';
@@ -47,6 +48,15 @@ import { DoraReportPage } from '../features/reports/DoraReportPage';
 import { ChatWorkspacePage } from '../features/chat/ChatWorkspacePage';
 import { ImportsPage } from '../features/imports/ImportsPage';
 import { AutomationManagerPage } from '../features/integrations/AutomationManagerPage';
+import { FindingsExplorerPage } from '../features/grc/FindingsExplorerPage';
+import { FrameworkKnowledgeDetailPage } from '../features/grc/FrameworkKnowledgeDetailPage';
+import { FrameworkLibraryPage } from '../features/grc/FrameworkLibraryPage';
+import { GapAssessmentDetailPage } from '../features/grc/GapAssessmentDetailPage';
+import { GapAssessmentsPage } from '../features/grc/GapAssessmentsPage';
+import { GrcAdministrationPage } from '../features/grc/GrcAdministrationPage';
+import { ReportBundleDetailPage } from '../features/grc/ReportBundleDetailPage';
+import { ReportBundlesPage } from '../features/grc/ReportBundlesPage';
+import { FedrampProviderShellPage } from '../features/fedramp/FedrampProviderShellPage';
 import { PortalDashboardPage } from '../features/portal/PortalDashboardPage';
 import { PortalAssignmentDetailPage } from '../features/portal/PortalAssignmentDetailPage';
 import { ExportBuilderPage } from '../features/builders/ExportBuilderPage';
@@ -59,6 +69,9 @@ import { QuestionnaireOverviewPage } from '../features/builders/QuestionnaireOve
 import { QuestionnaireRulesEnginePage } from '../features/builders/QuestionnaireRulesEnginePage';
 import { RulesBuilderPage } from '../features/builders/RulesBuilderPage';
 import { WayfinderBuilderPage } from '../features/builders/WayfinderBuilderPage';
+import { ModuleDirectoryPage } from '../features/modules/ModuleDirectoryPage';
+import { SharedModuleWorkspacePage } from '../features/modules/SharedModuleWorkspacePage';
+import { SHARED_MODULE_ALIAS_ROUTES } from '../features/modules/types';
 import { AIPolicyBuilderPage } from '../features/ai/AIPolicyBuilderPage';
 import { ComplianceExportsPage } from '../features/ai/ComplianceExportsPage';
 import { ResponseAutomationPage } from '../features/ai/ResponseAutomationPage';
@@ -90,10 +103,6 @@ import { QuickStartControlPage } from '../features/ops/QuickStartControlPage';
 import {
   ActorsControlPage,
   AssetAssessmentsControlPage,
-  AssetsControlPage,
-  IncidentsControlPage,
-  PoliciesControlPage,
-  SecurityExceptionsControlPage,
   VulnerabilitiesControlPage,
 } from '../features/ops/RegistryControlPages';
 import { SearchControlRoomPage } from '../features/ops/SearchControlRoomPage';
@@ -116,6 +125,7 @@ import { SecurityPosturePage } from '../features/setup/SecurityPosturePage';
 import { ServiceAccountsPage } from '../features/setup/ServiceAccountsPage';
 import { SSOPage } from '../features/setup/SSOPage';
 import { TagsPage } from '../features/setup/TagsPage';
+import { ComplianceNavigatorRouteBridgePage } from '../features/parity/ComplianceNavigatorRouteBridgePage';
 import { LegacyRouteBridgePage } from '../features/parity/LegacyRouteBridgePage';
 import { isAuthEntryPath, isLogoutPath, resetEdgeIdentity, useEdgeIdentity } from '../shared/session/identity';
 import { useSessionBootstrap } from '../shared/session/useSessionBootstrap';
@@ -177,6 +187,7 @@ const legacyBridgeModels = [
   'ro-to',
   'scoring-assistant',
   'search',
+  'security-profiles',
   'security-exceptions',
   'settings',
   'setup-mfa',
@@ -467,6 +478,8 @@ export function AppLayout() {
             <Route path="/" element={<HomePage access={access} />} />
             <Route path="/program" element={allowedOnly(access.canUseProgramWorkspace, <ProgramControlPage access={access} />)} />
             <Route path="/program/setup" element={adminOnly(<QuickStartControlPage />)} />
+            <Route path="/modules" element={allowedOnly(access.canUseModules, <ModuleDirectoryPage />)} />
+            <Route path="/modules/:moduleKey" element={allowedOnly(access.canUseModules, <SharedModuleWorkspacePage />)} />
             <Route path="/workspace/me" element={<MePage />} />
             <Route path="/workspace/domains" element={adminOnly(<FoldersPage />)} />
             <Route path="/workspace/team" element={adminOnly(<TeamPage />)} />
@@ -490,6 +503,13 @@ export function AppLayout() {
             <Route path="/libraries/:libraryId" element={allowedOnly(access.canUseLibraries, <LibraryDetailPage />)} />
             <Route path="/frameworks" element={allowedOnly(access.canUseFrameworks, <FrameworksPage />)} />
             <Route path="/frameworks/:frameworkId" element={allowedOnly(access.canUseFrameworks, <FrameworkDetailPage />)} />
+            <Route path="/framework-library" element={allowedOnly(access.canUseFrameworks, <FrameworkLibraryPage />)} />
+            <Route path="/framework-library/:frameworkId" element={allowedOnly(access.canUseFrameworks, <FrameworkKnowledgeDetailPage />)} />
+            <Route path="/findings" element={allowedOnly(access.canUseFrameworks, <FindingsExplorerPage />)} />
+            <Route path="/gap-assessments" element={allowedOnly(access.canUseFrameworks, <GapAssessmentsPage />)} />
+            <Route path="/gap-assessments/:assessmentId" element={allowedOnly(access.canUseFrameworks, <GapAssessmentDetailPage />)} />
+            <Route path="/report-bundles" element={allowedOnly(access.canUseFrameworks, <ReportBundlesPage />)} />
+            <Route path="/report-bundles/:bundleId" element={allowedOnly(access.canUseFrameworks, <ReportBundleDetailPage />)} />
             <Route path="/assessments" element={allowedOnly(access.canUseAssessmentWorkspace, <AssessmentsPage />)} />
             <Route path="/risk-assessments/:assessmentId" element={allowedOnly(access.canUseRiskAssessments, <RiskAssessmentDetailPage />)} />
             <Route
@@ -554,11 +574,11 @@ export function AppLayout() {
             <Route path="/builders/dashboard-builder" element={adminOnly(<DashboardBuilderPage />)} />
             <Route path="/builders/rules-builder" element={adminOnly(<RulesBuilderPage />)} />
             <Route path="/builders/wayfinder-builder" element={adminOnly(<WayfinderBuilderPage />)} />
-            <Route path="/builders/questionnaire-builder/overview" element={adminOnly(<QuestionnaireOverviewPage />)} />
-            <Route path="/builders/questionnaire-builder" element={adminOnly(<QuestionnaireBuilderPage />)} />
+            <Route path="/builders/questionnaire-builder/overview" element={adminOnly(<QuestionnaireOverviewPage workspaceMode="all" />)} />
+            <Route path="/builders/questionnaire-builder" element={adminOnly(<QuestionnaireBuilderPage workspaceMode="all" />)} />
             <Route
               path="/builders/questionnaire-builder/rules-engine"
-              element={adminOnly(<QuestionnaireRulesEnginePage />)}
+              element={adminOnly(<QuestionnaireRulesEnginePage workspaceMode="all" />)}
             />
             <Route path="/features/regml" element={adminOnly(<RegMLPage />)} />
             <Route path="/features/regml/control-ai-features" element={adminOnly(<RegMLPage />)} />
@@ -570,6 +590,20 @@ export function AppLayout() {
             <Route path="/features/regml/ai-generator" element={adminOnly(<RegMLAIGeneratorPage />)} />
             <Route path="/ai-policy-builder" element={adminOnly(<AIPolicyBuilderPage />)} />
             <Route path="/features/ai-policy-builder" element={adminOnly(<AIPolicyBuilderPage />)} />
+            <Route
+              path="/security-profiles"
+              element={allowedOnly(access.canUseModules, <AIPolicyBuilderPage surface="security-profiles" />)}
+            />
+            <Route
+              path="/threat-models"
+              element={allowedOnly(
+                access.canUseModules,
+                <ThreatModelsPage
+                  canConfigureModel={access.canViewAdminNavigation}
+                  canUseRiskAssessments={access.canUseRiskAssessments}
+                />,
+              )}
+            />
             <Route path="/response-automation" element={adminOnly(<ResponseAutomationPage />)} />
             <Route path="/features/response-automation" element={adminOnly(<ResponseAutomationPage />)} />
             <Route path="/evidence-mapping" element={adminOnly(<EvidenceMappingPage />)} />
@@ -582,6 +616,8 @@ export function AppLayout() {
             <Route path="/imports" element={adminOnly(<ImportsPage />)} />
             <Route path="/automation-manager" element={adminOnly(<AutomationManagerPage />)} />
             <Route path="/features/automation-manager" element={adminOnly(<AutomationManagerPage />)} />
+            <Route path="/grc-admin" element={adminOnly(<GrcAdministrationPage />)} />
+            <Route path="/trust-center" element={adminOnly(<FedrampProviderShellPage />)} />
             <Route path="/workflow" element={internalOnly(<WorkflowControlPage />)} />
             <Route path="/features/workflow" element={internalOnly(<WorkflowControlPage />)} />
             <Route path="/utilities" element={internalOnly(<UtilitiesControlPage />)} />
@@ -596,6 +632,22 @@ export function AppLayout() {
             <Route path="/features/workbench" element={internalOnly(<WorkbenchControlPage />)} />
             <Route path="/news-feed" element={internalOnly(<NewsFeedControlPage />)} />
             <Route path="/features/news-feed" element={internalOnly(<NewsFeedControlPage />)} />
+            {SHARED_MODULE_ALIAS_ROUTES.map((entry) => (
+              <Route
+                key={entry.route}
+                path={entry.route}
+                element={allowedOnly(access.canUseModules, <SharedModuleWorkspacePage fixedModuleKey={entry.moduleKey} />)}
+              />
+            ))}
+            <Route path="/catalogues" element={allowedOnly(access.canUseModules, <Navigate replace to="/frameworks" />)} />
+            <Route path="/assessment-plans" element={allowedOnly(access.canUseModules, <QuestionnaireOverviewPage workspaceMode="assessment-plans" />)} />
+            <Route path="/questionnaires" element={allowedOnly(access.canUseModules, <QuestionnaireOverviewPage workspaceMode="questionnaires" />)} />
+            <Route path="/modules/*" element={<ComplianceNavigatorRouteBridgePage area="modules" access={access} />} />
+            <Route path="/features/*" element={<ComplianceNavigatorRouteBridgePage area="features" access={access} />} />
+            <Route path="/builders/*" element={<ComplianceNavigatorRouteBridgePage area="builders" access={access} />} />
+            <Route path="/setup/*" element={<ComplianceNavigatorRouteBridgePage area="setup" access={access} />} />
+            <Route path="/utilities/*" element={<ComplianceNavigatorRouteBridgePage area="utilities" access={access} />} />
+            <Route path="/logs" element={<ComplianceNavigatorRouteBridgePage area="logs" access={access} />} />
             <Route path="/portal" element={allowedOnly(access.canUsePortal, <PortalDashboardPage />)} />
             <Route path="/portal/assignments/:assignmentId" element={allowedOnly(access.canUsePortal, <PortalAssignmentDetailPage />)} />
             <Route path="/advanced-risk/ebios" element={allowedOnly(access.canUseAdvancedRisk, <EbiosWorkspacePage />)} />
@@ -679,10 +731,6 @@ export function AppLayout() {
               element={allowedOnly(access.canUseAdvancedRisk, <QuantitativeActionPlanPage />)}
             />
             <Route
-              path="/assets"
-              element={internalOnly(<AssetsControlPage />)}
-            />
-            <Route
               path="/asset-assessments"
               element={internalOnly(<AssetAssessmentsControlPage />)}
             />
@@ -693,18 +741,6 @@ export function AppLayout() {
             <Route
               path="/vulnerabilities"
               element={internalOnly(<VulnerabilitiesControlPage />)}
-            />
-            <Route
-              path="/policies"
-              element={adminOnly(<PoliciesControlPage />)}
-            />
-            <Route
-              path="/incidents"
-              element={internalOnly(<IncidentsControlPage />)}
-            />
-            <Route
-              path="/security-exceptions"
-              element={internalOnly(<SecurityExceptionsControlPage />)}
             />
             <Route path="/analytics" element={allowedOnly(access.canUseAnalytics, <AnalyticsControlRoomPage access={access} />)} />
             <Route path="/search" element={allowedOnly(access.canUseSearch, <SearchControlRoomPage access={access} />)} />

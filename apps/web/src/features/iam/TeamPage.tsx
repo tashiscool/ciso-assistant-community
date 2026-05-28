@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
+import { getSetupSso } from '../setup/api';
+import type { SetupSsoSnapshot } from '../setup/types';
 import { ApiClient } from '../../shared/api/client';
 import { useEdgeIdentity } from '../../shared/session/identity';
 import type { WorkspaceFolder, WorkspaceUser, WorkspaceUserGroup } from './types';
@@ -10,6 +12,7 @@ export function TeamPage() {
   const [users, setUsers] = useState<WorkspaceUser[]>([]);
   const [groups, setGroups] = useState<WorkspaceUserGroup[]>([]);
   const [folders, setFolders] = useState<WorkspaceFolder[]>([]);
+  const [ssoSnapshot, setSsoSnapshot] = useState<SetupSsoSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -45,14 +48,16 @@ export function TeamPage() {
     try {
       setLoading(true);
       setError(null);
-      const [userResponse, groupResponse, folderResponse] = await Promise.all([
+      const [userResponse, groupResponse, folderResponse, ssoResponse] = await Promise.all([
         client.get<{ data: WorkspaceUser[] }>('/iam/users'),
         client.get<{ data: WorkspaceUserGroup[] }>('/iam/user-groups'),
         client.get<{ data: WorkspaceFolder[] }>('/iam/folders'),
+        getSetupSso(),
       ]);
       setUsers(userResponse.data);
       setGroups(groupResponse.data);
       setFolders(folderResponse.data);
+      setSsoSnapshot(ssoResponse);
       if (!groupFolderId) {
         const defaultFolder =
           folderResponse.data.find((folder) => folder.contentType === 'domain') ??
@@ -71,6 +76,21 @@ export function TeamPage() {
   useEffect(() => {
     void loadWorkspaceTeam();
   }, [identity.tenantId, identity.userId]);
+
+  const ssoProviderLabel = ssoSnapshot?.config.providerType || 'OIDC SSO';
+  const tenantRequiresSso = Boolean(
+    ssoSnapshot?.config.authProtocol === 'oidc' &&
+      ssoSnapshot.config.runtimeReady &&
+      ssoSnapshot.config.loginEnforced,
+  );
+  const tenantAllowsLocalFallback = !tenantRequiresSso || Boolean(ssoSnapshot?.config.allowLocalFallback);
+  const localFallbackPolicyLocked = tenantRequiresSso && !tenantAllowsLocalFallback;
+
+  useEffect(() => {
+    if (localFallbackPolicyLocked && keepLocalLogin) {
+      setKeepLocalLogin(false);
+    }
+  }, [keepLocalLogin, localFallbackPolicyLocked]);
 
   function toggleSelection(
     currentValues: string[],
@@ -95,7 +115,7 @@ export function TeamPage() {
         firstName,
         lastName,
         locale,
-        keepLocalLogin,
+        keepLocalLogin: localFallbackPolicyLocked ? false : keepLocalLogin,
         isThirdParty,
         isAuditee,
         groupIds: selectedGroupIds,
@@ -105,7 +125,7 @@ export function TeamPage() {
       setFirstName('');
       setLastName('');
       setLocale('en');
-      setKeepLocalLogin(true);
+      setKeepLocalLogin(localFallbackPolicyLocked ? false : true);
       setIsThirdParty(false);
       setIsAuditee(false);
       setSelectedGroupIds([]);
@@ -183,6 +203,13 @@ export function TeamPage() {
           Add workspace members, define shared groups, and prepare the principal layer that scoped
           access control builds on.
         </p>
+        {tenantRequiresSso ? (
+          <div className="mt-4 rounded-2xl border border-cyan-300/15 bg-cyan-400/[0.06] px-4 py-3 text-sm text-cyan-100">
+            {tenantAllowsLocalFallback
+              ? `${ssoProviderLabel} is the primary sign-in path for this tenant. Users can link their workspace account by signing in with the same email address, and only explicitly enabled accounts keep local fallback.`
+              : `${ssoProviderLabel} is required for normal sign-in in this tenant. Users added here should sign in with the same workspace email, and local password or email-code access is disabled by tenant policy.`}
+          </div>
+        ) : null}
       </section>
 
       {notice && <div className="notice-success">{notice}</div>}
@@ -245,14 +272,22 @@ export function TeamPage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
-              <label className="panel-subtle flex items-center gap-3">
+              <label className="panel-subtle flex items-start gap-3">
                 <input
-                  checked={keepLocalLogin}
+                  checked={localFallbackPolicyLocked ? false : keepLocalLogin}
                   className="h-4 w-4 accent-cyan-400"
+                  disabled={localFallbackPolicyLocked}
                   onChange={(event) => setKeepLocalLogin(event.target.checked)}
                   type="checkbox"
                 />
-                <span className="text-sm text-slate-300">Keep local login</span>
+                <div>
+                  <div className="text-sm text-slate-300">Allow local fallback for this user</div>
+                  <div className="mt-1 text-xs text-slate-500">
+                    {localFallbackPolicyLocked
+                      ? 'Disabled because this tenant requires SSO for normal sign-in.'
+                      : 'Keep password or email-code access available for this user during rollout or recovery.'}
+                  </div>
+                </div>
               </label>
               <label className="panel-subtle flex items-center gap-3">
                 <input
@@ -410,14 +445,22 @@ export function TeamPage() {
                     )}
                   </td>
                   <td className="px-4 py-4 text-slate-300">
-                    <div>{user.keepLocalLogin ? 'Local login enabled' : 'SSO-only ready'}</div>
-                    {user.keepLocalLogin && (
+                    <div>
+                      {tenantRequiresSso
+                        ? tenantAllowsLocalFallback && user.keepLocalLogin
+                          ? 'SSO preferred with local fallback'
+                          : 'SSO managed by tenant policy'
+                        : user.keepLocalLogin
+                          ? 'Local login enabled'
+                          : 'SSO-only ready'}
+                    </div>
+                    {tenantAllowsLocalFallback && user.keepLocalLogin && (
                       <div>{user.localPasswordConfigured ? 'Password configured' : 'Password pending'}</div>
                     )}
-                    {user.keepLocalLogin && user.localPasswordResetRequired && (
+                    {tenantAllowsLocalFallback && user.keepLocalLogin && user.localPasswordResetRequired && (
                       <div>Password reset required</div>
                     )}
-                    {user.keepLocalLogin && user.localPasswordLockedUntil && (
+                    {tenantAllowsLocalFallback && user.keepLocalLogin && user.localPasswordLockedUntil && (
                       <div>Temporarily locked</div>
                     )}
                     <div>{user.isThirdParty ? 'Third-party' : 'Internal'}</div>
@@ -425,7 +468,7 @@ export function TeamPage() {
                   </td>
                   <td className="px-4 py-4 text-slate-300">{user.assignmentCount}</td>
                   <td className="px-4 py-4 text-slate-300">
-                    {user.keepLocalLogin ? (
+                    {tenantAllowsLocalFallback && user.keepLocalLogin ? (
                       <div className="space-y-3">
                         <div className="text-xs text-slate-500">
                           {user.localPasswordConfigured
@@ -492,6 +535,10 @@ export function TeamPage() {
                           </form>
                         )}
                       </div>
+                    ) : localFallbackPolicyLocked ? (
+                      <span className="text-xs text-slate-500">
+                        Disabled by tenant SSO policy.
+                      </span>
                     ) : (
                       <span className="text-xs text-slate-500">Managed by SSO policy.</span>
                     )}

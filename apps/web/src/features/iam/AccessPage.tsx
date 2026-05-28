@@ -12,6 +12,15 @@ import type {
 
 const client = new ApiClient();
 
+const TENANT_ADMIN_PERMISSIONS = new Set([
+  'add_user',
+  'change_user',
+  'delete_user',
+  'add_role',
+  'change_role',
+  'delete_role',
+]);
+
 function parsePermissions(input: string): string[] {
   return [...new Set(input.split(/[\n,]/).map((value) => value.trim()).filter(Boolean))];
 }
@@ -45,6 +54,22 @@ export function AccessPage() {
     () => folders.filter((folder) => folder.contentType === 'root' || folder.contentType === 'domain'),
     [folders],
   );
+  const rootFolder = useMemo(
+    () => folders.find((folder) => folder.id === me?.rootFolderId) ?? null,
+    [folders, me?.rootFolderId],
+  );
+  const selectedRole = useMemo(
+    () => roles.find((role) => role.id === selectedRoleId) ?? null,
+    [roles, selectedRoleId],
+  );
+  const selectedScopeFolder = useMemo(
+    () => folders.find((folder) => folder.id === selectedScopeFolderId) ?? null,
+    [folders, selectedScopeFolderId],
+  );
+  const selectedRoleCarriesTenantAdmin = Boolean(
+    selectedRole?.permissions.some((permission) => TENANT_ADMIN_PERMISSIONS.has(permission)),
+  );
+  const selectedAssignmentIsRootScoped = selectedScopeFolderId === me?.rootFolderId;
 
   async function loadAccessWorkspace() {
     try {
@@ -72,8 +97,8 @@ export function AccessPage() {
       }
       if (!selectedScopeFolderId) {
         const defaultScope =
-          folderResponse.data.find((folder) => folder.contentType === 'domain') ??
-          folderResponse.data.find((folder) => folder.contentType === 'root');
+          folderResponse.data.find((folder) => folder.contentType === 'root') ??
+          folderResponse.data.find((folder) => folder.contentType === 'domain');
         if (defaultScope) {
           setSelectedScopeFolderId(defaultScope.id);
         }
@@ -151,6 +176,11 @@ export function AccessPage() {
           Build the role catalog, assign principals to workspace scopes, and verify what the active
           identity can actually see and operate.
         </p>
+        <div className="mt-4 rounded-2xl border border-cyan-300/15 bg-cyan-400/[0.06] px-4 py-3 text-sm text-cyan-100">
+          Tenant administration follows administrator permissions, not only root-folder placement.
+          Scope still controls the regular workspace perimeter, but any assignment carrying tenant-admin
+          permissions can open setup, IAM, and other tenant administration surfaces.
+        </div>
       </section>
 
       {notice && <div className="notice-success">{notice}</div>}
@@ -354,6 +384,14 @@ export function AccessPage() {
                 </label>
               </div>
 
+              {selectedRoleCarriesTenantAdmin ? (
+                <div className="rounded-2xl border border-cyan-300/15 bg-cyan-400/[0.06] px-4 py-3 text-sm text-cyan-100">
+                  {selectedAssignmentIsRootScoped
+                    ? `This assignment grants tenant administration and full workspace visibility from ${rootFolder?.name ?? 'the tenant root'}.`
+                    : `This assignment still unlocks tenant administration because ${selectedRole?.name ?? 'the selected role'} carries administrator permissions. The chosen scope continues to define the user's normal content perimeter: ${selectedScopeFolder?.pathLabel ?? 'selected scope'}.`}
+                </div>
+              ) : null}
+
               <button className="button-primary" disabled={assignmentBusy} type="submit">
                 {assignmentBusy ? 'Saving...' : 'Assign Role'}
               </button>
@@ -415,10 +453,21 @@ export function AccessPage() {
                   <div className="mt-1 text-xs text-slate-500">
                     {assignment.isRecursive ? 'Recursive' : 'Direct only'}
                   </div>
+                  {assignment.permissions.some((permission) => TENANT_ADMIN_PERMISSIONS.has(permission)) ? (
+                    <div className="mt-1 text-xs text-cyan-300">
+                      Tenant admin enabled
+                    </div>
+                  ) : null}
                 </td>
                 <td className="px-4 py-4 text-slate-300">
                   <div>{assignment.scopeFolderName}</div>
                   <div className="mt-1 text-xs text-slate-500">{assignment.scopePathLabel}</div>
+                  {assignment.permissions.some((permission) => TENANT_ADMIN_PERMISSIONS.has(permission)) &&
+                  assignment.scopeFolderId !== me?.rootFolderId ? (
+                    <div className="mt-1 text-xs text-slate-500">
+                      Admin surface access with scoped data perimeter
+                    </div>
+                  ) : null}
                 </td>
                 <td className="px-4 py-4 text-slate-300">{assignment.permissions.length}</td>
               </tr>

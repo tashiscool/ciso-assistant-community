@@ -40,6 +40,7 @@ cf_load_prod_env() {
     echo "Missing production env file: ${env_file}" >&2
     return 1
   fi
+  env_file="$(cd "$(dirname "${env_file}")" && pwd)/$(basename "${env_file}")"
 
   local preserved_prod_base_url="${REGOVISE_PROD_BASE_URL-}"
 
@@ -156,7 +157,7 @@ cf_verify_workers_deploy_access() {
   local payload
   payload="$(curl -sS "${check_url}" -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}")"
 
-  SERVICE_NAME_FOR_CHECK="${service_name}" printf '%s' "${payload}" | node -e '
+  printf '%s' "${payload}" | SERVICE_NAME_FOR_CHECK="${service_name}" node -e '
 let raw = "";
 process.stdin.on("data", (chunk) => (raw += chunk));
 process.stdin.on("end", () => {
