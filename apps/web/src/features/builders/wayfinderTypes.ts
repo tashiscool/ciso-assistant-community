@@ -1,11 +1,18 @@
 export type WayfinderStatus = 'Active' | 'Draft' | 'Archived';
 
+export type WayfinderDocumentationLink = {
+  id: string;
+  label: string;
+  url: string;
+};
+
 export type WayfinderActivity = {
   id: string;
   title: string;
   type: string;
   description: string;
   link: string;
+  documentationLinks: WayfinderDocumentationLink[];
 };
 
 export type WayfinderStage = {

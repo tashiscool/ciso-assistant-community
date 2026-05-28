@@ -3,12 +3,19 @@ import { json, methodNotAllowed, readJson } from '../../utils/http';
 
 type WayfinderStatus = 'Active' | 'Draft' | 'Archived';
 
+type WayfinderDocumentationLink = {
+  id: string;
+  label: string;
+  url: string;
+};
+
 type WayfinderActivity = {
   id: string;
   title: string;
   type: string;
   description: string;
   link: string;
+  documentationLinks?: WayfinderDocumentationLink[];
 };
 
 type WayfinderStage = {
@@ -61,6 +68,8 @@ type CreateWayfinderInput = {
   title?: string;
   owner?: string;
   description?: string;
+  status?: WayfinderStatus;
+  stages?: WayfinderStage[];
 };
 
 type SaveWayfinderInput = {
@@ -104,6 +113,14 @@ function countActivities(stages: WayfinderStage[]) {
   return stages.reduce((total, stage) => total + stage.activities.length, 0);
 }
 
+function emptyDocumentationLink(index: number): WayfinderDocumentationLink {
+  return {
+    id: crypto.randomUUID(),
+    label: `Documentation ${index}`,
+    url: '',
+  };
+}
+
 function emptyActivity(index: number): WayfinderActivity {
   return {
     id: crypto.randomUUID(),
@@ -111,6 +128,7 @@ function emptyActivity(index: number): WayfinderActivity {
     type: 'Manual Activity',
     description: 'Describe the work needed to complete this step.',
     link: '',
+    documentationLinks: [emptyDocumentationLink(1)],
   };
 }
 
@@ -121,6 +139,97 @@ function emptyStage(index: number): WayfinderStage {
     description: 'Describe the outcome of this stage.',
     activities: [emptyActivity(1)],
   };
+}
+
+function normalizeDocumentationLinks(activity: Partial<WayfinderActivity>): WayfinderDocumentationLink[] {
+  const incoming = Array.isArray(activity.documentationLinks) ? activity.documentationLinks : [];
+  const normalized = incoming
+    .map((link, index) => ({
+      id: String(link?.id || crypto.randomUUID()),
+      label: String(link?.label || `Documentation ${index + 1}`).trim(),
+      url: String(link?.url || '').trim(),
+    }))
+    .filter((link) => link.label || link.url);
+
+  if (normalized.length === 0 && activity.link?.trim()) {
+    return [
+      {
+        id: crypto.randomUUID(),
+        label: 'Reference Link',
+        url: activity.link.trim(),
+      },
+    ];
+  }
+
+  return normalized.length > 0 ? normalized : [emptyDocumentationLink(1)];
+}
+
+function normalizeStages(stages: WayfinderStage[]): WayfinderStage[] {
+  return stages.map((stage, stageIndex) => ({
+    id: String(stage.id || crypto.randomUUID()),
+    name: String(stage.name || `Stage ${stageIndex + 1}`).trim(),
+    description: String(stage.description || '').trim(),
+    activities: (Array.isArray(stage.activities) && stage.activities.length > 0
+      ? stage.activities
+      : [emptyActivity(1)]
+    ).map((activity, activityIndex) => {
+      const documentationLinks = normalizeDocumentationLinks(activity);
+      return {
+        id: String(activity.id || crypto.randomUUID()),
+        title: String(activity.title || `Activity ${activityIndex + 1}`).trim(),
+        type: String(activity.type || 'Manual Activity').trim(),
+        description: String(activity.description || '').trim(),
+        link: String(activity.link || documentationLinks[0]?.url || '').trim(),
+        documentationLinks,
+      };
+    }),
+  }));
+}
+
+function validateWayfinderTemplate(input: {
+  title: string;
+  status: string;
+  owner: string;
+  stages: WayfinderStage[];
+}) {
+  const diagnostics: string[] = [];
+  if (!input.title.trim()) {
+    diagnostics.push('Title is required.');
+  }
+  if (!['Active', 'Draft', 'Archived'].includes(input.status)) {
+    diagnostics.push('Status must be Active, Draft, or Archived.');
+  }
+  if (!input.owner.trim()) {
+    diagnostics.push('Owner is required.');
+  }
+  if (input.stages.length === 0) {
+    diagnostics.push('At least one stage is required.');
+  }
+  input.stages.forEach((stage, stageIndex) => {
+    if (!stage.name.trim()) {
+      diagnostics.push(`Stage ${stageIndex + 1} requires a name.`);
+    }
+    if (stage.activities.length === 0) {
+      diagnostics.push(`Stage ${stageIndex + 1} requires at least one activity.`);
+    }
+    stage.activities.forEach((activity, activityIndex) => {
+      if (!activity.title.trim()) {
+        diagnostics.push(`Stage ${stageIndex + 1}, activity ${activityIndex + 1} requires a title.`);
+      }
+      if (!activity.type.trim()) {
+        diagnostics.push(`Stage ${stageIndex + 1}, activity ${activityIndex + 1} requires an activity type.`);
+      }
+      const invalidLink = (activity.documentationLinks ?? []).find(
+        (link) => link.url && !/^(https?:\/\/|\/|[A-Za-z][A-Za-z\s]+(?:\s\/\s[A-Za-z\s]+)*)/.test(link.url),
+      );
+      if (invalidLink) {
+        diagnostics.push(
+          `Stage ${stageIndex + 1}, activity ${activityIndex + 1} has an invalid documentation link: ${invalidLink.url}.`,
+        );
+      }
+    });
+  });
+  return diagnostics;
 }
 
 function seedTemplates() {
@@ -297,7 +406,7 @@ async function ensureSeedTemplates(env: WorkerRequestContext['env'], tenantId: s
 }
 
 function toSummary(row: WayfinderTemplateRow): WayfinderTemplateSummary {
-  const stages = asJson<WayfinderStage[]>(row.stages_json, []);
+  const stages = normalizeStages(asJson<WayfinderStage[]>(row.stages_json, []));
   return {
     id: row.id,
     title: row.title,
@@ -319,7 +428,7 @@ function toDetail(row: WayfinderTemplateRow): WayfinderTemplateDetail {
     owner: row.owner,
     creator: row.creator,
     description: row.description,
-    stages: asJson<WayfinderStage[]>(row.stages_json, []),
+    stages: normalizeStages(asJson<WayfinderStage[]>(row.stages_json, [])),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -372,6 +481,12 @@ export async function handleWayfinderBuilderRoutes(
       const templateId = crypto.randomUUID();
       const title = body.title?.trim() || 'New Wayfinder Template';
       const owner = body.owner?.trim() || 'Regovise Operator';
+      const status = body.status || 'Draft';
+      const stages = normalizeStages(body.stages?.length ? body.stages : [emptyStage(1)]);
+      const diagnostics = validateWayfinderTemplate({ title, status, owner, stages });
+      if (diagnostics.length > 0) {
+        return json({ error: 'invalid_wayfinder', diagnostics }, { status: 400 });
+      }
       await ctx.env.D1_MAIN.prepare(
         `INSERT INTO wayfinder_templates (
           id, tenant_id, title, status, owner, creator, description, stages_json,
@@ -382,11 +497,11 @@ export async function handleWayfinderBuilderRoutes(
           templateId,
           tenantId,
           title,
-          'Draft',
+          status,
           owner,
           owner,
           body.description?.trim() || 'Custom canonical Wayfinder template.',
-          JSON.stringify([emptyStage(1)]),
+          JSON.stringify(stages),
           userIdOrResponse,
           userIdOrResponse,
           createdAt,
@@ -398,6 +513,50 @@ export async function handleWayfinderBuilderRoutes(
     }
 
     return methodNotAllowed(['GET', 'POST']);
+  }
+
+  if (id === 'import' && !action) {
+    if (ctx.request.method !== 'POST') {
+      return methodNotAllowed(['POST']);
+    }
+    const userIdOrResponse = requireUser(ctx);
+    if (userIdOrResponse instanceof Response) {
+      return userIdOrResponse;
+    }
+    const body = await readJson<SaveWayfinderInput>(ctx.request);
+    const title = body.title?.trim() || 'Imported Wayfinder Template';
+    const status = body.status || 'Draft';
+    const owner = body.owner?.trim() || 'Regovise Operator';
+    const stages = normalizeStages(body.stages ?? []);
+    const diagnostics = validateWayfinderTemplate({ title, status, owner, stages });
+    if (diagnostics.length > 0) {
+      return json({ error: 'invalid_import', message: 'Imported template failed validation.', diagnostics }, { status: 400 });
+    }
+    const createdAt = nowIso();
+    const templateId = crypto.randomUUID();
+    await ctx.env.D1_MAIN.prepare(
+      `INSERT INTO wayfinder_templates (
+        id, tenant_id, title, status, owner, creator, description, stages_json,
+        created_by_user_id, updated_by_user_id, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+      .bind(
+        templateId,
+        tenantId,
+        title,
+        status,
+        owner,
+        owner,
+        body.description ?? 'Imported Wayfinder template.',
+        JSON.stringify(stages),
+        userIdOrResponse,
+        userIdOrResponse,
+        createdAt,
+        createdAt,
+      )
+      .run();
+    const row = await getTemplateRow(ctx.env, tenantId, templateId);
+    return row ? json({ data: toDetail(row) }, { status: 201 }) : json({ error: 'import_failed' }, { status: 500 });
   }
 
   if (!action) {
@@ -416,6 +575,14 @@ export async function handleWayfinderBuilderRoutes(
         return json({ error: 'not_found', message: 'Wayfinder template not found.' }, { status: 404 });
       }
       const body = await readJson<SaveWayfinderInput>(ctx.request);
+      const title = body.title?.trim() || current.title;
+      const status = body.status || (current.status as WayfinderStatus);
+      const owner = body.owner?.trim() || current.owner;
+      const stages = normalizeStages(body.stages ?? asJson<WayfinderStage[]>(current.stages_json, []));
+      const diagnostics = validateWayfinderTemplate({ title, status, owner, stages });
+      if (diagnostics.length > 0) {
+        return json({ error: 'invalid_wayfinder', diagnostics }, { status: 400 });
+      }
       await ctx.env.D1_MAIN.prepare(
         `UPDATE wayfinder_templates
             SET title = ?, status = ?, owner = ?, description = ?, stages_json = ?,
@@ -423,11 +590,11 @@ export async function handleWayfinderBuilderRoutes(
           WHERE tenant_id = ? AND id = ?`,
       )
         .bind(
-          body.title?.trim() || current.title,
-          body.status || current.status,
-          body.owner?.trim() || current.owner,
+          title,
+          status,
+          owner,
           body.description ?? current.description,
-          JSON.stringify(body.stages ?? asJson<WayfinderStage[]>(current.stages_json, [])),
+          JSON.stringify(stages),
           userIdOrResponse,
           nowIso(),
           tenantId,
@@ -465,12 +632,13 @@ export async function handleWayfinderBuilderRoutes(
       return json({ error: 'not_found' }, { status: 404 });
     }
     const body = await readJson<SaveWayfinderInput>(ctx.request);
-    const stages = body.stages ?? [];
-    if (stages.length === 0) {
-      return json(
-        { error: 'invalid_import', message: 'Imported template must include at least one stage.' },
-        { status: 400 },
-      );
+    const title = body.title?.trim() || current.title;
+    const status = body.status || (current.status as WayfinderStatus);
+    const owner = body.owner?.trim() || current.owner;
+    const stages = normalizeStages(body.stages ?? []);
+    const diagnostics = validateWayfinderTemplate({ title, status, owner, stages });
+    if (diagnostics.length > 0) {
+      return json({ error: 'invalid_import', message: 'Imported template failed validation.', diagnostics }, { status: 400 });
     }
     await ctx.env.D1_MAIN.prepare(
       `UPDATE wayfinder_templates
@@ -479,9 +647,9 @@ export async function handleWayfinderBuilderRoutes(
         WHERE tenant_id = ? AND id = ?`,
     )
       .bind(
-        body.title?.trim() || current.title,
-        body.status || current.status,
-        body.owner?.trim() || current.owner,
+        title,
+        status,
+        owner,
         body.description ?? current.description,
         JSON.stringify(stages),
         userIdOrResponse,

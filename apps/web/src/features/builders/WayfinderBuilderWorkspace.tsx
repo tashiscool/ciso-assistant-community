@@ -22,12 +22,14 @@ import {
   createWayfinderTemplate,
   deleteWayfinderTemplate,
   getWayfinderTemplate,
+  importNewWayfinderTemplate,
   importWayfinderTemplate,
   listWayfinderTemplates,
   saveWayfinderTemplate,
 } from './wayfinderApi';
 import type {
   WayfinderActivity,
+  WayfinderDocumentationLink,
   WayfinderStage,
   WayfinderTemplateDetail,
   WayfinderTemplateSummary,
@@ -52,6 +54,14 @@ function reorder<T>(items: T[], index: number, direction: 'up' | 'down'): T[] {
   return next;
 }
 
+function emptyDocumentationLink(index: number): WayfinderDocumentationLink {
+  return {
+    id: crypto.randomUUID(),
+    label: `Documentation ${index}`,
+    url: '',
+  };
+}
+
 function emptyActivity(index: number): WayfinderActivity {
   return {
     id: crypto.randomUUID(),
@@ -59,6 +69,7 @@ function emptyActivity(index: number): WayfinderActivity {
     type: 'Manual Activity',
     description: 'Describe the work needed to complete this step.',
     link: '',
+    documentationLinks: [emptyDocumentationLink(1)],
   };
 }
 
@@ -74,6 +85,32 @@ function emptyStage(index: number): WayfinderStage {
 const owners = ['Aria Patel', 'Maya Ellison', 'Jon Park', 'Priya Ramesh', 'Regovise Operator'];
 const activityTypes = ['Manual Activity', 'Approval Activity', 'Evidence Activity', 'Review Activity'];
 
+function normalizeImportedStages(stages: WayfinderStage[] | undefined): WayfinderStage[] {
+  return (stages?.length ? stages : [emptyStage(1)]).map((stage, stageIndex) => ({
+    ...stage,
+    id: stage.id || crypto.randomUUID(),
+    name: stage.name || `Stage ${stageIndex + 1}`,
+    description: stage.description ?? '',
+    activities: (stage.activities?.length ? stage.activities : [emptyActivity(1)]).map((activity, activityIndex) => {
+      const documentationLinks =
+        activity.documentationLinks?.length
+          ? activity.documentationLinks
+          : activity.link
+            ? [{ id: crypto.randomUUID(), label: 'Reference Link', url: activity.link }]
+            : [emptyDocumentationLink(1)];
+      return {
+        ...activity,
+        id: activity.id || crypto.randomUUID(),
+        title: activity.title || `Activity ${activityIndex + 1}`,
+        type: activity.type || 'Manual Activity',
+        description: activity.description ?? '',
+        link: activity.link ?? documentationLinks[0]?.url ?? '',
+        documentationLinks,
+      };
+    }),
+  }));
+}
+
 export function WayfinderBuilderWorkspace() {
   const { identity } = useEdgeIdentity();
   const [templates, setTemplates] = useState<WayfinderTemplateSummary[]>([]);
@@ -84,6 +121,7 @@ export function WayfinderBuilderWorkspace() {
   const [newTemplateTitle, setNewTemplateTitle] = useState('');
   const [newTemplateOwner, setNewTemplateOwner] = useState('Regovise Operator');
   const [selectedStageId, setSelectedStageId] = useState<string | null>(null);
+  const [importMode, setImportMode] = useState<'selected' | 'new'>('selected');
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -179,14 +217,15 @@ export function WayfinderBuilderWorkspace() {
   const selectedStage =
     draft?.stages.find((stage) => stage.id === selectedStageId) ?? draft?.stages[0] ?? null;
 
-  async function handleCreateTemplate() {
+  async function handleCreateTemplate(input?: { title?: string; owner?: string; description?: string }) {
     try {
       setSaving(true);
       setError(null);
       setNotice(null);
       const created = await createWayfinderTemplate({
-        title: newTemplateTitle || undefined,
-        owner: newTemplateOwner || undefined,
+        title: input?.title ?? (newTemplateTitle || undefined),
+        owner: input?.owner ?? (newTemplateOwner || undefined),
+        description: input?.description,
       });
       setNewTemplateTitle('');
       setNewTemplateOwner('Regovise Operator');
@@ -258,9 +297,11 @@ export function WayfinderBuilderWorkspace() {
       [
         JSON.stringify(
           {
+            schemaVersion: 1,
             title: draft.title,
             status: draft.status,
             owner: draft.owner,
+            creator: draft.creator,
             description: draft.description,
             stages: draft.stages,
           },
@@ -279,8 +320,8 @@ export function WayfinderBuilderWorkspace() {
     setNotice('Wayfinder template exported to JSON.');
   }
 
-  async function handleImport(file: File) {
-    if (!draft) {
+  async function handleImport(file: File, mode: 'selected' | 'new' = 'selected') {
+    if (!draft && mode === 'selected') {
       return;
     }
     try {
@@ -295,17 +336,32 @@ export function WayfinderBuilderWorkspace() {
         description?: string | null;
         stages?: WayfinderTemplateDetail['stages'];
       };
-      const imported = await importWayfinderTemplate(draft.id, {
-        title: parsed.title ?? draft.title,
-        status: parsed.status ?? draft.status,
-        owner: parsed.owner ?? draft.owner,
-        description: parsed.description ?? draft.description,
-        stages: parsed.stages ?? draft.stages,
-      });
+      const stages = normalizeImportedStages(parsed.stages);
+      const imported =
+        mode === 'new'
+          ? await importNewWayfinderTemplate({
+              title: parsed.title ?? 'Imported Wayfinder Template',
+              status: parsed.status ?? 'Draft',
+              owner: parsed.owner ?? 'Regovise Operator',
+              description: parsed.description ?? 'Imported Wayfinder template.',
+              stages,
+            })
+          : await importWayfinderTemplate(draft!.id, {
+              title: parsed.title ?? draft!.title,
+              status: parsed.status ?? draft!.status,
+              owner: parsed.owner ?? draft!.owner,
+              description: parsed.description ?? draft!.description,
+              stages,
+            });
       setDetail(imported);
       setDraft(clone(imported));
       await loadTemplates();
-      setNotice('Wayfinder template imported into the canonical builder service.');
+      setSelectedId(imported.id);
+      setNotice(
+        mode === 'new'
+          ? 'Wayfinder template imported as a new canonical template.'
+          : 'Wayfinder template imported into the selected canonical builder template.',
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to import Wayfinder template.');
     } finally {
@@ -330,7 +386,7 @@ export function WayfinderBuilderWorkspace() {
         onChange={(event) => {
           const file = event.target.files?.[0];
           if (file) {
-            void handleImport(file);
+            void handleImport(file, importMode);
           }
         }}
       />
@@ -355,9 +411,27 @@ export function WayfinderBuilderWorkspace() {
               <Download className="mr-2 h-4 w-4" />
               Export
             </button>
-            <button className="button-secondary" onClick={() => importRef.current?.click()} type="button">
+            <button
+              className="button-secondary"
+              onClick={() => {
+                setImportMode('selected');
+                importRef.current?.click();
+              }}
+              type="button"
+            >
               <Upload className="mr-2 h-4 w-4" />
-              Import
+              Import Into Selected
+            </button>
+            <button
+              className="button-secondary"
+              onClick={() => {
+                setImportMode('new');
+                importRef.current?.click();
+              }}
+              type="button"
+            >
+              <FileJson className="mr-2 h-4 w-4" />
+              Import JSON as New
             </button>
             <button className="button-secondary" onClick={() => void handleDelete()} type="button">
               <Trash2 className="mr-2 h-4 w-4" />
@@ -402,6 +476,35 @@ export function WayfinderBuilderWorkspace() {
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
+          <div>
+            <label className="label">Template Selector</label>
+            <select
+              aria-label="Wayfinder template selector"
+              className="input mt-2"
+              value={selectedId ?? ''}
+              onChange={(event) => {
+                if (event.target.value === '__new__') {
+                  void handleCreateTemplate({
+                    title: newTemplateTitle || 'New Wayfinder Template',
+                    owner: newTemplateOwner,
+                    description: 'New blank Wayfinder template created from the selector.',
+                  });
+                  return;
+                }
+                setSelectedId(event.target.value);
+              }}
+            >
+              <option value="" disabled>
+                Select a Wayfinder template
+              </option>
+              <option value="__new__">New blank Wayfinder template</option>
+              {templates.map((template) => (
+                <option key={template.id} value={template.id}>
+                  {template.title}
+                </option>
+              ))}
+            </select>
+          </div>
           <form
             className="space-y-3"
             onSubmit={(event) => {
@@ -415,47 +518,58 @@ export function WayfinderBuilderWorkspace() {
               value={newTemplateTitle}
               onChange={(event) => setNewTemplateTitle(event.target.value)}
             />
-            <select
+            <input
               className="input"
+              list="wayfinder-owner-options"
+              placeholder="Owner"
               value={newTemplateOwner}
               onChange={(event) => setNewTemplateOwner(event.target.value)}
-            >
+            />
+            <datalist id="wayfinder-owner-options">
               {owners.map((owner) => (
-                <option key={owner} value={owner}>
-                  {owner}
-                </option>
+                <option key={owner} value={owner} />
               ))}
-            </select>
+            </datalist>
             <button className="button-secondary w-full" disabled={saving} type="submit">
               <Plus className="mr-2 h-4 w-4" />
-              Create Template
+              New
             </button>
           </form>
           <div className="space-y-3">
             {filteredTemplates.map((template) => (
-              <button
+              <div
                 key={template.id}
                 className={`panel-subtle w-full text-left transition ${
                   selectedId === template.id ? 'border-cyan-300/30 bg-cyan-400/[0.04]' : 'hover:border-cyan-300/20'
                 }`}
-                onClick={() => setSelectedId(template.id)}
-                type="button"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="font-medium text-white">{template.title}</div>
-                    <div className="mt-1 text-sm text-slate-400">{template.owner}</div>
+                    <div className="mt-1 text-xs text-slate-500">ID {template.id}</div>
+                    <div className="mt-2 text-sm text-slate-400">
+                      Creator {template.creator} · Owner {template.owner}
+                    </div>
                   </div>
                   <span className={template.status === 'Active' ? 'badge-success' : 'badge-neutral'}>
                     {template.status}
                   </span>
                 </div>
+                {template.description && (
+                  <div className="mt-3 text-sm leading-6 text-slate-300">{template.description}</div>
+                )}
                 <div className="mt-4 flex flex-wrap gap-2">
                   <span className="badge-neutral">{template.stageCount} stages</span>
                   <span className="badge-neutral">{template.activityCount} activities</span>
                 </div>
-                <div className="mt-3 text-xs text-slate-500">Updated {formatDate(template.lastUpdated)}</div>
-              </button>
+                <div className="mt-4 flex items-center justify-between gap-3">
+                  <div className="text-xs text-slate-500">Updated {formatDate(template.lastUpdated)}</div>
+                  <button className="button-secondary px-3 py-2" onClick={() => setSelectedId(template.id)} type="button">
+                    <Eye className="mr-2 h-4 w-4" />
+                    View
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
         </aside>
@@ -494,17 +608,12 @@ export function WayfinderBuilderWorkspace() {
                   </div>
                   <div>
                     <label className="label">Owner</label>
-                    <select
+                    <input
                       className="input mt-2"
+                      list="wayfinder-owner-options"
                       value={draft.owner}
                       onChange={(event) => setDraft({ ...draft, owner: event.target.value })}
-                    >
-                      {owners.map((owner) => (
-                        <option key={owner} value={owner}>
-                          {owner}
-                        </option>
-                      ))}
-                    </select>
+                    />
                   </div>
                   <div>
                     <label className="label">Creator</label>
@@ -805,28 +914,152 @@ export function WayfinderBuilderWorkspace() {
                                   />
                                 </div>
                                 <div className="md:col-span-2">
-                                  <label className="label">Reference Link</label>
-                                  <input
-                                    className="input mt-2"
-                                    value={activity.link}
-                                    onChange={(event) =>
-                                      setDraft({
-                                        ...draft,
-                                        stages: draft.stages.map((entry) =>
-                                          entry.id === stage.id
-                                            ? {
-                                                ...entry,
-                                                activities: entry.activities.map((item) =>
-                                                  item.id === activity.id
-                                                    ? { ...item, link: event.target.value }
-                                                    : item,
-                                                ),
-                                              }
-                                            : entry,
-                                        ),
-                                      })
-                                    }
-                                  />
+                                  <div className="mb-3 flex items-center justify-between gap-3">
+                                    <label className="label">Documentation Links</label>
+                                    <button
+                                      className="button-secondary"
+                                      onClick={() =>
+                                        setDraft({
+                                          ...draft,
+                                          stages: draft.stages.map((entry) =>
+                                            entry.id === stage.id
+                                              ? {
+                                                  ...entry,
+                                                  activities: entry.activities.map((item) =>
+                                                    item.id === activity.id
+                                                      ? {
+                                                          ...item,
+                                                          documentationLinks: [
+                                                            ...(item.documentationLinks?.length
+                                                              ? item.documentationLinks
+                                                              : [emptyDocumentationLink(1)]),
+                                                            emptyDocumentationLink((item.documentationLinks?.length ?? 1) + 1),
+                                                          ],
+                                                        }
+                                                      : item,
+                                                  ),
+                                                }
+                                              : entry,
+                                          ),
+                                        })
+                                      }
+                                      type="button"
+                                    >
+                                      <Plus className="mr-2 h-4 w-4" />
+                                      Add Documentation Link
+                                    </button>
+                                  </div>
+                                  <div className="space-y-3">
+                                    {(activity.documentationLinks?.length
+                                      ? activity.documentationLinks
+                                      : [emptyDocumentationLink(1)]
+                                    ).map((docLink, docLinkIndex) => (
+                                      <div
+                                        key={docLink.id}
+                                        className="grid gap-3 rounded-2xl border border-white/10 bg-slate-950/50 p-3 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)_auto]"
+                                      >
+                                        <input
+                                          className="input"
+                                          aria-label="Documentation label"
+                                          placeholder="Label"
+                                          value={docLink.label}
+                                          onChange={(event) =>
+                                            setDraft({
+                                              ...draft,
+                                              stages: draft.stages.map((entry) =>
+                                                entry.id === stage.id
+                                                  ? {
+                                                      ...entry,
+                                                      activities: entry.activities.map((item) =>
+                                                        item.id === activity.id
+                                                          ? {
+                                                              ...item,
+                                                              documentationLinks: (
+                                                                item.documentationLinks?.length
+                                                                  ? item.documentationLinks
+                                                                  : [docLink]
+                                                              ).map((link) =>
+                                                                link.id === docLink.id
+                                                                  ? { ...link, label: event.target.value }
+                                                                  : link,
+                                                              ),
+                                                            }
+                                                          : item,
+                                                      ),
+                                                    }
+                                                  : entry,
+                                              ),
+                                            })
+                                          }
+                                        />
+                                        <input
+                                          className="input"
+                                          aria-label="Documentation URL"
+                                          placeholder="URL or module path"
+                                          value={docLink.url}
+                                          onChange={(event) =>
+                                            setDraft({
+                                              ...draft,
+                                              stages: draft.stages.map((entry) =>
+                                                entry.id === stage.id
+                                                  ? {
+                                                      ...entry,
+                                                      activities: entry.activities.map((item) =>
+                                                        item.id === activity.id
+                                                          ? {
+                                                              ...item,
+                                                              link: docLinkIndex === 0 ? event.target.value : item.link,
+                                                              documentationLinks: (
+                                                                item.documentationLinks?.length
+                                                                  ? item.documentationLinks
+                                                                  : [docLink]
+                                                              ).map((link) =>
+                                                                link.id === docLink.id
+                                                                  ? { ...link, url: event.target.value }
+                                                                  : link,
+                                                              ),
+                                                            }
+                                                          : item,
+                                                      ),
+                                                    }
+                                                  : entry,
+                                              ),
+                                            })
+                                          }
+                                        />
+                                        <button
+                                          className="button-secondary px-3 py-2 text-rose-200"
+                                          onClick={() =>
+                                            setDraft({
+                                              ...draft,
+                                              stages: draft.stages.map((entry) =>
+                                                entry.id === stage.id
+                                                  ? {
+                                                      ...entry,
+                                                      activities: entry.activities.map((item) =>
+                                                        item.id === activity.id
+                                                          ? {
+                                                              ...item,
+                                                              documentationLinks: (
+                                                                item.documentationLinks?.length
+                                                                  ? item.documentationLinks
+                                                                  : [docLink]
+                                                              ).filter((link) => link.id !== docLink.id),
+                                                            }
+                                                          : item,
+                                                      ),
+                                                    }
+                                                  : entry,
+                                              ),
+                                            })
+                                          }
+                                          type="button"
+                                        >
+                                          <X className="h-4 w-4" />
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
                               </div>
                             </div>

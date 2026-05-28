@@ -772,6 +772,19 @@ function trackExportBuilderConfig(config) {
   });
 }
 
+function trackWayfinderTemplate(template) {
+  return trackArtifact({
+    type: 'wayfinder-template',
+    id: template.id,
+    title: template.title,
+    route: '/builders/wayfinder-builder',
+    cleanupMethod: 'delete',
+    cleanup: async (context) => {
+      await jsonRequest(context.request, 'DELETE', `/builders/wayfinders/${template.id}`, null, { allowStatuses: [404] });
+    },
+  });
+}
+
 async function createModuleRecordFixture(context, entry, folderId) {
   const title = `${MARKER} ${entry.pluralName} fixture`;
   const created = await jsonRequest(context.request, 'POST', `/core/modules/${entry.moduleKey}/records`, {
@@ -1296,6 +1309,174 @@ async function validateExportBuilderWorkflow(context, page) {
   return { exportBuilderConfigId: created.id, mappedTags: testResult.mappedTags, subTemplates: testResult.subTemplates };
 }
 
+async function validateWayfinderBuilderWorkflow(context, page) {
+  const listPayload = await jsonRequest(context.request, 'GET', '/builders/wayfinders');
+  const seededTemplates = asArray(listPayload?.data?.templates);
+  for (const title of [
+    'RMF Authorization Wayfinder',
+    'FedRAMP Readiness Wayfinder',
+    'Internal Audit Preparation Wayfinder',
+    'Annual Security Review Wayfinder',
+  ]) {
+    assert(seededTemplates.some((template) => template.title === title), `Wayfinder Builder missing seeded template: ${title}`);
+  }
+
+  const createdPayload = await jsonRequest(
+    context.request,
+    'POST',
+    '/builders/wayfinders',
+    {
+      title: `${MARKER} Wayfinder`,
+      owner: 'Regovise E2E Owner',
+      description: `${MARKER} created to validate Wayfinder Builder templates.`,
+    },
+    { retries: 3 },
+  );
+  const created = createdPayload?.data;
+  assert(created?.id, 'Wayfinder template creation failed.');
+  trackWayfinderTemplate(created);
+
+  const stages = [
+    {
+      id: crypto.randomUUID(),
+      name: `${MARKER} Intake`,
+      description: 'Collect scope and audit context before certification work starts.',
+      activities: [
+        {
+          id: crypto.randomUUID(),
+          title: `${MARKER} Confirm scope`,
+          type: 'Manual Activity',
+          description: 'Confirm certification scope, owner, deadline, and evidence sources.',
+          link: '/modules/security-plans',
+          documentationLinks: [
+            {
+              id: crypto.randomUUID(),
+              label: 'Security Plan Workspace',
+              url: '/modules/security-plans',
+            },
+            {
+              id: crypto.randomUUID(),
+              label: 'Internal Process Guide',
+              url: 'https://regovise.com/builders/wayfinder-builder',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: crypto.randomUUID(),
+      name: `${MARKER} Evidence Review`,
+      description: 'Track evidence refresh and final review tasks.',
+      activities: [
+        {
+          id: crypto.randomUUID(),
+          title: `${MARKER} Review evidence`,
+          type: 'Evidence Activity',
+          description: 'Review evidence freshness and route gaps to owners.',
+          link: '/evidence-management',
+          documentationLinks: [
+            {
+              id: crypto.randomUUID(),
+              label: 'Evidence Workspace',
+              url: '/evidence-management',
+            },
+          ],
+        },
+        {
+          id: crypto.randomUUID(),
+          title: `${MARKER} Approval checkpoint`,
+          type: 'Approval Activity',
+          description: 'Confirm certification readiness with the accountable owner.',
+          link: '/workbench',
+          documentationLinks: [
+            {
+              id: crypto.randomUUID(),
+              label: 'Workbench',
+              url: '/workbench',
+            },
+          ],
+        },
+      ],
+    },
+  ];
+
+  const savedPayload = await jsonRequest(
+    context.request,
+    'PUT',
+    `/builders/wayfinders/${created.id}`,
+    {
+      title: created.title,
+      status: 'Active',
+      owner: 'Regovise E2E Owner',
+      description: `${MARKER} active Wayfinder with stages, activities, and documentation links.`,
+      stages,
+    },
+    { retries: 3 },
+  );
+  const saved = savedPayload?.data;
+  assert(saved?.status === 'Active', 'Wayfinder template did not save as Active.');
+  assert(asArray(saved?.stages).length === 2, 'Wayfinder template did not persist two stages.');
+  assert(
+    JSON.stringify(saved.stages).includes('documentationLinks') && JSON.stringify(saved.stages).includes('Security Plan Workspace'),
+    'Wayfinder template did not persist documentation links.',
+  );
+
+  const importedPayload = await jsonRequest(
+    context.request,
+    'POST',
+    '/builders/wayfinders/import',
+    {
+      title: `${MARKER} Imported Wayfinder`,
+      status: 'Draft',
+      owner: 'Regovise E2E Owner',
+      description: `${MARKER} imported as a new template from JSON.`,
+      stages,
+    },
+    { retries: 3 },
+  );
+  const imported = importedPayload?.data;
+  assert(imported?.id && imported.id !== created.id, 'Wayfinder import-as-new did not create a distinct template.');
+  trackWayfinderTemplate(imported);
+
+  await page.goto(absoluteUrl('/builders/wayfinder-builder'));
+  await waitForSettledPage(page);
+  await page.getByPlaceholder(/Search templates/i).fill(MARKER);
+  await page.getByText(created.title, { exact: false }).first().waitFor({ state: 'visible', timeout: 12000 });
+  let bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  for (const marker of [
+    'Template Selector',
+    'New blank Wayfinder Template',
+    'Import JSON as New',
+    'Import Into Selected',
+    'ID',
+    'Creator',
+    'Owner',
+    'View',
+    'Stage Builder',
+    'Activities',
+    'Documentation Links',
+  ]) {
+    assert(bodyText.toLowerCase().includes(marker.toLowerCase()), `Wayfinder Builder UI did not expose ${marker}.`);
+  }
+
+  await page.locator('.panel-subtle').filter({ hasText: created.title }).getByRole('button', { name: /View/i }).click();
+  await page.getByDisplayValue(created.title).waitFor({ state: 'visible', timeout: 12000 });
+  await page.getByText(`${MARKER} Intake`, { exact: false }).waitFor({ state: 'visible', timeout: 12000 });
+  await page.getByText(`${MARKER} Confirm scope`, { exact: false }).waitFor({ state: 'visible', timeout: 12000 });
+  await page.getByRole('button', { name: /Add Documentation Link/i }).first().waitFor({ state: 'visible', timeout: 12000 });
+  bodyText = await page.locator('body').innerText({ timeout: 12000 });
+  assert(bodyText.includes('Manual Activity'), 'Wayfinder activity type was not visible.');
+  assert(bodyText.includes('Evidence Activity'), 'Wayfinder evidence activity type was not visible.');
+  assert(bodyText.includes('Security Plan Workspace'), 'Wayfinder documentation link label was not visible.');
+
+  return {
+    templateId: created.id,
+    importedTemplateId: imported.id,
+    stages: saved.stages.length,
+    activities: saved.stages.reduce((total, stage) => total + asArray(stage.activities).length, 0),
+  };
+}
+
 async function validateIamMutation(context, page, tenantContext) {
   const email = `${RUN_ID}@example.invalid`.toLowerCase();
   const userPayload = await jsonRequest(context.request, 'POST', '/iam/users', {
@@ -1432,6 +1613,13 @@ async function verifyNoExportBuilderResidue(context) {
   return { activeResidues: residues.length };
 }
 
+async function verifyNoWayfinderResidue(context) {
+  const payload = await jsonRequest(context.request, 'GET', '/builders/wayfinders');
+  const residues = asArray(payload?.data?.templates).filter((item) => JSON.stringify(item).includes(RUN_ID));
+  assert(residues.length === 0, `Wayfinder Builder test-owned templates remain: ${JSON.stringify(residues)}`);
+  return { activeResidues: residues.length };
+}
+
 async function cleanupArtifacts(context) {
   for (const artifact of cleanupStack.reverse()) {
     const startedAt = new Date().toISOString();
@@ -1534,10 +1722,11 @@ async function main() {
     await runCheck(seededData, 'builder surfaces', () => validateBuilderSurfaces(page, modules));
     if (!READ_ONLY) {
       await runCheck(seededData, 'export builder semantic workflow', () => validateExportBuilderWorkflow(context, page));
+      await runCheck(seededData, 'wayfinder builder semantic workflow', () => validateWayfinderBuilderWorkflow(context, page));
     } else {
       report.skips.push({
         suite: 'seeded data and module directory',
-        reason: 'E2E_READ_ONLY=1 was set; Export Builder mutation workflow was skipped.',
+        reason: 'E2E_READ_ONLY=1 was set; builder mutation workflows were skipped.',
       });
     }
     finishSuite(seededData);
@@ -1583,6 +1772,7 @@ async function main() {
       await runCheck(cleanupSuite, 'verify no active module residue', () => verifyNoActiveModuleResidue(context));
       await runCheck(cleanupSuite, 'verify no IAM residue', () => verifyNoIamResidue(context));
       await runCheck(cleanupSuite, 'verify no Export Builder residue', () => verifyNoExportBuilderResidue(context));
+      await runCheck(cleanupSuite, 'verify no Wayfinder Builder residue', () => verifyNoWayfinderResidue(context));
     } else {
       report.skips.push({
         suite: 'cleanup verification',

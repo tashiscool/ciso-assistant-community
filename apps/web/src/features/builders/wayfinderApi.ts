@@ -12,8 +12,21 @@ export async function createWayfinderTemplate(body?: {
   title?: string;
   owner?: string;
   description?: string;
+  status?: WayfinderTemplateDetail['status'];
+  stages?: WayfinderTemplateDetail['stages'];
 }): Promise<WayfinderTemplateDetail> {
   const response = await client.post<{ data: WayfinderTemplateDetail }>('/builders/wayfinders', body ?? {});
+  return response.data;
+}
+
+export async function importNewWayfinderTemplate(body: {
+  title: string;
+  status: WayfinderTemplateDetail['status'];
+  owner: string;
+  description: string | null;
+  stages: WayfinderTemplateDetail['stages'];
+}): Promise<WayfinderTemplateDetail> {
+  const response = await client.post<{ data: WayfinderTemplateDetail }>('/builders/wayfinders/import', body);
   return response.data;
 }
 
