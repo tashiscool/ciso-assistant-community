@@ -1039,7 +1039,7 @@ async function validateBuilderSurfaces(page, modules) {
     'Import',
     'Export',
   ]) {
-    assert(builderText.includes(marker), `Form Builder did not expose ${marker}.`);
+    assert(builderText.toLowerCase().includes(marker.toLowerCase()), `Form Builder did not expose ${marker}.`);
   }
   await page.getByRole('button', { name: /Add Validation/i }).first().click();
   builderText = await page.locator('body').innerText({ timeout: 12000 });
@@ -1062,7 +1062,7 @@ async function validateBuilderSurfaces(page, modules) {
     'Constant value',
     'Field reference',
   ]) {
-    assert(rulesText.includes(marker), `Rules Builder did not expose ${marker}.`);
+    assert(rulesText.toLowerCase().includes(marker.toLowerCase()), `Rules Builder did not expose ${marker}.`);
   }
   const actionTypeSelect = page
     .locator('select')

@@ -3700,8 +3700,11 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
     if (searchParams.get('create') === 'true') {
       setIsCreating(true);
       setSelectedRecordId(null);
+      if (moduleEntry) {
+        setDraft(createBlankDraft(moduleEntry, baseRenderableSections, domainFolders[0]?.id ?? ''));
+      }
     }
-  }, [searchParams]);
+  }, [baseRenderableSections, domainFolders, moduleEntry, searchParams]);
 
   useEffect(() => {
     if (isCreating) {
@@ -3853,6 +3856,7 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
               onClick={() => {
                 setIsCreating(true);
                 setSelectedRecordId(null);
+                setDraft(createBlankDraft(moduleEntry, baseRenderableSections, domainFolders[0]?.id ?? ''));
                 setSearchParams((current) => {
                   const next = new URLSearchParams(current);
                   next.delete('record');
