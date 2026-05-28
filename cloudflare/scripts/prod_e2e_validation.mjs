@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const frontendRequire = createRequire(path.resolve(scriptDir, '../../frontend/package.json'));
+const scaleMdPath = path.resolve(scriptDir, '../../features/scale.md');
 
 let chromium;
 try {
@@ -63,6 +64,48 @@ const EXPECTED_SCALE_MODULE_KEYS = [
   'tasks',
   'threats',
 ];
+
+const SCALE_MD_HEADING_IGNORES = new Set([
+  'RegScale Manual Assessments Guide',
+  'How to Perform a Manual Assessment in RegScale',
+]);
+
+const SCALE_MD_HEADING_TO_MODULE_KEY = new Map([
+  ['Assets', 'assets'],
+  ['Assessments', 'assessments'],
+  ['Assessment Plans', 'assessment-plans'],
+  ['Capabilities', 'capabilities'],
+  ['Case Management', 'case-management'],
+  ['Catalogues', 'catalogues'],
+  ['Import Regscale Catalogs', 'import-regscale-catalogs'],
+  ['Causal Analysis', 'causal-analysis'],
+  ['Changes', 'changes'],
+  ['Components', 'components'],
+  ['Data Calls', 'data-calls'],
+  ['Evidence Locker', 'evidence-locker'],
+  ['Exceptions', 'exceptions'],
+  ['Incidents', 'incidents'],
+  ['Interconnections', 'interconnections'],
+  ['Policies', 'policies'],
+  ['Programs', 'programs'],
+  ['Projects', 'projects'],
+  ['Questionnaires', 'questionnaires'],
+  ['Requirements', 'requirements'],
+  ['Risks', 'risks'],
+  ['Security Controls', 'security-controls'],
+  ['Security Plans', 'security-plans'],
+  ['Supply Chain', 'supply-chain'],
+  ['Tasks', 'tasks'],
+  ['Threats', 'threats'],
+]);
+
+const SCALE_MD_SEMANTIC_SURFACES = new Map([
+  ['assessments', { implementationType: 'dedicated-workspace', semanticSurface: '/assessments' }],
+  ['assessment-plans', { implementationType: 'template-workspace', semanticSurface: '/assessment-plans' }],
+  ['catalogues', { implementationType: 'dedicated-workspace', semanticSurface: '/catalogues' }],
+  ['import-regscale-catalogs', { implementationType: 'subfeature', semanticSurface: '/framework-library' }],
+  ['questionnaires', { implementationType: 'template-workspace', semanticSurface: '/questionnaires' }],
+]);
 
 const SHARED_MODULE_ALIAS_ROUTES = [
   { moduleKey: 'assets', route: '/assets' },
@@ -473,6 +516,90 @@ async function loadLiveCatalog(context) {
   return modules;
 }
 
+async function loadScaleMdSemanticInventory() {
+  const source = await fs.readFile(scaleMdPath, 'utf8');
+  const headings = [...source.matchAll(/^#\s+(.+)$/gm)].map((match) => match[1].trim());
+  const unmappedHeadings = [];
+  const ignoredHeadings = [];
+  const headingToModule = [];
+
+  for (const heading of headings) {
+    if (SCALE_MD_HEADING_IGNORES.has(heading)) {
+      ignoredHeadings.push(heading);
+      continue;
+    }
+
+    const moduleKey = SCALE_MD_HEADING_TO_MODULE_KEY.get(heading);
+    if (!moduleKey) {
+      unmappedHeadings.push(heading);
+      continue;
+    }
+    headingToModule.push({ heading, moduleKey });
+  }
+
+  const sourceKeys = [...new Set(headingToModule.map((entry) => entry.moduleKey))].sort();
+  const expectedKeys = [...EXPECTED_SCALE_MODULE_KEYS].sort();
+  const missingFromHarness = sourceKeys.filter((key) => !expectedKeys.includes(key));
+  const missingFromScaleMd = expectedKeys.filter((key) => !sourceKeys.includes(key));
+
+  assert(unmappedHeadings.length === 0, `features/scale.md has unmapped top-level module headings: ${unmappedHeadings.join(', ')}`);
+  assert(missingFromHarness.length === 0, `Production E2E harness is missing scale.md module keys: ${missingFromHarness.join(', ')}`);
+  assert(missingFromScaleMd.length === 0, `Production E2E harness expects keys absent from scale.md: ${missingFromScaleMd.join(', ')}`);
+
+  report.app.scaleMdSource = {
+    path: scaleMdPath,
+    topLevelHeadings: headings.length,
+    ignoredGuideHeadings: ignoredHeadings.length,
+    uniqueSemanticModules: sourceKeys.length,
+    duplicateSemanticSections: headingToModule.length - sourceKeys.length,
+    moduleKeys: sourceKeys,
+  };
+
+  return { headings, headingToModule, moduleKeys: sourceKeys };
+}
+
+async function validateScaleMdSemanticSurfaceCoverage(modules) {
+  const routeChecks = new Set([
+    ...ROUTE_CHECKS.map((entry) => entry.path),
+    ...modules.map((entry) => entry.canonicalRoute),
+    ...modules.map((entry) => entry.directRoute).filter(Boolean),
+    ...SHARED_MODULE_ALIAS_ROUTES.map((entry) => entry.route),
+  ]);
+
+  for (const key of EXPECTED_SCALE_MODULE_KEYS) {
+    const entry = modules.find((item) => item.moduleKey === key);
+    assert(entry, `Live module catalog is missing scale.md semantic module ${key}.`);
+    assert(entry.pluralName?.trim(), `${key} does not expose a tenant-facing product label.`);
+    assert(entry.description?.trim(), `${key} does not expose a tenant-facing module summary.`);
+    assert(entry.primaryAction?.trim(), `${key} does not expose a primary tenant action.`);
+    assert(entry.coverageBadge?.trim(), `${key} does not expose a coverage badge.`);
+    assert(asArray(entry.relatedModules).length > 0, `${key} does not expose related modules.`);
+    assert(routeChecks.has(entry.canonicalRoute), `${key} canonical route is not included in the E2E route sweep: ${entry.canonicalRoute}`);
+
+    const expectation = SCALE_MD_SEMANTIC_SURFACES.get(key);
+    if (expectation) {
+      assert(
+        entry.implementationType === expectation.implementationType,
+        `${key} should be ${expectation.implementationType}, found ${entry.implementationType}.`,
+      );
+      assert(
+        entry.canonicalRoute === expectation.semanticSurface,
+        `${key} should route to ${expectation.semanticSurface}, found ${entry.canonicalRoute}.`,
+      );
+      continue;
+    }
+
+    assert(entry.implementationType === 'shared-workspace', `${key} should use the shared workspace, found ${entry.implementationType}.`);
+    assert(entry.canonicalRoute === `/modules/${key}`, `${key} should route through /modules/${key}, found ${entry.canonicalRoute}.`);
+  }
+
+  return {
+    checkedModules: EXPECTED_SCALE_MODULE_KEYS.length,
+    specialSemanticSurfaces: SCALE_MD_SEMANTIC_SURFACES.size,
+    sharedWorkspaceModules: EXPECTED_SCALE_MODULE_KEYS.length - SCALE_MD_SEMANTIC_SURFACES.size,
+  };
+}
+
 async function loadTenantContext(context) {
   const [foldersPayload, usersPayload, frameworksPayload, mePayload] = await Promise.all([
     jsonRequest(context.request, 'GET', '/iam/folders?contentType=domain'),
@@ -862,6 +989,23 @@ async function validateTemplateAndAssessmentSurfaces(context, page, tenantContex
   );
 }
 
+async function validateCatalogueAndImportSurfaces(page) {
+  await page.goto(absoluteUrl('/frameworks'));
+  await waitForSettledPage(page);
+  const cataloguesBody = await page.locator('body').innerText({ timeout: 12000 });
+  assert(cataloguesBody.includes('Catalogues Workspace'), 'Catalogues dedicated workspace did not render.');
+  assert(cataloguesBody.includes('Import RegScale Catalogs'), 'Import RegScale Catalogs subfeature was not visible.');
+  assert(cataloguesBody.includes('Upload'), 'Catalogue upload import option was not visible.');
+  assert(/Learn more|All packaged catalogues|No packaged catalogue snapshot/i.test(cataloguesBody), 'Import-from-system catalogue context was not visible.');
+
+  await page.getByRole('button', { name: /^Upload$/i }).click();
+  await page.getByText('Import from file', { exact: false }).waitFor({ state: 'visible', timeout: 12000 });
+  await page.getByText('Select catalogue file', { exact: false }).waitFor({ state: 'visible', timeout: 12000 });
+
+  await page.getByRole('button', { name: /Import RegScale Catalogs/i }).click();
+  await page.getByText('Import from system', { exact: false }).waitFor({ state: 'visible', timeout: 12000 });
+}
+
 async function validateBuilderSurfaces(page, modules) {
   const checks = [
     { path: '/builders/form-builder', marker: modules[0]?.pluralName ?? 'Assets' },
@@ -1074,8 +1218,10 @@ async function main() {
 
   try {
     const preflight = makeSuite('preflight');
+    await runCheck(preflight, 'features/scale.md semantic inventory', () => loadScaleMdSemanticInventory(), { critical: true });
     await runCheck(preflight, 'bootstrap admin session', () => bootstrapSession(context), { critical: true });
     modules = await runCheck(preflight, 'load scale module catalog', () => loadLiveCatalog(context), { critical: true }) ?? [];
+    await runCheck(preflight, 'scale.md semantic surface coverage', () => validateScaleMdSemanticSurfaceCoverage(modules), { critical: true });
     tenantContext = await runCheck(preflight, 'load seeded tenant context', () => loadTenantContext(context), { critical: true });
     finishSuite(preflight);
 
@@ -1106,6 +1252,7 @@ async function main() {
     await runCheck(seededData, 'module directory contract', () => validateModuleDirectory(page, modules));
     await runCheck(seededData, 'seeded operational content', () => validateSeededOperationalContent(page));
     await runCheck(seededData, 'template and assessment surfaces', () => validateTemplateAndAssessmentSurfaces(context, page, tenantContext));
+    await runCheck(seededData, 'catalogue import subfeature surface', () => validateCatalogueAndImportSurfaces(page));
     await runCheck(seededData, 'builder surfaces', () => validateBuilderSurfaces(page, modules));
     finishSuite(seededData);
 
