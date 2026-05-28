@@ -99,13 +99,20 @@ const navigation: NavItem[] = [
   { to: '/response-automation', label: 'Response Automation', section: 'Administration', icon: Bot, audience: 'admin' },
   { to: '/evidence-mapping', label: 'Evidence Mapping', section: 'Administration', icon: Link2, audience: 'admin' },
   { to: '/features/regml', label: 'AI Authoring', section: 'Administration', icon: Sparkles, audience: 'admin' },
+  { to: '/builders/form-builder', label: 'Form Builder', section: 'Builders', icon: SlidersHorizontal, audience: 'admin' },
+  { to: '/builders/rules-builder', label: 'Rules Builder', section: 'Builders', icon: Workflow, audience: 'admin' },
+  { to: '/builders/export-builder', label: 'Export Builder', section: 'Builders', icon: FileOutput, audience: 'admin' },
+  { to: '/builders/report-builder', label: 'Report Builder', section: 'Builders', icon: BarChart3, audience: 'standard' },
+  { to: '/builders/dashboard-builder', label: 'Dashboard Builder', section: 'Builders', icon: Gauge, audience: 'admin' },
+  { to: '/builders/questionnaire-builder', label: 'Questionnaire Builder', section: 'Builders', icon: ClipboardCheck, audience: 'admin' },
+  { to: '/builders/wayfinder-builder', label: 'Wayfinder Builder', section: 'Builders', icon: Compass, audience: 'admin' },
   { to: '/settings', label: 'Platform Settings', section: 'Internal', icon: ServerCog, audience: 'internal' },
   { to: '/workflow', label: 'Workflow Console', section: 'Internal', icon: Workflow, audience: 'internal' },
 ];
 
-const sections = ['Home', 'Program', 'Evidence & Monitoring', 'Assurance', 'Automation', 'Administration', 'Internal'];
+const sections = ['Home', 'Program', 'Evidence & Monitoring', 'Assurance', 'Automation', 'Administration', 'Builders', 'Internal'];
 
-const SECTION_SEPARATORS_BEFORE = new Set(['Program', 'Evidence & Monitoring', 'Assurance', 'Automation', 'Administration', 'Internal']);
+const SECTION_SEPARATORS_BEFORE = new Set(['Program', 'Evidence & Monitoring', 'Assurance', 'Automation', 'Administration', 'Builders', 'Internal']);
 
 type SidebarProps = {
   access: ShellAccessProfile;

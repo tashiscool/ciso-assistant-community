@@ -4402,6 +4402,9 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                 <Link className="button-secondary" to={`/builders/form-builder?moduleKey=${encodeURIComponent(moduleEntry.moduleKey)}`}>
                   Form Builder
                 </Link>
+                <Link className="button-secondary" to={`/builders/rules-builder?moduleKey=${encodeURIComponent(moduleEntry.moduleKey)}`}>
+                  Rules Builder
+                </Link>
                 <Link className="button-secondary" to="/builders/export-builder">
                   Export Builder
                 </Link>
@@ -4410,6 +4413,12 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                 </Link>
                 <Link className="button-secondary" to="/builders/dashboard-builder">
                   Dashboard Builder
+                </Link>
+                <Link className="button-secondary" to="/builders/questionnaire-builder">
+                  Questionnaire Builder
+                </Link>
+                <Link className="button-secondary" to="/builders/wayfinder-builder">
+                  Wayfinder Builder
                 </Link>
                 {moduleEntry.relatedModules.includes('assessments') ? (
                   <Link className="button-secondary" to="/assessments">

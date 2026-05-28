@@ -987,6 +987,17 @@ async function validateModuleRecordInUi(page, record) {
   await page.getByText(record.title, { exact: false }).first().click();
   await page.getByText('Record Detail', { exact: false }).waitFor({ state: 'visible', timeout: 12000 });
   await page.getByText('Builder and reporting hooks', { exact: false }).waitFor({ state: 'visible', timeout: 12000 });
+  for (const marker of [
+    'Form Builder',
+    'Rules Builder',
+    'Export Builder',
+    'Report Builder',
+    'Dashboard Builder',
+    'Questionnaire Builder',
+    'Wayfinder Builder',
+  ]) {
+    await page.getByText(marker, { exact: false }).first().waitFor({ state: 'visible', timeout: 12000 });
+  }
   await page.getByText('Linked records and evidence', { exact: false }).waitFor({ state: 'visible', timeout: 12000 });
 }
 
@@ -1185,6 +1196,26 @@ async function validateBuilderSurfaces(page, modules) {
     await waitForSettledPage(page);
     const bodyText = await page.locator('body').innerText({ timeout: 12000 });
     assert(bodyText.includes(check.marker), `${check.path} did not show ${check.marker}.`);
+  }
+
+  await page.goto(absoluteUrl('/'));
+  await waitForSettledPage(page);
+  await page.locator('nav').evaluate((node) => {
+    node.scrollTop = node.scrollHeight;
+  });
+  const shellText = await page.locator('body').innerText({ timeout: 12000 });
+  const normalizedShellText = shellText.toLowerCase();
+  for (const marker of [
+    'Builders',
+    'Form Builder',
+    'Rules Builder',
+    'Export Builder',
+    'Report Builder',
+    'Dashboard Builder',
+    'Questionnaire Builder',
+    'Wayfinder Builder',
+  ]) {
+    assert(normalizedShellText.includes(marker.toLowerCase()), `Main navigation did not expose ${marker}.`);
   }
 
   await page.goto(absoluteUrl('/builders/form-builder'));
