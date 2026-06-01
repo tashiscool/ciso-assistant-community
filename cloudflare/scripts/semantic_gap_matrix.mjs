@@ -41,6 +41,96 @@ const SCALE_MD_HEADING_TO_MODULE_KEY = new Map([
   ['Threats', 'threats'],
 ]);
 
+const REGSCALE_BUILDER_COMPATIBILITY = new Map([
+  ['form_builder', { canonicalRoutes: ['/builders/form-builder'], apiServices: ['builders'] }],
+  ['rules_builder', { canonicalRoutes: ['/builders/rules-builder', '/builders/form-builder/rules-guide'], apiServices: ['builders'] }],
+  ['export_builder', { canonicalRoutes: ['/builders/export-builder'], apiServices: ['builders'] }],
+  ['report_builder', { canonicalRoutes: ['/builders/report-builder'], apiServices: ['builders', 'ops'] }],
+  ['dashboard_builder', { canonicalRoutes: ['/builders/dashboard-builder', '/dashboards'], apiServices: ['builders', 'ops'] }],
+  ['questionnaire_builder', { canonicalRoutes: ['/builders/questionnaire-builder', '/questionnaires'], apiServices: ['builders'] }],
+  ['wayfinder_builder', { canonicalRoutes: ['/builders/wayfinder-builder'], apiServices: ['builders'] }],
+]);
+
+const CISO_BACKEND_COMPATIBILITY = new Map([
+  ['core', { canonicalRoutes: ['/program', '/modules'], apiServices: ['core'] }],
+  ['iam', { canonicalRoutes: ['/workspace/access', '/workspace/team', '/workspace/domains'], apiServices: ['iam'] }],
+  ['settings', { canonicalRoutes: ['/setup', '/setup/general'], apiServices: ['setup'] }],
+  ['global_settings', { canonicalRoutes: ['/setup', '/setup/general'], apiServices: ['setup'] }],
+  ['enterprise_core', { canonicalRoutes: ['/setup', '/workspace/access', '/license-management'], apiServices: ['setup', 'iam', 'ops'] }],
+  ['webhooks', { canonicalRoutes: ['/features/automation-manager'], apiServices: ['integrations'] }],
+  ['integrations', { canonicalRoutes: ['/features/automation-manager'], apiServices: ['integrations'] }],
+  ['serdes', { canonicalRoutes: ['/backup-restore', '/imports'], apiServices: ['ops'] }],
+  ['data_wizard', { canonicalRoutes: ['/imports'], apiServices: ['ops'] }],
+  ['chat', { canonicalRoutes: ['/chat', '/features/regml'], apiServices: ['ai'] }],
+  ['ebios_rm', { canonicalRoutes: ['/advanced-risk/ebios', '/ebios-rm'], apiServices: ['ops'] }],
+  ['privacy', { canonicalRoutes: ['/privacy', '/processings'], apiServices: ['core'] }],
+  ['resilience', { canonicalRoutes: ['/resilience', '/business-impact-analysis'], apiServices: ['core'] }],
+  ['crq', { canonicalRoutes: ['/advanced-risk/quantitative', '/quantitative-risk-studies'], apiServices: ['ops'] }],
+  ['pmbok', { canonicalRoutes: ['/generic-collections', '/accreditations'], apiServices: ['ops'] }],
+  ['metrology', { canonicalRoutes: ['/analytics', '/dashboards'], apiServices: ['ops', 'builders'] }],
+  ['doc_management', { canonicalRoutes: ['/assurance/packages', '/report-bundles', '/evidence-management'], apiServices: ['assurance', 'evidence'] }],
+  ['library', { canonicalRoutes: ['/libraries', '/frameworks', '/framework-library'], apiServices: ['core', 'grc'] }],
+  ['tprm', { canonicalRoutes: ['/third-party', '/entities', '/contracts'], apiServices: ['core'] }],
+  ['cal', { canonicalRoutes: ['/calendar'], apiServices: ['ops'] }],
+]);
+
+const MINIMUM_EQUIVALENT_COMPATIBILITY = [
+  {
+    match: /Tenant identity/i,
+    semanticKey: 'tenant-identity-access',
+    canonicalRoutes: ['/workspace/access', '/workspace/team', '/setup/sso', '/setup/service-accounts'],
+    apiServices: ['iam', 'setup', 'core'],
+  },
+  {
+    match: /Generic module-record/i,
+    semanticKey: 'generic-module-records',
+    canonicalRoutes: ['/modules'],
+    apiServices: ['core'],
+  },
+  {
+    match: /Form Builder/i,
+    semanticKey: 'form-builder-runtime-validation',
+    canonicalRoutes: ['/builders/form-builder', '/builders/rules-builder'],
+    apiServices: ['builders', 'core'],
+  },
+  {
+    match: /Export, Report, Dashboard, Questionnaire, and Wayfinder/i,
+    semanticKey: 'builder-suite',
+    canonicalRoutes: [
+      '/builders/export-builder',
+      '/builders/report-builder',
+      '/builders/dashboard-builder',
+      '/builders/questionnaire-builder',
+      '/builders/wayfinder-builder',
+    ],
+    apiServices: ['builders'],
+  },
+  {
+    match: /Questionnaire runtime/i,
+    semanticKey: 'questionnaire-runtime',
+    canonicalRoutes: ['/builders/questionnaire-builder', '/questionnaires', '/questionnaires/response/:shareToken'],
+    apiServices: ['builders'],
+  },
+  {
+    match: /Automation Manager/i,
+    semanticKey: 'automation-manager',
+    canonicalRoutes: ['/features/automation-manager', '/automation-manager'],
+    apiServices: ['integrations'],
+  },
+  {
+    match: /AI\/RegML/i,
+    semanticKey: 'ai-regml',
+    canonicalRoutes: ['/features/regml', '/chat'],
+    apiServices: ['ai'],
+  },
+  {
+    match: /Compliance catalogs/i,
+    semanticKey: 'compliance-catalogs-controls',
+    canonicalRoutes: ['/frameworks', '/libraries', '/security-controls', '/security-plans', '/evidence-management'],
+    apiServices: ['core', 'grc', 'evidence'],
+  },
+];
+
 export const OPENREGSCALE_ROUTE_COMPATIBILITY = [
   { sourceRoute: '/', canonicalRoute: '/', group: 'shell', required: true, expectAny: ['Regovise', 'Dashboard', 'Workspace'] },
   { sourceRoute: '/builders', canonicalRoute: '/builders', group: 'builders', required: true, expectAny: ['Builder Launcher', 'Form Builder'] },
@@ -259,6 +349,54 @@ function extractLegacyBridgeModels(source) {
   return uniqueSorted([...match[1].matchAll(/'([^']+)'/g)].map((entry) => entry[1]));
 }
 
+function extractYamlSectionKeys(source, sectionName) {
+  const sectionMatch = source.match(new RegExp(`^${sectionName}:\\n([\\s\\S]*?)(?=^[A-Za-z0-9_]+:|(?![\\s\\S]))`, 'm'));
+  if (!sectionMatch) {
+    return [];
+  }
+  return uniqueSorted(
+    [...sectionMatch[1].matchAll(/^  ([A-Za-z0-9_-]+):/gm)]
+      .map((match) => match[1])
+      .filter((key) => key !== 'description' && key !== 'examples'),
+  );
+}
+
+function extractYamlListAfterKey(source, keyName) {
+  const keyMatch = source.match(new RegExp(`^\\s{2}${keyName}:\\n([\\s\\S]*?)(?=^\\s{0,2}[A-Za-z0-9_]+:|(?![\\s\\S]))`, 'm'));
+  if (!keyMatch) {
+    return [];
+  }
+  return [...keyMatch[1].matchAll(/^    - "([^"]+)"/gm)].map((match) => match[1]);
+}
+
+function extractRegoviseApiServices(source) {
+  return extractYamlSectionKeys(source, 'api_services');
+}
+
+function extractRouterApiServices(source) {
+  return uniqueSorted([...source.matchAll(/case\s+'([^']+)':/g)].map((match) => match[1]));
+}
+
+function toModuleKey(value) {
+  return value.replace(/_/g, '-');
+}
+
+function anyRouteExists(routes, routeSet) {
+  return routes.some((route) => canonicalExists(route, routeSet));
+}
+
+function anyApiServiceExists(services, serviceSet) {
+  return services.some((service) => serviceSet.has(service));
+}
+
+function resolveMinimumEquivalentContract(text) {
+  return MINIMUM_EQUIVALENT_COMPATIBILITY.find((entry) => entry.match.test(text)) ?? {
+    semanticKey: text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+    canonicalRoutes: [],
+    apiServices: [],
+  };
+}
+
 async function extractBackendModelClasses(repoRoot) {
   const backendRoot = path.join(repoRoot, 'backend');
   const classes = [];
@@ -310,6 +448,10 @@ export async function buildSemanticGapMatrix(options = {}) {
     moduleTypes,
     openRegScaleApp,
     prodE2e,
+    routerSource,
+    regoviseBackendMapping,
+    cisoBackendMapping,
+    regscaleBackendMapping,
     backendModelClasses,
   ] = await Promise.all([
     readIfExists(path.join(repoRoot, 'features/scale.md')),
@@ -318,6 +460,10 @@ export async function buildSemanticGapMatrix(options = {}) {
     readIfExists(path.join(repoRoot, 'apps/web/src/features/modules/types.ts')),
     readIfExists(path.join(repoRoot, 'openregscale/client/src/App.tsx')),
     readIfExists(path.join(repoRoot, 'cloudflare/scripts/prod_e2e_validation.mjs')),
+    readIfExists(path.join(repoRoot, 'cloudflare/src/router.ts')),
+    readIfExists(path.join(repoRoot, 'cloudflare/docs/regovise_backend_mapping.yaml')),
+    readIfExists(path.join(repoRoot, 'backend/docs/ciso_assistant_python_backend_mapping.yaml')),
+    readIfExists(path.join(repoRoot, 'backend/docs/regscale_public_inferred_backend_mapping.yaml')),
     extractBackendModelClasses(repoRoot),
   ]);
 
@@ -328,8 +474,18 @@ export async function buildSemanticGapMatrix(options = {}) {
   const openRegScaleRoutes = extractOpenRegScaleRoutes(openRegScaleApp);
   const e2eRoutes = extractE2eRouteChecks(prodE2e);
   const legacyBridgeModels = extractLegacyBridgeModels(appLayout);
-  const routeSet = new Set([...appRoutes, ...sharedAliasRoutes, ...moduleCatalog.flatMap((entry) => [entry.canonicalRoute, entry.directRoute])]);
+  const legacyBridgeRoutes = legacyBridgeModels.flatMap((model) => [`/${model}`, `/${model}/*`]);
+  const routeSet = new Set([
+    ...appRoutes,
+    ...sharedAliasRoutes,
+    ...moduleCatalog.flatMap((entry) => [entry.canonicalRoute, entry.directRoute]),
+    ...legacyBridgeRoutes,
+  ]);
   const e2eRouteSet = new Set(e2eRoutes);
+  const apiServiceSet = new Set([
+    ...extractRegoviseApiServices(regoviseBackendMapping),
+    ...extractRouterApiServices(routerSource),
+  ]);
 
   const scaleMappings = scaleInventory.moduleKeys.map((moduleKey) => {
     const catalogEntry = moduleCatalog.find((entry) => entry.moduleKey === moduleKey) ?? null;
@@ -377,9 +533,84 @@ export async function buildSemanticGapMatrix(options = {}) {
     testCovered: e2eRouteSet.has(`/${model}`),
   }));
 
+  const regscaleModuleMappings = extractYamlSectionKeys(regscaleBackendMapping, 'module_domains').map((sourceKey) => {
+    const moduleKey = toModuleKey(sourceKey);
+    const catalogEntry = moduleCatalog.find((entry) => entry.moduleKey === moduleKey) ?? null;
+    const canonicalRoute = catalogEntry?.canonicalRoute ?? (canonicalExists(`/${moduleKey}`, routeSet) ? `/${moduleKey}` : null);
+    return {
+      source: 'backend/docs/regscale_public_inferred_backend_mapping.yaml#module_domains',
+      sourceKey,
+      semanticKey: moduleKey,
+      canonicalRoute,
+      implementationModel: catalogEntry?.implementationType ?? (canonicalRoute ? 'semantic-route' : null),
+      tenantDestinationExists: Boolean(canonicalRoute && canonicalExists(canonicalRoute, routeSet)),
+      testCovered: Boolean(canonicalRoute && e2eRouteSet.has(canonicalRoute)),
+      unresolved: !canonicalRoute || !canonicalExists(canonicalRoute, routeSet),
+    };
+  });
+
+  const regscaleBuilderMappings = extractYamlSectionKeys(regscaleBackendMapping, 'builder_domains').map((sourceKey) => {
+    const declared = REGSCALE_BUILDER_COMPATIBILITY.get(sourceKey);
+    const canonicalRoutes = declared?.canonicalRoutes ?? [];
+    const apiServices = declared?.apiServices ?? [];
+    return {
+      source: 'backend/docs/regscale_public_inferred_backend_mapping.yaml#builder_domains',
+      sourceKey,
+      canonicalRoutes,
+      apiServices,
+      tenantDestinationExists: anyRouteExists(canonicalRoutes, routeSet),
+      apiServiceExists: anyApiServiceExists(apiServices, apiServiceSet),
+      testCovered: canonicalRoutes.some((route) => e2eRouteSet.has(route)),
+      unresolved: !declared || !anyRouteExists(canonicalRoutes, routeSet) || !anyApiServiceExists(apiServices, apiServiceSet),
+    };
+  });
+
+  const minimumEquivalentMappings = extractYamlListAfterKey(regscaleBackendMapping, 'minimum_backend_equivalents').map((text) => {
+    const declared = resolveMinimumEquivalentContract(text);
+    return {
+      source: 'backend/docs/regscale_public_inferred_backend_mapping.yaml#semantic_parity_guidance_for_regovise',
+      semanticKey: declared.semanticKey,
+      requirement: text,
+      canonicalRoutes: declared.canonicalRoutes,
+      apiServices: declared.apiServices,
+      tenantDestinationExists: anyRouteExists(declared.canonicalRoutes, routeSet),
+      apiServiceExists: anyApiServiceExists(declared.apiServices, apiServiceSet),
+      testCovered: declared.canonicalRoutes.some((route) => e2eRouteSet.has(route)),
+      unresolved:
+        declared.canonicalRoutes.length === 0 ||
+        declared.apiServices.length === 0 ||
+        !anyRouteExists(declared.canonicalRoutes, routeSet) ||
+        !anyApiServiceExists(declared.apiServices, apiServiceSet),
+    };
+  });
+
+  const cisoBackendKeys = uniqueSorted([
+    ...extractYamlSectionKeys(cisoBackendMapping, 'api_map'),
+    ...extractYamlSectionKeys(cisoBackendMapping, 'domain_apps'),
+  ]);
+  const cisoBackendMappings = cisoBackendKeys.map((sourceKey) => {
+    const declared = CISO_BACKEND_COMPATIBILITY.get(sourceKey);
+    const canonicalRoutes = declared?.canonicalRoutes ?? [];
+    const apiServices = declared?.apiServices ?? [];
+    return {
+      source: 'backend/docs/ciso_assistant_python_backend_mapping.yaml',
+      semanticKey: sourceKey,
+      canonicalRoutes,
+      apiServices,
+      tenantDestinationExists: anyRouteExists(canonicalRoutes, routeSet),
+      apiServiceExists: anyApiServiceExists(apiServices, apiServiceSet),
+      testCovered: canonicalRoutes.some((route) => e2eRouteSet.has(route)),
+      unresolved: !declared || !anyRouteExists(canonicalRoutes, routeSet) || !anyApiServiceExists(apiServices, apiServiceSet),
+    };
+  });
+
   const unresolvedRequired = [
     ...scaleMappings.filter((entry) => entry.unresolved),
     ...openRegScaleMappings.filter((entry) => entry.unresolved),
+    ...regscaleModuleMappings.filter((entry) => entry.unresolved),
+    ...regscaleBuilderMappings.filter((entry) => entry.unresolved),
+    ...minimumEquivalentMappings.filter((entry) => entry.unresolved),
+    ...cisoBackendMappings.filter((entry) => entry.unresolved),
   ];
 
   return {
@@ -390,6 +621,11 @@ export async function buildSemanticGapMatrix(options = {}) {
       openRegScaleRoutes: openRegScaleMappings.length,
       legacyBridgeModels: legacyMappings.length,
       backendModelClasses: backendModelClasses.length,
+      regscaleModuleDomains: regscaleModuleMappings.length,
+      regscaleBuilderDomains: regscaleBuilderMappings.length,
+      regscaleMinimumEquivalents: minimumEquivalentMappings.length,
+      cisoBackendDomains: cisoBackendMappings.length,
+      regoviseApiServices: apiServiceSet.size,
       appRoutes: appRoutes.length,
       e2eRoutes: e2eRoutes.length,
       unresolvedRequired: unresolvedRequired.length,
@@ -405,13 +641,21 @@ export async function buildSemanticGapMatrix(options = {}) {
       sharedAliasRoutes,
       openRegScaleRoutes,
       e2eRoutes,
+      apiServices: [...apiServiceSet].sort(),
       legacyBridgeModels,
+      legacyBridgeRoutes,
       backendModelClasses,
     },
     mappings: {
       scaleMd: scaleMappings,
       openRegScale: openRegScaleMappings,
       legacy: legacyMappings,
+      regscalePublicInferred: {
+        moduleDomains: regscaleModuleMappings,
+        builderDomains: regscaleBuilderMappings,
+        minimumEquivalents: minimumEquivalentMappings,
+      },
+      cisoAssistantBackend: cisoBackendMappings,
     },
     unresolvedRequired,
   };

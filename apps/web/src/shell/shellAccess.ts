@@ -120,7 +120,9 @@ const ADMIN_ROUTE_EXACT = new Set([
   '/builders/questionnaire-builder',
   '/builders/rules-builder',
   '/builders/wayfinder-builder',
+  '/backup-restore',
   '/folders',
+  '/license-management',
   '/users',
   '/quick-start',
   '/conmon/profiles',
@@ -129,50 +131,9 @@ const ADMIN_ROUTE_EXACT = new Set([
   '/trust-center',
 ]);
 
-const INTERNAL_ROUTE_PREFIXES = [
-  '/workflow',
-  '/features/workflow',
-  '/utilities',
-  '/features/utilities',
-  '/subsystems',
-  '/features/subsystems',
-  '/rmf',
-  '/features/rmf',
-  '/app-management',
-  '/features/app-management',
-  '/workbench',
-  '/features/workbench',
-  '/news-feed',
-  '/features/news-feed',
-];
+const INTERNAL_ROUTE_PREFIXES: string[] = [];
 
-const INTERNAL_ROUTE_EXACT = new Set([
-  '/asset-assessments',
-  '/actors',
-  '/vulnerabilities',
-  '/backup-restore',
-  '/calendar',
-  '/dashboards',
-  '/recap',
-  '/validation-flows',
-  '/x-rays',
-  '/task-nodes',
-  '/task-templates',
-  '/risk-matrices',
-  '/requirement-assessments',
-  '/requirement-mapping-sets',
-  '/sync-mappings',
-  '/content-types',
-  '/generic-collections',
-  '/presets',
-  '/preset-journeys',
-  '/experimental',
-  '/license-management',
-  '/metric-instances',
-  '/accreditations',
-  '/findings-assessments',
-  '/scoring-assistant',
-]);
+const INTERNAL_ROUTE_EXACT = new Set<string>([]);
 
 function hasAnyPermission(payload: IamMePayload | null, permissions: Set<string>): boolean {
   if (!payload) {
@@ -226,7 +187,27 @@ function canAccessStandardRoute(route: string, access: ShellAccessProfile): bool
   const capabilityChecks: Array<[Array<string>, boolean]> = [
     [['/search'], access.canUseSearch],
     [['/analytics'], access.canUseAnalytics],
-    [['/program'], access.canUseProgramWorkspace],
+    [
+      [
+        '/program',
+        '/calendar',
+        '/workflow',
+        '/features/workflow',
+        '/workbench',
+        '/features/workbench',
+        '/news-feed',
+        '/features/news-feed',
+        '/app-management',
+        '/features/app-management',
+        '/content-types',
+        '/generic-collections',
+        '/presets',
+        '/preset-journeys',
+        '/accreditations',
+        '/experimental',
+      ],
+      access.canUseProgramWorkspace,
+    ],
     [
       [
         '/modules',
@@ -260,18 +241,29 @@ function canAccessStandardRoute(route: string, access: ShellAccessProfile): bool
       ],
       access.canUseModules,
     ],
-    [['/libraries', '/loaded-libraries', '/mapping-libraries', '/stored-libraries'], access.canUseLibraries],
+    [
+      [
+        '/libraries',
+        '/loaded-libraries',
+        '/mapping-libraries',
+        '/stored-libraries',
+        '/requirement-mapping-sets',
+        '/sync-mappings',
+      ],
+      access.canUseLibraries,
+    ],
     [['/frameworks'], access.canUseFrameworks],
     [['/framework-library'], access.canUseFrameworks],
     [['/findings'], access.canUseFrameworks],
     [['/gap-assessments'], access.canUseFrameworks],
     [['/report-bundles'], access.canUseFrameworks],
+    [['/rmf', '/features/rmf', '/requirement-assessments', '/validation-flows', '/findings-assessments'], access.canUseFrameworks],
     [['/assessments', '/compliance-assessments'], access.canUseAssessmentWorkspace],
     [['/applied-controls'], access.canUseComplianceAssessments],
-    [['/risk-assessments', '/risk-scenarios'], access.canUseRiskAssessments],
+    [['/risk-assessments', '/risk-scenarios', '/vulnerabilities', '/risk-matrices'], access.canUseRiskAssessments],
     [['/third-party', '/entities', '/contracts'], access.canUseThirdParty],
     [['/privacy', '/processings'], access.canUsePrivacy],
-    [['/resilience', '/business-impact-analysis'], access.canUseResilience],
+    [['/resilience', '/business-impact-analysis', '/asset-assessments'], access.canUseResilience],
     [['/portal', '/auditee-dashboard', '/auditee-assessments', '/my-assignments'], access.canUsePortal],
     [
       [
@@ -289,11 +281,13 @@ function canAccessStandardRoute(route: string, access: ShellAccessProfile): bool
       ],
       access.canUseAdvancedRisk,
     ],
-    [['/evidence-management', '/features/evidence-management', '/evidence/jobs'], access.canUseEvidence],
+    [['/evidence-management', '/features/evidence-management', '/evidence/jobs', '/evidences', '/evidence-revisions'], access.canUseEvidence],
     [['/conmon/executions'], access.canUseConMon],
     [['/reports', '/builders/report-builder'], access.canUseReports],
+    [['/dashboards', '/recap', '/metric-instances', '/x-rays'], access.canUseAnalytics],
+    [['/utilities', '/features/utilities', '/subsystems', '/features/subsystems', '/task-nodes', '/task-templates'], access.canUseModules],
     [['/assurance'], access.canUseAssurance],
-    [['/chat'], access.canUseChat],
+    [['/chat', '/scoring-assistant'], access.canUseChat],
   ];
 
   for (const [prefixes, allowed] of capabilityChecks) {

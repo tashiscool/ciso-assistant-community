@@ -18,6 +18,60 @@ document:
     migrations: "cloudflare/migrations/*.sql"
     semantic_matrix: "cloudflare/scripts/semantic_gap_matrix.mjs"
     production_e2e: "cloudflare/scripts/prod_e2e_validation.mjs"
+    semantic_contracts:
+      - "cloudflare/docs/regovise_backend_mapping.yaml"
+      - "backend/docs/ciso_assistant_python_backend_mapping.yaml"
+      - "backend/docs/regscale_public_inferred_backend_mapping.yaml"
+
+contract_alignment:
+  source_of_truth:
+    regovise_runtime: "cloudflare/docs/regovise_backend_mapping.yaml"
+    ciso_assistant_semantics: "backend/docs/ciso_assistant_python_backend_mapping.yaml"
+    regscale_public_semantics: "backend/docs/regscale_public_inferred_backend_mapping.yaml"
+    checker: "cloudflare/scripts/semantic_gap_matrix.mjs"
+  enforcement_summary:
+    - "The semantic matrix now loads all three backend mapping YAML files."
+    - "features/scale.md remains the hard tenant module inventory."
+    - "RegScale public module domains are checked as extended semantic module coverage."
+    - "CISO Assistant backend app/API domains are checked against concrete Regovise routes and Worker service roots."
+    - "Builder, questionnaire, automation, AI/RegML, compliance, identity, and module-record minimum equivalents must resolve to tenant-facing Regovise routes plus real Worker APIs."
+  tenant_access_rule: >
+    Semantic parity routes should be gated by tenant capabilities such as modules,
+    framework, risk, evidence, privacy, resilience, analytics, portal, chat, or
+    workspace administration. They should not be hidden behind internal-only
+    access when the route represents a current-app tenant feature.
+  extended_semantic_contracts:
+    regscale_public_module_domains:
+      - "issues"
+      - "requests"
+      - "security-profiles"
+      - "threat-models"
+    ciso_assistant_semantic_routes:
+      - "asset-assessments"
+      - "auditee-assessments"
+      - "calendar"
+      - "dashboards"
+      - "data-wizard/imports"
+      - "doc-management"
+      - "ebios-rm"
+      - "evidences"
+      - "metrology/analytics"
+      - "pmbok/accreditations"
+      - "privacy/processings"
+      - "quantitative-risk"
+      - "resilience/business-impact-analysis"
+      - "serdes/backup-restore"
+      - "task-nodes"
+      - "vulnerabilities"
+      - "webhooks/integrations"
+    access_fix: >
+      CISO/RegScale-equivalent tenant surfaces such as workflow, utilities,
+      subsystems, RMF, app management, workbench, news feed, calendar,
+      dashboards, vulnerability review, task operations, library mappings,
+      requirement assessments, and quantitative-risk satellites now use domain
+      capability gates instead of internalOnly gating. Backup/restore and
+      license-management remain administrator-only because they affect tenant
+      state or licensing.
 
 runtime:
   platform: "Cloudflare Workers"

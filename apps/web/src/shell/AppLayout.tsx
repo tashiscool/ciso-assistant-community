@@ -453,10 +453,6 @@ export function AppLayout() {
     return access.isWorkspaceAdmin ? element : <RouteAccessBoundary fallback={fallback} variant="admin" />;
   }
 
-  function internalOnly(element: JSX.Element, fallback = getDefaultShellRoute(access)): JSX.Element {
-    return access.canViewInternalTools ? element : <RouteAccessBoundary fallback={fallback} variant="internal" />;
-  }
-
   function allowedOnly(condition: boolean, element: JSX.Element, fallback = getDefaultShellRoute(access)): JSX.Element {
     return condition ? element : <RouteAccessBoundary fallback={fallback} variant="standard" />;
   }
@@ -684,20 +680,20 @@ export function AppLayout() {
             <Route path="/features/continuous-monitoring" element={adminOnly(<ConMonProfilesPage />)} />
             <Route path="/grc-admin" element={adminOnly(<GrcAdministrationPage />)} />
             <Route path="/trust-center" element={adminOnly(<FedrampProviderShellPage />)} />
-            <Route path="/workflow" element={internalOnly(<WorkflowControlPage />)} />
-            <Route path="/features/workflow" element={internalOnly(<WorkflowControlPage />)} />
-            <Route path="/utilities" element={internalOnly(<UtilitiesControlPage />)} />
-            <Route path="/features/utilities" element={internalOnly(<UtilitiesControlPage />)} />
-            <Route path="/subsystems" element={internalOnly(<SubsystemsControlPage />)} />
-            <Route path="/features/subsystems" element={internalOnly(<SubsystemsControlPage />)} />
-            <Route path="/rmf" element={internalOnly(<RMFControlPage />)} />
-            <Route path="/features/rmf" element={internalOnly(<RMFControlPage />)} />
-            <Route path="/app-management" element={internalOnly(<AppManagementControlPage />)} />
-            <Route path="/features/app-management" element={internalOnly(<AppManagementControlPage />)} />
-            <Route path="/workbench" element={internalOnly(<WorkbenchControlPage />)} />
-            <Route path="/features/workbench" element={internalOnly(<WorkbenchControlPage />)} />
-            <Route path="/news-feed" element={internalOnly(<NewsFeedControlPage />)} />
-            <Route path="/features/news-feed" element={internalOnly(<NewsFeedControlPage />)} />
+            <Route path="/workflow" element={allowedOnly(access.canUseProgramWorkspace, <WorkflowControlPage />)} />
+            <Route path="/features/workflow" element={allowedOnly(access.canUseProgramWorkspace, <WorkflowControlPage />)} />
+            <Route path="/utilities" element={allowedOnly(access.canUseModules, <UtilitiesControlPage />)} />
+            <Route path="/features/utilities" element={allowedOnly(access.canUseModules, <UtilitiesControlPage />)} />
+            <Route path="/subsystems" element={allowedOnly(access.canUseModules, <SubsystemsControlPage />)} />
+            <Route path="/features/subsystems" element={allowedOnly(access.canUseModules, <SubsystemsControlPage />)} />
+            <Route path="/rmf" element={allowedOnly(access.canUseFrameworks, <RMFControlPage />)} />
+            <Route path="/features/rmf" element={allowedOnly(access.canUseFrameworks, <RMFControlPage />)} />
+            <Route path="/app-management" element={allowedOnly(access.canUseProgramWorkspace, <AppManagementControlPage />)} />
+            <Route path="/features/app-management" element={allowedOnly(access.canUseProgramWorkspace, <AppManagementControlPage />)} />
+            <Route path="/workbench" element={allowedOnly(access.canUseProgramWorkspace, <WorkbenchControlPage />)} />
+            <Route path="/features/workbench" element={allowedOnly(access.canUseProgramWorkspace, <WorkbenchControlPage />)} />
+            <Route path="/news-feed" element={allowedOnly(access.canUseProgramWorkspace, <NewsFeedControlPage />)} />
+            <Route path="/features/news-feed" element={allowedOnly(access.canUseProgramWorkspace, <NewsFeedControlPage />)} />
             {SHARED_MODULE_ALIAS_ROUTES.map((entry) => (
               <Route
                 key={entry.route}
@@ -798,25 +794,25 @@ export function AppLayout() {
             />
             <Route
               path="/asset-assessments"
-              element={internalOnly(<AssetAssessmentsControlPage />)}
+              element={allowedOnly(access.canUseResilience, <AssetAssessmentsControlPage />)}
             />
             <Route
               path="/actors"
-              element={internalOnly(<ActorsControlPage />)}
+              element={allowedOnly(access.canUseAdvancedRisk, <ActorsControlPage />)}
             />
             <Route
               path="/vulnerabilities"
-              element={internalOnly(<VulnerabilitiesControlPage />)}
+              element={allowedOnly(access.canUseRiskAssessments, <VulnerabilitiesControlPage />)}
             />
             <Route path="/analytics" element={allowedOnly(access.canUseAnalytics, <AnalyticsControlRoomPage access={access} />)} />
             <Route path="/search" element={allowedOnly(access.canUseSearch, <SearchControlRoomPage access={access} />)} />
             <Route
               path="/backup-restore"
-              element={internalOnly(<BackupRestoreControlPage />)}
+              element={adminOnly(<BackupRestoreControlPage />)}
             />
             <Route
               path="/calendar"
-              element={internalOnly(<CalendarControlPage />)}
+              element={allowedOnly(access.canUseProgramWorkspace, <CalendarControlPage />)}
             />
             <Route
               path="/quick-start"
@@ -828,103 +824,103 @@ export function AppLayout() {
             />
             <Route
               path="/dashboards"
-              element={internalOnly(<DashboardsControlPage />)}
+              element={allowedOnly(access.canUseAnalytics, <DashboardsControlPage />)}
             />
             <Route
               path="/recap"
-              element={internalOnly(<DashboardsControlPage />)}
+              element={allowedOnly(access.canUseAnalytics, <DashboardsControlPage />)}
             />
             <Route
               path="/validation-flows"
-              element={internalOnly(<ValidationFlowsControlPage />)}
+              element={allowedOnly(access.canUseFrameworks, <ValidationFlowsControlPage />)}
             />
             <Route
               path="/x-rays"
-              element={internalOnly(<XRaysControlPage />)}
+              element={allowedOnly(access.canUseAnalytics, <XRaysControlPage />)}
             />
             <Route
               path="/task-nodes"
-              element={internalOnly(<TaskOperationsControlPage />)}
+              element={allowedOnly(access.canUseModules, <TaskOperationsControlPage />)}
             />
             <Route
               path="/task-templates"
-              element={internalOnly(<TaskOperationsControlPage />)}
+              element={allowedOnly(access.canUseModules, <TaskOperationsControlPage />)}
             />
             <Route
               path="/risk-matrices"
-              element={internalOnly(<DashboardsControlPage />)}
+              element={allowedOnly(access.canUseRiskAssessments, <DashboardsControlPage />)}
             />
             <Route
               path="/requirement-assessments"
-              element={internalOnly(<ValidationFlowsControlPage />)}
+              element={allowedOnly(access.canUseFrameworks, <ValidationFlowsControlPage />)}
             />
             <Route
               path="/requirement-mapping-sets"
-              element={internalOnly(<LibraryMappingsControlPage />)}
+              element={allowedOnly(access.canUseLibraries, <LibraryMappingsControlPage />)}
             />
             <Route
               path="/sync-mappings"
-              element={internalOnly(<LibraryMappingsControlPage />)}
+              element={allowedOnly(access.canUseLibraries, <LibraryMappingsControlPage />)}
             />
             <Route
               path="/content-types"
-              element={internalOnly(<ProgramControlPage access={access} />)}
+              element={allowedOnly(access.canUseProgramWorkspace, <ProgramControlPage access={access} />)}
             />
             <Route
               path="/generic-collections"
-              element={internalOnly(<ProgramControlPage access={access} />)}
+              element={allowedOnly(access.canUseProgramWorkspace, <ProgramControlPage access={access} />)}
             />
             <Route
               path="/presets"
-              element={internalOnly(<ProgramControlPage access={access} />)}
+              element={allowedOnly(access.canUseProgramWorkspace, <ProgramControlPage access={access} />)}
             />
             <Route
               path="/preset-journeys"
-              element={internalOnly(<ProgramControlPage access={access} />)}
+              element={allowedOnly(access.canUseProgramWorkspace, <ProgramControlPage access={access} />)}
             />
             <Route
               path="/experimental"
-              element={internalOnly(<ProgramControlPage access={access} />)}
+              element={allowedOnly(access.canUseProgramWorkspace, <ProgramControlPage access={access} />)}
             />
             <Route
               path="/license-management"
-              element={internalOnly(<ProgramControlPage access={access} />)}
+              element={adminOnly(<ProgramControlPage access={access} />)}
             />
             <Route
               path="/metric-instances"
-              element={internalOnly(<AnalyticsControlRoomPage access={access} />)}
+              element={allowedOnly(access.canUseAnalytics, <AnalyticsControlRoomPage access={access} />)}
             />
             <Route
               path="/accreditations"
-              element={internalOnly(<ProgramControlPage access={access} />)}
+              element={allowedOnly(access.canUseProgramWorkspace, <ProgramControlPage access={access} />)}
             />
             <Route
               path="/findings-assessments"
-              element={internalOnly(<ValidationFlowsControlPage />)}
+              element={allowedOnly(access.canUseFrameworks, <ValidationFlowsControlPage />)}
             />
             <Route
               path="/operating-modes"
-              element={<EbiosWorkspacePage />}
+              element={allowedOnly(access.canUseAdvancedRisk, <EbiosWorkspacePage />)}
             />
             <Route
               path="/operational-scenarios"
-              element={<EbiosWorkspacePage />}
+              element={allowedOnly(access.canUseAdvancedRisk, <EbiosWorkspacePage />)}
             />
             <Route
               path="/strategic-scenarios"
-              element={<EbiosWorkspacePage />}
+              element={allowedOnly(access.canUseAdvancedRisk, <EbiosWorkspacePage />)}
             />
             <Route
               path="/ro-to"
-              element={<EbiosWorkspacePage />}
+              element={allowedOnly(access.canUseAdvancedRisk, <EbiosWorkspacePage />)}
             />
             <Route
               path="/stakeholders"
-              element={<EbiosWorkspacePage />}
+              element={allowedOnly(access.canUseAdvancedRisk, <EbiosWorkspacePage />)}
             />
             <Route
               path="/scoring-assistant"
-              element={internalOnly(<ChatWorkspacePage />)}
+              element={allowedOnly(access.canUseChat, <ChatWorkspacePage />)}
             />
             <Route path="/risk-scenarios" element={allowedOnly(access.canUseRiskAssessments, <RiskScenariosPage />)} />
             <Route path="/conmon/profiles" element={adminOnly(<ConMonProfilesPage />)} />
