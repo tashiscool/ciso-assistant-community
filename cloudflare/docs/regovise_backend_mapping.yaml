@@ -588,6 +588,7 @@ api_services:
       assessments: "/assessments"
       report_bundles: "/report-bundles"
       report_snapshots: "/report-snapshots"
+      reports: "/reports/*"
       evidence_packages: "/evidence-packages"
       providers:
         - "aws"
@@ -649,19 +650,19 @@ api_services:
       vdr:
         base_path: "/_api/vdr"
         route_families:
+          - "/sync"
           - "/reports"
-          - "/oar-cycles"
-          - "/quarterly-reviews"
       ccm:
         base_path: "/_api/ccm"
         route_families:
-          - "/inventory"
-          - "/sync"
+          - "/oar-cycles"
+          - "/quarterly-reviews"
+          - "/feedback"
       scn:
         base_path: "/_api/scn"
         route_families:
-          - "/documents"
-          - "/publish-package"
+          - "/changes"
+          - "/notices"
       secure_config:
         base_path: "/_api/secure-config"
         route_families:

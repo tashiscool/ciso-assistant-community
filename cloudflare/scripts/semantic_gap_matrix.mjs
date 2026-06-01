@@ -370,7 +370,19 @@ function extractYamlListAfterKey(source, keyName) {
 }
 
 function extractRegoviseApiServices(source) {
-  return extractYamlSectionKeys(source, 'api_services');
+  const servicesBlock = source.match(/^api_services:\n([\s\S]*?)(?=^[A-Za-z0-9_]+:|(?![\s\S]))/m)?.[1] ?? '';
+  const services = [];
+  for (const serviceMatch of servicesBlock.matchAll(/^  ([A-Za-z0-9_-]+):\n([\s\S]*?)(?=^  [A-Za-z0-9_-]+:|$(?![\s\S]))/gm)) {
+    const service = serviceMatch[1];
+    const block = serviceMatch[2];
+    if (/^\s{4}base_path:\s+"\/_api\//m.test(block)) {
+      services.push(service);
+    }
+    for (const nestedMatch of block.matchAll(/^\s+base_path:\s+"\/_api\/([^"]+)"/gm)) {
+      services.push(nestedMatch[1]);
+    }
+  }
+  return uniqueSorted(services);
 }
 
 function extractRouterApiServices(source) {
@@ -687,7 +699,7 @@ async function main() {
   }
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   main().catch((error) => {
     console.error(error);
     process.exit(1);

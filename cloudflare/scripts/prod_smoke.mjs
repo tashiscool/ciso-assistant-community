@@ -240,6 +240,20 @@ if (semanticCoverage.data.summary?.regscaleBuilderDomains !== 7) {
     `Expected 7 RegScale builder domains, found ${semanticCoverage.data.summary?.regscaleBuilderDomains ?? 'unknown'}.`,
   );
 }
+const semanticAlignment = semanticCoverage.data.alignment;
+if (!semanticAlignment) {
+  throw new Error('Production semantic coverage did not include frontend/backend alignment evidence.');
+}
+for (const key of ['frontendRoutesCovered', 'frontendApiCallsCovered', 'backendHandlersCovered', 'permissionGatesCovered']) {
+  if (semanticAlignment[key] !== true) {
+    throw new Error(`Production semantic alignment check failed for ${key}.`);
+  }
+}
+if (Array.isArray(semanticAlignment.unresolvedAlignmentGaps) && semanticAlignment.unresolvedAlignmentGaps.length > 0) {
+  throw new Error(
+    `Production semantic alignment has unresolved gaps: ${JSON.stringify(semanticAlignment.unresolvedAlignmentGaps)}`,
+  );
+}
 
 const violations = results.filter((item) => item.p95 > p95BudgetMs);
 if (violations.length > 0) {

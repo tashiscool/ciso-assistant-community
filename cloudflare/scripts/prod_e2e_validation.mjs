@@ -9,6 +9,7 @@ import {
   OPENREGSCALE_ROUTE_COMPATIBILITY,
   buildSemanticGapMatrix,
 } from './semantic_gap_matrix.mjs';
+import { buildFrontendBackendAlignment } from './frontend_backend_alignment_check.mjs';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const frontendRequire = createRequire(path.resolve(scriptDir, '../../frontend/package.json'));
@@ -683,6 +684,48 @@ async function validateSemanticGapMatrix() {
     unresolvedRequired: matrix.unresolvedRequired,
   };
   return matrix.summary;
+}
+
+async function validateFrontendBackendAlignment() {
+  const alignment = await buildFrontendBackendAlignment({ cwd: path.resolve(scriptDir, '../..') });
+  assert(
+    alignment.ok,
+    `Frontend/backend alignment has unresolved gaps: ${alignment.alignment.unresolvedAlignmentGaps
+      .map((entry) => `${entry.category}:${entry.route ?? entry.path ?? entry.service ?? entry.semanticKey ?? entry.reason}`)
+      .join(', ')}`,
+  );
+  report.app.frontendBackendAlignment = {
+    generatedAt: alignment.generatedAt,
+    summary: alignment.summary,
+    unresolvedAlignmentGaps: alignment.alignment.unresolvedAlignmentGaps,
+  };
+  return alignment.summary;
+}
+
+async function validateLiveSemanticAlignment(context) {
+  const payload = await jsonRequest(context.request, 'GET', '/core/semantic-coverage');
+  const data = payload?.data;
+  assert(data?.ok === true, `Live semantic coverage endpoint is not healthy: ${JSON.stringify(data?.unresolvedRequired ?? [])}`);
+  assert(data?.summary?.unresolvedRequired === 0, 'Live semantic coverage endpoint reports unresolved semantic mappings.');
+  assert(data?.summary?.unresolvedAlignmentGaps === 0, 'Live semantic coverage endpoint reports unresolved alignment gaps.');
+  const alignment = data?.alignment;
+  assert(alignment, 'Live semantic coverage endpoint did not include alignment evidence.');
+  for (const key of ['frontendRoutesCovered', 'frontendApiCallsCovered', 'backendHandlersCovered', 'permissionGatesCovered']) {
+    assert(alignment[key] === true, `Live semantic alignment endpoint reports ${key}=false.`);
+  }
+  assert(
+    !Array.isArray(alignment.unresolvedAlignmentGaps) || alignment.unresolvedAlignmentGaps.length === 0,
+    `Live semantic alignment endpoint has unresolved gaps: ${JSON.stringify(alignment.unresolvedAlignmentGaps)}`,
+  );
+  report.app.liveSemanticAlignment = {
+    generatedAt: data.generatedAt,
+    summary: data.summary,
+    alignmentSummary: alignment.summary,
+  };
+  return {
+    semanticContracts: data.summary,
+    alignment: alignment.summary,
+  };
 }
 
 function semanticCompatibilityRouteChecks() {
@@ -3046,6 +3089,8 @@ async function main() {
     const preflight = makeSuite('preflight');
     await runCheck(preflight, 'features/scale.md semantic inventory', () => loadScaleMdSemanticInventory(), { critical: true });
     await runCheck(preflight, 'bootstrap admin session', () => bootstrapSession(context), { critical: true });
+    await runCheck(preflight, 'frontend/backend static alignment', () => validateFrontendBackendAlignment(), { critical: true });
+    await runCheck(preflight, 'live semantic alignment endpoint', () => validateLiveSemanticAlignment(context), { critical: true });
     modules = await runCheck(preflight, 'load scale module catalog', () => loadLiveCatalog(context), { critical: true }) ?? [];
     await runCheck(preflight, 'scale.md semantic surface coverage', () => validateScaleMdSemanticSurfaceCoverage(modules), { critical: true });
     await runCheck(preflight, 'semantic gap matrix', () => validateSemanticGapMatrix(), { critical: true });

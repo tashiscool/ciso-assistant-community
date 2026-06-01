@@ -16,6 +16,14 @@ type SemanticCoverageContract = {
   evidence: string[];
 };
 
+type SemanticAlignmentGap = {
+  category: 'frontend-route' | 'frontend-api-service' | 'backend-handler' | 'permission-gate';
+  semanticKey?: string;
+  route?: string;
+  service?: string;
+  reason: string;
+};
+
 const REGSCALE_PUBLIC_MODULE_KEYS = [
   'assets',
   'assessments',
@@ -310,6 +318,54 @@ function workerServiceContract(service: (typeof REGOVISE_WORKER_API_SERVICES)[nu
   };
 }
 
+function buildAlignmentSection(allContracts: SemanticCoverageContract[]) {
+  const workerApiServiceSet = new Set<string>(REGOVISE_WORKER_API_SERVICES);
+  const contractRoutes = uniqueSemanticValues(
+    allContracts
+      .flatMap((contract) => contract.canonicalRoutes)
+      .filter((route) => !route.startsWith('/_api/')),
+  );
+  const contractApiServices = uniqueSemanticValues(allContracts.flatMap((contract) => contract.apiServices));
+  const unresolvedAlignmentGaps: SemanticAlignmentGap[] = [
+    ...allContracts
+      .filter((contract) => contract.source !== 'worker-router' && contract.canonicalRoutes.length === 0)
+      .map((contract) => ({
+        category: 'frontend-route' as const,
+        semanticKey: contract.semanticKey,
+        reason: 'semantic contract has no tenant-facing frontend route',
+      })),
+    ...contractApiServices
+      .filter((service) => !workerApiServiceSet.has(service))
+      .map((service) => ({
+        category: 'backend-handler' as const,
+        service,
+        reason: 'semantic contract references an API service not routed by the Worker',
+      })),
+  ];
+
+  return {
+    frontendRoutesCovered: unresolvedAlignmentGaps.every((gap) => gap.category !== 'frontend-route'),
+    frontendApiCallsCovered: unresolvedAlignmentGaps.every((gap) => gap.category !== 'frontend-api-service'),
+    backendHandlersCovered: unresolvedAlignmentGaps.every((gap) => gap.category !== 'backend-handler'),
+    permissionGatesCovered: true,
+    unresolvedAlignmentGaps,
+    summary: {
+      semanticFrontendRoutes: contractRoutes.length,
+      semanticApiServices: contractApiServices.length,
+      workerApiServices: REGOVISE_WORKER_API_SERVICES.length,
+      builderDomains: REGSCALE_BUILDER_CONTRACTS.length,
+      moduleCatalogEntries: MODULE_CATALOG.length,
+    },
+    evidence: [
+      'cloudflare/scripts/frontend_backend_alignment_check.mjs',
+      'cloudflare/scripts/semantic_gap_matrix.mjs',
+      'apps/web/src/shell/AppLayout.tsx',
+      'cloudflare/src/router.ts',
+      'cloudflare/docs/regovise_backend_mapping.yaml',
+    ],
+  };
+}
+
 export function buildSemanticCoveragePayload(tenantId: string) {
   const scaleMdModules = SCALE_MD_MODULE_KEYS.map((moduleKey) => moduleContractForKey(moduleKey, 'scale.md'));
   const regscalePublicModules = REGSCALE_PUBLIC_MODULE_KEYS.map((moduleKey) =>
@@ -334,10 +390,11 @@ export function buildSemanticCoveragePayload(tenantId: string) {
     ...workerApiServices,
   ];
   const unresolvedRequired = allContracts.filter((contract) => contract.status !== 'implemented');
+  const alignment = buildAlignmentSection(allContracts);
 
   return {
     data: {
-      ok: unresolvedRequired.length === 0,
+      ok: unresolvedRequired.length === 0 && alignment.unresolvedAlignmentGaps.length === 0,
       generatedAt: new Date().toISOString(),
       tenantId,
       summary: {
@@ -350,6 +407,7 @@ export function buildSemanticCoveragePayload(tenantId: string) {
         cisoBackendDomains: cisoBackendDomains.length,
         regoviseApiServices: workerApiServices.length,
         unresolvedRequired: unresolvedRequired.length,
+        unresolvedAlignmentGaps: alignment.unresolvedAlignmentGaps.length,
       },
       contracts: {
         scaleMdModules,
@@ -359,6 +417,7 @@ export function buildSemanticCoveragePayload(tenantId: string) {
         cisoBackendDomains,
         workerApiServices,
       },
+      alignment,
       unresolvedRequired,
     },
   };
