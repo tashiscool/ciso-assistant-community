@@ -1,0 +1,1238 @@
+schema_version: "1.0"
+document:
+  title: "CISO Assistant Community Python Backend Mapping"
+  repository: "ciso-assistant-community"
+  generated_on: "2026-06-01"
+  purpose: >
+    Machine-readable map of the Python backend surfaces in ciso-assistant-community,
+    including the Django REST API, data model, authentication and authorization,
+    background jobs, storage, enterprise overlay, automation sidecars, dispatcher,
+    CLI/MCP tooling, management commands, and validation entry points.
+  scope:
+    primary_backend: "backend/"
+    enterprise_overlay: "enterprise/backend/"
+    python_sidecars:
+      - "automation/"
+      - "dispatcher/"
+      - "cli/"
+      - "tools/"
+      - "config/"
+    excludes:
+      - "frontend runtime implementation details"
+      - "Cloudflare Regovise Worker implementation details"
+  authoritative_sources:
+    django_settings: "backend/ciso_assistant/settings.py"
+    django_root_urls: "backend/ciso_assistant/urls.py"
+    django_core_urls: "backend/core/urls.py"
+    django_apps: "backend/*/apps.py"
+    django_models: "backend/*/models.py"
+    django_serializers: "backend/*/serializers.py"
+    django_views: "backend/*/views.py"
+    django_tasks: "backend/*/tasks.py"
+    migrations: "backend/*/migrations/*.py"
+    enterprise_settings: "enterprise/backend/enterprise_core/settings.py"
+    enterprise_urls: "enterprise/backend/enterprise_core/urls.py"
+    enterprise_models: "enterprise/backend/enterprise_core/models.py"
+    docker_runtime: "backend/Dockerfile, docker-compose.yml, config/docker-compose-barebone.yml"
+    dispatcher: "dispatcher/"
+    cli_mcp: "cli/"
+    automation: "automation/"
+
+runtime:
+  primary_framework: "Django"
+  api_framework: "Django REST Framework"
+  schema_generator: "drf-spectacular"
+  auth_packages:
+    - "django-rest-knox"
+    - "django-allauth"
+    - "allauth.headless"
+    - "allauth.mfa"
+    - "allauth.socialaccount.providers.saml"
+    - "allauth.socialaccount.providers.openid_connect"
+  background_jobs: "Huey via huey.contrib.djhuey"
+  audit: "django-auditlog plus core.custom_middleware.AuditlogMiddleware"
+  structured_logging: "django-structlog / structlog"
+  file_storage:
+    default: "local filesystem at LOCAL_STORAGE_DIRECTORY / MEDIA_ROOT"
+    optional: "S3-compatible storage via django-storages S3Boto3Storage when USE_S3=true"
+  vector_search:
+    qdrant: "Used by chat/RAG when ENABLE_CHAT=true and QDRANT_URL is configured."
+  llm_backends:
+    chat_mode:
+      enabled_by: "ENABLE_CHAT=true plus chat_mode feature flag"
+      supported:
+        - "Ollama"
+        - "OpenAI-compatible local servers such as LM Studio, MLX, vLLM, llama.cpp"
+        - "sentence-transformers embeddings fallback"
+  python_targets:
+    backend: ">=3.14,<3.15"
+    enterprise_backend: "^3.14"
+    automation: ">=3.12"
+    dispatcher: ">=3.11,<4.0"
+    cli: ">=3.12"
+  server_entrypoints:
+    manage_py: "backend/manage.py"
+    wsgi: "backend/ciso_assistant/wsgi.py"
+    asgi: "backend/ciso_assistant/asgi.py"
+    container_entrypoint: "backend/startup.sh via backend/Dockerfile"
+    huey_worker: "python manage.py run_huey -w 2 --scheduler-interval 60"
+  docker:
+    backend_image_source: "backend/Dockerfile"
+    backend_port: 8000
+    frontend_port: 3000
+    tls_reverse_proxy: "Caddy in docker-compose.yml"
+    healthcheck: "GET /api/health/"
+
+configuration:
+  core_settings:
+    DJANGO_SETTINGS_MODULE: "ciso_assistant.settings"
+    ROOT_URLCONF: "ciso_assistant.urls"
+    CISO_ASSISTANT_URL: "frontend/public origin; default http://localhost:5173"
+    ALLOWED_HOSTS: "comma-separated host list; default localhost,127.0.0.1,host.docker.internal"
+    CSRF_TRUSTED_ORIGINS: "derived from CISO_ASSISTANT_URL"
+    DJANGO_SECRET_KEY: "secret key override; random generated fallback"
+    DJANGO_DEBUG: "enables browsable API, staticfiles, SessionAuthentication, debug-only routes"
+    CISO_ASSISTANT_VERSION: "runtime version metadata"
+    CISO_ASSISTANT_BUILD: "runtime build metadata"
+    FORCE_CREATE_ADMIN: "startup/admin creation behavior"
+  logging:
+    LOG_LEVEL: "default WARNING"
+    LOG_FORMAT: "plain or json"
+    LOG_OUTFILE: "optional ciso-assistant.log JSON file handler"
+    DB_LOG: "enables database logging path"
+  database:
+    default_sqlite:
+      engine: "django.db.backends.sqlite3"
+      env: "SQLITE_FILE"
+      default_path: "backend/db/ciso-assistant.sqlite3"
+      test_path: "backend/db/test_ciso-assistant.sqlite3"
+      pragmas:
+        - "journal_mode=WAL"
+        - "synchronous=NORMAL"
+        - "transaction_mode=IMMEDIATE"
+    postgres:
+      enabled_when: "POSTGRES_NAME is set"
+      engine: "django.db.backends.postgresql_psycopg2"
+      env:
+        - "POSTGRES_NAME"
+        - "POSTGRES_USER"
+        - "POSTGRES_PASSWORD"
+        - "DB_HOST"
+        - "DB_PORT"
+        - "CONN_MAX_AGE"
+        - "POSTGRES_SSL_MODE"
+  storage:
+    local:
+      LOCAL_STORAGE_DIRECTORY: "default backend/db/attachments"
+      ATTACHMENT_MAX_SIZE_MB: "default 25"
+    s3:
+      enabled_when: "USE_S3=true"
+      backend: "storages.backends.s3boto3.S3Boto3Storage"
+      credential_modes:
+        - "AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY"
+        - "AWS_WEB_IDENTITY_TOKEN_FILE + AWS_ROLE_ARN for IRSA"
+      env:
+        - "AWS_STORAGE_BUCKET_NAME"
+        - "AWS_S3_ENDPOINT_URL"
+        - "AWS_S3_REGION_NAME"
+        - "AWS_LOCATION"
+        - "AWS_S3_FILE_OVERWRITE=false"
+  email:
+    primary_smtp:
+      - "DEFAULT_FROM_EMAIL"
+      - "EMAIL_HOST"
+      - "EMAIL_PORT"
+      - "EMAIL_HOST_USER"
+      - "EMAIL_HOST_PASSWORD"
+      - "EMAIL_USE_TLS"
+      - "EMAIL_USE_SSL"
+    rescue_smtp:
+      - "EMAIL_HOST_RESCUE"
+      - "EMAIL_PORT_RESCUE"
+      - "EMAIL_HOST_USER_RESCUE"
+      - "EMAIL_HOST_PASSWORD_RESCUE"
+      - "EMAIL_USE_TLS_RESCUE"
+      - "EMAIL_USE_SSL_RESCUE"
+    safety:
+      - "EMAIL_USE_TLS and EMAIL_USE_SSL are mutually exclusive."
+      - "EMAIL_FORCE_TLS_1_2 can pin SMTP TLS to TLS 1.2."
+      - "MAIL_DEBUG=true uses console email backend."
+  auth_tokens:
+    AUTH_TOKEN_TTL: "default 60 minutes"
+    AUTH_TOKEN_AUTO_REFRESH: "default true"
+    AUTH_TOKEN_AUTO_REFRESH_MAX_TTL: "default 10 hours"
+    KNOX_TOKEN_MODEL: "knox.AuthToken"
+  huey:
+    HUEY_FILE_PATH: "default backend/db/huey.db"
+    class: "huey.SqliteHuey"
+    name: "ciso_assistant"
+    utc: true
+    results: true
+    immediate: false
+  feature_flags:
+    ENABLE_CHAT: "enables chat feature flag, chat settings, signals, and chat API runtime behavior"
+    ENABLE_SANDBOX: "enables bubblewrap isolation for sensitive processing paths"
+    WEBHOOK_ALLOW_PRIVATE_IPS: "allows private IP webhook delivery targets when true"
+  enterprise:
+    settings_module: "enterprise/backend/enterprise_core/settings.py"
+    license_env:
+      - "LICENSE_SEATS"
+      - "LICENSE_EXPIRATION"
+    dynamic_routes:
+      - "client-settings"
+      - "custom-email-templates"
+      - "custom-word-templates"
+
+django_rest_framework:
+  default_renderers:
+    - "JSONRenderer"
+    - "BrowsableAPIRenderer only in DEBUG"
+  default_authentication:
+    - "knox.auth.TokenAuthentication"
+    - "SessionAuthentication only in DEBUG"
+  default_permissions:
+    - "IsAuthenticated"
+    - "core.permissions.RBACPermissions"
+    - "enterprise_core.permissions.LicensePermission in enterprise build"
+  default_filter_backends:
+    - "django_filters.rest_framework.DjangoFilterBackend"
+  default_pagination: "core.pagination.CustomLimitOffsetPagination"
+  schema_class: "drf_spectacular.openapi.AutoSchema"
+  exception_handler: "core.helpers.handle"
+
+authentication_and_authorization:
+  identity_model: "iam.User"
+  login_methods:
+    local_password: "/api/iam/login/"
+    knox_logout: "/api/iam/logout/"
+    knox_logout_all: "/api/iam/logoutall/"
+    personal_access_tokens: "/api/iam/auth-tokens/"
+    headless_allauth: "/api/_allauth/"
+    oidc: "/api/accounts/oidc/"
+    saml: "/api/accounts/saml/"
+    session_token_exchange: "/api/iam/session-token/"
+  sso:
+    providers:
+      - "SAML"
+      - "OpenID Connect"
+    adapters:
+      account: "iam.adapter.AccountAdapter"
+      social_account: "iam.adapter.SocialAccountAdapter"
+    headless_token_strategy: "iam.utils.KnoxTokenStrategy"
+  authorization_model:
+    root_folder: "iam.Folder with content_type=GL"
+    domain_folder: "iam.Folder with content_type=DO"
+    enclave_folder: "iam.Folder with content_type=EN"
+    role_catalog: "iam.Role"
+    role_assignment: "iam.RoleAssignment"
+    group_membership: "iam.UserGroup"
+    object_scope: "Folder.get_folder(obj) resolves object-to-folder ownership"
+    object_permissions: "core.permissions.RBACPermissions maps HTTP verbs to Django model permissions"
+    published_visibility: "is_published objects use RoleAssignment.is_object_readable for safe read access"
+    cache_layer:
+      source: "backend/iam/cache_builders.py"
+      caches:
+        - "folders"
+        - "roles"
+        - "user_groups"
+        - "role_assignments"
+  permission_apps:
+    - "core"
+    - "ebios_rm"
+    - "tprm"
+    - "privacy"
+    - "resilience"
+    - "crq"
+    - "pmbok"
+    - "iam"
+    - "global_settings"
+  ignored_permission_models:
+    - "personalaccesstoken"
+    - "role"
+    - "roleassignment"
+    - "usergroup"
+    - "ssosettings"
+    - "historicalmetric"
+
+top_level_urls:
+  source: "backend/ciso_assistant/urls.py"
+  routes:
+    - path: "/api/webhooks/"
+      include: "webhooks.urls"
+    - path: "/api/schema/"
+      view: "SpectacularAPIView"
+    - path: "/api/schema/swagger/"
+      view: "SpectacularSwaggerView"
+    - path: "/api/schema/redoc/"
+      view: "SpectacularRedocView"
+    - path: "/api/integrations/"
+      include: "integrations.urls"
+      namespace: "integrations"
+    - path: "/api/"
+      include: "core.urls"
+    - path: "/serdes/"
+      include: "serdes.urls"
+      note: "Non-api compatibility route, duplicated under /api/serdes/ by core.urls."
+    - path: "/i18n/"
+      include: "django.conf.urls.i18n"
+
+api_map:
+  core:
+    base_path: "/api/"
+    source: "backend/core/urls.py"
+    purpose: "Main GRC, IAM include bridge, assessment, risk, evidence, library, tasks, incidents, search, metrics, imports, and module includes."
+    router_viewsets:
+      - route: "folders"
+        viewset: "FolderViewSet"
+        model: "iam.Folder"
+      - route: "entities"
+        viewset: "EntityViewSet"
+        model: "tprm.Entity"
+      - route: "entity-assessments"
+        viewset: "EntityAssessmentViewSet"
+        model: "tprm.EntityAssessment"
+      - route: "solutions"
+        viewset: "SolutionViewSet"
+        model: "tprm.Solution"
+      - route: "representatives"
+        viewset: "RepresentativeViewSet"
+        model: "tprm.Representative"
+      - route: "contracts"
+        viewset: "ContractViewSet"
+        model: "tprm.Contract"
+      - route: "perimeters"
+        viewset: "PerimeterViewSet"
+        model: "core.Perimeter"
+      - route: "risk-matrices"
+        viewset: "RiskMatrixViewSet"
+        model: "core.RiskMatrix"
+      - route: "vulnerabilities"
+        viewset: "VulnerabilityViewSet"
+        model: "core.Vulnerability"
+      - route: "risk-assessments"
+        viewset: "RiskAssessmentViewSet"
+        model: "core.RiskAssessment"
+      - route: "threats"
+        viewset: "ThreatViewSet"
+        model: "core.Threat"
+      - route: "risk-scenarios"
+        viewset: "RiskScenarioViewSet"
+        model: "core.RiskScenario"
+      - route: "applied-controls"
+        viewset: "AppliedControlViewSet"
+        model: "core.AppliedControl"
+      - route: "policies"
+        viewset: "PolicyViewSet"
+        model: "core.Policy"
+      - route: "risk-acceptances"
+        viewset: "RiskAcceptanceViewSet"
+        model: "core.RiskAcceptance"
+      - route: "validation-flows"
+        viewset: "ValidationFlowViewSet"
+        model: "core.ValidationFlow"
+      - route: "reference-controls"
+        viewset: "ReferenceControlViewSet"
+        model: "core.ReferenceControl"
+      - route: "asset-capabilities"
+        viewset: "AssetCapabilityViewSet"
+        model: "core.AssetCapability"
+      - route: "assets"
+        viewset: "AssetViewSet"
+        model: "core.Asset"
+      - route: "asset-class"
+        viewset: "AssetClassViewSet"
+        model: "core.AssetClass"
+      - route: "actors"
+        viewset: "ActorViewSet"
+        model: "core.Actor"
+      - route: "teams"
+        viewset: "TeamViewSet"
+        model: "core.Team"
+      - route: "users"
+        viewset: "UserViewSet"
+        model: "iam.User"
+      - route: "user-groups"
+        viewset: "UserGroupViewSet"
+        model: "iam.UserGroup"
+      - route: "role-assignments"
+        viewset: "RoleAssignmentViewSet"
+        model: "iam.RoleAssignment"
+      - route: "frameworks"
+        viewset: "FrameworkViewSet"
+        model: "core.Framework"
+      - route: "evidences"
+        viewset: "EvidenceViewSet"
+        model: "core.Evidence"
+      - route: "evidence-revisions"
+        viewset: "EvidenceRevisionViewSet"
+        model: "core.EvidenceRevision"
+      - route: "compliance-assessments"
+        viewset: "ComplianceAssessmentViewSet"
+        model: "core.ComplianceAssessment"
+      - route: "campaigns"
+        viewset: "CampaignViewSet"
+        model: "core.Campaign"
+      - route: "organisation-objectives"
+        viewset: "OrganisationObjectiveViewSet"
+        model: "core.OrganisationObjective"
+      - route: "organisation-issues"
+        viewset: "OrganisationIssueViewSet"
+        model: "core.OrganisationIssue"
+      - route: "requirement-nodes"
+        viewset: "RequirementViewSet"
+        model: "core.RequirementNode"
+      - route: "requirement-assessments"
+        viewset: "RequirementAssessmentViewSet"
+        model: "core.RequirementAssessment"
+      - route: "requirement-assignments"
+        viewset: "RequirementAssignmentViewSet"
+        model: "core.RequirementAssignment"
+      - route: "stored-libraries"
+        viewset: "StoredLibraryViewSet"
+        model: "core.StoredLibrary"
+      - route: "loaded-libraries"
+        viewset: "LoadedLibraryViewSet"
+        model: "core.LoadedLibrary"
+      - route: "requirement-mapping-sets"
+        viewset: "RequirementMappingSetViewSet"
+        model: "core.RequirementMappingSet"
+      - route: "filtering-labels"
+        viewset: "FilteringLabelViewSet"
+        model: "core.FilteringLabel"
+      - route: "library-filtering-labels"
+        viewset: "LibraryFilteringLabelViewSet"
+        model: "core.LibraryFilteringLabel"
+      - route: "security-exceptions"
+        viewset: "SecurityExceptionViewSet"
+        model: "core.SecurityException"
+      - route: "findings-assessments"
+        viewset: "FindingsAssessmentViewSet"
+        model: "core.FindingsAssessment"
+      - route: "findings"
+        viewset: "FindingViewSet"
+        model: "core.Finding"
+      - route: "incidents"
+        viewset: "IncidentViewSet"
+        model: "core.Incident"
+      - route: "timeline-entries"
+        viewset: "TimelineEntryViewSet"
+        model: "core.TimelineEntry"
+      - route: "comments"
+        viewset: "CommentViewSet"
+        model: "core.Comment"
+      - route: "task-templates"
+        viewset: "TaskTemplateViewSet"
+        model: "core.TaskTemplate"
+      - route: "task-nodes"
+        viewset: "TaskNodeViewSet"
+        model: "core.TaskNode"
+      - route: "terminologies"
+        viewset: "TerminologyViewSet"
+        model: "core.Terminology"
+      - route: "preset-journeys"
+        viewset: "PresetJourneyViewSet"
+        model: "core.PresetJourney"
+      - route: "preset-journey-steps"
+        viewset: "PresetJourneyStepViewSet"
+        model: "core.PresetJourneyStep"
+      - route: "client-settings"
+        viewset: "enterprise_core.views.ClientSettingsViewSet"
+        model: "enterprise_core.ClientSettings"
+        source: "enterprise dynamic ROUTES"
+      - route: "custom-email-templates"
+        viewset: "enterprise_core.views.CustomEmailTemplateViewSet"
+        model: "core.CustomEmailTemplate"
+        source: "enterprise dynamic ROUTES"
+      - route: "custom-word-templates"
+        viewset: "enterprise_core.views.CustomWordTemplateViewSet"
+        model: "core.CustomWordTemplate"
+        source: "enterprise dynamic ROUTES"
+    included_modules:
+      - path: "iam/"
+        include: "iam.urls"
+      - path: "serdes/"
+        include: "serdes.urls"
+      - path: "data-wizard/"
+        include: "data_wizard.urls"
+      - path: "settings/"
+        include: "global_settings.urls"
+      - path: "chat/"
+        include: "chat.urls"
+      - path: "ebios-rm/"
+        include: "ebios_rm.urls"
+      - path: ""
+        include: "doc_management.urls"
+      - path: "privacy/"
+        include: "privacy.urls"
+      - path: "resilience/"
+        include: "resilience.urls"
+      - path: "crq/"
+        include: "crq.urls"
+      - path: "pmbok/"
+        include: "pmbok.urls"
+      - path: "metrology/"
+        include: "metrology.urls"
+      - path: "accounts/oidc/"
+        include: "iam.sso.oidc.urls"
+      - path: "accounts/saml/"
+        include: "iam.sso.saml.urls"
+      - path: "accounts/"
+        include: "allauth.urls"
+      - path: "_allauth/"
+        include: "allauth.headless.urls"
+      - path: ""
+        include: "enterprise_core.urls"
+        enabled_by: "enterprise MODULES dynamic include"
+    direct_endpoints:
+      - "user-preferences/"
+      - "csrf/"
+      - "health/"
+      - "build/"
+      - "evidences/<uuid:pk>/upload/"
+      - "evidence-revisions/<uuid:pk>/upload/"
+      - "get_counters/"
+      - "get_metrics/"
+      - "get_audits_metrics/"
+      - "get_combined_assessments_status/"
+      - "get_governance_calendar_data/"
+      - "agg_data/"
+      - "composer_data/"
+      - "i18n/"
+      - "requirement-assessments/<uuid:pk>/suggestions/applied-controls/"
+      - "compliance-assessments/<uuid:pk>/suggestions/applied-controls/"
+      - "compliance-assessments/<uuid:pk>/action-plan/"
+      - "compliance-assessments/<uuid:pk>/action-plan/budget-overview/"
+      - "compliance-assessments/<uuid:pk>/evidences-list/"
+      - "risk-assessments/<uuid:pk>/action-plan/"
+      - "risk-assessments/<uuid:pk>/action-plan/budget-overview/"
+      - "mapping-libraries/"
+      - "folders/<uuid:pk>/users/"
+      - "search/"
+      - "quick-start/"
+      - "content-types/"
+      - "task-nodes/<uuid:pk>/evidences/"
+      - "api-auth/ only in DEBUG"
+  iam:
+    base_path: "/api/iam/"
+    source: "backend/iam/urls.py"
+    endpoints:
+      - "login/"
+      - "logout/"
+      - "logoutall/"
+      - "current-user/"
+      - "change-password/"
+      - "password-reset/"
+      - "password-reset/confirm/"
+      - "set-password/"
+      - "revoke-sessions/"
+      - "sso/"
+      - "session-token/"
+      - "auth-tokens/"
+      - "auth-tokens/<str:pk>/"
+  settings:
+    base_path: "/api/settings/"
+    source: "backend/global_settings/urls.py"
+    router_viewsets:
+      - "global -> GlobalSettingsViewSet"
+      - "sso -> SSOSettingsViewSet"
+      - "general -> GeneralSettingsViewSet"
+      - "feature-flags -> FeatureFlagsViewSet"
+    direct_endpoints:
+      - "sso/info/"
+      - "general/default-language/"
+  webhooks:
+    base_path: "/api/webhooks/"
+    source: "backend/webhooks/urls.py"
+    router_viewsets:
+      - "endpoints -> WebhookEndpointViewSet"
+    direct_endpoints:
+      - "event-types/"
+  integrations:
+    base_path: "/api/integrations/"
+    source: "backend/integrations/urls.py"
+    namespace: "integrations"
+    router_viewsets:
+      - "configs -> IntegrationConfigurationViewSet"
+    direct_endpoints:
+      - "providers/"
+      - "test-connection/"
+      - "webhook/<uuid:config_id>/"
+      - "sync-mappings/<uuid:pk>/"
+  serdes:
+    base_paths:
+      - "/api/serdes/"
+      - "/serdes/"
+    source: "backend/serdes/urls.py"
+    endpoints:
+      - "dump-db/"
+      - "load-backup/"
+      - "full-restore/"
+      - "attachment-metadata/"
+      - "batch-download-attachments/"
+      - "batch-upload-attachments/"
+  data_wizard:
+    base_path: "/api/data-wizard/"
+    source: "backend/data_wizard/urls.py"
+    endpoints:
+      - "load-file/"
+    purpose: "Excel/CSV import wizard for assets, users, folders, perimeters, assessments, libraries, privacy, TPRM, EBIOS, and BIA templates."
+  chat:
+    base_path: "/api/chat/"
+    source: "backend/chat/urls.py"
+    enabled_by: "ENABLE_CHAT=true plus settings feature flag"
+    router_viewsets:
+      - "sessions -> ChatSessionViewSet"
+      - "documents -> IndexedDocumentViewSet"
+    direct_endpoints:
+      - "status/"
+      - "ollama-models/"
+  ebios_rm:
+    base_path: "/api/ebios-rm/"
+    source: "backend/ebios_rm/urls.py"
+    router_viewsets:
+      - "studies -> EbiosRMStudyViewSet"
+      - "feared-events -> FearedEventViewSet"
+      - "ro-to -> RoToViewSet"
+      - "stakeholders -> StakeholderViewSet"
+      - "strategic-scenarios -> StrategicScenarioViewSet"
+      - "attack-paths -> AttackPathViewSet"
+      - "operational-scenarios -> OperationalScenarioViewSet"
+      - "elementary-actions -> ElementaryActionViewSet"
+      - "operating-modes -> OperatingModeViewSet"
+      - "kill-chains -> KillChainViewSet"
+  privacy:
+    base_path: "/api/privacy/"
+    source: "backend/privacy/urls.py"
+    router_viewsets:
+      - "purposes -> PurposeViewSet"
+      - "personal-data -> PersonalDataViewSet"
+      - "data-subjects -> DataSubjectViewSet"
+      - "data-recipients -> DataRecipientViewSet"
+      - "data-contractors -> DataContractorViewSet"
+      - "data-transfers -> DataTransferViewSet"
+      - "processings -> ProcessingViewSet"
+      - "processing-natures -> ProcessingNatureViewSet"
+      - "right-requests -> RightRequestViewSet"
+      - "data-breaches -> DataBreachViewSet"
+  resilience:
+    base_path: "/api/resilience/"
+    source: "backend/resilience/urls.py"
+    router_viewsets:
+      - "business-impact-analysis -> BusinessImpactAnalysisViewSet"
+      - "asset-assessments -> AssetAssessmentViewSet"
+      - "escalation-thresholds -> EscalationThresholdViewSet"
+  crq:
+    base_path: "/api/crq/"
+    source: "backend/crq/urls.py"
+    router_viewsets:
+      - "quantitative-risk-studies -> QuantitativeRiskStudyViewSet"
+      - "quantitative-risk-scenarios -> QuantitativeRiskScenarioViewSet"
+      - "quantitative-risk-hypotheses -> QuantitativeRiskHypothesisViewSet"
+    direct_endpoints:
+      - "quantitative-risk-studies/<uuid:pk>/action-plan/"
+      - "quantitative-risk-studies/<uuid:pk>/action-plan/budget-overview/"
+  pmbok:
+    base_path: "/api/pmbok/"
+    source: "backend/pmbok/urls.py"
+    router_viewsets:
+      - "generic-collections -> GenericCollectionViewSet"
+      - "accreditations -> AccreditationViewSet"
+  metrology:
+    base_path: "/api/metrology/"
+    source: "backend/metrology/urls.py"
+    router_viewsets:
+      - "metric-definitions -> MetricDefinitionViewSet"
+      - "metric-instances -> MetricInstanceViewSet"
+      - "custom-metric-samples -> CustomMetricSampleViewSet"
+      - "builtin-metric-samples -> BuiltinMetricSampleViewSet"
+      - "dashboards -> DashboardViewSet"
+      - "dashboard-widgets -> DashboardWidgetViewSet"
+  doc_management:
+    base_path: "/api/"
+    source: "backend/doc_management/urls.py"
+    router_viewsets:
+      - "managed-documents -> ManagedDocumentViewSet"
+      - "document-revisions -> DocumentRevisionViewSet"
+      - "document-attachments -> DocumentAttachmentViewSet"
+  enterprise_core:
+    base_path: "/api/"
+    source: "enterprise/backend/enterprise_core/urls.py"
+    enabled_by: "enterprise_core settings MODULES include"
+    router_viewsets:
+      - "log-entries -> LogEntryViewSet"
+      - "roles -> RoleViewSet"
+      - "permissions -> PermissionViewSet"
+    direct_endpoints:
+      - "build/"
+      - "license-status/"
+
+domain_apps:
+  iam:
+    path: "backend/iam"
+    responsibility: "Folders/domains, users, groups, roles, role assignments, PATs, SSO, MFA/headless auth adapters, permission cache."
+    models:
+      - "Folder"
+      - "UserGroup"
+      - "User"
+      - "Role"
+      - "RoleAssignment"
+      - "PersonalAccessToken"
+    migrations: 21
+  core:
+    path: "backend/core"
+    responsibility: "Core GRC domain: libraries, controls, frameworks, assets, evidences, assessments, risks, tasks, incidents, validation flows, policies, objectives, imports/exports, search."
+    models:
+      - "FilteringLabel"
+      - "LibraryFilteringLabel"
+      - "StoredLibrary"
+      - "LoadedLibrary"
+      - "Terminology"
+      - "Threat"
+      - "ReferenceControl"
+      - "RiskMatrix"
+      - "Framework"
+      - "RequirementNode"
+      - "RequirementMappingSet"
+      - "RequirementMapping"
+      - "Perimeter"
+      - "SecurityException"
+      - "AssetCapability"
+      - "Asset"
+      - "AssetClass"
+      - "Evidence"
+      - "EvidenceRevision"
+      - "Incident"
+      - "TimelineEntry"
+      - "Comment"
+      - "AppliedControl"
+      - "Policy"
+      - "OrganisationIssue"
+      - "OrganisationObjective"
+      - "Vulnerability"
+      - "HistoricalMetric"
+      - "RiskAssessment"
+      - "RiskScenario"
+      - "Campaign"
+      - "ComplianceAssessment"
+      - "RequirementAssessment"
+      - "RequirementAssignment"
+      - "RequirementAssignmentEvent"
+      - "FindingsAssessment"
+      - "Finding"
+      - "RiskAcceptance"
+      - "TaskTemplate"
+      - "TaskNode"
+      - "ValidationFlow"
+      - "FlowEvent"
+      - "Team"
+      - "Actor"
+      - "PresetJourney"
+      - "PresetJourneyStep"
+      - "CustomEmailTemplate"
+      - "CustomWordTemplate"
+    migrations: 151
+  library:
+    path: "backend/library"
+    responsibility: "Library upload, validation, preset execution, autoload/store library management, mapping library surfaces."
+    models: "Uses core StoredLibrary and LoadedLibrary models."
+    management_commands:
+      - "autoloadlibraries"
+      - "storelibraries"
+  tprm:
+    path: "backend/tprm"
+    responsibility: "Third-party risk management, entities, entity assessments, representatives, solutions, contracts, DORA exports."
+    models:
+      - "Entity"
+      - "EntityAssessment"
+      - "Representative"
+      - "Solution"
+      - "Contract"
+    migrations: 15
+  privacy:
+    path: "backend/privacy"
+    responsibility: "GDPR/privacy processing records, data categories, contractors/transfers, right requests, data breaches."
+    models:
+      - "ProcessingNature"
+      - "Processing"
+      - "Purpose"
+      - "PersonalData"
+      - "DataSubject"
+      - "DataRecipient"
+      - "DataContractor"
+      - "DataTransfer"
+      - "RightRequest"
+      - "DataBreach"
+    migrations: 17
+  resilience:
+    path: "backend/resilience"
+    responsibility: "Business impact analysis, asset recovery assessments, escalation thresholds."
+    models:
+      - "BusinessImpactAnalysis"
+      - "AssetAssessment"
+      - "EscalationThreshold"
+    migrations: 6
+  ebios_rm:
+    path: "backend/ebios_rm"
+    responsibility: "EBIOS Risk Manager studies, feared events, Ro/To, stakeholders, strategic and operational scenarios, attack paths, kill chains."
+    models:
+      - "EbiosRMStudy"
+      - "FearedEvent"
+      - "RoTo"
+      - "Stakeholder"
+      - "StrategicScenario"
+      - "AttackPath"
+      - "ElementaryAction"
+      - "OperatingMode"
+      - "OperationalScenario"
+      - "KillChain"
+    migrations: 24
+  crq:
+    path: "backend/crq"
+    responsibility: "Cyber Risk Quantification studies, scenarios, hypotheses, simulation data, action plans."
+    models:
+      - "QuantitativeRiskStudy"
+      - "QuantitativeRiskScenario"
+      - "QuantitativeRiskHypothesis"
+    migrations: 3
+  pmbok:
+    path: "backend/pmbok"
+    responsibility: "PMBOK-style generic collections and accreditations linked to GRC work items."
+    models:
+      - "GenericCollection"
+      - "Accreditation"
+    migrations: 4
+  metrology:
+    path: "backend/metrology"
+    responsibility: "Metrics, custom/builtin metric samples, dashboards, dashboard widgets."
+    models:
+      - "MetricDefinition"
+      - "MetricInstance"
+      - "CustomMetricSample"
+      - "BuiltinMetricSample"
+      - "Dashboard"
+      - "DashboardWidget"
+    migrations: 4
+  doc_management:
+    path: "backend/doc_management"
+    responsibility: "Managed documents, revisions, publishing workflow, PDF export, document attachments."
+    models:
+      - "ManagedDocument"
+      - "DocumentRevision"
+      - "DocumentAttachment"
+      - "DocumentEdit"
+    migrations: 1
+  global_settings:
+    path: "backend/global_settings"
+    responsibility: "Global, general, SSO, language, feature flag and interface settings."
+    models:
+      - "GlobalSettings"
+    migrations: 3
+  data_wizard:
+    path: "backend/data_wizard"
+    responsibility: "Validated import parser/orchestrator for Excel and CSV templates."
+    models: []
+    migrations: 0
+  integrations:
+    path: "backend/integrations"
+    responsibility: "Provider configs, webhook ingestion, local/remote sync mappings, RPC execution."
+    models:
+      - "IntegrationProvider"
+      - "IntegrationConfiguration"
+      - "SyncMapping"
+      - "SyncEvent"
+    migrations: 1
+  webhooks:
+    path: "backend/webhooks"
+    responsibility: "Outbound webhook endpoints, event type registry, payload delivery tasks."
+    models:
+      - "WebhookEventType"
+      - "WebhookEndpoint"
+    migrations: 3
+  chat:
+    path: "backend/chat"
+    responsibility: "AI assistant sessions, messages, RAG-indexed documents, Qdrant ingestion, model status."
+    enabled_by: "ENABLE_CHAT=true"
+    models:
+      - "ChatSession"
+      - "ChatMessage"
+      - "IndexedDocument"
+    migrations: 1
+  cal:
+    path: "backend/cal"
+    responsibility: "Calendar event model."
+    models:
+      - "Event"
+    migrations: 1
+  serdes:
+    path: "backend/serdes"
+    responsibility: "Database backup/restore, full restore, attachment metadata, batch attachment streaming."
+    models: []
+  enterprise_core:
+    path: "enterprise/backend/enterprise_core"
+    responsibility: "Enterprise-only client settings, roles/permissions management extensions, audit log listing, custom email/Word templates, license status."
+    models:
+      - "ClientSettings"
+    migrations: 3
+
+data_model_relationships:
+  supporting_abstractions:
+    core:
+      - "ReferentialObjectMixin"
+      - "I18nObjectMixin"
+      - "LibraryMixin"
+    iam:
+      - "UserManager"
+      - "CaseInsensitiveUserManager"
+    pmbok:
+      - "NameDescriptionFolderMixin"
+    privacy:
+      - "NameDescriptionFolderMixin"
+  tenancy_scope:
+    primary_scope_model: "iam.Folder"
+    scoped_mixins:
+      - "FolderMixin"
+      - "PublishInRootFolderMixin"
+      - "FilteringLabelMixin"
+    notes:
+      - "Most domain objects carry a folder field directly or through an assessment/perimeter/entity parent."
+      - "RoleAssignment.perimeter_folders controls recursive domain/enclave access."
+  assessment_inheritance:
+    abstract_base: "core.Assessment"
+    concrete_models:
+      - "RiskAssessment"
+      - "ComplianceAssessment"
+      - "FindingsAssessment"
+      - "tprm.EntityAssessment"
+      - "resilience.BusinessImpactAnalysis"
+      - "ebios_rm.EbiosRMStudy"
+  evidence_lifecycle:
+    record: "core.Evidence"
+    revisions: "core.EvidenceRevision"
+    attachments:
+      storage: "default_storage"
+      integrity: "EvidenceRevision.attachment_hash stores SHA256"
+      upload_endpoints:
+        - "/api/evidences/<uuid:pk>/upload/"
+        - "/api/evidence-revisions/<uuid:pk>/upload/"
+  libraries:
+    stored: "core.StoredLibrary stores library YAML/content and autoload metadata."
+    loaded: "core.LoadedLibrary represents active loaded library content."
+    derived_objects:
+      - "Framework"
+      - "RequirementNode"
+      - "ReferenceControl"
+      - "Threat"
+      - "RiskMatrix"
+      - "MetricDefinition"
+      - "ProcessingNature"
+  action_plans:
+    control_model: "core.AppliedControl"
+    surfaced_from:
+      - "ComplianceAssessment"
+      - "RiskAssessment"
+      - "QuantitativeRiskStudy"
+  task_system:
+    templates: "core.TaskTemplate"
+    generated_nodes: "core.TaskNode"
+    notifications: "backend/core/tasks.py"
+  validation_workflow:
+    parent: "core.ValidationFlow"
+    events: "core.FlowEvent"
+    linked_models:
+      - "compliance_assessments"
+      - "risk_assessments"
+      - "business_impact_analysis"
+      - "crq_studies"
+      - "ebios_studies"
+      - "entity_assessments"
+      - "findings_assessments"
+      - "evidences"
+      - "security_exceptions"
+      - "policies"
+      - "processings"
+      - "accreditations"
+      - "contracts"
+
+background_processing:
+  huey:
+    config: "backend/ciso_assistant/settings.py#HUEY"
+    worker_command: "python manage.py run_huey -w 2 --scheduler-interval 60"
+    task_modules:
+      core:
+        source: "backend/core/tasks.py"
+        periodic:
+          - "check_controls_with_expired_eta @ 06:00"
+          - "check_compliance_assessments_due_in_month @ 06:05"
+          - "check_compliance_assessments_due_in_week @ 06:10"
+          - "check_compliance_assessments_due_tomorrow @ 06:15"
+          - "check_applied_controls_expiring_in_month @ 06:17"
+          - "check_applied_controls_expiring_in_week @ 06:20"
+          - "check_applied_controls_expiring_tomorrow @ 06:25"
+          - "check_evidences_expiring_in_month @ 06:27"
+          - "check_evidences_expiring_in_week @ 06:30"
+          - "check_evidences_expiring_tomorrow @ 06:35"
+          - "check_evidences_expired @ 06:40"
+          - "check_validation_flows_deadline_in_month @ 06:37"
+          - "check_validation_flows_deadline_in_week @ 06:40"
+          - "check_validation_flows_deadline_tomorrow @ 06:45"
+          - "check_task_nodes_due_in_month @ 06:55"
+          - "check_task_nodes_due_in_week @ 07:00"
+          - "check_task_nodes_due_tomorrow @ 07:05"
+          - "check_task_nodes_overdue @ 07:10"
+          - "check_expired_organisation_issues @ 06:50"
+          - "auditlog_retention_cleanup @ 22:30"
+          - "auditlog_prune @ every 3 hours"
+          - "lock_overdue_compliance_assessments @ 02:30"
+          - "auto_sync_assessments @ 02:45"
+          - "deactivate_expired_users @ 03:00"
+          - "mark_expired_evidences @ 03:35"
+        async:
+          - "send_task_node_due_soon_notification"
+          - "send_task_node_overdue_notification"
+          - "send_notification_email_expired_eta"
+          - "send_notification_email"
+          - "send_applied_control_assignment_notification"
+          - "send_task_template_assignment_notification"
+          - "send_compliance_assessment_assignment_notification"
+          - "send_risk_scenario_assignment_notification"
+          - "send_compliance_assessment_due_soon_notification"
+          - "send_applied_control_expiring_soon_notification"
+          - "send_notification_email_expired_evidence"
+          - "send_evidence_expiring_soon_notification"
+          - "send_validation_flow_created_notification"
+          - "send_validation_flow_updated_notification"
+          - "send_validation_deadline_notification"
+          - "send_assignment_activated_notification"
+          - "send_assignment_submitted_notification"
+          - "send_assignment_reviewed_notification"
+      chat:
+        source: "backend/chat/tasks.py"
+        tasks:
+          - "ingest_document"
+          - "index_model_object"
+          - "remove_model_object"
+          - "index_library_knowledge_base"
+      integrations:
+        source: "backend/integrations/tasks.py"
+        tasks:
+          - "sync_object_to_integrations"
+          - "process_webhook_event"
+      metrology:
+        source: "backend/metrology/tasks.py"
+        periodic:
+          - "check_realtime_metric_staleness @ every 15 minutes"
+          - "check_hourly_metric_staleness @ minute 5"
+          - "check_daily_and_longer_metric_staleness @ 04:00"
+          - "cleanup_old_builtin_metric_samples @ 03:45"
+      webhooks:
+        source: "backend/webhooks/tasks.py"
+        tasks:
+          - "send_webhook_request with retries=5, retry_delay=60, retry_backoff=2.0"
+  signals:
+    auditlog_user_info:
+      source: "backend/core/custom_middleware.py"
+      behavior: "post_save on LogEntry enriches audit log with user/folder info."
+    chat_indexing:
+      source: "backend/chat/signals.py"
+      enabled_by: "ENABLE_CHAT=true"
+      behavior: "post_save/post_delete hooks queue incremental RAG indexing for selected models and evidence revisions."
+    startup_post_migrate:
+      sources:
+        - "backend/core/apps.py"
+        - "backend/global_settings/apps.py"
+        - "enterprise/backend/enterprise_core/apps.py"
+
+sidecars_and_tools:
+  dispatcher:
+    path: "dispatcher/"
+    package: "ciso-assistant-dispatcher"
+    purpose: "Kafka-compatible message dispatcher that consumes observation messages and calls CISO Assistant REST API actions."
+    entrypoint: "dispatcher/dispatcher.py"
+    config_sources:
+      - "environment variables"
+      - ".dispatcher_config"
+      - "init-config command"
+    external_services:
+      - "Kafka or Redpanda"
+      - "CISO Assistant REST API"
+      - "optional S3-compatible object store"
+    auth_modes:
+      - "personal access token via USER_TOKEN"
+      - "email/password with optional AUTO_RENEW_SESSION"
+    message_domains:
+      - "update_applied_control"
+      - "update_requirement_assessment"
+      - "evidence/file upload style dispatch"
+      - "errors topic routing"
+  cli:
+    path: "cli/"
+    package: "ciso-assistant-cli"
+    purpose: "Command-line API client and MCP server for imports, reads, updates, evidence uploads, backups, restore, and analysis workflows."
+    entrypoints:
+      - "cli/clica.py"
+      - "cli/ca_mcp/server.py"
+    auth: "Personal Access Token via TOKEN/API_URL/VERIFY_CERTIFICATE"
+    main_command_groups:
+      - "folder/perimeter/risk matrix discovery"
+      - "Data Wizard imports"
+      - "evidence attachment upload"
+      - "full backup and restore"
+      - "MCP read/write/update/library/tprm/ebios/risk analysis tools"
+  automation:
+    path: "automation/"
+    package: "automation"
+    purpose: "Prefect-based security scan ETL, currently Prowler-oriented."
+    flow: "scan_etl_pipeline"
+    tasks:
+      - "extract_config"
+      - "create_tmp_config_files"
+      - "run_prowler_scan"
+      - "transform_results"
+      - "match_framework_urn"
+      - "update_audit"
+      - "delete_tmp_files"
+  tools:
+    path: "tools/"
+    purpose: "Framework/library conversion, mappings, Excel/YAML transformations, semantic mapping helpers, and data preparation scripts."
+    notable_subsystems:
+      - "tools/mapping_builder"
+      - "tools/misc"
+      - "tools/excel"
+      - "tools/prepare_framework_v2.py"
+      - "tools/prepare_mapping_v2.py"
+  config:
+    path: "config/"
+    purpose: "Docker compose templates and interactive config generation."
+    entrypoint: "config/make_config.py"
+
+management_commands:
+  core:
+    - "audit_visibility"
+    - "clone_instance"
+    - "dump_permissions"
+    - "mapping"
+    - "metrics_server"
+    - "populate_applied_controls"
+    - "populate_assets"
+    - "populate_domains"
+    - "populate_findings"
+    - "populate_incidents"
+    - "populate_security_exceptions"
+    - "populate_tasks"
+    - "populate_vulnerabilities"
+    - "prune_auditlog"
+    - "reset_audit"
+    - "reset_mail"
+    - "set_assessment_results"
+    - "status"
+    - "welcome_mail"
+  library:
+    - "autoloadlibraries"
+    - "storelibraries"
+  tprm:
+    - "populate_dora_data"
+    - "populate_tprm_data"
+  privacy:
+    - "populate_privacy_data"
+  chat:
+    - "cleanup_sessions"
+    - "index_libraries"
+    - "index_objects"
+    - "init_qdrant"
+  webhooks:
+    - "sync_event_types"
+
+imports_exports_and_documents:
+  data_wizard:
+    endpoint: "/api/data-wizard/load-file/"
+    parsers:
+      - "Excel and CSV"
+      - "ARM helpers"
+      - "EBIOS RM Excel helpers"
+  serdes:
+    backup_restore:
+      - "dump-db"
+      - "load-backup"
+      - "full-restore"
+      - "attachment metadata"
+      - "batch attachment download/upload streaming"
+  report_exports:
+    core_views:
+      - "risk assessment CSV/XLSX/PDF"
+      - "compliance action plan CSV/XLSX/PDF"
+      - "compliance assessment Word report"
+      - "findings XLSX/Markdown/PDF"
+      - "incident Markdown/PDF"
+      - "risk matrix YAML import/export"
+      - "framework Excel template"
+      - "DORA ROI export via TPRM"
+  document_management:
+    workflow:
+      - "draft"
+      - "editing lock/takeover"
+      - "submit for review"
+      - "approve"
+      - "publish"
+      - "request changes"
+      - "diff/edit diff"
+      - "PDF export"
+    attachment_endpoint: "/api/document-attachments/<id>/file/"
+
+testing_and_validation:
+  test_locations:
+    - "backend/app_tests/"
+    - "backend/core/tests/"
+    - "backend/iam/tests/"
+    - "backend/library/tests/"
+    - "backend/chat/tests/"
+    - "backend/serdes/tests/"
+    - "backend/tprm/test/"
+    - "backend/privacy/tests.py"
+    - "backend/ebios_rm/tests/"
+    - "backend/metrology/tests/"
+    - "dispatcher/tests/"
+    - "cli/tests/"
+  local_checks:
+    yaml_parse: "ruby -e 'require \"yaml\"; YAML.load_file(\"backend/docs/ciso_assistant_python_backend_mapping.yaml\")'"
+    django_check: "cd backend && poetry run python manage.py check"
+    backend_tests: "cd backend && poetry run pytest"
+    dispatcher_tests: "cd dispatcher && uv run pytest"
+    cli_tests: "cd cli && pytest"
+  source_cross_checks:
+    - "Every router.register route in backend/*/urls.py and enterprise/backend/*/urls.py is represented in api_map."
+    - "Every Django model class discovered in backend/*/models.py and enterprise/backend/*/models.py is represented under domain_apps or supporting model notes."
+    - "Every Huey-decorated task in backend/*/tasks.py is represented under background_processing."
+
+observability_and_security:
+  audit_trail:
+    package: "django-auditlog"
+    enrichment: "core.custom_middleware.AuditlogMiddleware and LogEntry post_save receiver"
+    enterprise_surface: "/api/log-entries/"
+  metrics:
+    endpoints:
+      - "/api/get_metrics/"
+      - "/api/get_audits_metrics/"
+      - "/api/metrology/*"
+    management_command: "metrics_server"
+    dependency: "prometheus-client"
+  webhook_safety:
+    outbound_delivery_task: "webhooks.tasks.send_webhook_request"
+    private_ip_guard: "WEBHOOK_ALLOW_PRIVATE_IPS"
+  sandboxing:
+    enabled_by: "ENABLE_SANDBOX=true"
+    dependency: "bubblewrap installed in backend Dockerfile"
+  password_hashers:
+    - "Argon2PasswordHasher"
+    - "PBKDF2PasswordHasher"
+    - "PBKDF2SHA1PasswordHasher"
+    - "BCryptSHA256PasswordHasher"
+    - "ScryptPasswordHasher"
+
+known_architecture_notes:
+  - "The primary API is mounted under /api/ and most business endpoints are DRF ViewSets registered in core.urls."
+  - "Enterprise routes augment the community route registry through settings.ROUTES and settings.MODULES rather than replacing core.urls."
+  - "The backend is single-instance/folder-scoped rather than tenant-slug-scoped; folder/domain hierarchy is the main authorization boundary."
+  - "SQLite is first-class for local/container deployments, with PostgreSQL enabled by environment variables."
+  - "Attachments are stored through Django default_storage, allowing either local files or S3-compatible object storage."
+  - "Chat/RAG is dormant unless ENABLE_CHAT and the chat feature flag are enabled."
+  - "Sidecar Python packages are operational tooling around the API, not Django apps loaded into INSTALLED_APPS."
