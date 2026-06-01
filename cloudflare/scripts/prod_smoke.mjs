@@ -34,6 +34,7 @@ const publicChecks = [
 
 const authedChecks = [
   { name: 'workspace profile', path: '/_api/iam/me', expect: [200] },
+  { name: 'semantic coverage', path: '/_api/core/semantic-coverage', expect: [200] },
   { name: 'grc overview', path: '/_api/grc', expect: [200] },
   { name: 'grc status', path: '/_api/grc/status', expect: [200] },
   { name: 'grc frameworks', path: '/_api/grc/frameworks', expect: [200] },
@@ -222,6 +223,22 @@ if (Array.isArray(connectors?.data)) {
       throw new Error(`Collector ${connector.source} reported live mode without live auth readiness.`);
     }
   }
+}
+
+const semanticCoverage = await fetchJson('/_api/core/semantic-coverage', authHeaders());
+if (semanticCoverage?.data?.ok !== true) {
+  throw new Error(`Production semantic coverage is not healthy: ${JSON.stringify(semanticCoverage?.data?.unresolvedRequired ?? [])}`);
+}
+if (semanticCoverage.data.summary?.unresolvedRequired !== 0) {
+  throw new Error(`Production semantic coverage has unresolved required mappings: ${semanticCoverage.data.summary.unresolvedRequired}`);
+}
+if (semanticCoverage.data.summary?.scaleModules !== 26) {
+  throw new Error(`Expected 26 scale.md modules, found ${semanticCoverage.data.summary?.scaleModules ?? 'unknown'}.`);
+}
+if (semanticCoverage.data.summary?.regscaleBuilderDomains !== 7) {
+  throw new Error(
+    `Expected 7 RegScale builder domains, found ${semanticCoverage.data.summary?.regscaleBuilderDomains ?? 'unknown'}.`,
+  );
 }
 
 const violations = results.filter((item) => item.p95 > p95BudgetMs);

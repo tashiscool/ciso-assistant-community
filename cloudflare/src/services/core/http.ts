@@ -44,6 +44,7 @@ import {
   MODULE_CATALOG,
   type ModuleCatalogEntry,
 } from './moduleRegistry';
+import { buildSemanticCoveragePayload } from './semanticCoverage';
 import {
   evaluateFormRuntime,
   loadFormRuntimeSchema,
@@ -8563,6 +8564,17 @@ export async function handleCoreRoutes(
         },
       },
     });
+  }
+
+  if (resource === 'semantic-coverage') {
+    if (ctx.request.method !== 'GET') {
+      return methodNotAllowed(['GET']);
+    }
+    if (!ctx.tenantId) {
+      return json({ error: 'missing_tenant', message: 'A tenant session is required.' }, { status: 401 });
+    }
+
+    return json(buildSemanticCoveragePayload(ctx.tenantId));
   }
 
   if (resource === 'me' && ctx.request.method === 'GET') {

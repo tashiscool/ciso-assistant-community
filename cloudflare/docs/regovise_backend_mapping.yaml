@@ -255,6 +255,7 @@ api_services:
       bootstrap_demo: "/bootstrap-demo"
       me: "/me"
       overview: "/overview"
+      semantic_coverage: "/semantic-coverage"
       modules: "/modules, /modules/:moduleKey, /modules/:moduleKey/records"
       frameworks: "/frameworks, /frameworks/:id"
       libraries: "/libraries"
