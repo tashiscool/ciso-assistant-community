@@ -1,0 +1,1037 @@
+schema_version: "1.0"
+document:
+  title: "Regovise Backend Mapping"
+  environment: "production"
+  canonical_origin: "https://regovise.com"
+  generated_on: "2026-06-01"
+  purpose: >
+    Machine-readable backend map for the Regovise Cloudflare Worker, including
+    service roots, route families, runtime bindings, data stores, queue workers,
+    semantic module coverage, and production validation entry points.
+  sources:
+    router: "cloudflare/src/router.ts"
+    worker_entrypoint: "cloudflare/src/index.ts"
+    bindings: "cloudflare/wrangler.toml"
+    env_types: "cloudflare/src/types/env.ts"
+    authorization: "cloudflare/src/auth.ts, cloudflare/src/authorization.ts"
+    services: "cloudflare/src/services/**"
+    migrations: "cloudflare/migrations/*.sql"
+    semantic_matrix: "cloudflare/scripts/semantic_gap_matrix.mjs"
+    production_e2e: "cloudflare/scripts/prod_e2e_validation.mjs"
+
+runtime:
+  platform: "Cloudflare Workers"
+  worker_name:
+    development: "ciso-assistant-edge"
+    production: "ciso-assistant-edge-production"
+  fetch_behavior:
+    api_prefix: "/_api/"
+    spa_assets: "All non-API requests are served from ASSETS with SPA fallback."
+    cors: "Every API response is wrapped by withCors; OPTIONS uses corsPreflight."
+    error_shape:
+      typed: "{ error, message, details? }"
+      untyped: "{ error: request_failed, message }"
+  production_routes:
+    - "regovise.com"
+    - "www.regovise.com"
+  production_vars:
+    APP_ENV: "production"
+    APP_ORIGIN: "https://regovise.com"
+    EMAIL_PROVIDER: "mailchannels"
+    EMAIL_FROM: "no-reply@regovise.com"
+    EMAIL_FROM_NAME: "Regovise"
+    EMAIL_DKIM_DOMAIN: "regovise.com"
+    EMAIL_DKIM_SELECTOR: "mcdkim"
+
+bindings:
+  assets:
+    ASSETS:
+      type: "Cloudflare Workers Assets"
+      source_directory: "apps/web/dist"
+      html_handling: "auto-trailing-slash"
+      not_found_handling: "single-page-application"
+  d1:
+    D1_MAIN:
+      database_name: "ciso-assistant-d1"
+      database_id: "d14a0f7a-6158-4ea3-9622-e735417fb51e"
+      migrations_dir: "cloudflare/migrations"
+  r2:
+    R2_EVIDENCE:
+      bucket_name: "ciso-assistant-evidence"
+      preview_bucket_name: "ciso-assistant-evidence-preview"
+      primary_uses:
+        - "evidence artifacts"
+        - "assurance bundles"
+        - "agent traces and generated artifacts"
+  vectorize:
+    EVIDENCE_VECTOR_INDEX:
+      index_name: "ciso-assistant-evidence-index"
+      production_only: true
+      fallback_behavior: "AI/vector search paths label deterministic fallback when Vectorize or AI is unavailable."
+  ai:
+    AI:
+      type: "Cloudflare AI binding"
+      production_only: true
+  durable_objects:
+    TENANT_WORKFLOW_COORDINATOR:
+      class: "TenantWorkflowCoordinator"
+      source: "cloudflare/src/durable-objects/TenantWorkflowCoordinator.ts"
+      purpose: "Tenant workflow heartbeat, lease, and run-state coordination."
+  queues:
+    QUEUE_EVIDENCE_JOBS:
+      queue: "ciso-assistant-evidence-jobs"
+      consumer: "cloudflare/src/queues/evidence.ts"
+      message_type: "evidence.job.run"
+      max_batch_size: 5
+      max_retries: 3
+    QUEUE_CONMON_JOBS:
+      queue: "ciso-assistant-conmon-jobs"
+      consumer: "cloudflare/src/queues/conmon.ts"
+      message_type: "conmon.execution.run"
+      max_batch_size: 5
+      max_retries: 3
+    QUEUE_GRC_CONTENT_IMPORT:
+      queue: "ciso-assistant-grc-content-import"
+      consumer: "cloudflare/src/queues/grc.ts"
+      message_type: "grc.content.import"
+      max_batch_size: 2
+      max_retries: 3
+    QUEUE_GRC_SCF_REFRESH:
+      queue: "ciso-assistant-grc-scf-refresh"
+      consumer: "cloudflare/src/queues/grc.ts"
+      message_type: "grc.scf.refresh"
+      max_batch_size: 2
+      max_retries: 3
+    QUEUE_GRC_FINDING_INGEST:
+      queue: "ciso-assistant-grc-finding-ingest"
+      consumer: "cloudflare/src/queues/grc.ts"
+      message_type: "grc.finding.ingest"
+      max_batch_size: 5
+      max_retries: 3
+    QUEUE_GRC_GAP_REPORT:
+      queue: "ciso-assistant-grc-gap-report"
+      consumer: "cloudflare/src/queues/grc.ts"
+      message_type: "grc.gap.report"
+      max_batch_size: 2
+      max_retries: 3
+    QUEUE_GRC_AI_ENRICH:
+      queue: "ciso-assistant-grc-ai-enrich"
+      consumer: "cloudflare/src/queues/grc.ts"
+      message_type: "grc.ai.enrich"
+      max_batch_size: 2
+      max_retries: 3
+  secrets:
+    BOOTSTRAP_SETUP_SECRET:
+      purpose: "Guarded bootstrap admin/session recovery and production validation."
+      committed: false
+    OIDC_CLIENT_SECRET:
+      purpose: "Generic OIDC client secret fallback."
+      committed: false
+    SSO_OIDC_CLIENT_SECRET:
+      purpose: "SSO OIDC client secret."
+      committed: false
+    GOOGLE_OIDC_CLIENT_SECRET:
+      purpose: "Google Workspace OIDC client secret."
+      committed: false
+    GOOGLE_CLIENT_SECRET:
+      purpose: "Alternate Google client secret."
+      committed: false
+    OPENAI_API_KEY:
+      purpose: "Optional OpenAI-compatible backend for AI features."
+      committed: false
+    OPENAI_API_BASE_URL:
+      purpose: "Optional OpenAI-compatible endpoint override."
+      committed: false
+
+auth_and_authorization:
+  auth_pipeline:
+    source: "cloudflare/src/auth.ts"
+    order:
+      - "D1 session cookie lookup via ca_session or session_id."
+      - "Header auth only outside production, except /_api/core/session/exchange."
+      - "Anonymous context when no valid session/header auth exists."
+  session:
+    table: "sessions"
+    cookie_name: "ca_session"
+    legacy_cookie_name: "session_id"
+    create_session_source: "cloudflare/src/session.ts"
+  sso:
+    config_table: "setup_sso_configs"
+    transaction_table: "sso_auth_transactions"
+    runtime_source: "cloudflare/src/services/core/oidc.ts"
+    callback_flow_source: "cloudflare/src/services/core/http.ts"
+    supported_protocols:
+      - "none"
+      - "oidc"
+      - "saml"
+      - "cloudflare-access"
+    notes:
+      - "Google Workspace OIDC is used by fedhr."
+      - "JIT provisioning is supported when enabled by tenant setup."
+      - "Role sync depends on configured group/role claims and matching Regovise role names."
+  permissions:
+    source: "cloudflare/src/authorization.ts"
+    model:
+      folders: "Domain/root scope hierarchy."
+      roles: "Role catalog with role_permissions."
+      assignments: "User or group role assignments scoped to folders."
+      scoped_context: "loadScopedPermissionContext computes accessible folders/domains for requested permissions."
+    tenant_admin_permissions:
+      - "add_user"
+      - "change_user"
+      - "delete_user"
+      - "add_role"
+      - "change_role"
+      - "delete_role"
+
+api_services:
+  core:
+    base_path: "/_api/core"
+    handler: "cloudflare/src/services/core/http.ts"
+    purpose: "Tenant shell, health, session/auth, canonical GRC records, scale module runtime, SSO, and bootstrap."
+    auth: "Session required for tenant data except public health/login/bootstrap/session flows."
+    route_families:
+      health: "/health"
+      tenants: "/tenants"
+      session: "/session/*"
+      login: "/login/*"
+      local_auth: "/local-auth/*"
+      sso: "/sso/*"
+      bootstrap: "/bootstrap/*"
+      bootstrap_demo: "/bootstrap-demo"
+      me: "/me"
+      overview: "/overview"
+      modules: "/modules, /modules/:moduleKey, /modules/:moduleKey/records"
+      frameworks: "/frameworks, /frameworks/:id"
+      libraries: "/libraries"
+      controls: "/frameworks/:frameworkId/controls, /controls"
+      perimeters: "/perimeters"
+      assessments: "/risk-assessments, /compliance-assessments, /assessment-plan-items"
+      applied_controls: "/applied-controls"
+      risk: "/risk-registers, /risk-scenarios"
+      tprm: "/entities, /solutions, /contracts, /entity-assessments"
+      privacy: "/processings, /right-requests, /data-breaches"
+      resilience: "/business-impact-analyses"
+      workflows: "/workflows"
+    primary_tables:
+      - "tenants"
+      - "tenant_settings"
+      - "users"
+      - "sessions"
+      - "setup_sso_configs"
+      - "sso_auth_transactions"
+      - "frameworks"
+      - "controls"
+      - "libraries"
+      - "perimeters"
+      - "risk_assessments"
+      - "compliance_assessments"
+      - "compliance_assessment_plan_items"
+      - "compliance_requirement_assessments"
+      - "applied_controls"
+      - "risk_registers"
+      - "risk_scenarios"
+      - "entities"
+      - "solutions"
+      - "contracts"
+      - "entity_assessments"
+      - "processings"
+      - "right_requests"
+      - "data_breaches"
+      - "business_impact_analyses"
+      - "module_records"
+  iam:
+    base_path: "/_api/iam"
+    handler: "cloudflare/src/services/iam/http.ts"
+    purpose: "Workspace identity, folders/domains, groups, roles, and scoped role assignments."
+    route_families:
+      me: "/me"
+      folders: "/folders"
+      users: "/users"
+      user_groups: "/user-groups"
+      roles: "/roles"
+      role_assignments: "/role-assignments"
+    primary_tables:
+      - "users"
+      - "folders"
+      - "user_groups"
+      - "user_group_memberships"
+      - "roles"
+      - "role_permissions"
+      - "role_assignments"
+      - "local_password_credentials"
+  setup:
+    base_path: "/_api/setup"
+    handler: "cloudflare/src/services/setup/http.ts"
+    purpose: "Tenant setup/admin configuration surfaces."
+    route_families:
+      general: "/general"
+      tags: "/tags"
+      classification: "/classification"
+      service_accounts: "/service-accounts"
+      security: "/security"
+      modules_features: "/modules-features"
+      risk_model: "/risk-model"
+      sso: "/sso"
+      mfa: "/mfa"
+      email: "/email"
+      branding: "/branding"
+      logs_utilization: "/logs-utilization"
+    primary_tables:
+      - "setup_general_configs"
+      - "setup_tags"
+      - "setup_classifications"
+      - "setup_service_accounts"
+      - "setup_security_controls"
+      - "setup_modules_features"
+      - "setup_risk_models"
+      - "setup_sso_configs"
+      - "setup_mfa_policies"
+      - "setup_email_configs"
+      - "setup_branding_configs"
+      - "transactional_email_delivery_log"
+  builders:
+    base_path: "/_api/builders"
+    handler: "cloudflare/src/services/builders/http.ts"
+    purpose: "Form, Rules, Export, Report, Dashboard, Questionnaire, and Wayfinder builders."
+    public_route_families:
+      questionnaire_access: "/questionnaire-access/*"
+    protected_route_families:
+      forms: "/forms/*"
+      exports: "/exports/*"
+      reports: "/reports/*"
+      dashboards: "/dashboards/*"
+      wayfinders: "/wayfinders/*"
+      questionnaires: "/questionnaires, /questionnaires/:id, /questionnaires/:id/assignments, /questionnaires/:id/instances, /questionnaires/:id/rules, /questionnaires/:id/test-preview"
+    primary_tables:
+      - "form_builder_modules"
+      - "export_builder_exports"
+      - "export_builder_test_runs"
+      - "report_builder_reports"
+      - "report_builder_subscriptions"
+      - "dashboard_builder_dashboards"
+      - "wayfinder_templates"
+      - "questionnaire_templates"
+      - "questionnaire_rule_sets"
+      - "questionnaire_rule_test_runs"
+      - "questionnaire_instances"
+      - "questionnaire_recurring_assignments"
+      - "questionnaire_history_entries"
+      - "questionnaire_response_properties"
+      - "report_exports"
+      - "module_records"
+  ops:
+    base_path: "/_api/ops"
+    handler: "cloudflare/src/services/ops/http.ts"
+    purpose: "Operational workbench, reports, imports, portal, advanced risk, utilities, and parity overview."
+    route_families:
+      key_metrics: "/key-metrics"
+      executive_summary: "/executive-summary"
+      workbench: "/workbench"
+      news_feed: "/news-feed"
+      reports: "/reports/*"
+      imports: "/imports/*"
+      chat: "/chat/*"
+      portal: "/portal/*"
+      ebios_studies: "/ebios-studies/*"
+      quantitative_studies: "/quantitative-studies/*"
+      quantitative_scenarios: "/quantitative-scenarios/*"
+      quantitative_hypotheses: "/quantitative-hypotheses/*"
+      workflow: "/workflow/*"
+      utilities: "/utilities/*"
+      subsystems: "/subsystems/*"
+      rmf: "/rmf/*"
+      app_management: "/app-management/*"
+      parity: "/parity/overview"
+    primary_tables:
+      - "report_exports"
+      - "import_jobs"
+      - "chat_sessions"
+      - "portal_assignments"
+      - "ebios_studies"
+      - "quantitative_studies"
+      - "ops_utility_runs"
+      - "ops_subsystem_preferences"
+      - "ops_subsystem_sessions"
+      - "ops_rmf_packages"
+      - "ops_app_management_apps"
+      - "module_records"
+      - "report_builder_reports"
+      - "grc_job_runs"
+      - "grc_report_snapshots"
+  conmon:
+    base_path: "/_api/conmon"
+    handler: "cloudflare/src/services/conmon/http.ts"
+    purpose: "Continuous monitoring profiles, activities, executions, and metrics."
+    route_families:
+      profiles: "/profiles"
+      executions: "/executions"
+    queues:
+      - "QUEUE_CONMON_JOBS"
+    primary_tables:
+      - "conmon_profiles"
+      - "conmon_activity_configs"
+      - "conmon_executions"
+      - "conmon_metrics"
+      - "evidence_jobs"
+      - "ai_compliance_export_jobs"
+  evidence:
+    base_path: "/_api/evidence"
+    handler: "cloudflare/src/services/evidence/http.ts"
+    purpose: "Evidence source registry, evidence jobs, artifacts, and download metadata."
+    route_families:
+      sources: "/sources"
+      jobs: "/jobs"
+      artifacts: "/artifacts"
+    queues:
+      - "QUEUE_EVIDENCE_JOBS"
+    storage:
+      - "R2_EVIDENCE"
+      - "EVIDENCE_VECTOR_INDEX"
+    primary_tables:
+      - "evidence_sources"
+      - "evidence_jobs"
+      - "evidence_artifacts"
+  integrations:
+    base_path: "/_api/integrations"
+    handler: "cloudflare/src/services/integrations/http.ts"
+    purpose: "Automation Manager connectors, provider lifecycle tests, dry-runs, sync runs, and credential metadata."
+    route_families:
+      connectors: "/connectors"
+      providers:
+        - "wiz"
+        - "github"
+        - "aws"
+        - "okta"
+        - "slack"
+        - "teams"
+        - "ad-ldap"
+        - "tenable"
+        - "webhook"
+      connector_actions:
+        - "test"
+        - "sync"
+        - "dry-run"
+        - "delete test-owned connector"
+    primary_tables:
+      - "integration_connectors"
+      - "integration_connector_runs"
+  ai:
+    base_path: "/_api/ai"
+    handler: "cloudflare/src/services/ai/http.ts"
+    purpose: "Workspace AI, policy authoring, response automation, evidence mapping, RegML, compliance exports, and AI runtime diagnostics."
+    route_families:
+      workspace_guidance: "/always"
+      assessment: "/assessment"
+      categorization: "/categorization"
+      inventory: "/inventory"
+      findings: "/findings"
+      evidence: "/evidence"
+      policy_builder: "/policy-builder/*"
+      response_automation: "/response-automation/*"
+      evidence_mapping: "/evidence-mapping/*"
+      compliance_exports: "/compliance-exports/*"
+      regml: "/regml/*"
+    storage:
+      - "AI"
+      - "EVIDENCE_VECTOR_INDEX"
+      - "R2_EVIDENCE"
+    primary_tables:
+      - "ai_policy_builder_sessions"
+      - "ai_policy_builder_requirements"
+      - "response_automation_jobs"
+      - "response_automation_items"
+      - "evidence_record_mappings"
+      - "evidence_mapping_recommendation_runs"
+      - "ai_compliance_export_jobs"
+      - "regml_settings"
+      - "regml_sessions"
+      - "regml_attempts"
+      - "regml_messages"
+      - "report_exports"
+      - "evidence_artifacts"
+      - "evidence_jobs"
+  assurance:
+    base_path: "/_api/assurance"
+    handler: "cloudflare/src/services/assurance/http.ts"
+    purpose: "Assurance workbench, normalized evidence bundles, evaluations, graphs, POA&M, reviews, and agent workflow outputs."
+    route_families:
+      overview: "/overview"
+      executive: "/executive"
+      assessor: "/assessor"
+      ao: "/ao"
+      packages: "/packages"
+      evals: "/evals"
+      gaps: "/gaps"
+      graph: "/graph"
+      poam: "/poam"
+      reconciliation: "/reconciliation"
+      remediation: "/remediation"
+      reviews: "/reviews"
+      tracker: "/tracker"
+      workflows: "/workflows"
+      reasonableness: "/reasonableness"
+      explain: "/explain"
+      parity: "/parity"
+    primary_tables:
+      - "assurance_bundle_assets"
+      - "assurance_bundle_events"
+      - "assurance_bundle_findings"
+      - "assurance_bundle_scanner_targets"
+      - "assurance_bundle_log_sources"
+      - "assurance_bundle_alert_rules"
+      - "assurance_bundle_tickets"
+      - "assurance_eval_results"
+      - "assurance_evidence_gaps"
+      - "assurance_poam_items"
+      - "assurance_graph_nodes"
+      - "assurance_graph_edges"
+      - "assurance_reconciliation_runs"
+      - "assurance_review_recommendations"
+      - "assurance_review_decisions"
+      - "assurance_tracker_row_diagnostics"
+      - "assurance_agent_runs"
+      - "assurance_agent_steps"
+      - "assurance_agent_policy_decisions"
+      - "assurance_writeback_approvals"
+      - "evidence_jobs"
+      - "evidence_artifacts"
+      - "ai_compliance_export_jobs"
+  agent:
+    base_path: "/_api/agent"
+    handler: "cloudflare/src/services/agent/http.ts"
+    purpose: "Agent runs, workflow steps, writeback approvals, and artifact retrieval."
+    route_families:
+      runs: "/runs/*"
+      writebacks: "/writebacks/*"
+    primary_tables:
+      - "assurance_agent_runs"
+      - "assurance_agent_steps"
+      - "assurance_agent_policy_decisions"
+      - "assurance_writeback_approvals"
+      - "assurance_reconciliation_runs"
+      - "integration_connectors"
+      - "integration_connector_runs"
+      - "evidence_jobs"
+      - "ai_compliance_export_jobs"
+  grc:
+    base_path: "/_api/grc"
+    handler: "cloudflare/src/services/grc-engine/http.ts"
+    purpose: "GRC content engine, SCF/crosswalks, connector collection, findings, gap assessments, reports, and async job orchestration."
+    route_families:
+      status: "/status"
+      admin: "/admin/*"
+      content: "/content/*"
+      frameworks: "/frameworks"
+      controls: "/controls"
+      crosswalk: "/crosswalk"
+      connectors: "/connectors"
+      collect: "/collect"
+      runs: "/runs"
+      jobs: "/jobs"
+      findings: "/findings"
+      assessments: "/assessments"
+      report_bundles: "/report-bundles"
+      report_snapshots: "/report-snapshots"
+      evidence_packages: "/evidence-packages"
+      providers:
+        - "aws"
+        - "github"
+        - "okta"
+        - "wiz"
+    queues:
+      - "QUEUE_GRC_CONTENT_IMPORT"
+      - "QUEUE_GRC_SCF_REFRESH"
+      - "QUEUE_GRC_FINDING_INGEST"
+      - "QUEUE_GRC_GAP_REPORT"
+      - "QUEUE_GRC_AI_ENRICH"
+    primary_tables:
+      - "grc_import_snapshots"
+      - "grc_frameworks"
+      - "grc_content_documents"
+      - "grc_content_revisions"
+      - "grc_scf_versions"
+      - "grc_scf_controls"
+      - "grc_scf_crosswalks"
+      - "grc_connector_runs"
+      - "grc_findings"
+      - "grc_finding_evaluations"
+      - "grc_gap_assessments"
+      - "grc_gap_assessment_rows"
+      - "grc_report_bundles"
+      - "grc_job_runs"
+      - "grc_ingest_payloads"
+      - "grc_metric_catalog"
+      - "grc_metric_points"
+      - "grc_exception_snapshots"
+      - "grc_evidence_packages"
+      - "grc_report_snapshots"
+      - "grc_ai_provider_settings"
+  fedramp_provider_shell:
+    handler: "cloudflare/src/services/fedramp/http.ts"
+    runtime: "cloudflare/src/services/fedramp/runtime.ts"
+    purpose: "FedRAMP provider shell, trust center, VDR, continuous communication, scope, crypto, secure config, CCM, and SCN."
+    services:
+      trust_center:
+        base_path: "/_api/trust-center"
+        route_families:
+          - "/offerings"
+          - "/services"
+          - "/artifacts"
+          - "/public"
+          - "/portal"
+          - "/grants"
+      fedramp_communications:
+        base_path: "/_api/fedramp-communications"
+        route_families:
+          - "/messages"
+          - "/deliveries"
+          - "/contacts"
+          - "/incidents"
+          - "/changes"
+          - "/notices"
+          - "/feedback"
+      vdr:
+        base_path: "/_api/vdr"
+        route_families:
+          - "/reports"
+          - "/oar-cycles"
+          - "/quarterly-reviews"
+      ccm:
+        base_path: "/_api/ccm"
+        route_families:
+          - "/inventory"
+          - "/sync"
+      scn:
+        base_path: "/_api/scn"
+        route_families:
+          - "/documents"
+          - "/publish-package"
+      secure_config:
+        base_path: "/_api/secure-config"
+        route_families:
+          - "/guides"
+          - "/releases"
+      scope:
+        base_path: "/_api/scope"
+        route_families:
+          - "/documents"
+          - "/flows"
+          - "/third-party-resources"
+      crypto:
+        base_path: "/_api/crypto"
+        route_families:
+          - "/inventory"
+    primary_tables:
+      - "trust_center_offerings"
+      - "trust_center_services"
+      - "artifact_versions"
+      - "trust_center_access_grants"
+      - "trust_center_access_events"
+      - "agency_contacts"
+      - "fedramp_messages"
+      - "fedramp_message_deliveries"
+      - "incident_notifications"
+      - "vulnerability_evaluations"
+      - "vdr_reports"
+      - "oar_cycles"
+      - "quarterly_reviews"
+      - "feedback_items"
+      - "significant_changes"
+      - "significant_change_notices"
+      - "secure_config_guides"
+      - "secure_default_releases"
+      - "scope_documents"
+      - "resource_flows"
+      - "third_party_resources"
+      - "crypto_module_inventory"
+
+semantic_modules:
+  inventory_source: "features/scale.md"
+  registry_source: "cloudflare/src/services/core/moduleRegistry.ts"
+  shared_runtime_table: "module_records"
+  api_base_pattern: "/_api/core/modules/:moduleKey/records"
+  tenant_directory_route: "/modules"
+  implementation_models:
+    shared_workspace:
+      description: "Generic schema-backed module-record list/detail/create/update/archive surface."
+      examples:
+        - "assets"
+        - "policies"
+        - "incidents"
+        - "exceptions"
+        - "supply-chain"
+    dedicated_workspace:
+      description: "Richer domain-specific workspace."
+      examples:
+        - "assessments"
+        - "catalogues"
+    template_workspace:
+      description: "Reusable authoring/run template workspace."
+      examples:
+        - "assessment-plans"
+        - "questionnaires"
+    subfeature:
+      description: "Tenant-visible named entry inside a parent workspace."
+      examples:
+        - "import-regscale-catalogs"
+  module_keys:
+    - "assets"
+    - "assessments"
+    - "assessment-plans"
+    - "capabilities"
+    - "case-management"
+    - "catalogues"
+    - "import-regscale-catalogs"
+    - "causal-analysis"
+    - "changes"
+    - "components"
+    - "data-calls"
+    - "evidence-locker"
+    - "exceptions"
+    - "incidents"
+    - "interconnections"
+    - "policies"
+    - "programs"
+    - "projects"
+    - "questionnaires"
+    - "requirements"
+    - "risks"
+    - "security-controls"
+    - "security-plans"
+    - "supply-chain"
+    - "tasks"
+    - "threats"
+
+data_model:
+  migration_groups:
+    core_identity_and_grc:
+      migrations:
+        - "0001_core.sql"
+        - "0003_workspace_admin.sql"
+        - "0028_core_domain_permissions.sql"
+        - "0031_sso_runtime.sql"
+      tables:
+        - "tenants"
+        - "tenant_settings"
+        - "users"
+        - "sessions"
+        - "roles"
+        - "role_permissions"
+        - "folders"
+        - "user_groups"
+        - "user_group_memberships"
+        - "role_assignments"
+        - "setup_sso_configs"
+        - "sso_auth_transactions"
+        - "local_login_codes"
+        - "local_password_credentials"
+    frameworks_assessments_and_modules:
+      migrations:
+        - "0004_assessments.sql"
+        - "0005_framework_requirements.sql"
+        - "0006_catalog_action_plans.sql"
+        - "0029_risk_register_folder_scope.sql"
+        - "0036_shared_modules_runtime.sql"
+        - "0037_assessment_plan_runtime.sql"
+      tables:
+        - "frameworks"
+        - "controls"
+        - "libraries"
+        - "perimeters"
+        - "risk_assessments"
+        - "compliance_assessments"
+        - "compliance_assessment_plan_items"
+        - "compliance_requirement_assessments"
+        - "applied_controls"
+        - "module_records"
+        - "risk_registers"
+        - "risk_scenarios"
+        - "risk_scenario_controls"
+    evidence_conmon_and_assurance:
+      migrations:
+        - "0002_conmon_evidence.sql"
+        - "0030_assurance_foundation.sql"
+      tables:
+        - "conmon_profiles"
+        - "conmon_activity_configs"
+        - "conmon_executions"
+        - "conmon_metrics"
+        - "evidence_sources"
+        - "evidence_jobs"
+        - "evidence_artifacts"
+        - "assurance_bundle_assets"
+        - "assurance_bundle_events"
+        - "assurance_bundle_findings"
+        - "assurance_bundle_scanner_targets"
+        - "assurance_bundle_log_sources"
+        - "assurance_bundle_alert_rules"
+        - "assurance_bundle_tickets"
+        - "assurance_eval_results"
+        - "assurance_evidence_gaps"
+        - "assurance_poam_items"
+        - "assurance_graph_nodes"
+        - "assurance_graph_edges"
+        - "assurance_reconciliation_runs"
+        - "assurance_review_recommendations"
+        - "assurance_review_decisions"
+        - "assurance_tracker_row_diagnostics"
+        - "assurance_agent_runs"
+        - "assurance_agent_steps"
+        - "assurance_agent_policy_decisions"
+        - "assurance_writeback_approvals"
+    privacy_tprm_and_resilience:
+      migrations:
+        - "0007_privacy_tprm_resilience.sql"
+      tables:
+        - "entities"
+        - "solutions"
+        - "contracts"
+        - "entity_assessments"
+        - "processings"
+        - "right_requests"
+        - "data_breaches"
+        - "business_impact_analyses"
+    ops_reports_portal_and_advanced_risk:
+      migrations:
+        - "0008_reports_chat_portal_advanced_risk.sql"
+        - "0018_ops_control_surfaces.sql"
+      tables:
+        - "report_exports"
+        - "import_jobs"
+        - "chat_sessions"
+        - "portal_assignments"
+        - "ebios_studies"
+        - "quantitative_studies"
+        - "ops_utility_runs"
+        - "ops_subsystem_preferences"
+        - "ops_subsystem_sessions"
+        - "ops_rmf_packages"
+        - "ops_app_management_apps"
+    builders:
+      migrations:
+        - "0010_builders_questionnaires.sql"
+        - "0012_form_builder.sql"
+        - "0013_export_builder.sql"
+        - "0014_wayfinder_builder.sql"
+        - "0015_report_builder.sql"
+        - "0016_dashboard_builder.sql"
+        - "0038_questionnaire_runtime.sql"
+      tables:
+        - "questionnaire_templates"
+        - "questionnaire_rule_sets"
+        - "questionnaire_rule_test_runs"
+        - "form_builder_modules"
+        - "export_builder_exports"
+        - "export_builder_test_runs"
+        - "wayfinder_templates"
+        - "report_builder_reports"
+        - "report_builder_subscriptions"
+        - "dashboard_builder_dashboards"
+        - "questionnaire_instances"
+        - "questionnaire_recurring_assignments"
+        - "questionnaire_history_entries"
+        - "questionnaire_response_properties"
+    setup_admin:
+      migrations:
+        - "0017_setup_admin.sql"
+        - "0022_setup_identity_modules.sql"
+        - "0023_setup_email.sql"
+        - "0024_setup_branding_classification.sql"
+        - "0025_setup_general_risk_model.sql"
+      tables:
+        - "setup_tags"
+        - "setup_service_accounts"
+        - "setup_security_controls"
+        - "setup_modules_features"
+        - "setup_sso_configs"
+        - "setup_mfa_policies"
+        - "setup_email_configs"
+        - "setup_branding_configs"
+        - "setup_classifications"
+        - "setup_general_configs"
+        - "setup_risk_models"
+    automation_ai_and_integrations:
+      migrations:
+        - "0011_integrations_connectors.sql"
+        - "0019_ai_policy_builder_and_compliance_exports.sql"
+        - "0020_response_automation_and_evidence_mapping.sql"
+        - "0021_regml.sql"
+      tables:
+        - "integration_connectors"
+        - "integration_connector_runs"
+        - "ai_policy_builder_sessions"
+        - "ai_policy_builder_requirements"
+        - "ai_compliance_export_jobs"
+        - "response_automation_jobs"
+        - "response_automation_items"
+        - "evidence_record_mappings"
+        - "evidence_mapping_recommendation_runs"
+        - "regml_settings"
+        - "regml_sessions"
+        - "regml_attempts"
+        - "regml_messages"
+    grc_engine:
+      migrations:
+        - "0032_grc_engine_foundation.sql"
+        - "0033_grc_engine_operations.sql"
+      tables:
+        - "grc_import_snapshots"
+        - "grc_frameworks"
+        - "grc_content_documents"
+        - "grc_content_revisions"
+        - "grc_scf_versions"
+        - "grc_scf_controls"
+        - "grc_scf_crosswalks"
+        - "grc_connector_runs"
+        - "grc_findings"
+        - "grc_finding_evaluations"
+        - "grc_gap_assessments"
+        - "grc_gap_assessment_rows"
+        - "grc_report_bundles"
+        - "grc_ai_provider_settings"
+        - "grc_job_runs"
+        - "grc_ingest_payloads"
+        - "grc_metric_catalog"
+        - "grc_metric_points"
+        - "grc_exception_snapshots"
+        - "grc_evidence_packages"
+        - "grc_report_snapshots"
+    fedramp_provider_shell:
+      migrations:
+        - "0034_fedramp_provider_shell.sql"
+        - "0035_fedramp_provider_shell_hardening.sql"
+      tables:
+        - "trust_center_offerings"
+        - "trust_center_services"
+        - "artifact_versions"
+        - "trust_center_access_grants"
+        - "trust_center_access_events"
+        - "agency_contacts"
+        - "fedramp_messages"
+        - "fedramp_message_deliveries"
+        - "incident_notifications"
+        - "vulnerability_evaluations"
+        - "vdr_reports"
+        - "oar_cycles"
+        - "quarterly_reviews"
+        - "feedback_items"
+        - "significant_changes"
+        - "significant_change_notices"
+        - "secure_config_guides"
+        - "secure_default_releases"
+        - "scope_documents"
+        - "resource_flows"
+        - "third_party_resources"
+        - "crypto_module_inventory"
+
+background_processing:
+  queue_entrypoint: "cloudflare/src/index.ts#queue"
+  durable_object_workflows: "cloudflare/src/utils/workflows.ts"
+  consumers:
+    evidence:
+      queue: "ciso-assistant-evidence-jobs"
+      source: "cloudflare/src/queues/evidence.ts"
+      side_effects:
+        - "evidence_jobs status updates"
+        - "evidence_artifacts creation"
+        - "R2_EVIDENCE artifact writes"
+        - "assurance normalization hooks"
+    conmon:
+      queue: "ciso-assistant-conmon-jobs"
+      source: "cloudflare/src/queues/conmon.ts"
+      side_effects:
+        - "conmon_executions status updates"
+        - "conmon_metrics generation"
+        - "reasonableness artifact generation"
+        - "workflow run updates"
+    grc:
+      queues:
+        - "ciso-assistant-grc-content-import"
+        - "ciso-assistant-grc-scf-refresh"
+        - "ciso-assistant-grc-finding-ingest"
+        - "ciso-assistant-grc-gap-report"
+        - "ciso-assistant-grc-ai-enrich"
+      source: "cloudflare/src/queues/grc.ts"
+      side_effects:
+        - "grc_job_runs lifecycle"
+        - "content import and SCF refresh"
+        - "finding ingest"
+        - "gap report generation"
+        - "AI enrichment"
+
+production_operations:
+  deploy:
+    script: "cloudflare/scripts/deploy_production.sh"
+    command: "bash cloudflare/scripts/deploy_production.sh ../alovoa/.env-prod"
+    notes:
+      - "Loads production secrets from ../alovoa/.env-prod and cloudflare/.env-prod."
+      - "Runs web typecheck/build and Cloudflare typecheck before wrangler deploy."
+      - "Uploads BOOTSTRAP_SETUP_SECRET before deploy."
+  smoke:
+    production_http: "npm --prefix cloudflare run smoke:production"
+    production_modules: "npm --prefix cloudflare run smoke:production:modules"
+    production_playwright: "npm --prefix cloudflare run smoke:production:playwright"
+    production_e2e: "npm --prefix cloudflare run smoke:production:e2e"
+    semantic_matrix: "npm --prefix cloudflare run semantic:matrix"
+  mutation_guards:
+    required_for_full_e2e:
+      REGOVISE_PROD_BASE_URL: "https://regovise.com"
+      REGOVISE_VERIFY_TENANT_SLUG: "regovise"
+      REGOVISE_VERIFY_EMAIL: "admin@regovise.com"
+      BOOTSTRAP_SETUP_SECRET: "from production env"
+      E2E_ALLOW_PRODUCTION_MUTATIONS: "1"
+      LIVE_VALIDATION_ALLOW_MUTATIONS: "1"
+  latest_known_validation:
+    worker_version_id: "6936eb73-9339-4d67-a0e0-97412abd255f"
+    full_e2e_result: ".playwright-regovise/e2e-20260528201722-b7ab8e8a/result.json"
+    full_e2e_summary:
+      route_checks: 194
+      module_count: 26
+      created_artifacts: 43
+      cleanup_actions: 48
+      skips: []
+    module_smoke: "passed"
+    fedhr_mutual_admin_summary: ".playwright-regovise/fedhr-christopher-sso-admin-1780009942799/summary.json"
+
+security_and_data_scope:
+  tenant_isolation: "Every persisted business table includes tenant_id or is joined through a tenant-scoped parent."
+  session_strategy: "Production uses D1 sessions; header auth is disabled except session exchange."
+  scoped_domain_access:
+    source: "cloudflare/src/authorization.ts"
+    enforced_in:
+      - "core module-record list/detail/create/update/archive"
+      - "core framework/risk/privacy/tprm/resilience endpoints"
+      - "evidence jobs/artifacts"
+      - "assurance and agent surfaces"
+      - "report builder module-record preview/export"
+      - "ops workbench/parity module-record feeds"
+  production_mutation_policy:
+    e2e: "Only test-owned artifacts marked with E2E run IDs are created and cleaned up."
+    connector_delete: "Automation connector delete endpoint is restricted to E2E-named test connectors."
+    seeded_data: "Production seeded fixtures are read-only baselines for validation."
+
+frontend_backend_contract:
+  web_app: "apps/web"
+  api_client: "apps/web/src/shared/api/client.ts"
+  shell_routes: "apps/web/src/shell/AppLayout.tsx"
+  backend_prefix: "/_api"
+  tenant_surfaces:
+    launchers:
+      - "/builders"
+      - "/features"
+      - "/setup"
+    module_directory: "/modules"
+    shared_module_workspace: "/modules/:moduleKey"
+    compatibility_bridges:
+      - "/builders/form-builder/user-guide"
+      - "/builders/form-builder/rules-guide"
+      - "/builders/export-builder/docx-template-guide"
+      - "/setup/compliance-settings"
+      - "/setup/file-system"
+      - "/setup/facilities"
+      - "/setup/cause-codes"
+      - "/setup/security-policies"
+      - "/setup/user-management-roles"
+      - "/setup/functional-roles"
+      - "/setup/email-settings"
