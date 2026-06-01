@@ -1263,6 +1263,8 @@ async function validateOpsIndexes(context, page, createdRecords) {
 
   await page.goto(absoluteUrl('/calendar'));
   await waitForSettledPage(page);
+  await page.getByLabel(/^Search calendar$/i).fill(MARKER);
+  await page.getByText(MARKER, { exact: false }).first().waitFor({ state: 'visible', timeout: 12000 });
   const calendarText = await page.locator('body').innerText({ timeout: 12000 });
   assert(activeTitles.some((title) => calendarText.includes(title)), 'Calendar did not include created dated module records.');
 

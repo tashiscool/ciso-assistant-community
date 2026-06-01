@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarDays, RefreshCw, ShieldCheck, TimerReset } from 'lucide-react';
+import { CalendarDays, RefreshCw, Search, ShieldCheck, TimerReset } from 'lucide-react';
 import { useOpsParityOverview } from './useOpsParityOverview';
 
 function formatDate(value: string) {
@@ -8,6 +9,7 @@ function formatDate(value: string) {
 
 export function CalendarControlPage() {
   const { overview, loading, error, refresh } = useOpsParityOverview();
+  const [query, setQuery] = useState('');
 
   if (loading) {
     return <div className="panel p-6 text-sm text-slate-300">Loading operational calendar...</div>;
@@ -18,6 +20,13 @@ export function CalendarControlPage() {
   }
 
   const nextEvent = overview.calendar[0] ?? null;
+  const normalizedQuery = query.trim().toLowerCase();
+  const filteredCalendar = normalizedQuery
+    ? overview.calendar.filter((item) =>
+        [item.title, item.detail, item.date, item.route].some((value) => value.toLowerCase().includes(normalizedQuery)),
+      )
+    : overview.calendar;
+  const visibleCalendar = filteredCalendar.slice(0, normalizedQuery ? 24 : 8);
 
   return (
     <div className="space-y-6">
@@ -81,13 +90,32 @@ export function CalendarControlPage() {
               <p className="text-sm text-slate-400">The canonical time-ordered queue of module milestones, assessment windows, portal deadlines, and privacy response dates.</p>
               </div>
           </div>
+          <label className="mt-5 block">
+            <span className="sr-only">Search calendar</span>
+            <span className="relative block">
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <input
+                aria-label="Search calendar"
+                className="w-full rounded-2xl border border-white/10 bg-slate-950/50 py-3 pl-11 pr-4 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300/60 focus:ring-2 focus:ring-cyan-300/15"
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search calendar events, modules, milestones..."
+                type="search"
+                value={query}
+              />
+            </span>
+          </label>
+          {normalizedQuery ? (
+            <div className="mt-3 text-xs uppercase tracking-[0.18em] text-slate-500">
+              Showing {filteredCalendar.length} of {overview.calendar.length} events
+            </div>
+          ) : null}
           <div className="mt-5 space-y-3">
-            {overview.calendar.length === 0 ? (
+            {filteredCalendar.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-white/10 bg-slate-950/20 p-4 text-sm text-slate-400">
-                No dated events are queued for this tenant yet.
+                {normalizedQuery ? 'No calendar events match that search.' : 'No dated events are queued for this tenant yet.'}
               </div>
             ) : (
-              overview.calendar.slice(0, 8).map((item) => (
+              visibleCalendar.map((item) => (
                 <Link
                   key={item.id}
                   className="block rounded-3xl border border-white/10 bg-slate-950/30 p-4 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
