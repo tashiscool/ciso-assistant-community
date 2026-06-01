@@ -1,0 +1,1085 @@
+schema_version: "1.0"
+document:
+  title: "RegScale Publicly Inferred Backend Mapping"
+  generated_on: "2026-06-01"
+  repository_context: "ciso-assistant-community"
+  purpose: >
+    Machine-readable backend map for RegScale based only on public RegScale
+    website, documentation, documentation index, and API reference material.
+    This file separates directly documented facts from inferred backend
+    responsibilities so it can be used for semantic parity planning without
+    implying access to RegScale private source code or infrastructure.
+  scope:
+    includes:
+      - "Publicly documented deployment/runtime architecture"
+      - "Publicly documented authentication, tenant, setup, and service-account surfaces"
+      - "Publicly documented module inventory"
+      - "Publicly documented builder, automation, AI, export, workflow, and subsystem semantics"
+      - "Publicly documented API examples and likely API resource families"
+      - "Inferred backend service responsibilities and entity families"
+    excludes:
+      - "Private source code"
+      - "Private database schema details not documented publicly"
+      - "Private queue, object-storage, observability, and hosting provider internals"
+      - "Customer-specific RegScale configuration"
+  confidence_legend:
+    high: "Directly stated by a cited RegScale public source."
+    medium: "Strongly implied by multiple public sources or by named API/entity/service surfaces."
+    low: "Reasonable architecture inference, but not directly documented by public sources."
+  safety_notes:
+    - "Use this as an external semantic map, not as authoritative RegScale internals."
+    - "Do not copy proprietary behavior; implement equivalent tenant-facing capabilities independently."
+    - "All source anchors are public RegScale domains as of the generated date."
+
+source_catalog:
+  product_home:
+    url: "https://regscale.com/"
+    confidence: "high"
+    evidence:
+      - "RegScale positions the product as Continuous Controls Monitoring automation."
+      - "Public marketing describes API-first automation, GraphQL, and Automation Manager capabilities."
+  documentation_index:
+    url: "https://regscale.readme.io/llms.txt"
+    confidence: "high"
+    evidence:
+      - "Public documentation index lists setup areas, builders, AI features, exports, utilities, subsystems, modules, CLI, integrations, and self-hosting."
+  docs_hub:
+    url: "https://regscale.readme.io/"
+    confidence: "high"
+    evidence:
+      - "Current public RegScale documentation hub and API reference entry point."
+  self_host_prerequisites:
+    url: "https://regscale.readme.io/docs/pre-requisites"
+    confidence: "high"
+    evidence:
+      - "Self-hosting prerequisites identify SQL Server as the application data store."
+  multi_tenancy:
+    url: "https://regscale.readme.io/docs/multi-tenancy-1"
+    confidence: "high"
+    evidence:
+      - "Enterprise multi-tenancy provides isolated tenants with tenant-specific users, settings, and data."
+  api_overview:
+    url: "https://regscale.readme.io/reference/overview"
+    confidence: "high"
+    evidence:
+      - "API reference documents Bearer-token authentication for REST APIs and an access token for CLI use."
+  api_load_data:
+    url: "https://regscale.readme.io/docs/using-the-api-to-load-data"
+    confidence: "high"
+    evidence:
+      - "Service-account setup requires host URL, tenant ID, and API key for API/CLI operations."
+  setup_service_accounts:
+    url: "https://regscale.readme.io/docs/service-accounts-1"
+    confidence: "high"
+    evidence:
+      - "Service accounts generate Personal Access Tokens for automated RegScale API access."
+  form_builder:
+    url: "https://regscale.readme.io/docs/form-builder"
+    confidence: "high"
+    evidence:
+      - "Form Builder customizes module layout, sections, fields, ordering, visibility, requirements, import, and export."
+  form_builder_user_guide:
+    url: "https://regscale.readme.io/docs/form-builder-user-guide"
+    confidence: "high"
+    evidence:
+      - "User guide documents module display settings, field types, choices, validations, rules, import/export, and reset semantics."
+  rules_user_guide:
+    url: "https://regscale.readme.io/docs/rules-user-guide"
+    confidence: "high"
+    evidence:
+      - "Rules guide documents conditional logic, condition types, actions, validation, and troubleshooting."
+  export_builder:
+    url: "https://regscale.readme.io/docs/export-builder"
+    confidence: "high"
+    evidence:
+      - "Export Builder creates DOCX/XLSX exports using uploaded templates, template tags, field mappings, filters, and sub-templates."
+  export_builder_docx_templates:
+    url: "https://regscale.readme.io/docs/creating-an-export-builder-docx-template"
+    confidence: "high"
+    evidence:
+      - "DOCX template guide documents placeholder tags, tables, lists, and checkbox rendering."
+  report_builder:
+    url: "https://regscale.readme.io/docs/report-builder"
+    confidence: "high"
+    evidence:
+      - "Report Builder creates list and chart reports from compliance and risk data with filters, logic, sorting, sharing, export, and subscriptions."
+  dashboard_builder:
+    url: "https://regscale.readme.io/docs/dashboard-builder"
+    confidence: "high"
+    evidence:
+      - "Dashboard Builder creates dashboards with access levels, widgets, report placement, publish, manage, preview, delete, and favorites."
+  questionnaire_builder:
+    url: "https://regscale.readme.io/docs/questionnaire-builder"
+    confidence: "high"
+    evidence:
+      - "Questionnaire Builder creates, assigns, completes, reviews, scores, exports, and manages questionnaire responses."
+  questionnaire_overview:
+    url: "https://regscale.readme.io/docs/questionnaire-overview"
+    confidence: "high"
+    evidence:
+      - "Questionnaire Overview documents backend C#/.NET controllers, services, entities, soft delete, tenant isolation, audit fields, API endpoints, and database tables."
+  visual_rules_engine:
+    url: "https://regscale.readme.io/docs/visual-rules-engine-user-guide"
+    confidence: "high"
+    evidence:
+      - "Visual questionnaire rules engine documents question/score conditions, show/hide/enable/disable/set answer/score/grade actions, JSON editor, validation, and test mode."
+  wayfinder_builder:
+    url: "https://regscale.readme.io/docs/wayfinder-builder"
+    confidence: "high"
+    evidence:
+      - "Wayfinder Builder manages templates, stages, activities, owners, import/export, and delete."
+  modules_features_setup:
+    url: "https://regscale.readme.io/docs/setup-modules-and-features"
+    confidence: "high"
+    evidence:
+      - "Administrators can enable or disable platform modules and feature flags."
+  identity_roles_setup:
+    url: "https://regscale.readme.io/docs/identity-and-access-management"
+    confidence: "high"
+    evidence:
+      - "Public setup guide covers users, groups, and roles."
+  sso_setup:
+    url: "https://regscale.readme.io/docs/setup-single-sign-on-sso"
+    confidence: "high"
+    evidence:
+      - "RegScale supports OAuth 2.0 and SAML SSO with enterprise IAM systems."
+  email_setup:
+    url: "https://regscale.readme.io/docs/email"
+    confidence: "high"
+    evidence:
+      - "SMTP configuration supports registration workflows and platform alerts."
+  file_system_setup:
+    url: "https://regscale.readme.io/docs/setup-file-system"
+    confidence: "high"
+    evidence:
+      - "File System Config defines platform upload limits and acceptable file types."
+  risk_model_setup:
+    url: "https://regscale.readme.io/docs/setup-risk-configuration"
+    confidence: "high"
+    evidence:
+      - "Risk Configuration defines custom risk and opportunity models and scoring logic."
+  ai_regml:
+    url: "https://regscale.readme.io/docs/ai-regml"
+    confidence: "high"
+    evidence:
+      - "RegML is the AI/ML platform for compliance, available in cloud and local deployment modes."
+  compliance_exports:
+    url: "https://regscale.readme.io/docs/generating-compliance-exports"
+    confidence: "high"
+    evidence:
+      - "Compliance exports generate standardized compliance records and integrate with compliance documentation workflows."
+  automation_manager:
+    url: "https://regscale.readme.io/docs/optional-integrations"
+    confidence: "high"
+    evidence:
+      - "Automation Manager and optional integrations are documented public product areas."
+  subsystems:
+    url: "https://regscale.readme.io/docs/subsystems"
+    confidence: "high"
+    evidence:
+      - "Subsystems are standardized features across all RegScale modules."
+
+observed_runtime_architecture:
+  product_category:
+    value: "Continuous Controls Monitoring and GRC automation platform"
+    confidence: "high"
+  application_backend_stack:
+    documented_questionnaire_backend:
+      value: "C# .NET controllers, services, entities, repository pattern, service layer"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    product_wide_stack:
+      value: "Likely .NET web API backed by SQL Server based on documented C# questionnaire backend, SQL Server prerequisites, and /api/* route style."
+      confidence: "medium"
+  frontend_stack:
+    documented_questionnaire_frontend:
+      value: "Angular components and Angular services for questionnaire builder, response, unified review, assignments, self-assignment, and rule execution."
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    product_wide_stack:
+      value: "Likely Angular or Angular-family single-page application for the main tenant UI."
+      confidence: "medium"
+  primary_data_store:
+    self_hosted:
+      value: "SQL Server stores application data."
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/pre-requisites"
+    multi_tenant_enterprise:
+      value: "Enterprise Edition supports logically isolated tenants with tenant-specific users, settings, and data; public docs also describe dedicated tenant databases in multi-tenant mode."
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/multi-tenancy-1"
+  deployment_modes:
+    saas:
+      value: "RegScale SaaS / cloud offering."
+      confidence: "high"
+    self_hosted:
+      value: "Self-hosted RegScale supports Docker, Podman, and Kubernetes installation options."
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/installation-options-1"
+  api_styles:
+    rest_api:
+      value: "REST APIs under /api/* authenticated by Bearer token."
+      confidence: "high"
+      source: "https://regscale.readme.io/reference/overview"
+    cli:
+      value: "CLI uses host URL, tenant ID, and API key or access token configuration."
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/using-the-api-to-load-data"
+    graphql:
+      value: "Public product site references GraphQL capability, but the public mapping here does not infer schema details."
+      confidence: "medium"
+      source: "https://regscale.com/"
+
+canonical_backend_components:
+  tenant_boundary_service:
+    confidence: "high"
+    responsibilities:
+      - "Resolve tenant context for users, service accounts, records, setup settings, and module data."
+      - "Enforce tenant isolation across SQL-backed records."
+      - "Support enterprise multi-tenant mode with tenant-specific settings and data."
+    likely_entities:
+      - "Tenant"
+      - "TenantSetting"
+      - "TenantFeature"
+      - "TenantModule"
+      - "TenantDatabase or tenant discriminator"
+  identity_access_service:
+    confidence: "high"
+    responsibilities:
+      - "Manage users, groups, roles, functional roles, service accounts, and API tokens."
+      - "Authenticate local sessions, Bearer tokens, CLI access tokens, SSO, and MFA."
+      - "Authorize administrator-only setup and builder surfaces."
+    documented_surfaces:
+      - "Setup User Management and Roles"
+      - "Setup Functional Roles"
+      - "Setup Service Accounts"
+      - "Setup Single Sign-On"
+      - "Multi-Factor Authentication"
+      - "Setup Security Policies"
+    likely_entities:
+      - "User"
+      - "Group"
+      - "Role"
+      - "FunctionalRole"
+      - "ServiceAccount"
+      - "PersonalAccessToken"
+      - "SsoConfiguration"
+      - "SecurityPolicy"
+  setup_configuration_service:
+    confidence: "high"
+    responsibilities:
+      - "Persist tenant-level setup values for branding, classification, compliance settings, email, files, facilities, cause codes, risk models, tags, modules, and feature flags."
+      - "Expose administrative setup APIs and UI panels."
+    documented_setup_domains:
+      - "General"
+      - "Classification"
+      - "Compliance Settings"
+      - "Email Settings"
+      - "Single Sign-On"
+      - "Theming and Branding"
+      - "User Management and Roles"
+      - "MFA"
+      - "Security Policies"
+      - "Cause Codes"
+      - "Facilities"
+      - "File System"
+      - "Functional Roles"
+      - "Modules and Features"
+      - "Risk Model"
+      - "Tags"
+      - "Service Accounts"
+      - "Logs and Utilization"
+      - "Security"
+  module_record_service:
+    confidence: "high"
+    responsibilities:
+      - "Provide CRUD, search, list, detail, filter, relationship, history, workflow, and subsystem behavior for each module."
+      - "Apply form-builder metadata and rule-builder behavior to module records."
+      - "Expose module records to reports, exports, dashboards, workbench, search, AI, and evidence flows."
+    likely_backend_pattern:
+      - "One API controller/resource family per module or generic module-record endpoint plus module-specific services."
+      - "Shared SQL audit fields and soft delete are likely based on questionnaire documentation and common module behavior."
+  subsystem_service_layer:
+    confidence: "high"
+    responsibilities:
+      - "Attach standardized collaboration and record-management capabilities to every module record."
+      - "Maintain cross-module context and auditability."
+    documented_subsystems:
+      - "Comments"
+      - "Files"
+      - "Links"
+      - "Kanban"
+      - "History"
+      - "Workflow"
+      - "Classification"
+      - "Time Travel"
+      - "Timeline"
+      - "Relationships"
+      - "Stakeholders"
+      - "Properties"
+      - "Data"
+  form_metadata_service:
+    confidence: "high"
+    responsibilities:
+      - "Store per-module display names, plural names, section/tab configuration, field definitions, field ordering, visibility, required flags, help text, and import/export JSON."
+      - "Preserve custom fields that cannot be hard-deleted by hiding/deactivating them."
+      - "Serve runtime forms to module create/update/detail UI."
+    likely_entities:
+      - "ModuleForm"
+      - "FormSection"
+      - "FormField"
+      - "FormFieldChoice"
+      - "FormFieldValidation"
+  form_rules_service:
+    confidence: "high"
+    responsibilities:
+      - "Store and validate conditional rules for module forms."
+      - "Evaluate field/system/feature/module conditions."
+      - "Apply show, hide, require, not require, enable, disable, set value, and validate actions."
+      - "Provide import/export and reset-safe behavior with module form configuration."
+    likely_entities:
+      - "FormRule"
+      - "FormRuleCondition"
+      - "FormRuleAction"
+  export_generation_service:
+    confidence: "high"
+    responsibilities:
+      - "Manage export configurations, groups, statuses, modules, descriptions, DOCX/XLSX template files, field mappings, filters, filter logic, data types, and sub-templates."
+      - "Extract template tags from DOCX/XLSX files and map them to module fields."
+      - "Generate compliance-ready documents with rich text, date formatting, checkboxes, nested data, and component/control implementation data."
+      - "Support out-of-the-box SSP/SAP/SAR/FedRAMP/eMASS style templates."
+    likely_entities:
+      - "ExportConfiguration"
+      - "ExportGroup"
+      - "ExportTemplateFile"
+      - "ExportFieldMapping"
+      - "ExportFilter"
+      - "ExportSubTemplate"
+      - "GeneratedExportArtifact"
+  report_service:
+    confidence: "high"
+    responsibilities:
+      - "Persist report definitions for list, bar, line, and pie reports."
+      - "Support module selection, display fields, drill-down fields, aggregation, filters, filter logic, dynamic filters, sorting, previews, CSV export, share links, and subscriptions."
+      - "Expose questionnaire responses through flattened reportable entities."
+    likely_entities:
+      - "ReportDefinition"
+      - "ReportField"
+      - "ReportFilter"
+      - "ReportSort"
+      - "ReportSubscription"
+      - "ReportShare"
+  dashboard_service:
+    confidence: "high"
+    responsibilities:
+      - "Persist dashboard definitions, access level, assigned groups, favorite state, preview data, widget/report placement, and publish state."
+      - "Compose widgets, report-builder reports, and by-module items into dashboard layouts."
+    likely_entities:
+      - "Dashboard"
+      - "DashboardGroupAccess"
+      - "DashboardWidget"
+      - "DashboardReportWidget"
+      - "DashboardFavorite"
+  questionnaire_service:
+    confidence: "high"
+    responsibilities:
+      - "Manage questionnaire templates, sections, questions, assignments, instances, access codes, responses, scoring, grading, review feedback, workflow states, history snapshots, recurrence, imports, exports, and report integration."
+      - "Support user, email, module, public self-assignment, recurring assignment, bulk Excel assignment, and per-question assignment."
+      - "Store both structured JSON responses and flattened Properties records for report/search/control evidence integration."
+    documented_backend:
+      controllers:
+        - "QuestionnairesController"
+        - "QuestionnaireInstancesController"
+      services:
+        - "QuestionnaireService"
+        - "QuestionnaireScoreCalculationService"
+        - "QuestionnaireExportService"
+      entities:
+        - "Questionnaires"
+        - "QuestionnaireInstances"
+        - "Question"
+        - "QuestionnaireInstanceAssignee"
+        - "QuestionAssignee"
+        - "QuestionnaireHistoryEntry"
+        - "QuestionnaireRecurringAssignment"
+        - "QuestionnaireHeader"
+        - "questionControl"
+        - "Properties"
+      patterns:
+        - "Repository pattern"
+        - "Service layer"
+        - "Tenant isolation"
+        - "Soft delete with IsDeleted"
+        - "Audit fields CreatedBy, UpdatedBy, DateCreated, DateLastUpdated"
+  questionnaire_rules_service:
+    confidence: "high"
+    responsibilities:
+      - "Store newline-delimited JSON questionnaire rules and convert to UI objects."
+      - "Validate rule names, conditions, actions, operators, references, and circular dependencies."
+      - "Simulate rules in test mode and execute runtime rules against questionnaire responses."
+      - "Apply show, hide, enable, disable, set answer, clear answer, score, grade, repeat, and display option actions."
+  wayfinder_service:
+    confidence: "high"
+    responsibilities:
+      - "Persist wayfinder templates with title, status, owner, description, stages, activities, activity type, documentation links, import/export, and delete behavior."
+      - "Expose templates for certification and audit process guidance."
+    likely_entities:
+      - "WayfinderTemplate"
+      - "WayfinderStage"
+      - "WayfinderActivity"
+  compliance_content_service:
+    confidence: "high"
+    responsibilities:
+      - "Manage catalogs/catalogues, security controls, compliance settings, control mapping, imported RegScale catalogs, compliance rollups, and compliance export content."
+      - "Support native framework language and cross-framework reporting."
+    documented_surfaces:
+      - "Compliance Settings"
+      - "Catalogues"
+      - "Import RegScale Catalogs"
+      - "Security Controls"
+      - "Control Mapping Utility"
+      - "Compliance Exports"
+      - "FedRAMP Exports"
+      - "eMASS Exports"
+  automation_manager_service:
+    confidence: "high"
+    responsibilities:
+      - "Manage connector configurations, automation jobs, schedules, credential metadata, job status, integration execution, dry-run/test behavior, and import/sync error states."
+      - "Bridge CLI integrations and in-app Automation Manager surfaces."
+    documented_connector_families:
+      identity_and_collaboration:
+        - "AD/LDAP"
+        - "Microsoft Teams"
+        - "Slack"
+        - "Webhooks"
+      cloud_and_platform:
+        - "AWS"
+        - "Azure"
+        - "GCP"
+        - "Okta"
+        - "ServiceNow"
+        - "Jira"
+      scanners_and_security_tools:
+        - "Aqua"
+        - "Axonius"
+        - "Burp Suite"
+        - "CrowdStrike"
+        - "Dependabot"
+        - "GitLab"
+        - "Grype"
+        - "IBM AppScan"
+        - "Microsoft Defender"
+        - "Nexpose"
+        - "NPM Audit"
+        - "OpenSCAP"
+        - "Prisma"
+        - "Qualys"
+        - "Rapid7"
+        - "SARIF"
+        - "Sicura"
+        - "Snyk"
+        - "SonarCloud"
+        - "STIG"
+        - "Tanium"
+        - "Tenable Nessus"
+        - "Tenable Security Center"
+        - "Tenable Vulnerability Management"
+        - "Trivy"
+        - "Veracode"
+        - "Wiz"
+        - "Xray"
+      public_sector:
+        - "CSAM"
+        - "DHS CISA"
+        - "eMASS"
+        - "FedRAMP"
+        - "NIST OSCAL"
+  ai_regml_service:
+    confidence: "high"
+    responsibilities:
+      - "Provide RegML AI/ML compliance features for control authorship, explanations, SSP authoring, SSP auditing, SSP generation, response automation, evidence mapping, and AI policy builder."
+      - "Support cloud RegML and locally deployed RegML modes."
+    documented_ai_features:
+      - "RegML"
+      - "Control AI Features"
+      - "RegML Author"
+      - "RegML Explainer"
+      - "SSP AI Features"
+      - "RegML SSP Author"
+      - "RegML Auditor"
+      - "AI Generator"
+      - "Response Automation"
+      - "Evidence Mapping"
+      - "AI Policy Builder"
+
+api_surface:
+  authentication:
+    bearer_tokens:
+      description: "REST APIs use Bearer-token authentication."
+      confidence: "high"
+      source: "https://regscale.readme.io/reference/overview"
+    service_accounts:
+      description: "Service accounts create Personal Access Tokens for automated API access."
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/service-accounts-1"
+    cli_context:
+      description: "CLI/API setup uses host URL, tenant ID, and API key."
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/using-the-api-to-load-data"
+  route_style:
+    base_prefix: "/api"
+    confidence: "high"
+    notes:
+      - "Public reference examples use /api/<domain>/<operation> route patterns."
+      - "Some endpoints use RESTful /api/<resource>/{id}; others use verb-style operations."
+  documented_endpoint_examples:
+    - path: "/api/securityplans/{intId}"
+      method: "GET"
+      domain: "security_plans"
+      confidence: "high"
+      source: "https://regscale.readme.io/reference/get_api-securityplans-intid"
+    - path: "/api/tenants/getDetailedCliConfig"
+      method: "POST"
+      domain: "tenant_cli_config"
+      confidence: "high"
+      source: "https://regscale.readme.io/reference/post_api-tenants-getdetailedcliconfig"
+    - path: "/api/files/renameDuplicateFileName"
+      method: "GET"
+      domain: "files"
+      confidence: "high"
+      source: "https://regscale.readme.io/reference/get_api-files-renameduplicatefilename"
+    - path: "/api/compliance/migrate"
+      method: "POST"
+      domain: "compliance_content"
+      confidence: "high"
+      source: "https://regscale.readme.io/reference/post_api-compliance-migrate"
+    - path: "/api/regml/query"
+      method: "POST"
+      domain: "ai_regml"
+      confidence: "high"
+      source: "https://regscale.readme.io/reference/post_api-regml-query"
+    - path: "/api/data"
+      method: "GET"
+      domain: "automation_manager_jobs"
+      confidence: "medium"
+      source: "https://regscale.readme.io/reference/get_api-data"
+    - path: "/api/questionnaires/getList"
+      method: "GET"
+      domain: "questionnaires"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaires/create"
+      method: "POST"
+      domain: "questionnaires"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaires/bulkUpdate/{id}"
+      method: "POST"
+      domain: "questionnaires"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaires/createInstancesFromQuestionnaires"
+      method: "POST"
+      domain: "questionnaire_assignments"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaires/selfAssignQuestionnaire"
+      method: "POST"
+      domain: "questionnaire_self_assignment"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaires/createRecurringAssignment"
+      method: "POST"
+      domain: "questionnaire_recurring_assignment"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaires/upload"
+      method: "POST"
+      domain: "questionnaire_import"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaires/uploadBulkEmailAssignment/{id}"
+      method: "POST"
+      domain: "questionnaire_bulk_email_assignment"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaires/exportQuestionnaire/{id}"
+      method: "GET"
+      domain: "questionnaire_export"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaires/exportAllResponses/{id}"
+      method: "GET"
+      domain: "questionnaire_export"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaireInstances/filterQuestionnaireInstances"
+      method: "POST"
+      domain: "questionnaire_instances"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaireInstances/getAllByParent/{id}"
+      method: "GET"
+      domain: "questionnaire_instances"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaireInstances/link"
+      method: "POST"
+      domain: "questionnaire_response_link"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaireInstances/updateResponses/{uuid}"
+      method: "PUT"
+      domain: "questionnaire_responses"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaireInstances/submitForFeedback/{uuid}"
+      method: "PUT"
+      domain: "questionnaire_review_workflow"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaireInstances/changeStateAccepted/{uuid}"
+      method: "PUT"
+      domain: "questionnaire_review_workflow"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaireInstances/changeStateRejected/{uuid}"
+      method: "PUT"
+      domain: "questionnaire_review_workflow"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaireInstances/reopenInstance/{uuid}"
+      method: "PUT"
+      domain: "questionnaire_review_workflow"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaireInstances/history/{id}"
+      method: "GET"
+      domain: "questionnaire_history"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+    - path: "/api/questionnaireInstances/assignQuestions/{id}"
+      method: "POST"
+      domain: "questionnaire_per_question_assignment"
+      confidence: "high"
+      source: "https://regscale.readme.io/docs/questionnaire-overview"
+  inferred_standard_module_patterns:
+    confidence: "medium"
+    patterns:
+      - "GET /api/<module>/getList"
+      - "GET /api/<module>/{id}"
+      - "POST /api/<module>/create"
+      - "PUT /api/<module>/{id}"
+      - "DELETE /api/<module>/{id}"
+      - "POST /api/<module>/filter"
+      - "POST /api/<module>/bulkUpdate"
+    caveat: "Exact route names vary by module and should be confirmed against the public API reference or an authenticated tenant."
+
+module_domains:
+  assets:
+    label: "Assets"
+    confidence: "high"
+    backend_responsibilities:
+      - "Asset inventory records, owners/custodians, classification, facility/location links, platform metadata, lifecycle dates, evidence, relationships, vulnerabilities, controls, and reports."
+  assessments:
+    label: "Assessments"
+    confidence: "high"
+    backend_responsibilities:
+      - "Assessment records, editors, control assessment results, recurrence, due-date extension requests, SAP/SAR export context, and evidence links."
+  assessment_plans:
+    label: "Assessment Plans"
+    confidence: "high"
+    backend_responsibilities:
+      - "Assessment plan records, assessment items, schedules, related controls, evidence, SAP planning export context, and recurrence."
+  capabilities:
+    label: "Capabilities"
+    confidence: "high"
+    backend_responsibilities:
+      - "Capability records for program/system maturity, relationships, evidence, and reporting."
+  case_management:
+    label: "Case Management"
+    confidence: "high"
+    backend_responsibilities:
+      - "Case records, workflow, comments, evidence, stakeholders, status tracking, and reportable properties."
+  catalogues:
+    label: "Catalogues"
+    confidence: "high"
+    backend_responsibilities:
+      - "Control catalog content, import from system/file, framework-native taxonomy, control mappings, rollups, and compliance export data."
+  causal_analysis:
+    label: "Causal Analysis"
+    confidence: "high"
+    backend_responsibilities:
+      - "Cause analysis records, standardized cause codes, issue/incident relationships, root-cause traceability, and audit history."
+  changes:
+    label: "Changes"
+    confidence: "high"
+    backend_responsibilities:
+      - "Change records, approvals/workflow, impacted assets/systems/controls, timelines, evidence, and reports."
+  components:
+    label: "Components"
+    confidence: "high"
+    backend_responsibilities:
+      - "System/component inventory, inheritance, control implementations, component metadata, security plan links, and export data objects."
+  data_calls:
+    label: "Data Calls"
+    confidence: "high"
+    backend_responsibilities:
+      - "Data collection requests, recurrence, assignments, responses, due dates, evidence, workflow, and reporting."
+  evidence_locker:
+    label: "Evidence Locker"
+    confidence: "high"
+    backend_responsibilities:
+      - "Evidence records, file attachments, tags, control/security plan links, evidence mapping, retention, and report/search integration."
+  exceptions:
+    label: "Exceptions"
+    confidence: "high"
+    backend_responsibilities:
+      - "Risk/control exceptions, FedRAMP deviations, justification, approvals, due dates, relationships to issues/POA&Ms, and exports."
+  incidents:
+    label: "Incidents"
+    confidence: "high"
+    backend_responsibilities:
+      - "Incident records, impact/severity/status, timeline, stakeholders, evidence, root cause links, tasks, and reports."
+  interconnections:
+    label: "Interconnections"
+    confidence: "high"
+    backend_responsibilities:
+      - "System interconnection records, authorization boundaries, related assets/components/security plans, evidence, and exports."
+  issues:
+    label: "Issues"
+    confidence: "high"
+    backend_responsibilities:
+      - "Issues and POA&M records, owners, milestones, scanner findings, deviations, due-date extensions, Jira/sync links, reports, and exports."
+  policies:
+    label: "Policies"
+    confidence: "high"
+    backend_responsibilities:
+      - "Policy records, control inheritance, AI policy builder outputs, approvals, evidence, requirements, and report/export integration."
+  programs:
+    label: "Programs"
+    confidence: "high"
+    backend_responsibilities:
+      - "Program records, objectives, related projects/assets/controls, dashboards, evidence, and reporting."
+  projects:
+    label: "Projects"
+    confidence: "high"
+    backend_responsibilities:
+      - "Project records, requirements, controls, tasks, schedules, stakeholders, evidence, and workflow."
+  questionnaires:
+    label: "Questionnaires"
+    confidence: "high"
+    backend_responsibilities:
+      - "Questionnaire templates, assignment, responses, scoring, rules, review workflow, export, control mapping, and report integration."
+  requests:
+    label: "Requests"
+    confidence: "high"
+    backend_responsibilities:
+      - "Request records, routing, workflow, status, stakeholders, notifications, and reporting."
+  requirements:
+    label: "Requirements"
+    confidence: "high"
+    backend_responsibilities:
+      - "Requirement records, catalog/control mapping, project/policy/supply-chain links, evidence, and reports."
+  risks:
+    label: "Risks"
+    confidence: "high"
+    backend_responsibilities:
+      - "Risk records, risk models, scoring, probability/consequence, owners, mitigations, exceptions, tasks, dashboards, and reports."
+  security_controls:
+    label: "Security Controls"
+    confidence: "high"
+    backend_responsibilities:
+      - "Control catalog records, implementations, assessments, evidence, AI explanations, control mappings, and compliance export data."
+  security_plans:
+    label: "Security Plans"
+    confidence: "high"
+    backend_responsibilities:
+      - "System security plan records, system metadata, components, controls, inheritance, categorization, SSP AI features, SAP/SAR/SSP exports, and compliance rollup."
+  security_profiles:
+    label: "Security Profiles"
+    confidence: "high"
+    backend_responsibilities:
+      - "Reusable control/profile packages for builder utility, control selection, inheritance, and policy/project/supply-chain population."
+  supply_chain:
+    label: "Supply Chain"
+    confidence: "high"
+    backend_responsibilities:
+      - "Supplier/vendor/supply-chain records, third-party risk links, questionnaires, contracts, requirements, issues, evidence, and reports."
+  tasks:
+    label: "Tasks"
+    confidence: "high"
+    backend_responsibilities:
+      - "Task records, assignments, due dates, recurrence, workflow, comments, evidence, and module parent relationships."
+  threats:
+    label: "Threats"
+    confidence: "high"
+    backend_responsibilities:
+      - "Threat records, risk/security control relationships, threat intelligence context, evidence, and reports."
+  threat_models:
+    label: "Threat Models"
+    confidence: "high"
+    backend_responsibilities:
+      - "Threat modeling records, system/component relationships, risks, controls, workflow, and evidence."
+
+builder_domains:
+  form_builder:
+    confidence: "high"
+    backend_entity_families:
+      - "Module display settings"
+      - "Form sections or tabs"
+      - "Form fields"
+      - "Select choices"
+      - "Field validations"
+      - "Form rules"
+      - "Import/export JSON payloads"
+    runtime_contract:
+      - "Module create/update/detail surfaces consume the configured sections, fields, visibility, requirements, and rules."
+      - "Custom fields are preserved even when hidden or deactivated."
+  rules_builder:
+    confidence: "high"
+    backend_entity_families:
+      - "Rule"
+      - "Condition"
+      - "Action"
+      - "Operator"
+      - "Value source"
+      - "Target field or tab"
+    condition_types:
+      - "Field"
+      - "System NO_PARENT"
+      - "System NO_CONDITION"
+      - "Tenant Feature"
+      - "Module"
+    action_types:
+      - "SHOW"
+      - "HIDE"
+      - "REQUIRE"
+      - "NOT_REQUIRE"
+      - "ENABLE"
+      - "DISABLE"
+      - "SET_VALUE"
+      - "VALIDATE"
+  export_builder:
+    confidence: "high"
+    backend_entity_families:
+      - "Export configuration"
+      - "Export group"
+      - "Template file"
+      - "Template tag"
+      - "Field mapping"
+      - "Filter"
+      - "Filter logic"
+      - "Sub-template"
+      - "Generated artifact"
+    supported_formats:
+      - "DOCX"
+      - "XLSX"
+    module_support:
+      documented: "Security Plans"
+      inferred_expansion: "Other module-aware exports through field metadata and compliance export surfaces."
+      confidence: "medium"
+  report_builder:
+    confidence: "high"
+    backend_entity_families:
+      - "Report definition"
+      - "Report chart type"
+      - "Report fields"
+      - "Report filters"
+      - "Filter logic"
+      - "Sort fields"
+      - "Share metadata"
+      - "Subscription schedule"
+      - "Export artifact"
+    chart_types:
+      - "List"
+      - "Bar"
+      - "Line"
+      - "Pie"
+  dashboard_builder:
+    confidence: "high"
+    backend_entity_families:
+      - "Dashboard"
+      - "Dashboard access level"
+      - "Dashboard assigned groups"
+      - "Dashboard widget"
+      - "Dashboard report item"
+      - "Layout column and position"
+      - "Favorite"
+      - "Preview"
+    access_levels:
+      - "Public"
+      - "Private"
+  questionnaire_builder:
+    confidence: "high"
+    backend_entity_families:
+      - "Questionnaire template"
+      - "Section"
+      - "Question"
+      - "Question option"
+      - "Questionnaire rule"
+      - "Questionnaire instance"
+      - "Assignee"
+      - "Per-question assignee"
+      - "Access code"
+      - "Response"
+      - "Upload"
+      - "Score"
+      - "Grade"
+      - "Feedback"
+      - "History snapshot"
+      - "Recurring assignment"
+      - "Header metadata"
+      - "Flattened property"
+    workflow_states:
+      - "Open"
+      - "Submitted"
+      - "Accepted"
+      - "RequestChanges"
+      - "Closed"
+  wayfinder_builder:
+    confidence: "high"
+    backend_entity_families:
+      - "Wayfinder template"
+      - "Stage"
+      - "Activity"
+      - "Owner"
+      - "Documentation link"
+      - "Import/export artifact"
+
+cross_cutting_services:
+  files_and_evidence:
+    confidence: "high"
+    responsibilities:
+      - "Enforce setup file limits and accepted file types."
+      - "Store files attached to any module through the Files subsystem."
+      - "Support evidence locker, questionnaire uploads, export templates, generated exports, and compliance evidence."
+  notifications:
+    confidence: "high"
+    responsibilities:
+      - "SMTP-backed registration, alerts, assignment notices, reviewer notices, feedback emails, reminders, subscriptions, and workflow notifications."
+  audit_history_and_time_travel:
+    confidence: "high"
+    responsibilities:
+      - "Track record changes, views, edits, comments, prints, emails, snapshots, and cryptographically linked version history."
+  search_reporting_and_properties:
+    confidence: "high"
+    responsibilities:
+      - "Index record fields, form-builder custom properties, questionnaire flattened properties, files/evidence metadata, and module relationships for reports, dashboard widgets, workbench, and search."
+  workflow_and_approvals:
+    confidence: "high"
+    responsibilities:
+      - "Provide reusable approval workflows directly from records and support routing via functional roles."
+  relationship_graph:
+    confidence: "high"
+    responsibilities:
+      - "Maintain many-to-many links across module records for context, AI features, evidence, reporting, and inheritance."
+  recurrence_and_scheduling:
+    confidence: "high"
+    responsibilities:
+      - "Schedule recurring assessments, data calls, corrective action tasks, report subscriptions, questionnaire assignments, and automation jobs."
+
+background_jobs_and_async_work:
+  confidence: "medium"
+  likely_job_families:
+    - "Export generation for DOCX/XLSX and compliance packages"
+    - "Report subscription delivery"
+    - "Questionnaire recurring assignment creation and reminder emails"
+    - "Automation Manager connector sync and job status updates"
+    - "Scanner/cloud/identity connector imports through CLI libraries"
+    - "Compliance catalog migration and import"
+    - "RegML AI generation, authoring, auditing, extraction, and response automation"
+    - "Evidence mapping and AI/vector enrichment"
+    - "Time Travel snapshot creation and verification"
+  caveat: "Public docs expose job semantics, not the internal queue implementation."
+
+data_model_relationships:
+  tenant_identity:
+    confidence: "high"
+    relationships:
+      - "Tenant has users, groups, roles, functional roles, settings, modules, features, service accounts, and SSO configuration."
+      - "Service account has API/PAT token scoped to tenant API access."
+  module_records:
+    confidence: "high"
+    relationships:
+      - "Tenant owns many records per module."
+      - "Module record has comments, files, links, kanban, history, workflow, classification, time-travel snapshots, timeline events, relationships, stakeholders, properties, and data objects."
+      - "Module record may link to facilities, classifications, tags, controls, evidence, risks, tasks, and workflows."
+  security_plan_compliance:
+    confidence: "high"
+    relationships:
+      - "Security Plan links to components, controls, control implementations, assessment plans, assessments, evidence, issues, interconnections, assets, and export templates."
+      - "Controls link to catalogues/frameworks, control implementations, questionnaire evidence, assessments, and AI explanations."
+  questionnaire_reporting:
+    confidence: "high"
+    relationships:
+      - "Questionnaire template has sections, questions, rules, headers, assignments, and recurring assignments."
+      - "Questionnaire instance has assignees, answers, uploads, score, grade, state, feedback, history, and flattened Properties."
+      - "Flattened Properties make questionnaire answers reportable and linkable to security controls."
+  builder_outputs:
+    confidence: "high"
+    relationships:
+      - "Form Builder affects module runtime forms."
+      - "Export Builder consumes module metadata and records to generate documents."
+      - "Report Builder consumes module records and questionnaire flattened responses."
+      - "Dashboard Builder consumes widgets and report definitions."
+      - "Wayfinder Builder guides workflow execution through stages and activities."
+
+security_and_governance_controls:
+  confidence: "high"
+  controls:
+    - "Tenant isolation"
+    - "Role and group-based access management"
+    - "Functional role workflow routing"
+    - "Service-account PATs"
+    - "SSO via OAuth 2.0 and SAML"
+    - "MFA support"
+    - "Security policy configuration"
+    - "SMTP configuration for alerts and workflows"
+    - "File upload restrictions"
+    - "Audit history"
+    - "Soft delete for questionnaire entities"
+    - "Time Travel encrypted snapshots"
+    - "Classification values and CIA categorization"
+
+known_unknowns:
+  - area: "Product-wide backend stack"
+    detail: "Questionnaire docs explicitly document C#/.NET; public docs do not prove every backend service uses the same stack."
+    confidence: "medium"
+  - area: "Database schema"
+    detail: "SQL Server and several questionnaire tables/entities are documented, but full table/column names for all modules are private."
+    confidence: "medium"
+  - area: "Queue and scheduler implementation"
+    detail: "Asynchronous job semantics are documented, but queue technology and worker topology are not public."
+    confidence: "low"
+  - area: "Object/file storage implementation"
+    detail: "File subsystem and file system config are documented, but storage provider internals are not public."
+    confidence: "low"
+  - area: "GraphQL schema"
+    detail: "Public product site references GraphQL, but no schema is included in this mapping."
+    confidence: "low"
+  - area: "Exact route inventory"
+    detail: "Public API reference examples and questionnaire endpoints are included; exact route names for every module should be confirmed through the API reference or an authenticated tenant."
+    confidence: "medium"
+
+verification_playbook:
+  public_only:
+    - "Re-fetch https://regscale.readme.io/llms.txt and diff guide/module/API coverage."
+    - "Re-fetch each cited .md source and confirm entity and workflow claims."
+    - "Search the API reference for each module domain and add concrete endpoint examples as discovered."
+  authenticated_tenant_if_available:
+    - "Use a service account PAT, tenant ID, and host URL to enumerate API reference-backed routes safely."
+    - "Validate module list, feature flags, builder configurations, reportable entities, dashboard widgets, and export groups without mutating seeded data."
+    - "Create marked test-owned records only when mutation is explicitly allowed, then delete or archive them and verify cleanup."
+
+semantic_parity_guidance_for_regovise:
+  requirement: "Implement tenant-facing, discoverable, operable equivalents rather than cloning private RegScale internals."
+  minimum_backend_equivalents:
+    - "Tenant identity, roles, SSO, service accounts, module/feature flags, and setup configuration."
+    - "Generic module-record CRUD with standardized subsystems."
+    - "Form Builder metadata plus live rule evaluation and API-side validation."
+    - "Export, Report, Dashboard, Questionnaire, and Wayfinder builders wired to module metadata and records."
+    - "Questionnaire runtime with assignments, access codes, scoring, feedback, exports, flattened reporting data, and cleanup-safe delete."
+    - "Automation Manager connector lifecycle with credential metadata, schedules, dry-run/test, sync status, and errors."
+    - "AI/RegML-equivalent paths with deterministic fallback labeling when AI is unavailable."
+    - "Compliance catalogs, security controls, security plans, evidence, exports, workbench, dashboards, search, reports, and audit history."
