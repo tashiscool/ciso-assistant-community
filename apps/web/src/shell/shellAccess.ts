@@ -281,7 +281,17 @@ function canAccessStandardRoute(route: string, access: ShellAccessProfile): bool
       ],
       access.canUseAdvancedRisk,
     ],
-    [['/evidence-management', '/features/evidence-management', '/evidence/jobs', '/evidences', '/evidence-revisions'], access.canUseEvidence],
+    [
+      [
+        '/evidence-management',
+        '/features/evidence-management',
+        '/assessment-evidence-packages',
+        '/evidence/jobs',
+        '/evidences',
+        '/evidence-revisions',
+      ],
+      access.canUseEvidence,
+    ],
     [['/conmon/executions'], access.canUseConMon],
     [['/reports', '/builders/report-builder'], access.canUseReports],
     [['/dashboards', '/recap', '/metric-instances', '/x-rays'], access.canUseAnalytics],

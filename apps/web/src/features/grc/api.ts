@@ -21,7 +21,13 @@ import type {
   GrcOverview,
   GrcStatus,
   GeneratedReportSnapshot,
+  DraftScrutinyRunInput,
+  MaterializeScrutinyRunInput,
   ReportBundle,
+  ReviewScrutinyItemInput,
+  ScrutinyPattern,
+  ScrutinyRunDetail,
+  ScrutinyRunSummary,
 } from './types';
 
 const client = new ApiClient();
@@ -227,6 +233,62 @@ export async function refreshGrcScf(frameworkIds?: string[]) {
 
 export async function getGrcJobs() {
   const response = await client.get<{ data: GrcJobRun[] }>('/grc/jobs');
+  return response.data;
+}
+
+export async function getScrutinyPatterns(params: { controlRefs?: string[]; packageMarker?: string } = {}) {
+  const response = await client.get<{
+    data: {
+      featureFlag: string;
+      enabled: boolean;
+      message: string;
+      patterns: ScrutinyPattern[];
+    };
+  }>(
+    withQuery('/grc/scrutiny-patterns', {
+      controlRefs: params.controlRefs?.join(','),
+      packageMarker: params.packageMarker,
+    }),
+  );
+  return response.data;
+}
+
+export async function listScrutinyRuns() {
+  const response = await client.get<{ data: ScrutinyRunSummary[] }>('/grc/scrutiny-runs');
+  return response.data;
+}
+
+export async function createDraftScrutinyRun(body: DraftScrutinyRunInput) {
+  const response = await client.post<{ data: ScrutinyRunDetail }>('/grc/scrutiny-runs/draft', body);
+  return response.data;
+}
+
+export async function getScrutinyRun(runId: string) {
+  const response = await client.get<{ data: ScrutinyRunDetail }>(`/grc/scrutiny-runs/${encodeURIComponent(runId)}`);
+  return response.data;
+}
+
+export async function materializeScrutinyRun(runId: string, body: MaterializeScrutinyRunInput) {
+  const response = await client.post<{ data: ScrutinyRunDetail }>(
+    `/grc/scrutiny-runs/${encodeURIComponent(runId)}/materialize`,
+    body,
+  );
+  return response.data;
+}
+
+export async function reconcileScrutinyRun(runId: string) {
+  const response = await client.post<{ data: ScrutinyRunDetail }>(
+    `/grc/scrutiny-runs/${encodeURIComponent(runId)}/reconcile`,
+    {},
+  );
+  return response.data;
+}
+
+export async function reviewScrutinyItem(itemId: string, body: ReviewScrutinyItemInput) {
+  const response = await client.post<{ data: ScrutinyRunDetail }>(
+    `/grc/scrutiny-items/${encodeURIComponent(itemId)}/review`,
+    body,
+  );
   return response.data;
 }
 

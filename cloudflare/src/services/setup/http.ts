@@ -401,7 +401,17 @@ const featureFlagCatalog = [
     name: 'AI Policy Builder',
     description: 'Generate policy requirements from profiles and catalogue inputs.',
   },
-];
+  {
+    id: 'grc_scrutiny_engine',
+    name: 'GRC Scrutiny Engine',
+    description: 'Draft assessor scrutiny chains from controls through evidence requests, sufficiency review, and immutable comment trails.',
+    defaultEnabled: false,
+  },
+] satisfies Array<{ id: string; name: string; description: string; defaultEnabled?: boolean }>;
+
+const defaultEnabledFeatureFlagIds = featureFlagCatalog
+  .filter((feature) => feature.defaultEnabled !== false)
+  .map((feature) => feature.id);
 
 const classificationLevels = ['Low', 'Moderate', 'High'] as const;
 
@@ -946,7 +956,7 @@ async function ensureSeedModulesFeatures(env: EnvBindings, tenantId: string, use
     .bind(
       tenantId,
       JSON.stringify(moduleCatalog.map((module) => module.id)),
-      JSON.stringify(featureFlagCatalog.map((feature) => feature.id)),
+      JSON.stringify(defaultEnabledFeatureFlagIds),
       'Canonical module toggles seeded for the tenant. Review before changing production availability.',
       userId,
       userId,
@@ -1703,7 +1713,7 @@ async function buildModulesFeaturesSnapshot(env: EnvBindings, tenantId: string) 
 
   const enabledModules = new Set(asJson<string[]>(modulesRow?.enabled_modules_json, moduleCatalog.map((module) => module.id)));
   const enabledFeatureFlags = new Set(
-    asJson<string[]>(modulesRow?.feature_flags_json, featureFlagCatalog.map((feature) => feature.id)),
+    asJson<string[]>(modulesRow?.feature_flags_json, defaultEnabledFeatureFlagIds),
   );
   const regmlEnabled = regmlRow ? regmlRow.enabled === 1 : modulesRow?.regml_enabled === 1;
   const regmlTermsAccepted = regmlRow ? regmlRow.terms_accepted === 1 : modulesRow?.regml_terms_accepted === 1;
@@ -2587,7 +2597,7 @@ export async function handleSetupRoutes(
         : moduleCatalog.map((module) => module.id);
       const enabledFeatureFlagIds = Array.isArray(body.enabledFeatureFlagIds)
         ? featureFlagCatalog.map((feature) => feature.id).filter((id) => body.enabledFeatureFlagIds?.includes(id))
-        : featureFlagCatalog.map((feature) => feature.id);
+        : defaultEnabledFeatureFlagIds;
       const regmlEnabled = body.regmlEnabled ?? enabledFeatureFlagIds.includes('regml');
       const regmlTermsAccepted = body.regmlTermsAccepted ?? regmlEnabled;
       const note = body.statusNote?.trim() || null;

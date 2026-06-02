@@ -7,6 +7,7 @@ import {
 import {
   loadScopedPermissionContext,
   requireAnyPermission,
+  requireAnyScopedPermission,
   requireRootAdminAccess,
   type ScopedPermissionContext,
 } from '../../authorization';
@@ -1463,6 +1464,98 @@ type ModuleRecordResponse = {
   updatedAt: string;
 };
 
+type AssessmentEvidencePackageRow = {
+  id: string;
+  module_key: string;
+  folder_id: string;
+  title: string;
+  status: string;
+  start_on: string | null;
+  finish_on: string | null;
+  due_on: string | null;
+  review_on: string | null;
+  data_json: string;
+  links_json: string;
+  archived: number;
+  created_at: string;
+  updated_at: string;
+};
+
+type AssessmentEvidencePackageSummary = {
+  marker: string;
+  title: string;
+  matter: string | null;
+  folderIds: string[];
+  dataCallCount: number;
+  evidenceRollupCount: number;
+  closedRequestCount: number;
+  coreRequestCount: number;
+  commentEventCount: number;
+  rowsWithComments: number;
+  uniqueControlRefs: number;
+  familyCount: number;
+  evidenceTypeCount: number;
+  averageDaysToReceive: number | null;
+  slowestDaysToReceive: number | null;
+  anomalyCount: number;
+  updatedAt: string;
+};
+
+type AssessmentEvidencePackageDetail = {
+  summary: AssessmentEvidencePackageSummary;
+  controlCoverage: Array<{ controlRef: string; count: number }>;
+  familyCoverage: Array<{ family: string; requestCount: number; coreCount: number }>;
+  ownerCoverage: Array<{ owner: string; requestCount: number; averageDaysToReceive: number | null }>;
+  evidenceTypeCoverage: Array<{ evidenceType: string; requestCount: number }>;
+  requests: Array<{
+    id: string;
+    title: string;
+    status: string;
+    route: string;
+    excelRow: number | null;
+    owner: string | null;
+    requestedAt: string | null;
+    receivedAt: string | null;
+    daysToReceive: number | null;
+    coreControl: boolean;
+    controlRefs: string[];
+    family: string | null;
+    evidenceType: string | null;
+    commentEventCount: number;
+    dateQuality: string | null;
+  }>;
+  evidenceRollups: Array<{
+    id: string;
+    title: string;
+    status: string;
+    route: string;
+    family: string | null;
+    evidenceType: string | null;
+    controlRefs: string[];
+    sourceRows: number[];
+    historicalReferenceOnly: boolean;
+  }>;
+  reviewerComments: Array<{
+    requestId: string;
+    requestTitle: string;
+    route: string;
+    excelRow: number | null;
+    author: string;
+    dateLabel: string | null;
+    excerpt: string;
+  }>;
+  anomalies: Array<{
+    requestId: string;
+    requestTitle: string;
+    route: string;
+    excelRow: number | null;
+    dateQuality: string;
+    requestedAt: string | null;
+    receivedAt: string | null;
+    daysToReceive: number | null;
+  }>;
+};
+
 type SaveModuleRecordInput = {
   folderId?: string;
   title?: string;
@@ -1567,6 +1660,267 @@ function toModuleRecordResponse(row: ModuleRecordRow): ModuleRecordResponse {
     updatedByUserId: row.updated_by_user_id,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+  };
+}
+
+function stringArrayFromUnknown(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.map((item) => (typeof item === 'string' ? item.trim() : '')).filter(Boolean)
+    : [];
+}
+
+function numberFromUnknown(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === 'string' && value.trim()) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+function booleanFromUnknown(value: unknown): boolean {
+  return value === true || value === 1 || value === 'true';
+}
+
+function safeExcerpt(value: unknown, maxLength = 280): string {
+  return String(value ?? '')
+    .replace(/https?:\/\/\S+/gi, '[url redacted]')
+    .replace(/\b(?:\d{1,3}\.){3}\d{1,3}(?:\/\d{1,2})?\b/g, '[ip redacted]')
+    .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, '[email redacted]')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, maxLength);
+}
+
+function incrementMap(map: Map<string, number>, key: string, amount = 1) {
+  map.set(key, (map.get(key) ?? 0) + amount);
+}
+
+function sortedCountEntries(map: Map<string, number>, keyName: string, countName = 'count') {
+  return [...map.entries()]
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .map(([key, count]) => ({ [keyName]: key, [countName]: count }));
+}
+
+function buildAssessmentEvidencePackageSummary(
+  marker: string,
+  rows: AssessmentEvidencePackageRow[],
+): AssessmentEvidencePackageSummary {
+  const dataCalls = rows.filter((row) => row.module_key === 'data-calls');
+  const evidenceRollups = rows.filter((row) => row.module_key === 'evidence-locker');
+  const folderIds = [...new Set(rows.map((row) => row.folder_id).filter(Boolean))].sort();
+  const controlRefs = new Set<string>();
+  const families = new Set<string>();
+  const evidenceTypes = new Set<string>();
+  const days: number[] = [];
+  let coreRequestCount = 0;
+  let commentEventCount = 0;
+  let rowsWithComments = 0;
+  let anomalyCount = 0;
+  let title = marker;
+  let matter: string | null = null;
+
+  for (const row of dataCalls) {
+    const data = asJson<Record<string, unknown>>(row.data_json, {});
+    title = typeof data.packageTitle === 'string' && data.packageTitle.trim() ? data.packageTitle.trim() : title;
+    matter = typeof data.assessmentMatter === 'string' && data.assessmentMatter.trim() ? data.assessmentMatter.trim() : matter;
+    stringArrayFromUnknown(data.controlRefs).forEach((controlRef) => controlRefs.add(controlRef));
+    if (typeof data.assessmentFamily === 'string' && data.assessmentFamily.trim()) {
+      families.add(data.assessmentFamily.trim());
+    }
+    if (typeof data.evidenceType === 'string' && data.evidenceType.trim()) {
+      evidenceTypes.add(data.evidenceType.trim());
+    }
+    if (booleanFromUnknown(data.coreControl)) {
+      coreRequestCount += 1;
+    }
+    const commentEvents = Array.isArray(data.commentEvents) ? data.commentEvents : [];
+    commentEventCount += commentEvents.length;
+    if (commentEvents.length > 0 || data.hasReviewerScrutiny === true) {
+      rowsWithComments += 1;
+    }
+    const daysToReceive = numberFromUnknown(data.daysToReceive);
+    if (daysToReceive !== null) {
+      days.push(daysToReceive);
+    }
+    if (typeof data.dateQuality === 'string' && data.dateQuality !== 'ok') {
+      anomalyCount += 1;
+    }
+  }
+
+  const updatedAt =
+    rows.map((row) => row.updated_at).sort((left, right) => right.localeCompare(left))[0] ?? nowIso();
+
+  return {
+    marker,
+    title,
+    matter,
+    folderIds,
+    dataCallCount: dataCalls.length,
+    evidenceRollupCount: evidenceRollups.length,
+    closedRequestCount: dataCalls.filter((row) => row.status.toLowerCase() === 'closed').length,
+    coreRequestCount,
+    commentEventCount,
+    rowsWithComments,
+    uniqueControlRefs: controlRefs.size,
+    familyCount: families.size,
+    evidenceTypeCount: evidenceTypes.size,
+    averageDaysToReceive: days.length
+      ? Number((days.reduce((total, value) => total + value, 0) / days.length).toFixed(2))
+      : null,
+    slowestDaysToReceive: days.length ? Math.max(...days) : null,
+    anomalyCount,
+    updatedAt,
+  };
+}
+
+function buildAssessmentEvidencePackageDetail(
+  marker: string,
+  rows: AssessmentEvidencePackageRow[],
+): AssessmentEvidencePackageDetail {
+  const dataCalls = rows.filter((row) => row.module_key === 'data-calls');
+  const evidenceRollupRows = rows.filter((row) => row.module_key === 'evidence-locker');
+  const controlCounts = new Map<string, number>();
+  const familyCounts = new Map<string, number>();
+  const familyCoreCounts = new Map<string, number>();
+  const evidenceTypeCounts = new Map<string, number>();
+  const ownerCounts = new Map<string, number>();
+  const ownerDays = new Map<string, number[]>();
+  const reviewerComments: AssessmentEvidencePackageDetail['reviewerComments'] = [];
+  const anomalies: AssessmentEvidencePackageDetail['anomalies'] = [];
+
+  const requests = dataCalls.map((row) => {
+    const data = asJson<Record<string, unknown>>(row.data_json, {});
+    const controlRefs = stringArrayFromUnknown(data.controlRefs);
+    const family = typeof data.assessmentFamily === 'string' ? data.assessmentFamily : null;
+    const evidenceType = typeof data.evidenceType === 'string' ? data.evidenceType : null;
+    const owner =
+      typeof data.pocNormalized === 'string' && data.pocNormalized.trim()
+        ? data.pocNormalized.trim()
+        : typeof data.owner === 'string'
+          ? data.owner.trim()
+          : null;
+    const daysToReceive = numberFromUnknown(data.daysToReceive);
+    const excelRow = numberFromUnknown(data.sourceExcelRow);
+    const dateQuality = typeof data.dateQuality === 'string' ? data.dateQuality : null;
+    const route = `/data-calls?record=${encodeURIComponent(row.id)}`;
+    const coreControl = booleanFromUnknown(data.coreControl);
+    const commentEvents = Array.isArray(data.commentEvents) ? data.commentEvents : [];
+
+    controlRefs.forEach((controlRef) => incrementMap(controlCounts, controlRef));
+    if (family) {
+      incrementMap(familyCounts, family);
+      if (coreControl) {
+        incrementMap(familyCoreCounts, family);
+      }
+    }
+    if (evidenceType) {
+      incrementMap(evidenceTypeCounts, evidenceType);
+    }
+    if (owner) {
+      incrementMap(ownerCounts, owner);
+      if (daysToReceive !== null) {
+        ownerDays.set(owner, [...(ownerDays.get(owner) ?? []), daysToReceive]);
+      }
+    }
+
+    for (const event of commentEvents) {
+      const eventRecord = event && typeof event === 'object' ? (event as Record<string, unknown>) : {};
+      reviewerComments.push({
+        requestId: row.id,
+        requestTitle: row.title,
+        route,
+        excelRow,
+        author: typeof eventRecord.author === 'string' && eventRecord.author.trim() ? eventRecord.author.trim() : 'Reviewer',
+        dateLabel: typeof eventRecord.dateLabel === 'string' && eventRecord.dateLabel.trim() ? eventRecord.dateLabel.trim() : null,
+        excerpt: safeExcerpt(eventRecord.text),
+      });
+    }
+
+    if (dateQuality && dateQuality !== 'ok') {
+      anomalies.push({
+        requestId: row.id,
+        requestTitle: row.title,
+        route,
+        excelRow,
+        dateQuality,
+        requestedAt: typeof data.requested_at === 'string' ? data.requested_at : row.start_on,
+        receivedAt: typeof data.delivery_date === 'string' ? data.delivery_date : row.finish_on,
+        daysToReceive,
+      });
+    }
+
+    return {
+      id: row.id,
+      title: row.title,
+      status: row.status,
+      route,
+      excelRow,
+      owner,
+      requestedAt: typeof data.requested_at === 'string' ? data.requested_at : row.start_on,
+      receivedAt: typeof data.delivery_date === 'string' ? data.delivery_date : row.finish_on,
+      daysToReceive,
+      coreControl,
+      controlRefs,
+      family,
+      evidenceType,
+      commentEventCount: commentEvents.length,
+      dateQuality,
+    };
+  });
+
+  const evidenceRollups = evidenceRollupRows.map((row) => {
+    const data = asJson<Record<string, unknown>>(row.data_json, {});
+    return {
+      id: row.id,
+      title: row.title,
+      status: row.status,
+      route: `/evidence-locker?record=${encodeURIComponent(row.id)}`,
+      family: typeof data.assessmentFamily === 'string' ? data.assessmentFamily : null,
+      evidenceType: typeof data.evidenceType === 'string' ? data.evidenceType : null,
+      controlRefs: stringArrayFromUnknown(data.controlRefs),
+      sourceRows: Array.isArray(data.sourceExcelRows)
+        ? data.sourceExcelRows.map(numberFromUnknown).filter((value): value is number => value !== null)
+        : [],
+      historicalReferenceOnly: booleanFromUnknown(data.historicalReferenceOnly),
+    };
+  });
+
+  const ownerCoverage = [...ownerCounts.entries()]
+    .map(([owner, requestCount]) => {
+      const values = ownerDays.get(owner) ?? [];
+      return {
+        owner,
+        requestCount,
+        averageDaysToReceive: values.length
+          ? Number((values.reduce((total, value) => total + value, 0) / values.length).toFixed(2))
+          : null,
+      };
+    })
+    .sort((left, right) => right.requestCount - left.requestCount || left.owner.localeCompare(right.owner));
+
+  return {
+    summary: buildAssessmentEvidencePackageSummary(marker, rows),
+    controlCoverage: sortedCountEntries(controlCounts, 'controlRef') as AssessmentEvidencePackageDetail['controlCoverage'],
+    familyCoverage: [...familyCounts.entries()]
+      .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+      .map(([family, requestCount]) => ({
+        family,
+        requestCount,
+        coreCount: familyCoreCounts.get(family) ?? 0,
+      })),
+    ownerCoverage,
+    evidenceTypeCoverage: sortedCountEntries(
+      evidenceTypeCounts,
+      'evidenceType',
+      'requestCount',
+    ) as AssessmentEvidencePackageDetail['evidenceTypeCoverage'],
+    requests: requests.sort((left, right) => (left.excelRow ?? 0) - (right.excelRow ?? 0)),
+    evidenceRollups: evidenceRollups.sort((left, right) => left.title.localeCompare(right.title)),
+    reviewerComments: reviewerComments.slice(0, 250),
+    anomalies,
   };
 }
 
@@ -11174,6 +11528,109 @@ export async function handleCoreRoutes(
     }
 
     return methodNotAllowed(['GET', 'POST']);
+  }
+
+  if (resource === 'assessment-evidence-packages') {
+    if (!ctx.tenantId) {
+      return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
+    }
+
+    if (ctx.request.method !== 'GET') {
+      return methodNotAllowed(['GET']);
+    }
+
+    const access = await requireAnyScopedPermission(
+      ctx,
+      EVIDENCE_READ_PERMISSIONS,
+      'Assessment evidence package access requires evidence view permissions.',
+    );
+    if (access instanceof Response) {
+      return access;
+    }
+
+    if (subresource) {
+      return json(
+        {
+          error: 'assessment_evidence_package_route_not_supported',
+          message: 'Assessment evidence packages can be listed or opened by package marker.',
+        },
+        { status: 404 },
+      );
+    }
+
+    const packageMarker = id ? decodeURIComponent(id).trim() : null;
+    const accessiblePredicate = buildAccessibleDomainPredicate('folder_id', access);
+    const rows = await ctx.env.D1_MAIN.prepare(
+      `
+      SELECT
+        id,
+        module_key,
+        folder_id,
+        title,
+        status,
+        start_on,
+        finish_on,
+        due_on,
+        review_on,
+        data_json,
+        links_json,
+        archived,
+        created_at,
+        updated_at
+      FROM module_records
+      WHERE tenant_id = ?
+        AND module_key IN ('data-calls', 'evidence-locker')
+        AND archived = 0
+        AND ${accessiblePredicate.clause}
+        AND LOWER(COALESCE(data_json, '')) LIKE '%assessmentevidencepackage%'
+      ORDER BY updated_at DESC, title ASC
+      `,
+    )
+      .bind(ctx.tenantId, ...accessiblePredicate.bindings)
+      .all<AssessmentEvidencePackageRow>();
+
+    const packagesByMarker = new Map<string, AssessmentEvidencePackageRow[]>();
+    for (const row of rows.results) {
+      const data = asJson<Record<string, unknown>>(row.data_json, {});
+      const marker =
+        typeof data.importMarker === 'string' && data.importMarker.trim()
+          ? data.importMarker.trim()
+          : null;
+      if (!marker) {
+        continue;
+      }
+      if (packageMarker && marker !== packageMarker) {
+        continue;
+      }
+      packagesByMarker.set(marker, [...(packagesByMarker.get(marker) ?? []), row]);
+    }
+
+    if (packageMarker) {
+      const packageRows = packagesByMarker.get(packageMarker) ?? [];
+      if (packageRows.length === 0) {
+        return json(
+          {
+            error: 'assessment_evidence_package_not_found',
+            message: 'The selected assessment evidence package was not found.',
+          },
+          { status: 404 },
+        );
+      }
+
+      return json({
+        data: buildAssessmentEvidencePackageDetail(packageMarker, packageRows),
+      });
+    }
+
+    const packages = [...packagesByMarker.entries()]
+      .map(([marker, packageRows]) => buildAssessmentEvidencePackageSummary(marker, packageRows))
+      .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+
+    return json({
+      data: {
+        packages,
+      },
+    });
   }
 
   if (resource === 'modules') {

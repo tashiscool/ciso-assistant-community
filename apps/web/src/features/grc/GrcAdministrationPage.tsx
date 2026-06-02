@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   getGrcAdminStatus,
   importGrcSnapshot,
@@ -133,6 +134,17 @@ export function GrcAdministrationPage() {
           Manage the curated content snapshot, SCF synchronization state, and provider-neutral GRC AI backend
           settings that power framework knowledge, gap assessments, and report bundles.
         </p>
+        <div className="mt-5 rounded-3xl border border-cyan-400/20 bg-cyan-400/10 p-5">
+          <div className="eyebrow text-cyan-200">Assessor scrutiny workflow</div>
+          <div className="mt-2 text-lg font-semibold text-white">Draft control-driven questions and materialize evidence requests</div>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-cyan-50/80">
+            The Scrutiny Engine turns controls and imported FedRAMP evidence packages into draft questions,
+            Data Calls, Evidence Locker placeholders, reconciliation suggestions, and immutable review comments.
+          </p>
+          <Link className="mt-4 inline-flex rounded-2xl bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200" to="/grc-admin/scrutiny-engine">
+            Open Scrutiny Engine
+          </Link>
+        </div>
       </section>
 
       {error ? <div className="notice-error">{error}</div> : null}

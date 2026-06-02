@@ -278,6 +278,126 @@ export type GrcAdminStatus = {
   settings: GrcAdminSettings;
 };
 
+export type ScrutinySufficiencyState =
+  | 'draft'
+  | 'requested'
+  | 'responded'
+  | 'accepted'
+  | 'challenged'
+  | 'clarification_needed'
+  | 'still_needed'
+  | 'not_applicable';
+
+export type ScrutinyPattern = {
+  id: string | null;
+  source: 'fedhr_fedramp_import' | 'persisted' | 'scf' | 'questionnaire' | 'generated_fallback';
+  sourceRef: string | null;
+  controlRef: string;
+  scfControlId: string | null;
+  questionPrompt: string;
+  evidenceType: string;
+  evidenceHint: string | null;
+  priority: number;
+  metadata: Record<string, unknown>;
+};
+
+export type ScrutinyRunSummary = {
+  id: string;
+  folderId: string | null;
+  title: string;
+  mode: string;
+  status: string;
+  scope: Record<string, unknown>;
+  sourceSummary: Record<string, unknown>;
+  metrics: Record<string, unknown>;
+  createdByUserId: string | null;
+  updatedByUserId: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ScrutinyItem = {
+  id: string;
+  runId: string;
+  patternId: string | null;
+  controlRef: string;
+  questionPrompt: string;
+  evidenceType: string;
+  evidenceRequest: string;
+  evidenceHint: string | null;
+  sufficiencyState: ScrutinySufficiencyState;
+  ownerUserId: string | null;
+  dataCallRecordId: string | null;
+  evidenceRecordIds: string[];
+  coverage: Record<string, unknown>;
+  reviewerChallenge: boolean;
+  missingFeed: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ScrutinyCommentEvent = {
+  id: string;
+  runId: string;
+  itemId: string;
+  eventType: string;
+  author: string;
+  body: string;
+  source: string;
+  relatedEvidenceRefs: string[];
+  previousState: string | null;
+  nextState: string | null;
+  classifier: Record<string, unknown>;
+  createdByUserId: string | null;
+  createdAt: string;
+};
+
+export type ScrutinyMaterializedLink = {
+  id: string;
+  runId: string;
+  itemId: string;
+  targetModule: string;
+  targetId: string;
+  relationType: string;
+  route: string | null;
+  createdAt: string;
+};
+
+export type ScrutinyRunDetail = {
+  run: ScrutinyRunSummary;
+  items: ScrutinyItem[];
+  commentEvents: ScrutinyCommentEvent[];
+  materializedLinks: ScrutinyMaterializedLink[];
+  metrics: Record<string, unknown>;
+};
+
+export type DraftScrutinyRunInput = {
+  title?: string;
+  folderId?: string | null;
+  scope?: {
+    type?: 'package' | 'controls' | 'record' | 'default';
+    packageMarker?: string;
+    controlRefs?: string[];
+    moduleKey?: string;
+    recordId?: string;
+  };
+};
+
+export type MaterializeScrutinyRunInput = {
+  itemIds?: string[];
+  dueOn?: string | null;
+  createQuestionnaireTemplate?: boolean;
+};
+
+export type ReviewScrutinyItemInput = {
+  eventType?: string;
+  author?: string;
+  body: string;
+  source?: string;
+  relatedEvidenceRefs?: string[];
+  nextState?: ScrutinySufficiencyState;
+};
+
 export type GrcStatus = {
   latestSnapshot: GrcAdminStatus['latestSnapshot'];
   scfVersion: string | null;

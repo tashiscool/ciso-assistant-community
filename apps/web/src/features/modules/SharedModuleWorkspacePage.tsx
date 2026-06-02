@@ -21,6 +21,14 @@ import type {
 } from './types';
 
 const client = new ApiClient();
+const SCRUTINY_SOURCE_MODULES = new Set([
+  'assessment-plans',
+  'questionnaires',
+  'security-controls',
+  'security-plans',
+  'data-calls',
+  'evidence-locker',
+]);
 
 type SharedModuleWorkspacePageProps = {
   fixedModuleKey?: string;
@@ -575,6 +583,13 @@ function isoDateOnly(value: string | null | undefined) {
 
 function normalizeText(value: unknown) {
   return typeof value === 'string' ? value : value == null ? '' : String(value);
+}
+
+function joinControlRefs(value: unknown) {
+  if (!Array.isArray(value)) {
+    return normalizeText(value);
+  }
+  return value.map((item) => normalizeText(item).trim()).filter(Boolean).join(',');
 }
 
 function buildRenderableSections(
@@ -4053,6 +4068,14 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                 </h2>
               </div>
               <div className="flex flex-wrap gap-3">
+                {!isCreating && selectedRecord && SCRUTINY_SOURCE_MODULES.has(moduleEntry.moduleKey) ? (
+                  <Link
+                    className="button-secondary"
+                    to={`/grc-admin/scrutiny-engine?moduleKey=${encodeURIComponent(moduleEntry.moduleKey)}&recordId=${encodeURIComponent(selectedRecord.id)}&controlRefs=${encodeURIComponent(joinControlRefs(selectedRecord.data.controlRefs))}`}
+                  >
+                    Generate Scrutiny Run
+                  </Link>
+                ) : null}
                 {!isCreating && selectedRecord ? (
                   <button className="button-secondary" disabled={busy} onClick={() => void archiveRecord()} type="button">
                     Archive

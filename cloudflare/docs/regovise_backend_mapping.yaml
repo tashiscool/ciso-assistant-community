@@ -256,6 +256,7 @@ api_services:
       me: "/me"
       overview: "/overview"
       semantic_coverage: "/semantic-coverage"
+      assessment_evidence_packages: "/assessment-evidence-packages, /assessment-evidence-packages/:marker"
       modules: "/modules, /modules/:moduleKey, /modules/:moduleKey/records"
       frameworks: "/frameworks, /frameworks/:id"
       libraries: "/libraries"
@@ -572,7 +573,7 @@ api_services:
   grc:
     base_path: "/_api/grc"
     handler: "cloudflare/src/services/grc-engine/http.ts"
-    purpose: "GRC content engine, SCF/crosswalks, connector collection, findings, gap assessments, reports, and async job orchestration."
+    purpose: "GRC content engine, SCF/crosswalks, connector collection, findings, gap assessments, assessor scrutiny, reports, and async job orchestration."
     route_families:
       status: "/status"
       admin: "/admin/*"
@@ -590,6 +591,9 @@ api_services:
       report_snapshots: "/report-snapshots"
       reports: "/reports/*"
       evidence_packages: "/evidence-packages"
+      scrutiny_patterns: "/scrutiny-patterns"
+      scrutiny_runs: "/scrutiny-runs, /scrutiny-runs/draft, /scrutiny-runs/:id, /scrutiny-runs/:id/materialize, /scrutiny-runs/:id/reconcile"
+      scrutiny_reviews: "/scrutiny-items/:id/review"
       providers:
         - "aws"
         - "github"
@@ -617,6 +621,11 @@ api_services:
       - "grc_report_bundles"
       - "grc_job_runs"
       - "grc_ingest_payloads"
+      - "grc_scrutiny_patterns"
+      - "grc_scrutiny_runs"
+      - "grc_scrutiny_items"
+      - "grc_scrutiny_comment_events"
+      - "grc_scrutiny_materialized_links"
       - "grc_metric_catalog"
       - "grc_metric_points"
       - "grc_exception_snapshots"
@@ -931,6 +940,7 @@ data_model:
       migrations:
         - "0032_grc_engine_foundation.sql"
         - "0033_grc_engine_operations.sql"
+        - "0039_grc_scrutiny_engine.sql"
       tables:
         - "grc_import_snapshots"
         - "grc_frameworks"
@@ -947,6 +957,11 @@ data_model:
         - "grc_report_bundles"
         - "grc_ai_provider_settings"
         - "grc_job_runs"
+        - "grc_scrutiny_patterns"
+        - "grc_scrutiny_runs"
+        - "grc_scrutiny_items"
+        - "grc_scrutiny_comment_events"
+        - "grc_scrutiny_materialized_links"
         - "grc_ingest_payloads"
         - "grc_metric_catalog"
         - "grc_metric_points"

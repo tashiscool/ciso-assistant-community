@@ -17,6 +17,7 @@
     "migrate:production:script": "bash ./scripts/apply_d1_migrations_remote.sh",
     "smoke:local": "node ./scripts/local-smoke.mjs",
     "smoke:local:grc": "node ./scripts/smoke_grc_engine_local.mjs",
+    "smoke:local:scrutiny": "node ./scripts/smoke_scrutiny_engine_local.mjs",
     "smoke:local:fedramp": "node ./scripts/smoke_fedramp_provider_shell_local.mjs",
     "verify:aws-live-local": "node ./scripts/verify_live_aws_regovise.mjs",
     "smoke:local:email": "node ./scripts/assert_email_logs.mjs",
@@ -30,6 +31,7 @@
     "smoke:production:e2e": "node ./scripts/prod_e2e_validation.mjs",
     "semantic:matrix": "node ./scripts/semantic_gap_matrix.mjs",
     "alignment:check": "node ./scripts/frontend_backend_alignment_check.mjs",
+    "import:fedhr-fedramp": "node ./scripts/import_fedhr_fedramp_assessment.mjs",
     "verify:production-token": "bash ./scripts/verify_cloudflare_token.sh",
     "sync:grc-snapshot": "node ./scripts/sync_grc_vendor_snapshot.mjs",
     "validate:grc-contracts": "node ./scripts/validate_grc_contracts.mjs"

@@ -31,6 +31,7 @@ import { FoldersPage } from '../features/iam/FoldersPage';
 import { TeamPage } from '../features/iam/TeamPage';
 import { AccessPage } from '../features/iam/AccessPage';
 import { AssessmentsPage } from '../features/assessments/AssessmentsPage';
+import { AssessmentEvidencePackagePage } from '../features/assessments/AssessmentEvidencePackagePage';
 import { RiskAssessmentDetailPage } from '../features/assessments/RiskAssessmentDetailPage';
 import { ComplianceAssessmentDetailPage } from '../features/assessments/ComplianceAssessmentDetailPage';
 import { ComplianceActionPlanPage } from '../features/assessments/ComplianceActionPlanPage';
@@ -56,6 +57,7 @@ import { GapAssessmentsPage } from '../features/grc/GapAssessmentsPage';
 import { GrcAdministrationPage } from '../features/grc/GrcAdministrationPage';
 import { ReportBundleDetailPage } from '../features/grc/ReportBundleDetailPage';
 import { ReportBundlesPage } from '../features/grc/ReportBundlesPage';
+import { ScrutinyEnginePage } from '../features/grc/ScrutinyEnginePage';
 import { FedrampProviderShellPage } from '../features/fedramp/FedrampProviderShellPage';
 import { PortalDashboardPage } from '../features/portal/PortalDashboardPage';
 import { PortalAssignmentDetailPage } from '../features/portal/PortalAssignmentDetailPage';
@@ -679,6 +681,7 @@ export function AppLayout() {
             <Route path="/features/third-party-risk" element={allowedOnly(access.canUseThirdParty, <TprmWorkspacePage />)} />
             <Route path="/features/continuous-monitoring" element={adminOnly(<ConMonProfilesPage />)} />
             <Route path="/grc-admin" element={adminOnly(<GrcAdministrationPage />)} />
+            <Route path="/grc-admin/scrutiny-engine" element={adminOnly(<ScrutinyEnginePage />)} />
             <Route path="/trust-center" element={adminOnly(<FedrampProviderShellPage />)} />
             <Route path="/workflow" element={allowedOnly(access.canUseProgramWorkspace, <WorkflowControlPage />)} />
             <Route path="/features/workflow" element={allowedOnly(access.canUseProgramWorkspace, <WorkflowControlPage />)} />
@@ -927,6 +930,8 @@ export function AppLayout() {
             <Route path="/conmon/executions" element={allowedOnly(access.canUseConMon, <ConMonExecutionsPage />)} />
             <Route path="/evidence-management" element={allowedOnly(access.canUseEvidence, <EvidenceManagementPage />)} />
             <Route path="/features/evidence-management" element={allowedOnly(access.canUseEvidence, <EvidenceManagementPage />)} />
+            <Route path="/assessment-evidence-packages" element={allowedOnly(access.canUseEvidence, <AssessmentEvidencePackagePage />)} />
+            <Route path="/assessment-evidence-packages/:packageMarker" element={allowedOnly(access.canUseEvidence, <AssessmentEvidencePackagePage />)} />
             <Route path="/evidence/sources" element={adminOnly(<EvidenceSourcesPage />)} />
             <Route path="/evidence/jobs" element={allowedOnly(access.canUseEvidence, <EvidenceJobsPage />)} />
             <Route path="/assurance" element={allowedOnly(access.canUseAssurance, <AssuranceOverviewPage showOperationalReadiness={access.isWorkspaceAdmin} />)} />
