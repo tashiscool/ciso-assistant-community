@@ -101,12 +101,16 @@ The FedRAMP Provider Shell focused batch results were:
 
 ## Documentation Status
 
-This document is the audit documentation update for the findings above. It should be updated after deployment with:
+This document is the audit documentation update for the findings above.
 
-- The deployment identifier.
-- Post-deploy rerun artifact paths.
-- Confirmation that FedRAMP Batch 2 passes in production.
-- Confirmation that FedRAMP action route warnings no longer appear.
+Deployment update:
+
+- Production Worker Version ID: `d387636f-337e-4bfe-8fc7-fc7879c40717`.
+- Post-deploy smoke passed through the production deployment pipeline.
+- Targeted FedRAMP post-deploy fix validation passed `15/15`.
+- Post-deploy validation artifact: `.playwright-regovise/fedramp-provider-shell-postdeploy-fix-validation-1780375045112/summary.json`.
+- The FedRAMP artifact route failure is resolved: non-published artifacts no longer advertise download routes.
+- The FedRAMP action-route warnings are resolved: message, incident, VDR, CCM, and SCN action `GET` paths now return `405`.
 
 ## Verification
 
@@ -118,9 +122,15 @@ npm --prefix cloudflare run typecheck
 
 The command passed.
 
+Production deployment verification completed:
+
+```bash
+npm --prefix cloudflare run deploy:production:script -- /Users/tkhan/IdeaProjects/alovoa/.env-prod
+```
+
+The command passed and deployed Worker Version ID `d387636f-337e-4bfe-8fc7-fc7879c40717`.
+
 ## Remaining Work
 
-- Deploy the local backend fixes to `regovise.com`.
-- Rerun the affected production batches after deployment.
-- Commit the source fixes and this audit document.
+- Commit and push this post-deploy documentation update.
 - Keep `.playwright-regovise/` artifacts ignored as evidence outputs rather than tracked source files.
