@@ -4781,6 +4781,7 @@ function artifactSummary(
     includeRoute?: boolean;
   } = {},
 ) {
+  const canDownload = row.status === 'published' && row.publication_state === 'published';
   return {
     id: row.id,
     artifactKind: row.artifact_kind,
@@ -4793,7 +4794,7 @@ function artifactSummary(
     publishedAt: row.published_at ?? row.updated_at,
     publicationState: row.publication_state,
     generationSource: row.generation_source,
-    route: options.includeRoute === false ? null : buildTrustCenterArtifactRoute(row.id, options),
+    route: options.includeRoute === false || !canDownload ? null : buildTrustCenterArtifactRoute(row.id, options),
     metadata: asJson<Record<string, unknown>>(row.metadata_json, {}),
   };
 }

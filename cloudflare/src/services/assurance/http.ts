@@ -1838,7 +1838,18 @@ export async function handleAssuranceRoutes(
     }
 
     const body = await readJson<RunEvalInput>(ctx.request);
-    const evidenceJob = await resolveEvidenceJob(ctx, access.tenantId, body.evidenceJobId);
+    const evidenceJobId = body.evidenceJobId?.trim();
+    if (!evidenceJobId) {
+      return json(
+        {
+          error: 'missing_evidence_job',
+          message: 'evidenceJobId is required before assurance evaluations can run.',
+        },
+        { status: 400 },
+      );
+    }
+
+    const evidenceJob = await resolveEvidenceJob(ctx, access.tenantId, evidenceJobId);
     if (!evidenceJob) {
       return json(
         {
@@ -2750,7 +2761,18 @@ export async function handleAssuranceRoutes(
         { status: 403 },
       );
     }
-    const evidenceJob = await resolveEvidenceJob(ctx, access.tenantId, body.evidenceJobId);
+    const evidenceJobId = body.evidenceJobId?.trim();
+    if (!evidenceJobId) {
+      return json(
+        {
+          error: 'missing_evidence_job',
+          message: 'evidenceJobId is required before an assurance package can be built.',
+        },
+        { status: 400 },
+      );
+    }
+
+    const evidenceJob = await resolveEvidenceJob(ctx, access.tenantId, evidenceJobId);
     if (!evidenceJob) {
       return json({ error: 'evidence_job_not_found' }, { status: 404 });
     }
@@ -2913,7 +2935,15 @@ export async function handleAssuranceRoutes(
       return json({ error: 'invalid_family', message: 'Artifact family is required.' }, { status: 400 });
     }
 
-    const packageState = await loadPackageSummary(ctx.env, access.tenantId, id);
+    let packageState: Awaited<ReturnType<typeof loadPackageSummary>>;
+    try {
+      packageState = await loadPackageSummary(ctx.env, access.tenantId, id);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Package job not found.') {
+        return json({ error: 'not_found', message: 'Package job not found.' }, { status: 404 });
+      }
+      throw error;
+    }
     if (!hasAssuranceScope(access, packageState.job.folder_id)) {
       return json({ error: 'not_found', message: 'Package job not found.' }, { status: 404 });
     }
@@ -2951,7 +2981,15 @@ export async function handleAssuranceRoutes(
     if (access instanceof Response) {
       return access;
     }
-    const packageState = await loadPackageSummary(ctx.env, access.tenantId, id);
+    let packageState: Awaited<ReturnType<typeof loadPackageSummary>>;
+    try {
+      packageState = await loadPackageSummary(ctx.env, access.tenantId, id);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Package job not found.') {
+        return json({ error: 'not_found', message: 'Package job not found.' }, { status: 404 });
+      }
+      throw error;
+    }
     if (!hasAssuranceScope(access, packageState.job.folder_id)) {
       return json({ error: 'not_found', message: 'Package job not found.' }, { status: 404 });
     }
@@ -2965,7 +3003,15 @@ export async function handleAssuranceRoutes(
     if (access instanceof Response) {
       return access;
     }
-    const packageState = await loadPackageSummary(ctx.env, access.tenantId, id);
+    let packageState: Awaited<ReturnType<typeof loadPackageSummary>>;
+    try {
+      packageState = await loadPackageSummary(ctx.env, access.tenantId, id);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Package job not found.') {
+        return json({ error: 'not_found', message: 'Reconciliation record not found.' }, { status: 404 });
+      }
+      throw error;
+    }
     if (!hasAssuranceScope(access, packageState.job.folder_id)) {
       return json({ error: 'not_found', message: 'Reconciliation record not found.' }, { status: 404 });
     }

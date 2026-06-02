@@ -301,6 +301,26 @@ export async function handleFedrampCommunicationRoutes(
   }
 
   if (resource === 'messages') {
+    if (id && action === 'acknowledge') {
+      if (ctx.request.method === 'POST') {
+        const body = await readJson<Record<string, unknown>>(ctx.request);
+        const delivery = await acknowledgeFedrampDelivery(ctx.env, access.tenantId, {
+          deliveryId: typeof body.deliveryId === 'string' ? body.deliveryId : undefined,
+          messageId: id,
+          recipientEmail: typeof body.recipientEmail === 'string' ? body.recipientEmail : undefined,
+          acknowledgedBy: typeof body.acknowledgedBy === 'string' ? body.acknowledgedBy : access.userId,
+        });
+        return json({ data: delivery });
+      }
+      return methodNotAllowed(['POST']);
+    }
+    if (id && action === 'queue') {
+      if (ctx.request.method === 'POST') {
+        const message = await queueFedrampMessage(ctx.env, access.tenantId, access.userId, id);
+        return json({ data: message });
+      }
+      return methodNotAllowed(['POST']);
+    }
     if (ctx.request.method === 'GET') {
       const overview = await loadFedrampOverview(ctx.env, access.tenantId, access.userId);
       return json({
@@ -309,20 +329,6 @@ export async function handleFedrampCommunicationRoutes(
           deliveries: overview.communications.deliveries,
         },
       });
-    }
-    if (id && action === 'acknowledge' && ctx.request.method === 'POST') {
-      const body = await readJson<Record<string, unknown>>(ctx.request);
-      const delivery = await acknowledgeFedrampDelivery(ctx.env, access.tenantId, {
-        deliveryId: typeof body.deliveryId === 'string' ? body.deliveryId : undefined,
-        messageId: id,
-        recipientEmail: typeof body.recipientEmail === 'string' ? body.recipientEmail : undefined,
-        acknowledgedBy: typeof body.acknowledgedBy === 'string' ? body.acknowledgedBy : access.userId,
-      });
-      return json({ data: delivery });
-    }
-    if (id && action === 'queue' && ctx.request.method === 'POST') {
-      const message = await queueFedrampMessage(ctx.env, access.tenantId, access.userId, id);
-      return json({ data: message });
     }
     if (ctx.request.method === 'POST' && !id) {
       const body = await readJson<Record<string, unknown>>(ctx.request);
@@ -371,25 +377,37 @@ export async function handleFedrampCommunicationRoutes(
   }
 
   if (resource === 'incidents') {
+    if (id && action === 'queue') {
+      if (ctx.request.method === 'POST') {
+        const incident = await queueIncidentNotification(ctx.env, access.tenantId, id);
+        return json({ data: incident });
+      }
+      return methodNotAllowed(['POST']);
+    }
+    if (id && action === 'confirm-fedramp') {
+      if (ctx.request.method === 'POST') {
+        const incident = await confirmIncidentFedrampReport(ctx.env, access.tenantId, id);
+        return json({ data: incident });
+      }
+      return methodNotAllowed(['POST']);
+    }
+    if (id && action === 'confirm-cisa') {
+      if (ctx.request.method === 'POST') {
+        const incident = await confirmIncidentCisaReport(ctx.env, access.tenantId, id);
+        return json({ data: incident });
+      }
+      return methodNotAllowed(['POST']);
+    }
+    if (id && action === 'confirm-agencies') {
+      if (ctx.request.method === 'POST') {
+        const incident = await confirmIncidentAgencyNotifications(ctx.env, access.tenantId, id);
+        return json({ data: incident });
+      }
+      return methodNotAllowed(['POST']);
+    }
     if (ctx.request.method === 'GET') {
       const overview = await loadFedrampOverview(ctx.env, access.tenantId, access.userId);
       return json({ data: overview.communications.incidents });
-    }
-    if (id && action === 'queue' && ctx.request.method === 'POST') {
-      const incident = await queueIncidentNotification(ctx.env, access.tenantId, id);
-      return json({ data: incident });
-    }
-    if (id && action === 'confirm-fedramp' && ctx.request.method === 'POST') {
-      const incident = await confirmIncidentFedrampReport(ctx.env, access.tenantId, id);
-      return json({ data: incident });
-    }
-    if (id && action === 'confirm-cisa' && ctx.request.method === 'POST') {
-      const incident = await confirmIncidentCisaReport(ctx.env, access.tenantId, id);
-      return json({ data: incident });
-    }
-    if (id && action === 'confirm-agencies' && ctx.request.method === 'POST') {
-      const incident = await confirmIncidentAgencyNotifications(ctx.env, access.tenantId, id);
-      return json({ data: incident });
     }
     if (ctx.request.method === 'POST') {
       const body = await readJson<Record<string, unknown>>(ctx.request);
@@ -441,9 +459,12 @@ export async function handleVdrRoutes(segments: string[], ctx: WorkerRequestCont
   }
 
   if (resource === 'reports') {
-    if (id && action === 'publish' && ctx.request.method === 'POST') {
-      const report = await publishVdrReport(ctx.env, access.tenantId, id);
-      return json({ data: report });
+    if (id && action === 'publish') {
+      if (ctx.request.method === 'POST') {
+        const report = await publishVdrReport(ctx.env, access.tenantId, id);
+        return json({ data: report });
+      }
+      return methodNotAllowed(['POST']);
     }
     if (ctx.request.method === 'GET') {
       const overview = await loadFedrampOverview(ctx.env, access.tenantId, access.userId);
@@ -480,9 +501,12 @@ export async function handleCcmRoutes(segments: string[], ctx: WorkerRequestCont
   }
 
   if (resource === 'oar-cycles') {
-    if (id && action === 'publish' && ctx.request.method === 'POST') {
-      const cycle = await publishOarCycle(ctx.env, access.tenantId, id);
-      return json({ data: cycle });
+    if (id && action === 'publish') {
+      if (ctx.request.method === 'POST') {
+        const cycle = await publishOarCycle(ctx.env, access.tenantId, id);
+        return json({ data: cycle });
+      }
+      return methodNotAllowed(['POST']);
     }
     if (ctx.request.method === 'GET') {
       const overview = await loadFedrampOverview(ctx.env, access.tenantId, access.userId);
@@ -532,9 +556,12 @@ export async function handleCcmRoutes(segments: string[], ctx: WorkerRequestCont
   }
 
   if (resource === 'quarterly-reviews') {
-    if (id && action === 'publish' && ctx.request.method === 'POST') {
-      const review = await publishQuarterlyReview(ctx.env, access.tenantId, id);
-      return json({ data: review });
+    if (id && action === 'publish') {
+      if (ctx.request.method === 'POST') {
+        const review = await publishQuarterlyReview(ctx.env, access.tenantId, id);
+        return json({ data: review });
+      }
+      return methodNotAllowed(['POST']);
     }
     if (ctx.request.method === 'GET') {
       const overview = await loadFedrampOverview(ctx.env, access.tenantId, access.userId);
@@ -629,9 +656,12 @@ export async function handleScnRoutes(segments: string[], ctx: WorkerRequestCont
     return methodNotAllowed(['GET', 'POST', 'PATCH']);
   }
 
-  if (resource === 'notices' && id && action === 'publish' && ctx.request.method === 'POST') {
-    const notice = await publishSignificantChangeNotice(ctx.env, access.tenantId, access.userId, id);
-    return json({ data: notice });
+  if (resource === 'notices' && id && action === 'publish') {
+    if (ctx.request.method === 'POST') {
+      const notice = await publishSignificantChangeNotice(ctx.env, access.tenantId, access.userId, id);
+      return json({ data: notice });
+    }
+    return methodNotAllowed(['POST']);
   }
 
   return json({ error: 'not_found', message: 'SCN resource not found.' }, { status: 404 });

@@ -1904,6 +1904,24 @@ export async function handleAgentRoutes(
     }
     const body = await readJson<ApprovalInput>(ctx.request);
     const timestamp = nowIso();
+    const approval = await ctx.env.D1_MAIN.prepare(
+      `
+      SELECT agent_run_id, folder_id, request_type, status
+      FROM assurance_writeback_approvals
+      WHERE id = ? AND tenant_id = ?
+      LIMIT 1
+      `,
+    )
+      .bind(id, adminAccess.tenantId)
+      .first<{ agent_run_id: string; folder_id: string | null; request_type: string; status: string }>();
+
+    if (!approval) {
+      return json({ error: 'not_found', message: 'Writeback approval request not found.' }, { status: 404 });
+    }
+    if (approval.status !== 'pending') {
+      return json({ error: 'invalid_state', message: 'Only pending writebacks can be rejected.' }, { status: 409 });
+    }
+
     await ctx.env.D1_MAIN.prepare(
       `
       UPDATE assurance_writeback_approvals
@@ -1923,18 +1941,7 @@ export async function handleAgentRoutes(
       )
       .run();
 
-    const approval = await ctx.env.D1_MAIN.prepare(
-      `
-      SELECT agent_run_id, folder_id, request_type
-      FROM assurance_writeback_approvals
-      WHERE id = ? AND tenant_id = ?
-      LIMIT 1
-      `,
-    )
-      .bind(id, adminAccess.tenantId)
-      .first<{ agent_run_id: string; folder_id: string | null; request_type: string }>();
-
-    if (approval?.agent_run_id) {
+    if (approval.agent_run_id) {
       const remainingPending = await ctx.env.D1_MAIN.prepare(
         `
         SELECT COUNT(*) AS count
