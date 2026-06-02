@@ -26,6 +26,7 @@ import type {
   ReportBundle,
   ReviewScrutinyItemInput,
   ScrutinyPattern,
+  ScrutinyReadiness,
   ScrutinyRunDetail,
   ScrutinyRunSummary,
 } from './types';
@@ -246,6 +247,16 @@ export async function getScrutinyPatterns(params: { controlRefs?: string[]; pack
     };
   }>(
     withQuery('/grc/scrutiny-patterns', {
+      controlRefs: params.controlRefs?.join(','),
+      packageMarker: params.packageMarker,
+    }),
+  );
+  return response.data;
+}
+
+export async function getScrutinyReadiness(params: { controlRefs?: string[]; packageMarker?: string } = {}) {
+  const response = await client.get<{ data: ScrutinyReadiness }>(
+    withQuery('/grc/scrutiny-readiness', {
       controlRefs: params.controlRefs?.join(','),
       packageMarker: params.packageMarker,
     }),

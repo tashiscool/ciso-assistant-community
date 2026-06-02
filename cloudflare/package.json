@@ -32,6 +32,7 @@
     "semantic:matrix": "node ./scripts/semantic_gap_matrix.mjs",
     "alignment:check": "node ./scripts/frontend_backend_alignment_check.mjs",
     "import:fedhr-fedramp": "node ./scripts/import_fedhr_fedramp_assessment.mjs",
+    "verify:scrutiny-readiness": "node ./scripts/verify_scrutiny_tenant_readiness.mjs",
     "verify:production-token": "bash ./scripts/verify_cloudflare_token.sh",
     "sync:grc-snapshot": "node ./scripts/sync_grc_vendor_snapshot.mjs",
     "validate:grc-contracts": "node ./scripts/validate_grc_contracts.mjs"

@@ -265,6 +265,7 @@ type ScrutinyFeatureStatus = {
   enabled: boolean;
   featureFlag: typeof SCRUTINY_FEATURE_FLAG;
   message: string;
+  tenantSlug: string | null;
 };
 
 async function getScrutinyFeatureStatus(ctx: WorkerRequestContext, tenantId: string): Promise<ScrutinyFeatureStatus> {
@@ -286,6 +287,7 @@ async function getScrutinyFeatureStatus(ctx: WorkerRequestContext, tenantId: str
   return {
     enabled,
     featureFlag: SCRUTINY_FEATURE_FLAG,
+    tenantSlug: row?.slug ?? null,
     message: enabled
       ? 'The GRC Scrutiny Engine is enabled for this workspace.'
       : 'The GRC Scrutiny Engine is disabled for this workspace. Enable grc_scrutiny_engine in Setup > Modules & Features.',
@@ -813,6 +815,177 @@ async function collectPatterns(args: {
     patterns.sort((left, right) => right.priority - left.priority).slice(0, 8),
   );
   return selected.length > 0 ? selected : fallbackPatterns(['AC-2', 'IA-2', 'SI-4', 'CM-6', 'RA-5']);
+}
+
+function countPatternsBySource(patterns: ScrutinyPattern[]) {
+  return patterns.reduce<Record<string, number>>((acc, pattern) => {
+    acc[pattern.source] = (acc[pattern.source] ?? 0) + 1;
+    return acc;
+  }, {});
+}
+
+function readinessCheck(
+  id: string,
+  label: string,
+  status: 'ok' | 'warn' | 'blocker' | 'info',
+  message: string,
+  evidence: Record<string, unknown> = {},
+) {
+  return { id, label, status, message, evidence };
+}
+
+async function buildScrutinyReadiness(ctx: WorkerRequestContext, tenantId: string) {
+  const featureStatus = await getScrutinyFeatureStatus(ctx, tenantId);
+  const packageMarker = normalizeOptionalString(ctx.url.searchParams.get('packageMarker'));
+  const controlRefs = (ctx.url.searchParams.get('controlRefs') ?? 'AC-2,IA-2,SI-4')
+    .split(',')
+    .map(normalizeControlRef)
+    .filter((item): item is string => Boolean(item));
+  const effectiveControlRefs = controlRefs.length > 0 ? [...new Set(controlRefs)] : ['AC-2', 'IA-2', 'SI-4'];
+
+  const [folderCounts, runCounts, patterns] = await Promise.all([
+    ctx.env.D1_MAIN.prepare(
+      `
+      SELECT
+        SUM(CASE WHEN content_type = 'root' THEN 1 ELSE 0 END) AS root_count,
+        SUM(CASE WHEN content_type = 'domain' THEN 1 ELSE 0 END) AS domain_count,
+        COUNT(*) AS total_count
+      FROM folders
+      WHERE tenant_id = ?
+      `,
+    )
+      .bind(tenantId)
+      .first<{ root_count: number | null; domain_count: number | null; total_count: number | null }>(),
+    ctx.env.D1_MAIN.prepare(
+      `
+      SELECT
+        (SELECT COUNT(*) FROM grc_scrutiny_runs WHERE tenant_id = ?) AS run_count,
+        (SELECT COUNT(*) FROM grc_scrutiny_items WHERE tenant_id = ?) AS item_count,
+        (SELECT COUNT(*) FROM grc_scrutiny_comment_events WHERE tenant_id = ?) AS comment_count,
+        (SELECT COUNT(*) FROM grc_scrutiny_materialized_links WHERE tenant_id = ?) AS link_count
+      `,
+    )
+      .bind(tenantId, tenantId, tenantId, tenantId)
+      .first<{ run_count: number | null; item_count: number | null; comment_count: number | null; link_count: number | null }>(),
+    collectPatterns({
+      env: ctx.env,
+      tenantId,
+      controlRefs: effectiveControlRefs,
+      packageMarker,
+    }),
+  ]);
+
+  const sourceCounts = countPatternsBySource(patterns);
+  const nonFallbackCount = patterns.filter((pattern) => pattern.source !== 'generated_fallback').length;
+  const folderScopeCount = Number(folderCounts?.root_count ?? 0) + Number(folderCounts?.domain_count ?? 0);
+  const checks = [
+    readinessCheck(
+      'feature-flag',
+      'Tenant feature flag',
+      featureStatus.enabled ? 'ok' : 'warn',
+      featureStatus.enabled
+        ? 'Feature flag is enabled; draft/materialize/reconcile/review operations are available to authorized users.'
+        : 'Feature flag is disabled; read-only readiness is available, but mutating scrutiny workflows stay blocked.',
+      { featureFlag: featureStatus.featureFlag, tenantSlug: featureStatus.tenantSlug },
+    ),
+    readinessCheck(
+      'folder-scope',
+      'Folder/domain scope',
+      folderScopeCount > 0 ? 'ok' : 'blocker',
+      folderScopeCount > 0
+        ? 'At least one root/domain folder exists, so materialized Data Calls and Evidence Locker records can be domain-scoped.'
+        : 'No root/domain folder exists. Create a workspace domain before materializing scrutiny items.',
+      {
+        rootFolders: Number(folderCounts?.root_count ?? 0),
+        domainFolders: Number(folderCounts?.domain_count ?? 0),
+        totalFolders: Number(folderCounts?.total_count ?? 0),
+      },
+    ),
+    readinessCheck(
+      'hybrid-question-library',
+      'Hybrid question library',
+      nonFallbackCount > 0 ? 'ok' : 'warn',
+      nonFallbackCount > 0
+        ? 'At least one imported, persisted, SCF, or questionnaire pattern is available for the probe scope.'
+        : 'Only generated fallback prompts were found for the probe scope; import package rows, SCF evidence requests, or questionnaire patterns to improve assessor scrutiny quality.',
+      { controlRefs: effectiveControlRefs, packageMarker, sourceCounts },
+    ),
+    readinessCheck(
+      'draft-first',
+      'Draft-first automation',
+      'ok',
+      'Draft runs write only scrutiny tables. Data Calls, Evidence Locker records, and templates are created only by materialize.',
+      { draftEndpoint: '/_api/grc/scrutiny-runs/draft', materializeEndpoint: '/_api/grc/scrutiny-runs/:id/materialize' },
+    ),
+    readinessCheck(
+      'materialization-targets',
+      'Materialization targets',
+      'ok',
+      'Approved drafts materialize into Data Calls, Evidence Locker placeholders/rollups, and optional questionnaire templates.',
+      { modules: ['data-calls', 'evidence-locker', 'questionnaires'] },
+    ),
+    readinessCheck(
+      'immutable-comments',
+      'Immutable comment trail',
+      'ok',
+      'Sufficiency reviews append comment events and preserve previous/next states instead of rewriting history.',
+      { states: ['accepted', 'challenged', 'clarified', 'still_needed', 'note'] },
+    ),
+    readinessCheck(
+      'missing-feeds',
+      'Missing-feed visibility',
+      'ok',
+      'Fallback and reconciliation metadata keep missing evidence feeds explicit instead of silently certifying coverage.',
+      { coverageFields: ['manualResponse', 'evidenceLocker', 'grcFindings', 'evidenceArtifacts', 'connectorOutput', 'feedMissing'] },
+    ),
+  ];
+
+  return {
+    feature: featureStatus,
+    ready: featureStatus.enabled && folderScopeCount > 0,
+    probe: {
+      controlRefs: effectiveControlRefs,
+      packageMarker,
+    },
+    counts: {
+      folders: {
+        root: Number(folderCounts?.root_count ?? 0),
+        domain: Number(folderCounts?.domain_count ?? 0),
+        total: Number(folderCounts?.total_count ?? 0),
+      },
+      runs: Number(runCounts?.run_count ?? 0),
+      items: Number(runCounts?.item_count ?? 0),
+      commentEvents: Number(runCounts?.comment_count ?? 0),
+      materializedLinks: Number(runCounts?.link_count ?? 0),
+    },
+    patternSources: sourceCounts,
+    samplePatterns: patterns.slice(0, 10).map(toPatternResponse),
+    lifecycleApis: [
+      'GET /_api/grc/scrutiny-readiness',
+      'GET /_api/grc/scrutiny-patterns',
+      'POST /_api/grc/scrutiny-runs/draft',
+      'GET /_api/grc/scrutiny-runs',
+      'GET /_api/grc/scrutiny-runs/:id',
+      'POST /_api/grc/scrutiny-runs/:id/materialize',
+      'POST /_api/grc/scrutiny-runs/:id/reconcile',
+      'POST /_api/grc/scrutiny-items/:id/review',
+    ],
+    materializationTargets: ['data-calls', 'evidence-locker', 'questionnaires'],
+    generatedRecordTags: [
+      'scrutinyRunId',
+      'scrutinyItemId',
+      'sourcePatternId',
+      'sourcePatternSource',
+      'sourcePatternRef',
+      'importMarker',
+      'controlRefs',
+      'evidenceType',
+      'sufficiencyState',
+      'missingFeed',
+      'reviewerChallenge',
+    ],
+    checks,
+  };
 }
 
 async function inferControlRefsForDraft(env: WorkerRequestContext['env'], tenantId: string, input: DraftRunInput): Promise<string[]> {
@@ -1570,7 +1743,12 @@ export async function handleGrcScrutinyRoutes(
   ctx: WorkerRequestContext,
 ): Promise<Response | null> {
   const [resource, id, subresource] = segments;
-  if (resource !== 'scrutiny-patterns' && resource !== 'scrutiny-runs' && resource !== 'scrutiny-items') {
+  if (
+    resource !== 'scrutiny-readiness' &&
+    resource !== 'scrutiny-patterns' &&
+    resource !== 'scrutiny-runs' &&
+    resource !== 'scrutiny-items'
+  ) {
     return null;
   }
 
@@ -1585,6 +1763,13 @@ export async function handleGrcScrutinyRoutes(
   );
   if (permission instanceof Response) {
     return permission;
+  }
+
+  if (resource === 'scrutiny-readiness') {
+    if (ctx.request.method !== 'GET') {
+      return methodNotAllowed(['GET']);
+    }
+    return json({ data: await buildScrutinyReadiness(ctx, tenantId) });
   }
 
   if (resource === 'scrutiny-patterns') {

@@ -24,6 +24,7 @@ import { useEdgeIdentity } from '../../shared/session/identity';
 import {
   createDraftScrutinyRun,
   getScrutinyPatterns,
+  getScrutinyReadiness,
   getScrutinyRun,
   listScrutinyRuns,
   materializeScrutinyRun,
@@ -33,6 +34,7 @@ import {
 import type {
   ScrutinyItem,
   ScrutinyPattern,
+  ScrutinyReadiness,
   ScrutinyRunDetail,
   ScrutinyRunSummary,
   ScrutinySufficiencyState,
@@ -86,6 +88,13 @@ function stateBadgeClass(state: ScrutinySufficiencyState | string) {
   return 'border-white/10 bg-white/[0.04] text-slate-300';
 }
 
+function readinessBadgeClass(status: string) {
+  if (status === 'ok') return 'border-emerald-400/30 bg-emerald-500/10 text-emerald-200';
+  if (status === 'blocker') return 'border-rose-400/30 bg-rose-500/10 text-rose-200';
+  if (status === 'warn') return 'border-amber-400/30 bg-amber-500/10 text-amber-200';
+  return 'border-cyan-400/30 bg-cyan-500/10 text-cyan-200';
+}
+
 function joinControlRefs(value: unknown) {
   return Array.isArray(value) ? value.filter((item) => typeof item === 'string').join(', ') : '';
 }
@@ -137,6 +146,7 @@ export function ScrutinyEnginePage() {
   const [folders, setFolders] = useState<WorkspaceFolder[]>([]);
   const [runs, setRuns] = useState<ScrutinyRunSummary[]>([]);
   const [patterns, setPatterns] = useState<ScrutinyPattern[]>([]);
+  const [readiness, setReadiness] = useState<ScrutinyReadiness | null>(null);
   const [detail, setDetail] = useState<ScrutinyRunDetail | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -168,20 +178,26 @@ export function ScrutinyEnginePage() {
     try {
       setLoading(true);
       setError(null);
-      const [folderResponse, runResponse, patternResponse] = await Promise.all([
+      const probeControlRefs = initialControlRefs
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean);
+      const [folderResponse, runResponse, patternResponse, readinessResponse] = await Promise.all([
         client.get<{ data: WorkspaceFolder[] }>('/iam/folders'),
         listScrutinyRuns(),
         getScrutinyPatterns({
           packageMarker: initialPackageMarker || undefined,
-          controlRefs: initialControlRefs
-            .split(',')
-            .map((value) => value.trim())
-            .filter(Boolean),
+          controlRefs: probeControlRefs,
+        }),
+        getScrutinyReadiness({
+          packageMarker: initialPackageMarker || undefined,
+          controlRefs: probeControlRefs,
         }),
       ]);
       setFolders(folderResponse.data);
       setRuns(runResponse);
       setPatterns(patternResponse.patterns);
+      setReadiness(readinessResponse);
       setFeatureDisabledMessage(patternResponse.enabled === false ? patternResponse.message : null);
       setDraftForm((current) => ({
         ...current,
@@ -381,6 +397,84 @@ export function ScrutinyEnginePage() {
           </TabsList>
 
           <TabsContent value="scope" className="space-y-4">
+            {readiness && (
+              <Card>
+                <CardHeader>
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <CardTitle>Tenant Readiness</CardTitle>
+                      <CardDescription>
+                        Confirms each tenant has the building blocks for draft-first assessor scrutiny before operational records are created.
+                      </CardDescription>
+                    </div>
+                    <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${readinessBadgeClass(readiness.ready ? 'ok' : readiness.feature.enabled ? 'warn' : 'blocker')}`}>
+                      {readiness.ready ? 'Ready' : readiness.feature.enabled ? 'Needs setup' : 'Feature disabled'}
+                    </span>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-5">
+                  <div className="grid gap-3 md:grid-cols-4">
+                    <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                      <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Tenant</div>
+                      <div className="mt-2 text-sm font-semibold text-white">{readiness.feature.tenantSlug ?? 'current workspace'}</div>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                      <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Domain folders</div>
+                      <div className="mt-2 text-sm font-semibold text-white">{readiness.counts.folders.domain + readiness.counts.folders.root}</div>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                      <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Scrutiny runs</div>
+                      <div className="mt-2 text-sm font-semibold text-white">{readiness.counts.runs}</div>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                      <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Pattern sources</div>
+                      <div className="mt-2 text-sm font-semibold text-white">
+                        {Object.keys(readiness.patternSources).length || 0}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3 xl:grid-cols-2">
+                    {readiness.checks.map((check) => (
+                      <div key={check.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className={`rounded-full border px-2 py-1 text-xs font-semibold ${readinessBadgeClass(check.status)}`}>
+                            {check.status}
+                          </span>
+                          <span className="text-sm font-semibold text-white">{check.label}</span>
+                        </div>
+                        <p className="mt-2 text-sm leading-6 text-slate-400">{check.message}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid gap-3 lg:grid-cols-3">
+                    <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                      <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Probe Controls</div>
+                      <div className="mt-2 text-sm text-slate-300">{readiness.probe.controlRefs.join(', ') || 'Default starter controls'}</div>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                      <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Source Mix</div>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {Object.entries(readiness.patternSources).map(([source, count]) => (
+                          <span key={source} className="rounded-full border border-cyan-400/20 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-100">
+                            {source.replace(/_/g, ' ')}: {count}
+                          </span>
+                        ))}
+                        {Object.keys(readiness.patternSources).length === 0 && (
+                          <span className="text-sm text-slate-400">No source probe results yet.</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                      <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Generated Tags</div>
+                      <div className="mt-2 text-sm text-slate-300">{readiness.generatedRecordTags.slice(0, 6).join(', ')}</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
               <Card>
                 <CardHeader>

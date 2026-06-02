@@ -301,6 +301,45 @@ export type ScrutinyPattern = {
   metadata: Record<string, unknown>;
 };
 
+export type ScrutinyReadinessCheck = {
+  id: string;
+  label: string;
+  status: 'ok' | 'warn' | 'blocker' | 'info';
+  message: string;
+  evidence: Record<string, unknown>;
+};
+
+export type ScrutinyReadiness = {
+  feature: {
+    enabled: boolean;
+    featureFlag: string;
+    message: string;
+    tenantSlug: string | null;
+  };
+  ready: boolean;
+  probe: {
+    controlRefs: string[];
+    packageMarker: string | null;
+  };
+  counts: {
+    folders: {
+      root: number;
+      domain: number;
+      total: number;
+    };
+    runs: number;
+    items: number;
+    commentEvents: number;
+    materializedLinks: number;
+  };
+  patternSources: Record<string, number>;
+  samplePatterns: ScrutinyPattern[];
+  lifecycleApis: string[];
+  materializationTargets: string[];
+  generatedRecordTags: string[];
+  checks: ScrutinyReadinessCheck[];
+};
+
 export type ScrutinyRunSummary = {
   id: string;
   folderId: string | null;

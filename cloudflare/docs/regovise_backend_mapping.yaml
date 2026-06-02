@@ -591,6 +591,7 @@ api_services:
       report_snapshots: "/report-snapshots"
       reports: "/reports/*"
       evidence_packages: "/evidence-packages"
+      scrutiny_readiness: "/scrutiny-readiness"
       scrutiny_patterns: "/scrutiny-patterns"
       scrutiny_runs: "/scrutiny-runs, /scrutiny-runs/draft, /scrutiny-runs/:id, /scrutiny-runs/:id/materialize, /scrutiny-runs/:id/reconcile"
       scrutiny_reviews: "/scrutiny-items/:id/review"

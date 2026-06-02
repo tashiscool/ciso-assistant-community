@@ -340,7 +340,7 @@ const FRAMEWORK_WRITE_PERMISSIONS = ['add_framework', 'change_framework'];
 const EVIDENCE_READ_PERMISSIONS = ['view_evidence', 'collect_evidence'];
 const EVALUATION_STATUSES = new Set(['pass', 'fail', 'not_applicable', 'inconclusive', 'skipped']);
 const EVALUATION_SEVERITIES = ['critical', 'high', 'medium', 'low', 'info'] as const;
-const SCRUTINY_DELEGATED_RESOURCES = new Set(['scrutiny-patterns', 'scrutiny-runs', 'scrutiny-items']);
+const SCRUTINY_DELEGATED_RESOURCES = new Set(['scrutiny-readiness', 'scrutiny-patterns', 'scrutiny-runs', 'scrutiny-items']);
 
 function nowIso() {
   return new Date().toISOString();
