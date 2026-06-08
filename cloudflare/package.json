@@ -35,7 +35,9 @@
     "verify:scrutiny-readiness": "node ./scripts/verify_scrutiny_tenant_readiness.mjs",
     "verify:production-token": "bash ./scripts/verify_cloudflare_token.sh",
     "sync:grc-snapshot": "node ./scripts/sync_grc_vendor_snapshot.mjs",
-    "validate:grc-contracts": "node ./scripts/validate_grc_contracts.mjs"
+    "validate:grc-contracts": "node ./scripts/validate_grc_contracts.mjs",
+    "verify:observable-import-contract": "node ./scripts/verify_observable_import_contract.mjs",
+    "test:observable-import-contract": "node ./scripts/verify_observable_import_contract.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260305.1",

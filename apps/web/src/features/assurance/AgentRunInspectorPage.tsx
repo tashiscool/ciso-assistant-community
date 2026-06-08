@@ -3,11 +3,15 @@ import { Link, useSearchParams } from 'react-router-dom';
 import {
   approveWriteback,
   explainAssurance,
+  exportWritebackDraft,
   getAgentArtifactPreview,
   getAgentRun,
   getAgentTrace,
+  importObservableAgentRun,
   listAgentRuns,
+  markWritebackDuplicate,
   rejectWriteback,
+  requestWritebackEvidence,
 } from './api';
 import { AssuranceExplainPanel } from './AssuranceExplainPanel';
 import { AssuranceWorkflowPanel } from './AssuranceWorkflowPanel';
@@ -70,9 +74,60 @@ function isAgentArtifactFamily(value: string | null) {
     value === 'agent_instrumentation_plan' ||
     value === 'secure_agent_architecture' ||
     value === 'blocked_actions' ||
-    value === 'writeback_requests'
+    value === 'writeback_requests' ||
+    value === 'normalized_findings' ||
+    value === 'threat_hunt_findings' ||
+    value === 'draft_tickets' ||
+    value === 'manifest' ||
+    value === 'source_confidence' ||
+    value === 'rejection_diagnostics' ||
+    value === 'live_collection_coverage' ||
+    value === 'package_links' ||
+    value === 'reconciliation_links'
   );
 }
+
+const SAMPLE_OBSERVABLE_IMPORT = JSON.stringify(
+  {
+    manifest: {
+      schema_version: '1.0',
+      producer: { name: 'observable-security-agent', version: 'sample' },
+      run_id: 'osa-sample-import',
+      workflow_name: 'sample-observable-security-agent-import',
+      status: 'awaiting_review',
+      manifest_completeness: { complete: true, missing_families: [] },
+      artifact_families: {
+        agent_eval_results: { exists: true, status: 'available' },
+        normalized_findings: { exists: true, status: 'available' },
+        draft_tickets: { exists: true, status: 'available' },
+      },
+      policy_decisions: [
+        { action_id: 'draft.external_writebacks', allowed: false, category: 'real_ticket_create', reason: 'External dispatch requires human approval.' },
+      ],
+      review_gates: ['approve_or_reject_local_writeback_drafts'],
+      blocked_actions: { external_actions_require_human_approval: true },
+      writeback_requests: [
+        {
+          id: 'osa-sample-writeback-1',
+          request_type: 'ticket',
+          status: 'draft_requires_human_review',
+          payload: { summary: 'Review sample OSA recommendation', destination: 'draft-only' },
+          evidence_refs: ['agent_eval_results'],
+        },
+      ],
+      package_links: {},
+    },
+    artifacts: {
+      source_confidence: { content: { overall_confidence: 'high', signals: [{ source: 'sample', confidence: 'high' }] } },
+      rejection_diagnostics: { content: { rejected_record_count: 0, records: [] } },
+      live_collection_coverage: { content: { mode: 'fixture_only_no_credentials', redaction: { status: 'redacted' } } },
+      normalized_findings: { content: { finding_count: 1, findings: [{ finding_id: 'OSA-NF-001', status: 'pending_review' }] } },
+      draft_tickets: { content: { draft_count: 1, tickets: [{ ticket_id: 'osa-sample-writeback-1', status: 'pending_human_approval' }] } },
+    },
+  },
+  null,
+  2,
+);
 
 export function AgentRunInspectorPage() {
   const { identity } = useEdgeIdentity();
@@ -91,6 +146,7 @@ export function AgentRunInspectorPage() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [approvalNote, setApprovalNote] = useState('Validated by reviewer after trace inspection.');
+  const [observableImportText, setObservableImportText] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const requestedRunId = searchParams.get('runId') ?? '';
@@ -406,17 +462,51 @@ export function AgentRunInspectorPage() {
     setSearchParams(next, { replace: true });
   }, [searchParams, selectedWritebackId, setSearchParams]);
 
-  async function handleWritebackDecision(writeback: WritebackApproval, decision: 'approve' | 'reject') {
+  async function handleObservableImport() {
+    try {
+      setBusyAction('import-observable');
+      setError(null);
+      setNotice(null);
+      const body = JSON.parse(observableImportText) as Record<string, unknown>;
+      const result = await importObservableAgentRun(body);
+      const nextRuns = await listAgentRuns();
+      setRuns(nextRuns);
+      setSelectedRunId(result.runId);
+      updateSearchState({ runId: result.runId, stepId: null, policyId: null, writebackId: null });
+      setObservableImportText('');
+      setNotice(`Imported Observable Security Agent run ${result.runId}.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to import the Observable run manifest.');
+    } finally {
+      setBusyAction(null);
+    }
+  }
+
+  async function handleWritebackDecision(
+    writeback: WritebackApproval,
+    decision: 'approve' | 'reject' | 'request_more_evidence' | 'duplicate' | 'export',
+  ) {
     try {
       setBusyAction(`${decision}:${writeback.id}`);
       setError(null);
       setNotice(null);
       if (decision === 'approve') {
         const result = await approveWriteback(writeback.id, approvalNote);
-        setNotice(`Writeback ${result.approvalId} approved as integration run ${result.integrationRunId}.`);
-      } else {
+        setNotice(`Writeback ${result.approvalId} approved as a draft-only review decision. No external dispatch was performed.`);
+      } else if (decision === 'reject') {
         const result = await rejectWriteback(writeback.id, approvalNote);
         setNotice(`Writeback ${result.approvalId} rejected.`);
+      } else if (decision === 'request_more_evidence') {
+        const result = await requestWritebackEvidence(writeback.id, approvalNote);
+        setNotice(`Writeback ${result.approvalId} now requires more evidence.`);
+      } else if (decision === 'duplicate') {
+        const result = await markWritebackDuplicate(writeback.id, approvalNote);
+        setNotice(`Writeback ${result.approvalId} marked duplicate.`);
+      } else {
+        const result = await exportWritebackDraft(writeback.id);
+        setPreviewFamily('writeback_requests');
+        setPreview(result);
+        setNotice(`Writeback ${result.approvalId} draft payload exported locally. No external dispatch was performed.`);
       }
       const [runDetail, runTrace, nextRuns] = await Promise.all([
         getAgentRun(selectedRunId),
@@ -453,6 +543,31 @@ export function AgentRunInspectorPage() {
 
       {notice && <div className="notice-success">{notice}</div>}
       {error && <div className="notice-error">{error}</div>}
+
+      <section className="panel-subtle">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+          <div>
+            <div className="label">Observable Security Agent import</div>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
+              Paste a JSON object with a <code>manifest</code> field from <code>agent_run_manifest.json</code>. Optional <code>trace</code> and <code>artifacts</code> fields are preserved as previews; writebacks remain pending human approval.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button className="button-secondary" disabled={busyAction !== null} onClick={() => setObservableImportText(SAMPLE_OBSERVABLE_IMPORT)} type="button">
+              Load sample OSA run
+            </button>
+            <button className="button-primary" disabled={busyAction !== null || !observableImportText.trim()} onClick={() => void handleObservableImport()} type="button">
+              {busyAction === 'import-observable' ? 'Importing...' : 'Import Observable run'}
+            </button>
+          </div>
+        </div>
+        <textarea
+          className="input mt-4 min-h-[130px] font-mono text-xs"
+          onChange={(event) => setObservableImportText(event.target.value)}
+          placeholder='{"manifest":{"schema_version":"1.0","producer":{"name":"observable-security-agent"},"artifact_families":{}}}'
+          value={observableImportText}
+        />
+      </section>
 
       <section className="grid gap-6 xl:grid-cols-[0.82fr_1.18fr]">
         <section className="space-y-3">
@@ -556,6 +671,35 @@ export function AgentRunInspectorPage() {
                 <div className="metric-card">
                   <div className="metric-label">Validation</div>
                   <div className="metric-value text-base">{String(trace.summary.validationStatus ?? 'unknown')}</div>
+                </div>
+              </section>
+
+              <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div className="panel-subtle">
+                  <div className="label">Proof chain</div>
+                  <div className="mt-3 text-sm leading-6 text-slate-300">
+                    Manifest completeness:{' '}
+                    {String((detail.summary.manifestCompleteness as Record<string, unknown> | null | undefined)?.complete ?? detail.summary.manifest_complete ?? 'unknown')}
+                  </div>
+                  <div className="mt-2 text-xs text-slate-500">Deterministic artifacts remain authoritative; LLM output is explanatory only.</div>
+                </div>
+                <div className="panel-subtle">
+                  <div className="label">Source confidence</div>
+                  <pre className="mt-3 max-h-[180px] overflow-auto rounded-2xl border border-white/10 bg-slate-950/80 p-3 text-xs leading-5 text-slate-300">
+                    {toPreview(detail.summary.sourceConfidence ?? detail.summary.source_confidence ?? 'No source confidence payload imported yet.')}
+                  </pre>
+                </div>
+                <div className="panel-subtle">
+                  <div className="label">Rejected records</div>
+                  <pre className="mt-3 max-h-[180px] overflow-auto rounded-2xl border border-white/10 bg-slate-950/80 p-3 text-xs leading-5 text-slate-300">
+                    {toPreview(detail.summary.rejectionDiagnostics ?? detail.summary.rejection_diagnostics ?? detail.summary.unavailableArtifactFamilies ?? 'No rejection diagnostics imported yet.')}
+                  </pre>
+                </div>
+                <div className="panel-subtle">
+                  <div className="label">Live collection coverage</div>
+                  <pre className="mt-3 max-h-[180px] overflow-auto rounded-2xl border border-white/10 bg-slate-950/80 p-3 text-xs leading-5 text-slate-300">
+                    {toPreview(detail.summary.liveCollectionCoverage ?? detail.summary.live_collection_coverage ?? 'No live coverage payload imported yet.')}
+                  </pre>
                 </div>
               </section>
 
@@ -725,6 +869,15 @@ export function AgentRunInspectorPage() {
                     <option value="secure_agent_architecture">secure_agent_architecture</option>
                     <option value="blocked_actions">blocked_actions</option>
                     <option value="writeback_requests">writeback_requests</option>
+                    <option value="normalized_findings">normalized_findings</option>
+                    <option value="threat_hunt_findings">threat_hunt_findings</option>
+                    <option value="draft_tickets">draft_tickets</option>
+                    <option value="manifest">manifest</option>
+                    <option value="source_confidence">source_confidence</option>
+                    <option value="rejection_diagnostics">rejection_diagnostics</option>
+                    <option value="live_collection_coverage">live_collection_coverage</option>
+                    <option value="package_links">package_links</option>
+                    <option value="reconciliation_links">reconciliation_links</option>
                   </select>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
@@ -860,6 +1013,30 @@ export function AgentRunInspectorPage() {
                               type="button"
                             >
                               {busyAction === `reject:${item.id}` ? 'Rejecting...' : 'Reject'}
+                            </button>
+                            <button
+                              className="button-secondary"
+                              disabled={busyAction !== null}
+                              onClick={() => void handleWritebackDecision(item, 'request_more_evidence')}
+                              type="button"
+                            >
+                              {busyAction === `request_more_evidence:${item.id}` ? 'Requesting...' : 'More evidence'}
+                            </button>
+                            <button
+                              className="button-secondary"
+                              disabled={busyAction !== null}
+                              onClick={() => void handleWritebackDecision(item, 'duplicate')}
+                              type="button"
+                            >
+                              {busyAction === `duplicate:${item.id}` ? 'Marking...' : 'Duplicate'}
+                            </button>
+                            <button
+                              className="button-secondary"
+                              disabled={busyAction !== null}
+                              onClick={() => void handleWritebackDecision(item, 'export')}
+                              type="button"
+                            >
+                              {busyAction === `export:${item.id}` ? 'Exporting...' : 'Export draft'}
                             </button>
                           </div>
                         )}

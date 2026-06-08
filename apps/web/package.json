@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verify:observable-import-ui": "node ./scripts/verify_observable_import_ui.mjs",
+    "test:observable-import-ui": "node ./scripts/verify_observable_import_ui.mjs"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",

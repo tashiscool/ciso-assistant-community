@@ -244,6 +244,14 @@ export async function createAgentRun(body: {
   return response.data;
 }
 
+export async function importObservableAgentRun(body: Record<string, unknown>) {
+  const response = await client.post<{ data: { runId: string; trace: AgentRunTrace } }>(
+    '/agent/runs/import-observable',
+    body,
+  );
+  return response.data;
+}
+
 export async function getAgentRun(runId: string) {
   const response = await client.get<{
     data: {
@@ -296,7 +304,7 @@ export async function getAgentArtifactPreview(runId: string, family: string) {
 }
 
 export async function approveWriteback(writebackId: string, justification: string) {
-  const response = await client.post<{ data: { approvalId: string; integrationRunId: string; status: string } }>(
+  const response = await client.post<{ data: { approvalId: string; integrationRunId: string | null; status: string } }>(
     `/agent/writebacks/${writebackId}/approve`,
     { justification },
   );
@@ -308,5 +316,38 @@ export async function rejectWriteback(writebackId: string, justification: string
     `/agent/writebacks/${writebackId}/reject`,
     { justification },
   );
+  return response.data;
+}
+
+
+export async function requestWritebackEvidence(writebackId: string, justification: string) {
+  const response = await client.post<{ data: { approvalId: string; status: string } }>(
+    `/agent/writebacks/${writebackId}/request-more-evidence`,
+    { justification },
+  );
+  return response.data;
+}
+
+export async function markWritebackDuplicate(writebackId: string, justification: string) {
+  const response = await client.post<{ data: { approvalId: string; status: string } }>(
+    `/agent/writebacks/${writebackId}/duplicate`,
+    { justification },
+  );
+  return response.data;
+}
+
+export async function exportWritebackDraft(writebackId: string) {
+  const response = await client.get<{
+    data: {
+      approvalId: string;
+      agentRunId: string;
+      requestType: string;
+      status: string;
+      dispatchPerformed: boolean;
+      payload: Record<string, unknown>;
+      evidenceRefs: string[];
+      exportedAt: string;
+    };
+  }>(`/agent/writebacks/${writebackId}/export`);
   return response.data;
 }

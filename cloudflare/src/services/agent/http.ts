@@ -33,6 +33,14 @@ import {
   buildAgentInstrumentationPlanMarkdown,
   buildSecureAgentArchitectureMarkdown,
 } from './artifacts';
+import {
+  dispatchJiraWriteIntent,
+  dryRunJiraWriteIntent,
+  importJiraTickets,
+  summarizeJiraResult,
+  testJiraConnector,
+  type JiraConnectorRow,
+} from './jira';
 
 type AgentRunInput = {
   evidenceJobId?: string;
@@ -41,8 +49,32 @@ type AgentRunInput = {
   requestedWritebacks?: boolean;
 };
 
+type ObservableArtifactPayload = {
+  family?: string;
+  content?: unknown;
+  text?: string;
+  contentType?: string;
+};
+
+type ObservableAgentRunImportInput = {
+  manifest?: Record<string, unknown>;
+  trace?: Record<string, unknown>;
+  artifacts?: Record<string, unknown> | ObservableArtifactPayload[];
+  folderId?: string;
+  evidenceJobId?: string;
+  importJobId?: string;
+};
+
 type ApprovalInput = {
   justification?: string;
+};
+
+type JiraConnectorActionInput = {
+  connectorId?: string;
+  intent?: Record<string, unknown>;
+  justification?: string;
+  jql?: string;
+  maxResults?: number;
 };
 
 type EvidenceJobRow = {
@@ -135,6 +167,294 @@ type PolicyDecision = {
   category: 'autonomous' | 'blocked' | 'draft' | 'unknown';
   reason: string;
 };
+
+async function loadJiraConnectorForDispatch(
+  ctx: WorkerRequestContext,
+  tenantId: string,
+  connectorId?: string | null,
+): Promise<JiraConnectorRow | null> {
+  const baseSql = `
+    SELECT id, name, provider, category, auth_mode, base_url, status, is_enabled, config_json, capabilities_json
+    FROM integration_connectors
+    WHERE tenant_id = ?
+      AND LOWER(provider) = 'jira'
+      AND LOWER(category) = 'ticketing'
+      AND is_enabled = 1
+  `;
+  if (connectorId) {
+    return ctx.env.D1_MAIN.prepare(`${baseSql} AND id = ? LIMIT 1`).bind(tenantId, connectorId).first<JiraConnectorRow>();
+  }
+  return ctx.env.D1_MAIN.prepare(`${baseSql} ORDER BY updated_at DESC LIMIT 1`).bind(tenantId).first<JiraConnectorRow>();
+}
+
+async function recordJiraConnectorRun(args: {
+  ctx: WorkerRequestContext;
+  tenantId: string;
+  connectorId: string;
+  userId: string | null;
+  folderId: string | null;
+  actionType: string;
+  status: string;
+  summary: Record<string, unknown>;
+}): Promise<string> {
+  const runId = crypto.randomUUID();
+  const startedAt = nowIso();
+  await args.ctx.env.D1_MAIN.prepare(
+    `
+    INSERT INTO integration_connector_runs (
+      id, tenant_id, connector_id, action_type, status, summary_json, started_at, finished_at,
+      triggered_by_user_id, folder_id, run_family, input_mode, manifest_key, normalization_status,
+      coverage_json, error_summary_json, source_schema_version
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `,
+  )
+    .bind(
+      runId,
+      args.tenantId,
+      args.connectorId,
+      args.actionType,
+      args.status,
+      JSON.stringify(args.summary),
+      startedAt,
+      nowIso(),
+      args.userId,
+      args.folderId,
+      'jira_writeback',
+      'live',
+      null,
+      args.status === 'completed' ? 'completed' : 'failed',
+      JSON.stringify({ provider: 'jira', actionType: args.actionType }),
+      JSON.stringify(args.status === 'completed' ? {} : { status: args.status }),
+      'jira-write-intent-v1',
+    )
+    .run();
+  return runId;
+}
+
+
+function recordValue(record: Record<string, unknown> | null | undefined, key: string): unknown {
+  return record && Object.prototype.hasOwnProperty.call(record, key) ? record[key] : undefined;
+}
+
+function readRecordString(record: Record<string, unknown> | null | undefined, keys: string[], fallback = ''): string {
+  for (const key of keys) {
+    const value = recordValue(record, key);
+    if (typeof value === 'string' && value.trim()) return value.trim();
+  }
+  return fallback;
+}
+
+function readRecordArray(record: Record<string, unknown> | null | undefined, key: string): unknown[] {
+  const value = recordValue(record, key);
+  return Array.isArray(value) ? value : [];
+}
+
+function normalizeImportedObservableSteps(rawTrace: Record<string, unknown> | null, generatedAt: string): AgentRunTrace['steps'] {
+  const rawSteps = readRecordArray(rawTrace, 'steps');
+  return rawSteps.map((item, index) => {
+    const step = item && typeof item === 'object' ? (item as Record<string, unknown>) : {};
+    const verification = step.verification && typeof step.verification === 'object' ? (step.verification as Record<string, unknown>) : {};
+    const input = step.input && typeof step.input === 'object' ? (step.input as Record<string, unknown>) : {};
+    const output = step.output && typeof step.output === 'object' ? (step.output as Record<string, unknown>) : {};
+    return {
+      id: readRecordString(step, ['id'], crypto.randomUUID()),
+      order: typeof step.order === 'number' ? step.order : typeof step.step_index === 'number' ? step.step_index + 1 : index + 1,
+      actionCategory: readRecordString(step, ['actionCategory', 'action_category', 'phase'], 'imported'),
+      actionId: readRecordString(step, ['actionId', 'action_id', 'chosen_action', 'phase'], `imported.step_${index + 1}`),
+      status: readRecordString(step, ['status'], readRecordString(verification, ['status'], 'completed')).toLowerCase(),
+      input,
+      output: Object.keys(output).length ? output : { verification, outputArtifact: step.output_artifact ?? null },
+      startedAt: readRecordString(step, ['startedAt', 'started_at', 'timestamp'], generatedAt),
+      finishedAt: readRecordString(step, ['finishedAt', 'finished_at', 'timestamp'], generatedAt),
+    };
+  });
+}
+
+function normalizeImportedObservablePolicyDecisions(manifest: Record<string, unknown>, rawTrace: Record<string, unknown> | null) {
+  const source = readRecordArray(manifest, 'policy_decisions').length ? readRecordArray(manifest, 'policy_decisions') : readRecordArray(rawTrace, 'policyDecisions');
+  return source.map((item) => {
+    const row = item && typeof item === 'object' ? (item as Record<string, unknown>) : {};
+    return {
+      id: readRecordString(row, ['id'], crypto.randomUUID()),
+      actionId: readRecordString(row, ['actionId', 'action_id'], 'imported.policy_decision'),
+      allowed: Boolean(row.allowed),
+      category: readRecordString(row, ['category'], Boolean(row.allowed) ? 'autonomous' : 'blocked'),
+      reason: readRecordString(row, ['reason'], 'Imported Observable Security Agent policy decision.'),
+      detail: row,
+    };
+  });
+}
+
+function normalizeImportedObservableArtifactMap(input: ObservableAgentRunImportInput): Record<string, ObservableArtifactPayload> {
+  const out: Record<string, ObservableArtifactPayload> = {};
+  if (Array.isArray(input.artifacts)) {
+    for (const artifact of input.artifacts) if (artifact.family) out[artifact.family] = artifact;
+    return out;
+  }
+  if (input.artifacts && typeof input.artifacts === 'object') {
+    for (const [family, value] of Object.entries(input.artifacts)) out[family] = value && typeof value === 'object' && !Array.isArray(value) ? ({ family, ...(value as Record<string, unknown>) } as ObservableArtifactPayload) : { family, content: value };
+  }
+  return out;
+}
+
+function observableArtifactContent(artifact: ObservableArtifactPayload | undefined): unknown {
+  if (!artifact) return null;
+  if (artifact.content !== undefined) return artifact.content;
+  if (typeof artifact.text === 'string') {
+    try {
+      return JSON.parse(artifact.text);
+    } catch {
+      return artifact.text;
+    }
+  }
+  return null;
+}
+
+function normalizeImportedObservableJiraWritebacks(
+  manifest: Record<string, unknown>,
+  artifacts: Record<string, ObservableArtifactPayload>,
+): Record<string, unknown>[] {
+  const candidates: unknown[] = [];
+  const manifestJira = recordValue(manifest, 'jira_write_intents');
+  if (Array.isArray(manifestJira)) candidates.push(...manifestJira);
+  const artifactContent = observableArtifactContent(artifacts.jira_write_intents);
+  if (Array.isArray(artifactContent)) {
+    candidates.push(...artifactContent);
+  } else if (artifactContent && typeof artifactContent === 'object') {
+    const record = artifactContent as Record<string, unknown>;
+    const intents = Array.isArray(record.intents)
+      ? record.intents
+      : Array.isArray(record.write_intents)
+        ? record.write_intents
+        : Array.isArray(record.jira_write_intents)
+          ? record.jira_write_intents
+          : [];
+    candidates.push(...intents);
+  }
+  return candidates
+    .filter((item): item is Record<string, unknown> => Boolean(item && typeof item === 'object' && !Array.isArray(item)))
+    .map((intent, index) => {
+      const operation = readRecordString(intent, ['operation'], 'jira_write');
+      const idempotency = readRecordString(intent, ['idempotency_key', 'id'], `jira-write-intent-${index + 1}`);
+      return {
+        id: `jira:${idempotency}`,
+        request_type: `jira:${operation}`,
+        status: 'pending',
+        payload: intent,
+        evidence_refs: Array.isArray(intent.evidence_refs) ? intent.evidence_refs : [],
+        justification: 'Imported Observable Security Agent Jira write intent pending Regovise approval and dry-run validation.',
+      };
+    });
+}
+
+function artifactOrBodyRecord(
+  artifacts: Record<string, ObservableArtifactPayload>,
+  bodyRecord: Record<string, unknown>,
+  key: string,
+): Record<string, unknown> | null {
+  const artifact = observableArtifactContent(artifacts[key]);
+  if (artifact && typeof artifact === 'object' && !Array.isArray(artifact)) return artifact as Record<string, unknown>;
+  const bodyValue = bodyRecord[key];
+  if (bodyValue && typeof bodyValue === 'object' && !Array.isArray(bodyValue)) return bodyValue as Record<string, unknown>;
+  return null;
+}
+
+function normalizeTicketingComplianceSummary(
+  artifacts: Record<string, ObservableArtifactPayload>,
+  bodyRecord: Record<string, unknown>,
+): Record<string, unknown> {
+  const processCoverage = artifactOrBodyRecord(artifacts, bodyRecord, 'ticket_process_coverage');
+  const evidenceMatrix = artifactOrBodyRecord(artifacts, bodyRecord, 'ticket_evidence_matrix');
+  const inventory = artifactOrBodyRecord(artifacts, bodyRecord, 'ticket_system_inventory');
+  const jiraIntentContent = observableArtifactContent(artifacts.jira_write_intents);
+  const jiraIntentRecords = Array.isArray(jiraIntentContent)
+    ? jiraIntentContent
+    : jiraIntentContent && typeof jiraIntentContent === 'object'
+      ? ((jiraIntentContent as Record<string, unknown>).intents as unknown[] | undefined) ?? []
+      : [];
+  const matrixRows = Array.isArray(evidenceMatrix?.rows) ? (evidenceMatrix?.rows as Record<string, unknown>[]) : [];
+  const enclaveCounts: Record<string, number> = {};
+  const classificationCounts: Record<string, number> = {};
+  for (const row of matrixRows) {
+    const enclave = typeof row.source_enclave === 'string' && row.source_enclave.trim() ? row.source_enclave.trim() : 'unknown';
+    const classification = typeof row.data_classification === 'string' && row.data_classification.trim() ? row.data_classification.trim() : 'unknown';
+    enclaveCounts[enclave] = (enclaveCounts[enclave] ?? 0) + 1;
+    classificationCounts[classification] = (classificationCounts[classification] ?? 0) + 1;
+  }
+  const coverageRows = Array.isArray(processCoverage?.coverage) ? processCoverage.coverage as Record<string, unknown>[] : [];
+  return {
+    available: Boolean(processCoverage || evidenceMatrix || inventory || jiraIntentRecords.length),
+    system: inventory?.system ?? 'jira',
+    sourceEnclave: inventory?.source_enclave ?? null,
+    dataClassification: inventory?.data_classification ?? null,
+    redactionProfile: inventory?.redaction_profile ?? null,
+    projectCount: inventory?.project_count ?? null,
+    ticketCount: evidenceMatrix?.ticket_count ?? matrixRows.length,
+    processSlugCount: processCoverage?.slug_count ?? coverageRows.length,
+    coveredProcessSlugCount: processCoverage?.covered_slug_count ?? coverageRows.filter((row) => Number(row.ticket_count ?? 0) > 0).length,
+    missingProcessSlugs: Array.isArray(processCoverage?.gaps) ? processCoverage?.gaps : [],
+    unclassifiedTicketKeys: Array.isArray(processCoverage?.unclassified_ticket_keys) ? processCoverage?.unclassified_ticket_keys : [],
+    evidenceGapCounts: evidenceMatrix?.gap_counts ?? processCoverage?.evidence_gap_counts ?? {},
+    enclaveCounts,
+    classificationCounts,
+    jiraWriteIntentCount: jiraIntentRecords.length,
+    reviewerFocus: [
+      'Confirm ticket evidence is from the correct source system/enclave.',
+      'Review missing process slugs and ticket gap flags before package claims are accepted.',
+      'Approve Jira writebacks only after dry-run validation and human review.',
+    ],
+  };
+}
+
+async function putImportedObservableArtifact(ctx: WorkerRequestContext, objectKey: string, artifact: ObservableArtifactPayload | undefined, fallback: unknown, contentType: string): Promise<void> {
+  const body = artifact?.text ?? (typeof artifact?.content === 'string' ? artifact.content : JSON.stringify(artifact?.content ?? fallback, null, 2));
+  await ctx.env.R2_EVIDENCE.put(objectKey, body, { httpMetadata: { contentType: artifact?.contentType ?? contentType } });
+}
+
+function safeObservableArtifactFamily(family: string): string {
+  return family.replace(/[^a-zA-Z0-9_.-]/g, '_').slice(0, 96) || 'artifact';
+}
+
+function importedObservableArtifactKey(tenantId: string, runId: string, family: string): string {
+  return `tenants/${tenantId}/agent-runs/${runId}/observable/${safeObservableArtifactFamily(family)}.json`;
+}
+
+function unavailableObservableArtifact(family: string, reason: string, manifestRecord: unknown = null): Record<string, unknown> {
+  return {
+    unavailable: true,
+    family,
+    reason,
+    manifestRecord,
+  };
+}
+
+function artifactContentType(artifact: ObservableArtifactPayload | undefined, fallback: string): string {
+  return artifact?.contentType ?? fallback;
+}
+
+async function putImportedObservableGenericArtifact(
+  ctx: WorkerRequestContext,
+  tenantId: string,
+  runId: string,
+  family: string,
+  artifact: ObservableArtifactPayload | undefined,
+  fallback: unknown,
+  contentType = 'application/json',
+): Promise<Record<string, unknown>> {
+  const objectKey = importedObservableArtifactKey(tenantId, runId, family);
+  const finalContentType = artifactContentType(artifact, contentType);
+  const payload = artifact?.text ?? (typeof artifact?.content === 'string' ? artifact.content : JSON.stringify(artifact?.content ?? fallback, null, 2));
+  await ctx.env.R2_EVIDENCE.put(objectKey, payload, { httpMetadata: { contentType: finalContentType } });
+  const unavailable = !artifact && typeof fallback === 'object' && fallback !== null && Boolean((fallback as Record<string, unknown>).unavailable);
+  return {
+    family,
+    objectKey,
+    contentType: finalContentType,
+    previewAvailable: !unavailable,
+    unavailableReason: unavailable ? String((fallback as Record<string, unknown>).reason ?? 'Artifact preview is unavailable.') : null,
+  };
+}
 
 const ALLOWED_PREFIXES: Record<string, string> = {
   'observe.': 'autonomous',
@@ -780,6 +1100,248 @@ export async function handleAgentRoutes(
           };
         }),
     });
+  }
+
+  if (resource === 'connectors' && id === 'jira' && (action === 'test' || action === 'dry-run' || action === 'import-tickets') && ctx.request.method === 'POST') {
+    const adminAccess = await requireRootAdminAccess(ctx, 'Testing Jira connectors requires tenant administrator access.');
+    if (adminAccess instanceof Response) return adminAccess;
+    const body = await readJson<JiraConnectorActionInput>(ctx.request);
+    const connector = await loadJiraConnectorForDispatch(ctx, adminAccess.tenantId, body.connectorId ?? null);
+    if (!connector) return json({ error: 'not_found', message: 'Enabled Jira ticketing connector not found.' }, { status: 404 });
+
+    if (action === 'test') {
+      try {
+        const result = await testJiraConnector(connector);
+        const runId = await recordJiraConnectorRun({
+          ctx,
+          tenantId: adminAccess.tenantId,
+          connectorId: connector.id,
+          userId: adminAccess.userId,
+          folderId: null,
+          actionType: 'jira:test',
+          status: result.status === 'validated' ? 'completed' : 'failed',
+          summary: result,
+        });
+        return json({ data: { connectorId: connector.id, integrationRunId: runId, result } });
+      } catch (error) {
+        const result = { status: 'failed', failureReason: error instanceof Error ? error.message : 'Unknown Jira connector test failure.' };
+        const runId = await recordJiraConnectorRun({
+          ctx,
+          tenantId: adminAccess.tenantId,
+          connectorId: connector.id,
+          userId: adminAccess.userId,
+          folderId: null,
+          actionType: 'jira:test',
+          status: 'failed',
+          summary: result,
+        });
+        return json({ error: 'jira_test_failed', integrationRunId: runId, result }, { status: 502 });
+      }
+    }
+
+    if (action === 'import-tickets') {
+      try {
+        const result = await importJiraTickets(connector, { jql: body.jql, maxResults: body.maxResults });
+        const resultRecord = result && typeof result === 'object' ? (result as Record<string, unknown>) : {};
+        const runId = await recordJiraConnectorRun({
+          ctx,
+          tenantId: adminAccess.tenantId,
+          connectorId: connector.id,
+          userId: adminAccess.userId,
+          folderId: null,
+          actionType: 'jira:import_tickets',
+          status: resultRecord.status === 'completed' ? 'completed' : 'failed',
+          summary: resultRecord,
+        });
+        return json({ data: { connectorId: connector.id, integrationRunId: runId, result } }, { status: resultRecord.status === 'completed' ? 200 : 422 });
+      } catch (error) {
+        const result = { status: 'failed', failureReason: error instanceof Error ? error.message : 'Unknown Jira ticket import failure.' };
+        const runId = await recordJiraConnectorRun({
+          ctx,
+          tenantId: adminAccess.tenantId,
+          connectorId: connector.id,
+          userId: adminAccess.userId,
+          folderId: null,
+          actionType: 'jira:import_tickets',
+          status: 'failed',
+          summary: result,
+        });
+        return json({ error: 'jira_import_failed', integrationRunId: runId, result }, { status: 502 });
+      }
+    }
+
+    const dryRun = await dryRunJiraWriteIntent(connector, body.intent ?? {});
+    const runId = await recordJiraConnectorRun({
+      ctx,
+      tenantId: adminAccess.tenantId,
+      connectorId: connector.id,
+      userId: adminAccess.userId,
+      folderId: null,
+      actionType: 'jira:dry_run',
+      status: dryRun.validation.valid ? 'completed' : 'failed',
+      summary: summarizeJiraResult(dryRun),
+    });
+    return json({ data: { connectorId: connector.id, integrationRunId: runId, result: summarizeJiraResult(dryRun) } }, { status: dryRun.validation.valid ? 200 : 422 });
+  }
+
+
+  if (resource === 'runs' && id === 'import-observable' && !action && ctx.request.method === 'POST') {
+    const access = await requireAnyScopedPermission(ctx, ['view_evidence', 'collect_evidence'], 'Importing Observable Security Agent runs requires evidence access.');
+    if (access instanceof Response) return access;
+    const body = await readJson<ObservableAgentRunImportInput>(ctx.request);
+    const manifest = body.manifest && typeof body.manifest === 'object' ? body.manifest : null;
+    if (!manifest) return json({ error: 'missing_manifest', message: 'manifest is required.' }, { status: 400 });
+    const producer = manifest.producer && typeof manifest.producer === 'object' ? (manifest.producer as Record<string, unknown>) : {};
+    if (readRecordString(producer, ['name']) !== 'observable-security-agent') return json({ error: 'invalid_manifest', message: 'manifest.producer.name must be observable-security-agent.' }, { status: 400 });
+    const folderId = body.folderId?.trim() || null;
+    if (folderId && !hasAgentScope(access, folderId)) return json({ error: 'forbidden', message: 'You do not have access to import into the selected folder.' }, { status: 403 });
+
+    const runId = crypto.randomUUID();
+    const createdAt = nowIso();
+    const rawTrace = body.trace && typeof body.trace === 'object' ? body.trace : null;
+    const artifacts = normalizeImportedObservableArtifactMap(body);
+    const manifestArtifactFamilies = manifest.artifact_families && typeof manifest.artifact_families === 'object' && !Array.isArray(manifest.artifact_families)
+      ? (manifest.artifact_families as Record<string, unknown>)
+      : {};
+    const bodyRecord = body as Record<string, unknown>;
+    const manifestWritebackRequests = readRecordArray(manifest, 'writeback_requests').map((item, index) => (item && typeof item === 'object' ? (item as Record<string, unknown>) : { id: `imported-writeback-${index + 1}` }));
+    const jiraWritebackRequests = normalizeImportedObservableJiraWritebacks(manifest, artifacts);
+    const writebackRequests = [...manifestWritebackRequests, ...jiraWritebackRequests];
+    const policyDecisions = normalizeImportedObservablePolicyDecisions(manifest, rawTrace);
+    const steps = normalizeImportedObservableSteps(rawTrace, createdAt);
+    const workflowName = readRecordString(manifest, ['workflow_name', 'workflow'], readRecordString(rawTrace, ['workflowName', 'workflow'], 'observable-security-agent-import'));
+    const importedStatus = readRecordString(manifest, ['status', 'overall_status'], readRecordString(rawTrace, ['status'], 'completed'));
+    const finalStatus = writebackRequests.length > 0 || policyDecisions.some((item) => !item.allowed) ? 'awaiting_review' : importedStatus;
+    const summary: Record<string, unknown> = {
+      ...(manifest.summary && typeof manifest.summary === 'object' ? (manifest.summary as Record<string, unknown>) : {}),
+      importedObservableRun: true,
+      observableRunId: readRecordString(manifest, ['run_id'], ''),
+      artifactFamilyCount: Object.keys(manifestArtifactFamilies).length,
+      artifactFamilies: manifestArtifactFamilies,
+      manifestCompleteness: manifest.manifest_completeness && typeof manifest.manifest_completeness === 'object' ? manifest.manifest_completeness : null,
+      packageLinks: manifest.package_links && typeof manifest.package_links === 'object' ? manifest.package_links : {},
+      reconciliationLinks: manifest.package_links && typeof manifest.package_links === 'object' ? (manifest.package_links as Record<string, unknown>).reconciliation_results ?? null : null,
+      ticketingCompliance: normalizeTicketingComplianceSummary(artifacts, bodyRecord),
+      pendingWritebacks: writebackRequests.length,
+      policyDeniedCount: policyDecisions.filter((item) => !item.allowed).length,
+      workflowRationale: 'Imported from Observable Security Agent agent_run_manifest.json.',
+      awaitingReviewReasons: writebackRequests.length > 0 ? ['Observable writeback drafts require human approval'] : [],
+    };
+    const trace: AgentRunTrace = { runId, workflowName, status: finalStatus, generatedAt: createdAt, evidenceJobId: body.evidenceJobId ?? null, importJobId: body.importJobId ?? null, summary, steps, policyDecisions, pendingWritebacks: writebackRequests.map((item, index) => readRecordString(item, ['id'], `imported-writeback-${index + 1}`)) };
+
+    await ctx.env.D1_MAIN.prepare(`
+      INSERT INTO assurance_agent_runs (
+        id, tenant_id, folder_id, evidence_job_id, import_job_id, status, workflow_name, requested_writebacks,
+        trace_key, summary_key, summary_json, created_by_user_id, created_at, updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(runId, access.tenantId, folderId, body.evidenceJobId ?? null, body.importJobId ?? null, finalStatus, workflowName, writebackRequests.length > 0 ? 1 : 0, traceKey(access.tenantId, runId), summaryKey(access.tenantId, runId), JSON.stringify(summary), access.userId, createdAt, createdAt).run();
+
+    await ctx.env.D1_MAIN.batch([
+      ...steps.map((step) => ctx.env.D1_MAIN.prepare(`
+          INSERT INTO assurance_agent_steps (
+            id, agent_run_id, step_order, action_category, action_id, status, input_json, output_json, started_at, finished_at
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `).bind(step.id, runId, step.order, step.actionCategory, step.actionId, step.status, JSON.stringify(step.input), JSON.stringify(step.output), step.startedAt, step.finishedAt)),
+      ...policyDecisions.map((decision) => ctx.env.D1_MAIN.prepare(`
+          INSERT INTO assurance_agent_policy_decisions (
+            id, agent_run_id, agent_step_id, action_id, allowed, category, reason, decision_json, created_at
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `).bind(decision.id, runId, null, decision.actionId, decision.allowed ? 1 : 0, decision.category, decision.reason, JSON.stringify(decision.detail), createdAt)),
+      ...writebackRequests.map((request, index) => ctx.env.D1_MAIN.prepare(`
+          INSERT INTO assurance_writeback_approvals (
+            id, tenant_id, folder_id, agent_run_id, connector_id, request_type, status, payload_json,
+            evidence_refs_json, requested_by_user_id, reviewed_by_user_id, justification, integration_run_id, created_at, updated_at
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `).bind(readRecordString(request, ['id'], crypto.randomUUID()), access.tenantId, folderId, runId, null, readRecordString(request, ['request_type', 'requestType'], 'observable_writeback'), 'pending', JSON.stringify(request.payload && typeof request.payload === 'object' ? request.payload : request), JSON.stringify(Array.isArray(request.evidence_refs) ? request.evidence_refs : []), access.userId, null, readRecordString(request, ['justification'], 'Imported Observable Security Agent writeback draft pending review.'), null, createdAt, createdAt)),
+    ]);
+
+    const summaryMarkdown = buildTraceSummaryMarkdown(trace);
+    await Promise.all([
+      putImportedObservableArtifact(ctx, traceKey(access.tenantId, runId), artifacts.trace_json, trace, 'application/json'),
+      putImportedObservableArtifact(ctx, summaryKey(access.tenantId, runId), artifacts.summary_markdown, summaryMarkdown, 'text/markdown; charset=utf-8'),
+      putImportedObservableArtifact(ctx, taskGraphKey(access.tenantId, runId), artifacts.task_graph, manifestArtifactFamilies, 'application/json'),
+      putImportedObservableArtifact(ctx, workflowMemoryKey(access.tenantId, runId), artifacts.workflow_memory, { workflow_name: workflowName, imported: true }, 'application/json'),
+      putImportedObservableArtifact(ctx, agentEvalResultsKey(access.tenantId, runId), artifacts.agent_eval_results, { evaluations: [] }, 'application/json'),
+      putImportedObservableArtifact(ctx, agentRiskReportKey(access.tenantId, runId), artifacts.agent_risk_report, '# Imported Observable agent risk report\n', 'text/markdown; charset=utf-8'),
+      putImportedObservableArtifact(ctx, agentPoamKey(access.tenantId, runId), artifacts.agent_poam, 'poam_id,status,summary\n', 'text/csv; charset=utf-8'),
+      putImportedObservableArtifact(ctx, agentInstrumentationPlanKey(access.tenantId, runId), artifacts.agent_instrumentation_plan, '# Imported Observable agent instrumentation plan\n', 'text/markdown; charset=utf-8'),
+      putImportedObservableArtifact(ctx, secureAgentArchitectureKey(access.tenantId, runId), artifacts.secure_agent_architecture, '# Imported Observable secure agent architecture\n', 'text/markdown; charset=utf-8'),
+    ]);
+
+    const knownPreviewFamilies = new Set([
+      'trace_json',
+      'summary_markdown',
+      'task_graph',
+      'workflow_memory',
+      'agent_eval_results',
+      'agent_risk_report',
+      'agent_poam',
+      'agent_instrumentation_plan',
+      'secure_agent_architecture',
+      'blocked_actions',
+      'writeback_requests',
+    ]);
+    const supplementalFallbacks: Record<string, unknown> = {
+      manifest,
+      source_confidence: artifactOrBodyRecord(artifacts, bodyRecord, 'source_confidence') ?? unavailableObservableArtifact('source_confidence', 'Source confidence payload was not provided in the Observable import bundle.'),
+      rejection_diagnostics: artifactOrBodyRecord(artifacts, bodyRecord, 'rejection_diagnostics') ?? unavailableObservableArtifact('rejection_diagnostics', 'Rejection diagnostics payload was not provided in the Observable import bundle.'),
+      live_collection_coverage: artifactOrBodyRecord(artifacts, bodyRecord, 'live_collection_coverage') ?? unavailableObservableArtifact('live_collection_coverage', 'Live collection coverage was not provided; fixture/import may be credential-free.'),
+      ticket_system_inventory: artifactOrBodyRecord(artifacts, bodyRecord, 'ticket_system_inventory') ?? unavailableObservableArtifact('ticket_system_inventory', 'Ticketing-system inventory was not provided in the Observable import bundle.'),
+      ticket_process_coverage: artifactOrBodyRecord(artifacts, bodyRecord, 'ticket_process_coverage') ?? unavailableObservableArtifact('ticket_process_coverage', 'Ticket process coverage was not provided in the Observable import bundle.'),
+      ticket_evidence_matrix: artifactOrBodyRecord(artifacts, bodyRecord, 'ticket_evidence_matrix') ?? unavailableObservableArtifact('ticket_evidence_matrix', 'Ticket evidence matrix was not provided in the Observable import bundle.'),
+      jira_write_intents: observableArtifactContent(artifacts.jira_write_intents) ?? bodyRecord.jira_write_intents ?? unavailableObservableArtifact('jira_write_intents', 'Jira write intents were not provided in the Observable import bundle.'),
+      jira_write_results: observableArtifactContent(artifacts.jira_write_results) ?? bodyRecord.jira_write_results ?? unavailableObservableArtifact('jira_write_results', 'Jira write results were not provided in the Observable import bundle.'),
+      package_links: manifest.package_links ?? unavailableObservableArtifact('package_links', 'Package links were absent from agent_run_manifest.json.'),
+      reconciliation_links: manifest.package_links && typeof manifest.package_links === 'object'
+        ? (manifest.package_links as Record<string, unknown>).reconciliation_results ?? unavailableObservableArtifact('reconciliation_links', 'Reconciliation result link was absent from manifest.package_links.')
+        : unavailableObservableArtifact('reconciliation_links', 'Reconciliation links were absent from agent_run_manifest.json.'),
+    };
+    const genericFamilies = Array.from(new Set([
+      ...Object.keys(manifestArtifactFamilies),
+      'manifest',
+      'source_confidence',
+      'rejection_diagnostics',
+      'live_collection_coverage',
+      'package_links',
+      'reconciliation_links',
+      'normalized_findings',
+      'threat_hunt_findings',
+      'draft_tickets',
+      'ticket_system_inventory',
+      'ticket_process_coverage',
+      'ticket_evidence_matrix',
+      'jira_write_intents',
+      'jira_write_results',
+    ])).filter((family) => !knownPreviewFamilies.has(family));
+    const genericArtifactMetas = await Promise.all(
+      genericFamilies.map((family) => {
+        const manifestRecord = manifestArtifactFamilies[family];
+        const fallback = Object.prototype.hasOwnProperty.call(supplementalFallbacks, family)
+          ? supplementalFallbacks[family]
+          : unavailableObservableArtifact(family, 'Artifact payload was not included in the Observable import bundle.', manifestRecord ?? null);
+        return putImportedObservableGenericArtifact(ctx, access.tenantId, runId, family, artifacts[family], fallback);
+      }),
+    );
+    summary.importedObservableArtifactKeys = Object.fromEntries(genericArtifactMetas.map((meta) => [meta.family, meta]));
+    summary.unavailableArtifactFamilies = genericArtifactMetas
+      .filter((meta) => meta.previewAvailable === false)
+      .map((meta) => ({ family: meta.family, reason: meta.unavailableReason }));
+    summary.sourceConfidence = artifactOrBodyRecord(artifacts, bodyRecord, 'source_confidence');
+    summary.rejectionDiagnostics = artifactOrBodyRecord(artifacts, bodyRecord, 'rejection_diagnostics');
+    summary.liveCollectionCoverage = artifactOrBodyRecord(artifacts, bodyRecord, 'live_collection_coverage');
+    summary.ticketingCompliance = normalizeTicketingComplianceSummary(artifacts, bodyRecord);
+    await ctx.env.D1_MAIN.prepare(`
+      UPDATE assurance_agent_runs
+      SET summary_json = ?, updated_at = ?
+      WHERE id = ? AND tenant_id = ?
+      `).bind(JSON.stringify(summary), createdAt, runId, access.tenantId).run();
+
+    await beginWorkflowRun(ctx, access.tenantId, { runId: `observable-import:${runId}`, runType: 'assurance_agent_import', module: 'Agent', title: 'Imported Observable Security Agent run', status: finalStatus === 'awaiting_review' ? 'Awaiting Review' : 'Done', folderId, sourceRecordId: runId, route: `/assurance/agent-runs?runId=${encodeURIComponent(runId)}`, detail: `Imported Observable Security Agent manifest ${readRecordString(manifest, ['run_id'], runId)} with ${writebackRequests.length} pending writeback draft(s).`, metadata: { observableRunId: readRecordString(manifest, ['run_id'], ''), importedRunId: runId, writebackCount: writebackRequests.length, artifactFamilyCount: Object.keys(manifestArtifactFamilies).length } });
+    return json({ data: { runId, trace } }, { status: 201 });
   }
 
   if (resource === 'runs' && !id && ctx.request.method === 'POST') {
@@ -1746,7 +2308,252 @@ export async function handleAgentRoutes(
       });
     }
 
+    const summary = asJson<Record<string, unknown>>(run.summary_json, {});
+    const importedKeys = summary.importedObservableArtifactKeys && typeof summary.importedObservableArtifactKeys === 'object'
+      ? (summary.importedObservableArtifactKeys as Record<string, Record<string, unknown>>)
+      : {};
+    const importedMeta = importedKeys[family];
+    if (importedMeta && typeof importedMeta.objectKey === 'string') {
+      const object = await ctx.env.R2_EVIDENCE.get(importedMeta.objectKey);
+      if (!object) {
+        return json({ error: 'not_found', message: 'Imported Observable artifact preview object is missing.' }, { status: 404 });
+      }
+      const contentType = object.httpMetadata?.contentType ?? String(importedMeta.contentType ?? 'application/json');
+      const preview = contentType.includes('json') ? await object.json() : await object.text();
+      return json({
+        data: {
+          family,
+          items: [
+            {
+              id: `${run.id}:${family}`,
+              artifactFamily: family,
+              objectKey: importedMeta.objectKey,
+              sizeBytes: object.size ?? null,
+              contentType,
+              checksum: object.checksums?.md5 ?? null,
+              createdAt: run.updated_at,
+            },
+          ],
+          retrieval: {
+            kind: 'r2',
+            previewAvailable: importedMeta.previewAvailable !== false,
+            unavailableReason: importedMeta.unavailableReason ?? null,
+          },
+          preview,
+        },
+      });
+    }
+
     return json({ error: 'not_found', message: 'Agent artifact not found.' }, { status: 404 });
+  }
+
+  if (resource === 'writebacks' && id && action === 'dispatch-jira' && ctx.request.method === 'POST') {
+    const adminAccess = await requireRootAdminAccess(ctx, 'Dispatching approved Jira writebacks requires tenant administrator access.');
+    if (adminAccess instanceof Response) return adminAccess;
+    const body = await readJson<JiraConnectorActionInput>(ctx.request);
+    const approval = await ctx.env.D1_MAIN.prepare(
+      `
+      SELECT id, tenant_id, folder_id, agent_run_id, connector_id, request_type, status, payload_json, evidence_refs_json,
+             requested_by_user_id, reviewed_by_user_id, justification, integration_run_id, created_at, updated_at
+      FROM assurance_writeback_approvals
+      WHERE id = ? AND tenant_id = ?
+      LIMIT 1
+      `,
+    )
+      .bind(id, adminAccess.tenantId)
+      .first<ApprovalRow>();
+    if (!approval) return json({ error: 'not_found', message: 'Writeback approval request not found.' }, { status: 404 });
+    if (approval.status === 'dispatched') {
+      return json({
+        data: {
+          approvalId: id,
+          status: 'dispatched',
+          integrationRunId: approval.integration_run_id,
+          idempotent: true,
+        },
+      });
+    }
+    if (approval.status !== 'approved' && approval.status !== 'dispatch_failed') {
+      return json({ error: 'invalid_state', message: 'Jira dispatch requires an approved writeback draft.' }, { status: 409 });
+    }
+
+    const payload = asJson<Record<string, unknown>>(approval.payload_json, {});
+    const connector = await loadJiraConnectorForDispatch(ctx, adminAccess.tenantId, body.connectorId ?? approval.connector_id);
+    if (!connector) return json({ error: 'connector_not_found', message: 'Enabled Jira ticketing connector not found.' }, { status: 404 });
+
+    const timestamp = nowIso();
+    await ctx.env.D1_MAIN.prepare(
+      `
+      UPDATE assurance_writeback_approvals
+      SET status = 'dispatching',
+          connector_id = ?,
+          updated_at = ?
+      WHERE id = ? AND tenant_id = ?
+      `,
+    )
+      .bind(connector.id, timestamp, id, adminAccess.tenantId)
+      .run();
+
+    const result = await dispatchJiraWriteIntent(connector, payload);
+    const summary = {
+      ...summarizeJiraResult(result),
+      approvalId: id,
+      agentRunId: approval.agent_run_id,
+      requestType: approval.request_type,
+      evidenceRefs: asJson<string[]>(approval.evidence_refs_json, []),
+      dispatchApprovedByUserId: adminAccess.userId,
+    };
+    const integrationRunId = await recordJiraConnectorRun({
+      ctx,
+      tenantId: adminAccess.tenantId,
+      connectorId: connector.id,
+      userId: adminAccess.userId,
+      folderId: approval.folder_id,
+      actionType: `jira:${result.validation.operation || 'dispatch'}`,
+      status: result.status === 'dispatched' ? 'completed' : 'failed',
+      summary,
+    });
+
+    const nextStatus = result.status === 'dispatched' ? 'dispatched' : 'dispatch_failed';
+    await ctx.env.D1_MAIN.prepare(
+      `
+      UPDATE assurance_writeback_approvals
+      SET status = ?,
+          connector_id = ?,
+          reviewed_by_user_id = ?,
+          justification = ?,
+          integration_run_id = ?,
+          updated_at = ?
+      WHERE id = ? AND tenant_id = ?
+      `,
+    )
+      .bind(
+        nextStatus,
+        connector.id,
+        adminAccess.userId,
+        body.justification?.trim() || (result.status === 'dispatched' ? 'Approved Jira writeback dispatched.' : result.failureReason ?? 'Jira dispatch failed.'),
+        integrationRunId,
+        nowIso(),
+        id,
+        adminAccess.tenantId,
+      )
+      .run();
+
+    await beginWorkflowRun(ctx, adminAccess.tenantId, {
+      runId: crypto.randomUUID(),
+      runType: 'jira_writeback_dispatch',
+      module: 'Agent',
+      title: result.status === 'dispatched' ? 'Dispatched approved Jira writeback' : 'Jira writeback dispatch failed',
+      status: result.status === 'dispatched' ? 'Done' : 'Failed',
+      folderId: approval.folder_id ?? null,
+      sourceRecordId: id,
+      route: `/assurance/agent-runs?runId=${encodeURIComponent(approval.agent_run_id)}&writebackId=${encodeURIComponent(id)}`,
+      detail: result.status === 'dispatched'
+        ? `Dispatched ${approval.request_type} through Jira connector ${connector.name}.`
+        : `Jira dispatch failed for ${approval.request_type}: ${result.failureReason ?? 'unknown failure'}`,
+      metadata: {
+        agentRunId: approval.agent_run_id,
+        writebackApprovalId: id,
+        connectorId: connector.id,
+        integrationRunId,
+        requestType: approval.request_type,
+        status: nextStatus,
+        dispatchPerformed: result.externalDispatchPerformed,
+        jiraIssueKey: result.jiraIssueKey ?? null,
+        jiraUrl: result.jiraUrl ?? null,
+      },
+    });
+
+    return json(
+      {
+        data: {
+          approvalId: id,
+          status: nextStatus,
+          connectorId: connector.id,
+          integrationRunId,
+          result: summary,
+        },
+      },
+      { status: result.status === 'dispatched' ? 200 : 502 },
+    );
+  }
+
+  if (resource === 'writebacks' && id && action === 'export' && ctx.request.method === 'GET') {
+    const adminAccess = await requireRootAdminAccess(ctx, 'Exporting writeback drafts requires tenant administrator access.');
+    if (adminAccess instanceof Response) return adminAccess;
+    const approval = await ctx.env.D1_MAIN.prepare(
+      `
+      SELECT id, tenant_id, folder_id, agent_run_id, connector_id, request_type, status, payload_json, evidence_refs_json,
+             requested_by_user_id, reviewed_by_user_id, justification, integration_run_id, created_at, updated_at
+      FROM assurance_writeback_approvals
+      WHERE id = ? AND tenant_id = ?
+      LIMIT 1
+      `,
+    )
+      .bind(id, adminAccess.tenantId)
+      .first<ApprovalRow>();
+    if (!approval) return json({ error: 'not_found', message: 'Writeback approval request not found.' }, { status: 404 });
+    return json({
+      data: {
+        approvalId: approval.id,
+        agentRunId: approval.agent_run_id,
+        requestType: approval.request_type,
+        status: approval.status,
+        dispatchPerformed: approval.status === 'dispatched',
+        integrationRunId: approval.integration_run_id,
+        payload: asJson<Record<string, unknown>>(approval.payload_json, {}),
+        evidenceRefs: asJson<string[]>(approval.evidence_refs_json, []),
+        exportedAt: nowIso(),
+      },
+    });
+  }
+
+  if (resource === 'writebacks' && id && (action === 'request-more-evidence' || action === 'duplicate') && ctx.request.method === 'POST') {
+    const adminAccess = await requireRootAdminAccess(ctx, 'Updating writeback draft review state requires tenant administrator access.');
+    if (adminAccess instanceof Response) return adminAccess;
+    const body = await readJson<ApprovalInput>(ctx.request);
+    const nextStatus = action === 'request-more-evidence' ? 'needs_more_evidence' : 'duplicate';
+    const title = action === 'request-more-evidence' ? 'Requested more evidence for writeback draft' : 'Marked writeback draft duplicate';
+    const approval = await ctx.env.D1_MAIN.prepare(
+      `
+      SELECT agent_run_id, folder_id, request_type, status
+      FROM assurance_writeback_approvals
+      WHERE id = ? AND tenant_id = ?
+      LIMIT 1
+      `,
+    )
+      .bind(id, adminAccess.tenantId)
+      .first<{ agent_run_id: string; folder_id: string | null; request_type: string; status: string }>();
+    if (!approval) return json({ error: 'not_found', message: 'Writeback approval request not found.' }, { status: 404 });
+    if (approval.status !== 'pending') {
+      return json({ error: 'invalid_state', message: 'Only pending writebacks can be updated.' }, { status: 409 });
+    }
+    const timestamp = nowIso();
+    await ctx.env.D1_MAIN.prepare(
+      `
+      UPDATE assurance_writeback_approvals
+      SET status = ?,
+          reviewed_by_user_id = ?,
+          justification = ?,
+          updated_at = ?
+      WHERE id = ? AND tenant_id = ?
+      `,
+    )
+      .bind(nextStatus, adminAccess.userId, body.justification?.trim() || title, timestamp, id, adminAccess.tenantId)
+      .run();
+    await beginWorkflowRun(ctx, adminAccess.tenantId, {
+      runId: crypto.randomUUID(),
+      runType: 'writeback_review',
+      module: 'Agent',
+      title,
+      status: 'Done',
+      folderId: approval.folder_id ?? null,
+      sourceRecordId: id,
+      route: `/assurance/agent-runs?runId=${encodeURIComponent(approval.agent_run_id)}&writebackId=${encodeURIComponent(id)}`,
+      detail: `${title}: ${approval.request_type}. No external dispatch was performed.`,
+      metadata: { agentRunId: approval.agent_run_id, writebackApprovalId: id, requestType: approval.request_type, status: nextStatus, dispatchPerformed: false },
+    });
+    return json({ data: { approvalId: id, status: nextStatus } });
   }
 
   if (resource === 'writebacks' && id && action === 'approve' && ctx.request.method === 'POST') {
@@ -1778,67 +2585,26 @@ export async function handleAgentRoutes(
       return json({ error: 'invalid_state', message: 'Only pending writebacks can be approved.' }, { status: 409 });
     }
 
-    const connectorId = approval.connector_id;
-    if (!connectorId) {
-      return json({ error: 'missing_connector', message: 'No connector is linked to this writeback.' }, { status: 409 });
-    }
-
-    const integrationRunId = crypto.randomUUID();
     const timestamp = nowIso();
-    const payload = asJson<Record<string, unknown>>(approval.payload_json, {});
-    await ctx.env.D1_MAIN.batch([
-      ctx.env.D1_MAIN.prepare(
-        `
-        INSERT INTO integration_connector_runs (
-          id, tenant_id, connector_id, action_type, status, summary_json, started_at, finished_at, triggered_by_user_id,
-          folder_id, run_family, input_mode, manifest_key, normalization_status, coverage_json, error_summary_json, source_schema_version
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `,
-      ).bind(
-        integrationRunId,
-        adminAccess.tenantId,
-        connectorId,
-        'writeback',
-        'completed',
-        JSON.stringify({
-          requestType: approval.request_type,
-          payload,
-          approvedBy: adminAccess.userId,
-          justification: body.justification?.trim() || 'Approved from assurance agent review queue.',
-        }),
-        timestamp,
-        timestamp,
+    await ctx.env.D1_MAIN.prepare(
+      `
+      UPDATE assurance_writeback_approvals
+      SET status = 'approved',
+          reviewed_by_user_id = ?,
+          justification = ?,
+          integration_run_id = NULL,
+          updated_at = ?
+      WHERE id = ? AND tenant_id = ?
+      `,
+    )
+      .bind(
         adminAccess.userId,
-        approval.folder_id ?? adminAccess.rootFolderId,
-        'connector_writeback',
-        'live',
-        null,
-        'ready',
-        JSON.stringify({
-          requestType: approval.request_type,
-        }),
-        '{}',
-        'v1',
-      ),
-      ctx.env.D1_MAIN.prepare(
-        `
-        UPDATE assurance_writeback_approvals
-        SET status = 'approved',
-            reviewed_by_user_id = ?,
-            justification = ?,
-            integration_run_id = ?,
-            updated_at = ?
-        WHERE id = ?
-        `,
-      ).bind(
-        adminAccess.userId,
-        body.justification?.trim() || 'Approved from assurance agent review queue.',
-        integrationRunId,
+        body.justification?.trim() || 'Approved as a draft-only Observable/Regovise review decision; no external dispatch performed.',
         timestamp,
         id,
-      ),
-    ]);
+        adminAccess.tenantId,
+      )
+      .run();
 
     const remainingPending = await ctx.env.D1_MAIN.prepare(
       `
@@ -1863,7 +2629,7 @@ export async function handleAgentRoutes(
       await patchWorkflowRun(ctx, adminAccess.tenantId, {
         runId: approval.agent_run_id,
         status: 'Done',
-        detail: 'All pending external writeback approvals were resolved.',
+        detail: 'All pending external writeback approvals were resolved without external dispatch.',
       });
     }
 
@@ -1871,24 +2637,25 @@ export async function handleAgentRoutes(
       runId: crypto.randomUUID(),
       runType: 'writeback_approval',
       module: 'Agent',
-      title: 'Approved external writeback',
+      title: 'Approved writeback draft',
       status: 'Done',
       folderId: approval.folder_id ?? null,
       sourceRecordId: id,
       route: `/assurance/agent-runs?runId=${encodeURIComponent(approval.agent_run_id)}&writebackId=${encodeURIComponent(id)}`,
-      detail: `Approved ${approval.request_type} writeback and dispatched integration run ${integrationRunId}.`,
+      detail: `Approved ${approval.request_type} writeback draft. No external connector, ticket, Slack, email, cloud, or GitHub dispatch was performed.`,
       metadata: {
         agentRunId: approval.agent_run_id,
         writebackApprovalId: id,
-        integrationRunId,
+        integrationRunId: null,
         requestType: approval.request_type,
+        dispatchPerformed: false,
       },
     });
 
     return json({
       data: {
         approvalId: id,
-        integrationRunId,
+        integrationRunId: null,
         status: 'approved',
       },
     });
