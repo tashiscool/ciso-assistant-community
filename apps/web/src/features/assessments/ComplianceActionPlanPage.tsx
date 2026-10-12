@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { ApiClient } from '../../shared/api/client';
 import { useEdgeIdentity } from '../../shared/session/identity';
 import type { AppliedControl, ComplianceAssessment } from './types';
@@ -18,6 +18,7 @@ function formatDate(value: string | null | undefined) {
 
 export function ComplianceActionPlanPage() {
   const { identity } = useEdgeIdentity();
+  const location = useLocation();
   const { assessmentId } = useParams<{ assessmentId: string }>();
   const [assessment, setAssessment] = useState<ComplianceAssessment | null>(null);
   const [controls, setControls] = useState<AppliedControl[]>([]);
@@ -65,17 +66,24 @@ export function ComplianceActionPlanPage() {
       acc[control.status] = (acc[control.status] ?? 0) + 1;
       return acc;
     }, {});
+    const byPriority = controls.reduce<Record<string, number>>((acc, control) => {
+      const key = control.priority ?? '--';
+      acc[key] = (acc[key] ?? 0) + 1;
+      return acc;
+    }, {});
 
     return {
       totalAnnualCost,
       openItems: (byStatus.to_do ?? 0) + (byStatus.in_progress ?? 0) + (byStatus.on_hold ?? 0),
       activeItems: byStatus.active ?? 0,
       pendingItems: byStatus['--'] ?? 0,
+      controlsCount: controls.length,
+      highPriorityItems: (byPriority.P1 ?? 0) + (byPriority.P2 ?? 0),
     };
   }, [controls]);
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading action plan workspace...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading action plan workspace...</div>;
   }
 
   if (!assessment) {
@@ -84,37 +92,51 @@ export function ComplianceActionPlanPage() {
 
   const backUrl = `/compliance-assessments/${assessment.id}/action-plan`;
   const backLabel = 'Action Plan';
+  const isBudgetOverview = location.pathname.endsWith('/budget-overview');
+  const actionPlanUrl = `/compliance-assessments/${assessment.id}/action-plan`;
+  const budgetOverviewUrl = `${actionPlanUrl}/budget-overview`;
+  const pageTitle = isBudgetOverview ? 'Budget Overview' : 'Action Plan';
 
   return (
     <div className="space-y-6">
       <section className="panel grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
-          <Link className="text-sm text-cyan-200 transition hover:text-cyan-100" to={`/compliance-assessments/${assessment.id}`}>
+          <Link className="text-sm text-[#6d28d9] transition hover:text-[#5f1aa8]" to={`/compliance-assessments/${assessment.id}`}>
             Back to compliance review
           </Link>
           <div className="eyebrow mt-4">Remediation</div>
-          <h1 className="mt-2 text-3xl font-semibold text-white">Action Plan</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-            Track the applied controls and remediation work generated from this compliance review.
+          <h1 className="mt-2 text-3xl font-semibold text-[#241232]">{pageTitle}</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f435c]">
+            {isBudgetOverview
+              ? 'Review the annual remediation budget, priority mix, and open work generated from this compliance review.'
+              : 'Track the applied controls and remediation work generated from this compliance review.'}
           </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Link className={isBudgetOverview ? 'button-secondary' : 'button-primary'} to={actionPlanUrl}>
+              Action plan
+            </Link>
+            <Link className={isBudgetOverview ? 'button-primary' : 'button-secondary'} to={budgetOverviewUrl}>
+              Budget overview
+            </Link>
+          </div>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div className="metric-card">
               <div className="metric-label">Assessment</div>
-              <div className="mt-3 text-sm font-semibold text-white">{assessment.name}</div>
+              <div className="mt-3 text-sm font-semibold text-[#241232]">{assessment.name}</div>
             </div>
             <div className="metric-card">
               <div className="metric-label">Framework</div>
-              <div className="mt-3 text-sm font-semibold text-white">{assessment.frameworkName}</div>
+              <div className="mt-3 text-sm font-semibold text-[#241232]">{assessment.frameworkName}</div>
             </div>
             <div className="metric-card">
               <div className="metric-label">Perimeter</div>
-              <div className="mt-3 text-sm font-semibold text-white">
+              <div className="mt-3 text-sm font-semibold text-[#241232]">
                 {assessment.perimeterName ?? assessment.folderName}
               </div>
             </div>
             <div className="metric-card">
-              <div className="metric-label">Version</div>
-              <div className="metric-value">{assessment.version}</div>
+              <div className="metric-label">{isBudgetOverview ? 'High priority' : 'Version'}</div>
+              <div className="metric-value">{isBudgetOverview ? summary.highPriorityItems : assessment.version}</div>
             </div>
           </div>
         </div>
@@ -144,8 +166,8 @@ export function ComplianceActionPlanPage() {
               <div className="metric-value">{summary.openItems}</div>
             </div>
             <div className="metric-card">
-              <div className="metric-label">Active controls</div>
-              <div className="metric-value">{summary.activeItems}</div>
+              <div className="metric-label">{isBudgetOverview ? 'Controls costed' : 'Active controls'}</div>
+              <div className="metric-value">{isBudgetOverview ? summary.controlsCount : summary.activeItems}</div>
             </div>
             <div className="metric-card">
               <div className="metric-label">Tracking only</div>
@@ -157,9 +179,20 @@ export function ComplianceActionPlanPage() {
 
       {error && <div className="notice-error">{error}</div>}
 
+      {isBudgetOverview && (
+        <section className="panel-subtle">
+          <div className="label">Budget lens</div>
+          <p className="mt-3 text-sm leading-6 text-[#4f435c]">
+            This view keeps the budget route distinct while preserving the full remediation table below. Costs are
+            derived from linked applied controls so budget discussions stay tied to accountable remediation work.
+          </p>
+        </section>
+      )}
+
       <section className="panel overflow-hidden p-0">
-        <table className="min-w-full text-left text-sm">
-          <thead className="border-b border-white/10 bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
+        <div className="overflow-x-auto">
+        <table className="min-w-[920px] text-left text-sm">
+          <thead className="border-b border-[#ded8e4] bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
             <tr>
               <th className="px-4 py-3">Applied control</th>
               <th className="px-4 py-3">Status</th>
@@ -170,44 +203,45 @@ export function ComplianceActionPlanPage() {
           </thead>
           <tbody>
             {controls.map((control) => (
-              <tr key={control.id} className="border-t border-white/5 align-top">
+              <tr key={control.id} className="border-t border-[#eeeaf2] align-top">
                 <td className="px-4 py-4">
-                  <div className="font-medium text-white">
+                  <div className="font-medium text-[#241232]">
                     {control.refId ? `${control.refId} ` : ''}
                     {control.name}
                   </div>
                   {control.description && (
-                    <div className="mt-2 text-sm leading-6 text-slate-400">{control.description}</div>
+                    <div className="mt-2 text-sm leading-6 text-[#6f6578]">{control.description}</div>
                   )}
                   {control.requirementAssessment && (
-                    <div className="mt-2 text-xs text-cyan-200">
+                    <div className="mt-2 text-xs text-[#6d28d9]">
                       Linked requirement: {control.requirementAssessment.ref} {control.requirementAssessment.name}
                     </div>
                   )}
                   {control.assessmentPlanItem && (
-                    <div className="mt-2 text-xs text-cyan-200">
+                    <div className="mt-2 text-xs text-[#6d28d9]">
                       Linked line of inquiry: {control.assessmentPlanItem.ref} {control.assessmentPlanItem.prompt}
                     </div>
                   )}
                 </td>
                 <td className="px-4 py-4">
-                  <div className="capitalize text-slate-300">{control.status.replace(/_/g, ' ')}</div>
-                  <div className="mt-1 text-xs text-slate-500">{control.priority ?? '--'}</div>
+                  <div className="capitalize text-[#4f435c]">{control.status.replace(/_/g, ' ')}</div>
+                  <div className="mt-1 text-xs text-[#62576a]">{control.priority ?? '--'}</div>
                 </td>
-                <td className="px-4 py-4 text-slate-300">{control.ownerName ?? 'Unassigned'}</td>
-                <td className="px-4 py-4 text-slate-300">{formatDate(control.eta)}</td>
-                <td className="px-4 py-4 text-slate-300">{formatCurrency(control.annualCost)}</td>
+                <td className="px-4 py-4 text-[#4f435c]">{control.ownerName ?? 'Unassigned'}</td>
+                <td className="px-4 py-4 text-[#4f435c]">{formatDate(control.eta)}</td>
+                <td className="px-4 py-4 text-[#4f435c]">{formatCurrency(control.annualCost)}</td>
               </tr>
             ))}
             {controls.length === 0 && (
               <tr>
-                <td className="px-4 py-8 text-center text-slate-400" colSpan={5}>
+                <td className="px-4 py-8 text-center text-[#6f6578]" colSpan={5}>
                   No applied controls are linked to this compliance review yet.
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+        </div>
       </section>
     </div>
   );

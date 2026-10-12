@@ -101,6 +101,7 @@ const LEGACY_ROUTE_CONFIG: Record<string, LegacyRouteConfig> = {
   'ro-to': { resolvePath: () => '/advanced-risk/ebios' },
   'scoring-assistant': { resolvePath: () => '/chat' },
   search: { resolvePath: () => '/search' },
+  'security-profiles': { resolvePath: () => '/security-profiles' },
   'security-exceptions': { resolvePath: () => '/security-exceptions' },
   settings: { resolvePath: () => '/settings' },
   'setup-mfa': { resolvePath: () => '/setup/security' },

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Copy, KeyRound, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
+import { RegModal } from '../../components/regovise/PagePrimitives';
 import {
   createSetupServiceAccount,
   deleteSetupServiceAccount,
@@ -23,6 +24,9 @@ export function ServiceAccountsPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [pendingCreateOpen, setPendingCreateOpen] = useState(false);
+  const [pendingRotate, setPendingRotate] = useState<SetupServiceAccountRecord | null>(null);
+  const [pendingDeactivate, setPendingDeactivate] = useState<SetupServiceAccountRecord | null>(null);
 
   async function load() {
     try {
@@ -49,6 +53,7 @@ export function ServiceAccountsPage() {
       setSnapshot(next);
       setRevealedToken(next.newlyIssuedToken?.tokenValue ?? null);
       setDraft(defaultDraft);
+      setPendingCreateOpen(false);
       setNotice('Service account issued from the canonical setup service. Copy the token now; it is shown once.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to create service account.');
@@ -67,6 +72,7 @@ export function ServiceAccountsPage() {
       });
       setSnapshot(next);
       setRevealedToken(next.newlyIssuedToken?.tokenValue ?? null);
+      setPendingRotate(null);
       setNotice(`Service account ${account.tokenPrefix} rotated successfully.`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to rotate service account.');
@@ -82,6 +88,7 @@ export function ServiceAccountsPage() {
       setNotice(null);
       setSnapshot(await deleteSetupServiceAccount(accountId));
       setNotice('Service account deactivated.');
+      setPendingDeactivate(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to deactivate service account.');
     } finally {
@@ -99,7 +106,7 @@ export function ServiceAccountsPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading service account setup...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading service account setup...</div>;
   }
 
   if (error && !snapshot) {
@@ -111,8 +118,8 @@ export function ServiceAccountsPage() {
       <section className="panel grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
           <div className="eyebrow">Setup</div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Service Accounts</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">Service Accounts</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
             Issue and rotate scoped automation credentials for imports, exports, orchestration, and tenant-safe
             machine access.
           </p>
@@ -145,8 +152,8 @@ export function ServiceAccountsPage() {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <div className="eyebrow">One-Time Secret</div>
-              <div className="mt-2 font-mono text-sm text-white break-all">{revealedToken}</div>
-              <div className="mt-2 text-xs text-slate-400">Copy this token now. Only the prefix is stored after issuance.</div>
+              <div className="mt-2 font-mono text-sm text-[#241232] break-all">{revealedToken}</div>
+              <div className="mt-2 text-xs text-[#6f6578]">Copy this token now. Only the prefix is stored after issuance.</div>
             </div>
             <button className="button-primary" onClick={() => void copyToken()} type="button">
               <Copy className="mr-2 h-4 w-4" />
@@ -203,7 +210,7 @@ export function ServiceAccountsPage() {
                 />
               </label>
             </div>
-            <button className="button-primary" disabled={saving} onClick={() => void handleCreate()} type="button">
+            <button className="button-primary" disabled={saving} onClick={() => setPendingCreateOpen(true)} type="button">
               <KeyRound className="mr-2 h-4 w-4" />
               {saving ? 'Issuing...' : 'Issue token'}
             </button>
@@ -211,30 +218,30 @@ export function ServiceAccountsPage() {
         </div>
 
         <section className="panel overflow-hidden p-0">
-          <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+          <div className="flex items-center justify-between border-b border-[#ded8e4] px-6 py-4">
             <div>
               <div className="eyebrow">Token Inventory</div>
-              <p className="mt-1 text-sm text-slate-400">Stored prefixes, runtime scope, and lifecycle posture for automation credentials.</p>
+              <p className="mt-1 text-sm text-[#6f6578]">Stored prefixes, runtime scope, and lifecycle posture for automation credentials.</p>
             </div>
-            <ShieldCheck className="h-5 w-5 text-cyan-300" />
+            <ShieldCheck className="h-5 w-5 text-[#7a3ccf]" />
           </div>
-          <div className="divide-y divide-white/6">
+          <div className="divide-y divide-[#ded8e4]">
             {snapshot?.accounts.map((account) => (
               <div className="flex flex-col gap-3 px-6 py-4" key={account.id}>
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <div className="font-medium text-white">{account.tokenPrefix}</div>
-                      <span className={account.isActive ? 'badge-positive' : 'badge-neutral'}>
+                      <div className="font-medium text-[#241232]">{account.tokenPrefix}</div>
+                      <span className={account.isActive ? 'status-pill-positive' : 'status-pill-neutral'}>
                         {account.isActive ? 'Active' : 'Inactive'}
                       </span>
-                      <span className="badge-neutral">{account.role}</span>
+                      <span className="status-pill-neutral">{account.role}</span>
                     </div>
-                    <div className="mt-2 text-sm text-slate-300">{account.purpose}</div>
-                    <div className="mt-2 text-xs text-slate-500">
+                    <div className="mt-2 text-sm text-[#4f435c]">{account.purpose}</div>
+                    <div className="mt-2 text-xs text-[#62576a]">
                       Runtime {account.runtime} · Scopes {account.scopes}
                     </div>
-                    <div className="mt-2 text-xs text-slate-500">
+                    <div className="mt-2 text-xs text-[#62576a]">
                       Expires {new Date(account.expirationDate).toLocaleDateString()} · Last rotated{' '}
                       {new Date(account.lastRotatedAt).toLocaleString()}
                       {account.lastUsedAt ? ` · Last used ${new Date(account.lastUsedAt).toLocaleString()}` : ''}
@@ -244,7 +251,7 @@ export function ServiceAccountsPage() {
                     <button
                       className="button-secondary"
                       disabled={busyId === account.id}
-                      onClick={() => void handleRotate(account)}
+                      onClick={() => setPendingRotate(account)}
                       type="button"
                     >
                       <RefreshCw className="mr-2 h-4 w-4" />
@@ -253,7 +260,7 @@ export function ServiceAccountsPage() {
                     <button
                       className="button-secondary"
                       disabled={busyId === account.id}
-                      onClick={() => void handleDelete(account.id)}
+                      onClick={() => setPendingDeactivate(account)}
                       type="button"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
@@ -266,6 +273,144 @@ export function ServiceAccountsPage() {
           </div>
         </section>
       </section>
+
+      <RegModal
+        description="Issue a new machine credential for this workspace. The token will only be shown once."
+        footer={
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button className="button-secondary" disabled={saving} onClick={() => setPendingCreateOpen(false)} type="button">
+              Cancel
+            </button>
+            <button className="button-primary" disabled={saving} onClick={() => void handleCreate()} type="button">
+              {saving ? 'Issuing...' : 'Issue token'}
+            </button>
+          </div>
+        }
+        onOpenChange={(open) => {
+          if (!open && !saving) {
+            setPendingCreateOpen(false);
+          }
+        }}
+        open={pendingCreateOpen}
+        title="Issue service account token"
+      >
+        <div className="space-y-4 text-sm text-[#4f435c]">
+          <div className="notice-warning">
+            Copy the token after issuance. Regovise stores only the prefix and cannot display the secret again.
+          </div>
+          <dl className="grid gap-3 sm:grid-cols-2">
+            <div className="panel-subtle">
+              <dt className="label">Role</dt>
+              <dd className="mt-2 text-[#241232]">{draft.role}</dd>
+            </div>
+            <div className="panel-subtle">
+              <dt className="label">Duration</dt>
+              <dd className="mt-2 text-[#241232]">{draft.durationDays} days</dd>
+            </div>
+            <div className="panel-subtle sm:col-span-2">
+              <dt className="label">Purpose</dt>
+              <dd className="mt-2 text-[#4f435c]">{draft.purpose || 'No purpose supplied'}</dd>
+            </div>
+          </dl>
+        </div>
+      </RegModal>
+
+      <RegModal
+        description="Rotate this credential and issue a replacement token with the same service-account posture."
+        footer={
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button className="button-secondary" disabled={Boolean(busyId)} onClick={() => setPendingRotate(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-primary"
+              disabled={!pendingRotate || busyId === pendingRotate.id}
+              onClick={() => pendingRotate && void handleRotate(pendingRotate)}
+              type="button"
+            >
+              {pendingRotate && busyId === pendingRotate.id ? 'Rotating...' : 'Rotate token'}
+            </button>
+          </div>
+        }
+        onOpenChange={(open) => {
+          if (!open && !busyId) {
+            setPendingRotate(null);
+          }
+        }}
+        open={Boolean(pendingRotate)}
+        title="Rotate service account"
+      >
+        {pendingRotate ? (
+          <div className="space-y-4 text-sm text-[#4f435c]">
+            <div className="notice-warning">
+              Jobs using the old secret must be updated with the newly issued token after rotation.
+            </div>
+            <dl className="grid gap-3 sm:grid-cols-2">
+              <div className="panel-subtle">
+                <dt className="label">Token prefix</dt>
+                <dd className="mt-2 font-mono text-[#241232]">{pendingRotate.tokenPrefix}</dd>
+              </div>
+              <div className="panel-subtle">
+                <dt className="label">Role</dt>
+                <dd className="mt-2 text-[#241232]">{pendingRotate.role}</dd>
+              </div>
+              <div className="panel-subtle sm:col-span-2">
+                <dt className="label">Purpose</dt>
+                <dd className="mt-2 text-[#4f435c]">{pendingRotate.purpose}</dd>
+              </div>
+            </dl>
+          </div>
+        ) : null}
+      </RegModal>
+
+      <RegModal
+        description="Deactivate this automation credential before it can be used for imports, exports, or tenant operations."
+        footer={
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button className="button-secondary" onClick={() => setPendingDeactivate(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-primary"
+              disabled={!pendingDeactivate || busyId === pendingDeactivate.id}
+              onClick={() => pendingDeactivate && void handleDelete(pendingDeactivate.id)}
+              type="button"
+            >
+              {pendingDeactivate && busyId === pendingDeactivate.id ? 'Deactivating...' : 'Deactivate token'}
+            </button>
+          </div>
+        }
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingDeactivate(null);
+          }
+        }}
+        open={Boolean(pendingDeactivate)}
+        title="Deactivate service account"
+      >
+        {pendingDeactivate ? (
+          <div className="space-y-4">
+            <div className="rounded-lg border border-[#f2b7bf] bg-[#ffe2e5] px-4 py-3 text-sm text-[#9d1f2c]">
+              This action disables the token immediately. Existing jobs that use this prefix will fail until
+              they are updated with a new credential.
+            </div>
+            <dl className="grid gap-3 text-sm sm:grid-cols-2">
+              <div className="panel-subtle">
+                <dt className="label">Token prefix</dt>
+                <dd className="mt-2 font-mono text-[#241232]">{pendingDeactivate.tokenPrefix}</dd>
+              </div>
+              <div className="panel-subtle">
+                <dt className="label">Role</dt>
+                <dd className="mt-2 text-[#241232]">{pendingDeactivate.role}</dd>
+              </div>
+              <div className="panel-subtle sm:col-span-2">
+                <dt className="label">Purpose</dt>
+                <dd className="mt-2 text-[#4f435c]">{pendingDeactivate.purpose}</dd>
+              </div>
+            </dl>
+          </div>
+        ) : null}
+      </RegModal>
     </div>
   );
 }

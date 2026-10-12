@@ -63,8 +63,8 @@ export function MePage() {
     <div className="space-y-6">
       <section className="panel">
         <div className="eyebrow">Workspace</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">My Access</h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">My Access</h1>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f435c]">
           Review the identity, role sources, and domain perimeter active for this session.
         </p>
       </section>
@@ -108,15 +108,15 @@ export function MePage() {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="metric-card">
           <div className="metric-label">Identity</div>
-          <div className="mt-3 text-lg font-semibold text-white">
+          <div className="mt-3 text-lg font-semibold text-[#241232]">
             {me?.profile?.displayName ?? identity.userId}
           </div>
-          <div className="mt-2 text-xs text-cyan-200">{me?.profile?.email ?? 'No profile found'}</div>
+          <div className="mt-2 text-xs text-[#6d28d9]">{me?.profile?.email ?? 'No profile found'}</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Session</div>
           <div className="metric-value">{me?.isAuthenticated ? 'active' : 'inactive'}</div>
-          <div className="mt-2 text-xs text-slate-500">This workspace session is currently secured and available for use.</div>
+          <div className="mt-2 text-xs text-[#62576a]">This workspace session is currently secured and available for use.</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Permissions</div>
@@ -136,17 +136,17 @@ export function MePage() {
               <div className="panel-subtle" key={`${role.roleId}:${role.scopeFolderId}:${role.source}`}>
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <div className="font-medium text-white">{role.roleName}</div>
-                    <div className="mt-1 text-xs text-cyan-200">{role.scopePathLabel}</div>
+                    <div className="font-medium text-[#241232]">{role.roleName}</div>
+                    <div className="mt-1 text-xs text-[#6d28d9]">{role.scopePathLabel}</div>
                   </div>
-                  <span className="badge-neutral">{role.source === 'direct' ? 'Direct' : 'Via group'}</span>
+                  <span className="status-pill-neutral">{role.source === 'direct' ? 'Direct' : 'Via group'}</span>
                 </div>
                 {role.viaGroupName && (
-                  <div className="mt-3 text-sm text-slate-300">Inherited from {role.viaGroupName}</div>
+                  <div className="mt-3 text-sm text-[#4f435c]">Inherited from {role.viaGroupName}</div>
                 )}
                 <div className="mt-3 flex flex-wrap gap-2">
                   {role.permissions.map((permission) => (
-                    <span className="badge-neutral" key={permission}>
+                    <span className="status-pill-neutral" key={permission}>
                       {permission}
                     </span>
                   ))}
@@ -154,7 +154,7 @@ export function MePage() {
               </div>
             ))}
             {(me?.effectiveRoles.length ?? 0) === 0 && (
-              <div className="text-sm text-slate-400">No effective roles found for this identity.</div>
+              <div className="text-sm text-[#6f6578]">No effective roles found for this identity.</div>
             )}
           </div>
         </section>
@@ -164,12 +164,12 @@ export function MePage() {
             <div className="eyebrow">Groups</div>
             <div className="mt-4 flex flex-wrap gap-2">
               {me?.userGroups.map((group) => (
-                <span className="badge-neutral" key={group.id}>
+                <span className="status-pill-neutral" key={group.id}>
                   {group.name}
                 </span>
               ))}
               {(me?.userGroups.length ?? 0) === 0 && (
-                <div className="text-sm text-slate-500">This identity is not in any groups.</div>
+                <div className="text-sm text-[#62576a]">This identity is not in any groups.</div>
               )}
             </div>
           </section>
@@ -179,11 +179,11 @@ export function MePage() {
             <div className="mt-4 space-y-3">
               {me?.accessibleDomains.map((domain) => (
                 <div className="panel-subtle" key={domain.id}>
-                  <div className="font-medium text-white">{domain.name}</div>
-                  <div className="mt-1 text-xs text-cyan-200">{domain.pathLabel}</div>
+                  <div className="font-medium text-[#241232]">{domain.name}</div>
+                  <div className="mt-1 text-xs text-[#6d28d9]">{domain.pathLabel}</div>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {(me.domainPermissions[domain.id] ?? []).map((permission) => (
-                      <span className="badge-neutral" key={`${domain.id}:${permission}`}>
+                      <span className="status-pill-neutral" key={`${domain.id}:${permission}`}>
                         {permission}
                       </span>
                     ))}
@@ -191,7 +191,7 @@ export function MePage() {
                 </div>
               ))}
               {(me?.accessibleDomains.length ?? 0) === 0 && (
-                <div className="text-sm text-slate-400">No workspace domains are available yet.</div>
+                <div className="text-sm text-[#6f6578]">No workspace domains are available yet.</div>
               )}
             </div>
           </section>
@@ -202,31 +202,31 @@ export function MePage() {
               <div className="mt-4 space-y-4">
                 <div className="grid gap-3 sm:grid-cols-3">
                   <div className="panel-subtle">
-                    <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Password</div>
-                    <div className="mt-2 text-sm font-medium text-white">
+                    <div className="text-xs uppercase tracking-[0.18em] text-[#62576a]">Password</div>
+                    <div className="mt-2 text-sm font-medium text-[#241232]">
                       {me.profile.localPasswordConfigured ? 'Configured' : 'Not configured'}
                     </div>
                   </div>
                   <div className="panel-subtle">
-                    <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Reset posture</div>
-                    <div className="mt-2 text-sm font-medium text-white">
+                    <div className="text-xs uppercase tracking-[0.18em] text-[#62576a]">Reset posture</div>
+                    <div className="mt-2 text-sm font-medium text-[#241232]">
                       {me.profile.localPasswordResetRequired ? 'Reset required' : 'Healthy'}
                     </div>
                   </div>
                   <div className="panel-subtle">
-                    <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Lock state</div>
-                    <div className="mt-2 text-sm font-medium text-white">
+                    <div className="text-xs uppercase tracking-[0.18em] text-[#62576a]">Lock state</div>
+                    <div className="mt-2 text-sm font-medium text-[#241232]">
                       {me.profile.localPasswordLockedUntil ? 'Temporarily locked' : 'Ready'}
                     </div>
                     {me.profile.localPasswordLockedUntil && (
-                      <div className="mt-2 text-xs text-slate-400">
+                      <div className="mt-2 text-xs text-[#6f6578]">
                         Until {me.profile.localPasswordLockedUntil}
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="text-sm leading-6 text-slate-300">
+                <div className="text-sm leading-6 text-[#4f435c]">
                   {me.profile.localPasswordConfigured
                     ? 'Rotate the local password used for direct Regovise sign-in. The current password is required before a new one can be saved.'
                     : 'No local password is configured yet for this identity. Set one now to enable direct Regovise sign-in without administrator recovery.'}
@@ -264,7 +264,7 @@ export function MePage() {
                       />
                     </label>
                   </div>
-                  <div className="text-xs text-slate-500">
+                  <div className="text-xs text-[#62576a]">
                     Use at least 12 characters with upper, lower, number, and symbol characters.
                   </div>
                   <button className="button-primary" disabled={passwordBusy} type="submit">
@@ -277,7 +277,7 @@ export function MePage() {
                 </form>
               </div>
             ) : (
-              <div className="mt-4 text-sm leading-6 text-slate-400">
+              <div className="mt-4 text-sm leading-6 text-[#6f6578]">
                 This identity is currently configured for SSO-managed access only. Enable local login
                 in workspace administration before setting a direct sign-in password.
               </div>

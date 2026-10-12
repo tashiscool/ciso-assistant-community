@@ -41,7 +41,7 @@ export function QuantitativeExecutiveSummaryPage() {
   }, [identity.tenantId, identity.userId, studyId]);
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading executive summary...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading executive summary...</div>;
   }
 
   if (!study) {
@@ -51,20 +51,20 @@ export function QuantitativeExecutiveSummaryPage() {
   return (
     <div className="space-y-6">
       <section className="panel">
-        <Link className="text-sm text-cyan-200 transition hover:text-cyan-100" to={`/advanced-risk/quantitative/${study.id}`}>
+        <Link className="text-sm text-[#6d28d9] transition hover:text-[#5f1aa8]" to={`/advanced-risk/quantitative/${study.id}`}>
           Back to quantitative study
         </Link>
         <div className="eyebrow mt-4">Executive Summary</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">{study.name}</h1>
-        <p className="mt-4 max-w-4xl text-base leading-8 text-slate-200">{narrative}</p>
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">{study.name}</h1>
+        <p className="mt-4 max-w-4xl text-base leading-8 text-[#38254a]">{narrative}</p>
       </section>
 
       {error && <div className="notice-error">{error}</div>}
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-3">
         <div className="metric-card">
           <div className="metric-label">Risk register</div>
-          <div className="mt-3 text-sm font-semibold text-white">{study.riskRegisterName ?? 'n/a'}</div>
+          <div className="mt-3 text-sm font-semibold text-[#241232]">{study.riskRegisterName ?? 'n/a'}</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Scenarios</div>
@@ -72,7 +72,7 @@ export function QuantitativeExecutiveSummaryPage() {
         </div>
         <div className="metric-card">
           <div className="metric-label">Threshold</div>
-          <div className="mt-3 text-sm font-semibold text-white">{study.lossThreshold ?? 'n/a'}</div>
+          <div className="mt-3 text-sm font-semibold text-[#241232]">{study.lossThreshold ?? 'n/a'}</div>
         </div>
       </section>
     </div>

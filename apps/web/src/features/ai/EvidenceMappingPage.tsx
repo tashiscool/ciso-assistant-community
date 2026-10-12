@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CheckCircle2, Link2, Search, Sparkles, Trash2 } from 'lucide-react';
+import { RegModal } from '../../components/regovise/PagePrimitives';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { useEdgeIdentity } from '../../shared/session/identity';
 import {
@@ -11,14 +12,16 @@ import {
 } from './api';
 import type { EvidenceMappingDetail, EvidenceMappingTarget, EvidenceMappingType, EvidenceMappingWorkspace } from './types';
 
+type EvidenceMappingRecord = EvidenceMappingDetail['mappings'][number];
+
 function formatDate(value: string) {
   return new Date(value).toLocaleString();
 }
 
 function badgeClass(status: string) {
-  if (status === 'Ready' || status === 'Met') return 'badge-success';
-  if (status === 'Missing') return 'badge-danger';
-  return 'badge-neutral';
+  if (status === 'Ready' || status === 'Met') return 'status-pill-success';
+  if (status === 'Missing') return 'status-pill-danger';
+  return 'status-pill-neutral';
 }
 
 export function EvidenceMappingPage() {
@@ -37,6 +40,7 @@ export function EvidenceMappingPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [pendingMappingDelete, setPendingMappingDelete] = useState<EvidenceMappingRecord | null>(null);
 
   async function loadWorkspace() {
     try {
@@ -150,6 +154,7 @@ export function EvidenceMappingPage() {
       const next = await deleteEvidenceMapping(detail.artifact.id, mappingId);
       setDetail(next);
       await loadWorkspace();
+      setPendingMappingDelete(null);
       setNotice('Mapping removed.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete mapping.');
@@ -177,7 +182,7 @@ export function EvidenceMappingPage() {
   }
 
   if (loading || !workspace) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading Evidence Mapping...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading Evidence Mapping...</div>;
   }
 
   return (
@@ -185,13 +190,13 @@ export function EvidenceMappingPage() {
       <section className="panel grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <div>
           <div className="eyebrow">Evidence Mapping</div>
-          <h1 className="mt-2 text-3xl font-semibold text-white">Link evidence documents to controls, plans, and components</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Link evidence documents to controls, plans, and components</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
             Open an evidence record, review existing mappings, add new relationships by target type, and apply recommendation-driven mappings from the canonical Cloudflare data plane.
           </p>
         </div>
         <div className="panel-subtle space-y-3">
-          <div className="text-xs uppercase tracking-[0.22em] text-slate-500">Prerequisites</div>
+          <div className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Prerequisites</div>
           {([
             ['Evidence module enabled', workspace.readiness.evidenceModuleEnabled],
             ['Mapping permissions available', workspace.readiness.canMapEvidence],
@@ -202,9 +207,9 @@ export function EvidenceMappingPage() {
             ['Components available', workspace.readiness.targetComponents > 0],
             ['Controls available', workspace.readiness.targetControls > 0],
           ] as Array<[string, boolean]>).map(([label, ready]) => (
-            <div key={label} className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2 text-sm">
-              <span className="text-slate-300">{label}</span>
-              <span className={ready ? 'badge-success' : 'badge-danger'}>{ready ? 'Ready' : 'Missing'}</span>
+            <div key={label} className="flex items-center justify-between rounded-2xl border border-[#ded8e4] bg-white px-3 py-2 text-sm">
+              <span className="text-[#4f435c]">{label}</span>
+              <span className={ready ? 'status-pill-success' : 'status-pill-danger'}>{ready ? 'Ready' : 'Missing'}</span>
             </div>
           ))}
         </div>
@@ -216,9 +221,9 @@ export function EvidenceMappingPage() {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {metrics.map((metric) => (
           <article key={metric.label} className="panel-subtle">
-            <div className="text-xs uppercase tracking-[0.22em] text-slate-500">{metric.label}</div>
-            <div className="mt-3 text-3xl font-semibold text-white">{metric.value}</div>
-            <div className="mt-2 text-sm text-slate-400">{metric.detail}</div>
+            <div className="text-xs uppercase tracking-[0.22em] text-[#62576a]">{metric.label}</div>
+            <div className="mt-3 text-3xl font-semibold text-[#241232]">{metric.value}</div>
+            <div className="mt-2 text-sm text-[#6f6578]">{metric.detail}</div>
           </article>
         ))}
       </section>
@@ -227,24 +232,24 @@ export function EvidenceMappingPage() {
         <section className="panel space-y-4">
           <div>
             <div className="eyebrow">Evidence Records</div>
-            <div className="mt-2 text-lg font-semibold text-white">Current Mapping Context</div>
+            <div className="mt-2 text-lg font-semibold text-[#241232]">Current Mapping Context</div>
           </div>
           <div className="space-y-3">
             {workspace.records.map((record) => (
               <button
                 key={record.id}
-                className={`panel-subtle w-full text-left ${selectedArtifactId === record.id ? 'border-cyan-300/40 bg-cyan-400/[0.06]' : ''}`}
+                className={`panel-subtle w-full text-left ${selectedArtifactId === record.id ? 'border-[#c7a9ed] bg-[#f2e8ff]' : ''}`}
                 onClick={() => setSelectedArtifactId(record.id)}
                 type="button"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="text-sm font-semibold text-white">{record.title}</div>
-                    <div className="mt-1 text-xs text-slate-500">{record.sourceName}</div>
+                    <div className="text-sm font-semibold text-[#241232]">{record.title}</div>
+                    <div className="mt-1 text-xs text-[#62576a]">{record.sourceName}</div>
                   </div>
                   <span className={badgeClass(record.status)}>{record.status}</span>
                 </div>
-                <div className="mt-3 grid gap-2 text-xs text-slate-400">
+                <div className="mt-3 grid gap-2 text-xs text-[#6f6578]">
                   <div>{record.mappingCount} current mapping(s)</div>
                   <div>{record.recommendationCount} recommendation run(s)</div>
                   <div>{formatDate(record.uploadedAt)}</div>
@@ -252,7 +257,7 @@ export function EvidenceMappingPage() {
               </button>
             ))}
             {workspace.records.length === 0 && (
-              <div className="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-slate-400">
+              <div className="rounded-2xl border border-dashed border-[#ded8e4] px-4 py-8 text-center text-sm text-[#6f6578]">
                 No evidence artifacts are available for mapping yet.
               </div>
             )}
@@ -260,14 +265,14 @@ export function EvidenceMappingPage() {
         </section>
 
         <section className="panel space-y-4">
-          {detailLoading && <div className="text-sm text-slate-400">Loading mapping detail...</div>}
+          {detailLoading && <div className="text-sm text-[#6f6578]">Loading mapping detail...</div>}
           {!detailLoading && detail ? (
             <>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <div className="eyebrow">Mappings</div>
-                  <div className="mt-2 text-2xl font-semibold text-white">{detail.artifact.title}</div>
-                  <div className="mt-2 text-sm text-slate-300">
+                  <div className="mt-2 text-2xl font-semibold text-[#241232]">{detail.artifact.title}</div>
+                  <div className="mt-2 text-sm text-[#4f435c]">
                     {detail.artifact.sourceName} · {detail.artifact.objectKey}
                   </div>
                 </div>
@@ -281,9 +286,9 @@ export function EvidenceMappingPage() {
                 </TabsList>
 
                 <TabsContent value="current" className="mt-6 space-y-4">
-                  <div className="overflow-hidden rounded-2xl border border-white/10">
+                  <div className="overflow-hidden rounded-2xl border border-[#ded8e4]">
                     <table className="min-w-full text-left text-sm">
-                      <thead className="bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
+                      <thead className="bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
                         <tr>
                           <th className="px-4 py-3">Mapping ID</th>
                           <th className="px-4 py-3">Mapped ID</th>
@@ -295,14 +300,14 @@ export function EvidenceMappingPage() {
                       </thead>
                       <tbody>
                         {detail.mappings.map((mapping) => (
-                          <tr key={mapping.id} className="border-t border-white/5">
-                            <td className="px-4 py-3 text-slate-300">{mapping.id}</td>
-                            <td className="px-4 py-3 font-medium text-white">{mapping.mappedId}</td>
-                            <td className="px-4 py-3 text-slate-400">{mapping.mappingType}</td>
-                            <td className="px-4 py-3 text-slate-300">{mapping.mappingTitle}</td>
-                            <td className="px-4 py-3 text-slate-400">{mapping.parentLabel ?? '—'}</td>
+                          <tr key={mapping.id} className="border-t border-[#eeeaf2]">
+                            <td className="px-4 py-3 text-[#4f435c]">{mapping.id}</td>
+                            <td className="px-4 py-3 font-medium text-[#241232]">{mapping.mappedId}</td>
+                            <td className="px-4 py-3 text-[#6f6578]">{mapping.mappingType}</td>
+                            <td className="px-4 py-3 text-[#4f435c]">{mapping.mappingTitle}</td>
+                            <td className="px-4 py-3 text-[#6f6578]">{mapping.parentLabel ?? '—'}</td>
                             <td className="px-4 py-3">
-                              <button className="button-secondary text-rose-200" onClick={() => void handleDeleteMapping(mapping.id)}>
+                              <button className="button-secondary text-[#9d1f2c]" onClick={() => setPendingMappingDelete(mapping)}>
                                 <Trash2 className="h-4 w-4" />
                                 Remove
                               </button>
@@ -311,7 +316,7 @@ export function EvidenceMappingPage() {
                         ))}
                         {detail.mappings.length === 0 && (
                           <tr>
-                            <td className="px-4 py-8 text-center text-slate-400" colSpan={6}>
+                            <td className="px-4 py-8 text-center text-[#6f6578]" colSpan={6}>
                               No mappings exist for this evidence record yet.
                             </td>
                           </tr>
@@ -325,7 +330,7 @@ export function EvidenceMappingPage() {
                   <div className="grid gap-4 md:grid-cols-[0.32fr_0.68fr]">
                     <div className="space-y-3">
                       <label className="block space-y-2">
-                        <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Mapping Type</span>
+                        <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Mapping Type</span>
                         <select className="input" value={mappingType} onChange={(event) => setMappingType(event.target.value as EvidenceMappingType)}>
                           <option value="Security Plan">Security Plans</option>
                           <option value="Component">Components</option>
@@ -333,9 +338,9 @@ export function EvidenceMappingPage() {
                         </select>
                       </label>
                       <label className="block space-y-2">
-                        <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Search targets</span>
+                        <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Search targets</span>
                         <div className="relative">
-                          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#62576a]" />
                           <input className="input pl-10" value={targetSearch} onChange={(event) => setTargetSearch(event.target.value)} placeholder="Search plans, components, or controls" />
                         </div>
                       </label>
@@ -345,9 +350,9 @@ export function EvidenceMappingPage() {
                       </button>
                     </div>
 
-                    <div className="overflow-hidden rounded-2xl border border-white/10">
+                    <div className="overflow-hidden rounded-2xl border border-[#ded8e4]">
                       <table className="min-w-full text-left text-sm">
-                        <thead className="bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
+                        <thead className="bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
                           <tr>
                             <th className="px-4 py-3">Select</th>
                             <th className="px-4 py-3">Title</th>
@@ -361,7 +366,7 @@ export function EvidenceMappingPage() {
                               (mapping) => mapping.mappingType === target.mappingType && mapping.mappedId === target.id,
                             );
                             return (
-                              <tr key={target.id} className="border-t border-white/5">
+                              <tr key={target.id} className="border-t border-[#eeeaf2]">
                                 <td className="px-4 py-3">
                                   <input
                                     checked={selectedTargetIds.includes(target.id)}
@@ -374,18 +379,18 @@ export function EvidenceMappingPage() {
                                     type="checkbox"
                                   />
                                 </td>
-                                <td className="px-4 py-3 font-medium text-white">
+                                <td className="px-4 py-3 font-medium text-[#241232]">
                                   {target.title}
-                                  {alreadyMapped && <div className="mt-1 text-xs text-cyan-300">Already mapped</div>}
+                                  {alreadyMapped && <div className="mt-1 text-xs text-[#7a3ccf]">Already mapped</div>}
                                 </td>
-                                <td className="px-4 py-3 text-slate-400">{target.parentLabel}</td>
-                                <td className="px-4 py-3 text-slate-300">{target.description}</td>
+                                <td className="px-4 py-3 text-[#6f6578]">{target.parentLabel}</td>
+                                <td className="px-4 py-3 text-[#4f435c]">{target.description}</td>
                               </tr>
                             );
                           })}
                           {currentTargets.length === 0 && (
                             <tr>
-                              <td className="px-4 py-8 text-center text-slate-400" colSpan={4}>
+                              <td className="px-4 py-8 text-center text-[#6f6578]" colSpan={4}>
                                 No mapping targets matched the current selection.
                               </td>
                             </tr>
@@ -400,10 +405,10 @@ export function EvidenceMappingPage() {
                   <div className="grid gap-4 md:grid-cols-[0.32fr_0.68fr]">
                     <div className="space-y-4">
                       <div className="panel-subtle">
-                        <div className="text-sm font-medium text-white">Recommendation Controls</div>
-                        <div className="mt-3 text-sm text-slate-300">Relevance threshold: {threshold}</div>
+                        <div className="text-sm font-medium text-[#241232]">Recommendation Controls</div>
+                        <div className="mt-3 text-sm text-[#4f435c]">Relevance threshold: {threshold}</div>
                         <input
-                          className="mt-3 w-full accent-cyan-300"
+                          className="mt-3 w-full accent-[#8b35e6]"
                           max={100}
                           min={0}
                           onChange={(event) => setThreshold(Number(event.target.value))}
@@ -415,7 +420,7 @@ export function EvidenceMappingPage() {
                           Generate Recommendations
                         </button>
                         {detail.recommendations && (
-                          <div className="mt-4 text-xs text-slate-500">
+                          <div className="mt-4 text-xs text-[#62576a]">
                             Last run {formatDate(detail.recommendations.createdAt)} · threshold {detail.recommendations.threshold}
                           </div>
                         )}
@@ -441,9 +446,9 @@ export function EvidenceMappingPage() {
                       </button>
                     </div>
 
-                    <div className="overflow-hidden rounded-2xl border border-white/10">
+                    <div className="overflow-hidden rounded-2xl border border-[#ded8e4]">
                       <table className="min-w-full text-left text-sm">
-                        <thead className="bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
+                        <thead className="bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
                           <tr>
                             <th className="px-4 py-3">Select</th>
                             <th className="px-4 py-3">Target</th>
@@ -453,7 +458,7 @@ export function EvidenceMappingPage() {
                         </thead>
                         <tbody>
                           {filteredRecommendations.map((recommendation) => (
-                            <tr key={recommendation.id} className="border-t border-white/5">
+                            <tr key={recommendation.id} className="border-t border-[#eeeaf2]">
                               <td className="px-4 py-3">
                                 <input
                                   checked={selectedRecommendationIds.includes(recommendation.id)}
@@ -468,20 +473,20 @@ export function EvidenceMappingPage() {
                                 />
                               </td>
                               <td className="px-4 py-3">
-                                <div className="font-medium text-white">{recommendation.title}</div>
-                                <div className="mt-1 text-xs text-slate-500">{recommendation.mappingType} · {recommendation.parentLabel}</div>
+                                <div className="font-medium text-[#241232]">{recommendation.title}</div>
+                                <div className="mt-1 text-xs text-[#62576a]">{recommendation.mappingType} · {recommendation.parentLabel}</div>
                               </td>
                               <td className="px-4 py-3">
                                 <span className={badgeClass(recommendation.score >= 70 ? 'Ready' : recommendation.score >= 50 ? 'Derived' : 'Missing')}>
                                   {recommendation.score}
                                 </span>
                               </td>
-                              <td className="px-4 py-3 text-slate-300">{recommendation.rationale}</td>
+                              <td className="px-4 py-3 text-[#4f435c]">{recommendation.rationale}</td>
                             </tr>
                           ))}
                           {filteredRecommendations.length === 0 && (
                             <tr>
-                              <td className="px-4 py-8 text-center text-slate-400" colSpan={4}>
+                              <td className="px-4 py-8 text-center text-[#6f6578]" colSpan={4}>
                                 No recommendations matched the current threshold yet.
                               </td>
                             </tr>
@@ -494,12 +499,52 @@ export function EvidenceMappingPage() {
               </Tabs>
             </>
           ) : (
-            <div className="rounded-2xl border border-dashed border-white/10 px-6 py-12 text-center text-sm text-slate-400">
+            <div className="rounded-2xl border border-dashed border-[#ded8e4] px-6 py-12 text-center text-sm text-[#6f6578]">
               Open an evidence record to review current mappings and recommendation workflows.
             </div>
           )}
         </section>
       </section>
+
+      <RegModal
+        open={Boolean(pendingMappingDelete)}
+        onOpenChange={(open) => {
+          if (!open) setPendingMappingDelete(null);
+        }}
+        title="Remove evidence mapping"
+        description="Review this mapped relationship before removing it from the evidence record."
+        footer={
+          <div className="flex justify-end gap-3">
+            <button className="button-secondary" onClick={() => setPendingMappingDelete(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary text-[#9d1f2c]"
+              disabled={!pendingMappingDelete || busy === `delete:${pendingMappingDelete.id}`}
+              onClick={() => {
+                if (pendingMappingDelete) void handleDeleteMapping(pendingMappingDelete.id);
+              }}
+              type="button"
+            >
+              Remove mapping
+            </button>
+          </div>
+        }
+      >
+        <div className="notice-warning">
+          Removing this mapping disconnects the evidence artifact from the selected control, component, or security plan. The evidence file itself remains in the workspace.
+        </div>
+        {pendingMappingDelete ? (
+          <div className="mt-4 rounded-2xl border border-[#ded8e4] bg-white p-4">
+            <div className="text-sm font-semibold text-[#241232]">{pendingMappingDelete.mappingTitle}</div>
+            <div className="mt-1 text-sm text-[#62576a]">{pendingMappingDelete.mappedId}</div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="status-pill-neutral">{pendingMappingDelete.mappingType}</span>
+              {pendingMappingDelete.parentLabel ? <span className="status-pill-neutral">{pendingMappingDelete.parentLabel}</span> : null}
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
     </div>
   );
 }

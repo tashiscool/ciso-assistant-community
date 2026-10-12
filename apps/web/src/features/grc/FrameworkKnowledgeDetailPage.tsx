@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { RegPageHeader, RegStatusPill } from '../../components/regovise/PagePrimitives';
 import { getControlMap, getFrameworkDetail, getFrameworkDocument } from './api';
 import type { CrosswalkResolution, FrameworkContentDocument, FrameworkKnowledgeDetail } from './types';
 
@@ -110,60 +111,63 @@ export function FrameworkKnowledgeDetailPage() {
   }
 
   if (loading) {
-    return <section className="panel p-6 text-sm text-slate-300">Loading catalogue knowledge...</section>;
+    return <section className="panel p-6 text-sm text-[#4f435c]">Loading catalogue knowledge...</section>;
   }
 
   if (!detail) {
-    return <section className="panel p-6 text-sm text-slate-300">Framework content is not available.</section>;
+    return <section className="panel p-6 text-sm text-[#4f435c]">Framework content is not available.</section>;
   }
 
   return (
     <div className="space-y-6">
-      <section className="panel">
-        <Link className="text-sm text-cyan-300 transition hover:text-cyan-200" to="/framework-library">
-          ← Back to Catalogue Library
-        </Link>
-        <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="eyebrow">Catalogue Knowledge</div>
-            <h1 className="mt-2 text-3xl font-semibold text-white">{detail.name}</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-              {detail.description || 'Imported reference content for this catalogue is available below.'}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <span className={detail.crosswalkReady ? 'badge-success' : 'badge-neutral'}>
+      <RegPageHeader
+        eyebrow="Compliance / Catalogue Knowledge"
+        title={detail.name}
+        description={detail.description || 'Imported reference content for this catalogue is available below.'}
+        actions={
+          <Link className="button-secondary" to="/framework-library">
+            Back to Catalogue Library
+          </Link>
+        }
+        meta={
+          <>
+            <RegStatusPill tone={detail.crosswalkReady ? 'success' : 'neutral'}>
               {detail.crosswalkReady ? 'SCF synchronized' : 'Content synchronized'}
-            </span>
-            {detail.version ? <span className="badge-neutral">v{detail.version}</span> : null}
-          </div>
-        </div>
+            </RegStatusPill>
+            {detail.version ? <RegStatusPill tone="neutral">v{detail.version}</RegStatusPill> : null}
+            <RegStatusPill tone="purple">{detail.frameworkKey}</RegStatusPill>
+            <RegStatusPill tone="info">{detail.documents.length} documents</RegStatusPill>
+          </>
+        }
+        className="rounded-lg border border-[#ded8e4] shadow-[0_8px_24px_rgba(48,24,72,0.04)]"
+      />
 
-        <div className="mt-6 grid gap-3 md:grid-cols-4">
+      <section className="panel">
+        <div className="grid gap-3 md:grid-cols-4">
           <div className="panel-subtle">
             <div className="label">Catalogue key</div>
-            <div className="mt-2 text-sm font-semibold text-white">{detail.frameworkKey}</div>
+            <div className="mt-2 text-sm font-semibold text-[#241232]">{detail.frameworkKey}</div>
           </div>
           <div className="panel-subtle">
             <div className="label">SCF framework</div>
-            <div className="mt-2 text-sm font-semibold text-white">{detail.scfFrameworkId ?? 'Not mapped'}</div>
+            <div className="mt-2 text-sm font-semibold text-[#241232]">{detail.scfFrameworkId ?? 'Not mapped'}</div>
           </div>
           <div className="panel-subtle">
             <div className="label">Documents</div>
-            <div className="mt-2 text-2xl font-semibold text-white">{detail.documents.length}</div>
+            <div className="mt-2 text-2xl font-semibold text-[#241232]">{detail.documents.length}</div>
           </div>
           <div className="panel-subtle">
             <div className="label">Updated</div>
-            <div className="mt-2 text-sm font-semibold text-white">{formatTimestamp(detail.updatedAt)}</div>
+            <div className="mt-2 text-sm font-semibold text-[#241232]">{formatTimestamp(detail.updatedAt)}</div>
           </div>
         </div>
 
         {detail.tags.length > 0 ? (
           <div className="mt-4 flex flex-wrap gap-2">
             {detail.tags.map((tag) => (
-              <span className="badge-neutral" key={tag}>
+              <RegStatusPill tone="neutral" key={tag}>
                 {tag}
-              </span>
+              </RegStatusPill>
             ))}
           </div>
         ) : null}
@@ -171,8 +175,8 @@ export function FrameworkKnowledgeDetailPage() {
 
       {error ? <div className="notice-error">{error}</div> : null}
 
-      <section className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
-        <div className="panel space-y-3">
+      <section className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
+        <div className="panel min-w-0 space-y-3">
           <div className="eyebrow">Imported catalogue documents</div>
           {detail.documents.map((item) => {
             const active = item.slug === selectedSlug;
@@ -180,18 +184,18 @@ export function FrameworkKnowledgeDetailPage() {
               <button
                 className={`w-full rounded-3xl border px-4 py-4 text-left transition ${
                   active
-                    ? 'border-cyan-300/30 bg-cyan-400/[0.06] text-white'
-                    : 'border-white/10 bg-slate-950/20 text-slate-300 hover:border-cyan-300/20 hover:bg-cyan-400/[0.03]'
+                    ? 'border-[#d7c3f1] bg-[#f2e8ff] text-[#241232]'
+                    : 'border-[#ded8e4] bg-[#fbf9fc] text-[#4f435c] hover:border-[#d7c3f1] hover:bg-[#f6f1fa]'
                 }`}
                 key={item.id}
                 onClick={() => setSelectedSlug(item.slug)}
                 type="button"
               >
-                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-[#62576a]">
                   {DOC_KIND_LABELS[item.docKind] ?? item.docKind}
                 </div>
                 <div className="mt-2 text-base font-semibold">{item.title}</div>
-                <div className="mt-2 text-sm leading-6 text-slate-400">
+                <div className="mt-2 text-sm leading-6 text-[#6f6578]">
                   {item.summary || 'Managed reference content imported into Regovise.'}
                 </div>
               </button>
@@ -199,15 +203,15 @@ export function FrameworkKnowledgeDetailPage() {
           })}
         </div>
 
-        <div className="space-y-6">
-          <div className="panel">
+        <div className="min-w-0 space-y-6">
+          <div className="panel min-w-0">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <div className="eyebrow">{selectedMeta ? DOC_KIND_LABELS[selectedMeta.docKind] ?? selectedMeta.docKind : 'Document'}</div>
-                <h2 className="mt-2 text-2xl font-semibold text-white">{document?.title ?? selectedMeta?.title ?? 'Select a document'}</h2>
+                <h2 className="mt-2 text-2xl font-semibold text-[#241232]">{document?.title ?? selectedMeta?.title ?? 'Select a document'}</h2>
               </div>
               {selectedMeta ? (
-                <div className="text-right text-xs text-slate-400">
+                <div className="text-right text-xs text-[#6f6578]">
                   <div>Source: {selectedMeta.sourcePath}</div>
                   <div className="mt-1">Imported: {formatTimestamp(selectedMeta.importedAt)}</div>
                 </div>
@@ -215,20 +219,20 @@ export function FrameworkKnowledgeDetailPage() {
             </div>
 
             {document ? (
-              <article className="mt-6 rounded-3xl border border-white/10 bg-slate-950/30 p-5 text-sm leading-7 text-slate-200">
-                <div className="whitespace-pre-wrap">{document.bodyMarkdown}</div>
+              <article className="mt-6 min-w-0 rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-5 text-sm leading-7 text-[#38254a]">
+                <div className="min-w-0 whitespace-pre-wrap break-words">{document.bodyMarkdown}</div>
               </article>
             ) : (
-              <div className="mt-6 rounded-3xl border border-dashed border-white/10 bg-slate-950/20 p-6 text-sm text-slate-400">
+              <div className="mt-6 rounded-3xl border border-dashed border-[#ded8e4] bg-[#fbf9fc] p-6 text-sm text-[#6f6578]">
                 Select a catalogue document to view the imported guidance.
               </div>
             )}
           </div>
 
-          <div className="panel">
+          <div className="panel min-w-0">
             <div className="eyebrow">Catalogue tutoring</div>
-            <h2 className="mt-2 text-2xl font-semibold text-white">Crosswalk & control guidance</h2>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h2 className="mt-2 text-2xl font-semibold text-[#241232]">Crosswalk & control guidance</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
               Resolve a catalogue-native control into SCF mappings and downstream target obligations
               so operators can see how one implementation change closes work across multiple
               governing frameworks.
@@ -236,7 +240,7 @@ export function FrameworkKnowledgeDetailPage() {
 
             <div className="mt-6 flex flex-col gap-3 md:flex-row">
               <input
-                className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-300/40"
+                className="min-w-0 flex-1 rounded-2xl border border-[#ded8e4] bg-white px-4 py-3 text-sm text-[#241232] outline-none transition focus:border-[#8b35e6]"
                 onChange={(event) => setControlId(event.target.value)}
                 placeholder="Enter a control reference such as CC6.1 or AC-2"
                 value={controlId}
@@ -248,14 +252,14 @@ export function FrameworkKnowledgeDetailPage() {
 
             {controlMap ? (
               <div className="mt-6 grid gap-4 xl:grid-cols-2">
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-5">
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-5">
                   <div className="eyebrow">SCF controls</div>
                   <div className="mt-4 space-y-3">
                     {controlMap.scfControls.map((item) => (
-                      <div className="rounded-3xl border border-white/10 bg-slate-950/40 p-4" key={item.controlId}>
-                        <div className="text-sm font-semibold text-white">{item.controlId}</div>
-                        <div className="mt-2 text-sm text-slate-300">{item.title}</div>
-                        <div className="mt-2 text-xs text-slate-500">
+                      <div className="min-w-0 rounded-3xl border border-[#ded8e4] bg-white p-4" key={item.controlId}>
+                        <div className="text-sm font-semibold text-[#241232]">{item.controlId}</div>
+                        <div className="mt-2 text-sm text-[#4f435c]">{item.title}</div>
+                        <div className="mt-2 text-xs text-[#62576a]">
                           {item.familyCode ?? 'Family'} {item.familyName ? `• ${item.familyName}` : ''}
                         </div>
                       </div>
@@ -263,29 +267,29 @@ export function FrameworkKnowledgeDetailPage() {
                   </div>
                 </div>
 
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-5">
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-5">
                   <div className="eyebrow">Target obligations</div>
                   <div className="mt-4 space-y-3">
                     {controlMap.targets.map((target) => (
-                      <div className="rounded-3xl border border-white/10 bg-slate-950/40 p-4" key={target.frameworkId}>
-                        <div className="text-sm font-semibold text-white">{target.frameworkName}</div>
+                      <div className="min-w-0 rounded-3xl border border-[#ded8e4] bg-white p-4" key={target.frameworkId}>
+                        <div className="text-sm font-semibold text-[#241232]">{target.frameworkName}</div>
                         <div className="mt-2 flex flex-wrap gap-2">
                           {target.controlIds.map((targetControlId) => (
-                            <span className="badge-neutral" key={targetControlId}>
+                            <RegStatusPill tone="neutral" key={targetControlId}>
                               {targetControlId}
-                            </span>
+                            </RegStatusPill>
                           ))}
                         </div>
                       </div>
                     ))}
                   </div>
-                  <div className="mt-4 rounded-3xl border border-white/10 bg-slate-950/40 p-4 text-sm text-slate-300">
+                  <div className="mt-4 rounded-3xl border border-[#ded8e4] bg-white p-4 text-sm text-[#4f435c]">
                     Matching normalized findings: {controlMap.findingMatchCount ?? 0}
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="mt-6 rounded-3xl border border-dashed border-white/10 bg-slate-950/20 p-6 text-sm text-slate-400">
+              <div className="mt-6 rounded-3xl border border-dashed border-[#ded8e4] bg-[#fbf9fc] p-6 text-sm text-[#6f6578]">
                 Resolve a control to inspect its SCF mapping and downstream target coverage.
               </div>
             )}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Fingerprint, ShieldCheck, Smartphone, TriangleAlert } from 'lucide-react';
+import { RegModal } from '../../components/regovise/PagePrimitives';
 import { getSetupMfa, updateSetupMfa } from './api';
 import type { SetupMfaSnapshot } from './types';
 
@@ -16,6 +17,7 @@ export function MFAPage() {
   const [status, setStatus] = useState(statusOptions[0]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [reviewSaveOpen, setReviewSaveOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -62,6 +64,7 @@ export function MFAPage() {
         status,
       });
       hydrate(next);
+      setReviewSaveOpen(false);
       setNotice('MFA policy saved.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to save MFA policy.');
@@ -71,7 +74,7 @@ export function MFAPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading MFA policy...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading MFA policy...</div>;
   }
 
   if (error && !snapshot) {
@@ -83,8 +86,8 @@ export function MFAPage() {
       <section className="panel grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
         <div>
           <div className="eyebrow">Setup</div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Multi-Factor Authentication</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">Multi-Factor Authentication</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
             Define enforcement scope, acceptable methods, service-account exceptions, and rollout coverage targets for
             the tenant identity boundary.
           </p>
@@ -167,15 +170,15 @@ export function MFAPage() {
                 ['sms', 'SMS fallback'],
                 ['email', 'Email fallback'],
               ].map(([key, label]) => (
-                <label className="flex items-start gap-3 rounded-3xl border border-white/10 bg-slate-950/30 p-4" key={key}>
+                <label className="flex items-start gap-3 rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={key}>
                   <input
                     checked={Boolean(methods[key])}
-                    className="mt-1 h-4 w-4 rounded border-white/15 bg-slate-950 text-cyan-400"
+                    className="mt-1 h-4 w-4 rounded border-[#ded8e4] bg-white text-[#7a3ccf]"
                     onChange={() => setMethods((current) => ({ ...current, [key]: !current[key] }))}
                     type="checkbox"
                   />
                   <div>
-                    <div className="font-medium text-white">{label}</div>
+                    <div className="font-medium text-[#241232]">{label}</div>
                   </div>
                 </label>
               ))}
@@ -189,7 +192,7 @@ export function MFAPage() {
                 value={exemptServiceAccounts}
               />
             </label>
-            <button className="button-primary" disabled={saving} onClick={() => void handleSave()} type="button">
+            <button className="button-primary" disabled={saving} onClick={() => setReviewSaveOpen(true)} type="button">
               <ShieldCheck className="mr-2 h-4 w-4" />
               {saving ? 'Saving...' : 'Save MFA policy'}
             </button>
@@ -199,19 +202,19 @@ export function MFAPage() {
         <div className="space-y-4">
           <section className="panel-subtle">
             <div className="flex items-center gap-3">
-              <Fingerprint className="h-5 w-5 text-cyan-300" />
-              <h2 className="text-lg font-semibold text-white">Coverage guidance</h2>
+              <Fingerprint className="h-5 w-5 text-[#7a3ccf]" />
+              <h2 className="text-lg font-semibold text-[#241232]">Coverage guidance</h2>
             </div>
             <div className="mt-5 grid gap-3">
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="font-medium text-white">Preferred methods</div>
-                <div className="mt-2 text-sm text-slate-400">
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+                <div className="font-medium text-[#241232]">Preferred methods</div>
+                <div className="mt-2 text-sm text-[#6f6578]">
                   Favor phishing-resistant methods like WebAuthn, then TOTP for the broadest workforce coverage.
                 </div>
               </div>
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="font-medium text-white">Exception handling</div>
-                <div className="mt-2 text-sm text-slate-400">
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+                <div className="font-medium text-[#241232]">Exception handling</div>
+                <div className="mt-2 text-sm text-[#6f6578]">
                   Keep service-account exceptions explicit, short-lived, and tied to automation owners.
                 </div>
               </div>
@@ -220,12 +223,12 @@ export function MFAPage() {
 
           <section className="panel-subtle">
             <div className="flex items-center gap-3">
-              <Smartphone className="h-5 w-5 text-cyan-300" />
-              <h2 className="text-lg font-semibold text-white">Recommendations</h2>
+              <Smartphone className="h-5 w-5 text-[#7a3ccf]" />
+              <h2 className="text-lg font-semibold text-[#241232]">Recommendations</h2>
             </div>
             <div className="mt-5 space-y-3">
               {snapshot?.recommendations.map((item) => (
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4 text-sm text-slate-300" key={item}>
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#4f435c]" key={item}>
                   {item}
                 </div>
               ))}
@@ -234,16 +237,63 @@ export function MFAPage() {
 
           <section className="panel-subtle">
             <div className="flex items-center gap-3">
-              <TriangleAlert className="h-5 w-5 text-cyan-300" />
-              <h2 className="text-lg font-semibold text-white">Current posture</h2>
+              <TriangleAlert className="h-5 w-5 text-[#7a3ccf]" />
+              <h2 className="text-lg font-semibold text-[#241232]">Current posture</h2>
             </div>
-            <div className="mt-5 rounded-3xl border border-white/10 bg-slate-950/30 p-4 text-sm text-slate-300">
-              MFA rollout is currently tracked as <span className="font-medium text-white">{status}</span> with a target
-              enrollment threshold of <span className="font-medium text-white">{targetCoverage}%</span>.
+            <div className="mt-5 rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#4f435c]">
+              MFA rollout is currently tracked as <span className="font-medium text-[#241232]">{status}</span> with a target
+              enrollment threshold of <span className="font-medium text-[#241232]">{targetCoverage}%</span>.
             </div>
           </section>
         </div>
       </section>
+
+      <RegModal
+        description="Review enforcement, accepted factors, and exception scope before this tenant MFA policy is saved."
+        footer={
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button className="button-secondary" disabled={saving} onClick={() => setReviewSaveOpen(false)} type="button">
+              Cancel
+            </button>
+            <button className="button-primary" disabled={saving} onClick={() => void handleSave()} type="button">
+              {saving ? 'Saving...' : 'Save MFA policy'}
+            </button>
+          </div>
+        }
+        onOpenChange={setReviewSaveOpen}
+        open={reviewSaveOpen}
+        title="Save MFA policy"
+      >
+        <div className="space-y-4 text-sm text-[#4f435c]">
+          <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+            <div className="font-semibold text-[#241232]">{enforcement}</div>
+            <div className="mt-2 text-[#6f6578]">Status: {status}</div>
+            <div className="mt-1 text-[#6f6578]">
+              Grace period: {gracePeriodDays} days · Target coverage: {targetCoverage}%
+            </div>
+          </div>
+          <div className="rounded-3xl border border-[#ded8e4] bg-white p-4">
+            <div className="label">Enabled methods</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {Object.entries(methods).filter(([, enabled]) => enabled).length ? (
+                Object.entries(methods)
+                  .filter(([, enabled]) => enabled)
+                  .map(([method]) => (
+                    <span className="status-pill-neutral" key={method}>
+                      {method}
+                    </span>
+                  ))
+              ) : (
+                <span className="text-[#6f6578]">No factors enabled.</span>
+              )}
+            </div>
+          </div>
+          <div className="rounded-3xl border border-[#ded8e4] bg-white p-4">
+            <div className="label">Exempt service accounts</div>
+            <div className="mt-2 text-[#4f435c]">{exemptServiceAccounts || 'No service-account prefixes exempted.'}</div>
+          </div>
+        </div>
+      </RegModal>
     </div>
   );
 }

@@ -1,19 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { ApiClient } from '../../shared/api/client';
+import { RegStatusPill } from '../../components/regovise/PagePrimitives';
 import { useEdgeIdentity } from '../../shared/session/identity';
 import type { AppliedControl } from './types';
 
 const client = new ApiClient();
 
 const STATUS_COLUMNS = [
-  { id: '--', label: 'Tracking', tone: 'bg-slate-500/10 text-slate-300' },
-  { id: 'to_do', label: 'To do', tone: 'bg-cyan-500/10 text-cyan-200' },
-  { id: 'in_progress', label: 'In progress', tone: 'bg-amber-500/10 text-amber-200' },
-  { id: 'on_hold', label: 'On hold', tone: 'bg-violet-500/10 text-violet-200' },
-  { id: 'active', label: 'Active', tone: 'bg-emerald-500/10 text-emerald-200' },
-  { id: 'deprecated', label: 'Deprecated', tone: 'bg-rose-500/10 text-rose-200' },
-];
+  { id: '--', label: 'Tracking', tone: 'neutral' },
+  { id: 'to_do', label: 'To do', tone: 'purple' },
+  { id: 'in_progress', label: 'In progress', tone: 'warning' },
+  { id: 'on_hold', label: 'On hold', tone: 'purple' },
+  { id: 'active', label: 'Active', tone: 'success' },
+  { id: 'deprecated', label: 'Deprecated', tone: 'danger' },
+] as const;
 
 function formatCurrency(value: number | null | undefined) {
   return typeof value === 'number'
@@ -107,18 +108,18 @@ export function AppliedControlsKanbanPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading control board...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading control board...</div>;
   }
 
   return (
     <div className="space-y-6">
       <section className="panel">
-        <Link className="text-sm text-cyan-200 transition hover:text-cyan-100" to={backUrl}>
+        <Link className="text-sm text-[#6d28d9] transition hover:text-[#5f1aa8]" to={backUrl}>
           {backLabel}
         </Link>
         <div className="eyebrow mt-4">Remediation</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Applied Controls Board</h1>
-        <p className="mt-3 text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Applied Controls Board</h1>
+        <p className="mt-3 text-sm leading-6 text-[#4f435c]">
           Drag applied controls between workflow states to update the remediation queue.
         </p>
       </section>
@@ -131,13 +132,13 @@ export function AppliedControlsKanbanPage() {
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
                 <div className="eyebrow">Domain</div>
-                <h2 className="mt-2 text-xl font-semibold text-white">{folder.folderName}</h2>
+                <h2 className="mt-2 text-xl font-semibold text-[#241232]">{folder.folderName}</h2>
               </div>
-              <div className="badge-neutral">
+              <RegStatusPill tone="neutral">
                 {controls.filter((control) => control.folderId === folder.folderId).length} controls
-              </div>
+              </RegStatusPill>
             </div>
-            <div className="grid gap-4 xl:grid-cols-6">
+            <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2 xl:grid-cols-6">
               {STATUS_COLUMNS.map((column) => {
                 const items = controls.filter(
                   (control) => control.folderId === folder.folderId && control.status === column.id,
@@ -146,36 +147,36 @@ export function AppliedControlsKanbanPage() {
                 return (
                   <div
                     key={`${folder.folderId}-${column.id}`}
-                    className="min-h-[240px] rounded-3xl border border-white/10 bg-slate-950/60 p-4"
+                    className="min-h-[240px] rounded-3xl border border-[#ded8e4] bg-white p-4"
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={() => void handleDrop(column.id)}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <div className={`rounded-full px-2.5 py-1 text-xs font-medium uppercase tracking-[0.12em] ${column.tone}`}>
+                      <RegStatusPill tone={column.tone}>
                         {column.label}
-                      </div>
-                      <div className="text-xs text-slate-500">{items.length}</div>
+                      </RegStatusPill>
+                      <div className="text-xs text-[#62576a]">{items.length}</div>
                     </div>
                     <div className="mt-4 space-y-3">
                       {items.map((control) => (
                         <div
                           key={control.id}
-                          className="cursor-grab rounded-3xl border border-white/10 bg-white/[0.04] p-4 active:cursor-grabbing"
+                          className="cursor-grab rounded-3xl border border-[#ded8e4] bg-[#f6f1fa] p-4 active:cursor-grabbing"
                           draggable
                           onDragEnd={() => setDraggedControlId(null)}
                           onDragStart={() => setDraggedControlId(control.id)}
                         >
-                          <div className="font-medium text-white">
+                          <div className="font-medium text-[#241232]">
                             {control.refId ? `${control.refId} ` : ''}
                             {control.name}
                           </div>
-                          <div className="mt-2 text-xs text-slate-400">{control.priority ?? '--'} priority</div>
-                          <div className="mt-3 text-sm text-slate-300">{control.ownerName ?? 'Unassigned'}</div>
-                          <div className="mt-2 text-xs text-slate-500">{formatCurrency(control.annualCost)}</div>
+                          <div className="mt-2 text-xs text-[#6f6578]">{control.priority ?? '--'} priority</div>
+                          <div className="mt-3 text-sm text-[#4f435c]">{control.ownerName ?? 'Unassigned'}</div>
+                          <div className="mt-2 text-xs text-[#62576a]">{formatCurrency(control.annualCost)}</div>
                         </div>
                       ))}
                       {items.length === 0 && (
-                        <div className="rounded-3xl border border-dashed border-white/10 p-4 text-xs text-slate-500">
+                        <div className="rounded-3xl border border-dashed border-[#ded8e4] p-4 text-xs text-[#62576a]">
                           Drop a control here
                         </div>
                       )}
@@ -187,7 +188,7 @@ export function AppliedControlsKanbanPage() {
           </div>
         ))}
         {folders.length === 0 && (
-          <div className="panel text-sm text-slate-400">No applied controls match the current filter.</div>
+          <div className="panel text-sm text-[#6f6578]">No applied controls match the current filter.</div>
         )}
       </section>
     </div>

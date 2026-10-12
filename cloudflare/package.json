@@ -37,12 +37,16 @@
     "sync:grc-snapshot": "node ./scripts/sync_grc_vendor_snapshot.mjs",
     "validate:grc-contracts": "node ./scripts/validate_grc_contracts.mjs",
     "verify:observable-import-contract": "node ./scripts/verify_observable_import_contract.mjs",
-    "test:observable-import-contract": "node ./scripts/verify_observable_import_contract.mjs"
+    "test:observable-import-contract": "node ./scripts/verify_observable_import_contract.mjs",
+    "verify:queue-recovery": "node --experimental-strip-types ./scripts/verify_queue_recovery_contract.mjs",
+    "verify:provider-requests": "node --experimental-strip-types ./scripts/verify_provider_request.mjs",
+    "verify:release-plan": "node ./scripts/release_plan.mjs",
+    "test:release-plan": "node --test ./scripts/release_plan.test.mjs"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260305.1",
+    "@cloudflare/workers-types": "^5.20261012.1",
     "typescript": "^5.8.3",
-    "wrangler": "^4.56.0"
+    "wrangler": "^4.149.0"
   },
   "dependencies": {
     "ajv": "^8.17.1",

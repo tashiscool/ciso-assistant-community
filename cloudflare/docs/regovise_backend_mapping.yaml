@@ -3,7 +3,7 @@ document:
   title: "Regovise Backend Mapping"
   environment: "production"
   canonical_origin: "https://regovise.com"
-  generated_on: "2026-06-01"
+  generated_on: "2026-08-08"
   purpose: >
     Machine-readable backend map for the Regovise Cloudflare Worker, including
     service roots, route families, runtime bindings, data stores, queue workers,
@@ -138,42 +138,60 @@ bindings:
       message_type: "evidence.job.run"
       max_batch_size: 5
       max_retries: 3
+      dead_letter_queue: "ciso-assistant-dlq"
     QUEUE_CONMON_JOBS:
       queue: "ciso-assistant-conmon-jobs"
       consumer: "cloudflare/src/queues/conmon.ts"
       message_type: "conmon.execution.run"
       max_batch_size: 5
       max_retries: 3
+      dead_letter_queue: "ciso-assistant-dlq"
     QUEUE_GRC_CONTENT_IMPORT:
       queue: "ciso-assistant-grc-content-import"
       consumer: "cloudflare/src/queues/grc.ts"
       message_type: "grc.content.import"
       max_batch_size: 2
       max_retries: 3
+      dead_letter_queue: "ciso-assistant-dlq"
     QUEUE_GRC_SCF_REFRESH:
       queue: "ciso-assistant-grc-scf-refresh"
       consumer: "cloudflare/src/queues/grc.ts"
       message_type: "grc.scf.refresh"
       max_batch_size: 2
       max_retries: 3
+      dead_letter_queue: "ciso-assistant-dlq"
     QUEUE_GRC_FINDING_INGEST:
       queue: "ciso-assistant-grc-finding-ingest"
       consumer: "cloudflare/src/queues/grc.ts"
       message_type: "grc.finding.ingest"
       max_batch_size: 5
       max_retries: 3
+      dead_letter_queue: "ciso-assistant-dlq"
     QUEUE_GRC_GAP_REPORT:
       queue: "ciso-assistant-grc-gap-report"
       consumer: "cloudflare/src/queues/grc.ts"
       message_type: "grc.gap.report"
       max_batch_size: 2
       max_retries: 3
+      dead_letter_queue: "ciso-assistant-dlq"
     QUEUE_GRC_AI_ENRICH:
       queue: "ciso-assistant-grc-ai-enrich"
       consumer: "cloudflare/src/queues/grc.ts"
       message_type: "grc.ai.enrich"
       max_batch_size: 2
       max_retries: 3
+      dead_letter_queue: "ciso-assistant-dlq"
+    DEAD_LETTER_QUEUE:
+      queue: "ciso-assistant-dlq"
+      consumer: "cloudflare/src/queues/deadLetter.ts"
+      max_batch_size: 10
+      max_retries: 5
+      payload_store: "R2_EVIDENCE/queue-dead-letters/{tenantId}/{date}/{deadLetterId}.json"
+      metadata_tables:
+        - "queue_dead_letters"
+        - "queue_dead_letter_events"
+      replay_route: "POST /_api/ops/queue-dead-letters/:id/replay"
+      replay_coordination: "TENANT_WORKFLOW_COORDINATOR lease scoped by tenant and dead-letter id"
   secrets:
     BOOTSTRAP_SETUP_SECRET:
       purpose: "Guarded bootstrap admin/session recovery and production validation."
@@ -398,6 +416,7 @@ api_services:
       subsystems: "/subsystems/*"
       rmf: "/rmf/*"
       app_management: "/app-management/*"
+      queue_dead_letters: "/queue-dead-letters, /queue-dead-letters/:id/replay"
       parity: "/parity/overview"
     primary_tables:
       - "report_exports"
@@ -415,6 +434,8 @@ api_services:
       - "report_builder_reports"
       - "grc_job_runs"
       - "grc_report_snapshots"
+      - "queue_dead_letters"
+      - "queue_dead_letter_events"
   conmon:
     base_path: "/_api/conmon"
     handler: "cloudflare/src/services/conmon/http.ts"
@@ -1031,6 +1052,18 @@ background_processing:
         - "finding ingest"
         - "gap report generation"
         - "AI enrichment"
+      failure_behavior: "Failed messages retry and exhaust into ciso-assistant-dlq; failures are never acknowledged as successful."
+    dead_letter_recovery:
+      queue: "ciso-assistant-dlq"
+      source: "cloudflare/src/queues/deadLetter.ts"
+      operator_source: "cloudflare/src/services/ops/queueRecovery.ts"
+      migration: "cloudflare/migrations/0040_queue_dead_letter_recovery.sql"
+      guarantees:
+        - "Persist the exact failed payload in private R2 before acknowledging the DLQ message."
+        - "Record tenant-scoped metadata, SHA-256, attempts, status, and append-only replay events in D1."
+        - "Require operational permissions and matching tenant context for list and replay APIs."
+        - "Serialize replay through a tenant Durable Object lease and reject duplicate completed replays."
+        - "Retry the DLQ message if durable evidence persistence fails."
 
 production_operations:
   deploy:
@@ -1046,6 +1079,9 @@ production_operations:
     production_playwright: "npm --prefix cloudflare run smoke:production:playwright"
     production_e2e: "npm --prefix cloudflare run smoke:production:e2e"
     semantic_matrix: "npm --prefix cloudflare run semantic:matrix"
+    queue_recovery_contract: "npm --prefix cloudflare run verify:queue-recovery"
+    local_d1_migrations: "npx wrangler d1 migrations apply D1_MAIN --local --persist-to <temporary-path>"
+    worker_dry_run: "npx wrangler deploy --dry-run --env production"
   mutation_guards:
     required_for_full_e2e:
       REGOVISE_PROD_BASE_URL: "https://regovise.com"

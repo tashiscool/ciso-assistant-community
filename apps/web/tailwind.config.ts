@@ -18,9 +18,15 @@ const config: Config = {
         border: 'rgba(255, 255, 255, 0.1)',
       },
       borderRadius: {
+        sm: '0.125rem',
+        DEFAULT: '0.25rem',
         '2xl': '1rem',
         '3xl': '1.5rem',
         '4xl': '2rem',
+      },
+      blur: {
+        sm: '4px',
+        DEFAULT: '8px',
       },
       keyframes: {
         'accordion-down': {
@@ -55,6 +61,8 @@ const config: Config = {
         'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
       },
       boxShadow: {
+        sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+        DEFAULT: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
         panel: '0 24px 80px rgba(2, 8, 23, 0.55)',
         glow: '0 0 20px rgba(34, 211, 238, 0.3)',
         'glow-sm': '0 0 10px rgba(34, 211, 238, 0.2)',

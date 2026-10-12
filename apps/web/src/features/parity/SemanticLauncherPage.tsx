@@ -205,8 +205,8 @@ export function SemanticLauncherPage({ kind }: { kind: LauncherKind }) {
     <div className="space-y-6">
       <section className="panel">
         <div className="eyebrow">{content.eyebrow}</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">{content.title}</h1>
-        <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-300">{content.summary}</p>
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">{content.title}</h1>
+        <p className="mt-3 max-w-4xl text-sm leading-6 text-[#4f435c]">{content.summary}</p>
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
@@ -215,27 +215,27 @@ export function SemanticLauncherPage({ kind }: { kind: LauncherKind }) {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="eyebrow">{card.status}</div>
-                <h2 className="mt-2 text-xl font-semibold text-white">{card.title}</h2>
+                <h2 className="mt-2 text-xl font-semibold text-[#241232]">{card.title}</h2>
               </div>
-              <span className="badge-success">{card.status}</span>
+              <span className="status-pill-success">{card.status}</span>
             </div>
-            <p className="text-sm leading-6 text-slate-300">{card.summary}</p>
+            <p className="text-sm leading-6 text-[#4f435c]">{card.summary}</p>
             <div>
               <div className="label">Primary action</div>
-              <div className="mt-1 text-sm font-medium text-white">{card.primaryAction}</div>
+              <div className="mt-1 text-sm font-medium text-[#241232]">{card.primaryAction}</div>
             </div>
             <div>
               <div className="label">Related modules</div>
               <div className="mt-2 flex flex-wrap gap-2">
                 {card.relatedModules.map((module) => (
-                  <span className="badge-neutral" key={`${card.route}-${module}`}>
+                  <span className="status-pill-neutral" key={`${card.route}-${module}`}>
                     {module}
                   </span>
                 ))}
               </div>
             </div>
-            <div className="rounded-2xl border border-cyan-300/20 bg-cyan-400/[0.04] p-3 text-sm leading-6 text-cyan-100">
-              <span className="font-medium text-white">Last validation evidence:</span> {card.evidence}
+            <div className="rounded-2xl border border-[#d7c3f1] bg-[#f6f1fa] p-3 text-sm leading-6 text-[#5f1aa8]">
+              <span className="font-medium text-[#241232]">Last validation evidence:</span> {card.evidence}
             </div>
             <div className="mt-auto">
               <Link className="button-primary" to={card.route}>

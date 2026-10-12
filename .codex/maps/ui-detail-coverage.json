@@ -1,0 +1,512 @@
+{
+  "note": "23 seeded detail pages, four creation dialogs opened without submitting, four anonymous entry URLs. Browser external requests and non-read requests other than session exchange blocked. Anonymous questionnaire route remains loading because AppLayout renders the page directly outside matched Route params; follow-up after 1.5s sent only core/session GET and no questionnaire-access request.",
+  "results": [
+    {
+      "type": "detail",
+      "route": "/frameworks/framework-demo-iso27001",
+      "headings": [
+        "ISO 27001:2022",
+        "Requirement coverage",
+        "Add requirements without leaving context",
+        "Associated Requirements"
+      ],
+      "text": "COMPLIANCE / CATALOGUE\nISO 27001:2022\n\nManage the requirement and control collection that downstream assessments, plans, and governance artifacts rely on.\n\nISO27001_2022\n2022\nsecurity\n12 requirements\nBack to catalogues\nAdd requirement\nCATALOGUE READINESS\nRequirement coverage\n\nReview catalogue metadata, assessable tree coverage, and the requirement list before mapping the catalogue into assessments or policy evidence.\n\nFRAMEWORK KEY\nISO27001_2022\nVERSION\n2022\nCATEGORY\nSecurity\nREQUIREMENTS\n12\nCREATED\n10/11/2026, 8:18:54 PM\nUPDATED\n10/11/2026, 8:18:54 PM\nDOWNSTREAM USE\n- Flow requirements into security plans, policies, components, projects, and supply-chain records.\n- Keep one tenant source of truth for the governing controls your builders and assessments reference.\nCATALOGUE ACTIONS\nAdd requirements without leaving context\n\nNew requirements are appended to this catalogue and become available for downstream assessment, policy, evidence, and system mapping workflows.\n\nAdd requirement\nREQUIREMENT TREE\nAssociated Requirements\n12 assessable items\n5\nSection 5\nSECTION\n5.1\nPolicies for information security\nASSESSABLE\n\nDefine and maintain approved information security policies.\n\n5.2\nInformation security roles and responsibilities\nASSESSABLE\n\nAssign ownership and accountability for the control environment.\n\n5.23\nInformation security for use of cloud services\nASSESSABLE\n\nDefine governance and assurance expectations for cloud platforms.\n\n5.7\nThreat intelligence\nASSESSABLE\n\nCollect and act on relevant cyber threat intelligence sources.\n\n6\nSection 6\nSECTION\n6.1\nScreening\nASSESSABLE\n\nConduct screening aligned to personnel risk and legal requirements.\n\n6.3\nInformation security awareness, education and training\nASSESSABLE\n\nDeliver recurring training and track completion for covered teams.\n\n8\nSection 8\nSECTION\n8.1\nUser endpoint devices\nASSESSABLE\n\nSecure endpoints through configuration, hardening, and monitoring.\n\n8.16\nMonitoring activities\nASSESSABLE\n\nOperate monitoring across assets, control health, and exceptions.\n\n8.2\nPrivileged access rights\nASSESSABLE\n\nManage privileged access through approval and review workflows.\n\n8.24\nUse of cryptography\nASSESSABLE\n\nSelect and manage approved cryptographic controls.\n\n8.5\nSecure authentication\nASSESSABLE\n\nEnforce modern authentication patterns and credential hygiene.\n\n8.9\nConfiguration management\nASSESSABLE\n\nTrack authorized baselines and control drift in production systems.\n\nREFERENCE\tREQUIREMENT\tUPDATED\n5.1\t\nPolicies for information security\nDefine and maintain approved information security policies.\n\t10/11/2026, 8:18:54 PM\n5.2\t\nInformation security roles and responsibilities\nAssign ownership and accountability for the control environment.\n\t10/11/2026, 8:18:54 PM\n5.23\t\nInformation security for use of cloud services\nDefine governance and assurance expectations for cloud platforms.\n\t10/11/2026, 8:18:54 PM\n5.7\t\nThreat intelligence\nCollect and act on relevant cyber threat intelligence sources.\n\t10/11/2026, 8:18:54 PM\n6.1\t\nScreening\nConduct screening aligned to personnel risk and legal requirements.\n\t10/11/2026, 8:18:54 PM\n6.3\t\nInformation security awareness, education and training\nDeliver recurring training and track completion for covered teams.\n\t10/11/2026, 8:18:54 PM\n8.1\t\nUser endpoint devices\nSecure endpoints through configuration, hardening, and monitoring.\n\t10/11/2026, 8:18:54 PM\n8.16\t\nMonitoring activities\nOperate monitoring across assets, control health, and exceptions.\n\t10/11/2026, 8:18:54 PM\n8.2\t\nPrivileged access rights\nManage privileged access through approval and review workflows.\n\t10/11/2026, 8:18:54 PM\n8.24\t\nUse of cryptography\nSelect and manage approved cryptographic controls.\n\t10/11/2026, 8:18:54 PM\n8.5\t\nSecure authentication\nEnforce modern authentication patterns and credential hygiene.\n\t10/11/2026, 8:18:54 PM\n8.9\t\nConfiguration management\nTrack authorized baselines and control drift in production systems.\n\t10/11/2026, 8:18:54 PM",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/libraries/library-demo-iso-pack",
+      "headings": [
+        "ISO Governance Starter Pack",
+        "Reference Tree",
+        "Scoring Assets"
+      ],
+      "text": "Back to libraries\nCATALOG\nISO Governance Starter Pack\n\nA curated governance library for control reviews, baseline risk scoring, and assessment kick-off.\n\nPROVIDER\nCISO Assistant Library Exchange\nPACKAGER\nOpenAI Migration Demo\nVERSION\n2026.1\nSTATUS\nUPDATE AVAILABLE\nPUBLICATION DATE\n1/14/2026\nFRAMEWORK\nOpen ISO 27001:2022\nDEPENDENCIES\nNo dependencies\nCOPYRIGHT\nDemo content for local migration verification\nFRAMEWORK\nReference Tree\n12 ASSESSABLE ITEMS\n5\nSection 5\nSECTION\n5.1\nPolicies for information security\nASSESSABLE\n\nDefine and maintain approved information security policies.\n\n5.2\nInformation security roles and responsibilities\nASSESSABLE\n\nAssign ownership and accountability for the control environment.\n\n5.23\nInformation security for use of cloud services\nASSESSABLE\n\nDefine governance and assurance expectations for cloud platforms.\n\n5.7\nThreat intelligence\nASSESSABLE\n\nCollect and act on relevant cyber threat intelligence sources.\n\n6\nSection 6\nSECTION\n6.1\nScreening\nASSESSABLE\n\nConduct screening aligned to personnel risk and legal requirements.\n\n6.3\nInformation security awareness, education and training\nASSESSABLE\n\nDeliver recurring training and track completion for covered teams.\n\n8\nSection 8\nSECTION\n8.1\nUser endpoint devices\nASSESSABLE\n\nSecure endpoints through configuration, hardening, and monitoring.\n\n8.16\nMonitoring activities\nASSESSABLE\n\nOperate monitoring across assets, control health, and exceptions.\n\n8.2\nPrivileged access rights\nASSESSABLE\n\nManage privileged access through approval and review workflows.\n\n8.24\nUse of cryptography\nASSESSABLE\n\nSelect and manage approved cryptographic controls.\n\n8.5\nSecure authentication\nASSESSABLE\n\nEnforce modern authentication patterns and credential hygiene.\n\n8.9\nConfiguration management\nASSESSABLE\n\nTrack authorized baselines and control drift in production systems.\n\nRISK MATRICES\nScoring Assets\n5x5 Qualitative Matrix\nDefault enterprise matrix used for qualitative residual and inherent scoring.\n1 VERY LOW\n2 LOW\n3 MEDIUM\n4 HIGH\n5 VERY HIGH\nTHREAT\tSEVERITY\n\nT-001 Cloud configuration drift\nBaseline settings diverge from approved guardrails across production services.\n\tHIGH\n\nT-002 Evidence collection lag\nManual evidence requests delay quarterly review readiness and exception closure.\n\tMEDIUM\nREFERENCE\tCONTROL\n5.1\t\nPolicies for information security\nDefine and maintain approved information security policies.\n\n5.2\t\nInformation security roles and responsibilities\nAssign ownership and accountability for the control environment.\n\n5.23\t\nInformation security for use of cloud services\nDefine governance and assurance expectations for cloud platforms.\n\n5.7\t\nThreat intelligence\nCollect and act on relevant cyber threat intelligence sources.\n\n6.1\t\nScreening\nConduct screening aligned to personnel risk and legal requirements.\n\n6.3\t\nInformation security awareness, education and training\nDeliver recurring training and track completion for covered teams.\n\n8.1\t\nUser endpoint devices\nSecure endpoints through configuration, hardening, and monitoring.\n\n8.16\t\nMonitoring activities\nOperate monitoring across assets, control health, and exceptions.\n\n8.2\t\nPrivileged access rights\nManage privileged access through approval and review workflows.\n\n8.24\t\nUse of cryptography\nSelect and manage approved cryptographic controls.\n\n8.5\t\nSecure authentication\nEnforce modern authentication patterns and credential hygiene.\n\n8.9\t\nConfiguration management\nTrack authorized baselines and control drift in production systems.",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/risk-assessments/risk-assessment-enterprise-demo",
+      "headings": [
+        "Enterprise Risk Assessment",
+        "Likelihood x Impact Heatmap"
+      ],
+      "text": "Back to assessments\nRISK\nEnterprise Risk Assessment\n\nReview the attached risk register, add scenarios directly into scope, and watch how the inherent and residual posture changes over time.\n\nPERIMETER\nEnterprise Perimeter\nREGISTER\nEnterprise Risk Register\nVERSION\n1.0\nSTATUS\nIn_progress\nREFERENCE\nRA-001\nUPDATED\n10/11/2026, 8:18:54 PM\nOBSERVATION\nBaseline assessment aligned to the seeded enterprise risk register.\nADD SCENARIO\nSCENARIO TITLEDESCRIPTION\nLIKELIHOOD\nIMPACT\nSTATUS\nOpen\nMonitoring\nMitigating\nClosed\nAdd Risk Scenario\nSCENARIOS IN SCOPE\n1\nOPEN SCENARIOS\n1\nAVERAGE INHERENT SCORE\n14.0\nAVERAGE RESIDUAL SCORE\n8.0\nMATRIX VIEW\nLikelihood x Impact Heatmap\n\nScenarios are placed using the currently stored likelihood and impact values from the attached risk register.\n\nL1\nL2\nL3\nL4\nL5\nI5\n0 ITEMS\n0 ITEMS\n0 ITEMS\n0 ITEMS\n0 ITEMS\nI4\n0 ITEMS\n0 ITEMS\n0 ITEMS\n1 ITEMS\nCloud asset inventory drift\n0 ITEMS\nI3\n0 ITEMS\n0 ITEMS\n0 ITEMS\n0 ITEMS\n0 ITEMS\nI2\n0 ITEMS\n0 ITEMS\n0 ITEMS\n0 ITEMS\n0 ITEMS\nI1\n0 ITEMS\n0 ITEMS\n0 ITEMS\n0 ITEMS\n0 ITEMS\nSCENARIO\tSTATUS\tLIKELIHOOD / IMPACT\tSCORES\n\nCloud asset inventory drift\nVisibility gaps create stale compliance evidence and weak change control.\n10/11/2026, 8:18:54 PM\n\tOpen\t3.5 / 4\t\nInherent 14.0\nResidual 8.0",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/risk-assessments/risk-assessment-enterprise-demo/action-plan",
+      "headings": [
+        "Action Plan",
+        "Scenario-derived treatment items"
+      ],
+      "text": "RISK TREATMENT\nAction Plan\n\nLegacy risk-treatment routes now resolve into a Worker-backed action-plan summary built from the assessment register, scenario posture, and estimated remediation effort.\n\nin_progress\nEnterprise Risk Assessment\nEnterprise Risk Register\nBack to assessment\nPrepare review packet\nAction plan\nBudget overview\nTREATMENT ITEMS\n1\nP1 ITEMS\n0\nANNUAL BUDGET\n$7,000\nHIGHEST RESIDUAL\n8.0\nASSESSMENT\nEnterprise Risk Assessment\nPERIMETER\nEnterprise Perimeter\nVERSION\n1.0\nTREATMENT QUEUE\nScenario-derived treatment items\nRead-only derived plan\nSCENARIO\tPRIORITY\tSTATUS\tRESIDUAL\tEFFORT\tANNUAL COST\tACTIONS\n\nCloud asset inventory drift\nKeep the scenario under managed review and validate that residual controls stay effective.\nOpen mapped scenario workspace\n\tP3\tTo Do\t8.0\nInherent 14.0\n\tS\t$7,000\t",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/compliance-assessments/compliance-assessment-iso-demo",
+      "headings": [
+        "ISO 27001 Annual Audit",
+        "Progress Report",
+        "5.1 Policies for information security"
+      ],
+      "text": "Back to assessments\nGOVERNANCE\nISO 27001 Annual Audit\n\nWork through scoped controls and reusable lines of inquiry, capture lightning-assessment results, document evidence and gaps, and keep manual or compliance review progress current in the tenant workspace.\n\nFRAMEWORK\nISO 27001:2022\nPERIMETER\nEnterprise Perimeter\nPROGRESS\n67%\nMATURITY\n3.8\nASSESSMENT TYPE\nCompliance\nASSESSMENT PROGRESS\n8/12 requirements reviewed\nCOMPLIANT\n6\nPARTIAL\n2\nNON-COMPLIANT\n0\nN/A\n0\nNOT ASSESSED\n4\nASSESSMENT RECORD\nReference\nCA-ISO-001\nVersion\n2026.1\nLead assessor\nn/a\nStatus\nIn_review\nPlanned window\nn/a to n/a\nUpdated\n10/11/2026, 8:22:56 PM\nFramework workspace\nOpen ISO 27001:2022\nRemediation workspace\nOpen action plan\nObservation\nAnnual control review tied to the enterprise perimeter.\nInstructions\nNo reviewer instructions recorded yet.\nProcess info\nNo process notes recorded yet.\nCONTROLS IN SCOPE\nProgress Report\n12 items\n5.1\ncompliant\nPolicies for information security\nDefine and maintain approved information security policies.\n5.2\ncompliant\nInformation security roles and responsibilities\nAssign ownership and accountability for the control environment.\n5.23\ncompliant\nInformation security for use of cloud services\nDefine governance and assurance expectations for cloud platforms.\n5.7\ncompliant\nThreat intelligence\nCollect and act on relevant cyber threat intelligence sources.\n6.1\ncompliant\nScreening\nConduct screening aligned to personnel risk and legal requirements.\n6.3\ncompliant\nInformation security awareness, education and training\nDeliver recurring training and track completion for covered teams.\n8.1\npartially compliant\nUser endpoint devices\nSecure endpoints through configuration, hardening, and monitoring.\n8.16\npartially compliant\nMonitoring activities\nOperate monitoring across assets, control health, and exceptions.\n8.2\nnot assessed\nPrivileged access rights\nManage privileged access through approval and review workflows.\n8.24\nnot assessed\nUse of cryptography\nSelect and manage approved cryptographic controls.\n8.5\nnot assessed\nSecure authentication\nEnforce modern authentication patterns and credential hygiene.\n8.9\nnot assessed\nConfiguration management\nTrack authorized baselines and control drift in production systems.\nLIGHTNING ASSESSMENT\n5.1 Policies for information security\nItem 1 of 12\n\nDefine and maintain approved information security policies.\n\nRESULT\nNot assessed\nPass\nPartial pass\nFail\nNot applicable\nEVIDENCE STATUS\nMissing\nDraft\nIn review\nApproved\nRejected\nIMPLEMENTATION SCORE\nDOCUMENTATION SCORE\nOBSERVATION\nEVIDENCE NOTE\nGAPS AND DIFFERENCES\nLIKELIHOOD\nIMPACT\nAuto-generate follow-up\nPrevious\nSave and Continue\nNext\nLast updated 10/11/2026, 8:18:54 PM",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/compliance-assessments/compliance-assessment-iso-demo/action-plan",
+      "headings": [
+        "Action Plan"
+      ],
+      "text": "Back to compliance review\nREMEDIATION\nAction Plan\n\nTrack the applied controls and remediation work generated from this compliance review.\n\nAction plan\nBudget overview\nASSESSMENT\nISO 27001 Annual Audit\nFRAMEWORK\nISO 27001:2022\nPERIMETER\nEnterprise Perimeter\nVERSION\n2026.1\nOpen Flash Mode\nOpen Kanban Board\nANNUAL BUDGET\n$0\nOPEN WORK\n0\nACTIVE CONTROLS\n0\nTRACKING ONLY\n0\nAPPLIED CONTROL\tSTATUS\tOWNER\tETA\tANNUAL COST\nNo applied controls are linked to this compliance review yet.",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/compliance-assessments/compliance-assessment-iso-demo/flash-mode",
+      "headings": [],
+      "text": "No applied controls are available for this view.",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/applied-controls/flash-mode?complianceAssessmentId=compliance-assessment-iso-demo",
+      "headings": [],
+      "text": "No applied controls are available for this view.",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/applied-controls/kanban-mode?complianceAssessmentId=compliance-assessment-iso-demo",
+      "headings": [
+        "Applied Controls Board"
+      ],
+      "text": "Back\nREMEDIATION\nApplied Controls Board\n\nDrag applied controls between workflow states to update the remediation queue.\n\nNo applied controls match the current filter.",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/third-party/entities/entity-demo-vendor",
+      "headings": [
+        "Northwind Cloud"
+      ],
+      "text": "Back to third-party workspace\nENTITY\nNorthwind Cloud\nActive\n\nCritical identity and audit-log provider supporting core enterprise access services.\n\nDEFAULT CRITICALITY\n4\nSOLUTIONS\n1\nCONTRACTS\n1\nASSESSMENTS\n1\nRELATIONSHIP\nict_provider\nCOUNTRY / CURRENCY\nIE / EUR\nPARENT ENTITY\nNone\nREFERENCE\nENTITY-VENDOR-001\nSOLUTIONS\nNorthwind IAM Platform\nCriticality 5\nNimbus Financial \u00b7 identity_and_access_management\nAssets: Identity Platform, Privileged Access Vault\nCONTRACTS\nNorthwind IAM Master Services Agreement\nActive\n$185,000 \u00b7 ends 12/30/2027\nSolutions: Northwind IAM Platform\nASSESSMENT COVERAGE\nNorthwind Annual Review\nWarning\nVendor Perimeter \u00b7 linked review Vendor Assurance Review\nDEPENDENCY\n4\nPENETRATION\n4\nMATURITY\n2\nTRUST\n2\n\nEvidence quality is strong, but exit-plan maturity and privileged support access remain open review items.",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/entities/entity-demo-vendor",
+      "headings": [
+        "Northwind Cloud"
+      ],
+      "text": "Back to third-party workspace\nENTITY\nNorthwind Cloud\nActive\n\nCritical identity and audit-log provider supporting core enterprise access services.\n\nDEFAULT CRITICALITY\n4\nSOLUTIONS\n1\nCONTRACTS\n1\nASSESSMENTS\n1\nRELATIONSHIP\nict_provider\nCOUNTRY / CURRENCY\nIE / EUR\nPARENT ENTITY\nNone\nREFERENCE\nENTITY-VENDOR-001\nSOLUTIONS\nNorthwind IAM Platform\nCriticality 5\nNimbus Financial \u00b7 identity_and_access_management\nAssets: Identity Platform, Privileged Access Vault\nCONTRACTS\nNorthwind IAM Master Services Agreement\nActive\n$185,000 \u00b7 ends 12/30/2027\nSolutions: Northwind IAM Platform\nASSESSMENT COVERAGE\nNorthwind Annual Review\nWarning\nVendor Perimeter \u00b7 linked review Vendor Assurance Review\nDEPENDENCY\n4\nPENETRATION\n4\nMATURITY\n2\nTRUST\n2\n\nEvidence quality is strong, but exit-plan maturity and privileged support access remain open review items.",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/privacy/processings/processing-demo-customer",
+      "headings": [
+        "Customer Due Diligence Workflow"
+      ],
+      "text": "Back to privacy workspace\nPROCESSING\nCustomer Due Diligence Workflow\nprivacy_approved\n\nCollect and review onboarding data, sanctions checks, and account risk signals for regulated customers.\n\nPURPOSES\n2\nPERSONAL DATA\n2\nRECIPIENTS\n2\nTRANSFERS\n1\nFOLDER\nCorporate Governance\nREFERENCE\nPROC-CUSTOMER-001\nDPIA\nDPIA-CDD-2026\nSENSITIVE DATA\nYes\nPURPOSES & LAWFUL BASIS\nCustomer due diligence\nLegal basis: privacy_legal_obligation\nFraud monitoring\nLegal basis: privacy_legitimate_interests\nPERSONAL DATA & SUBJECTS\nGovernment identifier\nStandard\nprivacy_government_identifiers\nRetention 5 years after account closure \u00b7 privacy_manual_review_deletion\nBiometric selfie match\nSensitive\nprivacy_biometric_data\nRetention 90 days \u00b7 privacy_automatic_deletion\nDATA SUBJECTS\nRetail customers\nProspects\nRECIPIENTS & CONTRACTORS\nFraud analytics provider\nprivacy_analytics_provider\nRegulatory authority\nprivacy_regulatory_authority\nNorthwind Cloud\nprivacy_data_processor \u00b7 IE\nLinked entity: Northwind Cloud \u00b7 https://example.com/northwind-cloud/dpa\nBluefin Recovery Services\nprivacy_sub_processor \u00b7 GB\nLinked entity: Bluefin Recovery Services \u00b7 https://example.com/bluefin-recovery/privacy\nTRANSFERS\nSupport escalation transfer\nGB \u00b7 privacy_appropriate_safeguards\nContractual clauses and restricted incident access.",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/processings/processing-demo-customer",
+      "headings": [
+        "Customer Due Diligence Workflow"
+      ],
+      "text": "Back to privacy workspace\nPROCESSING\nCustomer Due Diligence Workflow\nprivacy_approved\n\nCollect and review onboarding data, sanctions checks, and account risk signals for regulated customers.\n\nPURPOSES\n2\nPERSONAL DATA\n2\nRECIPIENTS\n2\nTRANSFERS\n1\nFOLDER\nCorporate Governance\nREFERENCE\nPROC-CUSTOMER-001\nDPIA\nDPIA-CDD-2026\nSENSITIVE DATA\nYes\nPURPOSES & LAWFUL BASIS\nCustomer due diligence\nLegal basis: privacy_legal_obligation\nFraud monitoring\nLegal basis: privacy_legitimate_interests\nPERSONAL DATA & SUBJECTS\nGovernment identifier\nStandard\nprivacy_government_identifiers\nRetention 5 years after account closure \u00b7 privacy_manual_review_deletion\nBiometric selfie match\nSensitive\nprivacy_biometric_data\nRetention 90 days \u00b7 privacy_automatic_deletion\nDATA SUBJECTS\nRetail customers\nProspects\nRECIPIENTS & CONTRACTORS\nFraud analytics provider\nprivacy_analytics_provider\nRegulatory authority\nprivacy_regulatory_authority\nNorthwind Cloud\nprivacy_data_processor \u00b7 IE\nLinked entity: Northwind Cloud \u00b7 https://example.com/northwind-cloud/dpa\nBluefin Recovery Services\nprivacy_sub_processor \u00b7 GB\nLinked entity: Bluefin Recovery Services \u00b7 https://example.com/bluefin-recovery/privacy\nTRANSFERS\nSupport escalation transfer\nGB \u00b7 privacy_appropriate_safeguards\nContractual clauses and restricted incident access.",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/resilience/business-impact-analyses/bia-demo-enterprise",
+      "headings": [
+        "Enterprise Service Recovery Study"
+      ],
+      "text": "Back to resilience workspace\nBUSINESS IMPACT ANALYSIS\nEnterprise Service Recovery Study\nin_review\n\nBusiness impact analysis covering identity, onboarding, and privileged recovery services.\n\nASSETS\n3\nDOCUMENTED\n67%\nRECOVERY TESTED\n33%\nTARGETS MET\n33%\nPERIMETER\nEnterprise Perimeter\nVERSION\n2026.1\nMATRIX\nEnterprise Recovery Matrix\nREFERENCE\nBIA-ENT-001\nRECOVERY MATRIX\nNegligible\nScore 1\nTONE EMERALD\nTolerable\nScore 2\nTONE LIME\nMaterial\nScore 3\nTONE AMBER\nSevere\nScore 4\nTONE ORANGE\nCritical\nScore 5\nTONE ROSE\nASSET ASSESSMENTS\nIdentity Platform\nCorporate Governance\nDocumented\nUntested\nTargets open\nDEPENDENCIES\nHRIS\nNorthwind IAM Platform\nASSOCIATED CONTROLS\n8.5\nPR.AA-01\n\nRunbook exists, but failover identity synchronization has not been exercised in the last quarter.\n\nTHRESHOLD\tIMPACT\tQUANTITATIVE\tJUSTIFICATION\n1h \u00b7 Tolerable\t2\t12 people\tInitial support impact limited to workforce login delays.\n4h \u00b7 Severe\t4\t150 people\tExtended outage blocks privileged recovery and onboarding.\nCustomer Onboarding API\nCorporate Governance\nDocumented\nTested\nTargets met\nDEPENDENCIES\nFraud Screening\nKYC Workflow\nASSOCIATED CONTROLS\n5.23\nDE.CM-01\n\nRecent test showed the active-active deployment meets the 2-hour objective.\n\nTHRESHOLD\tIMPACT\tQUANTITATIVE\tJUSTIFICATION\n2h \u00b7 Material\t3\t900 records\tBacklog begins affecting onboarding SLAs after 2 hours.\nPrivileged Access Vault\nCorporate Governance\nUndocumented\nUntested\nTargets open\nDEPENDENCIES\nIdentity Platform\nRecovery Hotline\nASSOCIATED CONTROLS\n8.2\nRC.RP-01\n\nFallback credentials are maintained manually and need periodic validation.\n\nTHRESHOLD\tIMPACT\tQUANTITATIVE\tJUSTIFICATION\n30m \u00b7 Material\t3\t8 people\tPrivileged operations begin queueing quickly during vault disruption.\n6h \u00b7 Critical\t5\t1 gu\tExtended outage blocks coordinated recovery across services.",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/business-impact-analysis/bia-demo-enterprise",
+      "headings": [
+        "Enterprise Service Recovery Study"
+      ],
+      "text": "Back to resilience workspace\nBUSINESS IMPACT ANALYSIS\nEnterprise Service Recovery Study\nin_review\n\nBusiness impact analysis covering identity, onboarding, and privileged recovery services.\n\nASSETS\n3\nDOCUMENTED\n67%\nRECOVERY TESTED\n33%\nTARGETS MET\n33%\nPERIMETER\nEnterprise Perimeter\nVERSION\n2026.1\nMATRIX\nEnterprise Recovery Matrix\nREFERENCE\nBIA-ENT-001\nRECOVERY MATRIX\nNegligible\nScore 1\nTONE EMERALD\nTolerable\nScore 2\nTONE LIME\nMaterial\nScore 3\nTONE AMBER\nSevere\nScore 4\nTONE ORANGE\nCritical\nScore 5\nTONE ROSE\nASSET ASSESSMENTS\nIdentity Platform\nCorporate Governance\nDocumented\nUntested\nTargets open\nDEPENDENCIES\nHRIS\nNorthwind IAM Platform\nASSOCIATED CONTROLS\n8.5\nPR.AA-01\n\nRunbook exists, but failover identity synchronization has not been exercised in the last quarter.\n\nTHRESHOLD\tIMPACT\tQUANTITATIVE\tJUSTIFICATION\n1h \u00b7 Tolerable\t2\t12 people\tInitial support impact limited to workforce login delays.\n4h \u00b7 Severe\t4\t150 people\tExtended outage blocks privileged recovery and onboarding.\nCustomer Onboarding API\nCorporate Governance\nDocumented\nTested\nTargets met\nDEPENDENCIES\nFraud Screening\nKYC Workflow\nASSOCIATED CONTROLS\n5.23\nDE.CM-01\n\nRecent test showed the active-active deployment meets the 2-hour objective.\n\nTHRESHOLD\tIMPACT\tQUANTITATIVE\tJUSTIFICATION\n2h \u00b7 Material\t3\t900 records\tBacklog begins affecting onboarding SLAs after 2 hours.\nPrivileged Access Vault\nCorporate Governance\nUndocumented\nUntested\nTargets open\nDEPENDENCIES\nIdentity Platform\nRecovery Hotline\nASSOCIATED CONTROLS\n8.2\nRC.RP-01\n\nFallback credentials are maintained manually and need periodic validation.\n\nTHRESHOLD\tIMPACT\tQUANTITATIVE\tJUSTIFICATION\n30m \u00b7 Material\t3\t8 people\tPrivileged operations begin queueing quickly during vault disruption.\n6h \u00b7 Critical\t5\t1 gu\tExtended outage blocks coordinated recovery across services.",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/portal/assignments/portal-assignment-demo-vendor",
+      "headings": [
+        "Vendor due diligence pack",
+        "Policies for information security",
+        "Privileged access rights",
+        "Monitoring activities"
+      ],
+      "text": "Back to portal\nASSIGNMENT\nVendor due diligence pack\n\nVendor is completing the latest security evidence refresh.\n\nFRAMEWORK\nISO 27001\nSTATUS\nIn Progress\nPROGRESS\n67%\nDUE\n10/25/2026, 8:18:54 PM\n5.1\nPolicies for information security\n\nDescribe how the vendor publishes and reviews information security policies.\n\nCompliant\nRESULT\nNot assessed\nNon compliant\nPartially compliant\nCompliant\nNot applicable\nRESPONSE\nOBSERVATION\nEVIDENCE NOTE\nReview Save\n8.2\nPrivileged access rights\n\nSummarize how privileged access is approved and monitored.\n\nPartially Compliant\nRESULT\nNot assessed\nNon compliant\nPartially compliant\nCompliant\nNot applicable\nRESPONSE\nOBSERVATION\nEVIDENCE NOTE\nReview Save\n8.16\nMonitoring activities\n\nExplain what monitoring is performed for production services.\n\nNot Assessed\nRESULT\nNot assessed\nNon compliant\nPartially compliant\nCompliant\nNot applicable\nRESPONSE\nOBSERVATION\nEVIDENCE NOTE\nReview Save\nSUBMISSION\nReviewed responses: 2 of 3\nSubmit for Review\nHISTORY\nassigned\n10/11/2026, 8:18:54 PM\nCISO Assistant\nAssignment opened for vendor response.",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/advanced-risk/ebios/ebios-study-demo-enterprise",
+      "headings": [
+        "Enterprise identity dependency study"
+      ],
+      "text": "Back to EBIOS workspace\nEBIOS-001\nEnterprise identity dependency study\n\nAdvanced risk study for privileged access concentration and ecosystem dependencies.\n\nPERIMETER\nEnterprise Perimeter\nREFERENCE ENTITY\nNorthwind Cloud\nSTATUS\nIn Progress\nWORKSHOP PROGRESS\n17%\nWORKSHOP 1\nStudy framing\ndone\nto_do\nin_progress\ndone\nSecurity baseline\ndone\nto_do\nin_progress\ndone\nFeared events\nin progress\nto_do\nin_progress\ndone\nScope validation\nto do\nto_do\nin_progress\ndone\nWORKSHOP 2\nRisk sources\ndone\nto_do\nin_progress\ndone\nObjectives\nin progress\nto_do\nin_progress\ndone\nMotivations\nto do\nto_do\nin_progress\ndone\nWORKSHOP 3\nEcosystem mapping\nin progress\nto_do\nin_progress\ndone\nStrategic scenarios\nto do\nto_do\nin_progress\ndone\nScenario review\nto do\nto_do\nin_progress\ndone\nWORKSHOP 4\nOperational scenarios\nto do\nto_do\nin_progress\ndone\nAttack path detail\nto do\nto_do\nin_progress\ndone\nSupporting measures\nto do\nto_do\nin_progress\ndone\nWORKSHOP 5\nRisk treatment\nto do\nto_do\nin_progress\ndone\nResidual exposure\nto do\nto_do\nin_progress\ndone\nAction tracking\nto do\nto_do\nin_progress\ndone\nManagement review\nto do\nto_do\nin_progress\ndone\nClosure\nto do\nto_do\nin_progress\ndone\nFEARED EVENTS\nPrivilege escalation disrupts access control\nGravity: 4\nIdentity platform\nPrivileged access workflows\nThird-party outage blocks administrative recovery\nGravity: 5\nPrivileged recovery channel\nDirectory services\nSTAKEHOLDERS AND SCENARIOS\nIdentity Provider\nsupplier\nDependency rating: 5\nInternal IAM Team\ninternal\nDependency rating: 4\nCredential theft via supplier channel\nAttacker: cybercrime \u00b7 Priority: 5\nPrivileged misuse after emergency access\nAttacker: insider \u00b7 Priority: 4",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/advanced-risk/quantitative/quantitative-study-demo-enterprise",
+      "headings": [
+        "Identity service economic exposure"
+      ],
+      "text": "Back to quantitative workspace\nQRS-001\nIdentity service economic exposure\n\nQuantitative study estimating annualized loss from platform and supplier disruption.\n\nExecutive Summary\nKey Metrics\nAction Plan\nRetrigger Simulations\nCURRENT ALE\n$1,430,000\nRESIDUAL ALE\n$570,000\nRISK REDUCTION\n$860,000\nTHRESHOLD BREACHES\n2\nSCENARIO\tCURRENT ALE\tRESIDUAL ALE\tOWNER\tTREATMENT\n\nQRS-001 Ransomware interruption\nLoss scenario covering prolonged service interruption across the primary workload.\n\t$920,000\t$340,000\tSecurity Operations\tAccelerate immutable backups and privileged access controls.\n\nQRS-002 Critical vendor outage\nEconomic loss tied to concentration risk across the identity provider tier.\n\t$510,000\t$230,000\tPlatform Engineering\tFund failover automation and contractual resilience commitments.",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/advanced-risk/quantitative/quantitative-study-demo-enterprise/executive-summary",
+      "headings": [
+        "Identity service economic exposure"
+      ],
+      "text": "Back to quantitative study\nEXECUTIVE SUMMARY\nIdentity service economic exposure\n\nCurrent modeled exposure is $1,430,000. Residual treatment lowers modeled annualized loss by $860,000 across 2 scenarios.\n\nRISK REGISTER\nEnterprise Risk Register\nSCENARIOS\n2\nTHRESHOLD\n400000",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/advanced-risk/quantitative/quantitative-study-demo-enterprise/key-metrics",
+      "headings": [
+        "Portfolio Metrics"
+      ],
+      "text": "Back to quantitative study\nKEY METRICS\nPortfolio Metrics\nCURRENT ALE\n$1,430,000\nRESIDUAL ALE\n$570,000\nRISK REDUCTION\n$860,000\nABOVE THRESHOLD\n2\nSCENARIOS\n2",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/advanced-risk/quantitative/quantitative-study-demo-enterprise/action-plan",
+      "headings": [
+        "Identity service economic exposure",
+        "Scenario-derived actions"
+      ],
+      "text": "ACTION PLAN\nIdentity service economic exposure\n\nTurn scenario economics into a prioritized set of treatment initiatives and budget asks. Actions are derived from scenario treatment data so deterministic risk economics stay visually primary.\n\nin_progress\n$305,000 budget\n2 actions\nBack to study\nPrepare review packet\nBUDGET\n$305,000\nACTIONS\n2\nASSIGNED\n2\nSCENARIO LINKS\n2\nTREATMENT QUEUE\nScenario-derived actions\nRead-only derived plan\nACTION\tOWNER\tSTATUS\tSCENARIO\tANNUAL COST\tACTIONS\nAccelerate immutable backups and privileged access controls.\tSecurity Operations\tPlanned\tRansomware interruption\t$180,000\t\n\nFund failover automation and contractual resilience commitments.\tPlatform Engineering\tPlanned\tCritical vendor outage\t$125,000\t",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/quantitative-risk-scenarios/quant-scenario-demo-ransomware",
+      "headings": [
+        "Ransomware interruption"
+      ],
+      "text": "Back to quantitative study\nQRS-001\nRansomware interruption\n\nLoss scenario covering prolonged service interruption across the primary workload.\n\nCURRENT ALE\n$920,000\nRESIDUAL ALE\n$340,000\nOWNER\nSecurity Operations\nSTATUS\ncurrent\nHYPOTHESES\nCurrent-state ransomware\ncurrent\n$920,000\nResidual ransomware\nresidual\n$340,000",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "detail",
+      "route": "/quantitative-risk-hypotheses/quant-hypothesis-demo-ransomware-current",
+      "headings": [
+        "Current-state ransomware"
+      ],
+      "text": "Back to quantitative scenario\nCURRENT\nCurrent-state ransomware\n\nThis hypothesis belongs to Ransomware interruption in Identity service economic exposure.\n\nPROBABILITY\n19%\nIMPACT LOW\n$350,000\nIMPACT HIGH\n$1,600,000\nALE\n$920,000",
+      "errors": [],
+      "failed": []
+    },
+    {
+      "type": "dialog",
+      "route": "/risk-scenarios",
+      "button": "Add scenario",
+      "fields": [
+        {
+          "type": "select-one",
+          "name": "",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "text",
+          "name": "",
+          "placeholder": "Critical SaaS supplier outage",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "textarea",
+          "name": "",
+          "placeholder": "What could go wrong, and what would it affect?",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "number",
+          "name": "",
+          "placeholder": "",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "number",
+          "name": "",
+          "placeholder": "",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "select-one",
+          "name": "",
+          "required": false,
+          "ariaLabel": null
+        }
+      ],
+      "text": "Regovise\nWorkspace console\nStaging\nHelp...\n\u2318+K\nHome\nHome\nFind anything\nAnalytics\nStarter Guide\nStarter Guide\nWork Queue\nMy Access\nTasks\nFindings\nReview Queue\nCompliance\nOverview\nFrameworks\nFramework Library\nLibraries\nModules\nControls\nAssessments and Tests\nGap Assessments\nPolicies\nDocuments and Evidence\nAudit Packages\nRisk\nRisk Library\nRisk Register\nAction Tracker\nThreat Models\nEBIOS RM\nQuantitative Risk\nIncidents\nExceptions\nEvidence and Assurance\nVendors and Trust\nAssets and Systems\nPeople and Access\nPrivacy and Resilience\nReports and Exports\nAutomation and Builders\nAdmin\nRegovise IA migration: stable routes, clearer domains, Vanta-like rhythm.\nRisk Scenarios\nPreview tools\nDA\nDemo Administrator\ndemo@ciso-assistant.local\nRISK\nRisk Scenarios\n\nTrack registers and scenarios in one place so teams can see where risk is emerging and what deserves action first.\n\nAdd register\nAdd scenario\nREGISTERS\nRisk registers\nNew\nEnterprise Risk Register\nCorporate Governance\nSeeded register for the Workers migration baseline\nVendor Risk Register\nVendor Assurance\nThird-party and supplier exposure tracked for the demo workspace\nSCENARIO LIBRARY\nRegister scenarios\nAdd scenario\nSCENARIO\tREGISTER\tSTATUS\tSCORES\tACTIONS\n\nCloud asset inventory drift\nVisibility gaps create stale compliance evidence and weak change control.\n\tEnterprise Risk Register\tOpen\t\nLikelihood: 3.5\nImpact: 4\nInherent: 14\nResidual: 8\n\t\n\n\nCritical SaaS supplier outage\nA key supplier outage delays evidence collection and quarterly control reviews.\n\tVendor Risk Register\tMonitoring\t\nLikelihood: 2.8\nImpact: 4.6\nInherent: 12.9\nResidual: 7.2\n\t\nAdd risk scenario\n\nCapture likelihood, impact, and current treatment state while preserving existing risk scenario data.\n\nRISK REGISTER\nEnterprise Risk Register\nVendor Risk Register\nSCENARIO TITLEDESCRIPTION\nLIKELIHOOD\nIMPACT\nSTATUS\nOpen\nMonitoring\nMitigated\nAccepted\nCancel\nAdd scenario\nClose",
+      "screenshot": "/Users/tkhan/IdeaProjects/ciso-assistant-community/.codex/maps/screenshots/dialog-risk-scenarios.png"
+    },
+    {
+      "type": "dialog",
+      "route": "/workspace/team",
+      "button": "Add team member",
+      "fields": [
+        {
+          "type": "email",
+          "name": "",
+          "placeholder": "owner@company.com",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "text",
+          "name": "",
+          "placeholder": "Security Program Owner",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "text",
+          "name": "",
+          "placeholder": "Security",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "text",
+          "name": "",
+          "placeholder": "Owner",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "text",
+          "name": "",
+          "placeholder": "en",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "checkbox",
+          "name": "",
+          "placeholder": "",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "checkbox",
+          "name": "",
+          "placeholder": "",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "checkbox",
+          "name": "",
+          "placeholder": "",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "checkbox",
+          "name": "",
+          "placeholder": "",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "checkbox",
+          "name": "",
+          "placeholder": "",
+          "required": false,
+          "ariaLabel": null
+        }
+      ],
+      "text": "Regovise\nWorkspace console\nStaging\nHelp...\n\u2318+K\nHome\nHome\nFind anything\nAnalytics\nStarter Guide\nStarter Guide\nWork Queue\nMy Access\nTasks\nFindings\nReview Queue\nCompliance\nOverview\nFrameworks\nFramework Library\nLibraries\nModules\nControls\nAssessments and Tests\nGap Assessments\nPolicies\nDocuments and Evidence\nAudit Packages\nRisk\nEvidence and Assurance\nVendors and Trust\nAssets and Systems\nPeople and Access\nPeople\nAccess\nSSO\nMFA\nService Accounts\nPrivacy and Resilience\nReports and Exports\nAutomation and Builders\nAdmin\nRegovise IA migration: stable routes, clearer domains, Vanta-like rhythm.\nWorkspace\nTeam\nPreview tools\nDA\nDemo Administrator\ndemo@ciso-assistant.local\nWORKSPACE\nTeam & Groups\n\nAdd workspace members, define shared groups, and prepare the principal layer that scoped access control builds on.\n\nCreate group\nAdd team member\nTEAM MEMBER\tSTATE\tGROUPS\tFLAGS\tASSIGNMENTS\tLOCAL SIGN-IN\tACTIONS\n\nDemo Administrator\ndemo@ciso-assistant.local\nJoined 2026-10-12T00:18:54.795Z\n\t\nActive\n\tNo groups\t\nLocal login enabled\nPassword pending\nInternal\nStandard view\n\t1\t\nNo local password has been provisioned yet.\nSet Temp Password\n\t\n\n\nGovernance Analyst\nanalyst@ciso-assistant.local\nJoined 2026-10-12T00:18:54.795Z\n\t\nActive\n\t\nDomain Analysts\n\t\nLocal login enabled\nPassword pending\nInternal\nStandard view\n\t1\t\nNo local password has been provisioned yet.\nSet Temp Password\n\t\n\n\nVendor Owner\nvendor.owner@ciso-assistant.local\nJoined 2026-10-12T00:18:54.795Z\n\t\nActive\nThird-party\nAuditee\n\t\nVendor Reviewers\n\t\nLocal login enabled\nPassword pending\nThird-party\nAuditee\n\t2\t\nNo local password has been provisioned yet.\nSet Temp Password\n\t\nGROUPS\nDomain Analysts\nCorporate Governance\n1 members\n1 assignments\nAnalysts who operate the primary governance and risk domain.\nGovernance Analyst\nVendor Reviewers\nVendor Assurance\n1 members\n1 assignments\nReviewers and external stakeholders for the vendor assurance domain.\nVendor Owner\nAdd team member\n\nInvite a workspace principal and optionally place them in existing user groups.\n\nEMAIL\nDISPLAY NAME\nFIRST NAME\nLAST NAME\nLOCALE\nKeep local fallback sign-in\nAllow admins to set a temporary local password for this user.\nThird-party identity\nMark the user as an external collaborator.\nAuditee view\nEnable the narrower evidence-response experience for this user.\nINITIAL GROUPS\nDomain AnalystsCorporate Governance\nVendor ReviewersVendor Assurance\nCancel\nAdd team member\nClose",
+      "screenshot": "/Users/tkhan/IdeaProjects/ciso-assistant-community/.codex/maps/screenshots/dialog-workspace-team.png"
+    },
+    {
+      "type": "dialog",
+      "route": "/third-party",
+      "button": "New entity",
+      "fields": [
+        {
+          "type": "select-one",
+          "name": "",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "text",
+          "name": "",
+          "placeholder": "TaskNimbus",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "text",
+          "name": "",
+          "placeholder": "VEN-001",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "textarea",
+          "name": "",
+          "placeholder": "",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "text",
+          "name": "",
+          "placeholder": "",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "text",
+          "name": "",
+          "placeholder": "",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "text",
+          "name": "",
+          "placeholder": "",
+          "required": false,
+          "ariaLabel": null
+        }
+      ],
+      "text": "Regovise\nWorkspace console\nStaging\nHelp...\n\u2318+K\nHome\nHome\nFind anything\nAnalytics\nStarter Guide\nStarter Guide\nWork Queue\nMy Access\nTasks\nFindings\nReview Queue\nCompliance\nOverview\nFrameworks\nFramework Library\nLibraries\nModules\nControls\nAssessments and Tests\nGap Assessments\nPolicies\nDocuments and Evidence\nAudit Packages\nRisk\nEvidence and Assurance\nVendors and Trust\nVendors\nExternal Portal\nQuestionnaires\nTrust Center\nAssets and Systems\nPeople and Access\nPrivacy and Resilience\nReports and Exports\nAutomation and Builders\nAdmin\nRegovise IA migration: stable routes, clearer domains, Vanta-like rhythm.\nThird Party\nPreview tools\nDA\nDemo Administrator\ndemo@ciso-assistant.local\nTHIRD PARTY\nThird-Party Management\n\nManage provider entities, map their solutions and contracts, and keep vendor assessment coverage close to the compliance and resilience work already in the workspace.\n\nReview vendor import\nBulk review\nNew entity\nNew solution\nNew contract\nENTITIES\n3\nSOLUTIONS\n2\nCONTRACTS\n2\nASSESSMENTS\n1\nENTITIES\nBluefin Recovery Services\nVendor Assurance \u00b7 GB \u00b7 criticality 1\nActive\n\nSpecialized disaster-recovery and crisis escalation provider for vendor continuity.\n\nSOLUTIONS\n1\nCONTRACTS\n1\nASSESSMENTS\n0\nNimbus Financial\nCorporate Governance \u00b7 US \u00b7 criticality 1.78\nActive\n\nPrimary financial entity used as the recipient for local third-party oversight demos.\n\nSOLUTIONS\n0\nCONTRACTS\n2\nASSESSMENTS\n0\nNorthwind Cloud\nVendor Assurance \u00b7 IE \u00b7 criticality 4\nActive\n\nCritical identity and audit-log provider supporting core enterprise access services.\n\nSOLUTIONS\n1\nCONTRACTS\n1\nASSESSMENTS\n1\nRECENT CONTRACTS\nBluefin Recovery Retainer\nActive\nBluefin Recovery Services \u2192 Nimbus Financial\n$62,000 \u00b7 Bluefin Recovery Hotline\nNorthwind IAM Master Services Agreement\nActive\nNorthwind Cloud \u2192 Nimbus Financial\n$185,000 \u00b7 Northwind IAM Platform\nASSESSMENT COVERAGE\nNorthwind Annual Review\nWarning\nNorthwind Cloud \u00b7 Vendor Perimeter\nNext review 9/29/2026 \u00b7 Criticality 4\nNew entity\n\nCreate a provider, customer, or internal third-party entity that can be linked to solutions, contracts, and assessments.\n\nDOMAIN FOLDER\nCorporate Governance\nVendor Assurance\nNAMEREFERENCEDESCRIPTIONRELATIONSHIP\nCOUNTRY\nCURRENCY\nCancelCreate entity\nClose",
+      "screenshot": "/Users/tkhan/IdeaProjects/ciso-assistant-community/.codex/maps/screenshots/dialog-third-party.png"
+    },
+    {
+      "type": "dialog",
+      "route": "/privacy",
+      "button": "New processing",
+      "fields": [
+        {
+          "type": "select-one",
+          "name": "",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "text",
+          "name": "",
+          "placeholder": "Employee onboarding records",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "text",
+          "name": "",
+          "placeholder": "PROC-001",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "textarea",
+          "name": "",
+          "placeholder": "",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "select-one",
+          "name": "",
+          "required": false,
+          "ariaLabel": null
+        },
+        {
+          "type": "checkbox",
+          "name": "",
+          "placeholder": "",
+          "required": false,
+          "ariaLabel": null
+        }
+      ],
+      "text": "Regovise\nWorkspace console\nStaging\nHelp...\n\u2318+K\nHome\nHome\nFind anything\nAnalytics\nStarter Guide\nStarter Guide\nWork Queue\nMy Access\nTasks\nFindings\nReview Queue\nCompliance\nOverview\nFrameworks\nFramework Library\nLibraries\nModules\nControls\nAssessments and Tests\nGap Assessments\nPolicies\nDocuments and Evidence\nAudit Packages\nRisk\nEvidence and Assurance\nVendors and Trust\nAssets and Systems\nPeople and Access\nPrivacy and Resilience\nPrivacy\nResilience\nIncidents\nExceptions\nReports and Exports\nAutomation and Builders\nAdmin\nRegovise IA migration: stable routes, clearer domains, Vanta-like rhythm.\nPrivacy\nPreview tools\nDA\nDemo Administrator\ndemo@ciso-assistant.local\nPRIVACY\nPrivacy Operations\n\nKeep processing records, rights requests, and breach workflows in one place so privacy reviews can follow the same operational rhythm as the rest of the workspace.\n\nNew right request\nNew breach record\nNew processing\nPROCESSINGS\n2\nRIGHTS REQUESTS\n1\nBREACHES\n1\nSENSITIVE REGISTERS\n1\nPROCESSING REGISTER\nWorkforce Identity Lifecycle\nprivacy_in_review\n\nProvision, maintain, and remove workforce identities for corporate access services.\n\nPURPOSES\n2\nDATA TYPES\n2\nCONTRACTORS\n1\nTRANSFERS\n1\nCustomer Due Diligence Workflow\nprivacy_approved\n\nCollect and review onboarding data, sanctions checks, and account risk signals for regulated customers.\n\nPURPOSES\n2\nDATA TYPES\n2\nCONTRACTORS\n2\nTRANSFERS\n1\nRIGHTS REQUESTS\nRetail customer access request\nin_progress\naccess \u00b7 requested 3/9/2026\nDue 4/8/2026 \u00b7 Customer Due Diligence Workflow\nBREACH HANDLING\nMisrouted workforce export\nprivacy_under_investigation\nprivacy_risk \u00b7 discovered 3/4/2026, 9:35:00 AM\n84 subjects \u00b7 Workforce Identity Lifecycle\nNew processing\n\nCreate a processing register record in the selected privacy scope.\n\nDOMAIN FOLDER\nCorporate Governance\nVendor Assurance\nNAME\nREFERENCE\nDESCRIPTION\nSTATUS\nDraft\nIn review\nApproved\nDeprecated\nDPIA required\nCancel\nCreate processing\nClose",
+      "screenshot": "/Users/tkhan/IdeaProjects/ciso-assistant-community/.codex/maps/screenshots/dialog-privacy.png"
+    },
+    {
+      "type": "anonymous",
+      "route": "/login",
+      "finalUrl": "http://127.0.0.1:8799/login",
+      "text": "SECURE SIGN-IN\nSign in to Regovise\n\nUse the simplest sign-in path available for this workspace. Setup and recovery live on separate guarded routes so the main entry stays focused.\n\nWorkspace sign-in\n\nRegovise workspaces usually use one of three paths: enterprise SSO, local password fallback, or email-code fallback. Start with the workspace slug and we will show the path that fits that tenant.\n\nPassword sign-in ready \u00b7 Email codes available \u00b7 Workspace demo\nWorkspace slug\nWorkspace detected: Isolated Regovise Review\nOIDC metadata is configured, but this provider also requires a runtime client secret before sign-in can complete.\nPassword\nEmail code\nEmail\nPassword\nSign in with password\nWorkspace access is usually provisioned by a tenant administrator or through enterprise SSO.\nNeed recovery access?\nSign out and start fresh\nHOW ACCESS WORKS\n1. WORKSPACE\nChoose the right tenant\nThe workspace slug tells Regovise which tenant policy and identity path should be used.\n2. IDENTITY\nUse the tenant method\nSome workspaces use OIDC SSO, some keep local fallback during rollout, and all keep guarded recovery separate.\n3. SESSION\nOpen a secure workspace session\nAfter identity is verified, Regovise creates a secure tenant session and returns you to the workspace.",
+      "headings": [
+        "Sign in to Regovise"
+      ]
+    },
+    {
+      "type": "anonymous",
+      "route": "/setup/initialize",
+      "finalUrl": "http://127.0.0.1:8799/setup/initialize",
+      "text": "WORKSPACE SETUP\nInitialize the first Regovise workspace\n\nCreate the first Regovise workspace, establish the first administrator account, and start the first secure session.\n\nThis workspace is already initialized. Use the normal sign-in path to continue.\nOpen sign-in\nBack to sign in",
+      "headings": [
+        "Initialize the first Regovise workspace"
+      ]
+    },
+    {
+      "type": "anonymous",
+      "route": "/admin/recover",
+      "finalUrl": "http://127.0.0.1:8799/admin/recover",
+      "text": "ADMINISTRATOR RECOVERY\nRecover administrator access\n\nUse the guarded recovery flow only when normal sign-in is unavailable and an administrator session must be restored.\n\nAdministrator recovery\n\nUse the guarded bootstrap secret to recover an administrator session when normal sign-in is unavailable.\n\nTenant slug\nAdministrator email\nBootstrap secret\nNew local password\nConfirm password\nSet local password\nOpen administrator session\nBack to sign in",
+      "headings": [
+        "Recover administrator access"
+      ]
+    },
+    {
+      "type": "anonymous",
+      "route": "/questionnaires/response/unknown-code",
+      "finalUrl": "http://127.0.0.1:8799/questionnaires/response/unknown-code",
+      "text": "Loading questionnaire response...",
+      "headings": []
+    }
+  ]
+}

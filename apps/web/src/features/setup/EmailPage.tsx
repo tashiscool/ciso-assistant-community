@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AtSign, Mail, Send, ShieldCheck } from 'lucide-react';
+import { RegModal } from '../../components/regovise/PagePrimitives';
 import { getSetupEmail, updateSetupEmail } from './api';
 import type { SetupEmailSnapshot } from './types';
 
@@ -14,6 +15,7 @@ export function EmailPage() {
   const [statusNote, setStatusNote] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [reviewSaveOpen, setReviewSaveOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -53,6 +55,7 @@ export function EmailPage() {
         statusNote,
       });
       hydrate(next);
+      setReviewSaveOpen(false);
       setNotice('Email configuration notes saved.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to save email configuration.');
@@ -62,7 +65,7 @@ export function EmailPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading email configuration...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading email configuration...</div>;
   }
 
   if (error && !snapshot) {
@@ -74,8 +77,8 @@ export function EmailPage() {
       <section className="panel grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
         <div>
           <div className="eyebrow">Setup</div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Email</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">Email</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
             Review the runtime delivery provider, sender identity, and recent notification health before enabling live
             customer-facing email on Regovise.
           </p>
@@ -147,7 +150,7 @@ export function EmailPage() {
                 value={statusNote}
               />
             </label>
-            <button className="button-primary" disabled={saving} onClick={() => void handleSave()} type="button">
+            <button className="button-primary" disabled={saving} onClick={() => setReviewSaveOpen(true)} type="button">
               <Send className="mr-2 h-4 w-4" />
               {saving ? 'Saving...' : 'Save email setup'}
             </button>
@@ -157,27 +160,27 @@ export function EmailPage() {
         <div className="space-y-4">
           <section className="panel-subtle">
             <div className="flex items-center gap-3">
-              <Mail className="h-5 w-5 text-cyan-300" />
-              <h2 className="text-lg font-semibold text-white">Runtime sender identity</h2>
+              <Mail className="h-5 w-5 text-[#7a3ccf]" />
+              <h2 className="text-lg font-semibold text-[#241232]">Runtime sender identity</h2>
             </div>
             <div className="mt-5 grid gap-3">
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
                 <div className="label">From</div>
-                <div className="mt-2 text-sm text-slate-300">{snapshot?.config.fromName} &lt;{snapshot?.config.fromEmail || 'unset'}&gt;</div>
+                <div className="mt-2 text-sm text-[#4f435c]">{snapshot?.config.fromName} &lt;{snapshot?.config.fromEmail || 'unset'}&gt;</div>
               </div>
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
                 <div className="label">DKIM</div>
-                <div className="mt-2 text-sm text-slate-300">
+                <div className="mt-2 text-sm text-[#4f435c]">
                   {snapshot?.config.dkimSelector || 'unset'} {snapshot?.config.dkimDomain ? `@ ${snapshot.config.dkimDomain}` : ''}
                 </div>
               </div>
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
                 <div className="label">Provider readiness</div>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  <span className={snapshot?.config.webhookConfigured ? 'badge-positive' : 'badge-neutral'}>
+                  <span className={snapshot?.config.webhookConfigured ? 'status-pill-positive' : 'status-pill-neutral'}>
                     Webhook {snapshot?.config.webhookConfigured ? 'Ready' : 'Pending'}
                   </span>
-                  <span className={snapshot?.config.mailchannelsConfigured ? 'badge-positive' : 'badge-neutral'}>
+                  <span className={snapshot?.config.mailchannelsConfigured ? 'status-pill-positive' : 'status-pill-neutral'}>
                     Mailchannels {snapshot?.config.mailchannelsConfigured ? 'Ready' : 'Pending'}
                   </span>
                 </div>
@@ -187,24 +190,24 @@ export function EmailPage() {
 
           <section className="panel-subtle">
             <div className="flex items-center gap-3">
-              <AtSign className="h-5 w-5 text-cyan-300" />
-              <h2 className="text-lg font-semibold text-white">Recent delivery events</h2>
+              <AtSign className="h-5 w-5 text-[#7a3ccf]" />
+              <h2 className="text-lg font-semibold text-[#241232]">Recent delivery events</h2>
             </div>
             <div className="mt-5 space-y-3">
               {snapshot?.recentEvents.length ? (
                 snapshot.recentEvents.map((event) => (
-                  <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4" key={`${event.eventType}:${event.timestamp}`}>
+                  <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={`${event.eventType}:${event.timestamp}`}>
                     <div className="flex items-center justify-between gap-3">
-                      <div className="font-medium text-white">{event.eventType}</div>
-                      <span className={event.status === 'sent' ? 'badge-positive' : 'badge-neutral'}>{event.status}</span>
+                      <div className="font-medium text-[#241232]">{event.eventType}</div>
+                      <span className={event.status === 'sent' ? 'status-pill-positive' : 'status-pill-neutral'}>{event.status}</span>
                     </div>
-                    <div className="mt-2 text-sm text-slate-400">
+                    <div className="mt-2 text-sm text-[#6f6578]">
                       {event.provider} · {new Date(event.timestamp).toLocaleString()}
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4 text-sm text-slate-400">
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#6f6578]">
                   No delivery events recorded yet for this local workspace.
                 </div>
               )}
@@ -213,12 +216,12 @@ export function EmailPage() {
 
           <section className="panel-subtle">
             <div className="flex items-center gap-3">
-              <ShieldCheck className="h-5 w-5 text-cyan-300" />
-              <h2 className="text-lg font-semibold text-white">Guidance</h2>
+              <ShieldCheck className="h-5 w-5 text-[#7a3ccf]" />
+              <h2 className="text-lg font-semibold text-[#241232]">Guidance</h2>
             </div>
             <div className="mt-5 space-y-3">
               {snapshot?.guidance.map((item) => (
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4 text-sm text-slate-300" key={item}>
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#4f435c]" key={item}>
                   {item}
                 </div>
               ))}
@@ -226,6 +229,35 @@ export function EmailPage() {
           </section>
         </div>
       </section>
+
+      <RegModal
+        description="Confirm the email rollout posture before saving delivery-mode and operator-note changes."
+        footer={
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button className="button-secondary" disabled={saving} onClick={() => setReviewSaveOpen(false)} type="button">
+              Cancel
+            </button>
+            <button className="button-primary" disabled={saving} onClick={() => void handleSave()} type="button">
+              {saving ? 'Saving...' : 'Save email setup'}
+            </button>
+          </div>
+        }
+        onOpenChange={setReviewSaveOpen}
+        open={reviewSaveOpen}
+        title="Save email setup"
+      >
+        <div className="space-y-4 text-sm text-[#4f435c]">
+          <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+            <div className="font-semibold text-[#241232]">{supportEmail || 'No support email set'}</div>
+            <div className="mt-2 text-[#6f6578]">Delivery mode: {deliveryMode}</div>
+            <div className="mt-1 text-[#6f6578]">Status: {status}</div>
+          </div>
+          <div className="rounded-3xl border border-[#ded8e4] bg-white p-4">
+            <div className="label">Operator note</div>
+            <div className="mt-2 whitespace-pre-wrap text-[#4f435c]">{statusNote || 'No rollout note recorded.'}</div>
+          </div>
+        </div>
+      </RegModal>
     </div>
   );
 }

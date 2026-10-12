@@ -55,21 +55,21 @@ export function RouteAccessBoundary({ fallback, variant = 'standard' }: RouteAcc
   return (
     <section className="panel max-w-3xl">
       <div className="eyebrow">{copy.eyebrow}</div>
-      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">{copy.title}</h1>
-      <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">{copy.description}</p>
+      <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">{copy.title}</h1>
+      <p className="mt-3 max-w-2xl text-sm leading-6 text-[#51465e]">{copy.description}</p>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <div className="rounded-3xl border border-white/10 bg-white/[0.02] px-4 py-4">
-          <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Requested area</div>
-          <div className="mt-2 text-base font-semibold text-white">{humanizePath(location.pathname)}</div>
-          <div className="mt-2 break-all text-xs text-slate-500">{requestedPath}</div>
+        <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-[#6f6578]">Requested area</div>
+          <div className="mt-2 text-base font-semibold text-[#241232]">{humanizePath(location.pathname)}</div>
+          <div className="mt-2 break-all text-xs text-[#6f6578]">{requestedPath}</div>
         </div>
-        <div className="rounded-3xl border border-cyan-300/15 bg-cyan-400/[0.04] px-4 py-4">
-          <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-200">Suggested next step</div>
-          <div className="mt-2 text-base font-semibold text-white">
+        <div className="rounded-3xl border border-[#d8c5ee] bg-[#f8f3ff] px-4 py-4">
+          <div className="text-[11px] uppercase tracking-[0.18em] text-[#7a2ed6]">Suggested next step</div>
+          <div className="mt-2 text-base font-semibold text-[#241232]">
             {showSecondaryAction ? humanizePath(fallbackRoute) : 'Home'}
           </div>
-          <div className="mt-2 text-sm leading-6 text-slate-300">
+          <div className="mt-2 text-sm leading-6 text-[#51465e]">
             Use a route that fits the current role instead of trying to work around the access boundary.
           </div>
         </div>

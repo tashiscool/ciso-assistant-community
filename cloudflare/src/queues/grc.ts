@@ -266,7 +266,7 @@ export async function consumeGrcQueue(
         type: body.type,
         error: error instanceof Error ? error.message : String(error),
       });
-      message.ack();
+      message.retry();
     }
   }
 }

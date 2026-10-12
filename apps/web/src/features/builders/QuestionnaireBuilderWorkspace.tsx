@@ -17,6 +17,7 @@ import {
   Upload,
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { RegModal, RegRightDrawer } from '../../components/regovise/PagePrimitives';
 import {
   createQuestionnaireTemplate,
   createQuestionnaireAssignment,
@@ -51,6 +52,11 @@ import type {
 type BuilderTab = 'overview' | 'builder' | 'assignments' | 'responses' | 'rules' | 'tests';
 type RuleEditorMode = 'visual' | 'json';
 type WorkspaceMode = 'all' | 'assessment-plans' | 'questionnaires';
+type InstanceReviewAction = 'submit' | 'accept' | 'reject' | 'reopen' | 'feedback';
+type PendingInstanceAction = {
+  instance: QuestionnaireInstance;
+  action: InstanceReviewAction;
+} | null;
 
 type Props = {
   initialTab?: BuilderTab;
@@ -89,6 +95,46 @@ function emptyRule(): QuestionnaireRule {
   };
 }
 
+function instanceActionCopy(action: InstanceReviewAction) {
+  switch (action) {
+    case 'submit':
+      return {
+        title: 'Submit questionnaire response',
+        description: 'Move this response into reviewer analysis.',
+        button: 'Submit response',
+        consequence: 'The response is saved and marked submitted for review.',
+      };
+    case 'feedback':
+      return {
+        title: 'Send questionnaire feedback',
+        description: 'Send reviewer feedback without rejecting the response.',
+        button: 'Send feedback email',
+        consequence: 'Reviewer comments are sent by email and the response remains available for follow-up.',
+      };
+    case 'reject':
+      return {
+        title: 'Reject questionnaire response',
+        description: 'Send the respondent feedback and request changes.',
+        button: 'Send email and reject',
+        consequence: 'Reviewer comments are emailed and the response is returned for changes.',
+      };
+    case 'accept':
+      return {
+        title: 'Accept questionnaire response',
+        description: 'Approve the response as reviewed.',
+        button: 'Accept response',
+        consequence: 'The response is moved to an accepted state and can feed downstream evidence/reporting.',
+      };
+    case 'reopen':
+      return {
+        title: 'Reopen questionnaire response',
+        description: 'Return this response to an editable state.',
+        button: 'Reopen response',
+        consequence: 'The respondent can edit answers again until the response is resubmitted.',
+      };
+  }
+}
+
 function buildDefaultAnswers(template: QuestionnaireTemplateDetail | null): Record<string, string | number | boolean | string[]> {
   if (!template) {
     return {};
@@ -117,12 +163,12 @@ function buildDefaultAnswers(template: QuestionnaireTemplateDetail | null): Reco
 
 function severityClass(severity: RuleDiagnostic['severity']) {
   if (severity === 'error') {
-    return 'badge-danger';
+    return 'status-pill-danger';
   }
   if (severity === 'warning') {
-    return 'badge-neutral';
+    return 'status-pill-neutral';
   }
-  return 'badge-success';
+  return 'status-pill-success';
 }
 
 function templateKindForWorkspace(mode: WorkspaceMode): QuestionnaireTemplateKind | null {
@@ -228,6 +274,12 @@ export function QuestionnaireBuilderWorkspace({
   const [testRuns, setTestRuns] = useState<RuleTestRun[]>([]);
   const [instances, setInstances] = useState<QuestionnaireInstance[]>([]);
   const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
+  const [pendingInstanceDelete, setPendingInstanceDelete] = useState<QuestionnaireInstance | null>(null);
+  const [pendingInstanceAction, setPendingInstanceAction] = useState<PendingInstanceAction>(null);
+  const [pendingQuestionDelete, setPendingQuestionDelete] = useState<QuestionnaireQuestion | null>(null);
+  const [pendingRuleDelete, setPendingRuleDelete] = useState<QuestionnaireRule | null>(null);
+  const [pendingTemplateCreate, setPendingTemplateCreate] = useState(false);
+  const [assignmentDrawerOpen, setAssignmentDrawerOpen] = useState(false);
   const [previewRun, setPreviewRun] = useState<RuleTestRun | null>(null);
   const [draftTemplate, setDraftTemplate] = useState<QuestionnaireTemplateDetail | null>(null);
   const [draftRuleSet, setDraftRuleSet] = useState<RuleSetDetail | null>(null);
@@ -403,6 +455,162 @@ export function QuestionnaireBuilderWorkspace({
     [instances, selectedInstanceId],
   );
 
+  const assignmentFormFields = (
+    <div className="grid gap-4 sm:grid-cols-2">
+      <label className="space-y-2">
+        <span className="label">Assignment Type</span>
+        <select
+          className="input"
+          value={assignmentForm.assignmentType}
+          onChange={(event) =>
+            setAssignmentForm((current) => ({
+              ...current,
+              assignmentType: event.target.value as typeof assignmentForm.assignmentType,
+            }))
+          }
+        >
+          <option value="user">Assign to User</option>
+          <option value="email">Assign by Email</option>
+          <option value="module">Assign by Module</option>
+          <option value="recurring">Assign Recurring</option>
+          <option value="bulk">Bulk Assignment</option>
+          <option value="self">Self-Assignment URL</option>
+        </select>
+      </label>
+      <label className="space-y-2">
+        <span className="label">Title</span>
+        <input
+          className="input"
+          placeholder={draftTemplate?.name ?? labels.singularLabel}
+          value={assignmentForm.title}
+          onChange={(event) => setAssignmentForm((current) => ({ ...current, title: event.target.value }))}
+        />
+      </label>
+      <label className="space-y-2">
+        <span className="label">Assignee User ID</span>
+        <input
+          className="input"
+          placeholder={identity.userId}
+          value={assignmentForm.assigneeUserId}
+          onChange={(event) => setAssignmentForm((current) => ({ ...current, assigneeUserId: event.target.value }))}
+        />
+      </label>
+      <label className="space-y-2">
+        <span className="label">Assignee Email</span>
+        <input
+          className="input"
+          placeholder="vendor@example.com"
+          value={assignmentForm.assigneeEmail}
+          onChange={(event) => setAssignmentForm((current) => ({ ...current, assigneeEmail: event.target.value }))}
+        />
+      </label>
+      <label className="space-y-2">
+        <span className="label">Reviewer User ID</span>
+        <input
+          className="input"
+          placeholder={identity.userId}
+          value={assignmentForm.reviewerUserId}
+          onChange={(event) => setAssignmentForm((current) => ({ ...current, reviewerUserId: event.target.value }))}
+        />
+      </label>
+      <label className="space-y-2">
+        <span className="label">Due Date</span>
+        <input
+          className="input"
+          type="date"
+          value={assignmentForm.dueDate}
+          onChange={(event) => setAssignmentForm((current) => ({ ...current, dueDate: event.target.value }))}
+        />
+      </label>
+      <label className="space-y-2">
+        <span className="label">Parent Module</span>
+        <input
+          className="input"
+          placeholder="supply-chain, assets, risks"
+          value={assignmentForm.parentModule}
+          onChange={(event) => setAssignmentForm((current) => ({ ...current, parentModule: event.target.value }))}
+        />
+      </label>
+      <label className="space-y-2">
+        <span className="label">Parent Record ID</span>
+        <input
+          className="input"
+          value={assignmentForm.parentRecordId}
+          onChange={(event) => setAssignmentForm((current) => ({ ...current, parentRecordId: event.target.value }))}
+        />
+      </label>
+      <label className="space-y-2">
+        <span className="label">Recurrence</span>
+        <select
+          className="input"
+          value={assignmentForm.recurrenceType}
+          onChange={(event) => setAssignmentForm((current) => ({ ...current, recurrenceType: event.target.value }))}
+        >
+          <option value="Weekly">Weekly</option>
+          <option value="Monthly">Monthly</option>
+          <option value="Quarterly">Quarterly</option>
+          <option value="Yearly">Yearly</option>
+        </select>
+      </label>
+      <label className="space-y-2">
+        <span className="label">Start Date</span>
+        <input
+          className="input"
+          type="date"
+          value={assignmentForm.startDate}
+          onChange={(event) => setAssignmentForm((current) => ({ ...current, startDate: event.target.value }))}
+        />
+      </label>
+      <label className="space-y-2 sm:col-span-2">
+        <span className="label">Bulk CSV Emails</span>
+        <textarea
+          className="input min-h-[100px]"
+          placeholder="email,reviewer,due date&#10;vendor@example.com,reviewer@example.com,2026-06-30"
+          value={assignmentForm.bulkCsv}
+          onChange={(event) => setAssignmentForm((current) => ({ ...current, bulkCsv: event.target.value }))}
+        />
+      </label>
+      <label className="flex items-center gap-3 text-sm text-[#4f435c] sm:col-span-2">
+        <input
+          checked={assignmentForm.loginRequired}
+          className="h-4 w-4 rounded border-[#d7c3f1] bg-white"
+          onChange={(event) => setAssignmentForm((current) => ({ ...current, loginRequired: event.target.checked }))}
+          type="checkbox"
+        />
+        Require username/password login
+      </label>
+    </div>
+  );
+
+  function handleRemoveQuestion(question: QuestionnaireQuestion) {
+    setDraftTemplate((current) =>
+      current
+        ? {
+            ...current,
+            questions: current.questions.filter((entry) => entry.id !== question.id),
+          }
+        : current,
+    );
+    setTestAnswers((current) => {
+      const next = { ...current };
+      delete next[question.ref];
+      return next;
+    });
+    setPendingQuestionDelete(null);
+  }
+
+  function handleRemoveRule(rule: QuestionnaireRule) {
+    setDraftRuleSet((current) =>
+      current
+        ? {
+            ...current,
+            rules: current.rules.filter((entry) => entry.id !== rule.id),
+          }
+        : current,
+    );
+    setPendingRuleDelete(null);
+  }
+
   async function handleCreateTemplate() {
     try {
       setSaving(true);
@@ -448,6 +656,7 @@ export function QuestionnaireBuilderWorkspace({
       await loadTemplates();
       setSelectedId(created.template.id);
       setActiveTab('builder');
+      setPendingTemplateCreate(false);
       setNotice(
         nextKind === 'assessment-plan'
           ? 'New assessment plan created in the canonical template service.'
@@ -703,6 +912,7 @@ export function QuestionnaireBuilderWorkspace({
       await refreshInstances(selectedId);
       setSelectedInstanceId(created[0]?.id ?? null);
       setActiveTab('responses');
+      setAssignmentDrawerOpen(false);
       setNotice(`Created ${created.length} questionnaire assignment${created.length === 1 ? '' : 's'}.`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to create questionnaire assignment.');
@@ -758,6 +968,7 @@ export function QuestionnaireBuilderWorkspace({
       await refreshInstances(selectedId);
       setSelectedInstanceId(updated.id);
       setNotice(`Questionnaire response moved to ${updated.status}.`);
+      setPendingInstanceAction(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to update questionnaire response state.');
     } finally {
@@ -769,16 +980,13 @@ export function QuestionnaireBuilderWorkspace({
     if (!selectedId) {
       return;
     }
-    const confirmed = window.confirm(`Delete questionnaire assignment "${instance.title}"?`);
-    if (!confirmed) {
-      return;
-    }
     try {
       setSaving(true);
       setError(null);
       setNotice(null);
       await deleteQuestionnaireInstance(selectedId, instance.id);
       await refreshInstances(selectedId);
+      setPendingInstanceDelete(null);
       setNotice('Questionnaire assignment deleted.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete questionnaire assignment.');
@@ -801,7 +1009,7 @@ export function QuestionnaireBuilderWorkspace({
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading builder workspace...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading builder workspace...</div>;
   }
 
   return (
@@ -810,8 +1018,8 @@ export function QuestionnaireBuilderWorkspace({
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">{labels.builderEyebrow}</div>
-            <h1 className="mt-2 text-3xl font-semibold text-white">{labels.pageTitle}</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h1 className="mt-2 text-3xl font-semibold text-[#241232]">{labels.pageTitle}</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
               {labels.pageDescription}
             </p>
           </div>
@@ -836,7 +1044,7 @@ export function QuestionnaireBuilderWorkspace({
               <SlidersHorizontal className="mr-2 h-4 w-4" />
               Visual Rules Engine
             </button>
-            <button className="button-secondary" onClick={() => void handleCreateTemplate()} type="button">
+            <button className="button-secondary" onClick={() => setPendingTemplateCreate(true)} type="button">
               <Plus className="mr-2 h-4 w-4" />
               {labels.createLabel}
             </button>
@@ -856,7 +1064,7 @@ export function QuestionnaireBuilderWorkspace({
           <div className="metric-card" key={metric.label}>
             <div className="metric-label">{metric.label}</div>
             <div className="metric-value">{metric.value}</div>
-            <div className="mt-2 text-xs text-slate-500">{metric.detail}</div>
+            <div className="mt-2 text-xs text-[#62576a]">{metric.detail}</div>
           </div>
         ))}
       </section>
@@ -866,42 +1074,42 @@ export function QuestionnaireBuilderWorkspace({
           <div className="flex items-center justify-between">
             <div>
               <div className="eyebrow">{labels.libraryLabel}</div>
-              <h2 className="mt-2 text-xl font-semibold text-white">{labels.libraryTitle}</h2>
+              <h2 className="mt-2 text-xl font-semibold text-[#241232]">{labels.libraryTitle}</h2>
             </div>
-            <Sparkles className="h-5 w-5 text-cyan-300" />
+            <Sparkles className="h-5 w-5 text-[#7a3ccf]" />
           </div>
           <div className="space-y-3">
             {visibleTemplates.map((template) => (
               <button
                 key={template.id}
                 className={`panel-subtle w-full text-left transition ${
-                  selectedId === template.id ? 'border-cyan-300/30 bg-cyan-400/[0.04]' : 'hover:border-cyan-300/20'
+                  selectedId === template.id ? 'border-[#d7c3f1] bg-[#f6f1fa]' : 'hover:border-[#d7c3f1]'
                 }`}
                 onClick={() => setSelectedId(template.id)}
                 type="button"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="font-medium text-white">{template.name}</div>
-                    <div className="mt-1 text-sm text-slate-400">{template.description ?? 'No description yet.'}</div>
+                    <div className="font-medium text-[#241232]">{template.name}</div>
+                    <div className="mt-1 text-sm text-[#6f6578]">{template.description ?? 'No description yet.'}</div>
                   </div>
-                  <ChevronRight className="mt-0.5 h-4 w-4 text-slate-500" />
+                  <ChevronRight className="mt-0.5 h-4 w-4 text-[#62576a]" />
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="badge-neutral">
+                  <span className="status-pill-neutral">
                     {template.templateKind === 'assessment-plan' ? 'Assessment Plan' : 'Questionnaire'}
                   </span>
                   {template.templateKind === 'questionnaire' && template.questionnaireType ? (
-                    <span className="badge-neutral">{template.questionnaireType}</span>
+                    <span className="status-pill-neutral">{template.questionnaireType}</span>
                   ) : null}
                   {template.templateKind === 'questionnaire' && template.assignmentModel ? (
-                    <span className="badge-neutral">{template.assignmentModel}</span>
+                    <span className="status-pill-neutral">{template.assignmentModel}</span>
                   ) : null}
-                  <span className="badge-neutral">{template.status}</span>
-                  <span className="badge-neutral">{template.questionCount} questions</span>
-                  <span className="badge-neutral">{template.ruleCount} rules</span>
+                  <span className="status-pill-neutral">{template.status}</span>
+                  <span className="status-pill-neutral">{template.questionCount} questions</span>
+                  <span className="status-pill-neutral">{template.ruleCount} rules</span>
                 </div>
-                <div className="mt-3 text-xs text-slate-500">Updated {formatDate(template.updatedAt)}</div>
+                <div className="mt-3 text-xs text-[#62576a]">Updated {formatDate(template.updatedAt)}</div>
               </button>
             ))}
           </div>
@@ -909,12 +1117,12 @@ export function QuestionnaireBuilderWorkspace({
 
         <section className="panel">
           {detailLoading || !draftTemplate || !draftRuleSet ? (
-            <div className="text-sm text-slate-300">
+            <div className="text-sm text-[#4f435c]">
               Loading {workspaceMode === 'assessment-plans' ? 'assessment plan' : 'template'} detail...
             </div>
           ) : (
             <Tabs onValueChange={(value) => setActiveTab(value as BuilderTab)} value={activeTab}>
-              <TabsList className="mb-6 w-fit rounded-2xl border border-white/10 bg-slate-950/70">
+              <TabsList className="mb-6 w-fit rounded-2xl border border-[#ded8e4] bg-white">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="builder">Builder</TabsTrigger>
                 <TabsTrigger value="assignments">Assignments</TabsTrigger>
@@ -928,8 +1136,8 @@ export function QuestionnaireBuilderWorkspace({
                   <div className="space-y-6">
                     <div className="panel-subtle">
                       <div className="eyebrow">{labels.pageTitle} Overview</div>
-                      <h3 className="mt-2 text-xl font-semibold text-white">{labels.overviewTitle}</h3>
-                      <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-300">
+                      <h3 className="mt-2 text-xl font-semibold text-[#241232]">{labels.overviewTitle}</h3>
+                      <p className="mt-3 max-w-4xl text-sm leading-6 text-[#4f435c]">
                         {workspaceMode === 'assessment-plans'
                           ? 'Understand how reusable audit criteria, lines of inquiry, requirement mappings, and reviewer guidance come together in one assessment-plan library. This overview stays connected to the live builder and rules engine instead of drifting into disconnected documentation.'
                           : 'Understand the template, assignment, attestation, evidence, and export model behind the canonical questionnaire platform. This overview stays connected to the live builder and rules engine instead of drifting into disconnected documentation.'}
@@ -939,7 +1147,7 @@ export function QuestionnaireBuilderWorkspace({
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="panel-subtle">
                         <div className="eyebrow">{labels.conceptLabel}</div>
-                        <div className="mt-4 space-y-3 text-sm text-slate-300">
+                        <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
                           {workspaceMode === 'assessment-plans' ? (
                             <>
                               <div>Assessment plans are reusable audit packages that carry stable lines of inquiry, requirement traceability, and reviewer guidance.</div>
@@ -957,7 +1165,7 @@ export function QuestionnaireBuilderWorkspace({
                       </div>
                       <div className="panel-subtle">
                         <div className="eyebrow">{workspaceMode === 'assessment-plans' ? 'How Plans Are Used' : 'Assignment Options'}</div>
-                        <div className="mt-4 space-y-2 text-sm text-slate-300">
+                        <div className="mt-4 space-y-2 text-sm text-[#4f435c]">
                           {(workspaceMode === 'assessment-plans'
                             ? [
                                 'Select an assessment plan while preparing a manual assessment',
@@ -974,7 +1182,7 @@ export function QuestionnaireBuilderWorkspace({
                                 'Routed for reviewer follow-up and attestation',
                                 'Repeated on recurring collection cadences',
                               ]).map((item) => (
-                            <div key={item} className="rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2">
+                            <div key={item} className="rounded-2xl border border-[#ded8e4] bg-white px-3 py-2">
                               {item}
                             </div>
                           ))}
@@ -989,12 +1197,12 @@ export function QuestionnaireBuilderWorkspace({
                           {(workspaceMode === 'assessment-plans'
                             ? ['Open', 'Submitted', 'Accepted', 'Request Changes', 'Closed']
                             : ['Draft', 'Assigned', 'In Progress', 'Submitted', 'In Review', 'Accepted', 'Request Changes', 'Closed']).map((state) => (
-                            <div key={state} className="rounded-2xl border border-white/10 bg-slate-950/50 px-4 py-3 text-sm text-slate-300">
+                            <div key={state} className="rounded-2xl border border-[#ded8e4] bg-white px-4 py-3 text-sm text-[#4f435c]">
                               {state}
                             </div>
                           ))}
                         </div>
-                        <div className="mt-4 text-sm text-slate-400">
+                        <div className="mt-4 text-sm text-[#6f6578]">
                           {workspaceMode === 'assessment-plans'
                             ? 'Persisted test runs, saved plans, and downstream assessment execution all inherit from this lifecycle posture.'
                             : 'Persisted test runs, saved questionnaires, and downstream report integrations all inherit from this lifecycle posture.'}
@@ -1002,7 +1210,7 @@ export function QuestionnaireBuilderWorkspace({
                       </div>
                       <div className="panel-subtle">
                         <div className="eyebrow">Question Types</div>
-                        <div className="mt-4 grid gap-3 md:grid-cols-2 text-sm text-slate-300">
+                        <div className="mt-4 grid gap-3 md:grid-cols-2 text-sm text-[#4f435c]">
                           {[
                             'Text response',
                             'Number response',
@@ -1010,7 +1218,7 @@ export function QuestionnaireBuilderWorkspace({
                             'Single select',
                             'Multi-select',
                           ].map((item) => (
-                            <div key={item} className="rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2">
+                            <div key={item} className="rounded-2xl border border-[#ded8e4] bg-white px-3 py-2">
                               {item}
                             </div>
                           ))}
@@ -1021,7 +1229,7 @@ export function QuestionnaireBuilderWorkspace({
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="panel-subtle">
                         <div className="eyebrow">Scoring System</div>
-                        <div className="mt-4 space-y-3 text-sm text-slate-300">
+                        <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
                           <div>Question-level weighting supports calculated, maturity, and boolean score models.</div>
                           <div>Grade, pass/fail, and completion posture stay visible across test runs and downstream assessments.</div>
                           <div>Manual overrides and derived scoring can coexist when reviewer sign-off is still required.</div>
@@ -1029,7 +1237,7 @@ export function QuestionnaireBuilderWorkspace({
                       </div>
                       <div className="panel-subtle">
                         <div className="eyebrow">Key Features</div>
-                        <div className="mt-4 space-y-2 text-sm text-slate-300">
+                        <div className="mt-4 space-y-2 text-sm text-[#4f435c]">
                           {(workspaceMode === 'assessment-plans'
                             ? [
                                 'Lines of inquiry',
@@ -1051,7 +1259,7 @@ export function QuestionnaireBuilderWorkspace({
                                 'Scoring and attestation posture',
                                 'Recurring distribution semantics',
                               ]).map((item) => (
-                            <div key={item} className="rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2">
+                            <div key={item} className="rounded-2xl border border-[#ded8e4] bg-white px-3 py-2">
                               {item}
                             </div>
                           ))}
@@ -1067,10 +1275,10 @@ export function QuestionnaireBuilderWorkspace({
                           ['Rules', `${draftRuleSet.rules.length}`, 'Visual rules and validation diagnostics'],
                           ['History', `${testRuns.length}`, 'Persisted execution history for review and auditability'],
                         ].map(([label, value, detail]) => (
-                          <div key={label} className="rounded-3xl border border-white/10 bg-slate-950/50 p-4">
+                          <div key={label} className="rounded-3xl border border-[#ded8e4] bg-white p-4">
                             <div className="label">{label}</div>
-                            <div className="mt-2 text-2xl font-semibold text-white">{value}</div>
-                            <div className="mt-2 text-sm text-slate-400">{detail}</div>
+                            <div className="mt-2 text-2xl font-semibold text-[#241232]">{value}</div>
+                            <div className="mt-2 text-sm text-[#6f6578]">{detail}</div>
                           </div>
                         ))}
                       </div>
@@ -1080,15 +1288,15 @@ export function QuestionnaireBuilderWorkspace({
                   <aside className="space-y-4">
                     <div className="panel-subtle">
                       <div className="eyebrow">Current Package</div>
-                      <div className="mt-3 text-2xl font-semibold text-white">{draftTemplate.name}</div>
-                      <div className="mt-2 text-sm text-slate-400">
+                      <div className="mt-3 text-2xl font-semibold text-[#241232]">{draftTemplate.name}</div>
+                      <div className="mt-2 text-sm text-[#6f6578]">
                         Version {draftTemplate.version} · Updated {formatDate(draftTemplate.updatedAt)}
                       </div>
                       {draftTemplate.sourceFramework ? (
-                        <div className="mt-3 text-sm text-slate-300">Source: {draftTemplate.sourceFramework}</div>
+                        <div className="mt-3 text-sm text-[#4f435c]">Source: {draftTemplate.sourceFramework}</div>
                       ) : null}
                       {isQuestionnaireTemplate(draftTemplate.templateKind) ? (
-                        <div className="mt-4 space-y-2 text-sm text-slate-300">
+                        <div className="mt-4 space-y-2 text-sm text-[#4f435c]">
                           {draftTemplate.questionnaireType ? <div>Type: {draftTemplate.questionnaireType}</div> : null}
                           {draftTemplate.assignmentModel ? <div>Assignment: {draftTemplate.assignmentModel}</div> : null}
                           {draftTemplate.evidenceCollectionMode ? <div>Evidence: {draftTemplate.evidenceCollectionMode}</div> : null}
@@ -1098,13 +1306,13 @@ export function QuestionnaireBuilderWorkspace({
                     </div>
                     <div className="panel-subtle">
                       <div className="eyebrow">Live Alignment</div>
-                      <div className="mt-4 space-y-3 text-sm text-slate-300">
+                      <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
                         <div className="flex items-start gap-2">
-                          <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-300" />
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 text-[#126b36]" />
                           <span>This overview reflects the live builder, rules engine, and test-run data in the canonical stack.</span>
                         </div>
                         <div className="flex items-start gap-2">
-                          <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-300" />
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 text-[#126b36]" />
                           <span>Use the builder and rules tabs to move directly from overview concepts into authoring and validation.</span>
                         </div>
                       </div>
@@ -1370,17 +1578,17 @@ export function QuestionnaireBuilderWorkspace({
                           />
                         </div>
                         {isQuestionnaireTemplate(draftTemplate.templateKind) ? (
-                          <div className="md:col-span-2 grid gap-3 rounded-3xl border border-white/10 bg-slate-950/50 p-4 md:grid-cols-2">
+                          <div className="md:col-span-2 grid gap-3 rounded-3xl border border-[#ded8e4] bg-white p-4 md:grid-cols-2">
                             {[
                               ['allowPublicUrl', 'Generate self-assignment URL'],
                               ['loginRequired', 'Require username/password login'],
                               ['enableScoring', 'Enable scoring and grade display'],
                               ['enableQuestionAssignment', 'Enable per-question assignment'],
                             ].map(([key, label]) => (
-                              <label className="flex items-center gap-3 text-sm text-slate-300" key={key}>
+                              <label className="flex items-center gap-3 text-sm text-[#4f435c]" key={key}>
                                 <input
                                   checked={Boolean(draftTemplate[key as keyof QuestionnaireTemplateDetail])}
-                                  className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                  className="h-4 w-4 rounded border-[#d7c3f1] bg-white"
                                   onChange={(event) =>
                                     setDraftTemplate((current) =>
                                       current ? { ...current, [key]: event.target.checked } : current,
@@ -1478,7 +1686,7 @@ export function QuestionnaireBuilderWorkspace({
                       <div className="flex items-center justify-between gap-3">
                         <div>
                           <div className="eyebrow">{labels.questionSetLabel}</div>
-                          <h3 className="mt-2 text-lg font-semibold text-white">{labels.questionSetLabel}</h3>
+                          <h3 className="mt-2 text-lg font-semibold text-[#241232]">{labels.questionSetLabel}</h3>
                         </div>
                         <div className="flex flex-wrap gap-2">
                           <input
@@ -1534,23 +1742,15 @@ export function QuestionnaireBuilderWorkspace({
                       </div>
                       <div className="mt-4 space-y-4">
                         {draftTemplate.questions.map((question, index) => (
-                          <div className="rounded-3xl border border-white/10 bg-slate-950/60 p-4" key={question.id}>
+                          <div className="rounded-3xl border border-[#ded8e4] bg-white p-4" key={question.id}>
                             <div className="flex items-center justify-between gap-3">
-                              <div className="text-sm font-medium text-white">
+                              <div className="text-sm font-medium text-[#241232]">
                                 {labels.questionLabel} {index + 1}
                               </div>
                               <button
-                                className="text-xs uppercase tracking-[0.18em] text-rose-300 transition hover:text-rose-200"
-                                onClick={() =>
-                                  setDraftTemplate((current) =>
-                                    current
-                                      ? {
-                                          ...current,
-                                          questions: current.questions.filter((entry) => entry.id !== question.id),
-                                        }
-                                      : current,
-                                  )
-                                }
+                                aria-label={`Remove ${labels.questionLabel.toLowerCase()} ${question.ref}`}
+                                className="text-xs uppercase tracking-[0.18em] text-[#9d1f2c] transition hover:text-[#9d1f2c]"
+                                onClick={() => setPendingQuestionDelete(question)}
                                 type="button"
                               >
                                 Remove
@@ -1647,11 +1847,11 @@ export function QuestionnaireBuilderWorkspace({
                                   <option value="file-upload">File Upload</option>
                                 </select>
                               </div>
-                              <div className="grid gap-3 rounded-2xl border border-white/10 bg-slate-950/50 p-3">
-                                <label className="flex items-center gap-3 text-sm text-slate-300">
+                              <div className="grid gap-3 rounded-2xl border border-[#ded8e4] bg-white p-3">
+                                <label className="flex items-center gap-3 text-sm text-[#4f435c]">
                                   <input
                                     checked={question.required}
-                                    className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                    className="h-4 w-4 rounded border-[#d7c3f1] bg-white"
                                     onChange={(event) =>
                                       setDraftTemplate((current) =>
                                         current
@@ -1668,10 +1868,10 @@ export function QuestionnaireBuilderWorkspace({
                                   />
                                   Required
                                 </label>
-                                <label className="flex items-center gap-3 text-sm text-slate-300">
+                                <label className="flex items-center gap-3 text-sm text-[#4f435c]">
                                   <input
                                     checked={Boolean(question.enableUpload || question.type === 'file-upload')}
-                                    className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                    className="h-4 w-4 rounded border-[#d7c3f1] bg-white"
                                     onChange={(event) =>
                                       setDraftTemplate((current) =>
                                         current
@@ -1812,35 +2012,35 @@ export function QuestionnaireBuilderWorkspace({
                   <aside className="space-y-4">
                     <div className="panel-subtle">
                       <div className="eyebrow">Authoring Status</div>
-                      <div className="mt-3 text-2xl font-semibold text-white">{draftTemplate.status}</div>
-                      <div className="mt-2 text-sm leading-6 text-slate-300">
+                      <div className="mt-3 text-2xl font-semibold text-[#241232]">{draftTemplate.status}</div>
+                      <div className="mt-2 text-sm leading-6 text-[#4f435c]">
                         Version {draftTemplate.version} · Updated {formatDate(draftTemplate.updatedAt)}
                       </div>
                     </div>
                     <div className="panel-subtle">
                       <div className="eyebrow">Coverage</div>
-                      <div className="mt-4 space-y-3 text-sm text-slate-300">
+                      <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
                         <div className="flex items-center justify-between">
                           <span>Required {labels.questionSetLabel.toLowerCase()}</span>
-                          <span className="font-medium text-white">
+                          <span className="font-medium text-[#241232]">
                             {draftTemplate.questions.filter((question) => question.required).length}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span>Sections</span>
-                          <span className="font-medium text-white">
+                          <span className="font-medium text-[#241232]">
                             {new Set(draftTemplate.questions.map((question) => question.section)).size}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span>Mapped requirements</span>
-                          <span className="font-medium text-white">
+                          <span className="font-medium text-[#241232]">
                             {draftTemplate.questions.filter((question) => question.requirementRef?.trim()).length}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span>Weighted score points</span>
-                          <span className="font-medium text-white">
+                          <span className="font-medium text-[#241232]">
                             {draftTemplate.questions.reduce((total, question) => total + question.weight, 0)}
                           </span>
                         </div>
@@ -1853,84 +2053,27 @@ export function QuestionnaireBuilderWorkspace({
               <TabsContent className="space-y-6" value="assignments">
                 <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
                   <div className="panel-subtle">
-                    <div className="eyebrow">Assignment</div>
-                    <h3 className="mt-2 text-xl font-semibold text-white">Create Questionnaire Assignment</h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">
-                      Assign to an internal user, external email, linked module record, recurring schedule, bulk CSV list, or a self-assignment access-code URL.
+                    <div className="eyebrow">Assignment workspace</div>
+                    <h3 className="mt-2 text-xl font-semibold text-[#241232]">Questionnaire Assignments</h3>
+                    <p className="mt-2 text-sm leading-6 text-[#4f435c]">
+                      Create internal, external, module-linked, recurring, bulk, or self-assignment response requests from the active package.
                     </p>
-                    <div className="mt-5 grid gap-4 md:grid-cols-2">
-                      <label className="space-y-2">
-                        <span className="label">Assignment Type</span>
-                        <select
-                          className="input"
-                          value={assignmentForm.assignmentType}
-                          onChange={(event) =>
-                            setAssignmentForm((current) => ({
-                              ...current,
-                              assignmentType: event.target.value as typeof assignmentForm.assignmentType,
-                            }))
-                          }
-                        >
-                          <option value="user">Assign to User</option>
-                          <option value="email">Assign by Email</option>
-                          <option value="module">Assign by Module</option>
-                          <option value="recurring">Assign Recurring</option>
-                          <option value="bulk">Bulk Assignment</option>
-                          <option value="self">Self-Assignment URL</option>
-                        </select>
-                      </label>
-                      <label className="space-y-2">
-                        <span className="label">Title</span>
-                        <input className="input" value={assignmentForm.title} onChange={(event) => setAssignmentForm((current) => ({ ...current, title: event.target.value }))} placeholder={draftTemplate.name} />
-                      </label>
-                      <label className="space-y-2">
-                        <span className="label">Assignee User ID</span>
-                        <input className="input" value={assignmentForm.assigneeUserId} onChange={(event) => setAssignmentForm((current) => ({ ...current, assigneeUserId: event.target.value }))} placeholder={identity.userId} />
-                      </label>
-                      <label className="space-y-2">
-                        <span className="label">Assignee Email</span>
-                        <input className="input" value={assignmentForm.assigneeEmail} onChange={(event) => setAssignmentForm((current) => ({ ...current, assigneeEmail: event.target.value }))} placeholder="vendor@example.com" />
-                      </label>
-                      <label className="space-y-2">
-                        <span className="label">Reviewer User ID</span>
-                        <input className="input" value={assignmentForm.reviewerUserId} onChange={(event) => setAssignmentForm((current) => ({ ...current, reviewerUserId: event.target.value }))} placeholder={identity.userId} />
-                      </label>
-                      <label className="space-y-2">
-                        <span className="label">Due Date</span>
-                        <input className="input" type="date" value={assignmentForm.dueDate} onChange={(event) => setAssignmentForm((current) => ({ ...current, dueDate: event.target.value }))} />
-                      </label>
-                      <label className="space-y-2">
-                        <span className="label">Parent Module</span>
-                        <input className="input" value={assignmentForm.parentModule} onChange={(event) => setAssignmentForm((current) => ({ ...current, parentModule: event.target.value }))} placeholder="supply-chain, assets, risks" />
-                      </label>
-                      <label className="space-y-2">
-                        <span className="label">Parent Record ID</span>
-                        <input className="input" value={assignmentForm.parentRecordId} onChange={(event) => setAssignmentForm((current) => ({ ...current, parentRecordId: event.target.value }))} />
-                      </label>
-                      <label className="space-y-2">
-                        <span className="label">Recurrence</span>
-                        <select className="input" value={assignmentForm.recurrenceType} onChange={(event) => setAssignmentForm((current) => ({ ...current, recurrenceType: event.target.value }))}>
-                          <option value="Weekly">Weekly</option>
-                          <option value="Monthly">Monthly</option>
-                          <option value="Quarterly">Quarterly</option>
-                          <option value="Yearly">Yearly</option>
-                        </select>
-                      </label>
-                      <label className="space-y-2">
-                        <span className="label">Start Date</span>
-                        <input className="input" type="date" value={assignmentForm.startDate} onChange={(event) => setAssignmentForm((current) => ({ ...current, startDate: event.target.value }))} />
-                      </label>
-                      <label className="space-y-2 md:col-span-2">
-                        <span className="label">Bulk CSV Emails</span>
-                        <textarea className="input min-h-[100px]" value={assignmentForm.bulkCsv} onChange={(event) => setAssignmentForm((current) => ({ ...current, bulkCsv: event.target.value }))} placeholder="email,reviewer,due date&#10;vendor@example.com,reviewer@example.com,2026-06-30" />
-                      </label>
-                      <label className="flex items-center gap-3 text-sm text-slate-300">
-                        <input checked={assignmentForm.loginRequired} className="h-4 w-4 rounded border-white/20 bg-slate-950" onChange={(event) => setAssignmentForm((current) => ({ ...current, loginRequired: event.target.checked }))} type="checkbox" />
-                        Require username/password login
-                      </label>
+                    <div className="mt-5 grid gap-3 md:grid-cols-3">
+                      <div className="rounded-2xl border border-[#ded8e4] bg-white p-4">
+                        <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6e6575]">Active package</div>
+                        <div className="mt-2 font-semibold text-[#241232]">{draftTemplate.name}</div>
+                      </div>
+                      <div className="rounded-2xl border border-[#ded8e4] bg-white p-4">
+                        <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6e6575]">Available items</div>
+                        <div className="mt-2 font-semibold text-[#241232]">{draftTemplate.questions.length} {labels.questionSetLabel.toLowerCase()}</div>
+                      </div>
+                      <div className="rounded-2xl border border-[#ded8e4] bg-white p-4">
+                        <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#6e6575]">Public response URL</div>
+                        <div className="mt-2 font-semibold text-[#241232]">{draftTemplate.allowPublicUrl ? 'Enabled' : 'Disabled'}</div>
+                      </div>
                     </div>
                     <div className="mt-5 flex flex-wrap gap-2">
-                      <button className="button-primary" disabled={saving} onClick={() => void handleCreateAssignment()} type="button">
+                      <button className="button-primary" disabled={saving} onClick={() => setAssignmentDrawerOpen(true)} type="button">
                         <Send className="mr-2 h-4 w-4" />
                         Create Assignment
                       </button>
@@ -1944,7 +2087,7 @@ export function QuestionnaireBuilderWorkspace({
                   <aside className="space-y-4">
                     <div className="panel-subtle">
                       <div className="eyebrow">Assignment Coverage</div>
-                      <div className="mt-4 space-y-3 text-sm text-slate-300">
+                      <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
                         <div>Instances: {instances.length}</div>
                         <div>Submitted: {instances.filter((instance) => instance.status === 'Submitted').length}</div>
                         <div>Accepted: {instances.filter((instance) => instance.status === 'Accepted').length}</div>
@@ -1969,53 +2112,53 @@ export function QuestionnaireBuilderWorkspace({
                 <div className="grid gap-6 xl:grid-cols-[340px_minmax(0,1fr)]">
                   <aside className="panel-subtle">
                     <div className="eyebrow">Responses</div>
-                    <h3 className="mt-2 text-lg font-semibold text-white">Assigned Questionnaires</h3>
+                    <h3 className="mt-2 text-lg font-semibold text-[#241232]">Assigned Questionnaires</h3>
                     <div className="mt-4 space-y-3">
                       {instances.map((instance) => (
                         <button
-                          className={`w-full rounded-2xl border p-4 text-left transition ${selectedInstance?.id === instance.id ? 'border-cyan-300/30 bg-cyan-400/[0.04]' : 'border-white/10 bg-slate-950/50 hover:border-cyan-300/20'}`}
+                          className={`w-full rounded-2xl border p-4 text-left transition ${selectedInstance?.id === instance.id ? 'border-[#d7c3f1] bg-[#f6f1fa]' : 'border-[#ded8e4] bg-white hover:border-[#d7c3f1]'}`}
                           key={instance.id}
                           onClick={() => setSelectedInstanceId(instance.id)}
                           type="button"
                         >
-                          <div className="font-medium text-white">{instance.title}</div>
-                          <div className="mt-2 text-sm text-slate-400">{instance.assigneeEmail || instance.assigneeUserId || instance.assignmentType}</div>
+                          <div className="font-medium text-[#241232]">{instance.title}</div>
+                          <div className="mt-2 text-sm text-[#6f6578]">{instance.assigneeEmail || instance.assigneeUserId || instance.assignmentType}</div>
                           <div className="mt-3 flex flex-wrap gap-2">
-                            <span className="badge-neutral">{instance.status}</span>
-                            <span className="badge-neutral">{Math.round(instance.percentComplete)}%</span>
-                            <span className={instance.passingStatus === 'Passing' ? 'badge-success' : 'badge-neutral'}>{instance.passingStatus}</span>
+                            <span className="status-pill-neutral">{instance.status}</span>
+                            <span className="status-pill-neutral">{Math.round(instance.percentComplete)}%</span>
+                            <span className={instance.passingStatus === 'Passing' ? 'status-pill-success' : 'status-pill-neutral'}>{instance.passingStatus}</span>
                           </div>
                         </button>
                       ))}
                       {instances.length === 0 ? (
-                        <div className="rounded-2xl border border-dashed border-white/10 p-4 text-sm text-slate-400">No assignments yet. Create one from the Assignments tab.</div>
+                        <div className="rounded-2xl border border-dashed border-[#ded8e4] p-4 text-sm text-[#6f6578]">No assignments yet. Create one from the Assignments tab.</div>
                       ) : null}
                     </div>
                   </aside>
 
                   <div className="panel-subtle">
                     {!selectedInstance ? (
-                      <div className="text-sm text-slate-300">Select or create an assignment to review responses.</div>
+                      <div className="text-sm text-[#4f435c]">Select or create an assignment to review responses.</div>
                     ) : (
                       <div className="space-y-6">
                         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                           <div>
                             <div className="eyebrow">Response Detail</div>
-                            <h3 className="mt-2 text-xl font-semibold text-white">{selectedInstance.title}</h3>
+                            <h3 className="mt-2 text-xl font-semibold text-[#241232]">{selectedInstance.title}</h3>
                             <div className="mt-3 flex flex-wrap gap-2">
-                              <span className="badge-neutral">{selectedInstance.status}</span>
-                              <span className="badge-neutral">Access Code: {selectedInstance.accessCode}</span>
-                              <span className="badge-neutral">Score: {selectedInstance.score}/{selectedInstance.maxScore}</span>
-                              <span className="badge-success">{selectedInstance.grade ?? 'Pending'}</span>
+                              <span className="status-pill-neutral">{selectedInstance.status}</span>
+                              <span className="status-pill-neutral">Access Code: {selectedInstance.accessCode}</span>
+                              <span className="status-pill-neutral">Score: {selectedInstance.score}/{selectedInstance.maxScore}</span>
+                              <span className="status-pill-success">{selectedInstance.grade ?? 'Pending'}</span>
                             </div>
-                            <div className="mt-3 break-all text-sm text-cyan-200">{selectedInstance.shareLink}</div>
+                            <div className="mt-3 break-all text-sm text-[#6d28d9]">{selectedInstance.shareLink}</div>
                           </div>
                           <div className="flex flex-wrap gap-2">
                             <button className="button-secondary" onClick={() => void handleExportInstance(selectedInstance)} type="button">
                               <Download className="mr-2 h-4 w-4" />
                               Export
                             </button>
-                            <button className="button-secondary" onClick={() => void handleDeleteInstance(selectedInstance)} type="button">
+                            <button className="button-secondary" onClick={() => setPendingInstanceDelete(selectedInstance)} type="button">
                               <Trash2 className="mr-2 h-4 w-4" />
                               Delete
                             </button>
@@ -2024,15 +2167,15 @@ export function QuestionnaireBuilderWorkspace({
 
                         <div className="grid gap-4 md:grid-cols-2">
                           {draftTemplate.questions.map((question) => (
-                            <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4" key={question.id}>
+                            <div className="rounded-2xl border border-[#ded8e4] bg-white p-4" key={question.id}>
                               <div className="flex flex-wrap items-start justify-between gap-2">
                                 <div>
-                                  <div className="text-sm font-medium text-white">{question.prompt}</div>
-                                  <div className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">{question.ref} · {question.section}</div>
+                                  <div className="text-sm font-medium text-[#241232]">{question.prompt}</div>
+                                  <div className="mt-1 text-xs uppercase tracking-[0.18em] text-[#62576a]">{question.ref} · {question.section}</div>
                                 </div>
-                                {question.required ? <span className="badge-neutral">Required</span> : null}
+                                {question.required ? <span className="status-pill-neutral">Required</span> : null}
                               </div>
-                              {question.helpText ? <div className="mt-3 text-sm text-slate-400">{question.helpText}</div> : null}
+                              {question.helpText ? <div className="mt-3 text-sm text-[#6f6578]">{question.helpText}</div> : null}
                               <div className="mt-4">
                                 {question.type === 'boolean' ? (
                                   <select className="input" value={String(responseDrafts[selectedInstance.id]?.[question.ref] ?? false)} onChange={(event) => setResponseDrafts((current) => ({ ...current, [selectedInstance.id]: { ...(current[selectedInstance.id] ?? {}), [question.ref]: event.target.value === 'true' } }))}>
@@ -2044,7 +2187,7 @@ export function QuestionnaireBuilderWorkspace({
                                     {(question.options ?? []).map((option) => <option key={option} value={option}>{option}</option>)}
                                   </select>
                                 ) : question.type === 'instructional' ? (
-                                  <div className="rounded-2xl border border-cyan-300/10 bg-cyan-400/[0.04] p-3 text-sm text-slate-300">{question.prompt}</div>
+                                  <div className="rounded-2xl border border-[#d7c3f1] bg-[#f6f1fa] p-3 text-sm text-[#4f435c]">{question.prompt}</div>
                                 ) : (
                                   <textarea className="input min-h-[90px]" value={String(responseDrafts[selectedInstance.id]?.[question.ref] ?? '')} onChange={(event) => setResponseDrafts((current) => ({ ...current, [selectedInstance.id]: { ...(current[selectedInstance.id] ?? {}), [question.ref]: event.target.value } }))} />
                                 )}
@@ -2055,9 +2198,9 @@ export function QuestionnaireBuilderWorkspace({
                                   <textarea className="input mt-2 min-h-[70px]" value={String(uploadDrafts[selectedInstance.id]?.[question.ref] ?? '')} onChange={(event) => setUploadDrafts((current) => ({ ...current, [selectedInstance.id]: { ...(current[selectedInstance.id] ?? {}), [question.ref]: event.target.value } }))} placeholder="Evidence file name, URL, or artifact reference" />
                                 </div>
                               ) : null}
-                              <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-3">
+                              <div className="mt-4 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-3">
                                 <label className="label">Reviewer Feedback</label>
-                                <div className="mt-2 text-sm text-slate-300">
+                                <div className="mt-2 text-sm text-[#4f435c]">
                                   {selectedInstance.feedback?.[question.ref]?.rating ?? 'Not reviewed'} {selectedInstance.feedback?.[question.ref]?.comment ? `· ${selectedInstance.feedback[question.ref].comment}` : ''}
                                 </div>
                               </div>
@@ -2070,24 +2213,24 @@ export function QuestionnaireBuilderWorkspace({
                           <textarea className="input mt-3 min-h-[90px]" value={reviewComments} onChange={(event) => setReviewComments(event.target.value)} placeholder="Comments, request changes guidance, or reviewer note" />
                           <div className="mt-4 flex flex-wrap gap-2">
                             <button className="button-secondary" disabled={saving} onClick={() => void handleSaveInstanceResponse(selectedInstance)} type="button">Save Progress</button>
-                            <button className="button-secondary" disabled={saving} onClick={() => void handleInstanceAction(selectedInstance, 'submit')} type="button">Submit</button>
-                            <button className="button-secondary" disabled={saving} onClick={() => void handleInstanceAction(selectedInstance, 'feedback')} type="button">Send Email</button>
-                            <button className="button-secondary" disabled={saving} onClick={() => void handleInstanceAction(selectedInstance, 'reject')} type="button">Send Email & Reject</button>
-                            <button className="button-primary" disabled={saving} onClick={() => void handleInstanceAction(selectedInstance, 'accept')} type="button">Accept</button>
-                            <button className="button-secondary" disabled={saving} onClick={() => void handleInstanceAction(selectedInstance, 'reopen')} type="button">Reopen</button>
+                            <button className="button-secondary" disabled={saving} onClick={() => setPendingInstanceAction({ instance: selectedInstance, action: 'submit' })} type="button">Submit</button>
+                            <button className="button-secondary" disabled={saving} onClick={() => setPendingInstanceAction({ instance: selectedInstance, action: 'feedback' })} type="button">Send Email</button>
+                            <button className="button-secondary" disabled={saving} onClick={() => setPendingInstanceAction({ instance: selectedInstance, action: 'reject' })} type="button">Send Email & Reject</button>
+                            <button className="button-primary" disabled={saving} onClick={() => setPendingInstanceAction({ instance: selectedInstance, action: 'accept' })} type="button">Accept</button>
+                            <button className="button-secondary" disabled={saving} onClick={() => setPendingInstanceAction({ instance: selectedInstance, action: 'reopen' })} type="button">Reopen</button>
                           </div>
                           <div className="mt-5 grid gap-3 md:grid-cols-3">
-                            <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-3">
+                            <div className="rounded-2xl border border-[#ded8e4] bg-white p-3">
                               <div className="label">Completion</div>
-                              <div className="mt-2 text-2xl font-semibold text-white">{Math.round(selectedInstance.percentComplete)}%</div>
+                              <div className="mt-2 text-2xl font-semibold text-[#241232]">{Math.round(selectedInstance.percentComplete)}%</div>
                             </div>
-                            <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-3">
+                            <div className="rounded-2xl border border-[#ded8e4] bg-white p-3">
                               <div className="label">Passing Status</div>
-                              <div className="mt-2 text-lg font-semibold text-white">{selectedInstance.passingStatus}</div>
+                              <div className="mt-2 text-lg font-semibold text-[#241232]">{selectedInstance.passingStatus}</div>
                             </div>
-                            <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-3">
+                            <div className="rounded-2xl border border-[#ded8e4] bg-white p-3">
                               <div className="label">Due Date</div>
-                              <div className="mt-2 text-lg font-semibold text-white">{selectedInstance.dueDate || 'Not set'}</div>
+                              <div className="mt-2 text-lg font-semibold text-[#241232]">{selectedInstance.dueDate || 'Not set'}</div>
                             </div>
                           </div>
                         </div>
@@ -2101,8 +2244,8 @@ export function QuestionnaireBuilderWorkspace({
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <div className="eyebrow">Rules Engine</div>
-                    <h3 className="mt-2 text-xl font-semibold text-white">Visual Rule Graph</h3>
-                    <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
+                    <h3 className="mt-2 text-xl font-semibold text-[#241232]">Visual Rule Graph</h3>
+                    <p className="mt-2 max-w-3xl text-sm leading-6 text-[#4f435c]">
                       Persisted rule definitions now live in Cloudflare D1 and drive the same scoring and visibility
                       flows your {workspaceMode === 'assessment-plans' ? 'assessment plan' : 'questionnaire package'} uses
                       in test runs. Draft validation and preview execution now hit the canonical Worker too, so you can
@@ -2156,7 +2299,7 @@ export function QuestionnaireBuilderWorkspace({
                       }}
                       value={ruleEditorMode}
                     >
-                      <TabsList className="mb-4 w-fit rounded-2xl border border-white/10 bg-slate-950/70">
+                      <TabsList className="mb-4 w-fit rounded-2xl border border-[#ded8e4] bg-white">
                         <TabsTrigger value="visual">Visual Editor</TabsTrigger>
                         <TabsTrigger value="json">
                           <Code2 className="mr-2 h-4 w-4" />
@@ -2169,20 +2312,15 @@ export function QuestionnaireBuilderWorkspace({
                           <div className="panel-subtle" key={rule.id}>
                             <div className="flex items-start justify-between gap-4">
                               <div>
-                                <div className="text-sm font-medium text-white">Rule {index + 1}</div>
-                                <div className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">
+                                <div className="text-sm font-medium text-[#241232]">Rule {index + 1}</div>
+                                <div className="mt-1 text-xs uppercase tracking-[0.18em] text-[#62576a]">
                                   {rule.active ? 'Active' : 'Inactive'}
                                 </div>
                               </div>
                               <button
-                                className="text-xs uppercase tracking-[0.18em] text-rose-300 transition hover:text-rose-200"
-                                onClick={() =>
-                                  setDraftRuleSet((current) =>
-                                    current
-                                      ? { ...current, rules: current.rules.filter((entry) => entry.id !== rule.id) }
-                                      : current,
-                                  )
-                                }
+                                aria-label={`Remove rule ${rule.name}`}
+                                className="text-xs uppercase tracking-[0.18em] text-[#9d1f2c] transition hover:text-[#9d1f2c]"
+                                onClick={() => setPendingRuleDelete(rule)}
                                 type="button"
                               >
                                 Remove
@@ -2305,10 +2443,10 @@ export function QuestionnaireBuilderWorkspace({
                                   value={rule.actions.join('\n')}
                                 />
                               </div>
-                              <label className="flex items-center gap-3 text-sm text-slate-300">
+                              <label className="flex items-center gap-3 text-sm text-[#4f435c]">
                                 <input
                                   checked={rule.active}
-                                  className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                  className="h-4 w-4 rounded border-[#d7c3f1] bg-white"
                                   onChange={(event) =>
                                     setDraftRuleSet((current) =>
                                       current
@@ -2335,7 +2473,7 @@ export function QuestionnaireBuilderWorkspace({
                           <div className="flex flex-wrap items-center justify-between gap-3">
                             <div>
                               <div className="eyebrow">Raw Definition</div>
-                              <h4 className="mt-2 text-lg font-semibold text-white">Rules JSON</h4>
+                              <h4 className="mt-2 text-lg font-semibold text-[#241232]">Rules JSON</h4>
                             </div>
                             <div className="flex gap-2">
                               <button className="button-secondary" onClick={applyRuleJsonDraft} type="button">
@@ -2373,31 +2511,31 @@ export function QuestionnaireBuilderWorkspace({
                       <div className="eyebrow">Diagnostics</div>
                       <div className="mt-4 space-y-3">
                         {draftRuleSet.diagnostics.map((diagnostic) => (
-                          <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3" key={diagnostic.id}>
+                          <div className="rounded-2xl border border-[#ded8e4] bg-white p-3" key={diagnostic.id}>
                             <div className={severityClass(diagnostic.severity)}>{diagnostic.severity}</div>
-                            <div className="mt-2 text-sm leading-6 text-slate-300">{diagnostic.message}</div>
+                            <div className="mt-2 text-sm leading-6 text-[#4f435c]">{diagnostic.message}</div>
                           </div>
                         ))}
                       </div>
                     </div>
                     <div className="panel-subtle">
                       <div className="eyebrow">Rule Engine Version</div>
-                      <div className="mt-3 text-2xl font-semibold text-white">{draftRuleSet.engineVersion}</div>
-                      <div className="mt-2 text-sm text-slate-400">Updated {formatDate(draftRuleSet.updatedAt)}</div>
+                      <div className="mt-3 text-2xl font-semibold text-[#241232]">{draftRuleSet.engineVersion}</div>
+                      <div className="mt-2 text-sm text-[#6f6578]">Updated {formatDate(draftRuleSet.updatedAt)}</div>
                     </div>
                     <div className="panel-subtle">
                       <div className="eyebrow">Draft Ops</div>
-                      <div className="mt-4 space-y-3 text-sm text-slate-300">
+                      <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
                         <div className="flex items-center gap-2">
-                          <CheckCircle2 className="h-4 w-4 text-emerald-300" />
+                          <CheckCircle2 className="h-4 w-4 text-[#126b36]" />
                           <span>Validate against current questionnaire refs before saving</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <CheckCircle2 className="h-4 w-4 text-emerald-300" />
+                          <CheckCircle2 className="h-4 w-4 text-[#126b36]" />
                           <span>Preview unsaved draft logic in the test runner</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Code2 className="h-4 w-4 text-cyan-300" />
+                          <Code2 className="h-4 w-4 text-[#7a3ccf]" />
                           <span>Drop to JSON when bulk edits are faster than card editing</span>
                         </div>
                       </div>
@@ -2413,7 +2551,7 @@ export function QuestionnaireBuilderWorkspace({
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <div>
                           <div className="eyebrow">Simulation</div>
-                          <h3 className="mt-2 text-xl font-semibold text-white">Run Rule Test</h3>
+                          <h3 className="mt-2 text-xl font-semibold text-[#241232]">Run Rule Test</h3>
                         </div>
                         <div className="flex flex-wrap gap-2">
                           <button
@@ -2503,35 +2641,35 @@ export function QuestionnaireBuilderWorkspace({
                         <div className="flex flex-wrap items-center justify-between gap-3">
                           <div>
                             <div className="eyebrow">Draft Preview</div>
-                            <h3 className="mt-2 text-xl font-semibold text-white">{previewRun.scenarioName}</h3>
+                            <h3 className="mt-2 text-xl font-semibold text-[#241232]">{previewRun.scenarioName}</h3>
                           </div>
                           <div className="flex gap-2">
-                            <span className="badge-neutral">{previewRun.status}</span>
-                            <span className="badge-success">{previewRun.result.grade}</span>
+                            <span className="status-pill-neutral">{previewRun.status}</span>
+                            <span className="status-pill-success">{previewRun.result.grade}</span>
                           </div>
                         </div>
                         <div className="mt-4 grid gap-3 md:grid-cols-3">
-                          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                          <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-3">
                             <div className="label">Score</div>
-                            <div className="mt-2 text-2xl font-semibold text-white">{previewRun.result.score}</div>
+                            <div className="mt-2 text-2xl font-semibold text-[#241232]">{previewRun.result.score}</div>
                           </div>
-                          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                          <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-3">
                             <div className="label">Matched Rules</div>
-                            <div className="mt-2 text-2xl font-semibold text-white">
+                            <div className="mt-2 text-2xl font-semibold text-[#241232]">
                               {previewRun.result.matchedRules.length}
                             </div>
                           </div>
-                          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                          <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-3">
                             <div className="label">Visible Questions</div>
-                            <div className="mt-2 text-2xl font-semibold text-white">
+                            <div className="mt-2 text-2xl font-semibold text-[#241232]">
                               {previewRun.result.visibleQuestions.length}
                             </div>
                           </div>
                         </div>
                         <div className="mt-4 grid gap-4 xl:grid-cols-[240px_minmax(0,1fr)]">
-                          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                          <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-3">
                             <div className="label">Matched Rules</div>
-                            <div className="mt-3 space-y-2 text-sm text-slate-300">
+                            <div className="mt-3 space-y-2 text-sm text-[#4f435c]">
                               {previewRun.result.matchedRules.length > 0 ? (
                                 previewRun.result.matchedRules.map((match) => <div key={match}>{match}</div>)
                               ) : (
@@ -2539,9 +2677,9 @@ export function QuestionnaireBuilderWorkspace({
                               )}
                             </div>
                           </div>
-                          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                          <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-3">
                             <div className="label">Execution Log</div>
-                            <div className="mt-3 space-y-2 text-sm text-slate-300">
+                            <div className="mt-3 space-y-2 text-sm text-[#4f435c]">
                               {previewRun.executionLog.map((entry, index) => (
                                 <div key={`${previewRun.id}-${index}`}>{entry}</div>
                               ))}
@@ -2555,37 +2693,37 @@ export function QuestionnaireBuilderWorkspace({
                       <div className="eyebrow">Execution History</div>
                       <div className="mt-4 space-y-3">
                         {testRuns.map((run) => (
-                          <div className="rounded-3xl border border-white/10 bg-slate-950/60 p-4" key={run.id}>
+                          <div className="rounded-3xl border border-[#ded8e4] bg-white p-4" key={run.id}>
                             <div className="flex flex-wrap items-start justify-between gap-3">
                               <div>
-                                <div className="font-medium text-white">{run.scenarioName}</div>
-                                <div className="mt-1 text-xs text-slate-500">{formatDate(run.createdAt)}</div>
+                                <div className="font-medium text-[#241232]">{run.scenarioName}</div>
+                                <div className="mt-1 text-xs text-[#62576a]">{formatDate(run.createdAt)}</div>
                               </div>
                               <div className="flex gap-2">
-                                <span className="badge-neutral">{run.status}</span>
-                                <span className="badge-success">{run.result.grade}</span>
+                                <span className="status-pill-neutral">{run.status}</span>
+                                <span className="status-pill-success">{run.result.grade}</span>
                               </div>
                             </div>
                             <div className="mt-4 grid gap-3 md:grid-cols-3">
-                              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                              <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-3">
                                 <div className="label">Score</div>
-                                <div className="mt-2 text-2xl font-semibold text-white">{run.result.score}</div>
+                                <div className="mt-2 text-2xl font-semibold text-[#241232]">{run.result.score}</div>
                               </div>
-                              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                              <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-3">
                                 <div className="label">Matched Rules</div>
-                                <div className="mt-2 text-2xl font-semibold text-white">{run.result.matchedRules.length}</div>
+                                <div className="mt-2 text-2xl font-semibold text-[#241232]">{run.result.matchedRules.length}</div>
                               </div>
-                              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                              <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-3">
                                 <div className="label">Visible Questions</div>
-                                <div className="mt-2 text-2xl font-semibold text-white">
+                                <div className="mt-2 text-2xl font-semibold text-[#241232]">
                                   {run.result.visibleQuestions.length}
                                 </div>
                               </div>
                             </div>
                             <div className="mt-4 grid gap-4 xl:grid-cols-[240px_minmax(0,1fr)]">
-                              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                              <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-3">
                                 <div className="label">Matched Rules</div>
-                                <div className="mt-3 space-y-2 text-sm text-slate-300">
+                                <div className="mt-3 space-y-2 text-sm text-[#4f435c]">
                                   {run.result.matchedRules.length > 0 ? (
                                     run.result.matchedRules.map((match) => <div key={match}>{match}</div>)
                                   ) : (
@@ -2593,9 +2731,9 @@ export function QuestionnaireBuilderWorkspace({
                                   )}
                                 </div>
                               </div>
-                              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+                              <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-3">
                                 <div className="label">Execution Log</div>
-                                <div className="mt-3 space-y-2 text-sm text-slate-300">
+                                <div className="mt-3 space-y-2 text-sm text-[#4f435c]">
                                   {run.executionLog.map((entry, index) => (
                                     <div key={`${run.id}-${index}`}>{entry}</div>
                                   ))}
@@ -2611,17 +2749,17 @@ export function QuestionnaireBuilderWorkspace({
                   <aside className="space-y-4">
                     <div className="panel-subtle">
                       <div className="eyebrow">Runtime Posture</div>
-                      <div className="mt-4 space-y-3 text-sm text-slate-300">
+                      <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
                         <div className="flex items-center gap-2">
-                          <CheckCircle2 className="h-4 w-4 text-emerald-300" />
+                          <CheckCircle2 className="h-4 w-4 text-[#126b36]" />
                           <span>D1 stores questionnaire packages, rules, and execution history</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <CheckCircle2 className="h-4 w-4 text-emerald-300" />
+                          <CheckCircle2 className="h-4 w-4 text-[#126b36]" />
                           <span>Rule tests are persisted for auditability and future approvals</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <FlaskConical className="h-4 w-4 text-cyan-300" />
+                          <FlaskConical className="h-4 w-4 text-[#7a3ccf]" />
                           <span>Draft preview runs let authors test unsaved logic before committing it</span>
                         </div>
                       </div>
@@ -2633,6 +2771,278 @@ export function QuestionnaireBuilderWorkspace({
           )}
         </section>
       </section>
+      <RegModal
+        open={pendingTemplateCreate}
+        onOpenChange={setPendingTemplateCreate}
+        title={`Create ${labels.singularLabel.toLowerCase()}`}
+        description={`Review the starter ${labels.singularLabel.toLowerCase()} before it is created in the canonical builder service.`}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" disabled={saving} onClick={() => setPendingTemplateCreate(false)} type="button">
+              Cancel
+            </button>
+            <button className="button-primary" disabled={saving} onClick={() => void handleCreateTemplate()} type="button">
+              <Plus className="mr-2 h-4 w-4" />
+              Create {labels.singularLabel.toLowerCase()}
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-4 text-sm leading-6 text-[#4f435c]">
+          <p>
+            Regovise will create a starter package using the current workspace defaults. You can edit metadata,
+            questions, scoring, assignment behavior, and rules after it is created.
+          </p>
+          <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+            <div className="font-semibold text-[#241232]">Default starting point</div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="status-pill-neutral">{scopedTemplateKind ?? 'questionnaire'}</span>
+              <span className="status-pill-neutral">Owner {identity.userId}</span>
+              <span className="status-pill-neutral">Package #{visibleTemplates.length + 1}</span>
+              <span className="status-pill-neutral">
+                Public URL {scopedTemplateKind === 'assessment-plan' ? 'disabled' : 'enabled'}
+              </span>
+            </div>
+          </div>
+        </div>
+      </RegModal>
+      <RegRightDrawer
+        open={assignmentDrawerOpen}
+        onOpenChange={setAssignmentDrawerOpen}
+        title="Create Questionnaire Assignment"
+        description="Assign the active package to a user, external email, linked module record, recurring schedule, CSV list, or self-assignment access-code URL."
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" disabled={saving} onClick={() => setAssignmentDrawerOpen(false)} type="button">
+              Cancel
+            </button>
+            <button className="button-primary" disabled={saving || !selectedId} onClick={() => void handleCreateAssignment()} type="button">
+              <Send className="mr-2 h-4 w-4" />
+              Create Assignment
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-5">
+          <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm leading-6 text-[#4f435c]">
+            <div className="font-semibold text-[#241232]">{draftTemplate?.name ?? labels.singularLabel}</div>
+            <p className="mt-1">
+              Instances created here remain tied to the selected package, response history, and reviewer workflow.
+            </p>
+          </div>
+          {assignmentFormFields}
+        </div>
+      </RegRightDrawer>
+      <RegModal
+        open={Boolean(pendingQuestionDelete)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingQuestionDelete(null);
+          }
+        }}
+        title={`Remove ${labels.questionLabel.toLowerCase()}`}
+        description={
+          pendingQuestionDelete
+            ? `Review this draft item before removing "${pendingQuestionDelete.prompt}".`
+            : undefined
+        }
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setPendingQuestionDelete(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary border-[#f1b7bd] text-[#a51f2b] hover:border-[#df7d89] hover:bg-[#fff3f4]"
+              disabled={!pendingQuestionDelete}
+              onClick={() => pendingQuestionDelete && handleRemoveQuestion(pendingQuestionDelete)}
+              type="button"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Remove {labels.questionLabel.toLowerCase()}
+            </button>
+          </div>
+        }
+      >
+        {pendingQuestionDelete ? (
+          <div className="space-y-4 text-sm leading-6 text-[#4f435c]">
+            <p>
+              This only removes the item from the current draft. It is not persisted until you save the template.
+              Review any rules that reference this item before saving.
+            </p>
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+              <div className="font-semibold text-[#241232]">{pendingQuestionDelete.prompt}</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="status-pill-neutral">{pendingQuestionDelete.ref}</span>
+                <span className="status-pill-neutral">{pendingQuestionDelete.section || 'No section'}</span>
+                <span className="status-pill-neutral">{pendingQuestionDelete.type}</span>
+                {pendingQuestionDelete.required ? <span className="status-pill-warning">Required</span> : null}
+                <span className="status-pill-neutral">Weight {pendingQuestionDelete.weight}</span>
+                {pendingQuestionDelete.enableUpload ? <span className="status-pill-neutral">Upload enabled</span> : null}
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
+      <RegModal
+        open={Boolean(pendingRuleDelete)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingRuleDelete(null);
+          }
+        }}
+        title="Remove rule"
+        description={pendingRuleDelete ? `Review this draft rule before removing "${pendingRuleDelete.name}".` : undefined}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setPendingRuleDelete(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary border-[#f1b7bd] text-[#a51f2c] hover:border-[#df7d89] hover:bg-[#fff3f4]"
+              disabled={!pendingRuleDelete}
+              onClick={() => pendingRuleDelete && handleRemoveRule(pendingRuleDelete)}
+              type="button"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Remove rule
+            </button>
+          </div>
+        }
+      >
+        {pendingRuleDelete ? (
+          <div className="space-y-4 text-sm leading-6 text-[#4f435c]">
+            <p>
+              This only removes the rule from the current draft. It is not persisted until you save rules. Preview and
+              validate the draft after removal to confirm visibility and scoring behavior.
+            </p>
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+              <div className="font-semibold text-[#241232]">{pendingRuleDelete.name}</div>
+              <p className="mt-2 text-[#62576a]">{pendingRuleDelete.description}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className={pendingRuleDelete.active ? 'status-pill-success' : 'status-pill-neutral'}>
+                  {pendingRuleDelete.active ? 'Active' : 'Inactive'}
+                </span>
+                <span className="status-pill-neutral">{pendingRuleDelete.logic}</span>
+                <span className="status-pill-neutral">{pendingRuleDelete.conditions.length} conditions</span>
+                <span className="status-pill-neutral">{pendingRuleDelete.actions.length} actions</span>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
+      <RegModal
+        open={Boolean(pendingInstanceAction)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingInstanceAction(null);
+          }
+        }}
+        title={pendingInstanceAction ? instanceActionCopy(pendingInstanceAction.action).title : 'Review questionnaire action'}
+        description={pendingInstanceAction ? instanceActionCopy(pendingInstanceAction.action).description : undefined}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" disabled={saving} onClick={() => setPendingInstanceAction(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className={pendingInstanceAction?.action === 'accept' ? 'button-primary' : 'button-secondary'}
+              disabled={!pendingInstanceAction || saving}
+              onClick={() =>
+                pendingInstanceAction &&
+                void handleInstanceAction(pendingInstanceAction.instance, pendingInstanceAction.action)
+              }
+              type="button"
+            >
+              {saving
+                ? 'Working...'
+                : pendingInstanceAction
+                  ? instanceActionCopy(pendingInstanceAction.action).button
+                  : 'Confirm'}
+            </button>
+          </div>
+        }
+      >
+        {pendingInstanceAction ? (
+          <div className="space-y-4 text-sm leading-6 text-[#4f435c]">
+            <p>{instanceActionCopy(pendingInstanceAction.action).consequence}</p>
+            {(pendingInstanceAction.action === 'reject' || pendingInstanceAction.action === 'feedback') && !reviewComments.trim() ? (
+              <div className="notice-warning">
+                No reviewer comments are entered. Regovise will use a generic fallback comment for the email.
+              </div>
+            ) : null}
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+              <div className="font-semibold text-[#241232]">{pendingInstanceAction.instance.title}</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="status-pill-neutral">{pendingInstanceAction.instance.status}</span>
+                <span className="status-pill-neutral">{pendingInstanceAction.instance.assignmentType}</span>
+                <span className="status-pill-neutral">{Math.round(pendingInstanceAction.instance.percentComplete)}% complete</span>
+                <span className={pendingInstanceAction.instance.passingStatus === 'Passing' ? 'status-pill-success' : 'status-pill-neutral'}>
+                  {pendingInstanceAction.instance.passingStatus}
+                </span>
+                {pendingInstanceAction.instance.assigneeEmail || pendingInstanceAction.instance.assigneeUserId ? (
+                  <span className="status-pill-neutral">
+                    {pendingInstanceAction.instance.assigneeEmail || pendingInstanceAction.instance.assigneeUserId}
+                  </span>
+                ) : null}
+              </div>
+              {reviewComments.trim() ? (
+                <p className="mt-3 rounded-2xl border border-[#ded8e4] bg-white p-3 text-[#62576a]">
+                  {reviewComments}
+                </p>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
+      <RegModal
+        open={Boolean(pendingInstanceDelete)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingInstanceDelete(null);
+          }
+        }}
+        title="Delete questionnaire assignment"
+        description={
+          pendingInstanceDelete
+            ? `Review this assignment before deleting "${pendingInstanceDelete.title}".`
+            : undefined
+        }
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setPendingInstanceDelete(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary border-[#f1b7bd] text-[#a51f2b] hover:border-[#df7d89] hover:bg-[#fff3f4]"
+              disabled={!pendingInstanceDelete || saving}
+              onClick={() => pendingInstanceDelete && void handleDeleteInstance(pendingInstanceDelete)}
+              type="button"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              {saving ? 'Deleting...' : 'Delete assignment'}
+            </button>
+          </div>
+        }
+      >
+        {pendingInstanceDelete ? (
+          <div className="space-y-3 text-sm leading-6 text-[#4f435c]">
+            <p>
+              This permanently removes the assignment, response draft, review state, access code, and share link from this tenant.
+            </p>
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+              <div className="font-semibold text-[#241232]">{pendingInstanceDelete.title}</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="status-pill-neutral">{pendingInstanceDelete.status}</span>
+                <span className="status-pill-neutral">{pendingInstanceDelete.assignmentType}</span>
+                <span className="status-pill-neutral">{Math.round(pendingInstanceDelete.percentComplete)}% complete</span>
+                <span className={pendingInstanceDelete.passingStatus === 'Passing' ? 'status-pill-success' : 'status-pill-neutral'}>
+                  {pendingInstanceDelete.passingStatus}
+                </span>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
     </div>
   );
 }

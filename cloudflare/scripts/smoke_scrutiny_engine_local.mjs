@@ -6,7 +6,7 @@ const headers = {
 };
 
 async function request(pathname, init = {}) {
-  const response = await fetch(`${baseUrl}${pathname}`, init);
+  const response = await fetch(`${baseUrl}${pathname}`, { ...init, signal: AbortSignal.timeout(30000) });
   const text = await response.text();
   if (!response.ok) {
     throw new Error(`${init.method ?? 'GET'} ${pathname} failed (${response.status}): ${text}`);
@@ -148,18 +148,29 @@ async function main() {
     'Materialization should create a reusable questionnaire template when requested.',
   );
 
-  const dataCalls = await listModuleRecords('data-calls', marker);
-  const evidenceRecords = await listModuleRecords('evidence-locker', marker);
-  assert(dataCalls.length >= materializedItems.length, 'Expected materialized Data Calls to be discoverable by marker.');
-  assert(evidenceRecords.length >= materializedItems.length, 'Expected materialized Evidence Locker records to be discoverable by marker.');
-  assert(
-    dataCalls.every((record) => record.data?.scrutinyRunId === run.id && record.data?.scrutinyItemId),
-    'Data Calls should carry scrutiny run/item backlinks.',
-  );
-  assert(
-    evidenceRecords.every((record) => record.data?.scrutinyRunId === run.id && record.data?.placeholderOnly === true),
-    'Evidence Locker records should be marked as scrutiny placeholders.',
-  );
+  // Materialization returns canonical record ids. Evidence titles need not contain
+  // the run title; run/item backlinks are the durable relationship to test.
+  const dataCallIds = [...new Set(materializedItems.map((item) => item.dataCallRecordId))];
+  const evidenceIds = [...new Set(materializedItems.flatMap((item) => item.evidenceRecordIds))];
+  const readRecord = async (moduleKey, recordId) => {
+    const payload = await request(`/_api/core/modules/${moduleKey}/records/${encodeURIComponent(recordId)}`, { headers });
+    assert(payload?.data?.id === recordId, `Expected canonical ${moduleKey} record ${recordId}.`);
+    return payload.data;
+  };
+  const dataCalls = await Promise.all(dataCallIds.map((id) => readRecord('data-calls', id)));
+  const evidenceRecords = await Promise.all(evidenceIds.map((id) => readRecord('evidence-locker', id)));
+  for (const item of materializedItems) {
+    const dataCall = dataCalls.find((record) => record.id === item.dataCallRecordId);
+    assert(dataCall?.data?.scrutinyRunId === run.id && dataCall.data.scrutinyItemId === item.id, 'Data Calls should carry their exact scrutiny run/item backlinks.');
+    for (const evidenceId of item.evidenceRecordIds) {
+      const evidence = evidenceRecords.find((record) => record.id === evidenceId);
+      assert(evidence?.data?.scrutinyRunId === run.id && evidence.data.scrutinyItemId === item.id && evidence.data.placeholderOnly === true, 'Evidence Locker records should carry exact scrutiny backlinks and remain placeholders.');
+    }
+  }
+  const searchedDataCalls = await listModuleRecords('data-calls', run.id);
+  const searchedEvidence = await listModuleRecords('evidence-locker', run.id);
+  assert(dataCallIds.every((id) => searchedDataCalls.some((record) => record.id === id)), 'Expected every materialized Data Call to be discoverable by run id.');
+  assert(evidenceIds.every((id) => searchedEvidence.some((record) => record.id === id)), 'Expected every materialized Evidence Locker placeholder to be discoverable by run id.');
 
   const reconciled = await request(`/_api/grc/scrutiny-runs/${encodeURIComponent(run.id)}/reconcile`, {
     method: 'POST',

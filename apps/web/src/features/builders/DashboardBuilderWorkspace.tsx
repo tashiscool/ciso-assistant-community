@@ -18,6 +18,7 @@ import type {
   DashboardTemplateItem,
   PaletteTab,
 } from './dashboardTypes';
+import { RegModal, RegRightDrawer } from '../../components/regovise/PagePrimitives';
 
 function clone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
@@ -86,6 +87,9 @@ export function DashboardBuilderWorkspace() {
   const [newTitle, setNewTitle] = useState('');
   const [newAccess, setNewAccess] = useState<DashboardAccess>('Public');
   const [newGroups, setNewGroups] = useState('');
+  const [createDrawerOpen, setCreateDrawerOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [pendingItemRemove, setPendingItemRemove] = useState<DashboardLayoutItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -236,6 +240,7 @@ export function DashboardBuilderWorkspace() {
       setNewTitle('');
       setNewAccess('Public');
       setNewGroups('');
+      setCreateDrawerOpen(false);
       await loadDashboards();
       setSelectedId(created.id);
       setNotice('New dashboard created in the canonical Dashboard Builder service.');
@@ -270,11 +275,6 @@ export function DashboardBuilderWorkspace() {
     if (!draft) {
       return;
     }
-    const confirmation = window.prompt(`Type "${draft.title}" to confirm delete.`);
-    if (confirmation !== draft.title) {
-      setNotice('Delete cancelled.');
-      return;
-    }
     try {
       setBusyAction('delete');
       setError(null);
@@ -284,6 +284,7 @@ export function DashboardBuilderWorkspace() {
       setDetail(null);
       setDraft(null);
       await loadDashboards();
+      setDeleteModalOpen(false);
       setNotice('Dashboard deleted.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete dashboard.');
@@ -372,6 +373,7 @@ export function DashboardBuilderWorkspace() {
         },
       });
     });
+    setPendingItemRemove(null);
   }
 
   function moveItem(instanceId: string, direction: 'up' | 'down') {
@@ -420,7 +422,7 @@ export function DashboardBuilderWorkspace() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading Dashboard Builder...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading Dashboard Builder...</div>;
   }
 
   return (
@@ -429,13 +431,17 @@ export function DashboardBuilderWorkspace() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">Builders</div>
-            <h1 className="mt-2 text-3xl font-semibold text-white">Dashboard Builder</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Dashboard Builder</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
               Assemble executive, operational, and module-specific dashboards with real Report
               Builder embeds and reusable widget tiles stored in the canonical Cloudflare runtime.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <button className="button-secondary" onClick={() => setCreateDrawerOpen(true)} type="button">
+              <Plus className="mr-2 h-4 w-4" />
+              Create dashboard
+            </button>
             <button className="button-secondary" onClick={() => void handleFavorite()} type="button">
               <Star className="mr-2 h-4 w-4" />
               {busyAction === 'favorite' ? 'Updating...' : draft?.favorite ? 'Unfavorite' : 'Favorite'}
@@ -463,7 +469,7 @@ export function DashboardBuilderWorkspace() {
           <div className="metric-card" key={metric.label}>
             <div className="metric-label">{metric.label}</div>
             <div className="metric-value">{metric.value}</div>
-            <div className="mt-2 text-xs text-slate-500">{metric.detail}</div>
+            <div className="mt-2 text-xs text-[#62576a]">{metric.detail}</div>
           </div>
         ))}
       </section>
@@ -473,9 +479,9 @@ export function DashboardBuilderWorkspace() {
           <div className="flex items-center justify-between">
             <div>
               <div className="eyebrow">Manage Dashboards</div>
-              <h2 className="mt-2 text-xl font-semibold text-white">Canvases</h2>
+              <h2 className="mt-2 text-xl font-semibold text-[#241232]">Canvases</h2>
             </div>
-            <LayoutDashboard className="h-5 w-5 text-cyan-300" />
+            <LayoutDashboard className="h-5 w-5 text-[#7a3ccf]" />
           </div>
           <label className="space-y-2">
             <span className="label">Select Dashboard</span>
@@ -492,7 +498,7 @@ export function DashboardBuilderWorkspace() {
             </select>
           </label>
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-500" />
+            <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-[#62576a]" />
             <input
               className="input pl-10"
               placeholder="Search dashboards"
@@ -500,56 +506,30 @@ export function DashboardBuilderWorkspace() {
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
-          <form
-            className="space-y-3"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void handleCreateDashboard();
-            }}
-          >
-            <input
-              className="input"
-              placeholder="New dashboard title"
-              value={newTitle}
-              onChange={(event) => setNewTitle(event.target.value)}
-            />
-            <select className="input" value={newAccess} onChange={(event) => setNewAccess(event.target.value as DashboardAccess)}>
-              <option value="Public">Public</option>
-              <option value="Private">Private</option>
-            </select>
-            {newAccess === 'Private' && (
-              <input
-                className="input"
-                placeholder="Audit Team, FedRAMP PMO"
-                value={newGroups}
-                onChange={(event) => setNewGroups(event.target.value)}
-              />
-            )}
-            <button className="button-secondary w-full" disabled={saving} type="submit">
-              <Plus className="mr-2 h-4 w-4" />
-              Create New Dashboard
-            </button>
-          </form>
+          <button className="button-secondary w-full justify-center" onClick={() => setCreateDrawerOpen(true)} type="button">
+            <Plus className="mr-2 h-4 w-4" />
+            Create dashboard
+          </button>
           <div className="space-y-3">
             {filteredDashboards.map((dashboard) => (
               <button
                 key={dashboard.id}
                 className={`panel-subtle w-full text-left transition ${
-                  selectedId === dashboard.id ? 'border-cyan-300/30 bg-cyan-400/[0.04]' : 'hover:border-cyan-300/20'
+                  selectedId === dashboard.id ? 'border-[#d7c3f1] bg-[#f6f1fa]' : 'hover:border-[#d7c3f1]'
                 }`}
                 onClick={() => setSelectedId(dashboard.id)}
                 type="button"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="font-medium text-white">{dashboard.title}</div>
-                    <div className="mt-1 text-sm text-slate-400">
+                    <div className="font-medium text-[#241232]">{dashboard.title}</div>
+                    <div className="mt-1 text-sm text-[#6f6578]">
                       {dashboard.access} · {dashboard.itemCount} tiles
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    {dashboard.favorite && <span className="badge-success">Favorite</span>}
-                    <span className={dashboard.published ? 'badge-success' : 'badge-neutral'}>
+                    {dashboard.favorite && <span className="status-pill-success">Favorite</span>}
+                    <span className={dashboard.published ? 'status-pill-success' : 'status-pill-neutral'}>
                       {dashboard.published ? 'Published' : 'Draft'}
                     </span>
                   </div>
@@ -557,13 +537,13 @@ export function DashboardBuilderWorkspace() {
                 {dashboard.groups.length > 0 && (
                   <div className="mt-4 flex flex-wrap gap-2">
                     {dashboard.groups.map((group) => (
-                      <span className="badge-neutral" key={group}>
+                      <span className="status-pill-neutral" key={group}>
                         {group}
                       </span>
                     ))}
                   </div>
                 )}
-                <div className="mt-3 text-xs text-slate-500">Updated {formatDate(dashboard.lastUpdated)}</div>
+                <div className="mt-3 text-xs text-[#62576a]">Updated {formatDate(dashboard.lastUpdated)}</div>
               </button>
             ))}
           </div>
@@ -571,24 +551,24 @@ export function DashboardBuilderWorkspace() {
 
         <section className="panel">
           {detailLoading || !draft ? (
-            <div className="text-sm text-slate-300">Loading dashboard definition...</div>
+            <div className="text-sm text-[#4f435c]">Loading dashboard definition...</div>
           ) : (
             <div className="space-y-6">
               <div className="panel-subtle">
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div>
                     <div className="eyebrow">Dashboard Summary</div>
-                    <h3 className="mt-2 text-xl font-semibold text-white">{draft.title}</h3>
+                    <h3 className="mt-2 text-xl font-semibold text-[#241232]">{draft.title}</h3>
                     <div className="mt-2 flex flex-wrap gap-2">
-                      <span className="badge-neutral">{draft.access}</span>
-                      <span className={draft.published ? 'badge-success' : 'badge-neutral'}>
+                      <span className="status-pill-neutral">{draft.access}</span>
+                      <span className={draft.published ? 'status-pill-success' : 'status-pill-neutral'}>
                         {draft.published ? 'Published' : 'Draft'}
                       </span>
-                      {draft.favorite && <span className="badge-success">Favorite</span>}
-                      {hasUnsavedChanges && <span className="badge-neutral">Unsaved changes</span>}
+                      {draft.favorite && <span className="status-pill-success">Favorite</span>}
+                      {hasUnsavedChanges && <span className="status-pill-neutral">Unsaved changes</span>}
                     </div>
                   </div>
-                  <button className="button-secondary" onClick={() => void handleDelete()} type="button">
+                  <button className="button-secondary" onClick={() => setDeleteModalOpen(true)} type="button">
                     <Trash2 className="mr-2 h-4 w-4" />
                     {busyAction === 'delete' ? 'Deleting...' : 'Delete'}
                   </button>
@@ -597,17 +577,17 @@ export function DashboardBuilderWorkspace() {
                       More Actions
                     </button>
                     {menuOpen ? (
-                      <div className="absolute right-0 z-10 mt-2 w-56 rounded-2xl border border-white/10 bg-slate-950 p-2 shadow-xl">
-                        <button className="w-full rounded-xl px-3 py-2 text-left text-sm text-slate-200 hover:bg-white/10" onClick={() => { setPreviewMode(false); setMenuOpen(false); }} type="button">
+                      <div className="absolute right-0 z-10 mt-2 w-56 rounded-2xl border border-[#ded8e4] bg-white p-2 shadow-xl">
+                        <button className="w-full rounded-xl px-3 py-2 text-left text-sm text-[#38254a] hover:bg-[#f6f1fa]" onClick={() => { setPreviewMode(false); setMenuOpen(false); }} type="button">
                           Edit
                         </button>
-                        <button className="w-full rounded-xl px-3 py-2 text-left text-sm text-slate-200 hover:bg-white/10" onClick={() => { setPreviewMode(true); setMenuOpen(false); }} type="button">
+                        <button className="w-full rounded-xl px-3 py-2 text-left text-sm text-[#38254a] hover:bg-[#f6f1fa]" onClick={() => { setPreviewMode(true); setMenuOpen(false); }} type="button">
                           Preview
                         </button>
-                        <button className="w-full rounded-xl px-3 py-2 text-left text-sm text-slate-200 hover:bg-white/10" onClick={() => { setMenuOpen(false); void handleFavorite(); }} type="button">
+                        <button className="w-full rounded-xl px-3 py-2 text-left text-sm text-[#38254a] hover:bg-[#f6f1fa]" onClick={() => { setMenuOpen(false); void handleFavorite(); }} type="button">
                           {draft.favorite ? 'Remove Favorite' : 'Favorite'}
                         </button>
-                        <button className="w-full rounded-xl px-3 py-2 text-left text-sm text-rose-200 hover:bg-rose-500/10" onClick={() => { setMenuOpen(false); void handleDelete(); }} type="button">
+                        <button className="w-full rounded-xl px-3 py-2 text-left text-sm text-[#9d1f2c] hover:bg-[#ffe2e5]" onClick={() => { setMenuOpen(false); setDeleteModalOpen(true); }} type="button">
                           Delete
                         </button>
                       </div>
@@ -623,7 +603,7 @@ export function DashboardBuilderWorkspace() {
                     <div className="eyebrow">Settings</div>
                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                       <label className="space-y-2 md:col-span-2">
-                        <span className="text-sm font-medium text-slate-200">Title</span>
+                        <span className="text-sm font-medium text-[#38254a]">Title</span>
                         <input
                           className="input"
                           value={draft.title}
@@ -631,7 +611,7 @@ export function DashboardBuilderWorkspace() {
                         />
                       </label>
                       <label className="space-y-2">
-                        <span className="text-sm font-medium text-slate-200">Access</span>
+                        <span className="text-sm font-medium text-[#38254a]">Access</span>
                         <select
                           className="input"
                           value={draft.access}
@@ -642,7 +622,7 @@ export function DashboardBuilderWorkspace() {
                         </select>
                       </label>
                       <label className="space-y-2">
-                        <span className="text-sm font-medium text-slate-200">Groups</span>
+                        <span className="text-sm font-medium text-[#38254a]">Groups</span>
                         <input
                           className="input"
                           value={draft.groups.join(', ')}
@@ -665,29 +645,29 @@ export function DashboardBuilderWorkspace() {
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <div className="eyebrow">{previewMode ? 'Preview' : 'Canvas'}</div>
-                        <p className="mt-2 text-sm text-slate-400">
+                        <p className="mt-2 text-sm text-[#6f6578]">
                           {previewMode
                             ? 'Preview how this dashboard will display once published or selected by an operator.'
                             : 'Arrange tiles across left and right columns. Items can be moved between columns and reordered before saving.'}
                         </p>
                       </div>
-                      <span className="badge-neutral">{draft.items.length} active tiles</span>
+                      <span className="status-pill-neutral">{draft.items.length} active tiles</span>
                     </div>
                     <div className="mt-4 grid gap-4 lg:grid-cols-2">
                       {canvasColumns.map((column) => (
-                        <div className="rounded-2xl border border-white/10 bg-black/20 p-4" key={column.id}>
-                          <div className="text-sm font-medium capitalize text-slate-200">{column.title} column</div>
+                        <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={column.id}>
+                          <div className="text-sm font-medium capitalize text-[#38254a]">{column.title} column</div>
                           <div className="mt-4 space-y-3">
                             {column.items.map((item) => (
-                              <div className="rounded-2xl border border-white/10 bg-black/20 p-4" key={item.instanceId}>
+                              <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={item.instanceId}>
                                 <div className="flex items-start justify-between gap-3">
                                   <div>
                                     <div className="flex flex-wrap gap-2">
-                                      <span className="badge-neutral">{item.type}</span>
-                                      <span className="badge-neutral">{item.sourceLabel}</span>
+                                      <span className="status-pill-neutral">{item.type}</span>
+                                      <span className="status-pill-neutral">{item.sourceLabel}</span>
                                     </div>
-                                    <div className="mt-2 text-sm font-medium text-white">{item.title}</div>
-                                    <div className="mt-2 text-sm text-slate-400">{item.description}</div>
+                                    <div className="mt-2 text-sm font-medium text-[#241232]">{item.title}</div>
+                                    <div className="mt-2 text-sm text-[#6f6578]">{item.description}</div>
                                   </div>
                                 </div>
                                 {!previewMode ? (
@@ -704,20 +684,20 @@ export function DashboardBuilderWorkspace() {
                                     <ArrowLeftRight className="mr-2 h-4 w-4" />
                                     Move
                                   </button>
-                                  <button className="button-secondary" onClick={() => removeItem(item.instanceId)} type="button">
+                                  <button className="button-secondary" onClick={() => setPendingItemRemove(item)} type="button">
                                     <Trash2 className="mr-2 h-4 w-4" />
                                     Remove
                                   </button>
                                 </div>
                                 ) : (
-                                  <div className="mt-4 rounded-2xl border border-cyan-300/10 bg-cyan-400/[0.04] p-3 text-sm text-slate-300">
+                                  <div className="mt-4 rounded-2xl border border-[#d7c3f1] bg-[#f6f1fa] p-3 text-sm text-[#4f435c]">
                                     Live preview tile sourced from {item.sourceLabel}. Report tiles open drill-in data through Report Builder.
                                   </div>
                                 )}
                               </div>
                             ))}
                             {column.items.length === 0 && (
-                              <div className="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-slate-500">
+                              <div className="rounded-2xl border border-dashed border-[#ded8e4] px-4 py-8 text-center text-sm text-[#62576a]">
                                 No tiles in the {column.title} column yet.
                               </div>
                             )}
@@ -732,13 +712,13 @@ export function DashboardBuilderWorkspace() {
                 <div className="space-y-6">
                   <div className="panel-subtle">
                     <div className="eyebrow">Palette</div>
-                    <p className="mt-2 text-sm text-slate-400">
+                    <p className="mt-2 text-sm text-[#6f6578]">
                       Add widgets or embedded Report Builder outputs to the current dashboard.
                     </p>
                     <div className="mt-4 flex flex-wrap gap-2">
                       {paletteTabs.map((tab) => (
                         <button
-                          className={paletteTab === tab ? 'badge-success' : 'badge-neutral'}
+                          className={paletteTab === tab ? 'status-pill-success' : 'status-pill-neutral'}
                           key={tab}
                           onClick={() => setPaletteTab(tab)}
                           type="button"
@@ -748,7 +728,7 @@ export function DashboardBuilderWorkspace() {
                       ))}
                     </div>
                     <div className="relative mt-4">
-                      <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-500" />
+                      <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-[#62576a]" />
                       <input
                         className="input pl-10"
                         placeholder="Search palette"
@@ -758,15 +738,15 @@ export function DashboardBuilderWorkspace() {
                     </div>
                     <div className="mt-4 space-y-3">
                       {currentPalette.map((item) => (
-                        <div className="rounded-2xl border border-white/10 bg-black/20 p-4" key={item.templateId}>
+                        <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={item.templateId}>
                           <div className="flex items-start justify-between gap-3">
                             <div>
                               <div className="flex flex-wrap gap-2">
-                                <span className="badge-neutral">{item.type}</span>
-                                <span className="badge-neutral">{item.sourceLabel}</span>
+                                <span className="status-pill-neutral">{item.type}</span>
+                                <span className="status-pill-neutral">{item.sourceLabel}</span>
                               </div>
-                              <div className="mt-2 text-sm font-medium text-white">{item.title}</div>
-                              <div className="mt-2 text-sm text-slate-400">{item.description}</div>
+                              <div className="mt-2 text-sm font-medium text-[#241232]">{item.title}</div>
+                              <div className="mt-2 text-sm text-[#6f6578]">{item.description}</div>
                             </div>
                             <div className="flex flex-col gap-2">
                               <button className="button-secondary" onClick={() => addPaletteItem(item, 'left')} type="button">
@@ -787,8 +767,8 @@ export function DashboardBuilderWorkspace() {
                 ) : (
                   <aside className="panel-subtle">
                     <div className="eyebrow">Publish Summary</div>
-                    <div className="mt-3 text-lg font-semibold text-white">{draft.title}</div>
-                    <div className="mt-3 space-y-2 text-sm text-slate-300">
+                    <div className="mt-3 text-lg font-semibold text-[#241232]">{draft.title}</div>
+                    <div className="mt-3 space-y-2 text-sm text-[#4f435c]">
                       <div>Access: {draft.access}</div>
                       <div>Groups: {draft.groups.length > 0 ? draft.groups.join(', ') : 'All users with access'}</div>
                       <div>Status: {draft.published ? 'Published' : 'Draft'}</div>
@@ -802,6 +782,135 @@ export function DashboardBuilderWorkspace() {
           )}
         </section>
       </section>
+
+      <RegRightDrawer
+        description="Create a dashboard canvas without leaving the builder workspace."
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setCreateDrawerOpen(false)} type="button">
+              Cancel
+            </button>
+            <button className="button-primary" disabled={saving} form="dashboard-builder-create-form" type="submit">
+              {saving ? 'Creating...' : 'Create dashboard'}
+            </button>
+          </div>
+        }
+        onOpenChange={setCreateDrawerOpen}
+        open={createDrawerOpen}
+        title="Create dashboard"
+      >
+        <form
+          className="space-y-4"
+          id="dashboard-builder-create-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void handleCreateDashboard();
+          }}
+        >
+          <label className="space-y-1">
+            <span className="label">Dashboard title</span>
+            <input
+              className="input"
+              placeholder="New dashboard title"
+              value={newTitle}
+              onChange={(event) => setNewTitle(event.target.value)}
+            />
+          </label>
+          <label className="space-y-1">
+            <span className="label">Access</span>
+            <select
+              className="input"
+              value={newAccess}
+              onChange={(event) => setNewAccess(event.target.value as DashboardAccess)}
+            >
+              <option value="Public">Public</option>
+              <option value="Private">Private</option>
+            </select>
+          </label>
+          {newAccess === 'Private' && (
+            <label className="space-y-1">
+              <span className="label">Allowed groups</span>
+              <input
+                className="input"
+                placeholder="Audit Team, FedRAMP PMO"
+                value={newGroups}
+                onChange={(event) => setNewGroups(event.target.value)}
+              />
+            </label>
+          )}
+        </form>
+      </RegRightDrawer>
+      <RegModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        title="Delete dashboard"
+        description={draft ? `This permanently removes "${draft.title}" from the dashboard library.` : undefined}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setDeleteModalOpen(false)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary border-[#f1b7bd] text-[#a51f2b] hover:border-[#df7d89] hover:bg-[#fff3f4]"
+              disabled={busyAction === 'delete'}
+              onClick={() => void handleDelete()}
+              type="button"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              {busyAction === 'delete' ? 'Deleting...' : 'Delete dashboard'}
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-3 text-sm leading-6 text-[#4f435c]">
+          <p>
+            This removes the dashboard canvas, layout, widget assignments, access settings, and publish state from this tenant.
+          </p>
+          <p>Duplicate or export any dashboard configuration you need before deleting it.</p>
+        </div>
+      </RegModal>
+      <RegModal
+        open={Boolean(pendingItemRemove)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingItemRemove(null);
+          }
+        }}
+        title="Remove dashboard tile"
+        description={pendingItemRemove ? `Review "${pendingItemRemove.title}" before removing it from this draft.` : undefined}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setPendingItemRemove(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary border-[#f1b7bd] text-[#a51f2b] hover:border-[#df7d89] hover:bg-[#fff3f4]"
+              disabled={!pendingItemRemove}
+              onClick={() => pendingItemRemove && removeItem(pendingItemRemove.instanceId)}
+              type="button"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Remove tile
+            </button>
+          </div>
+        }
+      >
+        {pendingItemRemove ? (
+          <div className="space-y-3 text-sm leading-6 text-[#4f435c]">
+            <p>
+              This removes the tile from the current dashboard draft. Save changes to persist the updated layout.
+            </p>
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+              <div className="font-semibold text-[#241232]">{pendingItemRemove.title}</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="status-pill-neutral">{pendingItemRemove.type}</span>
+                <span className="status-pill-neutral">{pendingItemRemove.sourceLabel}</span>
+                <span className="status-pill-neutral">{pendingItemRemove.column} column</span>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
     </div>
   );
 }

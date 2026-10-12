@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Cloud, Globe2, KeyRound, ShieldCheck } from 'lucide-react';
+import { RegModal } from '../../components/regovise/PagePrimitives';
 import { getSetupSso, updateSetupSso } from './api';
 import type { SetupSsoSnapshot } from './types';
 
@@ -33,6 +34,7 @@ export function SSOPage() {
   const [status, setStatus] = useState(statusOptions[0]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [reviewSaveOpen, setReviewSaveOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -113,6 +115,7 @@ export function SSOPage() {
         status,
       });
       hydrate(next);
+      setReviewSaveOpen(false);
       setNotice('Single sign-on settings saved.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to save SSO configuration.');
@@ -122,7 +125,7 @@ export function SSOPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading SSO configuration...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading SSO configuration...</div>;
   }
 
   if (error && !snapshot) {
@@ -140,8 +143,8 @@ export function SSOPage() {
       <section className="panel grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
         <div>
           <div className="eyebrow">Setup</div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Single sign-on</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">Single sign-on</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
             Configure the enterprise identity path for Regovise. OIDC is the active sign-in method in this worker
             today. SAML can be documented here for planning, but it is not yet the interactive workspace sign-in path.
             Providers that use confidential web clients, including Google Workspace, may also require a runtime client
@@ -172,13 +175,13 @@ export function SSOPage() {
       {error && <div className="notice-error">{error}</div>}
 
       {runtimeMessage ? (
-        <div className="rounded-3xl border border-white/10 bg-slate-950/40 px-5 py-4 text-sm text-slate-300">
+        <div className="rounded-3xl border border-[#ded8e4] bg-white px-5 py-4 text-sm text-[#4f435c]">
           {runtimeMessage}
         </div>
       ) : null}
 
       {isOidc ? (
-        <div className="rounded-3xl border border-cyan-300/15 bg-cyan-400/[0.06] px-5 py-4 text-sm text-cyan-100">
+        <div className="rounded-3xl border border-[#d7c3f1] bg-[#f2e8ff] px-5 py-4 text-sm text-[#5f1aa8]">
           {tenantSsoOnly
             ? 'This tenant is currently SSO-only for normal sign-in. Team-created users should normally be provisioned as SSO-managed accounts, and any local password or email-code path should be treated as break-glass only.'
             : 'This tenant can combine enterprise SSO with selected local fallback accounts during rollout. Existing workspace users are matched by email on first successful SSO sign-in, and access is still governed by IAM role assignments.'}
@@ -192,18 +195,18 @@ export function SSOPage() {
           <div className="grid gap-3">
             {authProtocolOptions.map((option) => (
               <label
-                className="flex items-start gap-3 rounded-3xl border border-white/10 bg-slate-950/30 p-4"
+                className="flex items-start gap-3 rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4"
                 key={option.value}
               >
                 <input
                   checked={authProtocol === option.value}
-                  className="mt-1 h-4 w-4 rounded border-white/15 bg-slate-950 text-cyan-400"
+                  className="mt-1 h-4 w-4 rounded border-[#ded8e4] bg-white text-[#7a3ccf]"
                   onChange={() => setAuthProtocol(option.value)}
                   type="radio"
                 />
                 <div>
-                  <div className="font-medium text-white">{option.label}</div>
-                  <div className="mt-1 text-sm text-slate-400">{option.hint}</div>
+                  <div className="font-medium text-[#241232]">{option.label}</div>
+                  <div className="mt-1 text-sm text-[#6f6578]">{option.hint}</div>
                 </div>
               </label>
             ))}
@@ -323,70 +326,70 @@ export function SSOPage() {
           )}
 
           <div className="grid gap-3">
-            <label className="flex items-start gap-3 rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+            <label className="flex items-start gap-3 rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
               <input
                 checked={groupSyncEnabled}
-                className="mt-1 h-4 w-4 rounded border-white/15 bg-slate-950 text-cyan-400"
+                className="mt-1 h-4 w-4 rounded border-[#ded8e4] bg-white text-[#7a3ccf]"
                 onChange={() => setGroupSyncEnabled((current) => !current)}
                 type="checkbox"
               />
               <div>
-                <div className="font-medium text-white">Sync claim-based role assignments</div>
-                <div className="mt-2 text-sm text-slate-400">
+                <div className="font-medium text-[#241232]">Sync claim-based role assignments</div>
+                <div className="mt-2 text-sm text-[#6f6578]">
                   Match the configured roles claim against existing Regovise role names during sign-in.
                 </div>
               </div>
             </label>
 
-            <label className="flex items-start gap-3 rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+            <label className="flex items-start gap-3 rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
               <input
                 checked={jitProvisioningEnabled}
-                className="mt-1 h-4 w-4 rounded border-white/15 bg-slate-950 text-cyan-400"
+                className="mt-1 h-4 w-4 rounded border-[#ded8e4] bg-white text-[#7a3ccf]"
                 onChange={() => setJitProvisioningEnabled((current) => !current)}
                 type="checkbox"
               />
               <div>
-                <div className="font-medium text-white">Allow just-in-time user provisioning</div>
-                <div className="mt-2 text-sm text-slate-400">
+                <div className="font-medium text-[#241232]">Allow just-in-time user provisioning</div>
+                <div className="mt-2 text-sm text-[#6f6578]">
                   Create a workspace account on first successful OIDC login when no existing workspace account matches by
                   email. New accounts still need mapped Regovise roles, unless the tenant uses the first-user bootstrap path.
                 </div>
               </div>
             </label>
 
-            <label className="flex items-start gap-3 rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+            <label className="flex items-start gap-3 rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
               <input
                 checked={allowLocalFallback}
-                className="mt-1 h-4 w-4 rounded border-white/15 bg-slate-950 text-cyan-400"
+                className="mt-1 h-4 w-4 rounded border-[#ded8e4] bg-white text-[#7a3ccf]"
                 onChange={() => setAllowLocalFallback((current) => !current)}
                 type="checkbox"
               />
               <div>
-                <div className="font-medium text-white">Keep local fallback available</div>
-                <div className="mt-2 text-sm text-slate-400">
+                <div className="font-medium text-[#241232]">Keep local fallback available</div>
+                <div className="mt-2 text-sm text-[#6f6578]">
                   Leave password or email-code fallback available for invited or break-glass users until cutover is complete.
                 </div>
               </div>
             </label>
 
-            <label className="flex items-start gap-3 rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+            <label className="flex items-start gap-3 rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
               <input
                 checked={loginEnforced}
-                className="mt-1 h-4 w-4 rounded border-white/15 bg-slate-950 text-cyan-400"
+                className="mt-1 h-4 w-4 rounded border-[#ded8e4] bg-white text-[#7a3ccf]"
                 disabled={!isOidc}
                 onChange={() => setLoginEnforced((current) => !current)}
                 type="checkbox"
               />
               <div>
-                <div className="font-medium text-white">Enforce provider sign-in</div>
-                <div className="mt-2 text-sm text-slate-400">
+                <div className="font-medium text-[#241232]">Enforce provider sign-in</div>
+                <div className="mt-2 text-sm text-[#6f6578]">
                   For normal user access, require the configured OIDC provider instead of local login.
                 </div>
               </div>
             </label>
           </div>
 
-          <button className="button-primary" disabled={saving} onClick={() => void handleSave()} type="button">
+          <button className="button-primary" disabled={saving} onClick={() => setReviewSaveOpen(true)} type="button">
             <KeyRound className="mr-2 h-4 w-4" />
             {saving ? 'Saving...' : 'Save SSO settings'}
           </button>
@@ -395,19 +398,19 @@ export function SSOPage() {
         <div className="space-y-4">
           <section className="panel-subtle">
             <div className="flex items-center gap-3">
-              <Cloud className="h-5 w-5 text-cyan-300" />
-              <h2 className="text-lg font-semibold text-white">Provider readiness</h2>
+              <Cloud className="h-5 w-5 text-[#7a3ccf]" />
+              <h2 className="text-lg font-semibold text-[#241232]">Provider readiness</h2>
             </div>
             <div className="mt-5 space-y-3">
               {snapshot?.providerCards.map((card) => (
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4" key={card.name}>
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={card.name}>
                   <div className="flex items-center justify-between gap-3">
-                    <div className="font-medium text-white">{card.name}</div>
-                    <span className={card.ready ? 'badge-positive' : 'badge-neutral'}>
+                    <div className="font-medium text-[#241232]">{card.name}</div>
+                    <span className={card.ready ? 'status-pill-positive' : 'status-pill-neutral'}>
                       {card.ready ? 'Ready' : 'Pending'}
                     </span>
                   </div>
-                  <div className="mt-2 text-sm text-slate-400">{card.description}</div>
+                  <div className="mt-2 text-sm text-[#6f6578]">{card.description}</div>
                 </div>
               ))}
             </div>
@@ -415,12 +418,12 @@ export function SSOPage() {
 
           <section className="panel-subtle">
             <div className="flex items-center gap-3">
-              <ShieldCheck className="h-5 w-5 text-cyan-300" />
-              <h2 className="text-lg font-semibold text-white">Cutover checklist</h2>
+              <ShieldCheck className="h-5 w-5 text-[#7a3ccf]" />
+              <h2 className="text-lg font-semibold text-[#241232]">Cutover checklist</h2>
             </div>
             <div className="mt-5 space-y-3">
               {snapshot?.checklist.map((item) => (
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4 text-sm text-slate-300" key={item}>
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#4f435c]" key={item}>
                   {item}
                 </div>
               ))}
@@ -429,25 +432,25 @@ export function SSOPage() {
 
           <section className="panel-subtle">
             <div className="flex items-center gap-3">
-              <Globe2 className="h-5 w-5 text-cyan-300" />
-              <h2 className="text-lg font-semibold text-white">Provider examples</h2>
+              <Globe2 className="h-5 w-5 text-[#7a3ccf]" />
+              <h2 className="text-lg font-semibold text-[#241232]">Provider examples</h2>
             </div>
-            <div className="mt-5 space-y-3 text-sm text-slate-300">
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="font-medium text-white">Microsoft Entra</div>
-                <div className="mt-2 text-slate-400">
+            <div className="mt-5 space-y-3 text-sm text-[#4f435c]">
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+                <div className="font-medium text-[#241232]">Microsoft Entra</div>
+                <div className="mt-2 text-[#6f6578]">
                   Register a public client, use the OIDC discovery URL for your tenant, and set the redirect URI to the callback shown here.
                 </div>
               </div>
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="font-medium text-white">Okta</div>
-                <div className="mt-2 text-slate-400">
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+                <div className="font-medium text-[#241232]">Okta</div>
+                <div className="mt-2 text-[#6f6578]">
                   Use the default authorization server discovery URL, expose a roles claim, and keep the app configured for PKCE/public-client login.
                 </div>
               </div>
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="font-medium text-white">SAML note</div>
-                <div className="mt-2 text-slate-400">
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+                <div className="font-medium text-[#241232]">SAML note</div>
+                <div className="mt-2 text-[#6f6578]">
                   If your organization requires SAML, capture the metadata here for planning, but do not enforce it yet. The live worker path today is OIDC.
                 </div>
               </div>
@@ -455,6 +458,49 @@ export function SSOPage() {
           </section>
         </div>
       </section>
+
+      <RegModal
+        description="Confirm the identity-provider configuration before saving SSO routing, claims, and fallback behavior."
+        footer={
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button className="button-secondary" disabled={saving} onClick={() => setReviewSaveOpen(false)} type="button">
+              Cancel
+            </button>
+            <button className="button-primary" disabled={saving} onClick={() => void handleSave()} type="button">
+              {saving ? 'Saving...' : 'Save SSO settings'}
+            </button>
+          </div>
+        }
+        onOpenChange={setReviewSaveOpen}
+        open={reviewSaveOpen}
+        title="Save SSO settings"
+      >
+        <div className="space-y-4 text-sm text-[#4f435c]">
+          <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+            <div className="font-semibold text-[#241232]">{providerType}</div>
+            <div className="mt-2 text-[#6f6578]">Protocol: {authProtocol.toUpperCase()} · Status: {status}</div>
+            <div className="mt-1 text-[#6f6578]">Domain hint: {domainHint || 'Not set'}</div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-3xl border border-[#ded8e4] bg-white p-4">
+              <div className="label">Group sync</div>
+              <div className="mt-2 font-semibold text-[#241232]">{groupSyncEnabled ? 'Enabled' : 'Disabled'}</div>
+            </div>
+            <div className="rounded-3xl border border-[#ded8e4] bg-white p-4">
+              <div className="label">JIT provisioning</div>
+              <div className="mt-2 font-semibold text-[#241232]">{jitProvisioningEnabled ? 'Enabled' : 'Disabled'}</div>
+            </div>
+            <div className="rounded-3xl border border-[#ded8e4] bg-white p-4">
+              <div className="label">Local fallback</div>
+              <div className="mt-2 font-semibold text-[#241232]">{allowLocalFallback ? 'Available' : 'Disabled'}</div>
+            </div>
+          </div>
+          <div className="rounded-3xl border border-[#ded8e4] bg-white p-4">
+            <div className="label">Metadata URL</div>
+            <div className="mt-2 break-all text-[#4f435c]">{metadataUrl || 'Not set'}</div>
+          </div>
+        </div>
+      </RegModal>
     </div>
   );
 }

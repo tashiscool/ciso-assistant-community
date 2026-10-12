@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Bot, CheckCircle2, ChevronLeft, ChevronRight, FileSpreadsheet, Search, Sparkles, Trash2 } from 'lucide-react';
+import { RegModal } from '../../components/regovise/PagePrimitives';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { useEdgeIdentity } from '../../shared/session/identity';
 import {
@@ -13,21 +14,22 @@ import {
 import type { ResponseAutomationJobDetail, ResponseAutomationItem, ResponseAutomationWorkspace } from './types';
 
 type WizardStep = 'intake' | 'sources' | 'launch';
+type ResponseAutomationJobSummary = ResponseAutomationWorkspace['jobs'][number];
 
 function formatDate(value: string) {
   return new Date(value).toLocaleString();
 }
 
 function statusBadgeClass(status: string) {
-  if (status === 'Finished') return 'badge-success';
-  if (status === 'Attention') return 'badge-danger';
-  return 'badge-neutral';
+  if (status === 'Finished') return 'status-pill-success';
+  if (status === 'Attention') return 'status-pill-danger';
+  return 'status-pill-neutral';
 }
 
 function confidenceBadgeClass(value: number) {
-  if (value >= 85) return 'badge-success';
-  if (value >= 60) return 'badge-neutral';
-  return 'badge-danger';
+  if (value >= 85) return 'status-pill-success';
+  if (value >= 60) return 'status-pill-neutral';
+  return 'status-pill-danger';
 }
 
 export function ResponseAutomationPage() {
@@ -53,6 +55,8 @@ export function ResponseAutomationPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [pendingJobDelete, setPendingJobDelete] = useState<ResponseAutomationJobSummary | null>(null);
+  const [pendingItemDelete, setPendingItemDelete] = useState<ResponseAutomationItem | null>(null);
 
   async function loadWorkspace() {
     try {
@@ -239,6 +243,7 @@ export function ResponseAutomationPage() {
       setDraftAnswers(Object.fromEntries(next.items.map((item) => [item.id, item.answer])));
       setDraftAccepted(Object.fromEntries(next.items.map((item) => [item.id, item.accepted])));
       await loadWorkspace();
+      setPendingItemDelete(null);
       setNotice('Question removed from the review set.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete response item.');
@@ -256,6 +261,7 @@ export function ResponseAutomationPage() {
         setSelectedJobId(null);
       }
       await loadWorkspace();
+      setPendingJobDelete(null);
       setNotice('Response-automation job deleted.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete response-automation job.');
@@ -274,7 +280,7 @@ export function ResponseAutomationPage() {
   }
 
   if (loading || !workspace) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading Response Automation...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading Response Automation...</div>;
   }
 
   return (
@@ -282,16 +288,16 @@ export function ResponseAutomationPage() {
       <section className="panel grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <div>
           <div className="eyebrow">Response Automation</div>
-          <h1 className="mt-2 text-3xl font-semibold text-white">Automate questionnaire answering from approved internal sources</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Automate questionnaire answering from approved internal sources</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
             Launch a response job, select grounded internal sources, review generated answers in batches of ten, and export the reviewed answer set from the canonical Cloudflare stack.
           </p>
         </div>
         <div className="panel-subtle space-y-3">
-          <div className="text-xs uppercase tracking-[0.22em] text-slate-500">Prerequisites</div>
-          <div className="rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2 text-sm text-slate-300">
-            Runtime provider: <span className="font-medium text-white">{workspace.health.runtimeProvider}</span> · Vector index records:{' '}
-            <span className="font-medium text-white">{workspace.health.vectorCount}</span>
+          <div className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Prerequisites</div>
+          <div className="rounded-2xl border border-[#ded8e4] bg-white px-3 py-2 text-sm text-[#4f435c]">
+            Runtime provider: <span className="font-medium text-[#241232]">{workspace.health.runtimeProvider}</span> · Vector index records:{' '}
+            <span className="font-medium text-[#241232]">{workspace.health.vectorCount}</span>
           </div>
           {([
             ['RegML enabled', workspace.health.regmlEnabled],
@@ -301,9 +307,9 @@ export function ResponseAutomationPage() {
             ['Harvester processed sources', workspace.health.harvesterProcessedSources],
             ['Environment healthy', workspace.health.environmentHealthy],
           ] as Array<[string, boolean]>).map(([label, ready]) => (
-            <div key={label} className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2 text-sm">
-              <span className="text-slate-300">{label}</span>
-              <span className={ready ? 'badge-success' : 'badge-danger'}>{ready ? 'Ready' : 'Missing'}</span>
+            <div key={label} className="flex items-center justify-between rounded-2xl border border-[#ded8e4] bg-white px-3 py-2 text-sm">
+              <span className="text-[#4f435c]">{label}</span>
+              <span className={ready ? 'status-pill-success' : 'status-pill-danger'}>{ready ? 'Ready' : 'Missing'}</span>
             </div>
           ))}
         </div>
@@ -315,9 +321,9 @@ export function ResponseAutomationPage() {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {metrics.map((metric) => (
           <article key={metric.label} className="panel-subtle">
-            <div className="text-xs uppercase tracking-[0.22em] text-slate-500">{metric.label}</div>
-            <div className="mt-3 text-3xl font-semibold text-white">{metric.value}</div>
-            <div className="mt-2 text-sm text-slate-400">{metric.detail}</div>
+            <div className="text-xs uppercase tracking-[0.22em] text-[#62576a]">{metric.label}</div>
+            <div className="mt-3 text-3xl font-semibold text-[#241232]">{metric.value}</div>
+            <div className="mt-2 text-sm text-[#6f6578]">{metric.detail}</div>
           </article>
         ))}
       </section>
@@ -326,7 +332,7 @@ export function ResponseAutomationPage() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="eyebrow">Start Response</div>
-            <div className="mt-2 text-lg font-semibold text-white">Multi-step job creation flow</div>
+            <div className="mt-2 text-lg font-semibold text-[#241232]">Multi-step job creation flow</div>
           </div>
           <button className="button-primary" disabled={busy !== null} onClick={() => void handleCreateJob()}>
             <Sparkles className="h-4 w-4" />
@@ -342,25 +348,25 @@ export function ResponseAutomationPage() {
           </TabsList>
           <TabsContent value="intake" className="mt-6 grid gap-4 lg:grid-cols-2">
             <label className="block space-y-2">
-              <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Title</span>
+              <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Title</span>
               <input className="input" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Customer DDQ April 2026" />
             </label>
             <label className="block space-y-2">
-              <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Questionnaire document</span>
+              <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Questionnaire document</span>
               <input className="input" value={sourceDocument} onChange={(event) => setSourceDocument(event.target.value)} placeholder="questionnaire.docx" />
             </label>
-            <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300 lg:col-span-2">
+            <div className="rounded-2xl border border-[#ded8e4] bg-white p-4 text-sm text-[#4f435c] lg:col-span-2">
               Supported intake references include `.pdf`, `.xls`, `.xlsx`, and `.docx`. This canonical stack currently stores the uploaded document name and links the final reviewed export into the shared files history layer.
             </div>
           </TabsContent>
           <TabsContent value="sources" className="mt-6 space-y-4">
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               {workspace.sources.map((source) => (
-                <label key={source.id} className={`rounded-3xl border p-4 ${selectedSourceIds.includes(source.id) ? 'border-cyan-300/40 bg-cyan-400/[0.06]' : 'border-white/10 bg-slate-950/50'}`}>
+                <label key={source.id} className={`rounded-3xl border p-4 ${selectedSourceIds.includes(source.id) ? 'border-[#c7a9ed] bg-[#f2e8ff]' : 'border-[#ded8e4] bg-white'}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="text-sm font-semibold text-white">{source.label}</div>
-                      <div className="mt-1 text-xs text-slate-500">{source.type}</div>
+                      <div className="text-sm font-semibold text-[#241232]">{source.label}</div>
+                      <div className="mt-1 text-xs text-[#62576a]">{source.type}</div>
                     </div>
                     <input
                       checked={selectedSourceIds.includes(source.id)}
@@ -372,8 +378,8 @@ export function ResponseAutomationPage() {
                       type="checkbox"
                     />
                   </div>
-                  <div className="mt-3 text-sm text-slate-300">{source.description}</div>
-                  <div className="mt-3 text-xs text-slate-500">Indexed {formatDate(source.freshness)}</div>
+                  <div className="mt-3 text-sm text-[#4f435c]">{source.description}</div>
+                  <div className="mt-3 text-xs text-[#62576a]">Indexed {formatDate(source.freshness)}</div>
                 </label>
               ))}
             </div>
@@ -381,8 +387,8 @@ export function ResponseAutomationPage() {
           <TabsContent value="launch" className="mt-6 grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
             <div className="space-y-3">
               <div className="panel-subtle">
-                <div className="text-sm font-medium text-white">Launch Summary</div>
-                <div className="mt-3 space-y-2 text-sm text-slate-300">
+                <div className="text-sm font-medium text-[#241232]">Launch Summary</div>
+                <div className="mt-3 space-y-2 text-sm text-[#4f435c]">
                   <div>Title: {title || 'Untitled response job'}</div>
                   <div>Source document: {sourceDocument}</div>
                   <div>Selected sources: {selectedSourceIds.length}</div>
@@ -390,7 +396,7 @@ export function ResponseAutomationPage() {
                 </div>
               </div>
               <label className="block space-y-2">
-                <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Export format</span>
+                <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Export format</span>
                 <select className="input" value={exportFormat} onChange={(event) => setExportFormat(event.target.value)}>
                   <option value="xlsx">Excel</option>
                   <option value="csv">CSV</option>
@@ -399,11 +405,11 @@ export function ResponseAutomationPage() {
               </label>
             </div>
             <div className="panel-subtle">
-              <div className="flex items-center gap-2 text-white">
-                <Bot className="h-4 w-4 text-cyan-300" />
+              <div className="flex items-center gap-2 text-[#241232]">
+                <Bot className="h-4 w-4 text-[#7a3ccf]" />
                 <span className="font-semibold">What happens next</span>
               </div>
-              <div className="mt-4 space-y-3 text-sm text-slate-300">
+              <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
                 <p>The Worker extracts a review set, generates grounded draft answers, tracks acceptance state, and prepares an export package in the shared files history layer.</p>
                 <p>Blank responses remain intentionally blank when the selected source set does not provide enough grounding evidence.</p>
               </div>
@@ -417,20 +423,20 @@ export function ResponseAutomationPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="eyebrow">Jobs</div>
-              <div className="mt-2 text-lg font-semibold text-white">Response Automation Job List</div>
+              <div className="mt-2 text-lg font-semibold text-[#241232]">Response Automation Job List</div>
             </div>
           </div>
           <div className="space-y-3">
             {workspace.jobs.map((job) => (
-              <article key={job.id} className={`panel-subtle ${selectedJobId === job.id ? 'border-cyan-300/40 bg-cyan-400/[0.06]' : ''}`}>
+              <article key={job.id} className={`panel-subtle ${selectedJobId === job.id ? 'border-[#c7a9ed] bg-[#f2e8ff]' : ''}`}>
                 <div className="flex items-start justify-between gap-3">
                   <button className="text-left" onClick={() => setSelectedJobId(job.id)} type="button">
-                    <div className="text-sm font-semibold text-white">{job.title}</div>
-                    <div className="mt-1 text-xs text-slate-500">{job.sourceDocument}</div>
+                    <div className="text-sm font-semibold text-[#241232]">{job.title}</div>
+                    <div className="mt-1 text-xs text-[#62576a]">{job.sourceDocument}</div>
                   </button>
                   <span className={statusBadgeClass(job.status)}>{job.status}</span>
                 </div>
-                <div className="mt-3 grid gap-2 text-xs text-slate-400">
+                <div className="mt-3 grid gap-2 text-xs text-[#6f6578]">
                   <div>{job.questionCount} question(s)</div>
                   <div>{job.reviewAcceptedCount} accepted</div>
                   <div>Created {formatDate(job.createdAt)}</div>
@@ -447,14 +453,14 @@ export function ResponseAutomationPage() {
                       Export
                     </a>
                   )}
-                  <button className="button-secondary text-rose-200" onClick={() => void handleDeleteJob(job.id)}>
+                  <button className="button-secondary text-[#9d1f2c]" onClick={() => setPendingJobDelete(job)}>
                     Delete
                   </button>
                 </div>
               </article>
             ))}
             {workspace.jobs.length === 0 && (
-              <div className="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-slate-400">
+              <div className="rounded-2xl border border-dashed border-[#ded8e4] px-4 py-8 text-center text-sm text-[#6f6578]">
                 No response-automation jobs exist yet.
               </div>
             )}
@@ -462,14 +468,14 @@ export function ResponseAutomationPage() {
         </section>
 
         <section className="panel space-y-4">
-          {detailLoading && <div className="text-sm text-slate-400">Loading review job...</div>}
+          {detailLoading && <div className="text-sm text-[#6f6578]">Loading review job...</div>}
           {!detailLoading && detail ? (
             <>
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <div className="eyebrow">Review Responses</div>
-                  <div className="mt-2 text-2xl font-semibold text-white">{detail.job.title}</div>
-                  <div className="mt-2 text-sm text-slate-300">
+                  <div className="mt-2 text-2xl font-semibold text-[#241232]">{detail.job.title}</div>
+                  <div className="mt-2 text-sm text-[#4f435c]">
                     {detail.job.sourceDocument} · {detail.job.questionCount} question(s) · {detail.job.status}
                   </div>
                 </div>
@@ -491,14 +497,14 @@ export function ResponseAutomationPage() {
 
               <div className="grid gap-4 md:grid-cols-4">
                 <label className="block space-y-2 md:col-span-2">
-                  <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Search</span>
+                  <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Search</span>
                   <div className="relative">
-                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#62576a]" />
                     <input className="input pl-10" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search questions or answers" />
                   </div>
                 </label>
                 <label className="block space-y-2">
-                  <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Answer filter</span>
+                  <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Answer filter</span>
                   <select className="input" value={answerFilter} onChange={(event) => setAnswerFilter(event.target.value as typeof answerFilter)}>
                     <option value="all">All</option>
                     <option value="answered">Answered</option>
@@ -506,7 +512,7 @@ export function ResponseAutomationPage() {
                   </select>
                 </label>
                 <label className="block space-y-2">
-                  <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Accepted filter</span>
+                  <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Accepted filter</span>
                   <select className="input" value={acceptedFilter} onChange={(event) => setAcceptedFilter(event.target.value as typeof acceptedFilter)}>
                     <option value="all">All</option>
                     <option value="accepted">Accepted</option>
@@ -516,7 +522,7 @@ export function ResponseAutomationPage() {
               </div>
 
               <label className="block space-y-2">
-                <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Confidence filter</span>
+                <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Confidence filter</span>
                 <select className="input max-w-sm" value={confidenceFilter} onChange={(event) => setConfidenceFilter(event.target.value as typeof confidenceFilter)}>
                   <option value="all">All confidence</option>
                   <option value="high">High</option>
@@ -530,15 +536,15 @@ export function ResponseAutomationPage() {
                   {pageItems.map((item) => (
                     <article
                       key={item.id}
-                      className={`rounded-3xl border p-5 ${selectedItemId === item.id ? 'border-cyan-300/40 bg-cyan-400/[0.05]' : 'border-white/10 bg-slate-950/50'}`}
+                      className={`rounded-3xl border p-5 ${selectedItemId === item.id ? 'border-[#c7a9ed] bg-[#f2e8ff]' : 'border-[#ded8e4] bg-white'}`}
                     >
                       <div className="flex flex-wrap items-start justify-between gap-4">
                         <button className="text-left" onClick={() => setSelectedItemId(item.id)} type="button">
-                          <div className="text-sm font-semibold text-white">{item.question}</div>
+                          <div className="text-sm font-semibold text-[#241232]">{item.question}</div>
                         </button>
                         <div className="flex flex-wrap gap-2">
                           <span className={confidenceBadgeClass(item.confidence)}>{item.confidence}% confidence</span>
-                          <label className="flex items-center gap-2 text-xs text-slate-300">
+                          <label className="flex items-center gap-2 text-xs text-[#4f435c]">
                             <input
                               checked={draftAccepted[item.id] ?? item.accepted}
                               onChange={(event) => setDraftAccepted((current) => ({ ...current, [item.id]: event.target.checked }))}
@@ -553,9 +559,9 @@ export function ResponseAutomationPage() {
                         value={draftAnswers[item.id] ?? item.answer}
                         onChange={(event) => setDraftAnswers((current) => ({ ...current, [item.id]: event.target.value }))}
                       />
-                      <div className="mt-4 flex items-center justify-between gap-3 text-xs text-slate-500">
+                      <div className="mt-4 flex items-center justify-between gap-3 text-xs text-[#62576a]">
                         <span>Retrieval score {item.retrievalScore}</span>
-                        <button className="button-secondary text-rose-200" onClick={() => void handleDeleteItem(item.id)}>
+                        <button className="button-secondary text-[#9d1f2c]" onClick={() => setPendingItemDelete(item)}>
                           <Trash2 className="h-4 w-4" />
                           Delete question
                         </button>
@@ -563,12 +569,12 @@ export function ResponseAutomationPage() {
                     </article>
                   ))}
                   {pageItems.length === 0 && (
-                    <div className="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-slate-400">
+                    <div className="rounded-2xl border border-dashed border-[#ded8e4] px-4 py-8 text-center text-sm text-[#6f6578]">
                       No response items matched the current filters.
                     </div>
                   )}
-                  <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-slate-950/50 px-4 py-3">
-                    <div className="text-sm text-slate-300">
+                  <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#ded8e4] bg-white px-4 py-3">
+                    <div className="text-sm text-[#4f435c]">
                       Page {currentPage + 1} of {pageCount}
                     </div>
                     <div className="flex gap-2">
@@ -586,36 +592,36 @@ export function ResponseAutomationPage() {
 
                 <div className="space-y-4">
                   <section className="panel-subtle">
-                    <div className="flex items-center gap-2 text-white">
-                      <CheckCircle2 className="h-4 w-4 text-cyan-300" />
+                    <div className="flex items-center gap-2 text-[#241232]">
+                      <CheckCircle2 className="h-4 w-4 text-[#7a3ccf]" />
                       <span className="font-semibold">Citations</span>
                     </div>
                     <div className="mt-4 space-y-3">
                       {(selectedItem?.citations ?? []).map((citation, index) => (
-                        <article key={`${selectedItem?.id ?? 'item'}-${index}`} className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">
+                        <article key={`${selectedItem?.id ?? 'item'}-${index}`} className="rounded-2xl border border-[#ded8e4] bg-white p-4 text-sm text-[#4f435c]">
                           {citation}
                         </article>
                       ))}
                       {(selectedItem?.citations.length ?? 0) === 0 && (
-                        <div className="text-sm text-slate-400">No citations available for the current response.</div>
+                        <div className="text-sm text-[#6f6578]">No citations available for the current response.</div>
                       )}
                     </div>
                   </section>
 
                   <section className="panel-subtle">
-                    <div className="flex items-center gap-2 text-white">
-                      <Bot className="h-4 w-4 text-cyan-300" />
+                    <div className="flex items-center gap-2 text-[#241232]">
+                      <Bot className="h-4 w-4 text-[#7a3ccf]" />
                       <span className="font-semibold">Pipeline</span>
                     </div>
                     <div className="mt-4 space-y-3">
                       {detail.pipeline.map((step) => (
-                        <article key={step.id} className="rounded-2xl border border-white/10 bg-slate-950/50 p-4">
+                        <article key={step.id} className="rounded-2xl border border-[#ded8e4] bg-white p-4">
                           <div className="flex items-center justify-between gap-3">
-                            <div className="font-medium text-white">{step.title}</div>
+                            <div className="font-medium text-[#241232]">{step.title}</div>
                             <span className={statusBadgeClass(step.status)}>{step.status}</span>
                           </div>
-                          <div className="mt-2 text-sm text-slate-300">{step.helper}</div>
-                          <div className="mt-3 text-xs text-slate-500">{step.metric}</div>
+                          <div className="mt-2 text-sm text-[#4f435c]">{step.helper}</div>
+                          <div className="mt-3 text-xs text-[#62576a]">{step.metric}</div>
                         </article>
                       ))}
                     </div>
@@ -624,12 +630,95 @@ export function ResponseAutomationPage() {
               </div>
             </>
           ) : (
-            <div className="rounded-2xl border border-dashed border-white/10 px-6 py-12 text-center text-sm text-slate-400">
+            <div className="rounded-2xl border border-dashed border-[#ded8e4] px-6 py-12 text-center text-sm text-[#6f6578]">
               Open a response-automation job to review generated answers and citations.
             </div>
           )}
         </section>
       </section>
+
+      <RegModal
+        open={Boolean(pendingJobDelete)}
+        onOpenChange={(open) => {
+          if (!open) setPendingJobDelete(null);
+        }}
+        title="Delete response job"
+        description={pendingJobDelete ? `Review "${pendingJobDelete.title}" before removing it.` : undefined}
+        footer={
+          <div className="flex justify-end gap-3">
+            <button className="button-secondary" onClick={() => setPendingJobDelete(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary text-[#9d1f2c]"
+              disabled={!pendingJobDelete || busy === `delete-job:${pendingJobDelete.id}`}
+              onClick={() => {
+                if (pendingJobDelete) void handleDeleteJob(pendingJobDelete.id);
+              }}
+              type="button"
+            >
+              Delete job
+            </button>
+          </div>
+        }
+      >
+        <div className="notice-warning">
+          Deleting this response-automation job removes its review set and generated answer history from this workspace. Exported files already downloaded remain outside this review queue.
+        </div>
+        {pendingJobDelete ? (
+          <div className="mt-4 rounded-2xl border border-[#ded8e4] bg-white p-4">
+            <div className="text-sm font-semibold text-[#241232]">{pendingJobDelete.title}</div>
+            <div className="mt-1 text-sm text-[#62576a]">{pendingJobDelete.sourceDocument}</div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className={statusBadgeClass(pendingJobDelete.status)}>{pendingJobDelete.status}</span>
+              <span className="status-pill-neutral">{pendingJobDelete.questionCount} question(s)</span>
+              <span className="status-pill-neutral">{pendingJobDelete.reviewAcceptedCount} accepted</span>
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
+
+      <RegModal
+        open={Boolean(pendingItemDelete)}
+        onOpenChange={(open) => {
+          if (!open) setPendingItemDelete(null);
+        }}
+        title="Delete question"
+        description="Review this generated response item before removing it from the job."
+        footer={
+          <div className="flex justify-end gap-3">
+            <button className="button-secondary" onClick={() => setPendingItemDelete(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary text-[#9d1f2c]"
+              disabled={!pendingItemDelete || busy === `delete-item:${pendingItemDelete.id}`}
+              onClick={() => {
+                if (pendingItemDelete) void handleDeleteItem(pendingItemDelete.id);
+              }}
+              type="button"
+            >
+              Delete question
+            </button>
+          </div>
+        }
+      >
+        <div className="notice-warning">
+          Deleting this question removes the generated answer, accepted state, retrieval score, and citations from the current response job.
+        </div>
+        {pendingItemDelete ? (
+          <div className="mt-4 rounded-2xl border border-[#ded8e4] bg-white p-4">
+            <div className="text-sm font-semibold text-[#241232]">{pendingItemDelete.question}</div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className={confidenceBadgeClass(pendingItemDelete.confidence)}>{pendingItemDelete.confidence}% confidence</span>
+              <span className="status-pill-neutral">Retrieval {pendingItemDelete.retrievalScore}</span>
+              <span className={pendingItemDelete.accepted ? 'status-pill-success' : 'status-pill-neutral'}>
+                {pendingItemDelete.accepted ? 'Accepted' : 'Not accepted'}
+              </span>
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
     </div>
   );
 }

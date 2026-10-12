@@ -5,19 +5,21 @@ import {
   Archive,
   ClipboardCheck,
   Database,
+  Eye,
   FileSearch,
   MessageSquare,
   RefreshCw,
+  Search,
 } from 'lucide-react';
-import { Button } from '../../components/ui/button';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '../../components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+  RegActionMenu,
+  RegFilterBar,
+  RegPageHeader,
+  RegRightDrawer,
+  RegStatusPill,
+  RegTableShell,
+  RegTabs,
+} from '../../components/regovise/PagePrimitives';
 import { ApiClient } from '../../shared/api/client';
 import { useEdgeIdentity } from '../../shared/session/identity';
 
@@ -97,6 +99,11 @@ type AssessmentEvidencePackageDetail = {
     daysToReceive: number | null;
   }>;
 };
+
+type EvidenceRollup = AssessmentEvidencePackageDetail['evidenceRollups'][number];
+type ReviewerComment = AssessmentEvidencePackageDetail['reviewerComments'][number];
+type PackageAnomaly = AssessmentEvidencePackageDetail['anomalies'][number];
+type ActivePackageTab = 'overview' | 'requests' | 'comments' | 'rollups' | 'anomalies' | 'template';
 
 const client = new ApiClient();
 
@@ -186,14 +193,24 @@ function KpiCard({
   detail: string;
 }) {
   return (
-    <Card>
-      <CardContent className="p-5">
-        <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{label}</div>
-        <div className="mt-3 text-3xl font-semibold text-white">{value}</div>
-        <div className="mt-2 text-xs leading-5 text-slate-400">{detail}</div>
-      </CardContent>
-    </Card>
+    <article className="metric-card">
+      <div className="metric-label">{label}</div>
+      <div className="metric-value">{value}</div>
+      <div className="mt-2 text-xs leading-5 text-[#4f435c]">{detail}</div>
+    </article>
   );
+}
+
+function ToneForStatus({ status }: { status: string }) {
+  const normalized = status.toLowerCase();
+  const tone = normalized.includes('closed') || normalized.includes('ok')
+    ? 'success'
+    : normalized.includes('partial') || normalized.includes('review')
+      ? 'warning'
+      : normalized.includes('fail') || normalized.includes('error')
+        ? 'danger'
+        : 'neutral';
+  return <RegStatusPill tone={tone}>{status}</RegStatusPill>;
 }
 
 export function AssessmentEvidencePackagePage() {
@@ -206,6 +223,11 @@ export function AssessmentEvidencePackagePage() {
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<ActivePackageTab>('overview');
+  const [inspectedRequest, setInspectedRequest] = useState<AssessmentRequest | null>(null);
+  const [inspectedComment, setInspectedComment] = useState<ReviewerComment | null>(null);
+  const [inspectedRollup, setInspectedRollup] = useState<EvidenceRollup | null>(null);
+  const [inspectedAnomaly, setInspectedAnomaly] = useState<PackageAnomaly | null>(null);
   const [filters, setFilters] = useState({
     query: '',
     family: 'all',
@@ -313,117 +335,111 @@ export function AssessmentEvidencePackagePage() {
     : [];
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <div className="flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.28em] text-cyan-300/70">
+    <div className="space-y-6">
+      <RegPageHeader
+        actions={
+          <button className="button-secondary gap-2" onClick={() => void loadPackages()} type="button">
+            <RefreshCw className="h-4 w-4" />
+            Refresh
+          </button>
+        }
+        className="rounded-lg border border-[#ded8e4] shadow-[0_10px_28px_rgba(48,24,72,0.06)]"
+        description="Historical FedRAMP workbook imports become traceable packages: control to request, owner response, evidence rollup, reviewer comment, sufficiency status, and reusable assessment template coverage."
+        eyebrow={
+          <span className="inline-flex items-center gap-2">
             <FileSearch className="h-4 w-4" />
             Assessment Evidence Packages
-          </div>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white">
-            Scrutiny chain cockpit
-          </h1>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
-            Historical FedRAMP workbook imports become traceable packages: control to request,
-            owner response, evidence rollup, reviewer comment, sufficiency status, and reusable
-            assessment template coverage.
-          </p>
-        </div>
-        <Button variant="outline" onClick={() => void loadPackages()}>
-          <RefreshCw className="h-4 w-4" />
-          Refresh
-        </Button>
-      </div>
+          </span>
+        }
+        meta={
+          selectedSummary ? (
+            <>
+              <RegStatusPill tone={selectedSummary.anomalyCount > 0 ? 'warning' : 'success'}>
+                {selectedSummary.anomalyCount} anomalies
+              </RegStatusPill>
+              <span>{selectedSummary.folderIds.length} workspace scopes</span>
+              <span>Updated {formatDate(selectedSummary.updatedAt)}</span>
+            </>
+          ) : null
+        }
+        title="Scrutiny chain cockpit"
+      />
 
-      {error && (
-        <div className="rounded-2xl border border-rose-400/30 bg-rose-500/10 p-4 text-sm text-rose-200">
-          {error}
-        </div>
-      )}
+      {error ? <div className="notice-error">{error}</div> : null}
 
       {loading ? (
-        <Card>
-          <CardContent className="p-8 text-sm text-slate-400">Loading assessment evidence packages...</CardContent>
-        </Card>
+        <section className="panel" aria-live="polite">
+          <div className="text-sm text-[#4f435c]">Loading assessment evidence packages...</div>
+        </section>
       ) : packages.length === 0 ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>No assessment packages imported yet</CardTitle>
-            <CardDescription>
-              Run the guarded FedHR FedRAMP importer in dry-run mode first, then apply with
-              explicit production mutation guards after review.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        <section className="panel">
+          <h2 className="text-xl font-semibold text-[#241232]">No assessment packages imported yet</h2>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-[#4f435c]">
+            Run the guarded FedHR FedRAMP importer in dry-run mode first, then apply with explicit
+            production mutation guards after review.
+          </p>
+        </section>
       ) : (
         <>
-          <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
-            <Card>
-              <CardHeader>
-                <CardTitle>Imported Packages</CardTitle>
-                <CardDescription>Select a package marker to inspect the imported evidence chain.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
+          <div className="grid min-w-0 gap-4 xl:grid-cols-[320px_minmax(0,1fr)]">
+            <section className="panel">
+              <div className="eyebrow">Imported packages</div>
+              <h2 className="mt-2 text-xl font-semibold text-[#241232]">Imported Packages</h2>
+              <p className="mt-2 text-sm leading-6 text-[#4f435c]">
+                Select a package marker to inspect the imported evidence chain.
+              </p>
+              <div className="mt-5 space-y-3">
                 {packages.map((item) => {
                   const active = item.marker === selectedMarker;
                   return (
                     <button
-                      key={item.marker}
-                      type="button"
-                      onClick={() =>
-                        navigate(`/assessment-evidence-packages/${encodeURIComponent(item.marker)}`)
-                      }
-                      className={`w-full rounded-2xl border p-4 text-left transition ${
+                      className={`w-full rounded-lg border p-4 text-left transition ${
                         active
-                          ? 'border-cyan-400/40 bg-cyan-400/10 text-cyan-50'
-                          : 'border-white/10 bg-white/[0.03] text-slate-300 hover:border-white/20 hover:bg-white/[0.06]'
+                          ? 'border-[#8b35e6] bg-[#f2e8ff] text-[#241232] shadow-[0_8px_18px_rgba(139,53,230,0.12)]'
+                          : 'border-[#ded8e4] bg-white text-[#4f435c] hover:border-[#d7c3f1] hover:bg-[#fbf9fc]'
                       }`}
+                      key={item.marker}
+                      onClick={() => navigate(`/assessment-evidence-packages/${encodeURIComponent(item.marker)}`)}
+                      type="button"
                     >
                       <div className="text-sm font-semibold">{item.title}</div>
-                      <div className="mt-2 text-xs text-slate-400">{item.marker}</div>
-                      <div className="mt-3 flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.16em] text-slate-500">
-                        <span>{item.dataCallCount} requests</span>
-                        <span>{item.evidenceRollupCount} rollups</span>
+                      <div className="mt-2 text-xs text-[#4f435c]">{item.marker}</div>
+                      <div className="mt-3 flex flex-wrap gap-2 text-xs text-[#6f6578]">
+                        <RegStatusPill tone="info">{item.dataCallCount} requests</RegStatusPill>
+                        <RegStatusPill tone="purple">{item.evidenceRollupCount} rollups</RegStatusPill>
                       </div>
                     </button>
                   );
                 })}
-              </CardContent>
-            </Card>
+              </div>
+            </section>
 
-            <div className="space-y-4">
-              {selectedSummary && (
-                <Card>
-                  <CardHeader>
-                    <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                      <div>
-                        <CardTitle>{selectedSummary.title}</CardTitle>
-                        <CardDescription>
-                          {selectedSummary.matter ?? selectedSummary.marker} updated {formatDate(selectedSummary.updatedAt)}
-                        </CardDescription>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <Button variant="secondary" asChild>
-                          <Link to="/data-calls">Open Data Calls</Link>
-                        </Button>
-                        <Button variant="secondary" asChild>
-                          <Link to="/evidence-locker">Open Evidence Locker</Link>
-                        </Button>
-                        <Button variant="secondary" asChild>
-                          <Link to="/assessment-plans">Reusable Template</Link>
-                        </Button>
-                        <Button asChild>
-                          <Link to={`/grc-admin/scrutiny-engine?packageMarker=${encodeURIComponent(selectedSummary.marker)}`}>
-                            Generate Scrutiny Run
-                          </Link>
-                        </Button>
-                      </div>
+            <div className="min-w-0 space-y-4">
+              {selectedSummary ? (
+                <section className="panel">
+                  <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                    <div className="min-w-0">
+                      <h2 className="text-xl font-semibold text-[#241232]">{selectedSummary.title}</h2>
+                      <p className="mt-2 text-sm leading-6 text-[#4f435c]">
+                        {selectedSummary.matter ?? selectedSummary.marker} updated {formatDate(selectedSummary.updatedAt)}
+                      </p>
                     </div>
-                  </CardHeader>
-                </Card>
-              )}
+                    <div className="flex flex-wrap gap-2">
+                      <Link className="button-secondary" to="/data-calls">Open Data Calls</Link>
+                      <Link className="button-secondary" to="/evidence-locker">Open Evidence Locker</Link>
+                      <Link className="button-secondary" to="/assessment-plans">Reusable Template</Link>
+                      <Link
+                        className="button-primary"
+                        to={`/grc-admin/scrutiny-engine?packageMarker=${encodeURIComponent(selectedSummary.marker)}`}
+                      >
+                        Generate Scrutiny Run
+                      </Link>
+                    </div>
+                  </div>
+                </section>
+              ) : null}
 
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
                 {kpis.map((item) => (
                   <KpiCard key={item.label} {...item} />
                 ))}
@@ -432,48 +448,48 @@ export function AssessmentEvidencePackagePage() {
           </div>
 
           {detailLoading || !detail ? (
-            <Card>
-              <CardContent className="p-8 text-sm text-slate-400">Loading package detail...</CardContent>
-            </Card>
+            <section className="panel" aria-live="polite">
+              <div className="text-sm text-[#4f435c]">Loading package detail...</div>
+            </section>
           ) : (
-            <Tabs defaultValue="overview" className="space-y-4">
-              <TabsList className="flex h-auto flex-wrap justify-start">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="requests">Evidence Requests</TabsTrigger>
-                <TabsTrigger value="comments">Reviewer Comments</TabsTrigger>
-                <TabsTrigger value="rollups">Evidence Rollups</TabsTrigger>
-                <TabsTrigger value="anomalies">Anomalies</TabsTrigger>
-                <TabsTrigger value="template">Reusable Template</TabsTrigger>
-              </TabsList>
+            <section className="min-w-0">
+              <RegTabs
+                className="rounded-t-lg border border-b-0 border-[#ded8e4] bg-white px-2"
+                onSelect={(tabId) => setActiveTab(tabId as ActivePackageTab)}
+                tabs={[
+                  { id: 'overview', label: 'Overview', active: activeTab === 'overview' },
+                  { id: 'requests', label: 'Evidence Requests', count: detail.requests.length, active: activeTab === 'requests' },
+                  { id: 'comments', label: 'Reviewer Comments', count: detail.reviewerComments.length, active: activeTab === 'comments' },
+                  { id: 'rollups', label: 'Evidence Rollups', count: detail.evidenceRollups.length, active: activeTab === 'rollups' },
+                  { id: 'anomalies', label: 'Anomalies', count: detail.anomalies.length, active: activeTab === 'anomalies' },
+                  { id: 'template', label: 'Reusable Template', active: activeTab === 'template' },
+                ]}
+              />
 
-              <TabsContent value="overview">
-                <div className="grid gap-4 xl:grid-cols-2">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Control Coverage</CardTitle>
-                      <CardDescription>Most frequently scrutinized raw workbook control refs.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
+              {activeTab === 'overview' ? (
+                <div className="grid gap-4 rounded-b-lg border border-[#ded8e4] bg-white p-4 xl:grid-cols-2">
+                  <section className="panel-subtle">
+                    <h2 className="text-lg font-semibold text-[#241232]">Control Coverage</h2>
+                    <p className="mt-1 text-sm text-[#4f435c]">Most frequently scrutinized raw workbook control refs.</p>
+                    <div className="mt-4 max-h-[520px] space-y-2 overflow-auto pr-1">
                       {detail.controlCoverage.slice(0, 16).map((item) => (
-                        <div key={item.controlRef} className="flex items-center justify-between rounded-xl bg-white/[0.03] px-3 py-2 text-sm">
-                          <span className="font-medium text-slate-200">{item.controlRef}</span>
-                          <span className="text-slate-400">{item.count} requests</span>
+                        <div className="flex items-center justify-between gap-3 rounded-md bg-white px-3 py-2 text-sm" key={item.controlRef}>
+                          <span className="font-medium text-[#241232]">{item.controlRef}</span>
+                          <span className="shrink-0 text-[#4f435c]">{item.count} requests</span>
                         </div>
                       ))}
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </section>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Family and Owner Bottlenecks</CardTitle>
-                      <CardDescription>Where scrutiny clusters and which owners carried volume.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="grid gap-4 md:grid-cols-2">
+                  <section className="panel-subtle">
+                    <h2 className="text-lg font-semibold text-[#241232]">Family and Owner Bottlenecks</h2>
+                    <p className="mt-1 text-sm text-[#4f435c]">Where scrutiny clusters and which owners carried volume.</p>
+                    <div className="mt-4 grid gap-4 md:grid-cols-2">
                       <div className="space-y-2">
                         {detail.familyCoverage.slice(0, 10).map((item) => (
-                          <div key={item.family} className="rounded-xl bg-white/[0.03] px-3 py-2 text-sm">
-                            <div className="font-medium text-slate-200">{item.family}</div>
-                            <div className="text-xs text-slate-400">
+                          <div className="rounded-md bg-white px-3 py-2 text-sm" key={item.family}>
+                            <div className="font-medium text-[#241232]">{item.family}</div>
+                            <div className="text-xs text-[#4f435c]">
                               {item.requestCount} requests, {item.coreCount} core
                             </div>
                           </div>
@@ -481,302 +497,578 @@ export function AssessmentEvidencePackagePage() {
                       </div>
                       <div className="space-y-2">
                         {detail.ownerCoverage.slice(0, 10).map((item) => (
-                          <div key={item.owner} className="rounded-xl bg-white/[0.03] px-3 py-2 text-sm">
-                            <div className="font-medium text-slate-200">{item.owner}</div>
-                            <div className="text-xs text-slate-400">
+                          <div className="rounded-md bg-white px-3 py-2 text-sm" key={item.owner}>
+                            <div className="font-medium text-[#241232]">{item.owner}</div>
+                            <div className="text-xs text-[#4f435c]">
                               {item.requestCount} requests, avg {formatMetric(item.averageDaysToReceive)} days
                             </div>
                           </div>
                         ))}
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </section>
                 </div>
-              </TabsContent>
+              ) : null}
 
-              <TabsContent value="requests">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Evidence Requests</CardTitle>
-                    <CardDescription>
-                      Filter imported Data Calls by control, owner, family, evidence type, comments, and anomalies.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              {activeTab === 'requests' ? (
+                <RegTableShell className="rounded-t-none">
+                  <RegFilterBar>
+                    <label className="relative min-w-[240px] flex-1 lg:max-w-xs">
+                      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6f6578]" />
                       <input
-                        value={filters.query}
+                        className="input pl-10"
                         onChange={(event) => setFilters((current) => ({ ...current, query: event.target.value }))}
                         placeholder="Search title, owner, control..."
-                        className="rounded-2xl border border-white/10 bg-slate-950/70 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400/50"
+                        value={filters.query}
                       />
-                      <select
-                        value={filters.family}
-                        onChange={(event) => setFilters((current) => ({ ...current, family: event.target.value }))}
-                        className="rounded-2xl border border-white/10 bg-slate-950/70 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400/50"
-                      >
-                        <option value="all">All families</option>
-                        {families.map((family) => (
-                          <option key={family} value={family}>{family}</option>
-                        ))}
-                      </select>
-                      <select
-                        value={filters.evidenceType}
-                        onChange={(event) => setFilters((current) => ({ ...current, evidenceType: event.target.value }))}
-                        className="rounded-2xl border border-white/10 bg-slate-950/70 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400/50"
-                      >
-                        <option value="all">All evidence types</option>
-                        {evidenceTypes.map((evidenceType) => (
-                          <option key={evidenceType} value={evidenceType}>{evidenceType}</option>
-                        ))}
-                      </select>
-                      <select
-                        value={filters.owner}
-                        onChange={(event) => setFilters((current) => ({ ...current, owner: event.target.value }))}
-                        className="rounded-2xl border border-white/10 bg-slate-950/70 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400/50"
-                      >
-                        <option value="all">All owners</option>
-                        {owners.map((owner) => (
-                          <option key={owner} value={owner}>{owner}</option>
-                        ))}
-                      </select>
-                      <select
-                        value={filters.core}
-                        onChange={(event) => setFilters((current) => ({ ...current, core: event.target.value }))}
-                        className="rounded-2xl border border-white/10 bg-slate-950/70 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400/50"
-                      >
-                        <option value="all">All request priority</option>
-                        <option value="core">Core controls only</option>
-                        <option value="non-core">Non-core only</option>
-                      </select>
-                      <select
-                        value={filters.comments}
-                        onChange={(event) => setFilters((current) => ({ ...current, comments: event.target.value }))}
-                        className="rounded-2xl border border-white/10 bg-slate-950/70 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400/50"
-                      >
-                        <option value="all">All comment states</option>
-                        <option value="with-comments">With comments</option>
-                        <option value="without-comments">Without comments</option>
-                      </select>
-                      <select
-                        value={filters.anomaly}
-                        onChange={(event) => setFilters((current) => ({ ...current, anomaly: event.target.value }))}
-                        className="rounded-2xl border border-white/10 bg-slate-950/70 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400/50"
-                      >
-                        <option value="all">All date quality</option>
-                        <option value="anomaly">Anomalies only</option>
-                      </select>
-                      <div className="flex items-center rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-slate-300">
-                        {filteredRequests.length} of {detail.requests.length} requests
-                      </div>
+                    </label>
+                    <select
+                      className="input lg:w-44"
+                      onChange={(event) => setFilters((current) => ({ ...current, family: event.target.value }))}
+                      value={filters.family}
+                    >
+                      <option value="all">All families</option>
+                      {families.map((family) => (
+                        <option key={family} value={family}>{family}</option>
+                      ))}
+                    </select>
+                    <select
+                      className="input lg:w-48"
+                      onChange={(event) => setFilters((current) => ({ ...current, evidenceType: event.target.value }))}
+                      value={filters.evidenceType}
+                    >
+                      <option value="all">All evidence types</option>
+                      {evidenceTypes.map((evidenceType) => (
+                        <option key={evidenceType} value={evidenceType}>{evidenceType}</option>
+                      ))}
+                    </select>
+                    <select
+                      className="input lg:w-40"
+                      onChange={(event) => setFilters((current) => ({ ...current, owner: event.target.value }))}
+                      value={filters.owner}
+                    >
+                      <option value="all">All owners</option>
+                      {owners.map((owner) => (
+                        <option key={owner} value={owner}>{owner}</option>
+                      ))}
+                    </select>
+                    <select
+                      className="input lg:w-48"
+                      onChange={(event) => setFilters((current) => ({ ...current, core: event.target.value }))}
+                      value={filters.core}
+                    >
+                      <option value="all">All request priority</option>
+                      <option value="core">Core controls only</option>
+                      <option value="non-core">Non-core only</option>
+                    </select>
+                    <select
+                      className="input lg:w-44"
+                      onChange={(event) => setFilters((current) => ({ ...current, comments: event.target.value }))}
+                      value={filters.comments}
+                    >
+                      <option value="all">All comments</option>
+                      <option value="with-comments">With comments</option>
+                      <option value="without-comments">Without comments</option>
+                    </select>
+                    <select
+                      className="input lg:w-44"
+                      onChange={(event) => setFilters((current) => ({ ...current, anomaly: event.target.value }))}
+                      value={filters.anomaly}
+                    >
+                      <option value="all">All date quality</option>
+                      <option value="anomaly">Anomalies only</option>
+                    </select>
+                    <div className="rounded-md border border-[#ded8e4] bg-[#fbf9fc] px-3 py-2 text-sm text-[#4f435c]">
+                      {filteredRequests.length} of {detail.requests.length} requests
                     </div>
+                  </RegFilterBar>
+                  <div className="max-h-[min(720px,calc(100vh-220px))] overflow-auto">
+                    <table className="min-w-[1040px] w-full text-left text-sm">
+                      <thead className="sticky top-0 z-10 bg-[#f6f1fa] text-xs uppercase tracking-[0.12em] text-[#62576a]">
+                        <tr>
+                          <th className="px-4 py-3">Request</th>
+                          <th className="px-4 py-3">Controls</th>
+                          <th className="px-4 py-3">Owner</th>
+                          <th className="px-4 py-3">Timing</th>
+                          <th className="px-4 py-3">Signals</th>
+                          <th className="px-4 py-3 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#eeeaf2]">
+                        {filteredRequests.slice(0, 80).map((request) => (
+                          <tr className="align-top text-[#4f435c]" key={request.id}>
+                            <td className="px-4 py-3">
+                              <button
+                                className="text-left font-medium text-[#6d28d9] underline-offset-2 hover:text-[#5f1aa8] hover:underline"
+                                onClick={() => setInspectedRequest(request)}
+                                type="button"
+                              >
+                                {request.title}
+                              </button>
+                              <div className="mt-1 text-xs text-[#62576a]">Row {request.excelRow ?? '-'}</div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="max-w-xs text-xs leading-5 text-[#4f435c]">
+                                {request.controlRefs.slice(0, 6).join(', ') || '-'}
+                                {request.controlRefs.length > 6 ? ` +${request.controlRefs.length - 6}` : ''}
+                              </div>
+                              <div className="mt-1 text-xs text-[#62576a]">{request.family ?? 'Unmapped'}</div>
+                            </td>
+                            <td className="px-4 py-3">{request.owner ?? '-'}</td>
+                            <td className="px-4 py-3 text-xs leading-5">
+                              <div>Requested {formatDate(request.requestedAt)}</div>
+                              <div>Received {formatDate(request.receivedAt)}</div>
+                              <div>{formatMetric(request.daysToReceive)} days</div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex flex-wrap gap-2">
+                                <ToneForStatus status={request.status} />
+                                {request.coreControl ? <RegStatusPill tone="purple">Core</RegStatusPill> : null}
+                                {request.commentEventCount > 0 ? (
+                                  <RegStatusPill tone="info">{request.commentEventCount} comments</RegStatusPill>
+                                ) : null}
+                                {request.dateQuality && request.dateQuality !== 'ok' ? (
+                                  <RegStatusPill tone="danger">{request.dateQuality}</RegStatusPill>
+                                ) : null}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-right">
+                              <RegActionMenu
+                                actions={[
+                                  { label: 'Inspect request', icon: Eye, onSelect: () => setInspectedRequest(request) },
+                                  { label: 'Open source record', to: request.route },
+                                ]}
+                                label={`Open actions for ${request.title}`}
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </RegTableShell>
+              ) : null}
 
-                    <div className="overflow-hidden rounded-2xl border border-white/10">
-                      <table className="w-full text-left text-sm">
-                        <thead className="bg-white/[0.04] text-xs uppercase tracking-[0.18em] text-slate-500">
+              {activeTab === 'comments' ? (
+                <RegTableShell className="rounded-t-none">
+                  <div className="border-b border-[#ded8e4] bg-white px-6 py-4">
+                    <h2 className="text-lg font-semibold text-[#241232]">Reviewer Comments and Sufficiency Events</h2>
+                    <p className="mt-1 text-sm text-[#4f435c]">
+                      Sanitized excerpts preserve challenge patterns without turning sensitive operational details into dashboard copy.
+                    </p>
+                  </div>
+                  {detail.reviewerComments.length === 0 ? (
+                    <div className="p-6 text-sm text-[#4f435c]">No reviewer comments were parsed for this package.</div>
+                  ) : (
+                    <div className="max-h-[min(680px,calc(100vh-220px))] overflow-auto">
+                      <table className="min-w-[900px] w-full text-left text-sm">
+                        <thead className="sticky top-0 z-10 bg-[#f6f1fa] text-xs uppercase tracking-[0.12em] text-[#62576a]">
                           <tr>
                             <th className="px-4 py-3">Request</th>
-                            <th className="px-4 py-3">Controls</th>
-                            <th className="px-4 py-3">Owner</th>
-                            <th className="px-4 py-3">Timing</th>
-                            <th className="px-4 py-3">Signals</th>
+                            <th className="px-4 py-3">Reviewer</th>
+                            <th className="px-4 py-3">Excerpt</th>
+                            <th className="px-4 py-3 text-right">Actions</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/10">
-                          {filteredRequests.slice(0, 80).map((request) => (
-                            <tr key={request.id} className="align-top text-slate-300">
+                        <tbody className="divide-y divide-[#eeeaf2]">
+                          {detail.reviewerComments.map((comment, index) => (
+                            <tr className="align-top" key={`${comment.requestId}:${index}`}>
                               <td className="px-4 py-3">
-                                <Link to={request.route} className="font-medium text-cyan-200 hover:text-cyan-100">
-                                  {request.title}
-                                </Link>
-                                <div className="mt-1 text-xs text-slate-500">Row {request.excelRow ?? '-'}</div>
+                                <button
+                                  className="text-left font-medium text-[#6d28d9] underline-offset-2 hover:text-[#5f1aa8] hover:underline"
+                                  onClick={() => setInspectedComment(comment)}
+                                  type="button"
+                                >
+                                  {comment.requestTitle}
+                                </button>
+                                <div className="mt-1 text-xs text-[#62576a]">Row {comment.excelRow ?? '-'}</div>
                               </td>
-                              <td className="px-4 py-3">
-                                <div className="max-w-xs text-xs leading-5 text-slate-400">
-                                  {request.controlRefs.slice(0, 6).join(', ') || '-'}
-                                  {request.controlRefs.length > 6 ? ` +${request.controlRefs.length - 6}` : ''}
-                                </div>
-                                <div className="mt-1 text-xs text-slate-500">{request.family ?? 'Unmapped'}</div>
+                              <td className="px-4 py-3 text-[#4f435c]">
+                                <div>{comment.author}</div>
+                                <div className="text-xs text-[#62576a]">{comment.dateLabel ?? '-'}</div>
                               </td>
-                              <td className="px-4 py-3">{request.owner ?? '-'}</td>
-                              <td className="px-4 py-3 text-xs leading-5">
-                                <div>Requested {formatDate(request.requestedAt)}</div>
-                                <div>Received {formatDate(request.receivedAt)}</div>
-                                <div>{formatMetric(request.daysToReceive)} days</div>
+                              <td className="px-4 py-3 text-[#4f435c]">
+                                <div className="line-clamp-2 max-w-2xl">{comment.excerpt}</div>
                               </td>
-                              <td className="px-4 py-3">
-                                <div className="flex flex-wrap gap-2">
-                                  {request.coreControl && <span className="badge-neutral">Core</span>}
-                                  {request.commentEventCount > 0 && (
-                                    <span className="badge-neutral">{request.commentEventCount} comments</span>
-                                  )}
-                                  {request.dateQuality && request.dateQuality !== 'ok' && (
-                                    <span className="badge-danger">{request.dateQuality}</span>
-                                  )}
-                                </div>
+                              <td className="px-4 py-3 text-right">
+                                <RegActionMenu
+                                  actions={[
+                                    { label: 'Inspect comment', icon: MessageSquare, onSelect: () => setInspectedComment(comment) },
+                                    { label: 'Open source record', to: comment.route },
+                                  ]}
+                                  label={`Open actions for comment on ${comment.requestTitle}`}
+                                />
                               </td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
                     </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
+                  )}
+                </RegTableShell>
+              ) : null}
 
-              <TabsContent value="comments">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Reviewer Comments and Sufficiency Events</CardTitle>
-                    <CardDescription>
-                      Sanitized excerpts preserve challenge patterns without turning sensitive operational details into dashboard copy.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {detail.reviewerComments.length === 0 ? (
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-slate-400">
-                        No reviewer comments were parsed for this package.
-                      </div>
-                    ) : (
-                      detail.reviewerComments.map((comment, index) => (
-                        <div key={`${comment.requestId}:${index}`} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                          <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-                            <div>
-                              <Link to={comment.route} className="font-medium text-cyan-200 hover:text-cyan-100">
-                                {comment.requestTitle}
-                              </Link>
-                              <div className="mt-1 text-xs text-slate-500">
-                                Row {comment.excelRow ?? '-'} by {comment.author} {comment.dateLabel ? `on ${comment.dateLabel}` : ''}
-                              </div>
-                            </div>
-                            <MessageSquare className="h-4 w-4 text-slate-500" />
-                          </div>
-                          <p className="mt-3 text-sm leading-6 text-slate-300">{comment.excerpt}</p>
-                        </div>
-                      ))
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="rollups">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Evidence Locker Rollups</CardTitle>
-                    <CardDescription>
+              {activeTab === 'rollups' ? (
+                <div className="rounded-b-lg border border-[#ded8e4] bg-white p-4">
+                  <div className="mb-4">
+                    <h2 className="text-lg font-semibold text-[#241232]">Evidence Locker Rollups</h2>
+                    <p className="mt-1 text-sm text-[#4f435c]">
                       Rollups group historical file-share evidence references by family and evidence type.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    </p>
+                  </div>
+                  <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                     {detail.evidenceRollups.map((rollup) => (
-                      <Link
-                        key={rollup.id}
-                        to={rollup.route}
-                        className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
-                      >
+                      <article className="panel-subtle bg-white" key={rollup.id}>
                         <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <div className="font-medium text-slate-100">{rollup.title}</div>
-                            <div className="mt-1 text-xs text-slate-500">{rollup.family ?? 'Unmapped'} / {rollup.evidenceType ?? 'Evidence'}</div>
+                          <div className="min-w-0">
+                            <button
+                              className="text-left font-medium text-[#241232] underline-offset-2 hover:text-[#5f1aa8] hover:underline"
+                              onClick={() => setInspectedRollup(rollup)}
+                              type="button"
+                            >
+                              {rollup.title}
+                            </button>
+                            <div className="mt-1 text-xs text-[#62576a]">
+                              {rollup.family ?? 'Unmapped'} / {rollup.evidenceType ?? 'Evidence'}
+                            </div>
                           </div>
-                          <Archive className="h-4 w-4 text-slate-500" />
+                          <RegActionMenu
+                            actions={[
+                              { label: 'Inspect rollup', icon: Archive, onSelect: () => setInspectedRollup(rollup) },
+                              { label: 'Open locker record', to: rollup.route },
+                            ]}
+                            label={`Open actions for ${rollup.title}`}
+                          />
                         </div>
-                        <div className="mt-3 text-xs leading-5 text-slate-400">
+                        <div className="mt-3 text-xs leading-5 text-[#4f435c]">
                           {rollup.sourceRows.length} source rows, {rollup.controlRefs.length} controls
                         </div>
-                        {rollup.historicalReferenceOnly && (
-                          <div className="mt-3 rounded-xl bg-amber-400/10 px-3 py-2 text-xs text-amber-200">
+                        {rollup.historicalReferenceOnly ? (
+                          <div className="mt-3 rounded-md border border-[#f6d48e] bg-[#fff2d9] px-3 py-2 text-xs text-[#8a4d00]">
                             Historical file-share reference only. No fabricated artifact attached.
                           </div>
-                        )}
-                      </Link>
+                        ) : null}
+                      </article>
                     ))}
-                  </CardContent>
-                </Card>
-              </TabsContent>
+                  </div>
+                </div>
+              ) : null}
 
-              <TabsContent value="anomalies">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Date and Mapping Anomalies</CardTitle>
-                    <CardDescription>
+              {activeTab === 'anomalies' ? (
+                <div className="rounded-b-lg border border-[#ded8e4] bg-white p-4">
+                  <div className="mb-4">
+                    <h2 className="text-lg font-semibold text-[#241232]">Date and Mapping Anomalies</h2>
+                    <p className="mt-1 text-sm text-[#4f435c]">
                       Preserved workbook conditions that need audit-aware handling rather than silent normalization.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {detail.anomalies.length === 0 ? (
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm text-slate-400">
-                        No anomalies were detected.
-                      </div>
-                    ) : (
-                      detail.anomalies.map((anomaly) => (
-                        <div key={anomaly.requestId} className="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4">
-                          <div className="flex items-start gap-3">
-                            <AlertTriangle className="mt-0.5 h-4 w-4 text-amber-300" />
-                            <div>
-                              <Link to={anomaly.route} className="font-medium text-amber-100 hover:text-amber-50">
-                                {anomaly.requestTitle}
-                              </Link>
-                              <div className="mt-1 text-xs text-amber-100/70">
-                                Row {anomaly.excelRow ?? '-'}: {anomaly.dateQuality}
-                              </div>
-                              <div className="mt-2 text-xs text-amber-100/70">
-                                Requested {formatDate(anomaly.requestedAt)} / Received {formatDate(anomaly.receivedAt)} / {formatMetric(anomaly.daysToReceive)} days
+                    </p>
+                  </div>
+                  {detail.anomalies.length === 0 ? (
+                    <div className="panel-subtle text-sm text-[#4f435c]">No anomalies were detected.</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {detail.anomalies.map((anomaly) => (
+                        <article className="rounded-lg border border-[#f6d48e] bg-[#fff2d9] p-4" key={anomaly.requestId}>
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex min-w-0 items-start gap-3">
+                              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#8a4d00]" />
+                              <div className="min-w-0">
+                                <button
+                                  className="text-left font-medium text-[#6f3d00] underline-offset-2 hover:underline"
+                                  onClick={() => setInspectedAnomaly(anomaly)}
+                                  type="button"
+                                >
+                                  {anomaly.requestTitle}
+                                </button>
+                                <div className="mt-1 text-xs text-[#6f3d00]">
+                                  Row {anomaly.excelRow ?? '-'}: {anomaly.dateQuality}
+                                </div>
+                                <div className="mt-2 text-xs text-[#6f3d00]">
+                                  Requested {formatDate(anomaly.requestedAt)} / Received {formatDate(anomaly.receivedAt)} / {formatMetric(anomaly.daysToReceive)} days
+                                </div>
                               </div>
                             </div>
+                            <RegActionMenu
+                              actions={[
+                                { label: 'Inspect anomaly', icon: AlertTriangle, onSelect: () => setInspectedAnomaly(anomaly) },
+                                { label: 'Open source record', to: anomaly.route },
+                              ]}
+                              label={`Open actions for anomaly on ${anomaly.requestTitle}`}
+                            />
                           </div>
-                        </div>
-                      ))
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
+                        </article>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : null}
 
-              <TabsContent value="template">
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center gap-3">
-                      <ClipboardCheck className="h-5 w-5 text-cyan-300" />
-                      <div>
-                        <CardTitle>Reusable FedRAMP Scrutiny Template</CardTitle>
-                        <CardDescription>
-                          The import creates an assessment-plan/questionnaire template from workbook request items.
-                        </CardDescription>
-                      </div>
+              {activeTab === 'template' ? (
+                <div className="grid gap-4 rounded-b-lg border border-[#ded8e4] bg-white p-4 lg:grid-cols-3">
+                  <section className="panel-subtle bg-white">
+                    <div className="flex items-center gap-2">
+                      <ClipboardCheck className="h-5 w-5 text-[#7a3ccf]" />
+                      <h2 className="text-lg font-semibold text-[#241232]">Builder Entry</h2>
                     </div>
-                  </CardHeader>
-                  <CardContent className="grid gap-4 lg:grid-cols-3">
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Builder Entry</div>
-                      <p className="mt-3 text-sm leading-6 text-slate-300">
-                        Open Assessment Plans to reuse these rows as FedRAMP evidence questions grouped by family and evidence type.
-                      </p>
-                      <Button className="mt-4" asChild>
-                        <Link to="/assessment-plans">Open Assessment Plans</Link>
-                      </Button>
+                    <p className="mt-3 text-sm leading-6 text-[#4f435c]">
+                      Open Assessment Plans to reuse these rows as FedRAMP evidence questions grouped by family and evidence type.
+                    </p>
+                    <Link className="button-primary mt-4" to="/assessment-plans">Open Assessment Plans</Link>
+                  </section>
+                  <section className="panel-subtle bg-white">
+                    <h2 className="text-lg font-semibold text-[#241232]">Discovery Hooks</h2>
+                    <p className="mt-3 text-sm leading-6 text-[#4f435c]">
+                      Imported Data Calls and Evidence Rollups carry the package marker and raw controls for search,
+                      reports, dashboards, and workbench filtering.
+                    </p>
+                  </section>
+                  <section className="panel-subtle bg-white">
+                    <div className="flex items-center gap-2">
+                      <Database className="h-5 w-5 text-[#7a3ccf]" />
+                      <h2 className="text-lg font-semibold text-[#241232]">Historical Integrity</h2>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Discovery Hooks</div>
-                      <p className="mt-3 text-sm leading-6 text-slate-300">
-                        Imported Data Calls and Evidence Rollups carry the package marker and raw controls for search, reports, dashboards, and workbench filtering.
-                      </p>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                        <Database className="h-4 w-4" />
-                        Historical Integrity
-                      </div>
-                      <p className="mt-3 text-sm leading-6 text-slate-300">
-                        Actual files are not embedded in the workbook, so evidence is intentionally represented as historical file-share references and rollups.
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
+                    <p className="mt-3 text-sm leading-6 text-[#4f435c]">
+                      Actual files are not embedded in the workbook, so evidence is intentionally represented as
+                      historical file-share references and rollups.
+                    </p>
+                  </section>
+                </div>
+              ) : null}
+            </section>
           )}
         </>
       )}
+
+      <RegRightDrawer
+        description="Imported data-call request with source row, owner, controls, and timing preserved."
+        footer={
+          <div className="flex justify-end gap-2">
+            <button className="button-secondary" onClick={() => setInspectedRequest(null)} type="button">Close</button>
+            {inspectedRequest ? <Link className="button-primary" to={inspectedRequest.route}>Open source record</Link> : null}
+          </div>
+        }
+        onOpenChange={(open) => {
+          if (!open) {
+            setInspectedRequest(null);
+          }
+        }}
+        open={Boolean(inspectedRequest)}
+        title={inspectedRequest?.title ?? 'Evidence request'}
+      >
+        {inspectedRequest ? (
+          <div className="space-y-4">
+            <div className="panel-subtle">
+              <div className="flex flex-wrap gap-2">
+                <ToneForStatus status={inspectedRequest.status} />
+                {inspectedRequest.coreControl ? <RegStatusPill tone="purple">Core control</RegStatusPill> : null}
+                {inspectedRequest.commentEventCount > 0 ? (
+                  <RegStatusPill tone="info">{inspectedRequest.commentEventCount} comments</RegStatusPill>
+                ) : null}
+                {inspectedRequest.dateQuality && inspectedRequest.dateQuality !== 'ok' ? (
+                  <RegStatusPill tone="danger">{inspectedRequest.dateQuality}</RegStatusPill>
+                ) : null}
+              </div>
+              <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                <div>
+                  <dt className="label">Workbook row</dt>
+                  <dd className="mt-1 text-[#241232]">{inspectedRequest.excelRow ?? '-'}</dd>
+                </div>
+                <div>
+                  <dt className="label">Owner</dt>
+                  <dd className="mt-1 text-[#241232]">{inspectedRequest.owner ?? '-'}</dd>
+                </div>
+                <div>
+                  <dt className="label">Family</dt>
+                  <dd className="mt-1 text-[#241232]">{inspectedRequest.family ?? 'Unmapped'}</dd>
+                </div>
+                <div>
+                  <dt className="label">Evidence type</dt>
+                  <dd className="mt-1 text-[#241232]">{inspectedRequest.evidenceType ?? 'Evidence'}</dd>
+                </div>
+              </dl>
+            </div>
+            <div className="panel-subtle">
+              <h3 className="font-semibold text-[#241232]">Timing</h3>
+              <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-3">
+                <div>
+                  <dt className="label">Requested</dt>
+                  <dd className="mt-1 text-[#241232]">{formatDate(inspectedRequest.requestedAt)}</dd>
+                </div>
+                <div>
+                  <dt className="label">Received</dt>
+                  <dd className="mt-1 text-[#241232]">{formatDate(inspectedRequest.receivedAt)}</dd>
+                </div>
+                <div>
+                  <dt className="label">Elapsed</dt>
+                  <dd className="mt-1 text-[#241232]">{formatMetric(inspectedRequest.daysToReceive)} days</dd>
+                </div>
+              </dl>
+            </div>
+            <div className="panel-subtle">
+              <h3 className="font-semibold text-[#241232]">Control references</h3>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {inspectedRequest.controlRefs.length > 0 ? (
+                  inspectedRequest.controlRefs.map((controlRef) => (
+                    <RegStatusPill key={controlRef} tone="neutral">{controlRef}</RegStatusPill>
+                  ))
+                ) : (
+                  <span className="text-sm text-[#4f435c]">No control references parsed.</span>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </RegRightDrawer>
+
+      <RegRightDrawer
+        description="Reviewer sufficiency event parsed from the imported package."
+        footer={
+          <div className="flex justify-end gap-2">
+            <button className="button-secondary" onClick={() => setInspectedComment(null)} type="button">Close</button>
+            {inspectedComment ? <Link className="button-primary" to={inspectedComment.route}>Open source record</Link> : null}
+          </div>
+        }
+        onOpenChange={(open) => {
+          if (!open) {
+            setInspectedComment(null);
+          }
+        }}
+        open={Boolean(inspectedComment)}
+        title={inspectedComment?.requestTitle ?? 'Reviewer comment'}
+      >
+        {inspectedComment ? (
+          <div className="space-y-4">
+            <div className="panel-subtle">
+              <dl className="grid gap-3 text-sm sm:grid-cols-2">
+                <div>
+                  <dt className="label">Reviewer</dt>
+                  <dd className="mt-1 text-[#241232]">{inspectedComment.author}</dd>
+                </div>
+                <div>
+                  <dt className="label">Workbook row</dt>
+                  <dd className="mt-1 text-[#241232]">{inspectedComment.excelRow ?? '-'}</dd>
+                </div>
+                <div>
+                  <dt className="label">Date label</dt>
+                  <dd className="mt-1 text-[#241232]">{inspectedComment.dateLabel ?? '-'}</dd>
+                </div>
+              </dl>
+            </div>
+            <div className="panel-subtle">
+              <h3 className="font-semibold text-[#241232]">Excerpt</h3>
+              <p className="mt-3 text-sm leading-6 text-[#4f435c]">{inspectedComment.excerpt}</p>
+            </div>
+          </div>
+        ) : null}
+      </RegRightDrawer>
+
+      <RegRightDrawer
+        description="Historical evidence locker rollup linked to imported request rows."
+        footer={
+          <div className="flex justify-end gap-2">
+            <button className="button-secondary" onClick={() => setInspectedRollup(null)} type="button">Close</button>
+            {inspectedRollup ? <Link className="button-primary" to={inspectedRollup.route}>Open locker record</Link> : null}
+          </div>
+        }
+        onOpenChange={(open) => {
+          if (!open) {
+            setInspectedRollup(null);
+          }
+        }}
+        open={Boolean(inspectedRollup)}
+        title={inspectedRollup?.title ?? 'Evidence rollup'}
+      >
+        {inspectedRollup ? (
+          <div className="space-y-4">
+            <div className="panel-subtle">
+              <div className="flex flex-wrap gap-2">
+                <ToneForStatus status={inspectedRollup.status} />
+                {inspectedRollup.historicalReferenceOnly ? (
+                  <RegStatusPill tone="warning">Historical reference only</RegStatusPill>
+                ) : null}
+              </div>
+              <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                <div>
+                  <dt className="label">Family</dt>
+                  <dd className="mt-1 text-[#241232]">{inspectedRollup.family ?? 'Unmapped'}</dd>
+                </div>
+                <div>
+                  <dt className="label">Evidence type</dt>
+                  <dd className="mt-1 text-[#241232]">{inspectedRollup.evidenceType ?? 'Evidence'}</dd>
+                </div>
+                <div>
+                  <dt className="label">Source rows</dt>
+                  <dd className="mt-1 text-[#241232]">{inspectedRollup.sourceRows.join(', ') || '-'}</dd>
+                </div>
+              </dl>
+            </div>
+            <div className="panel-subtle">
+              <h3 className="font-semibold text-[#241232]">Control references</h3>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {inspectedRollup.controlRefs.length > 0 ? (
+                  inspectedRollup.controlRefs.map((controlRef) => (
+                    <RegStatusPill key={controlRef} tone="neutral">{controlRef}</RegStatusPill>
+                  ))
+                ) : (
+                  <span className="text-sm text-[#4f435c]">No control references parsed.</span>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </RegRightDrawer>
+
+      <RegRightDrawer
+        description="Workbook condition preserved for audit-aware follow-up."
+        footer={
+          <div className="flex justify-end gap-2">
+            <button className="button-secondary" onClick={() => setInspectedAnomaly(null)} type="button">Close</button>
+            {inspectedAnomaly ? <Link className="button-primary" to={inspectedAnomaly.route}>Open source record</Link> : null}
+          </div>
+        }
+        onOpenChange={(open) => {
+          if (!open) {
+            setInspectedAnomaly(null);
+          }
+        }}
+        open={Boolean(inspectedAnomaly)}
+        title={inspectedAnomaly?.requestTitle ?? 'Package anomaly'}
+      >
+        {inspectedAnomaly ? (
+          <div className="space-y-4">
+            <div className="rounded-lg border border-[#f6d48e] bg-[#fff2d9] p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="mt-0.5 h-5 w-5 text-[#8a4d00]" />
+                <div>
+                  <h3 className="font-semibold text-[#6f3d00]">{inspectedAnomaly.dateQuality}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[#6f3d00]">
+                    This condition should remain visible for review instead of being silently normalized away.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="panel-subtle">
+              <dl className="grid gap-3 text-sm sm:grid-cols-2">
+                <div>
+                  <dt className="label">Workbook row</dt>
+                  <dd className="mt-1 text-[#241232]">{inspectedAnomaly.excelRow ?? '-'}</dd>
+                </div>
+                <div>
+                  <dt className="label">Elapsed</dt>
+                  <dd className="mt-1 text-[#241232]">{formatMetric(inspectedAnomaly.daysToReceive)} days</dd>
+                </div>
+                <div>
+                  <dt className="label">Requested</dt>
+                  <dd className="mt-1 text-[#241232]">{formatDate(inspectedAnomaly.requestedAt)}</dd>
+                </div>
+                <div>
+                  <dt className="label">Received</dt>
+                  <dd className="mt-1 text-[#241232]">{formatDate(inspectedAnomaly.receivedAt)}</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        ) : null}
+      </RegRightDrawer>
     </div>
   );
 }

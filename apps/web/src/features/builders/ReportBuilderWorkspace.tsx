@@ -16,6 +16,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { RegModal, RegRightDrawer } from '../../components/regovise/PagePrimitives';
 import {
   createReportBuilderReport,
   createReportBuilderSubscription,
@@ -36,6 +37,7 @@ import type {
   ReportConfig,
   ReportFilterRow,
   ReportPreview,
+  ReportSubscription,
 } from './reportTypes';
 
 function clone<T>(value: T): T {
@@ -123,6 +125,12 @@ export function ReportBuilderWorkspace() {
   const [newReportOwner, setNewReportOwner] = useState('Regovise Operator');
   const [newReportChartType, setNewReportChartType] = useState<ReportBuilderDetail['chartType']>('List');
   const [newReportModule, setNewReportModule] = useState('Security Plans');
+  const [createDrawerOpen, setCreateDrawerOpen] = useState(false);
+  const [shareDrawerOpen, setShareDrawerOpen] = useState(false);
+  const [subscriptionDrawerOpen, setSubscriptionDrawerOpen] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [pendingSubscriptionDelete, setPendingSubscriptionDelete] = useState<ReportSubscription | null>(null);
   const [shareRecipients, setShareRecipients] = useState('security-ops@regovise.com, audit@regovise.com');
   const [subscriptionEmail, setSubscriptionEmail] = useState('security-ops@regovise.com');
   const [subscriptionType, setSubscriptionType] = useState('user');
@@ -300,6 +308,7 @@ export function ReportBuilderWorkspace() {
       });
       setNewReportTitle('');
       setNewReportOwner('Regovise Operator');
+      setCreateDrawerOpen(false);
       await loadReports();
       selectReport(created.id);
       setNotice('New report definition created in the canonical Report Builder service.');
@@ -334,16 +343,12 @@ export function ReportBuilderWorkspace() {
     if (!draft) {
       return;
     }
-    const confirmation = window.prompt(`Type "${draft.title}" to confirm delete.`);
-    if (confirmation !== draft.title) {
-      setNotice('Delete cancelled.');
-      return;
-    }
     try {
       setBusyAction('delete');
       setError(null);
       setNotice(null);
       await deleteReportBuilderReport(draft.id);
+      setDeleteModalOpen(false);
       setSelectedId(null);
       setDetail(null);
       setDraft(null);
@@ -388,6 +393,7 @@ export function ReportBuilderWorkspace() {
       setError(null);
       setNotice(null);
       const result = await shareReportBuilderReport(draft.id, recipients);
+      setShareDrawerOpen(false);
       setNotice(`Share workflow recorded for ${result.recipients.length} recipients.`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to record report share request.');
@@ -410,6 +416,7 @@ export function ReportBuilderWorkspace() {
           ? `Export generated as ${result.artifactName}. Download path: ${result.downloadPath}`
           : `Export queued as ${result.artifactName}.`,
       );
+      setExportModalOpen(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to queue report export.');
     } finally {
@@ -434,6 +441,7 @@ export function ReportBuilderWorkspace() {
       const refreshed = await getReportBuilderReport(draft.id);
       setDetail(refreshed);
       setDraft(clone(refreshed));
+      setSubscriptionDrawerOpen(false);
       setNotice('Subscription created and stored in D1.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to create report subscription.');
@@ -454,6 +462,7 @@ export function ReportBuilderWorkspace() {
       const refreshed = await getReportBuilderReport(draft.id);
       setDetail(refreshed);
       setDraft(clone(refreshed));
+      setPendingSubscriptionDelete(null);
       setNotice('Subscription removed.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete report subscription.');
@@ -463,7 +472,7 @@ export function ReportBuilderWorkspace() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading Report Builder...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading Report Builder...</div>;
   }
 
   return (
@@ -472,21 +481,25 @@ export function ReportBuilderWorkspace() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">Builders</div>
-            <h1 className="mt-2 text-3xl font-semibold text-white">Report Builder</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Report Builder</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
               Build list and chart reports directly from the canonical Cloudflare runtime, then
               preview, share, export, and schedule recurring delivery without leaving Regovise.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <button className="button-secondary" onClick={() => setCreateDrawerOpen(true)} type="button">
+              <Plus className="mr-2 h-4 w-4" />
+              Create report
+            </button>
             <Link className="button-secondary" to="/reports">
               Done
             </Link>
-            <button className="button-secondary" onClick={() => void handleShare()} type="button">
+            <button className="button-secondary" onClick={() => setShareDrawerOpen(true)} type="button">
               <Share2 className="mr-2 h-4 w-4" />
-              {busyAction === 'share' ? 'Sharing...' : 'Share'}
+              Share
             </button>
-            <button className="button-secondary" onClick={() => void handleExport()} type="button">
+            <button className="button-secondary" disabled={!draft || busyAction === 'export'} onClick={() => setExportModalOpen(true)} type="button">
               <Download className="mr-2 h-4 w-4" />
               {busyAction === 'export' ? 'Exporting...' : 'Export'}
             </button>
@@ -510,7 +523,7 @@ export function ReportBuilderWorkspace() {
           <div className="metric-card" key={metric.label}>
             <div className="metric-label">{metric.label}</div>
             <div className="metric-value">{metric.value}</div>
-            <div className="mt-2 text-xs text-slate-500">{metric.detail}</div>
+            <div className="mt-2 text-xs text-[#62576a]">{metric.detail}</div>
           </div>
         ))}
       </section>
@@ -520,12 +533,12 @@ export function ReportBuilderWorkspace() {
           <div className="flex items-center justify-between">
             <div>
               <div className="eyebrow">Report Library</div>
-              <h2 className="mt-2 text-xl font-semibold text-white">Definitions</h2>
+              <h2 className="mt-2 text-xl font-semibold text-[#241232]">Definitions</h2>
             </div>
-            <BarChart3 className="h-5 w-5 text-cyan-300" />
+            <BarChart3 className="h-5 w-5 text-[#7a3ccf]" />
           </div>
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-500" />
+            <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-[#62576a]" />
             <input
               className="input pl-10"
               placeholder="Search reports"
@@ -533,53 +546,14 @@ export function ReportBuilderWorkspace() {
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
-          <form
-            className="space-y-3"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void handleCreateReport();
-            }}
+          <button
+            className="button-secondary w-full justify-center"
+            onClick={() => setCreateDrawerOpen(true)}
+            type="button"
           >
-            <input
-              className="input"
-              placeholder="New report title"
-              value={newReportTitle}
-              onChange={(event) => setNewReportTitle(event.target.value)}
-            />
-            <input
-              className="input"
-              placeholder="Owner"
-              value={newReportOwner}
-              onChange={(event) => setNewReportOwner(event.target.value)}
-            />
-            <select
-              className="input"
-              aria-label="New report chart type"
-              value={newReportChartType}
-              onChange={(event) => setNewReportChartType(event.target.value as ReportBuilderDetail['chartType'])}
-            >
-              <option value="List">List</option>
-              <option value="Bar">Bar</option>
-              <option value="Line">Line</option>
-              <option value="Pie">Pie</option>
-            </select>
-            <select
-              className="input"
-              aria-label="New report module"
-              value={newReportModule}
-              onChange={(event) => setNewReportModule(event.target.value)}
-            >
-              {modules.map((module) => (
-                <option key={module} value={module}>
-                  {module}
-                </option>
-              ))}
-            </select>
-            <button className="button-secondary w-full" disabled={saving} type="submit">
-              <Plus className="mr-2 h-4 w-4" />
-              Create New Report
-            </button>
-          </form>
+            <Plus className="mr-2 h-4 w-4" />
+            Create report
+          </button>
           <div className="space-y-3">
             {filteredReports.map((report) => {
               const Icon =
@@ -594,32 +568,32 @@ export function ReportBuilderWorkspace() {
                 <button
                   key={report.id}
                   className={`panel-subtle w-full text-left transition ${
-                    selectedId === report.id ? 'border-cyan-300/30 bg-cyan-400/[0.04]' : 'hover:border-cyan-300/20'
+                    selectedId === report.id ? 'border-[#d7c3f1] bg-[#f6f1fa]' : 'hover:border-[#d7c3f1]'
                   }`}
                   onClick={() => selectReport(report.id)}
                   type="button"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
-                      <div className="mt-0.5 rounded-xl border border-white/10 bg-white/5 p-2">
-                        <Icon className="h-4 w-4 text-slate-200" />
+                      <div className="mt-0.5 rounded-xl border border-[#ded8e4] bg-[#f6f1fa] p-2">
+                        <Icon className="h-4 w-4 text-[#38254a]" />
                       </div>
                       <div>
-                        <div className="font-medium text-white">{report.title}</div>
-                        <div className="mt-1 text-sm text-slate-400">
+                        <div className="font-medium text-[#241232]">{report.title}</div>
+                        <div className="mt-1 text-sm text-[#6f6578]">
                           {report.module} · {report.owner}
                         </div>
                       </div>
                     </div>
-                    <span className={report.status === 'Active' ? 'badge-success' : 'badge-neutral'}>
+                    <span className={report.status === 'Active' ? 'status-pill-success' : 'status-pill-neutral'}>
                       {report.status}
                     </span>
                   </div>
                   <div className="mt-4 flex flex-wrap gap-2">
-                    <span className="badge-neutral">{report.chartType}</span>
-                    <span className="badge-neutral">{report.source}</span>
+                    <span className="status-pill-neutral">{report.chartType}</span>
+                    <span className="status-pill-neutral">{report.source}</span>
                   </div>
-                  <div className="mt-3 text-xs text-slate-500">Updated {formatDate(report.lastUpdated)}</div>
+                  <div className="mt-3 text-xs text-[#62576a]">Updated {formatDate(report.lastUpdated)}</div>
                 </button>
               );
             })}
@@ -628,28 +602,28 @@ export function ReportBuilderWorkspace() {
 
         <section className="panel">
           {detailLoading || !draft ? (
-            <div className="text-sm text-slate-300">Loading report definition...</div>
+            <div className="text-sm text-[#4f435c]">Loading report definition...</div>
           ) : (
             <div className="space-y-6">
               <div className="panel-subtle">
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div>
                     <div className="eyebrow">Report Summary</div>
-                    <h3 className="mt-2 text-xl font-semibold text-white">{draft.title}</h3>
+                    <h3 className="mt-2 text-xl font-semibold text-[#241232]">{draft.title}</h3>
                     <div className="mt-2 flex flex-wrap gap-2">
-                      <span className={draft.status === 'Active' ? 'badge-success' : 'badge-neutral'}>
+                      <span className={draft.status === 'Active' ? 'status-pill-success' : 'status-pill-neutral'}>
                         {draft.status}
                       </span>
-                      <span className="badge-neutral">{draft.chartType}</span>
-                      <span className="badge-neutral">{draft.module}</span>
-                      <span className="badge-neutral">{draft.owner}</span>
-                      {hasUnsavedChanges && <span className="badge-neutral">Unsaved changes</span>}
+                      <span className="status-pill-neutral">{draft.chartType}</span>
+                      <span className="status-pill-neutral">{draft.module}</span>
+                      <span className="status-pill-neutral">{draft.owner}</span>
+                      {hasUnsavedChanges && <span className="status-pill-neutral">Unsaved changes</span>}
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <button className="button-secondary" onClick={() => void handleDelete()} type="button">
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      {busyAction === 'delete' ? 'Deleting...' : 'Delete'}
+            <button className="button-secondary" onClick={() => setDeleteModalOpen(true)} type="button">
+              <Trash2 className="mr-2 h-4 w-4" />
+              {busyAction === 'delete' ? 'Deleting...' : 'Delete'}
                     </button>
                   </div>
                 </div>
@@ -661,7 +635,7 @@ export function ReportBuilderWorkspace() {
                     <div className="eyebrow">Basics</div>
                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                       <label className="space-y-2">
-                        <span className="text-sm font-medium text-slate-200">Report Title</span>
+                        <span className="text-sm font-medium text-[#38254a]">Report Title</span>
                         <input
                           className="input"
                           value={draft.title}
@@ -669,7 +643,7 @@ export function ReportBuilderWorkspace() {
                         />
                       </label>
                       <label className="space-y-2">
-                        <span className="text-sm font-medium text-slate-200">Owner</span>
+                        <span className="text-sm font-medium text-[#38254a]">Owner</span>
                         <input
                           className="input"
                           value={draft.owner}
@@ -677,7 +651,7 @@ export function ReportBuilderWorkspace() {
                         />
                       </label>
                       <label className="space-y-2">
-                        <span className="text-sm font-medium text-slate-200">Chart Type</span>
+                        <span className="text-sm font-medium text-[#38254a]">Chart Type</span>
                         <select
                           className="input"
                           value={draft.chartType}
@@ -692,7 +666,7 @@ export function ReportBuilderWorkspace() {
                         </select>
                       </label>
                       <label className="space-y-2">
-                        <span className="text-sm font-medium text-slate-200">Status</span>
+                        <span className="text-sm font-medium text-[#38254a]">Status</span>
                         <select
                           className="input"
                           value={draft.status}
@@ -705,7 +679,7 @@ export function ReportBuilderWorkspace() {
                         </select>
                       </label>
                       <label className="space-y-2">
-                        <span className="text-sm font-medium text-slate-200">Module</span>
+                        <span className="text-sm font-medium text-[#38254a]">Module</span>
                         <select
                           className="input"
                           value={draft.module}
@@ -719,7 +693,7 @@ export function ReportBuilderWorkspace() {
                         </select>
                       </label>
                       <label className="space-y-2">
-                        <span className="text-sm font-medium text-slate-200">Group By</span>
+                        <span className="text-sm font-medium text-[#38254a]">Group By</span>
                         <select
                           className="input"
                           value={draft.config.groupBy}
@@ -733,7 +707,7 @@ export function ReportBuilderWorkspace() {
                         </select>
                       </label>
                       <label className="space-y-2">
-                        <span className="text-sm font-medium text-slate-200">Aggregate Field</span>
+                        <span className="text-sm font-medium text-[#38254a]">Aggregate Field</span>
                         <select
                           className="input"
                           value={draft.config.aggregateField}
@@ -747,7 +721,7 @@ export function ReportBuilderWorkspace() {
                         </select>
                       </label>
                       <label className="space-y-2">
-                        <span className="text-sm font-medium text-slate-200">Aggregation Type</span>
+                        <span className="text-sm font-medium text-[#38254a]">Aggregation Type</span>
                         <select
                           className="input"
                           value={draft.config.aggregationType}
@@ -761,7 +735,7 @@ export function ReportBuilderWorkspace() {
                         </select>
                       </label>
                       <label className="space-y-2 md:col-span-2">
-                        <span className="text-sm font-medium text-slate-200">Description</span>
+                        <span className="text-sm font-medium text-[#38254a]">Description</span>
                         <textarea
                           className="input min-h-[110px]"
                           value={draft.description ?? ''}
@@ -775,11 +749,11 @@ export function ReportBuilderWorkspace() {
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <div className="eyebrow">Field Selection</div>
-                        <p className="mt-2 text-sm text-slate-400">
+                        <p className="mt-2 text-sm text-[#6f6578]">
                           Choose the fields that appear, support drill-down, and determine sorting.
                         </p>
                       </div>
-                      <span className="badge-neutral">{fieldOptions.length} fields</span>
+                      <span className="status-pill-neutral">{fieldOptions.length} fields</span>
                     </div>
                     <div className="mt-4 grid gap-4 lg:grid-cols-2">
                       {[
@@ -796,9 +770,9 @@ export function ReportBuilderWorkspace() {
                           values: draft.config.sortingFields,
                         },
                       ].map((group) => (
-                        <div className="rounded-2xl border border-white/10 bg-black/20 p-4" key={group.label}>
-                          <div className="text-sm font-medium text-slate-200">{group.label}</div>
-                          <div className="mt-1 text-xs text-slate-500">{group.help}</div>
+                        <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={group.label}>
+                          <div className="text-sm font-medium text-[#38254a]">{group.label}</div>
+                          <div className="mt-1 text-xs text-[#62576a]">{group.help}</div>
                           <select
                             className="input mt-3"
                             aria-label={`Add ${group.label}`}
@@ -818,10 +792,10 @@ export function ReportBuilderWorkspace() {
                           <div className="mt-3 space-y-2">
                             {group.values.map((field, index) => (
                               <div
-                                className="flex items-center justify-between gap-2 rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2"
+                                className="flex items-center justify-between gap-2 rounded-xl border border-[#ded8e4] bg-white px-3 py-2"
                                 key={`${group.key}-selected-${field}`}
                               >
-                                <span className="text-sm text-slate-200">{field}</span>
+                                <span className="text-sm text-[#38254a]">{field}</span>
                                 <div className="flex gap-1">
                                   <button
                                     className="button-secondary px-2 py-1"
@@ -853,9 +827,9 @@ export function ReportBuilderWorkspace() {
                         </div>
                       ))}
                     </div>
-                    <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-                      <div className="text-sm font-medium text-slate-200">Display Fields</div>
-                      <div className="mt-1 text-xs text-slate-500">
+                    <div className="mt-4 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+                      <div className="text-sm font-medium text-[#38254a]">Display Fields</div>
+                      <div className="mt-1 text-xs text-[#62576a]">
                         Reorder or remove the fields shown in list previews. These mirror selected fields by default.
                       </div>
                       <select
@@ -877,10 +851,10 @@ export function ReportBuilderWorkspace() {
                       <div className="mt-3 space-y-2">
                         {draft.config.displayFields.map((field, index) => (
                           <div
-                            className="flex items-center justify-between gap-2 rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2"
+                            className="flex items-center justify-between gap-2 rounded-xl border border-[#ded8e4] bg-white px-3 py-2"
                             key={`display-selected-${field}`}
                           >
-                            <span className="text-sm text-slate-200">{field}</span>
+                            <span className="text-sm text-[#38254a]">{field}</span>
                             <div className="flex gap-1">
                               <button
                                 className="button-secondary px-2 py-1"
@@ -910,13 +884,13 @@ export function ReportBuilderWorkspace() {
                         ))}
                       </div>
                     </div>
-                    <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
-                      <div className="text-sm font-medium text-slate-200">Drill-Down Fields</div>
+                    <div className="mt-4 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+                      <div className="text-sm font-medium text-[#38254a]">Drill-Down Fields</div>
                       <div className="mt-3 flex flex-wrap gap-2">
                         {fieldOptions.map((field) => (
                           <button
                             key={`drilldown-${field}`}
-                            className={draft.config.drillDownFields.includes(field) ? 'badge-success' : 'badge-neutral'}
+                            className={draft.config.drillDownFields.includes(field) ? 'status-pill-success' : 'status-pill-neutral'}
                             onClick={() =>
                               updateConfig({ drillDownFields: toggleValue(draft.config.drillDownFields, field) })
                             }
@@ -933,7 +907,7 @@ export function ReportBuilderWorkspace() {
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <div className="eyebrow">Filters</div>
-                        <p className="mt-2 text-sm text-slate-400">
+                        <p className="mt-2 text-sm text-[#6f6578]">
                           Define query clauses that shape the report dataset and downstream exports.
                         </p>
                       </div>
@@ -947,24 +921,24 @@ export function ReportBuilderWorkspace() {
                       </button>
                     </div>
                     <label className="mt-4 block space-y-2">
-                      <span className="text-sm font-medium text-slate-200">Filter Logic</span>
+                      <span className="text-sm font-medium text-[#38254a]">Filter Logic</span>
                       <input
                         className="input"
                         value={draft.config.filterLogic}
                         onChange={(event) => updateConfig({ filterLogic: event.target.value })}
                       />
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-[#62576a]">
                         Supports AND/OR and parentheses, for example <code>1 AND (2 OR 3)</code>.
                       </span>
                     </label>
                     <div className="mt-4 space-y-3">
                       {draft.config.filters.map((filter, filterIndex) => (
                         <div
-                          className="grid gap-3 rounded-2xl border border-white/10 bg-black/20 p-4 md:grid-cols-[1fr_1fr_1fr_auto]"
+                          className="grid gap-3 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4 md:grid-cols-[1fr_1fr_1fr_auto]"
                           key={filter.id}
                         >
                           <label className="space-y-1">
-                            <span className="text-xs uppercase tracking-[0.14em] text-slate-500">
+                            <span className="text-xs uppercase tracking-[0.14em] text-[#62576a]">
                               Filter {filterIndex + 1} Field
                             </span>
                             <select
@@ -986,7 +960,7 @@ export function ReportBuilderWorkspace() {
                             </select>
                           </label>
                           <label className="space-y-1">
-                            <span className="text-xs uppercase tracking-[0.14em] text-slate-500">Operator</span>
+                            <span className="text-xs uppercase tracking-[0.14em] text-[#62576a]">Operator</span>
                             <select
                               className="input"
                               value={filter.operator}
@@ -1006,7 +980,7 @@ export function ReportBuilderWorkspace() {
                             </select>
                           </label>
                           <label className="space-y-1">
-                            <span className="text-xs uppercase tracking-[0.14em] text-slate-500">Value</span>
+                            <span className="text-xs uppercase tracking-[0.14em] text-[#62576a]">Value</span>
                             <input
                             className="input"
                             value={filter.value}
@@ -1021,7 +995,7 @@ export function ReportBuilderWorkspace() {
                             <div className="mt-2 flex flex-wrap gap-1">
                               {['Current User', 'My Organization', '30 days', '90 days'].map((value) => (
                                 <button
-                                  className="badge-neutral"
+                                  className="status-pill-neutral"
                                   key={`${filter.id}-${value}`}
                                   onClick={() =>
                                     updateConfig({
@@ -1057,25 +1031,25 @@ export function ReportBuilderWorkspace() {
                 <div className="space-y-6">
                   <div className="panel-subtle">
                     <div className="eyebrow">Live Preview</div>
-                    <p className="mt-2 text-sm text-slate-400">
+                    <p className="mt-2 text-sm text-[#6f6578]">
                       Run the preview to inspect the chart or table generated from the current unsaved definition.
                     </p>
                     <button className="button-secondary mt-4 w-full" onClick={() => void handlePreview()} type="button">
                       <FileSpreadsheet className="mr-2 h-4 w-4" />
                       {busyAction === 'preview' ? 'Generating Report...' : 'Generate Report'}
                     </button>
-                    <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <div className="mt-4 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
                       {!preview ? (
-                        <div className="text-sm text-slate-400">
+                        <div className="text-sm text-[#6f6578]">
                           No preview generated yet. Run a preview to inspect the current report output.
                         </div>
                       ) : preview.kind === 'table' ? (
                         <div className="space-y-3">
-                          <div className="flex flex-wrap items-center gap-2 text-slate-200">
+                          <div className="flex flex-wrap items-center gap-2 text-[#38254a]">
                             <Table2 className="h-4 w-4" />
                             <span className="text-sm font-medium">Table Preview</span>
-                            <span className="badge-neutral">{preview.recordCount ?? preview.rows.length} records</span>
-                            <span className={preview.filterExpressionValid === false ? 'badge-neutral' : 'badge-success'}>
+                            <span className="status-pill-neutral">{preview.recordCount ?? preview.rows.length} records</span>
+                            <span className={preview.filterExpressionValid === false ? 'status-pill-neutral' : 'status-pill-success'}>
                               Filter logic {preview.filterExpressionValid === false ? 'needs review' : 'valid'}
                             </span>
                           </div>
@@ -1084,7 +1058,7 @@ export function ReportBuilderWorkspace() {
                               <thead>
                                 <tr>
                                   {preview.columns.map((column) => (
-                                    <th className="border-b border-white/10 px-3 py-2 text-slate-400" key={column}>
+                                    <th className="border-b border-[#ded8e4] px-3 py-2 text-[#6f6578]" key={column}>
                                       {column}
                                     </th>
                                   ))}
@@ -1094,7 +1068,7 @@ export function ReportBuilderWorkspace() {
                                 {preview.rows.map((row, rowIndex) => (
                                   <tr key={`row-${rowIndex}`}>
                                     {row.map((cell, cellIndex) => (
-                                      <td className="border-b border-white/5 px-3 py-2 text-slate-200" key={`${rowIndex}-${cellIndex}`}>
+                                      <td className="border-b border-[#eeeaf2] px-3 py-2 text-[#38254a]" key={`${rowIndex}-${cellIndex}`}>
                                         {cell}
                                       </td>
                                     ))}
@@ -1106,11 +1080,11 @@ export function ReportBuilderWorkspace() {
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          <div className="flex flex-wrap items-center gap-2 text-slate-200">
+                          <div className="flex flex-wrap items-center gap-2 text-[#38254a]">
                             {draft.chartType === 'Pie' ? <PieChart className="h-4 w-4" /> : <BarChart3 className="h-4 w-4" />}
                             <span className="text-sm font-medium">{draft.chartType} Preview</span>
-                            <span className="badge-neutral">{preview.recordCount ?? preview.labels.length} records</span>
-                            <span className={preview.filterExpressionValid === false ? 'badge-neutral' : 'badge-success'}>
+                            <span className="status-pill-neutral">{preview.recordCount ?? preview.labels.length} records</span>
+                            <span className={preview.filterExpressionValid === false ? 'status-pill-neutral' : 'status-pill-success'}>
                               Filter logic {preview.filterExpressionValid === false ? 'needs review' : 'valid'}
                             </span>
                           </div>
@@ -1119,13 +1093,13 @@ export function ReportBuilderWorkspace() {
                               const value = preview.values[index] ?? 0;
                               return (
                                 <div key={label}>
-                                  <div className="mb-1 flex items-center justify-between text-sm text-slate-300">
+                                  <div className="mb-1 flex items-center justify-between text-sm text-[#4f435c]">
                                     <span>{label}</span>
                                     <span>{value}</span>
                                   </div>
-                                  <div className="h-2 rounded-full bg-white/5">
+                                  <div className="h-2 rounded-full bg-[#f6f1fa]">
                                     <div
-                                      className="h-2 rounded-full bg-cyan-400"
+                                      className="h-2 rounded-full bg-[#8b35e6]"
                                       style={{ width: `${Math.max(12, Math.min(100, value))}%` }}
                                     />
                                   </div>
@@ -1140,7 +1114,7 @@ export function ReportBuilderWorkspace() {
 
                   <div className="panel-subtle">
                     <div className="eyebrow">More Tools</div>
-                    <p className="mt-2 text-sm text-slate-400">
+                    <p className="mt-2 text-sm text-[#6f6578]">
                       Use the same actions exposed from existing Report Builder reports: Edit, Export, Subscriptions,
                       and Delete.
                     </p>
@@ -1149,15 +1123,19 @@ export function ReportBuilderWorkspace() {
                         <Save className="mr-2 h-4 w-4" />
                         Edit / Save
                       </button>
-                      <button className="button-secondary" onClick={() => void handleExport()} type="button">
+                      <button className="button-secondary" disabled={!draft || busyAction === 'export'} onClick={() => setExportModalOpen(true)} type="button">
                         <Download className="mr-2 h-4 w-4" />
                         Export CSV
                       </button>
-                      <a className="button-secondary" href="#report-subscriptions">
+                      <button
+                        className="button-secondary"
+                        onClick={() => setSubscriptionDrawerOpen(true)}
+                        type="button"
+                      >
                         <Mail className="mr-2 h-4 w-4" />
                         Subscriptions
-                      </a>
-                      <button className="button-secondary" onClick={() => void handleDelete()} type="button">
+                      </button>
+                      <button className="button-secondary" onClick={() => setDeleteModalOpen(true)} type="button">
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
                       </button>
@@ -1166,23 +1144,15 @@ export function ReportBuilderWorkspace() {
 
                   <div className="panel-subtle">
                     <div className="eyebrow">Share</div>
-                    <p className="mt-2 text-sm text-slate-400">
+                    <p className="mt-2 text-sm text-[#6f6578]">
                       Record a share workflow or export handoff for the current report definition.
                     </p>
-                    <label className="mt-4 block space-y-2">
-                      <span className="text-sm font-medium text-slate-200">Recipients</span>
-                      <textarea
-                        className="input min-h-[110px]"
-                        value={shareRecipients}
-                        onChange={(event) => setShareRecipients(event.target.value)}
-                      />
-                    </label>
                     <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                      <button className="button-secondary" onClick={() => void handleShare()} type="button">
+                      <button className="button-secondary" onClick={() => setShareDrawerOpen(true)} type="button">
                         <Share2 className="mr-2 h-4 w-4" />
-                        {busyAction === 'share' ? 'Sharing...' : 'Record Share'}
+                        Record Share
                       </button>
-                      <button className="button-secondary" onClick={() => void handleExport()} type="button">
+                      <button className="button-secondary" disabled={!draft || busyAction === 'export'} onClick={() => setExportModalOpen(true)} type="button">
                         <Download className="mr-2 h-4 w-4" />
                         {busyAction === 'export' ? 'Queueing...' : 'Queue Export'}
                       </button>
@@ -1191,73 +1161,34 @@ export function ReportBuilderWorkspace() {
 
                   <div className="panel-subtle" id="report-subscriptions">
                     <div className="eyebrow">Subscriptions</div>
-                    <p className="mt-2 text-sm text-slate-400">
+                    <p className="mt-2 text-sm text-[#6f6578]">
                       Configure recurring delivery for the active report output.
                     </p>
-                    <div className="mt-4 grid gap-3">
-                      <input
-                        className="input"
-                        value={subscriptionEmail}
-                        onChange={(event) => setSubscriptionEmail(event.target.value)}
-                        placeholder="recipient@regovise.com"
-                      />
-                      <div className="grid gap-3 sm:grid-cols-3">
-                        <select
-                          className="input"
-                          value={subscriptionType}
-                          onChange={(event) => setSubscriptionType(event.target.value)}
-                        >
-                          {recipientTypes.map((recipientType) => (
-                            <option key={recipientType} value={recipientType}>
-                              {recipientType}
-                            </option>
-                          ))}
-                        </select>
-                        <input
-                          className="input"
-                          type="date"
-                          value={subscriptionStartDate}
-                          onChange={(event) => setSubscriptionStartDate(event.target.value)}
-                        />
-                        <select
-                          className="input"
-                          value={subscriptionRecurrence}
-                          onChange={(event) => setSubscriptionRecurrence(event.target.value as RecurrenceType)}
-                        >
-                          {recurrenceTypes.map((recurrence) => (
-                            <option key={recurrence} value={recurrence}>
-                              {recurrence}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <button
-                        className="button-secondary"
-                        onClick={() => void handleCreateSubscription()}
-                        type="button"
-                      >
+                    <div className="mt-4">
+                      <button className="button-secondary" onClick={() => setSubscriptionDrawerOpen(true)} type="button">
                         <Mail className="mr-2 h-4 w-4" />
-                        {busyAction === 'subscription-create' ? 'Creating...' : 'Create Subscription'}
+                        Create Subscription
                       </button>
                     </div>
                     <div className="mt-4 space-y-3">
                       {draft.subscriptions.map((subscription) => (
-                        <div className="rounded-2xl border border-white/10 bg-black/20 p-4" key={subscription.id}>
+                        <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={subscription.id}>
                           <div className="flex items-start justify-between gap-3">
                             <div>
-                              <div className="text-sm font-medium text-white">{subscription.recipientEmail}</div>
-                              <div className="mt-1 text-xs text-slate-400">
+                              <div className="text-sm font-medium text-[#241232]">{subscription.recipientEmail}</div>
+                              <div className="mt-1 text-xs text-[#6f6578]">
                                 {subscription.recipientType} · {subscription.recurrenceType} · starts {subscription.startDate}
                               </div>
-                              <div className="mt-1 text-xs text-slate-500">
+                              <div className="mt-1 text-xs text-[#62576a]">
                                 {subscription.lastSentAt
                                   ? `Last sent ${formatDate(subscription.lastSentAt)}`
                                   : 'No delivery recorded yet'}
                               </div>
                             </div>
                             <button
+                              aria-label={`Remove subscription ${subscription.recipientEmail}`}
                               className="button-secondary"
-                              onClick={() => void handleDeleteSubscription(subscription.id)}
+                              onClick={() => setPendingSubscriptionDelete(subscription)}
                               type="button"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -1273,6 +1204,314 @@ export function ReportBuilderWorkspace() {
           )}
         </section>
       </section>
+
+      <RegRightDrawer
+        title="Create report"
+        description="Create a report definition without leaving the builder workspace."
+        open={createDrawerOpen}
+        onOpenChange={setCreateDrawerOpen}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setCreateDrawerOpen(false)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-primary"
+              disabled={saving}
+              form="report-builder-create-form"
+              type="submit"
+            >
+              {saving ? 'Creating...' : 'Create report'}
+            </button>
+          </div>
+        }
+      >
+        <form
+          className="space-y-4"
+          id="report-builder-create-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void handleCreateReport();
+          }}
+        >
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-[#38254a]">Report title</span>
+            <input
+              className="input"
+              placeholder="New report title"
+              value={newReportTitle}
+              onChange={(event) => setNewReportTitle(event.target.value)}
+            />
+          </label>
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-[#38254a]">Owner</span>
+            <input
+              className="input"
+              placeholder="Owner"
+              value={newReportOwner}
+              onChange={(event) => setNewReportOwner(event.target.value)}
+            />
+          </label>
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-[#38254a]">Chart type</span>
+            <select
+              className="input"
+              aria-label="New report chart type"
+              value={newReportChartType}
+              onChange={(event) => setNewReportChartType(event.target.value as ReportBuilderDetail['chartType'])}
+            >
+              <option value="List">List</option>
+              <option value="Bar">Bar</option>
+              <option value="Line">Line</option>
+              <option value="Pie">Pie</option>
+            </select>
+          </label>
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-[#38254a]">Module</span>
+            <select
+              className="input"
+              aria-label="New report module"
+              value={newReportModule}
+              onChange={(event) => setNewReportModule(event.target.value)}
+            >
+              {modules.map((module) => (
+                <option key={module} value={module}>
+                  {module}
+                </option>
+              ))}
+            </select>
+          </label>
+        </form>
+      </RegRightDrawer>
+
+      <RegRightDrawer
+        title="Record share"
+        description="Record who should receive this report handoff."
+        open={shareDrawerOpen}
+        onOpenChange={setShareDrawerOpen}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setShareDrawerOpen(false)} type="button">
+              Cancel
+            </button>
+            <button className="button-primary" disabled={busyAction === 'share'} form="report-builder-share-form" type="submit">
+              {busyAction === 'share' ? 'Sharing...' : 'Record Share'}
+            </button>
+          </div>
+        }
+      >
+        <form
+          className="space-y-4"
+          id="report-builder-share-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void handleShare();
+          }}
+        >
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-[#38254a]">Recipients</span>
+            <textarea
+              className="input min-h-[160px]"
+              value={shareRecipients}
+              onChange={(event) => setShareRecipients(event.target.value)}
+            />
+          </label>
+          <p className="text-sm leading-6 text-[#6f6578]">
+            Separate recipients with commas. The existing share workflow records the handoff without changing report
+            definitions or permissions.
+          </p>
+        </form>
+      </RegRightDrawer>
+
+      <RegRightDrawer
+        title="Create subscription"
+        description="Schedule recurring delivery for the active report output."
+        open={subscriptionDrawerOpen}
+        onOpenChange={setSubscriptionDrawerOpen}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setSubscriptionDrawerOpen(false)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-primary"
+              disabled={busyAction === 'subscription-create'}
+              form="report-builder-subscription-form"
+              type="submit"
+            >
+              {busyAction === 'subscription-create' ? 'Creating...' : 'Create Subscription'}
+            </button>
+          </div>
+        }
+      >
+        <form
+          className="space-y-4"
+          id="report-builder-subscription-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void handleCreateSubscription();
+          }}
+        >
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-[#38254a]">Recipient</span>
+            <input
+              className="input"
+              value={subscriptionEmail}
+              onChange={(event) => setSubscriptionEmail(event.target.value)}
+              placeholder="recipient@regovise.com"
+            />
+          </label>
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-[#38254a]">Recipient type</span>
+            <select className="input" value={subscriptionType} onChange={(event) => setSubscriptionType(event.target.value)}>
+              {recipientTypes.map((recipientType) => (
+                <option key={recipientType} value={recipientType}>
+                  {recipientType}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-[#38254a]">Start date</span>
+            <input
+              className="input"
+              type="date"
+              value={subscriptionStartDate}
+              onChange={(event) => setSubscriptionStartDate(event.target.value)}
+            />
+          </label>
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-[#38254a]">Recurrence</span>
+            <select
+              className="input"
+              value={subscriptionRecurrence}
+              onChange={(event) => setSubscriptionRecurrence(event.target.value as RecurrenceType)}
+            >
+              {recurrenceTypes.map((recurrence) => (
+                <option key={recurrence} value={recurrence}>
+                  {recurrence}
+                </option>
+              ))}
+            </select>
+          </label>
+        </form>
+      </RegRightDrawer>
+
+      <RegModal
+        title="Queue report export"
+        description={draft ? `Review "${draft.title}" before generating a report export.` : undefined}
+        open={exportModalOpen}
+        onOpenChange={setExportModalOpen}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setExportModalOpen(false)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-primary"
+              disabled={!draft || busyAction === 'export'}
+              onClick={() => void handleExport()}
+              type="button"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {busyAction === 'export' ? 'Queueing...' : 'Queue export'}
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-4 text-sm leading-6 text-[#4f435c]">
+          <p>
+            This uses the existing Report Builder export workflow. It does not change the report definition,
+            permissions, subscriptions, or saved filters.
+          </p>
+          {draft ? (
+            <div className="rounded-lg border border-[#ded8e4] bg-[#fbf9fc] p-4">
+              <div className="font-semibold text-[#241232]">{draft.title}</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="status-pill-neutral">{draft.module}</span>
+                <span className="status-pill-neutral">{draft.chartType}</span>
+                <span className="status-pill-neutral">{draft.status}</span>
+                <span className="status-pill-neutral">{draft.config.displayFields.length} display fields</span>
+                <span className="status-pill-neutral">{draft.config.filters.length} filters</span>
+                <span className="status-pill-neutral">{draft.subscriptions.length} subscriptions</span>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </RegModal>
+
+      <RegModal
+        title="Delete report definition"
+        description="This removes the selected report definition from the Report Builder library."
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setDeleteModalOpen(false)} type="button">
+              Cancel
+            </button>
+            <button className="button-primary" disabled={busyAction === 'delete'} onClick={() => void handleDelete()} type="button">
+              {busyAction === 'delete' ? 'Deleting...' : 'Delete report'}
+            </button>
+          </div>
+        }
+      >
+        <div className="notice-warning">
+          Deleting {draft?.title ? <strong>{draft.title}</strong> : 'this report'} cannot be undone. Existing exports
+          and subscriptions tied to the definition may no longer have a report configuration to reference.
+        </div>
+      </RegModal>
+      <RegModal
+        title="Remove subscription"
+        description={
+          pendingSubscriptionDelete
+            ? `Review the scheduled delivery before removing ${pendingSubscriptionDelete.recipientEmail}.`
+            : undefined
+        }
+        open={Boolean(pendingSubscriptionDelete)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingSubscriptionDelete(null);
+          }
+        }}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setPendingSubscriptionDelete(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary border-[#f2b7bf] text-[#9d1f2c] hover:bg-[#ffe2e5]"
+              disabled={!pendingSubscriptionDelete || busyAction === `subscription:${pendingSubscriptionDelete.id}`}
+              onClick={() => pendingSubscriptionDelete && void handleDeleteSubscription(pendingSubscriptionDelete.id)}
+              type="button"
+            >
+              {pendingSubscriptionDelete && busyAction === `subscription:${pendingSubscriptionDelete.id}`
+                ? 'Removing...'
+                : 'Remove subscription'}
+            </button>
+          </div>
+        }
+      >
+        <div className="notice-warning">
+          This stops recurring delivery for the selected report. The report definition and historical share records remain
+          available.
+        </div>
+        {pendingSubscriptionDelete ? (
+          <div className="mt-4 rounded-lg border border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#4f435c]">
+            <div className="font-semibold text-[#241232]">{pendingSubscriptionDelete.recipientEmail}</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <span className="status-pill-neutral">{pendingSubscriptionDelete.recipientType}</span>
+              <span className="status-pill-neutral">{pendingSubscriptionDelete.recurrenceType}</span>
+              <span className="status-pill-neutral">Starts {pendingSubscriptionDelete.startDate}</span>
+            </div>
+            <div className="mt-3 text-xs text-[#62576a]">
+              {pendingSubscriptionDelete.lastSentAt
+                ? `Last sent ${formatDate(pendingSubscriptionDelete.lastSentAt)}`
+                : 'No delivery recorded yet'}
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
     </div>
   );
 }

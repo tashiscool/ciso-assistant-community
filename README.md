@@ -61,6 +61,18 @@ The other major app tracks in this repository have a narrower role:
 
 The detailed consolidation decision lives in [documentation/architecture/canonical-platform.md](/Users/tkhan/IdeaProjects/ciso-assistant-community/documentation/architecture/canonical-platform.md).
 
+### Canonical Regovise developer quickstart
+
+Use the existing web/Worker lockfiles and root-declared Node/npm range:
+
+```sh
+npm --prefix apps/web ci
+npm --prefix cloudflare ci
+npm run verify
+```
+
+`npm run verify:full` adds fresh isolated local Worker/D1 integration with synthetic fixtures and blocked outbound Worker HTTP. It is a finite test run, not a production deployment or an interactive server. See [ARCHITECTURE.md](ARCHITECTURE.md), [the developer guide](documentation/engineering/developer-guide.md), [web ownership](apps/web/README.md), and [local verification](ops/local/README.md). The inherited Docker quickstart below remains for the legacy CISO Assistant track.
+
 ![Single Hub](single_hub.png)
 
 Our vision is to create a **one-stop-shop** for cybersecurity management—modernizing GRC through **simplification** and **interoperability**.

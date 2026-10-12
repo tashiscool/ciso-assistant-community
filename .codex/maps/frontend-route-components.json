@@ -1,0 +1,2106 @@
+[
+  {
+    "path": "/login",
+    "components": [
+      "BootstrapAccessPanel"
+    ],
+    "line": 333,
+    "element": "{<BootstrapAccessPanel surface=\"login\" />}"
+  },
+  {
+    "path": "/auth/callback",
+    "components": [
+      "SsoCallbackPage"
+    ],
+    "line": 334,
+    "element": "{<SsoCallbackPage />}"
+  },
+  {
+    "path": "/setup/initialize",
+    "components": [
+      "BootstrapAccessPanel"
+    ],
+    "line": 335,
+    "element": "{<BootstrapAccessPanel surface=\"initialize\" />}"
+  },
+  {
+    "path": "/admin/recover",
+    "components": [
+      "BootstrapAccessPanel"
+    ],
+    "line": 336,
+    "element": "{<BootstrapAccessPanel surface=\"recovery\" />}"
+  },
+  {
+    "path": "*",
+    "components": [
+      "Navigate"
+    ],
+    "line": 337,
+    "element": "{<Navigate replace to={defaultTarget} />}"
+  },
+  {
+    "path": "/login",
+    "components": [
+      "Navigate"
+    ],
+    "line": 492,
+    "element": "{<Navigate replace to=\"/\" />}"
+  },
+  {
+    "path": "/auth/callback",
+    "components": [
+      "Navigate"
+    ],
+    "line": 493,
+    "element": "{<Navigate replace to=\"/\" />}"
+  },
+  {
+    "path": "/setup/initialize",
+    "components": [
+      "Navigate"
+    ],
+    "line": 494,
+    "element": "{<Navigate replace to=\"/\" />}"
+  },
+  {
+    "path": "/admin/recover",
+    "components": [
+      "Navigate"
+    ],
+    "line": 495,
+    "element": "{<Navigate replace to=\"/\" />}"
+  },
+  {
+    "path": "/",
+    "components": [
+      "HomePage"
+    ],
+    "line": 496,
+    "element": "{<HomePage access={access} />}"
+  },
+  {
+    "path": "/program",
+    "components": [
+      "ProgramControlPage"
+    ],
+    "line": 497,
+    "element": "{allowedOnly(access.canUseProgramWorkspace, <ProgramControlPage access={access} />)}"
+  },
+  {
+    "path": "/program/setup",
+    "components": [
+      "QuickStartControlPage"
+    ],
+    "line": 498,
+    "element": "{adminOnly(<QuickStartControlPage />)}"
+  },
+  {
+    "path": "/modules",
+    "components": [
+      "ModuleDirectoryPage"
+    ],
+    "line": 499,
+    "element": "{allowedOnly(access.canUseModules, <ModuleDirectoryPage />)}"
+  },
+  {
+    "path": "/modules/:moduleKey",
+    "components": [
+      "SharedModuleWorkspacePage"
+    ],
+    "line": 500,
+    "element": "{allowedOnly(access.canUseModules, <SharedModuleWorkspacePage />)}"
+  },
+  {
+    "path": "/workspace/me",
+    "components": [
+      "MePage"
+    ],
+    "line": 501,
+    "element": "{<MePage />}"
+  },
+  {
+    "path": "/workspace/domains",
+    "components": [
+      "FoldersPage"
+    ],
+    "line": 502,
+    "element": "{adminOnly(<FoldersPage />)}"
+  },
+  {
+    "path": "/workspace/team",
+    "components": [
+      "TeamPage"
+    ],
+    "line": 503,
+    "element": "{adminOnly(<TeamPage />)}"
+  },
+  {
+    "path": "/workspace/access",
+    "components": [
+      "AccessPage"
+    ],
+    "line": 504,
+    "element": "{adminOnly(<AccessPage />, '/workspace/me')}"
+  },
+  {
+    "path": "/setup/tags",
+    "components": [
+      "TagsPage"
+    ],
+    "line": 505,
+    "element": "{adminOnly(<TagsPage />)}"
+  },
+  {
+    "path": "/setup/general",
+    "components": [
+      "GeneralPage"
+    ],
+    "line": 506,
+    "element": "{adminOnly(<GeneralPage />)}"
+  },
+  {
+    "path": "/setup/classification",
+    "components": [
+      "ClassificationPage"
+    ],
+    "line": 507,
+    "element": "{adminOnly(<ClassificationPage />)}"
+  },
+  {
+    "path": "/setup/service-accounts",
+    "components": [
+      "ServiceAccountsPage"
+    ],
+    "line": 508,
+    "element": "{adminOnly(<ServiceAccountsPage />)}"
+  },
+  {
+    "path": "/setup/branding",
+    "components": [
+      "BrandingPage"
+    ],
+    "line": 509,
+    "element": "{adminOnly(<BrandingPage />)}"
+  },
+  {
+    "path": "/setup/email",
+    "components": [
+      "EmailPage"
+    ],
+    "line": 510,
+    "element": "{adminOnly(<EmailPage />)}"
+  },
+  {
+    "path": "/setup/email-settings",
+    "components": [
+      "EmailPage"
+    ],
+    "line": 511,
+    "element": "{adminOnly(<EmailPage />)}"
+  },
+  {
+    "path": "/setup/logs-utilization",
+    "components": [
+      "LogsUtilizationPage"
+    ],
+    "line": 512,
+    "element": "{adminOnly(<LogsUtilizationPage />)}"
+  },
+  {
+    "path": "/setup/security",
+    "components": [
+      "SecurityPosturePage"
+    ],
+    "line": 513,
+    "element": "{adminOnly(<SecurityPosturePage />)}"
+  },
+  {
+    "path": "/setup/modules-features",
+    "components": [
+      "ModulesFeaturesPage"
+    ],
+    "line": 514,
+    "element": "{adminOnly(<ModulesFeaturesPage />)}"
+  },
+  {
+    "path": "/setup/risk-model",
+    "components": [
+      "RiskModelPage"
+    ],
+    "line": 515,
+    "element": "{adminOnly(<RiskModelPage />)}"
+  },
+  {
+    "path": "/setup/sso",
+    "components": [
+      "SSOPage"
+    ],
+    "line": 516,
+    "element": "{adminOnly(<SSOPage />)}"
+  },
+  {
+    "path": "/setup/mfa",
+    "components": [
+      "MFAPage"
+    ],
+    "line": 517,
+    "element": "{adminOnly(<MFAPage />)}"
+  },
+  {
+    "path": "/setup/theming-branding",
+    "components": [
+      "BrandingPage"
+    ],
+    "line": 518,
+    "element": "{adminOnly(<BrandingPage />)}"
+  },
+  {
+    "path": "/setup",
+    "components": [
+      "SemanticLauncherPage"
+    ],
+    "line": 519,
+    "element": "{adminOnly(<SemanticLauncherPage kind=\"setup\" />)}"
+  },
+  {
+    "path": "/setup/compliance-settings",
+    "components": [
+      "FrameworksPage"
+    ],
+    "line": 520,
+    "element": "{adminOnly(<FrameworksPage />)}"
+  },
+  {
+    "path": "/setup/file-system",
+    "components": [
+      "EvidenceSourcesPage"
+    ],
+    "line": 521,
+    "element": "{adminOnly(<EvidenceSourcesPage />)}"
+  },
+  {
+    "path": "/setup/facilities",
+    "components": [
+      "FoldersPage"
+    ],
+    "line": 522,
+    "element": "{adminOnly(<FoldersPage />)}"
+  },
+  {
+    "path": "/setup/cause-codes",
+    "components": [
+      "RiskModelPage"
+    ],
+    "line": 523,
+    "element": "{adminOnly(<RiskModelPage />)}"
+  },
+  {
+    "path": "/setup/security-policies",
+    "components": [
+      "SharedModuleWorkspacePage"
+    ],
+    "line": 524,
+    "element": "{adminOnly(<SharedModuleWorkspacePage fixedModuleKey=\"policies\" />)}"
+  },
+  {
+    "path": "/setup/user-management-roles/roles",
+    "components": [
+      "AccessPage"
+    ],
+    "line": 528,
+    "element": "{adminOnly(<AccessPage />)}"
+  },
+  {
+    "path": "/setup/user-management-roles/mfa",
+    "components": [
+      "MFAPage"
+    ],
+    "line": 529,
+    "element": "{adminOnly(<MFAPage />)}"
+  },
+  {
+    "path": "/setup/user-management-roles",
+    "components": [
+      "TeamPage"
+    ],
+    "line": 530,
+    "element": "{adminOnly(<TeamPage />)}"
+  },
+  {
+    "path": "/setup/functional-roles",
+    "components": [
+      "AccessPage"
+    ],
+    "line": 531,
+    "element": "{adminOnly(<AccessPage />)}"
+  },
+  {
+    "path": "/sso",
+    "components": [
+      "SSOPage"
+    ],
+    "line": 532,
+    "element": "{adminOnly(<SSOPage />)}"
+  },
+  {
+    "path": "/setup-mfa",
+    "components": [
+      "MFAPage"
+    ],
+    "line": 533,
+    "element": "{adminOnly(<MFAPage />)}"
+  },
+  {
+    "path": "/libraries",
+    "components": [
+      "LibrariesPage"
+    ],
+    "line": 534,
+    "element": "{allowedOnly(access.canUseLibraries, <LibrariesPage />)}"
+  },
+  {
+    "path": "/libraries/:libraryId",
+    "components": [
+      "LibraryDetailPage"
+    ],
+    "line": 535,
+    "element": "{allowedOnly(access.canUseLibraries, <LibraryDetailPage />)}"
+  },
+  {
+    "path": "/frameworks",
+    "components": [
+      "FrameworksPage"
+    ],
+    "line": 536,
+    "element": "{allowedOnly(access.canUseFrameworks, <FrameworksPage />)}"
+  },
+  {
+    "path": "/frameworks/:frameworkId",
+    "components": [
+      "FrameworkDetailPage"
+    ],
+    "line": 537,
+    "element": "{allowedOnly(access.canUseFrameworks, <FrameworkDetailPage />)}"
+  },
+  {
+    "path": "/framework-library",
+    "components": [
+      "FrameworkLibraryPage"
+    ],
+    "line": 538,
+    "element": "{allowedOnly(access.canUseFrameworks, <FrameworkLibraryPage />)}"
+  },
+  {
+    "path": "/framework-library/:frameworkId",
+    "components": [
+      "FrameworkKnowledgeDetailPage"
+    ],
+    "line": 539,
+    "element": "{allowedOnly(access.canUseFrameworks, <FrameworkKnowledgeDetailPage />)}"
+  },
+  {
+    "path": "/findings",
+    "components": [
+      "FindingsExplorerPage"
+    ],
+    "line": 540,
+    "element": "{allowedOnly(access.canUseFrameworks, <FindingsExplorerPage />)}"
+  },
+  {
+    "path": "/gap-assessments",
+    "components": [
+      "GapAssessmentsPage"
+    ],
+    "line": 541,
+    "element": "{allowedOnly(access.canUseFrameworks, <GapAssessmentsPage />)}"
+  },
+  {
+    "path": "/gap-assessments/:assessmentId",
+    "components": [
+      "GapAssessmentDetailPage"
+    ],
+    "line": 542,
+    "element": "{allowedOnly(access.canUseFrameworks, <GapAssessmentDetailPage />)}"
+  },
+  {
+    "path": "/report-bundles",
+    "components": [
+      "ReportBundlesPage"
+    ],
+    "line": 543,
+    "element": "{allowedOnly(access.canUseFrameworks, <ReportBundlesPage />)}"
+  },
+  {
+    "path": "/report-bundles/:bundleId",
+    "components": [
+      "ReportBundleDetailPage"
+    ],
+    "line": 544,
+    "element": "{allowedOnly(access.canUseFrameworks, <ReportBundleDetailPage />)}"
+  },
+  {
+    "path": "/assessments",
+    "components": [
+      "AssessmentsPage"
+    ],
+    "line": 545,
+    "element": "{allowedOnly(access.canUseAssessmentWorkspace, <AssessmentsPage />)}"
+  },
+  {
+    "path": "/risk-assessments/:assessmentId",
+    "components": [
+      "RiskAssessmentDetailPage"
+    ],
+    "line": 546,
+    "element": "{allowedOnly(access.canUseRiskAssessments, <RiskAssessmentDetailPage />)}"
+  },
+  {
+    "path": "/risk-assessments/:assessmentId/action-plan",
+    "components": [
+      "RiskAssessmentActionPlanPage"
+    ],
+    "line": 547,
+    "element": "{allowedOnly(access.canUseRiskAssessments, <RiskAssessmentActionPlanPage />)}"
+  },
+  {
+    "path": "/risk-assessments/:assessmentId/action-plan/budget-overview",
+    "components": [
+      "RiskAssessmentActionPlanPage"
+    ],
+    "line": 551,
+    "element": "{allowedOnly(access.canUseRiskAssessments, <RiskAssessmentActionPlanPage />)}"
+  },
+  {
+    "path": "/compliance-assessments/:assessmentId",
+    "components": [
+      "ComplianceAssessmentDetailPage"
+    ],
+    "line": 555,
+    "element": "{allowedOnly(access.canUseComplianceAssessments, <ComplianceAssessmentDetailPage />)}"
+  },
+  {
+    "path": "/compliance-assessments/:assessmentId/action-plan",
+    "components": [
+      "ComplianceActionPlanPage"
+    ],
+    "line": 559,
+    "element": "{allowedOnly(access.canUseComplianceAssessments, <ComplianceActionPlanPage />)}"
+  },
+  {
+    "path": "/compliance-assessments/:assessmentId/action-plan/budget-overview",
+    "components": [
+      "ComplianceActionPlanPage"
+    ],
+    "line": 563,
+    "element": "{allowedOnly(access.canUseComplianceAssessments, <ComplianceActionPlanPage />)}"
+  },
+  {
+    "path": "/compliance-assessments/:assessmentId/flash-mode",
+    "components": [
+      "AppliedControlsFlashPage"
+    ],
+    "line": 567,
+    "element": "{allowedOnly(access.canUseComplianceAssessments, <AppliedControlsFlashPage />)}"
+  },
+  {
+    "path": "/applied-controls/kanban-mode",
+    "components": [
+      "AppliedControlsKanbanPage"
+    ],
+    "line": 571,
+    "element": "{allowedOnly(access.canUseComplianceAssessments, <AppliedControlsKanbanPage />)}"
+  },
+  {
+    "path": "/applied-controls/flash-mode",
+    "components": [
+      "AppliedControlsFlashPage"
+    ],
+    "line": 572,
+    "element": "{allowedOnly(access.canUseComplianceAssessments, <AppliedControlsFlashPage />)}"
+  },
+  {
+    "path": "/third-party",
+    "components": [
+      "TprmWorkspacePage"
+    ],
+    "line": 573,
+    "element": "{allowedOnly(access.canUseThirdParty, <TprmWorkspacePage />)}"
+  },
+  {
+    "path": "/third-party/entities/:entityId",
+    "components": [
+      "EntityDetailPage"
+    ],
+    "line": 574,
+    "element": "{allowedOnly(access.canUseThirdParty, <EntityDetailPage />)}"
+  },
+  {
+    "path": "/entities/:entityId",
+    "components": [
+      "EntityDetailPage"
+    ],
+    "line": 575,
+    "element": "{allowedOnly(access.canUseThirdParty, <EntityDetailPage />)}"
+  },
+  {
+    "path": "/privacy",
+    "components": [
+      "PrivacyWorkspacePage"
+    ],
+    "line": 576,
+    "element": "{allowedOnly(access.canUsePrivacy, <PrivacyWorkspacePage />)}"
+  },
+  {
+    "path": "/privacy/processings/:processingId",
+    "components": [
+      "ProcessingDetailPage"
+    ],
+    "line": 577,
+    "element": "{allowedOnly(access.canUsePrivacy, <ProcessingDetailPage />)}"
+  },
+  {
+    "path": "/processings/:processingId",
+    "components": [
+      "ProcessingDetailPage"
+    ],
+    "line": 578,
+    "element": "{allowedOnly(access.canUsePrivacy, <ProcessingDetailPage />)}"
+  },
+  {
+    "path": "/resilience",
+    "components": [
+      "ResiliencePage"
+    ],
+    "line": 579,
+    "element": "{allowedOnly(access.canUseResilience, <ResiliencePage />)}"
+  },
+  {
+    "path": "/resilience/business-impact-analyses/:analysisId",
+    "components": [
+      "BusinessImpactAnalysisDetailPage"
+    ],
+    "line": 580,
+    "element": "{allowedOnly(access.canUseResilience, <BusinessImpactAnalysisDetailPage />)}"
+  },
+  {
+    "path": "/business-impact-analysis/:analysisId",
+    "components": [
+      "BusinessImpactAnalysisDetailPage"
+    ],
+    "line": 584,
+    "element": "{allowedOnly(access.canUseResilience, <BusinessImpactAnalysisDetailPage />)}"
+  },
+  {
+    "path": "/business-impact-analysis/:analysisId/action-plan",
+    "components": [
+      "BusinessImpactAnalysisDetailPage"
+    ],
+    "line": 588,
+    "element": "{allowedOnly(access.canUseResilience, <BusinessImpactAnalysisDetailPage />)}"
+  },
+  {
+    "path": "/business-impact-analysis/:analysisId/report",
+    "components": [
+      "BusinessImpactAnalysisDetailPage"
+    ],
+    "line": 592,
+    "element": "{allowedOnly(access.canUseResilience, <BusinessImpactAnalysisDetailPage />)}"
+  },
+  {
+    "path": "/business-impact-analysis/:analysisId/visual",
+    "components": [
+      "BusinessImpactAnalysisDetailPage"
+    ],
+    "line": 596,
+    "element": "{allowedOnly(access.canUseResilience, <BusinessImpactAnalysisDetailPage />)}"
+  },
+  {
+    "path": "/reports",
+    "components": [
+      "ReportsPage"
+    ],
+    "line": 600,
+    "element": "{allowedOnly(access.canUseReports, <ReportsPage />)}"
+  },
+  {
+    "path": "/reports/dora-roi",
+    "components": [
+      "DoraReportPage"
+    ],
+    "line": 601,
+    "element": "{allowedOnly(access.canUseReports, <DoraReportPage />)}"
+  },
+  {
+    "path": "/builders",
+    "components": [
+      "SemanticLauncherPage"
+    ],
+    "line": 602,
+    "element": "{adminOnly(<SemanticLauncherPage kind=\"builders\" />)}"
+  },
+  {
+    "path": "/builders/export-builder",
+    "components": [
+      "ExportBuilderPage"
+    ],
+    "line": 603,
+    "element": "{adminOnly(<ExportBuilderPage />)}"
+  },
+  {
+    "path": "/builders/export-builder/docx-template",
+    "components": [
+      "ExportBuilderDocxGuidePage"
+    ],
+    "line": 604,
+    "element": "{adminOnly(<ExportBuilderDocxGuidePage />)}"
+  },
+  {
+    "path": "/builders/export-builder/docx-template-guide",
+    "components": [
+      "ExportBuilderDocxGuidePage"
+    ],
+    "line": 605,
+    "element": "{adminOnly(<ExportBuilderDocxGuidePage />)}"
+  },
+  {
+    "path": "/builders/form-builder",
+    "components": [
+      "FormBuilderPage"
+    ],
+    "line": 606,
+    "element": "{adminOnly(<FormBuilderPage />)}"
+  },
+  {
+    "path": "/builders/form-builder/user-guide",
+    "components": [
+      "FormBuilderPage"
+    ],
+    "line": 607,
+    "element": "{adminOnly(<FormBuilderPage />)}"
+  },
+  {
+    "path": "/builders/form-builder/rules-guide",
+    "components": [
+      "RulesBuilderPage"
+    ],
+    "line": 608,
+    "element": "{adminOnly(<RulesBuilderPage />)}"
+  },
+  {
+    "path": "/builders/report-builder",
+    "components": [
+      "ReportBuilderPage"
+    ],
+    "line": 609,
+    "element": "{allowedOnly(access.canUseReports, <ReportBuilderPage />)}"
+  },
+  {
+    "path": "/builders/dashboard-builder",
+    "components": [
+      "DashboardBuilderPage"
+    ],
+    "line": 610,
+    "element": "{adminOnly(<DashboardBuilderPage />)}"
+  },
+  {
+    "path": "/builders/rules-builder",
+    "components": [
+      "RulesBuilderPage"
+    ],
+    "line": 611,
+    "element": "{adminOnly(<RulesBuilderPage />)}"
+  },
+  {
+    "path": "/builders/wayfinder-builder",
+    "components": [
+      "WayfinderBuilderPage"
+    ],
+    "line": 612,
+    "element": "{adminOnly(<WayfinderBuilderPage />)}"
+  },
+  {
+    "path": "/builders/questionnaire-builder/overview",
+    "components": [
+      "QuestionnaireOverviewPage"
+    ],
+    "line": 613,
+    "element": "{adminOnly(<QuestionnaireOverviewPage workspaceMode=\"all\" />)}"
+  },
+  {
+    "path": "/builders/questionnaire-builder",
+    "components": [
+      "QuestionnaireBuilderPage"
+    ],
+    "line": 614,
+    "element": "{adminOnly(<QuestionnaireBuilderPage workspaceMode=\"all\" />)}"
+  },
+  {
+    "path": "/builders/questionnaire-builder/rules-engine",
+    "components": [
+      "QuestionnaireRulesEnginePage"
+    ],
+    "line": 615,
+    "element": "{adminOnly(<QuestionnaireRulesEnginePage workspaceMode=\"all\" />)}"
+  },
+  {
+    "path": "/questionnaires/response/:shareToken",
+    "components": [
+      "QuestionnaireResponsePage"
+    ],
+    "line": 619,
+    "element": "{<QuestionnaireResponsePage />}"
+  },
+  {
+    "path": "/features",
+    "components": [
+      "SemanticLauncherPage"
+    ],
+    "line": 620,
+    "element": "{adminOnly(<SemanticLauncherPage kind=\"features\" />)}"
+  },
+  {
+    "path": "/features/regml",
+    "components": [
+      "RegMLPage"
+    ],
+    "line": 621,
+    "element": "{adminOnly(<RegMLPage />)}"
+  },
+  {
+    "path": "/features/regml/control-ai-features",
+    "components": [
+      "RegMLPage"
+    ],
+    "line": 622,
+    "element": "{adminOnly(<RegMLPage />)}"
+  },
+  {
+    "path": "/features/regml/author",
+    "components": [
+      "RegMLAuthorPage"
+    ],
+    "line": 623,
+    "element": "{adminOnly(<RegMLAuthorPage />)}"
+  },
+  {
+    "path": "/features/regml/explainer",
+    "components": [
+      "RegMLExplainerPage"
+    ],
+    "line": 624,
+    "element": "{adminOnly(<RegMLExplainerPage />)}"
+  },
+  {
+    "path": "/features/regml/ssp-ai-features",
+    "components": [
+      "RegMLPage"
+    ],
+    "line": 625,
+    "element": "{adminOnly(<RegMLPage />)}"
+  },
+  {
+    "path": "/features/regml/ssp-author",
+    "components": [
+      "RegMLSSPAuthorPage"
+    ],
+    "line": 626,
+    "element": "{adminOnly(<RegMLSSPAuthorPage />)}"
+  },
+  {
+    "path": "/features/regml/auditor",
+    "components": [
+      "RegMLAuditorPage"
+    ],
+    "line": 627,
+    "element": "{adminOnly(<RegMLAuditorPage />)}"
+  },
+  {
+    "path": "/features/regml/ai-generator",
+    "components": [
+      "RegMLAIGeneratorPage"
+    ],
+    "line": 628,
+    "element": "{adminOnly(<RegMLAIGeneratorPage />)}"
+  },
+  {
+    "path": "/ai-policy-builder",
+    "components": [
+      "AIPolicyBuilderPage"
+    ],
+    "line": 629,
+    "element": "{adminOnly(<AIPolicyBuilderPage />)}"
+  },
+  {
+    "path": "/features/ai-policy-builder",
+    "components": [
+      "AIPolicyBuilderPage"
+    ],
+    "line": 630,
+    "element": "{adminOnly(<AIPolicyBuilderPage />)}"
+  },
+  {
+    "path": "/security-profiles",
+    "components": [
+      "AIPolicyBuilderPage"
+    ],
+    "line": 631,
+    "element": "{allowedOnly(access.canUseModules, <AIPolicyBuilderPage surface=\"security-profiles\" />)}"
+  },
+  {
+    "path": "/threat-models",
+    "components": [
+      "ThreatModelsPage"
+    ],
+    "line": 635,
+    "element": "{allowedOnly(\n                access.canUseModules,\n                <ThreatModelsPage\n                  canConfigureModel={access.canViewAdminNavigation}\n                  canUseRiskAssessments={access.canUseRiskAssessments}\n                />,\n              )}"
+  },
+  {
+    "path": "/response-automation",
+    "components": [
+      "ResponseAutomationPage"
+    ],
+    "line": 645,
+    "element": "{adminOnly(<ResponseAutomationPage />)}"
+  },
+  {
+    "path": "/features/response-automation",
+    "components": [
+      "ResponseAutomationPage"
+    ],
+    "line": 646,
+    "element": "{adminOnly(<ResponseAutomationPage />)}"
+  },
+  {
+    "path": "/evidence-mapping",
+    "components": [
+      "EvidenceMappingPage"
+    ],
+    "line": 647,
+    "element": "{adminOnly(<EvidenceMappingPage />)}"
+  },
+  {
+    "path": "/features/evidence-mapping",
+    "components": [
+      "EvidenceMappingPage"
+    ],
+    "line": 648,
+    "element": "{adminOnly(<EvidenceMappingPage />)}"
+  },
+  {
+    "path": "/compliance-exports",
+    "components": [
+      "ComplianceExportsPage"
+    ],
+    "line": 649,
+    "element": "{adminOnly(<ComplianceExportsPage />)}"
+  },
+  {
+    "path": "/features/compliance-exports",
+    "components": [
+      "ComplianceExportsPage"
+    ],
+    "line": 650,
+    "element": "{adminOnly(<ComplianceExportsPage />)}"
+  },
+  {
+    "path": "/features/compliance-exports/emass",
+    "components": [
+      "ComplianceExportsPage"
+    ],
+    "line": 651,
+    "element": "{adminOnly(<ComplianceExportsPage initialFilter=\"emass\" />)}"
+  },
+  {
+    "path": "/features/compliance-exports/emass/hardware-software-list",
+    "components": [
+      "ComplianceExportsPage"
+    ],
+    "line": 652,
+    "element": "{adminOnly(<ComplianceExportsPage initialFilter=\"emass\" />)}"
+  },
+  {
+    "path": "/features/compliance-exports/emass/poams",
+    "components": [
+      "ComplianceExportsPage"
+    ],
+    "line": 656,
+    "element": "{adminOnly(<ComplianceExportsPage initialFilter=\"emass\" />)}"
+  },
+  {
+    "path": "/features/compliance-exports/emass/ports-protocols",
+    "components": [
+      "ComplianceExportsPage"
+    ],
+    "line": 657,
+    "element": "{adminOnly(<ComplianceExportsPage initialFilter=\"emass\" />)}"
+  },
+  {
+    "path": "/features/compliance-exports/emass/sap-sar",
+    "components": [
+      "ComplianceExportsPage"
+    ],
+    "line": 661,
+    "element": "{adminOnly(<ComplianceExportsPage initialFilter=\"emass\" />)}"
+  },
+  {
+    "path": "/features/compliance-exports/emass/slcm",
+    "components": [
+      "ComplianceExportsPage"
+    ],
+    "line": 662,
+    "element": "{adminOnly(<ComplianceExportsPage initialFilter=\"emass\" />)}"
+  },
+  {
+    "path": "/features/compliance-exports/fedramp",
+    "components": [
+      "ComplianceExportsPage"
+    ],
+    "line": 663,
+    "element": "{adminOnly(<ComplianceExportsPage initialFilter=\"fedramp\" />)}"
+  },
+  {
+    "path": "/features/compliance-exports/fedramp/cis-crm",
+    "components": [
+      "ComplianceExportsPage"
+    ],
+    "line": 664,
+    "element": "{adminOnly(<ComplianceExportsPage initialFilter=\"fedramp\" />)}"
+  },
+  {
+    "path": "/features/compliance-exports/fedramp/inventory",
+    "components": [
+      "ComplianceExportsPage"
+    ],
+    "line": 668,
+    "element": "{adminOnly(<ComplianceExportsPage initialFilter=\"fedramp\" />)}"
+  },
+  {
+    "path": "/features/compliance-exports/fedramp/poams",
+    "components": [
+      "ComplianceExportsPage"
+    ],
+    "line": 672,
+    "element": "{adminOnly(<ComplianceExportsPage initialFilter=\"fedramp\" />)}"
+  },
+  {
+    "path": "/features/compliance-exports/fedramp/risk-exposure",
+    "components": [
+      "ComplianceExportsPage"
+    ],
+    "line": 673,
+    "element": "{adminOnly(<ComplianceExportsPage initialFilter=\"fedramp\" />)}"
+  },
+  {
+    "path": "/features/compliance-exports/fedramp/test-case-procedures",
+    "components": [
+      "ComplianceExportsPage"
+    ],
+    "line": 677,
+    "element": "{adminOnly(<ComplianceExportsPage initialFilter=\"fedramp\" />)}"
+  },
+  {
+    "path": "/chat",
+    "components": [
+      "ChatWorkspacePage"
+    ],
+    "line": 681,
+    "element": "{allowedOnly(access.canUseChat, <ChatWorkspacePage />)}"
+  },
+  {
+    "path": "/imports",
+    "components": [
+      "ImportsPage"
+    ],
+    "line": 682,
+    "element": "{adminOnly(<ImportsPage />)}"
+  },
+  {
+    "path": "/integrations",
+    "components": [
+      "AutomationManagerPage"
+    ],
+    "line": 683,
+    "element": "{adminOnly(<AutomationManagerPage />)}"
+  },
+  {
+    "path": "/automation-manager",
+    "components": [
+      "AutomationManagerPage"
+    ],
+    "line": 684,
+    "element": "{adminOnly(<AutomationManagerPage />)}"
+  },
+  {
+    "path": "/features/automation-manager",
+    "components": [
+      "AutomationManagerPage"
+    ],
+    "line": 685,
+    "element": "{adminOnly(<AutomationManagerPage />)}"
+  },
+  {
+    "path": "/fedramp/provider",
+    "components": [
+      "FedrampProviderShellPage"
+    ],
+    "line": 686,
+    "element": "{adminOnly(<FedrampProviderShellPage />)}"
+  },
+  {
+    "path": "/features/third-party-risk",
+    "components": [
+      "TprmWorkspacePage"
+    ],
+    "line": 687,
+    "element": "{allowedOnly(access.canUseThirdParty, <TprmWorkspacePage />)}"
+  },
+  {
+    "path": "/features/continuous-monitoring",
+    "components": [
+      "ConMonProfilesPage"
+    ],
+    "line": 688,
+    "element": "{adminOnly(<ConMonProfilesPage />)}"
+  },
+  {
+    "path": "/grc-admin",
+    "components": [
+      "GrcAdministrationPage"
+    ],
+    "line": 689,
+    "element": "{adminOnly(<GrcAdministrationPage />)}"
+  },
+  {
+    "path": "/scrutiny-engine",
+    "components": [
+      "ScrutinyEnginePage"
+    ],
+    "line": 690,
+    "element": "{adminOnly(<ScrutinyEnginePage />)}"
+  },
+  {
+    "path": "/grc-admin/scrutiny-engine",
+    "components": [
+      "ScrutinyEnginePage"
+    ],
+    "line": 691,
+    "element": "{adminOnly(<ScrutinyEnginePage />)}"
+  },
+  {
+    "path": "/trust-center",
+    "components": [
+      "FedrampProviderShellPage"
+    ],
+    "line": 692,
+    "element": "{adminOnly(<FedrampProviderShellPage />)}"
+  },
+  {
+    "path": "/workflow",
+    "components": [
+      "WorkflowControlPage"
+    ],
+    "line": 693,
+    "element": "{allowedOnly(access.canUseProgramWorkspace, <WorkflowControlPage />)}"
+  },
+  {
+    "path": "/features/workflow",
+    "components": [
+      "WorkflowControlPage"
+    ],
+    "line": 694,
+    "element": "{allowedOnly(access.canUseProgramWorkspace, <WorkflowControlPage />)}"
+  },
+  {
+    "path": "/utilities",
+    "components": [
+      "UtilitiesControlPage"
+    ],
+    "line": 695,
+    "element": "{allowedOnly(access.canUseModules, <UtilitiesControlPage />)}"
+  },
+  {
+    "path": "/features/utilities",
+    "components": [
+      "UtilitiesControlPage"
+    ],
+    "line": 696,
+    "element": "{allowedOnly(access.canUseModules, <UtilitiesControlPage />)}"
+  },
+  {
+    "path": "/subsystems",
+    "components": [
+      "SubsystemsControlPage"
+    ],
+    "line": 697,
+    "element": "{allowedOnly(access.canUseModules, <SubsystemsControlPage />)}"
+  },
+  {
+    "path": "/features/subsystems",
+    "components": [
+      "SubsystemsControlPage"
+    ],
+    "line": 698,
+    "element": "{allowedOnly(access.canUseModules, <SubsystemsControlPage />)}"
+  },
+  {
+    "path": "/rmf",
+    "components": [
+      "RMFControlPage"
+    ],
+    "line": 699,
+    "element": "{allowedOnly(access.canUseFrameworks, <RMFControlPage />)}"
+  },
+  {
+    "path": "/features/rmf",
+    "components": [
+      "RMFControlPage"
+    ],
+    "line": 700,
+    "element": "{allowedOnly(access.canUseFrameworks, <RMFControlPage />)}"
+  },
+  {
+    "path": "/app-management",
+    "components": [
+      "AppManagementControlPage"
+    ],
+    "line": 701,
+    "element": "{allowedOnly(access.canUseProgramWorkspace, <AppManagementControlPage />)}"
+  },
+  {
+    "path": "/features/app-management",
+    "components": [
+      "AppManagementControlPage"
+    ],
+    "line": 702,
+    "element": "{allowedOnly(access.canUseProgramWorkspace, <AppManagementControlPage />)}"
+  },
+  {
+    "path": "/workbench",
+    "components": [
+      "WorkbenchControlPage"
+    ],
+    "line": 703,
+    "element": "{allowedOnly(access.canUseProgramWorkspace, <WorkbenchControlPage />)}"
+  },
+  {
+    "path": "/features/workbench",
+    "components": [
+      "WorkbenchControlPage"
+    ],
+    "line": 704,
+    "element": "{allowedOnly(access.canUseProgramWorkspace, <WorkbenchControlPage />)}"
+  },
+  {
+    "path": "/news-feed",
+    "components": [
+      "NewsFeedControlPage"
+    ],
+    "line": 705,
+    "element": "{allowedOnly(access.canUseProgramWorkspace, <NewsFeedControlPage />)}"
+  },
+  {
+    "path": "/features/news-feed",
+    "components": [
+      "NewsFeedControlPage"
+    ],
+    "line": 706,
+    "element": "{allowedOnly(access.canUseProgramWorkspace, <NewsFeedControlPage />)}"
+  },
+  {
+    "path": "{entry.route}",
+    "components": [
+      "SharedModuleWorkspacePage"
+    ],
+    "line": 708,
+    "element": "{allowedOnly(access.canUseModules, <SharedModuleWorkspacePage fixedModuleKey={entry.moduleKey} />)}"
+  },
+  {
+    "path": "/catalogues",
+    "components": [
+      "Navigate"
+    ],
+    "line": 714,
+    "element": "{allowedOnly(access.canUseModules, <Navigate replace to=\"/frameworks\" />)}"
+  },
+  {
+    "path": "/assessment-plans",
+    "components": [
+      "QuestionnaireOverviewPage"
+    ],
+    "line": 715,
+    "element": "{allowedOnly(access.canUseModules, <QuestionnaireOverviewPage workspaceMode=\"assessment-plans\" />)}"
+  },
+  {
+    "path": "/questionnaires",
+    "components": [
+      "QuestionnaireOverviewPage"
+    ],
+    "line": 716,
+    "element": "{allowedOnly(access.canUseModules, <QuestionnaireOverviewPage workspaceMode=\"questionnaires\" />)}"
+  },
+  {
+    "path": "/modules/*",
+    "components": [
+      "ComplianceNavigatorRouteBridgePage"
+    ],
+    "line": 717,
+    "element": "{<ComplianceNavigatorRouteBridgePage area=\"modules\" access={access} />}"
+  },
+  {
+    "path": "/features/*",
+    "components": [
+      "ComplianceNavigatorRouteBridgePage"
+    ],
+    "line": 718,
+    "element": "{<ComplianceNavigatorRouteBridgePage area=\"features\" access={access} />}"
+  },
+  {
+    "path": "/builders/*",
+    "components": [
+      "ComplianceNavigatorRouteBridgePage"
+    ],
+    "line": 719,
+    "element": "{<ComplianceNavigatorRouteBridgePage area=\"builders\" access={access} />}"
+  },
+  {
+    "path": "/setup/*",
+    "components": [
+      "ComplianceNavigatorRouteBridgePage"
+    ],
+    "line": 720,
+    "element": "{<ComplianceNavigatorRouteBridgePage area=\"setup\" access={access} />}"
+  },
+  {
+    "path": "/utilities/*",
+    "components": [
+      "ComplianceNavigatorRouteBridgePage"
+    ],
+    "line": 721,
+    "element": "{<ComplianceNavigatorRouteBridgePage area=\"utilities\" access={access} />}"
+  },
+  {
+    "path": "/logs",
+    "components": [
+      "ComplianceNavigatorRouteBridgePage"
+    ],
+    "line": 722,
+    "element": "{<ComplianceNavigatorRouteBridgePage area=\"logs\" access={access} />}"
+  },
+  {
+    "path": "/portal",
+    "components": [
+      "PortalDashboardPage"
+    ],
+    "line": 723,
+    "element": "{allowedOnly(access.canUsePortal, <PortalDashboardPage />)}"
+  },
+  {
+    "path": "/portal/assignments/:assignmentId",
+    "components": [
+      "PortalAssignmentDetailPage"
+    ],
+    "line": 724,
+    "element": "{allowedOnly(access.canUsePortal, <PortalAssignmentDetailPage />)}"
+  },
+  {
+    "path": "/advanced-risk/ebios",
+    "components": [
+      "EbiosWorkspacePage"
+    ],
+    "line": 725,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosWorkspacePage />)}"
+  },
+  {
+    "path": "/advanced-risk/ebios/:studyId",
+    "components": [
+      "EbiosStudyDetailPage"
+    ],
+    "line": 726,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosStudyDetailPage />)}"
+  },
+  {
+    "path": "/advanced-risk/quantitative",
+    "components": [
+      "QuantitativeWorkspacePage"
+    ],
+    "line": 727,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <QuantitativeWorkspacePage />)}"
+  },
+  {
+    "path": "/advanced-risk/quantitative/:studyId",
+    "components": [
+      "QuantitativeStudyDetailPage"
+    ],
+    "line": 728,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <QuantitativeStudyDetailPage />)}"
+  },
+  {
+    "path": "/advanced-risk/quantitative/:studyId/executive-summary",
+    "components": [
+      "QuantitativeExecutiveSummaryPage"
+    ],
+    "line": 732,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <QuantitativeExecutiveSummaryPage />)}"
+  },
+  {
+    "path": "/advanced-risk/quantitative/:studyId/key-metrics",
+    "components": [
+      "QuantitativeKeyMetricsPage"
+    ],
+    "line": 736,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <QuantitativeKeyMetricsPage />)}"
+  },
+  {
+    "path": "/advanced-risk/quantitative/:studyId/action-plan",
+    "components": [
+      "QuantitativeActionPlanPage"
+    ],
+    "line": 740,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <QuantitativeActionPlanPage />)}"
+  },
+  {
+    "path": "/quantitative-risk-studies/:studyId/action-plan/budget-overview",
+    "components": [
+      "QuantitativeActionPlanPage"
+    ],
+    "line": 744,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <QuantitativeActionPlanPage />)}"
+  },
+  {
+    "path": "/quantitative-risk-scenarios/:scenarioId",
+    "components": [
+      "QuantitativeScenarioDetailPage"
+    ],
+    "line": 748,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <QuantitativeScenarioDetailPage />)}"
+  },
+  {
+    "path": "/quantitative-risk-hypotheses/:hypothesisId",
+    "components": [
+      "QuantitativeHypothesisDetailPage"
+    ],
+    "line": 752,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <QuantitativeHypothesisDetailPage />)}"
+  },
+  {
+    "path": "/risk-assessments/:assessmentId/convert-to-quantitative",
+    "components": [
+      "RiskAssessmentConversionPage"
+    ],
+    "line": 756,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <RiskAssessmentConversionPage />)}"
+  },
+  {
+    "path": "/folders",
+    "components": [
+      "FoldersPage"
+    ],
+    "line": 760,
+    "element": "{adminOnly(<FoldersPage />)}"
+  },
+  {
+    "path": "/users",
+    "components": [
+      "TeamPage"
+    ],
+    "line": 761,
+    "element": "{adminOnly(<TeamPage />)}"
+  },
+  {
+    "path": "/my-profile",
+    "components": [
+      "MePage"
+    ],
+    "line": 762,
+    "element": "{<MePage />}"
+  },
+  {
+    "path": "/my-assignments",
+    "components": [
+      "PortalDashboardPage"
+    ],
+    "line": 763,
+    "element": "{allowedOnly(access.canUsePortal, <PortalDashboardPage />)}"
+  },
+  {
+    "path": "/entities",
+    "components": [
+      "TprmWorkspacePage"
+    ],
+    "line": 764,
+    "element": "{allowedOnly(access.canUseThirdParty, <TprmWorkspacePage />)}"
+  },
+  {
+    "path": "/contracts",
+    "components": [
+      "TprmWorkspacePage"
+    ],
+    "line": 765,
+    "element": "{allowedOnly(access.canUseThirdParty, <TprmWorkspacePage />)}"
+  },
+  {
+    "path": "/processings",
+    "components": [
+      "PrivacyWorkspacePage"
+    ],
+    "line": 766,
+    "element": "{allowedOnly(access.canUsePrivacy, <PrivacyWorkspacePage />)}"
+  },
+  {
+    "path": "/business-impact-analysis",
+    "components": [
+      "ResiliencePage"
+    ],
+    "line": 767,
+    "element": "{allowedOnly(access.canUseResilience, <ResiliencePage />)}"
+  },
+  {
+    "path": "/compliance-assessments",
+    "components": [
+      "AssessmentsPage"
+    ],
+    "line": 768,
+    "element": "{allowedOnly(access.canUseAssessmentWorkspace, <AssessmentsPage />)}"
+  },
+  {
+    "path": "/risk-assessments",
+    "components": [
+      "AssessmentsPage"
+    ],
+    "line": 769,
+    "element": "{allowedOnly(access.canUseAssessmentWorkspace, <AssessmentsPage />)}"
+  },
+  {
+    "path": "/loaded-libraries",
+    "components": [
+      "LibrariesPage"
+    ],
+    "line": 770,
+    "element": "{allowedOnly(access.canUseLibraries, <LibrariesPage />)}"
+  },
+  {
+    "path": "/loaded-libraries/:libraryId",
+    "components": [
+      "LibraryDetailPage"
+    ],
+    "line": 771,
+    "element": "{allowedOnly(access.canUseLibraries, <LibraryDetailPage />)}"
+  },
+  {
+    "path": "/mapping-libraries",
+    "components": [
+      "LibrariesPage"
+    ],
+    "line": 772,
+    "element": "{allowedOnly(access.canUseLibraries, <LibrariesPage />)}"
+  },
+  {
+    "path": "/stored-libraries",
+    "components": [
+      "LibrariesPage"
+    ],
+    "line": 773,
+    "element": "{allowedOnly(access.canUseLibraries, <LibrariesPage />)}"
+  },
+  {
+    "path": "/stored-libraries/:libraryId",
+    "components": [
+      "LibraryDetailPage"
+    ],
+    "line": 774,
+    "element": "{allowedOnly(access.canUseLibraries, <LibraryDetailPage />)}"
+  },
+  {
+    "path": "/auditee-dashboard",
+    "components": [
+      "PortalDashboardPage"
+    ],
+    "line": 775,
+    "element": "{allowedOnly(access.canUsePortal, <PortalDashboardPage />)}"
+  },
+  {
+    "path": "/auditee-assessments/:assignmentId",
+    "components": [
+      "PortalAssignmentDetailPage"
+    ],
+    "line": 776,
+    "element": "{allowedOnly(access.canUsePortal, <PortalAssignmentDetailPage />)}"
+  },
+  {
+    "path": "/ebios-rm",
+    "components": [
+      "EbiosWorkspacePage"
+    ],
+    "line": 777,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosWorkspacePage />)}"
+  },
+  {
+    "path": "/ebios-rm/:studyId",
+    "components": [
+      "EbiosStudyDetailPage"
+    ],
+    "line": 778,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosStudyDetailPage />)}"
+  },
+  {
+    "path": "/ebios-rm/:studyId/visual",
+    "components": [
+      "EbiosStudyDetailPage"
+    ],
+    "line": 779,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosStudyDetailPage />)}"
+  },
+  {
+    "path": "/ebios-rm/:studyId/report",
+    "components": [
+      "EbiosStudyDetailPage"
+    ],
+    "line": 780,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosStudyDetailPage />)}"
+  },
+  {
+    "path": "/ebios-rm/:studyId/workshop-1/feared-events",
+    "components": [
+      "EbiosStudyDetailPage"
+    ],
+    "line": 781,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosStudyDetailPage />)}"
+  },
+  {
+    "path": "/ebios-rm/:studyId/workshop-1/baseline",
+    "components": [
+      "EbiosStudyDetailPage"
+    ],
+    "line": 782,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosStudyDetailPage />)}"
+  },
+  {
+    "path": "/ebios-rm/:studyId/workshop-1/ebios-rm-study",
+    "components": [
+      "EbiosStudyDetailPage"
+    ],
+    "line": 783,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosStudyDetailPage />)}"
+  },
+  {
+    "path": "/ebios-rm/:studyId/workshop-1/ebios-rm-study/edit",
+    "components": [
+      "EbiosStudyDetailPage"
+    ],
+    "line": 784,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosStudyDetailPage />)}"
+  },
+  {
+    "path": "/ebios-rm/:studyId/workshop-2/ro-to",
+    "components": [
+      "EbiosStudyDetailPage"
+    ],
+    "line": 785,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosStudyDetailPage />)}"
+  },
+  {
+    "path": "/ebios-rm/:studyId/workshop-3/ecosystem",
+    "components": [
+      "EbiosStudyDetailPage"
+    ],
+    "line": 786,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosStudyDetailPage />)}"
+  },
+  {
+    "path": "/ebios-rm/:studyId/workshop-3/strategic-scenarios",
+    "components": [
+      "EbiosStudyDetailPage"
+    ],
+    "line": 787,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosStudyDetailPage />)}"
+  },
+  {
+    "path": "/ebios-rm/:studyId/workshop-4/operational-scenario",
+    "components": [
+      "EbiosStudyDetailPage"
+    ],
+    "line": 788,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosStudyDetailPage />)}"
+  },
+  {
+    "path": "/ebios-rm/:studyId/workshop-4/elementary-actions",
+    "components": [
+      "EbiosStudyDetailPage"
+    ],
+    "line": 789,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosStudyDetailPage />)}"
+  },
+  {
+    "path": "/ebios-rm/:studyId/workshop-5/risk-analyses",
+    "components": [
+      "EbiosStudyDetailPage"
+    ],
+    "line": 790,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosStudyDetailPage />)}"
+  },
+  {
+    "path": "/quantitative-risk-studies",
+    "components": [
+      "QuantitativeWorkspacePage"
+    ],
+    "line": 791,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <QuantitativeWorkspacePage />)}"
+  },
+  {
+    "path": "/quantitative-risk-studies/:studyId",
+    "components": [
+      "QuantitativeStudyDetailPage"
+    ],
+    "line": 792,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <QuantitativeStudyDetailPage />)}"
+  },
+  {
+    "path": "/quantitative-risk-studies/:studyId/executive-summary",
+    "components": [
+      "QuantitativeExecutiveSummaryPage"
+    ],
+    "line": 793,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <QuantitativeExecutiveSummaryPage />)}"
+  },
+  {
+    "path": "/quantitative-risk-studies/:studyId/key-metrics",
+    "components": [
+      "QuantitativeKeyMetricsPage"
+    ],
+    "line": 797,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <QuantitativeKeyMetricsPage />)}"
+  },
+  {
+    "path": "/quantitative-risk-studies/:studyId/action-plan",
+    "components": [
+      "QuantitativeActionPlanPage"
+    ],
+    "line": 801,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <QuantitativeActionPlanPage />)}"
+  },
+  {
+    "path": "/asset-assessments",
+    "components": [
+      "AssetAssessmentsControlPage"
+    ],
+    "line": 805,
+    "element": "{allowedOnly(access.canUseResilience, <AssetAssessmentsControlPage />)}"
+  },
+  {
+    "path": "/actors",
+    "components": [
+      "ActorsControlPage"
+    ],
+    "line": 809,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <ActorsControlPage />)}"
+  },
+  {
+    "path": "/vulnerabilities",
+    "components": [
+      "VulnerabilitiesControlPage"
+    ],
+    "line": 813,
+    "element": "{allowedOnly(access.canUseRiskAssessments, <VulnerabilitiesControlPage />)}"
+  },
+  {
+    "path": "/analytics",
+    "components": [
+      "AnalyticsControlRoomPage"
+    ],
+    "line": 817,
+    "element": "{allowedOnly(access.canUseAnalytics, <AnalyticsControlRoomPage access={access} />)}"
+  },
+  {
+    "path": "/search",
+    "components": [
+      "SearchControlRoomPage"
+    ],
+    "line": 818,
+    "element": "{allowedOnly(access.canUseSearch, <SearchControlRoomPage access={access} />)}"
+  },
+  {
+    "path": "/backup-restore",
+    "components": [
+      "BackupRestoreControlPage"
+    ],
+    "line": 819,
+    "element": "{adminOnly(<BackupRestoreControlPage />)}"
+  },
+  {
+    "path": "/calendar",
+    "components": [
+      "CalendarControlPage"
+    ],
+    "line": 823,
+    "element": "{allowedOnly(access.canUseProgramWorkspace, <CalendarControlPage />)}"
+  },
+  {
+    "path": "/quick-start",
+    "components": [
+      "QuickStartControlPage"
+    ],
+    "line": 827,
+    "element": "{adminOnly(<QuickStartControlPage />)}"
+  },
+  {
+    "path": "/settings",
+    "components": [
+      "SettingsControlRoomPage"
+    ],
+    "line": 831,
+    "element": "{adminOnly(<SettingsControlRoomPage />)}"
+  },
+  {
+    "path": "/dashboards",
+    "components": [
+      "DashboardsControlPage"
+    ],
+    "line": 835,
+    "element": "{allowedOnly(access.canUseAnalytics, <DashboardsControlPage />)}"
+  },
+  {
+    "path": "/recap",
+    "components": [
+      "DashboardsControlPage"
+    ],
+    "line": 839,
+    "element": "{allowedOnly(access.canUseAnalytics, <DashboardsControlPage />)}"
+  },
+  {
+    "path": "/validation-flows",
+    "components": [
+      "ValidationFlowsControlPage"
+    ],
+    "line": 843,
+    "element": "{allowedOnly(access.canUseFrameworks, <ValidationFlowsControlPage />)}"
+  },
+  {
+    "path": "/x-rays",
+    "components": [
+      "XRaysControlPage"
+    ],
+    "line": 847,
+    "element": "{allowedOnly(access.canUseAnalytics, <XRaysControlPage />)}"
+  },
+  {
+    "path": "/tasks",
+    "components": [
+      "TaskOperationsControlPage"
+    ],
+    "line": 851,
+    "element": "{allowedOnly(access.canUseModules, <TaskOperationsControlPage mode=\"work-queue\" />)}"
+  },
+  {
+    "path": "/task-nodes",
+    "components": [
+      "TaskOperationsControlPage"
+    ],
+    "line": 855,
+    "element": "{allowedOnly(access.canUseModules, <TaskOperationsControlPage />)}"
+  },
+  {
+    "path": "/task-templates",
+    "components": [
+      "TaskOperationsControlPage"
+    ],
+    "line": 859,
+    "element": "{allowedOnly(access.canUseModules, <TaskOperationsControlPage />)}"
+  },
+  {
+    "path": "/risk-matrices",
+    "components": [
+      "DashboardsControlPage"
+    ],
+    "line": 863,
+    "element": "{allowedOnly(access.canUseRiskAssessments, <DashboardsControlPage />)}"
+  },
+  {
+    "path": "/requirement-assessments",
+    "components": [
+      "ValidationFlowsControlPage"
+    ],
+    "line": 867,
+    "element": "{allowedOnly(access.canUseFrameworks, <ValidationFlowsControlPage />)}"
+  },
+  {
+    "path": "/requirement-mapping-sets",
+    "components": [
+      "LibraryMappingsControlPage"
+    ],
+    "line": 871,
+    "element": "{allowedOnly(access.canUseLibraries, <LibraryMappingsControlPage />)}"
+  },
+  {
+    "path": "/sync-mappings",
+    "components": [
+      "LibraryMappingsControlPage"
+    ],
+    "line": 875,
+    "element": "{allowedOnly(access.canUseLibraries, <LibraryMappingsControlPage />)}"
+  },
+  {
+    "path": "/content-types",
+    "components": [
+      "ProgramControlPage"
+    ],
+    "line": 879,
+    "element": "{allowedOnly(access.canUseProgramWorkspace, <ProgramControlPage access={access} />)}"
+  },
+  {
+    "path": "/generic-collections",
+    "components": [
+      "ProgramControlPage"
+    ],
+    "line": 883,
+    "element": "{allowedOnly(access.canUseProgramWorkspace, <ProgramControlPage access={access} />)}"
+  },
+  {
+    "path": "/presets",
+    "components": [
+      "ProgramControlPage"
+    ],
+    "line": 887,
+    "element": "{allowedOnly(access.canUseProgramWorkspace, <ProgramControlPage access={access} />)}"
+  },
+  {
+    "path": "/preset-journeys",
+    "components": [
+      "ProgramControlPage"
+    ],
+    "line": 891,
+    "element": "{allowedOnly(access.canUseProgramWorkspace, <ProgramControlPage access={access} />)}"
+  },
+  {
+    "path": "/experimental",
+    "components": [
+      "ProgramControlPage"
+    ],
+    "line": 895,
+    "element": "{allowedOnly(access.canUseProgramWorkspace, <ProgramControlPage access={access} />)}"
+  },
+  {
+    "path": "/license-management",
+    "components": [
+      "ProgramControlPage"
+    ],
+    "line": 899,
+    "element": "{adminOnly(<ProgramControlPage access={access} />)}"
+  },
+  {
+    "path": "/metric-instances",
+    "components": [
+      "AnalyticsControlRoomPage"
+    ],
+    "line": 903,
+    "element": "{allowedOnly(access.canUseAnalytics, <AnalyticsControlRoomPage access={access} />)}"
+  },
+  {
+    "path": "/accreditations",
+    "components": [
+      "ProgramControlPage"
+    ],
+    "line": 907,
+    "element": "{allowedOnly(access.canUseProgramWorkspace, <ProgramControlPage access={access} />)}"
+  },
+  {
+    "path": "/findings-assessments",
+    "components": [
+      "ValidationFlowsControlPage"
+    ],
+    "line": 911,
+    "element": "{allowedOnly(access.canUseFrameworks, <ValidationFlowsControlPage />)}"
+  },
+  {
+    "path": "/operating-modes",
+    "components": [
+      "EbiosWorkspacePage"
+    ],
+    "line": 915,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosWorkspacePage />)}"
+  },
+  {
+    "path": "/operational-scenarios",
+    "components": [
+      "EbiosWorkspacePage"
+    ],
+    "line": 919,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosWorkspacePage />)}"
+  },
+  {
+    "path": "/strategic-scenarios",
+    "components": [
+      "EbiosWorkspacePage"
+    ],
+    "line": 923,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosWorkspacePage />)}"
+  },
+  {
+    "path": "/ro-to",
+    "components": [
+      "EbiosWorkspacePage"
+    ],
+    "line": 927,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosWorkspacePage />)}"
+  },
+  {
+    "path": "/stakeholders",
+    "components": [
+      "EbiosWorkspacePage"
+    ],
+    "line": 931,
+    "element": "{allowedOnly(access.canUseAdvancedRisk, <EbiosWorkspacePage />)}"
+  },
+  {
+    "path": "/scoring-assistant",
+    "components": [
+      "ChatWorkspacePage"
+    ],
+    "line": 935,
+    "element": "{allowedOnly(access.canUseChat, <ChatWorkspacePage />)}"
+  },
+  {
+    "path": "/risk-actions",
+    "components": [
+      "RiskActionTrackerPage"
+    ],
+    "line": 939,
+    "element": "{allowedOnly(access.canUseRiskAssessments, <RiskActionTrackerPage />)}"
+  },
+  {
+    "path": "/risk-scenarios",
+    "components": [
+      "RiskScenariosPage"
+    ],
+    "line": 940,
+    "element": "{allowedOnly(access.canUseRiskAssessments, <RiskScenariosPage />)}"
+  },
+  {
+    "path": "/conmon/profiles",
+    "components": [
+      "ConMonProfilesPage"
+    ],
+    "line": 941,
+    "element": "{adminOnly(<ConMonProfilesPage />)}"
+  },
+  {
+    "path": "/conmon/executions",
+    "components": [
+      "ConMonExecutionsPage"
+    ],
+    "line": 942,
+    "element": "{allowedOnly(access.canUseConMon, <ConMonExecutionsPage />)}"
+  },
+  {
+    "path": "/evidence-management",
+    "components": [
+      "EvidenceManagementPage"
+    ],
+    "line": 943,
+    "element": "{allowedOnly(access.canUseEvidence, <EvidenceManagementPage />)}"
+  },
+  {
+    "path": "/features/evidence-management",
+    "components": [
+      "EvidenceManagementPage"
+    ],
+    "line": 944,
+    "element": "{allowedOnly(access.canUseEvidence, <EvidenceManagementPage />)}"
+  },
+  {
+    "path": "/assessment-evidence-packages",
+    "components": [
+      "AssessmentEvidencePackagePage"
+    ],
+    "line": 945,
+    "element": "{allowedOnly(access.canUseEvidence, <AssessmentEvidencePackagePage />)}"
+  },
+  {
+    "path": "/assessment-evidence-packages/:packageMarker",
+    "components": [
+      "AssessmentEvidencePackagePage"
+    ],
+    "line": 946,
+    "element": "{allowedOnly(access.canUseEvidence, <AssessmentEvidencePackagePage />)}"
+  },
+  {
+    "path": "/evidence/sources",
+    "components": [
+      "EvidenceSourcesPage"
+    ],
+    "line": 947,
+    "element": "{adminOnly(<EvidenceSourcesPage />)}"
+  },
+  {
+    "path": "/evidence/jobs",
+    "components": [
+      "EvidenceJobsPage"
+    ],
+    "line": 948,
+    "element": "{allowedOnly(access.canUseEvidence, <EvidenceJobsPage />)}"
+  },
+  {
+    "path": "/assurance",
+    "components": [
+      "AssuranceOverviewPage"
+    ],
+    "line": 949,
+    "element": "{allowedOnly(access.canUseAssurance, <AssuranceOverviewPage showOperationalReadiness={access.isWorkspaceAdmin} />)}"
+  },
+  {
+    "path": "/assurance/evidence",
+    "components": [
+      "AssuranceEvidenceExplorerPage"
+    ],
+    "line": 950,
+    "element": "{allowedOnly(access.canUseAssurance, <AssuranceEvidenceExplorerPage />)}"
+  },
+  {
+    "path": "/assurance/tracker",
+    "components": [
+      "TrackerWorkbenchPage"
+    ],
+    "line": 951,
+    "element": "{allowedOnly(access.canUseAssurance, <TrackerWorkbenchPage />)}"
+  },
+  {
+    "path": "/assurance/packages",
+    "components": [
+      "PackageExplorerPage"
+    ],
+    "line": 952,
+    "element": "{allowedOnly(access.canUseAssurance, <PackageExplorerPage />)}"
+  },
+  {
+    "path": "/assurance/reviews",
+    "components": [
+      "ReviewQueuePage"
+    ],
+    "line": 953,
+    "element": "{allowedOnly(access.canUseAssurance, <ReviewQueuePage />)}"
+  },
+  {
+    "path": "/assurance/agent-runs",
+    "components": [
+      "AgentRunInspectorPage"
+    ],
+    "line": 954,
+    "element": "{allowedOnly(access.canUseAssurance, <AgentRunInspectorPage />)}"
+  },
+  {
+    "path": "{`/${model}/*`}",
+    "components": [
+      "LegacyRouteBridgePage"
+    ],
+    "line": 956,
+    "element": "{<LegacyRouteBridgePage legacyModel={model} access={access} />}"
+  },
+  {
+    "path": "*",
+    "components": [
+      "div"
+    ],
+    "line": 962,
+    "element": "{\n                    <div className=\"panel flex min-h-[240px] items-center justify-center text-[#4f435c]\">\n                      Choose a Regovise workspace area from the left navigation.\n                    </div>\n                  }"
+  }
+]

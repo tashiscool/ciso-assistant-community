@@ -14,13 +14,13 @@ function badgeClass(value: string) {
   switch (value.toLowerCase()) {
     case 'tenant-ready':
     case 'dedicated':
-      return 'badge-success';
+      return 'status-pill-success';
     case 'template':
-      return 'inline-flex rounded-full bg-indigo-500/10 px-2.5 py-1 text-xs font-medium uppercase tracking-[0.12em] text-indigo-200';
+      return 'inline-flex rounded-full bg-[#f2e8ff] px-2.5 py-1 text-xs font-medium uppercase tracking-[0.12em] text-[#5f1aa8]';
     case 'subfeature':
-      return 'inline-flex rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-medium uppercase tracking-[0.12em] text-amber-200';
+      return 'inline-flex rounded-full bg-[#fff2d9] px-2.5 py-1 text-xs font-medium uppercase tracking-[0.12em] text-[#8a4d00]';
     default:
-      return 'badge-neutral';
+      return 'status-pill-neutral';
   }
 }
 
@@ -70,15 +70,15 @@ export function ModuleDirectoryPage() {
   }, [modules]);
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading tenant module directory...</div>;
+    return <div className="panel p-6 text-sm text-[#51465e]">Loading tenant module directory...</div>;
   }
 
   return (
     <div className="space-y-6">
       <section className="panel">
         <div className="eyebrow">Modules</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Tenant Module Directory</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Tenant Module Directory</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">
           Every `scale.md` module is exposed here in a tenant-facing surface. Some modules run on the
           shared records workspace, while others land in stronger dedicated or template experiences.
         </p>
@@ -110,9 +110,9 @@ export function ModuleDirectoryPage() {
           <div className="panel-subtle flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="eyebrow">{TYPE_LABELS[group.type]}</div>
-              <h2 className="mt-2 text-xl font-semibold text-white">{TYPE_LABELS[group.type]}</h2>
+              <h2 className="mt-2 text-xl font-semibold text-[#241232]">{TYPE_LABELS[group.type]}</h2>
             </div>
-            <div className="badge-neutral">{group.modules.length} modules</div>
+            <div className="status-pill-neutral">{group.modules.length} modules</div>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
@@ -120,27 +120,27 @@ export function ModuleDirectoryPage() {
               <article className="panel-subtle flex h-full flex-col gap-4" key={entry.moduleKey}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <div className="text-lg font-semibold text-white">{entry.pluralName}</div>
-                    <div className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">{entry.moduleKey}</div>
+                    <div className="text-lg font-semibold text-[#241232]">{entry.pluralName}</div>
+                    <div className="mt-1 text-xs uppercase tracking-[0.18em] text-[#62576a]">{entry.moduleKey}</div>
                   </div>
                   <span className={badgeClass(entry.coverageBadge)}>{entry.coverageBadge}</span>
                 </div>
-                <p className="text-sm leading-6 text-slate-300">{entry.description}</p>
-                <div className="grid gap-3 text-sm text-slate-300 sm:grid-cols-2">
+                <p className="text-sm leading-6 text-[#51465e]">{entry.description}</p>
+                <div className="grid gap-3 text-sm text-[#51465e] sm:grid-cols-2">
                   <div className="panel-subtle">
                     <div className="label">Implementation</div>
-                    <div className="mt-2 text-white">{TYPE_LABELS[entry.implementationType]}</div>
+                    <div className="mt-2 text-[#241232]">{TYPE_LABELS[entry.implementationType]}</div>
                   </div>
                   <div className="panel-subtle">
                     <div className="label">Current records</div>
-                    <div className="mt-2 text-white">{entry.recordCount ?? 0}</div>
+                    <div className="mt-2 text-[#241232]">{entry.recordCount ?? 0}</div>
                   </div>
                 </div>
                 <div>
                   <div className="label">Related modules</div>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {entry.relatedModules.map((related) => (
-                      <span className="badge-neutral" key={related}>
+                      <span className="status-pill-neutral" key={related}>
                         {related}
                       </span>
                     ))}

@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { Plus } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { ApiClient } from '../../shared/api/client';
 import { useEdgeIdentity } from '../../shared/session/identity';
+import { RegPageHeader, RegRightDrawer, RegStatusPill, RegTableShell } from '../../components/regovise/PagePrimitives';
 import type { Framework, FrameworkControl, FrameworkTreeNode } from './types';
 import { countAssessableNodes, FrameworkTree } from './FrameworkTree';
 
@@ -21,6 +23,7 @@ export function FrameworkDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [requirementDrawerOpen, setRequirementDrawerOpen] = useState(false);
   const [ref, setRef] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -73,6 +76,7 @@ export function FrameworkDetailPage() {
       setTitle('');
       setDescription('');
       setNotice('Requirement added to the catalogue.');
+      setRequirementDrawerOpen(false);
       await loadFrameworkDetail();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -82,7 +86,7 @@ export function FrameworkDetailPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading catalogue workspace...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading catalogue workspace...</div>;
   }
 
   if (!framework) {
@@ -91,29 +95,51 @@ export function FrameworkDetailPage() {
 
   return (
     <div className="space-y-6">
+      <RegPageHeader
+        eyebrow="Compliance / Catalogue"
+        title={framework.name}
+        description="Manage the requirement and control collection that downstream assessments, plans, and governance artifacts rely on."
+        actions={
+          <>
+            <Link className="button-secondary" to="/frameworks">
+              Back to catalogues
+            </Link>
+            <button className="button-primary" onClick={() => setRequirementDrawerOpen(true)} type="button">
+              <Plus className="h-4 w-4" />
+              Add requirement
+            </button>
+          </>
+        }
+        meta={
+          <>
+            <RegStatusPill tone="purple">{framework.key}</RegStatusPill>
+            <RegStatusPill tone="neutral">{framework.version ?? 'Unversioned'}</RegStatusPill>
+            <RegStatusPill tone="info">{framework.category ?? 'Uncategorized'}</RegStatusPill>
+            <RegStatusPill tone="success">{framework.controlCount} requirements</RegStatusPill>
+          </>
+        }
+        className="rounded-lg border border-[#ded8e4] shadow-[0_8px_24px_rgba(48,24,72,0.04)]"
+      />
       <section className="panel grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
-          <Link className="text-sm text-cyan-200 transition hover:text-cyan-100" to="/frameworks">
-            Back to catalogues
-          </Link>
-          <div className="eyebrow mt-4">Catalogues</div>
-          <h1 className="mt-2 text-3xl font-semibold text-white">{framework.name}</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-            Use this catalogue workspace to manage the requirement and control collection that
-            downstream assessments, plans, and governance artifacts will rely on.
+          <div className="eyebrow">Catalogue readiness</div>
+          <h2 className="mt-2 text-2xl font-semibold text-[#241232]">Requirement coverage</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f435c]">
+            Review catalogue metadata, assessable tree coverage, and the requirement list before
+            mapping the catalogue into assessments or policy evidence.
           </p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div className="metric-card">
               <div className="metric-label">Framework key</div>
-              <div className="mt-3 font-mono text-sm text-cyan-200">{framework.key}</div>
+              <div className="mt-3 font-mono text-sm text-[#6d28d9]">{framework.key}</div>
             </div>
             <div className="metric-card">
               <div className="metric-label">Version</div>
-              <div className="mt-3 text-lg font-semibold text-white">{framework.version ?? 'n/a'}</div>
+              <div className="mt-3 text-lg font-semibold text-[#241232]">{framework.version ?? 'n/a'}</div>
             </div>
             <div className="metric-card">
               <div className="metric-label">Category</div>
-              <div className="mt-3 text-lg font-semibold capitalize text-white">
+              <div className="mt-3 text-lg font-semibold capitalize text-[#241232]">
                 {framework.category ?? 'n/a'}
               </div>
             </div>
@@ -122,7 +148,7 @@ export function FrameworkDetailPage() {
               <div className="metric-value">{framework.controlCount}</div>
             </div>
           </div>
-          <div className="mt-5 panel-subtle grid gap-3 text-sm text-slate-300 sm:grid-cols-2">
+          <div className="mt-5 panel-subtle grid gap-3 text-sm text-[#4f435c] sm:grid-cols-2">
             <div>
               <div className="label">Created</div>
               <div className="mt-2">{formatTimestamp(framework.createdAt)}</div>
@@ -134,21 +160,118 @@ export function FrameworkDetailPage() {
           </div>
           <div className="mt-5 panel-subtle">
             <div className="label">Downstream use</div>
-            <div className="mt-3 space-y-2 text-sm leading-6 text-slate-300">
+            <div className="mt-3 space-y-2 text-sm leading-6 text-[#4f435c]">
               <div>- Flow requirements into security plans, policies, components, projects, and supply-chain records.</div>
               <div>- Keep one tenant source of truth for the governing controls your builders and assessments reference.</div>
             </div>
           </div>
         </div>
 
+        <div className="panel-subtle flex flex-col justify-between gap-5">
+          <div>
+            <div className="eyebrow">Catalogue actions</div>
+            <h2 className="mt-2 text-2xl font-semibold text-[#241232]">Add requirements without leaving context</h2>
+            <p className="mt-3 text-sm leading-6 text-[#4f435c]">
+              New requirements are appended to this catalogue and become available for downstream
+              assessment, policy, evidence, and system mapping workflows.
+            </p>
+          </div>
+          <button className="button-primary w-fit" onClick={() => setRequirementDrawerOpen(true)} type="button">
+            <Plus className="h-4 w-4" />
+            Add requirement
+          </button>
+        </div>
+      </section>
+
+      {notice && <div className="notice-success">{notice}</div>}
+      {error && <div className="notice-error">{error}</div>}
+
+      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+        <section className="panel">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="eyebrow">Requirement Tree</div>
+              <h2 className="mt-2 text-xl font-semibold text-[#241232]">Associated Requirements</h2>
+            </div>
+            <RegStatusPill tone="neutral">{countAssessableNodes(tree)} assessable items</RegStatusPill>
+          </div>
+          <div className="mt-5">
+            {tree.length > 0 ? (
+              <FrameworkTree nodes={tree} />
+            ) : (
+              <div className="panel-subtle text-sm text-[#6f6578]">
+                Add your first requirement to build out the catalogue tree.
+              </div>
+            )}
+          </div>
+        </section>
+
+        <RegTableShell>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-sm">
+              <thead className="border-b border-[#ded8e4] bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
+                <tr>
+                  <th className="px-4 py-3">Reference</th>
+                  <th className="px-4 py-3">Requirement</th>
+                  <th className="px-4 py-3">Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                {controls.map((control) => (
+                  <tr key={control.id} className="border-t border-[#eeeaf2] align-top">
+                    <td className="px-4 py-4 font-mono text-xs text-[#6d28d9]">{control.ref}</td>
+                    <td className="px-4 py-4">
+                      <div className="font-medium text-[#241232]">{control.title}</div>
+                      {control.description && (
+                        <div className="mt-2 max-w-xl text-sm leading-6 text-[#6f6578]">
+                          {control.description}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-4 py-4 text-[#6f6578]">{formatTimestamp(control.updatedAt)}</td>
+                  </tr>
+                ))}
+                {controls.length === 0 && (
+                  <tr>
+                    <td className="px-4 py-8 text-center text-[#6f6578]" colSpan={3}>
+                      No requirements are loaded for this catalogue yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </RegTableShell>
+      </section>
+
+      <RegRightDrawer
+        description="Add a catalogue requirement while preserving the existing framework and control route contracts."
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button
+              className="button-secondary"
+              onClick={() => setRequirementDrawerOpen(false)}
+              type="button"
+            >
+              Cancel
+            </button>
+            <button className="button-primary" disabled={busy} form="framework-requirement-form" type="submit">
+              {busy ? 'Saving...' : 'Add requirement'}
+            </button>
+          </div>
+        }
+        onOpenChange={setRequirementDrawerOpen}
+        open={requirementDrawerOpen}
+        title="Add requirement"
+      >
         <form
-          className="space-y-3"
+          className="space-y-4"
+          id="framework-requirement-form"
           onSubmit={(event) => {
             event.preventDefault();
             void createControl();
           }}
         >
-          <div className="eyebrow">Add Requirement</div>
           <label className="space-y-1">
             <span className="label">Reference</span>
             <input
@@ -170,76 +293,14 @@ export function FrameworkDetailPage() {
           <label className="space-y-1">
             <span className="label">Description</span>
             <textarea
-              className="input min-h-[120px]"
+              className="input min-h-[140px]"
               onChange={(event) => setDescription(event.target.value)}
               placeholder="Describe the requirement or expected evidence."
               value={description}
             />
           </label>
-          <button className="button-primary" disabled={busy} type="submit">
-            {busy ? 'Saving...' : 'Add Requirement'}
-          </button>
         </form>
-      </section>
-
-      {notice && <div className="notice-success">{notice}</div>}
-      {error && <div className="notice-error">{error}</div>}
-
-      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
-        <section className="panel">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <div className="eyebrow">Requirement Tree</div>
-              <h2 className="mt-2 text-xl font-semibold text-white">Associated Requirements</h2>
-            </div>
-            <div className="badge-neutral">{countAssessableNodes(tree)} assessable items</div>
-          </div>
-          <div className="mt-5">
-            {tree.length > 0 ? (
-              <FrameworkTree nodes={tree} />
-            ) : (
-              <div className="panel-subtle text-sm text-slate-400">
-                Add your first requirement to build out the catalogue tree.
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section className="panel overflow-hidden p-0">
-          <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-white/10 bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
-              <tr>
-                <th className="px-4 py-3">Reference</th>
-                <th className="px-4 py-3">Requirement</th>
-                <th className="px-4 py-3">Updated</th>
-              </tr>
-            </thead>
-            <tbody>
-              {controls.map((control) => (
-                <tr key={control.id} className="border-t border-white/5 align-top">
-                  <td className="px-4 py-4 font-mono text-xs text-cyan-200">{control.ref}</td>
-                  <td className="px-4 py-4">
-                    <div className="font-medium text-white">{control.title}</div>
-                    {control.description && (
-                      <div className="mt-2 max-w-xl text-sm leading-6 text-slate-400">
-                        {control.description}
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-4 py-4 text-slate-400">{formatTimestamp(control.updatedAt)}</td>
-                </tr>
-              ))}
-              {controls.length === 0 && (
-                <tr>
-                  <td className="px-4 py-8 text-center text-slate-400" colSpan={3}>
-                    No requirements are loaded for this catalogue yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </section>
-      </section>
+      </RegRightDrawer>
     </div>
   );
 }

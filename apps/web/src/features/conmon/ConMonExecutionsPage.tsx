@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { RegStatusPill } from '../../components/regovise/PagePrimitives';
 import { ApiClient } from '../../shared/api/client';
 import { useEdgeIdentity } from '../../shared/session/identity';
 
@@ -46,24 +47,24 @@ export function ConMonExecutionsPage() {
     <div className="space-y-6">
       <section className="panel">
         <div className="eyebrow">ConMon</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Queue-Driven Executions</h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Queue-Driven Executions</h1>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f435c]">
           Review recent monitoring runs, their outcomes, and the metrics they produced.
         </p>
       </section>
 
       <section className="grid gap-4 xl:grid-cols-2">
-        <Link className="panel-subtle transition hover:border-cyan-300/30" to="/assurance/evidence">
+        <Link className="panel-subtle transition hover:border-[#d7c3f1]" to="/assurance/evidence">
           <div className="eyebrow">Assurance</div>
-          <div className="mt-2 text-lg font-semibold text-white">Inspect evidence-backed reasonableness</div>
-          <div className="mt-2 text-sm leading-6 text-slate-400">
+          <div className="mt-2 text-lg font-semibold text-[#241232]">Inspect evidence-backed reasonableness</div>
+          <div className="mt-2 text-sm leading-6 text-[#6f6578]">
             Open the assurance explorer to compare recent ConMon posture with normalized evidence, gaps, and policy rollups.
           </div>
         </Link>
-        <Link className="panel-subtle transition hover:border-cyan-300/30" to="/assurance/packages">
+        <Link className="panel-subtle transition hover:border-[#d7c3f1]" to="/assurance/packages">
           <div className="eyebrow">Assurance</div>
-          <div className="mt-2 text-lg font-semibold text-white">Review package reconciliation</div>
-          <div className="mt-2 text-sm leading-6 text-slate-400">
+          <div className="mt-2 text-lg font-semibold text-[#241232]">Review package reconciliation</div>
+          <div className="mt-2 text-sm leading-6 text-[#6f6578]">
             Validate the latest package-level reconciliation results before downstream export or human review handoff.
           </div>
         </Link>
@@ -73,7 +74,7 @@ export function ConMonExecutionsPage() {
 
       <section className="panel overflow-hidden p-0">
         <table className="min-w-full text-left text-sm">
-          <thead className="border-b border-white/10 bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
+          <thead className="border-b border-[#ded8e4] bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
             <tr>
               <th className="px-4 py-3">Execution</th>
               <th className="px-4 py-3">Profile</th>
@@ -83,34 +84,26 @@ export function ConMonExecutionsPage() {
           </thead>
           <tbody>
             {executions.map((execution) => (
-              <tr key={execution.id} className="border-t border-white/5 align-top">
+              <tr key={execution.id} className="border-t border-[#eeeaf2] align-top">
                 <td className="px-4 py-4">
-                  <div className="font-mono text-xs text-cyan-200">{execution.id}</div>
-                  <div className="mt-2 text-xs text-slate-500">
+                  <div className="font-mono text-xs text-[#6d28d9]">{execution.id}</div>
+                  <div className="mt-2 text-xs text-[#62576a]">
                     Started {execution.startedAt}
                     {execution.finishedAt ? `, finished ${execution.finishedAt}` : ''}
                   </div>
                 </td>
-                <td className="px-4 py-4 text-white">{execution.profileName}</td>
+                <td className="px-4 py-4 text-[#241232]">{execution.profileName}</td>
                 <td className="px-4 py-4">
-                  <span
-                    className={
-                      execution.status === 'success'
-                        ? 'badge-success'
-                        : execution.status === 'failed'
-                          ? 'badge-danger'
-                          : 'badge-neutral'
-                    }
-                  >
+                  <RegStatusPill tone={execution.status === 'success' ? 'success' : execution.status === 'failed' ? 'danger' : 'neutral'}>
                     {execution.status}
-                  </span>
+                  </RegStatusPill>
                   {execution.statusDetail && (
-                    <div className="mt-2 max-w-md text-xs leading-5 text-slate-400">
+                    <div className="mt-2 max-w-md text-xs leading-5 text-[#6f6578]">
                       {execution.statusDetail}
                     </div>
                   )}
                 </td>
-                <td className="px-4 py-4 text-slate-300">
+                <td className="px-4 py-4 text-[#4f435c]">
                   {execution.metrics ? (
                     <div className="space-y-1">
                       <div>Controls checked: {execution.metrics.controlsChecked ?? 0}</div>
@@ -118,21 +111,21 @@ export function ConMonExecutionsPage() {
                       <div>Exceptions reviewed: {execution.metrics.exceptionsReviewed ?? 0}</div>
                     </div>
                   ) : (
-                    <span className="text-slate-500">No metrics yet</span>
+                    <span className="text-[#62576a]">No metrics yet</span>
                   )}
                 </td>
               </tr>
             ))}
             {!loading && executions.length === 0 && (
               <tr>
-                <td className="px-4 py-8 text-center text-slate-400" colSpan={4}>
+                <td className="px-4 py-8 text-center text-[#6f6578]" colSpan={4}>
                   No ConMon executions found for tenant <span className="font-mono">{identity.tenantId}</span>.
                 </td>
               </tr>
             )}
             {loading && (
               <tr>
-                <td className="px-4 py-8 text-center text-slate-400" colSpan={4}>
+                <td className="px-4 py-8 text-center text-[#6f6578]" colSpan={4}>
                   Loading executions...
                 </td>
               </tr>

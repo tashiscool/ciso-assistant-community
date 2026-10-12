@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Bell, ChevronRight, Search, LogOut, Settings, SlidersHorizontal, User as UserIcon } from 'lucide-react';
+import { Bell, ChevronRight, Search, LogOut, Menu, Settings, SlidersHorizontal, User as UserIcon } from 'lucide-react';
 import { ApiClient } from '../shared/api/client';
 import { canUseHeaderIdentity, resetEdgeIdentity, useEdgeIdentity } from '../shared/session/identity';
 import type { WorkspaceUser } from '../features/iam/types';
@@ -36,6 +36,7 @@ type TopbarProps = {
   access: ShellAccessProfile;
   profileName?: string | null;
   profileEmail?: string | null;
+  onOpenNavigation?: () => void;
 };
 
 /** Map route segments to human-readable breadcrumb labels. */
@@ -104,7 +105,7 @@ function getInitials(name: string): string {
     .join('');
 }
 
-export function Topbar({ sessionReady, sessionSyncing, access, profileName, profileEmail }: TopbarProps) {
+export function Topbar({ sessionReady, sessionSyncing, access, profileName, profileEmail, onOpenNavigation }: TopbarProps) {
   const { identity, authMode, setIdentity, setAuthMode } = useEdgeIdentity();
   const navigate = useNavigate();
   const [tenantId, setTenantId] = useState(identity.tenantId);
@@ -191,18 +192,25 @@ export function Topbar({ sessionReady, sessionSyncing, access, profileName, prof
   }
 
   return (
-    <header className="glass-panel sticky top-0 z-10 flex min-h-16 items-center justify-between border-b border-white/10 px-5 gap-4">
-      {/* Left: breadcrumb */}
-      <div className="flex items-center gap-1.5 min-w-0">
+    <header className="sticky top-0 z-20 flex min-h-16 items-center justify-between gap-4 border-b border-[#ded7e5] bg-white px-4 text-[#2b0b4d] shadow-[0_1px_0_rgba(43,11,77,0.02)] sm:px-5">
+      <div className="flex min-w-0 flex-1 items-center gap-1.5">
+        <button
+          aria-label="Open navigation"
+          className="mr-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-[#d8d0de] bg-white text-[#5f536b] shadow-sm transition hover:bg-[#f8f5fa] md:hidden"
+          type="button"
+          onClick={onOpenNavigation}
+        >
+          <Menu className="h-4 w-4" />
+        </button>
         {breadcrumbs.map((crumb, i) => (
-          <div key={crumb.href} className="flex items-center gap-1.5">
-            {i > 0 && <ChevronRight className="h-3.5 w-3.5 shrink-0 text-slate-600" />}
+          <div key={crumb.href} className="flex min-w-0 items-center gap-1.5">
+            {i > 0 && <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#958b9d]" />}
             <span
               className={cn(
                 'truncate text-sm',
                 i === breadcrumbs.length - 1
-                  ? 'font-medium text-white'
-                  : 'text-slate-500',
+                  ? 'font-medium text-[#2b0b4d]'
+                  : 'text-[#62576a]',
               )}
             >
               {crumb.label}
@@ -211,7 +219,6 @@ export function Topbar({ sessionReady, sessionSyncing, access, profileName, prof
         ))}
       </div>
 
-      {/* Right: identity controls + search + notifications + user menu */}
       <div className="flex items-center gap-2 shrink-0">
         {showIdentityControls ? (
           <Dialog open={previewToolsOpen} onOpenChange={setPreviewToolsOpen}>
@@ -230,17 +237,17 @@ export function Topbar({ sessionReady, sessionSyncing, access, profileName, prof
               </DialogHeader>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-3xl border border-white/10 bg-white/[0.02] px-4 py-4">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">Current preview identity</div>
-                  <div className="mt-2 text-sm font-medium text-white">{displayName}</div>
-                  <div className="mt-1 text-xs text-cyan-200">{displayEmail || 'Workspace account'}</div>
-                  <div className="mt-3 text-xs text-slate-500">
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-[#6f6578]">Current preview identity</div>
+                  <div className="mt-2 text-sm font-medium text-[#241232]">{displayName}</div>
+                  <div className="mt-1 text-xs text-[#7a2ed6]">{displayEmail || 'Workspace account'}</div>
+                  <div className="mt-3 text-xs text-[#6f6578]">
                     {tenantId} / {userId}
                   </div>
                 </div>
-                <div className="rounded-3xl border border-cyan-300/15 bg-cyan-400/[0.04] px-4 py-4">
-                  <div className="text-[11px] uppercase tracking-[0.18em] text-cyan-200">Why this is hidden</div>
-                  <div className="mt-2 text-sm leading-6 text-slate-300">
+                <div className="rounded-3xl border border-[#d8c5ee] bg-[#f8f3ff] px-4 py-4">
+                  <div className="text-[11px] uppercase tracking-[0.18em] text-[#7a2ed6]">Why this is hidden</div>
+                  <div className="mt-2 text-sm leading-6 text-[#51465e]">
                     Tenant switching and identity overrides are preview-only mechanics. Regular users should never have to understand them to use Regovise.
                   </div>
                 </div>
@@ -250,7 +257,7 @@ export function Topbar({ sessionReady, sessionSyncing, access, profileName, prof
 
               <div className="grid gap-4 md:grid-cols-[0.7fr_1.3fr]">
                 <label className="space-y-2">
-                  <span className="text-sm text-slate-300">Tenant</span>
+                  <span className="text-sm text-[#51465e]">Tenant</span>
                   <Input
                     className="h-10 text-sm"
                     value={tenantId}
@@ -260,7 +267,7 @@ export function Topbar({ sessionReady, sessionSyncing, access, profileName, prof
                 </label>
 
                 <label className="space-y-2">
-                  <span className="text-sm text-slate-300">User</span>
+                  <span className="text-sm text-[#51465e]">User</span>
                   {users.length > 0 ? (
                     <Select value={userId} onValueChange={(val) => setUserId(val)}>
                       <SelectTrigger className="h-10 text-sm">
@@ -306,17 +313,16 @@ export function Topbar({ sessionReady, sessionSyncing, access, profileName, prof
         ) : null}
 
         {sessionSyncing ? (
-          <div className="hidden lg:flex items-center rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-slate-400">
+          <div className="hidden lg:flex items-center rounded-full border border-[#d8d0de] bg-[#f8f5fa] px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-[#62576a]">
             Syncing session
           </div>
         ) : null}
 
-        {/* Search trigger */}
         {access.canUseSearch ? (
           <Button
             variant="ghost"
             size="icon"
-            className="h-9 w-9 text-slate-400 hover:text-white"
+            className="h-9 w-9 text-[#6d6475] hover:bg-[#f4eef8] hover:text-[#2b0b4d]"
             aria-label="Search (Cmd+K)"
             onClick={() => navigate('/search')}
           >
@@ -324,32 +330,30 @@ export function Topbar({ sessionReady, sessionSyncing, access, profileName, prof
           </Button>
         ) : null}
 
-        {/* Notifications */}
         <Button
           variant="ghost"
           size="icon"
-          className="relative h-9 w-9 text-slate-400 hover:text-white"
+          className="relative h-9 w-9 text-[#6d6475] hover:bg-[#f4eef8] hover:text-[#2b0b4d]"
           aria-label="Notifications"
         >
           <Bell className="h-4 w-4" />
           {hasNotification && (
-            <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_4px_rgba(34,211,238,0.8)]" />
+            <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[#22a651]" />
           )}
         </Button>
 
-        {/* User avatar menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center gap-2 rounded-2xl px-2 py-1.5 transition hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50"
+              className="flex items-center gap-2 rounded-md px-2 py-1.5 transition hover:bg-[#f4eef8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9d3df2]/40"
               aria-label="User menu"
             >
               <Avatar className="h-7 w-7">
                 <AvatarFallback className="text-[10px]">{initials || 'U'}</AvatarFallback>
               </Avatar>
               <div className="hidden sm:block text-left">
-                <div className="text-xs font-medium text-white leading-none">{displayName}</div>
-                <div className="mt-0.5 text-[10px] text-slate-500 leading-none truncate max-w-[140px]">
+                <div className="text-xs font-medium text-[#2b0b4d] leading-none">{displayName}</div>
+                <div className="mt-0.5 text-[10px] text-[#62576a] leading-none truncate max-w-[140px]">
                   {displayEmail || 'Workspace account'}
                 </div>
               </div>
@@ -359,37 +363,37 @@ export function Topbar({ sessionReady, sessionSyncing, access, profileName, prof
             <DropdownMenuLabel>Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="flex-col items-start gap-0.5 cursor-default focus:bg-transparent">
-              <span className="text-xs text-slate-400">Signed in as</span>
-              <span className="text-xs text-cyan-300 truncate w-full">{displayName}</span>
+              <span className="text-xs text-[#6f6578]">Signed in as</span>
+              <span className="text-xs text-[#7a2ed6] truncate w-full">{displayName}</span>
             </DropdownMenuItem>
             {displayEmail ? (
               <DropdownMenuItem className="flex-col items-start gap-0.5 cursor-default focus:bg-transparent">
-                <span className="text-xs text-slate-400">Email</span>
-                <span className="text-xs text-cyan-300 truncate w-full">{displayEmail}</span>
+                <span className="text-xs text-[#6f6578]">Email</span>
+                <span className="text-xs text-[#7a2ed6] truncate w-full">{displayEmail}</span>
               </DropdownMenuItem>
             ) : null}
             {showIdentityControls ? (
               <DropdownMenuItem className="flex-col items-start gap-0.5 cursor-default focus:bg-transparent">
-                <span className="text-xs text-slate-400">Debug identity</span>
-                <span className="font-mono text-xs text-cyan-300 truncate w-full">
+                <span className="text-xs text-[#6f6578]">Debug identity</span>
+                <span className="font-mono text-xs text-[#7a2ed6] truncate w-full">
                   {tenantId} / {userId}
                 </span>
               </DropdownMenuItem>
             ) : null}
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={() => navigate('/workspace/me')}>
-              <UserIcon className="h-4 w-4 text-slate-400" />
+              <UserIcon className="h-4 w-4 text-[#6f6578]" />
               Profile
             </DropdownMenuItem>
             {settingsTarget ? (
               <DropdownMenuItem onSelect={() => navigate(settingsTarget)}>
-                <Settings className="h-4 w-4 text-slate-400" />
+                <Settings className="h-4 w-4 text-[#6f6578]" />
                 {settingsLabel}
               </DropdownMenuItem>
             ) : null}
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              className="text-rose-400 focus:text-rose-300 focus:bg-rose-500/10"
+              className="text-[#b72535] focus:text-[#9d1f2c] focus:bg-[#fff0f2]"
               onSelect={handleSignOut}
             >
               <LogOut className="h-4 w-4" />

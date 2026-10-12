@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ApiClient } from '../../shared/api/client';
+import { RegStatusPill } from '../../components/regovise/PagePrimitives';
 import { useEdgeIdentity } from '../../shared/session/identity';
 import type {
   ComplianceAssessment,
@@ -20,18 +21,18 @@ function formatDate(value: string | null | undefined) {
   return value ? new Date(value).toLocaleDateString() : 'n/a';
 }
 
-function resultBadge(result: string) {
+function resultTone(result: string): 'success' | 'danger' | 'warning' | 'purple' | 'neutral' {
   switch (result) {
     case 'compliant':
-      return 'badge-success';
+      return 'success';
     case 'non_compliant':
-      return 'badge-danger';
+      return 'danger';
     case 'partially_compliant':
-      return 'inline-flex rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-medium uppercase tracking-[0.12em] text-amber-200';
+      return 'warning';
     case 'not_applicable':
-      return 'inline-flex rounded-full bg-indigo-500/10 px-2.5 py-1 text-xs font-medium uppercase tracking-[0.12em] text-indigo-200';
+      return 'purple';
     default:
-      return 'badge-neutral';
+      return 'neutral';
   }
 }
 
@@ -274,7 +275,7 @@ export function ComplianceAssessmentDetailPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading compliance assessment workspace...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading compliance assessment workspace...</div>;
   }
 
   if (!assessment) {
@@ -285,12 +286,12 @@ export function ComplianceAssessmentDetailPage() {
     <div className="space-y-6">
       <section className="panel grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
         <div>
-          <Link className="text-sm text-cyan-200 transition hover:text-cyan-100" to="/assessments">
+          <Link className="text-sm text-[#6d28d9] transition hover:text-[#5f1aa8]" to="/assessments">
             Back to assessments
           </Link>
           <div className="eyebrow mt-4">Governance</div>
-          <h1 className="mt-2 text-3xl font-semibold text-white">{assessment.name}</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold text-[#241232]">{assessment.name}</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f435c]">
             Work through scoped controls and reusable lines of inquiry, capture lightning-assessment
             results, document evidence and gaps, and keep manual or compliance review progress current
             in the tenant workspace.
@@ -298,11 +299,11 @@ export function ComplianceAssessmentDetailPage() {
           <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
             <div className="metric-card">
               <div className="metric-label">Framework</div>
-              <div className="mt-3 text-lg font-semibold text-white">{assessment.frameworkName}</div>
+              <div className="mt-3 text-lg font-semibold text-[#241232]">{assessment.frameworkName}</div>
             </div>
             <div className="metric-card">
               <div className="metric-label">Perimeter</div>
-              <div className="mt-3 text-lg font-semibold text-white">
+              <div className="mt-3 text-lg font-semibold text-[#241232]">
                 {assessment.perimeterName ?? assessment.folderName}
               </div>
             </div>
@@ -316,7 +317,7 @@ export function ComplianceAssessmentDetailPage() {
             </div>
             <div className="metric-card">
               <div className="metric-label">Assessment type</div>
-              <div className="mt-3 text-lg font-semibold capitalize text-white">
+              <div className="mt-3 text-lg font-semibold capitalize text-[#241232]">
                 {assessment.assessmentKind.replace(/_/g, ' ')}
               </div>
             </div>
@@ -324,41 +325,41 @@ export function ComplianceAssessmentDetailPage() {
           <div className="mt-5 panel-subtle">
             <div className="flex items-center justify-between gap-3">
               <div className="label">Assessment progress</div>
-              <div className="text-sm text-slate-300">
+              <div className="text-sm text-[#4f435c]">
                 {assessment.controlsAssessed}/{assessment.controlsTotal}{' '}
                 {planItems.length > 0 ? 'review items' : 'requirements'} reviewed
               </div>
             </div>
-            <div className="mt-3 h-3 overflow-hidden rounded-full bg-slate-950/80">
+            <div className="mt-3 h-3 overflow-hidden rounded-full bg-white">
               <div
-                className="h-full rounded-full bg-cyan-400 transition-all"
+                className="h-full rounded-full bg-[#8b35e6] transition-all"
                 style={{ width: `${Math.max(assessment.progressPercent, 0)}%` }}
               />
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-5">
               <div className="panel-subtle">
                 <div className="label">Compliant</div>
-                <div className="mt-2 text-lg font-semibold text-white">{distribution.compliant}</div>
+                <div className="mt-2 text-lg font-semibold text-[#241232]">{distribution.compliant}</div>
               </div>
               <div className="panel-subtle">
                 <div className="label">Partial</div>
-                <div className="mt-2 text-lg font-semibold text-white">
+                <div className="mt-2 text-lg font-semibold text-[#241232]">
                   {distribution.partially_compliant}
                 </div>
               </div>
               <div className="panel-subtle">
                 <div className="label">Non-compliant</div>
-                <div className="mt-2 text-lg font-semibold text-white">{distribution.non_compliant}</div>
+                <div className="mt-2 text-lg font-semibold text-[#241232]">{distribution.non_compliant}</div>
               </div>
               <div className="panel-subtle">
                 <div className="label">N/A</div>
-                <div className="mt-2 text-lg font-semibold text-white">
+                <div className="mt-2 text-lg font-semibold text-[#241232]">
                   {distribution.not_applicable}
                 </div>
               </div>
               <div className="panel-subtle">
                 <div className="label">Not assessed</div>
-                <div className="mt-2 text-lg font-semibold text-white">{distribution.not_assessed}</div>
+                <div className="mt-2 text-lg font-semibold text-[#241232]">{distribution.not_assessed}</div>
               </div>
             </div>
           </div>
@@ -366,39 +367,39 @@ export function ComplianceAssessmentDetailPage() {
 
         <div className="panel-subtle space-y-3">
           <div className="label">Assessment record</div>
-          <div className="space-y-3 text-sm text-slate-300">
+          <div className="space-y-3 text-sm text-[#4f435c]">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-slate-500">Reference</span>
-              <span className="font-mono text-xs text-cyan-200">{assessment.refId ?? 'n/a'}</span>
+              <span className="text-[#62576a]">Reference</span>
+              <span className="font-mono text-xs text-[#6d28d9]">{assessment.refId ?? 'n/a'}</span>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <span className="text-slate-500">Version</span>
+              <span className="text-[#62576a]">Version</span>
               <span>{assessment.version}</span>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <span className="text-slate-500">Lead assessor</span>
+              <span className="text-[#62576a]">Lead assessor</span>
               <span>{assessment.leadAssessorUserId ?? 'n/a'}</span>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <span className="text-slate-500">Status</span>
+              <span className="text-[#62576a]">Status</span>
               <span className="capitalize">{assessment.status}</span>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <span className="text-slate-500">Planned window</span>
+              <span className="text-[#62576a]">Planned window</span>
               <span>
                 {formatDate(assessment.plannedStartOn)} to {formatDate(assessment.plannedFinishOn)}
               </span>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <span className="text-slate-500">Updated</span>
+              <span className="text-[#62576a]">Updated</span>
               <span>{formatTimestamp(assessment.updatedAt)}</span>
             </div>
             {assessment.assessmentPlanName ? (
               <div className="pt-2">
-                <div className="text-slate-500">Assessment plan</div>
-                <div className="mt-2 font-medium text-white">{assessment.assessmentPlanName}</div>
+                <div className="text-[#62576a]">Assessment plan</div>
+                <div className="mt-2 font-medium text-[#241232]">{assessment.assessmentPlanName}</div>
                 <Link
-                  className="mt-2 inline-flex text-sm text-cyan-200 transition hover:text-cyan-100"
+                  className="mt-2 inline-flex text-sm text-[#6d28d9] transition hover:text-[#5f1aa8]"
                   to="/assessment-plans"
                 >
                   Open assessment plans
@@ -406,37 +407,37 @@ export function ComplianceAssessmentDetailPage() {
               </div>
             ) : null}
             <div className="pt-2">
-              <div className="text-slate-500">Framework workspace</div>
+              <div className="text-[#62576a]">Framework workspace</div>
               <Link
-                className="mt-2 inline-flex text-sm text-cyan-200 transition hover:text-cyan-100"
+                className="mt-2 inline-flex text-sm text-[#6d28d9] transition hover:text-[#5f1aa8]"
                 to={`/frameworks/${assessment.frameworkId}`}
               >
                 Open {assessment.frameworkName}
               </Link>
             </div>
             <div className="pt-2">
-              <div className="text-slate-500">Remediation workspace</div>
+              <div className="text-[#62576a]">Remediation workspace</div>
               <Link
-                className="mt-2 inline-flex text-sm text-cyan-200 transition hover:text-cyan-100"
+                className="mt-2 inline-flex text-sm text-[#6d28d9] transition hover:text-[#5f1aa8]"
                 to={`/compliance-assessments/${assessment.id}/action-plan`}
               >
                 Open action plan
               </Link>
             </div>
             <div className="pt-2">
-              <div className="text-slate-500">Observation</div>
+              <div className="text-[#62576a]">Observation</div>
               <div className="mt-2 whitespace-pre-line leading-6">
                 {assessment.observation || 'No assessment observation recorded yet.'}
               </div>
             </div>
             <div className="pt-2">
-              <div className="text-slate-500">Instructions</div>
+              <div className="text-[#62576a]">Instructions</div>
               <div className="mt-2 whitespace-pre-line leading-6">
                 {assessment.instructions || 'No reviewer instructions recorded yet.'}
               </div>
             </div>
             <div className="pt-2">
-              <div className="text-slate-500">Process info</div>
+              <div className="text-[#62576a]">Process info</div>
               <div className="mt-2 whitespace-pre-line leading-6">
                 {assessment.processInfo || 'No process notes recorded yet.'}
               </div>
@@ -448,18 +449,18 @@ export function ComplianceAssessmentDetailPage() {
       {notice && <div className="notice-success">{notice}</div>}
       {error && <div className="notice-error">{error}</div>}
 
-      <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-        <section className="panel">
+      <section className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+        <section className="panel min-w-0">
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="eyebrow">
                 {activeLane === 'plan' ? 'Assessment Plan Execution' : 'Controls in Scope'}
               </div>
-              <h2 className="mt-2 text-xl font-semibold text-white">
+              <h2 className="mt-2 text-xl font-semibold text-[#241232]">
                 {activeLane === 'plan' ? 'Lines of Inquiry' : 'Progress Report'}
               </h2>
             </div>
-            <div className="badge-neutral">{activeItems.length} items</div>
+            <RegStatusPill tone="purple">{activeItems.length} items</RegStatusPill>
           </div>
           {planItems.length > 0 && requirements.length > 0 ? (
             <div className="mt-5 flex flex-wrap gap-2">
@@ -487,24 +488,24 @@ export function ComplianceAssessmentDetailPage() {
                     className={[
                       'w-full rounded-3xl border p-4 text-left transition',
                       item.id === selectedPlanItem?.id
-                        ? 'border-cyan-300/50 bg-cyan-400/10'
-                        : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.05]',
+                        ? 'border-[#c7a9ed] bg-[#f2e8ff]'
+                        : 'border-[#ded8e4] bg-[#fbf9fc] hover:bg-[#f6f1fa]',
                     ].join(' ')}
                     onClick={() => setSelectedPlanItemId(item.id)}
                     type="button"
                   >
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-xs uppercase tracking-[0.18em] text-cyan-200">
+                      <span className="font-mono text-xs uppercase tracking-[0.18em] text-[#6d28d9]">
                         {item.lineRef}
                       </span>
-                      <span className={resultBadge(item.result)}>{item.result.replace(/_/g, ' ')}</span>
+                      <RegStatusPill tone={resultTone(item.result)}>{item.result.replace(/_/g, ' ')}</RegStatusPill>
                       {item.requirementRef ? (
-                        <span className="badge-neutral">Maps to {item.requirementRef}</span>
+                        <RegStatusPill tone="neutral">Maps to {item.requirementRef}</RegStatusPill>
                       ) : null}
                     </div>
-                    <div className="mt-2 font-medium text-white">{item.linePrompt}</div>
+                    <div className="mt-2 font-medium text-[#241232]">{item.linePrompt}</div>
                     {item.lineSection ? (
-                      <div className="mt-2 text-xs uppercase tracking-[0.14em] text-slate-500">
+                      <div className="mt-2 text-xs uppercase tracking-[0.14em] text-[#62576a]">
                         {item.lineSection}
                       </div>
                     ) : null}
@@ -516,30 +517,30 @@ export function ComplianceAssessmentDetailPage() {
                     className={[
                       'w-full rounded-3xl border p-4 text-left transition',
                       requirement.id === selectedRequirement?.id
-                        ? 'border-cyan-300/50 bg-cyan-400/10'
-                        : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.05]',
+                        ? 'border-[#c7a9ed] bg-[#f2e8ff]'
+                        : 'border-[#ded8e4] bg-[#fbf9fc] hover:bg-[#f6f1fa]',
                     ].join(' ')}
                     onClick={() => setSelectedRequirementId(requirement.id)}
                     type="button"
                   >
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-xs uppercase tracking-[0.18em] text-cyan-200">
+                      <span className="font-mono text-xs uppercase tracking-[0.18em] text-[#6d28d9]">
                         {requirement.controlRef}
                       </span>
-                      <span className={resultBadge(requirement.result)}>
+                      <RegStatusPill tone={resultTone(requirement.result)}>
                         {requirement.result.replace(/_/g, ' ')}
-                      </span>
+                      </RegStatusPill>
                     </div>
-                    <div className="mt-2 font-medium text-white">{requirement.controlTitle}</div>
+                    <div className="mt-2 font-medium text-[#241232]">{requirement.controlTitle}</div>
                     {requirement.controlDescription ? (
-                      <div className="mt-2 max-h-[4.5rem] overflow-hidden text-sm leading-6 text-slate-400">
+                      <div className="mt-2 max-h-[4.5rem] overflow-hidden text-sm leading-6 text-[#6f6578]">
                         {requirement.controlDescription}
                       </div>
                     ) : null}
                   </button>
                 ))}
             {activeItems.length === 0 ? (
-              <div className="panel-subtle text-sm text-slate-400">
+              <div className="panel-subtle text-sm text-[#6f6578]">
                 {activeLane === 'plan'
                   ? 'No lines of inquiry are linked to this assessment yet.'
                   : 'No framework requirements are linked to this assessment yet.'}
@@ -548,7 +549,7 @@ export function ComplianceAssessmentDetailPage() {
           </div>
         </section>
 
-        <section className="panel">
+        <section className="panel min-w-0">
           {selectedItem ? (
             <>
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -556,7 +557,7 @@ export function ComplianceAssessmentDetailPage() {
                   <div className="eyebrow">
                     {activeLane === 'plan' ? 'Assessment Plan Review' : 'Lightning Assessment'}
                   </div>
-                  <h2 className="mt-2 text-xl font-semibold text-white">
+                  <h2 className="mt-2 text-xl font-semibold text-[#241232]">
                     {activeLane === 'plan' && selectedPlanItem
                       ? `${selectedPlanItem.lineRef} ${selectedPlanItem.linePrompt}`
                       : selectedRequirement
@@ -564,7 +565,7 @@ export function ComplianceAssessmentDetailPage() {
                         : 'Review Item'}
                   </h2>
                 </div>
-                <div className="text-sm text-slate-400">
+                <div className="text-sm text-[#6f6578]">
                   Item {selectedIndex + 1} of {activeItems.length}
                 </div>
               </div>
@@ -573,19 +574,19 @@ export function ComplianceAssessmentDetailPage() {
                 <>
                   <div className="mt-4 flex flex-wrap gap-2 text-xs">
                     {selectedPlanItem.lineSection ? (
-                      <span className="badge-neutral">{selectedPlanItem.lineSection}</span>
+                      <RegStatusPill tone="neutral">{selectedPlanItem.lineSection}</RegStatusPill>
                     ) : null}
                     {selectedPlanItem.requirementRef ? (
-                      <span className="badge-neutral">Requirement {selectedPlanItem.requirementRef}</span>
+                      <RegStatusPill tone="neutral">Requirement {selectedPlanItem.requirementRef}</RegStatusPill>
                     ) : null}
                   </div>
-                  <p className="mt-4 text-sm leading-6 text-slate-300">
+                  <p className="mt-4 text-sm leading-6 text-[#4f435c]">
                     {selectedPlanItem.evidenceHint ||
                       'Capture the specific evidence and reviewer observations that support this line of inquiry.'}
                   </p>
                 </>
               ) : (
-                <p className="mt-4 text-sm leading-6 text-slate-300">
+                <p className="mt-4 text-sm leading-6 text-[#4f435c]">
                   {selectedRequirement?.controlDescription || 'No control description is recorded yet.'}
                 </p>
               )}
@@ -617,7 +618,7 @@ export function ComplianceAssessmentDetailPage() {
                     </select>
                   </label>
                 ) : (
-                  <div className="panel-subtle text-sm leading-6 text-slate-300">
+                  <div className="panel-subtle text-sm leading-6 text-[#4f435c]">
                     Use the evidence note below to describe the supporting artifacts or reviewer references
                     used for this line of inquiry.
                   </div>
@@ -708,7 +709,7 @@ export function ComplianceAssessmentDetailPage() {
                     value={impact}
                   />
                 </label>
-                <label className="mt-7 flex items-center gap-3 text-sm text-slate-300">
+                <label className="mt-7 flex items-center gap-3 text-sm text-[#4f435c]">
                   <input
                     checked={autoGenerateFollowUp}
                     onChange={(event) => setAutoGenerateFollowUp(event.target.checked)}
@@ -743,13 +744,13 @@ export function ComplianceAssessmentDetailPage() {
                 >
                   Next
                 </button>
-                <div className="ml-auto text-xs text-slate-500">
+                <div className="ml-auto text-xs text-[#62576a]">
                   Last updated {formatTimestamp(selectedItem.updatedAt)}
                 </div>
               </div>
             </>
           ) : (
-            <div className="panel-subtle text-sm text-slate-400">
+            <div className="panel-subtle text-sm text-[#6f6578]">
               Select a {activeLane === 'plan' ? 'line of inquiry' : 'requirement'} from the left to
               begin the review flow.
             </div>

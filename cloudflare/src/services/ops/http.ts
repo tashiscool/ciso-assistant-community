@@ -14,6 +14,7 @@ import {
 } from '../../email';
 import { acquireTenantLease, getTenantWorkflowSnapshot, releaseTenantLease } from '../../utils/workflows';
 import { json, methodNotAllowed } from '../../utils/http';
+import { listQueueDeadLetters, replayQueueDeadLetter } from './queueRecovery';
 
 type OpsOverviewCounts = {
   reportExports: number;
@@ -5106,6 +5107,27 @@ export async function handleOpsRoutes(
 
   if (!ctx.tenantId) {
     return json({ error: 'missing_tenant', message: 'x-tenant-id is required' }, { status: 401 });
+  }
+
+  if (resource === 'queue-dead-letters') {
+    const queueRecoveryPermission = await requireAnyPermission(
+      ctx,
+      isReadMethod ? OPERATIONS_READ_PERMISSIONS : OPERATIONS_WRITE_PERMISSIONS,
+      isReadMethod
+        ? 'Queue recovery access requires operational-view permissions.'
+        : 'Queue replay requires operational workspace permissions.',
+    );
+    if (queueRecoveryPermission instanceof Response) {
+      return queueRecoveryPermission;
+    }
+
+    if (!id && ctx.request.method === 'GET') {
+      return json({ data: await listQueueDeadLetters(ctx) });
+    }
+    if (id && subresource === 'replay' && ctx.request.method === 'POST') {
+      return json({ data: await replayQueueDeadLetter(ctx, decodeURIComponent(id)) }, { status: 202 });
+    }
+    return methodNotAllowed(['GET', 'POST']);
   }
 
   if (resource === 'workflow') {

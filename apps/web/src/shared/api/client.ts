@@ -1,4 +1,5 @@
 import { getEdgeAuthMode, getEdgeIdentity } from '../session/identity';
+import { readApiResponse } from './response';
 
 export type ApiClientOptions = {
   baseUrl?: string;
@@ -54,25 +55,6 @@ export class ApiClient {
       body: body === undefined ? undefined : JSON.stringify(body),
     });
 
-    if (!res.ok) {
-      const text = await res.text();
-      if (text) {
-        let payload: { message?: string; error?: string } | null = null;
-        try {
-          payload = JSON.parse(text) as { message?: string; error?: string };
-        } catch {}
-
-        if (typeof payload?.message === 'string' && payload.message.trim()) {
-          throw new Error(payload.message);
-        }
-        if (typeof payload?.error === 'string' && payload.error.trim()) {
-          throw new Error(payload.error);
-        }
-      }
-
-      throw new Error(text || `Request failed: ${res.status}`);
-    }
-
-    return (await res.json()) as T;
+    return readApiResponse<T>(res);
   }
 }

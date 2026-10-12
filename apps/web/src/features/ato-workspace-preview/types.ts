@@ -1,0 +1,12 @@
+export type WorkspaceView = 'work' | 'system' | 'controls';
+export type ContextArea = 'evidence' | 'risk' | 'authorization' | 'monitoring' | 'tools' | 'administration';
+export type EvidenceStatus = 'Needs review' | 'Accepted' | 'Changes requested';
+export type ControlStatus = 'Approved' | 'Needs review' | 'Needs evidence';
+export interface EvidenceRecord { id: string; name: string; description: string; source: string; collectedAt: string; status: EvidenceStatus; controlIds: string[]; systemId: string; reviewNote?: string; }
+export interface ControlRecord { id: string; ref: string; name: string; family: string; owner: string; status: ControlStatus; narrative: string; requirement: string; evidenceIds: string[]; assessment: string; history: string[]; }
+export interface WorkItem { id: string; kind: 'evidence' | 'remediation' | 'change' | 'control'; title: string; description: string; reference: string; category: string; systemId: string; owner: string; ownerRole: string; date: string; dateLabel: string; status: string; tone: 'purple' | 'danger' | 'warning' | 'success'; evidenceId?: string; controlId?: string; }
+export interface SystemRecord { id: string; name: string; owner: string; isso: string; profile: string; description: string; boundary: string; assets: { name: string; type: string; owner: string }[]; dependencies: { name: string; responsibility: string; status: string }[]; team: { name: string; role: string }[]; caseStage: string; decisionDate: string; nextReview: string; activities: { date: string; event: string; detail: string; actor: string }[]; controls: ControlRecord[]; evidence: EvidenceRecord[]; work: WorkItem[]; }
+export interface SharedViewProps { system: SystemRecord; evidence: EvidenceRecord[]; work: WorkItem[]; controls: ControlRecord[]; onNavigate: (view: WorkspaceView, controlId?: string) => void; onOpenArea: (area: ContextArea) => void; onReviewEvidence: (id: string) => void; }
+export interface WorkViewProps extends SharedViewProps { selectedId: string | null; onSelect: (id: string | null) => void; }
+export interface SystemViewProps extends SharedViewProps { }
+export interface ControlViewProps extends SharedViewProps { selectedControlId: string; drafts: Record<string, string>; onEditDraft: (id: string, text: string) => void; onSaveDraft: (id: string) => void; onRequestReview: (id: string) => void; savedAt: Record<string, string>; savedDrafts: Record<string, string>; reviewRequested: Record<string, boolean>; }

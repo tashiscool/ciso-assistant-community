@@ -1,31 +1,66 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss" source(none);
+@config "../tailwind.config.ts";
+@source "./";
+@source "../index.html";
+
+/* Preserve existing v3 defaults while retaining the product's utility names. */
+@theme {
+  --default-ring-width: 3px;
+  --default-ring-color: rgb(59 130 246 / 0.5);
+}
+
+@layer base {
+  *, ::before, ::after, ::backdrop, ::file-selector-button {
+    border-color: #e5e7eb;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: #9ca3af;
+    opacity: 1;
+  }
+
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  dialog {
+    margin: auto;
+  }
+}
+
+/* Tailwind 4 requires composed @apply classes to be registered utilities. */
+@utility glass-panel {
+  @apply bg-white;
+}
+
+@utility panel-subtle {
+  @apply min-w-0 max-w-full rounded-lg border border-[#ded8e4] bg-[#fbf9fc] p-4;
+}
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
-  /* shadcn/ui CSS variables — dark theme wired to the glassmorphism palette */
-  --background: 222 47% 4%;
-  --foreground: 210 40% 98%;
-  --card: 222 47% 4%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222 47% 4%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 186 100% 52%;
-  --primary-foreground: 222 47% 4%;
-  --secondary: 217 32% 12%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 217 32% 12%;
-  --muted-foreground: 215 20% 55%;
-  --accent: 217 32% 12%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 63% 31%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 217 32% 14%;
-  --input: 217 32% 14%;
-  --ring: 186 100% 52%;
-  --radius: 1rem;
+  /* shadcn/ui CSS variables — Vanta-like light shell with accessible contrast. */
+  --background: 300 20% 99%;
+  --foreground: 271 43% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 271 43% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 271 43% 15%;
+  --primary: 271 78% 52%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 280 23% 95%;
+  --secondary-foreground: 271 43% 18%;
+  --muted: 280 18% 95%;
+  --muted-foreground: 276 10% 40%;
+  --accent: 274 100% 96%;
+  --accent-foreground: 271 70% 36%;
+  --destructive: 355 70% 45%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 285 14% 86%;
+  --input: 285 14% 86%;
+  --ring: 271 78% 52%;
+  --radius: 0.5rem;
 }
 
 html,
@@ -35,66 +70,69 @@ body,
 }
 
 body {
-  @apply text-slate-50;
+  @apply text-[#241232];
   margin: 0;
   font-family: 'Avenir Next', 'Segoe UI', sans-serif;
-  background:
-    radial-gradient(circle at top left, rgba(34, 211, 238, 0.18), transparent 30%),
-    radial-gradient(circle at bottom right, rgba(251, 146, 60, 0.14), transparent 26%),
-    linear-gradient(180deg, #081019 0%, #05080f 100%);
+  background: #fbfafc;
 }
 
 @layer components {
-  .glass-panel {
-    @apply bg-slate-950/55 backdrop-blur-xl;
-  }
-
   .panel {
-    @apply glass-panel rounded-[28px] border border-white/10 p-6 shadow-[0_24px_80px_rgba(2,8,23,0.55)];
-  }
-
-  .panel-subtle {
-    @apply rounded-3xl border border-white/10 bg-white/[0.03] p-4;
+    @apply glass-panel min-w-0 max-w-full rounded-lg border border-[#ded8e4] p-6 shadow-[0_10px_28px_rgba(48,24,72,0.08)];
   }
 
   .eyebrow {
-    @apply text-[11px] uppercase tracking-[0.24em] text-cyan-300/70;
+    @apply text-[11px] uppercase tracking-normal text-[#7a3ccf];
   }
 
   .label {
-    @apply text-[11px] uppercase tracking-[0.2em] text-slate-500;
+    @apply text-[11px] uppercase tracking-normal text-[#6f6578];
   }
 
   .input {
-    @apply w-full rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-300/60 focus:ring-2 focus:ring-cyan-400/20;
+    @apply w-full rounded-md border border-[#cfc7d8] bg-white px-4 py-3 text-sm text-[#241232] outline-hidden transition placeholder:text-[#8a8192] focus:border-[#8b35e6] focus:ring-2 focus:ring-[#8b35e6]/20 focus-visible:ring-2 focus-visible:ring-[#8b35e6]/35 focus-visible:ring-offset-2;
   }
 
   .button-primary {
-    @apply inline-flex items-center justify-center rounded-2xl bg-cyan-400 px-4 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex min-h-11 items-center justify-center rounded-md bg-[#8b35e6] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#742bc2] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#8b35e6] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .button-secondary {
-    @apply inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex min-h-11 items-center justify-center rounded-md border border-[#cfc7d8] bg-white px-4 py-2.5 text-sm font-medium text-[#2b173d] shadow-sm transition hover:bg-[#f6f1fa] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#8b35e6] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
-  .badge-success {
-    @apply inline-flex rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium uppercase tracking-[0.12em] text-emerald-300;
+  .button-danger {
+    @apply inline-flex min-h-11 items-center justify-center rounded-md border border-[#f2b7bf] bg-[#b4232f] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#9d1f2c] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#b4232f] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
-  .badge-neutral {
-    @apply inline-flex rounded-full bg-slate-500/15 px-2.5 py-1 text-xs font-medium uppercase tracking-[0.12em] text-slate-300;
+  .status-pill-success,
+  .status-pill-positive {
+    @apply inline-flex rounded-full bg-[#ddf7e6] px-2.5 py-1 text-xs font-semibold uppercase tracking-normal text-[#126b36];
   }
 
-  .badge-danger {
-    @apply inline-flex rounded-full bg-rose-500/10 px-2.5 py-1 text-xs font-medium uppercase tracking-[0.12em] text-rose-300;
+  .status-pill-neutral {
+    @apply inline-flex rounded-full bg-[#eeeaf2] px-2.5 py-1 text-xs font-semibold uppercase tracking-normal text-[#51465e];
+  }
+
+  .status-pill-warning {
+    @apply inline-flex rounded-full bg-[#fff2d9] px-2.5 py-1 text-xs font-semibold uppercase tracking-normal text-[#8a4d00];
+  }
+
+  .status-pill-danger,
+  .status-pill-error {
+    @apply inline-flex rounded-full bg-[#ffe2e5] px-2.5 py-1 text-xs font-semibold uppercase tracking-normal text-[#9d1f2c];
   }
 
   .notice-success {
-    @apply rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200;
+    @apply rounded-lg border border-[#9fdfb7] bg-[#e9f9ef] px-4 py-3 text-sm text-[#126b36];
   }
 
   .notice-error {
-    @apply rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200;
+    @apply rounded-lg border border-[#f2b7bf] bg-[#fff0f2] px-4 py-3 text-sm text-[#9d1f2c];
+  }
+
+  .notice-warning {
+    @apply rounded-lg border border-[#f6d48e] bg-[#fff8e8] px-4 py-3 text-sm text-[#714100];
   }
 
   .metric-card {
@@ -102,10 +140,43 @@ body {
   }
 
   .metric-label {
-    @apply text-xs uppercase tracking-[0.2em] text-slate-500;
+    @apply text-xs uppercase tracking-normal text-[#6f6578];
   }
 
   .metric-value {
-    @apply mt-3 text-3xl font-semibold text-white;
+    @apply mt-3 text-3xl font-semibold text-[#241232];
+  }
+
+  .regovise-workspace-main,
+  .regovise-workspace-main :where(section, article, aside, div, form, label) {
+    min-width: 0;
+  }
+
+  .regovise-workspace-main :where(pre) {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .regovise-workspace-main :where(.panel, .panel-subtle, [class*="rounded-2xl"], [class*="rounded-3xl"], p, dd, li, a) {
+    overflow-wrap: anywhere;
+  }
+
+  .regovise-workspace-main :where(input, select, textarea, button) {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .regovise-workspace-main :where(.font-mono) {
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Existing component class names keep the v3 transparent outline in forced colors. */
+@layer utilities {
+  .outline-none,
+  .focus\:outline-none:focus,
+  .focus-visible\:outline-none:focus-visible {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
   }
 }

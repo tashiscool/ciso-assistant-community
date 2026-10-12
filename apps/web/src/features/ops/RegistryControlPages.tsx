@@ -55,7 +55,7 @@ function RegistryControlPage({
   const { overview, loading, error, refresh } = useOpsParityOverview();
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading {title.toLowerCase()}...</div>;
+    return <div className="panel p-6 text-sm text-[#51465e]">Loading {title.toLowerCase()}...</div>;
   }
 
   if (error || !overview) {
@@ -67,35 +67,35 @@ function RegistryControlPage({
       overview.searchIndex.slice(0, 5).map((entry) => (
         <Link
           key={`${entry.section}-${entry.id}`}
-          className="block rounded-3xl border border-white/10 bg-slate-950/30 p-4 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
+          className="block rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4 transition hover:border-[#8b35e6]/30 hover:bg-[#f8f3ff]"
           to={entry.route}
         >
-          <div className="font-medium text-white">{entry.title}</div>
-          <div className="mt-1 text-sm text-slate-400">{entry.section}</div>
-          <div className="mt-3 text-xs uppercase tracking-[0.18em] text-slate-500">
+          <div className="font-medium text-[#241232]">{entry.title}</div>
+          <div className="mt-1 text-sm text-[#6f6578]">{entry.section}</div>
+          <div className="mt-3 text-xs uppercase tracking-[0.18em] text-[#62576a]">
             {entry.keywords.slice(0, 3).join(' · ')}
           </div>
         </Link>
       ))
     ) : overview.validationFlows.length === 0 ? (
-      <div className="rounded-3xl border border-dashed border-white/10 bg-slate-950/20 p-4 text-sm text-slate-400">
+      <div className="rounded-3xl border border-dashed border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#6f6578]">
         No validation-linked activity is active for this tenant right now.
       </div>
     ) : (
       overview.validationFlows.slice(0, 4).map((item) => (
         <Link
           key={item.id}
-          className="block rounded-3xl border border-white/10 bg-slate-950/30 p-4 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
+          className="block rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4 transition hover:border-[#8b35e6]/30 hover:bg-[#f8f3ff]"
           to={item.route}
         >
           <div className="flex items-start justify-between gap-3">
             <div>
-              <div className="font-medium text-white">{item.title}</div>
-              <div className="mt-1 text-sm text-slate-400">{item.subtitle}</div>
+              <div className="font-medium text-[#241232]">{item.title}</div>
+              <div className="mt-1 text-sm text-[#6f6578]">{item.subtitle}</div>
             </div>
-            <span className="badge-neutral">{item.status}</span>
+            <span className="status-pill-neutral">{item.status}</span>
           </div>
-          <div className="mt-3 text-sm leading-6 text-slate-300">{item.detail}</div>
+          <div className="mt-3 text-sm leading-6 text-[#51465e]">{item.detail}</div>
         </Link>
       ))
     );
@@ -107,8 +107,8 @@ function RegistryControlPage({
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">{eyebrow}</div>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">{title}</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">{description}</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">{title}</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">{description}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {actions.map((action) => (
@@ -128,22 +128,22 @@ function RegistryControlPage({
         <div className="metric-card">
           <div className="metric-label">{countLabel}</div>
           <div className="metric-value">{items.length}</div>
-          <div className="mt-2 text-xs text-slate-500">{countDetail}</div>
+          <div className="mt-2 text-xs text-[#62576a]">{countDetail}</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Tenant</div>
           <div className="metric-value text-lg">{overview.settings.tenantId}</div>
-          <div className="mt-2 text-xs text-slate-500">Canonical workspace context for this operational surface.</div>
+          <div className="mt-2 text-xs text-[#62576a]">Canonical workspace context for this operational surface.</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Search index</div>
           <div className="metric-value">{overview.searchIndex.length}</div>
-          <div className="mt-2 text-xs text-slate-500">Searchable canonical records available for operator drill-down.</div>
+          <div className="mt-2 text-xs text-[#62576a]">Searchable canonical records available for operator drill-down.</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Validation cues</div>
           <div className="metric-value">{overview.validationFlows.length}</div>
-          <div className="mt-2 text-xs text-slate-500">Current validation-linked work that can shape remediation and review cadence.</div>
+          <div className="mt-2 text-xs text-[#62576a]">Current validation-linked work that can shape remediation and review cadence.</div>
         </div>
       </section>
 
@@ -154,30 +154,30 @@ function RegistryControlPage({
               <Icon className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">{contextTitle}</h2>
-              <p className="text-sm text-slate-400">{contextDescription}</p>
+              <h2 className="text-lg font-semibold text-[#241232]">{contextTitle}</h2>
+              <p className="text-sm text-[#6f6578]">{contextDescription}</p>
             </div>
           </div>
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             {items.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-white/10 bg-slate-950/20 p-4 text-sm text-slate-400 md:col-span-2">
+              <div className="rounded-3xl border border-dashed border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#6f6578] md:col-span-2">
                 {emptyMessage}
               </div>
             ) : (
               items.map((item) => (
                 <Link
                   key={item.id}
-                  className="rounded-3xl border border-white/10 bg-slate-950/30 p-4 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
+                  className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4 transition hover:border-[#8b35e6]/30 hover:bg-[#f8f3ff]"
                   to={item.route}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="font-medium text-white">{item.title}</div>
-                      <div className="mt-1 text-sm text-slate-400">{item.subtitle}</div>
+                      <div className="font-medium text-[#241232]">{item.title}</div>
+                      <div className="mt-1 text-sm text-[#6f6578]">{item.subtitle}</div>
                     </div>
-                    <span className="badge-neutral">{item.status}</span>
+                    <span className="status-pill-neutral">{item.status}</span>
                   </div>
-                  <div className="mt-3 text-sm leading-6 text-slate-300">{item.detail}</div>
+                  <div className="mt-3 text-sm leading-6 text-[#51465e]">{item.detail}</div>
                 </Link>
               ))
             )}
@@ -185,8 +185,8 @@ function RegistryControlPage({
         </div>
 
         <div className="panel-subtle">
-          <h2 className="text-lg font-semibold text-white">{helperTitle}</h2>
-          <p className="mt-1 text-sm text-slate-400">{helperDescription}</p>
+          <h2 className="text-lg font-semibold text-[#241232]">{helperTitle}</h2>
+          <p className="mt-1 text-sm text-[#6f6578]">{helperDescription}</p>
           <div className="mt-5 space-y-3">{helperCards}</div>
         </div>
       </section>
@@ -198,7 +198,7 @@ export function AssetsControlPage() {
   const { overview } = useOpsParityOverview();
   return (
     <RegistryControlPage
-      accentClass="from-emerald-400/0 via-emerald-300/60 to-emerald-400/0"
+      accentClass="from-[#1aa854]/0 via-[#1aa854]/35 to-[#1aa854]/0"
       actions={[
         { label: 'Open resilience', to: '/resilience' },
         { label: 'Open evidence jobs', to: '/evidence/jobs' },
@@ -214,7 +214,7 @@ export function AssetsControlPage() {
       helperMode="search"
       helperTitle="Discovery paths"
       icon={Boxes}
-      iconToneClass="bg-emerald-400/10 text-emerald-300"
+      iconToneClass="bg-[#e9f9ef] text-[#126b36]"
       items={overview?.assets ?? []}
       title="Assets"
     />
@@ -252,7 +252,7 @@ export function ActorsControlPage() {
   const { overview } = useOpsParityOverview();
   return (
     <RegistryControlPage
-      accentClass="from-cyan-400/0 via-cyan-300/60 to-cyan-400/0"
+      accentClass="from-[#8b35e6]/0 via-[#8b35e6]/35 to-[#8b35e6]/0"
       actions={[
         { label: 'Open team', to: '/workspace/team' },
         { label: 'Open access control', to: '/workspace/access' },
@@ -268,7 +268,7 @@ export function ActorsControlPage() {
       helperMode="search"
       helperTitle="Linked workspaces"
       icon={Users}
-      iconToneClass="bg-cyan-400/10 text-cyan-300"
+      iconToneClass="bg-[#f3e9ff] text-[#7a2ed6]"
       items={overview?.actors ?? []}
       title="Actors"
     />
@@ -279,7 +279,7 @@ export function VulnerabilitiesControlPage() {
   const { overview } = useOpsParityOverview();
   return (
     <RegistryControlPage
-      accentClass="from-amber-400/0 via-amber-300/60 to-amber-400/0"
+      accentClass="from-[#d47a00]/0 via-[#d47a00]/35 to-[#d47a00]/0"
       actions={[
         { label: 'Open risk scenarios', to: '/risk-scenarios' },
         { label: 'Open assessments', to: '/assessments' },
@@ -295,7 +295,7 @@ export function VulnerabilitiesControlPage() {
       helperMode="validation"
       helperTitle="Remediation pressure"
       icon={AlertTriangle}
-      iconToneClass="bg-amber-400/10 text-amber-300"
+      iconToneClass="bg-[#fff2d9] text-[#8a4d00]"
       items={overview?.vulnerabilities ?? []}
       title="Vulnerabilities"
     />
@@ -306,7 +306,7 @@ export function PoliciesControlPage() {
   const { overview } = useOpsParityOverview();
   return (
     <RegistryControlPage
-      accentClass="from-indigo-400/0 via-indigo-300/60 to-indigo-400/0"
+      accentClass="from-[#8b35e6]/0 via-[#8b35e6]/35 to-[#8b35e6]/0"
       actions={[
         { label: 'Open frameworks', to: '/frameworks' },
         { label: 'Open libraries', to: '/libraries' },
@@ -322,7 +322,7 @@ export function PoliciesControlPage() {
       helperMode="search"
       helperTitle="Governance discovery"
       icon={FileText}
-      iconToneClass="bg-indigo-400/10 text-indigo-300"
+      iconToneClass="bg-[#f3e9ff] text-[#7a2ed6]"
       items={overview?.policies ?? []}
       title="Policies"
     />
@@ -333,7 +333,7 @@ export function IncidentsControlPage() {
   const { overview } = useOpsParityOverview();
   return (
     <RegistryControlPage
-      accentClass="from-rose-400/0 via-rose-300/60 to-rose-400/0"
+      accentClass="from-[#c53344]/0 via-[#c53344]/35 to-[#c53344]/0"
       actions={[
         { label: 'Open privacy', to: '/privacy' },
         { label: 'Open portal', to: '/portal' },
@@ -349,7 +349,7 @@ export function IncidentsControlPage() {
       helperMode="validation"
       helperTitle="Related remediation"
       icon={ShieldAlert}
-      iconToneClass="bg-rose-400/10 text-rose-300"
+      iconToneClass="bg-[#fff0f2] text-[#b72535]"
       items={overview?.incidents ?? []}
       title="Incidents"
     />

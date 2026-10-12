@@ -5,6 +5,7 @@ import { AssuranceWorkflowPanel } from './AssuranceWorkflowPanel';
 import { explainAssurance, getAssuranceOverview, getObservableParityStatus } from './api';
 import type { AssuranceExplainAudience, AssuranceOverview, AssuranceParityStatus } from './types';
 import { CoachMarksPanel } from '../../components/CoachMarksPanel';
+import { RegRightDrawer, RegStatusPill } from '../../components/regovise/PagePrimitives';
 import { useEdgeIdentity } from '../../shared/session/identity';
 
 type AssuranceOverviewPageProps = {
@@ -49,37 +50,37 @@ function humanizeKey(value: string | null | undefined) {
     .replace(/\b\w/g, (match) => match.toUpperCase());
 }
 
-function workflowBadgeClass(value: string) {
+function workflowTone(value: string): 'success' | 'danger' | 'neutral' {
   switch (value) {
     case 'Done':
-      return 'badge-success';
+      return 'success';
     case 'Failed':
-      return 'badge-danger';
+      return 'danger';
     default:
-      return 'badge-neutral';
+      return 'neutral';
   }
 }
 
 function attentionToneClass(value: AttentionTone) {
   switch (value) {
     case 'danger':
-      return 'border-rose-300/15 bg-rose-400/[0.04] hover:border-rose-300/30';
+      return 'border-[#f2a1ac] bg-[#fff0f2] hover:border-[#f2a1ac]';
     case 'warning':
-      return 'border-amber-300/15 bg-amber-400/[0.04] hover:border-amber-300/30';
+      return 'border-[#f3bf62] bg-[#fff8ea] hover:border-[#f3bf62]';
     default:
-      return 'border-cyan-300/15 bg-cyan-400/[0.04] hover:border-cyan-300/30';
+      return 'border-[#8b35e6]/20 bg-[#f8f3ff] hover:border-[#8b35e6]/30';
   }
 }
 
-function parityStatusBadgeClass(value: AssuranceParityStatus['status'] | null | undefined) {
+function parityStatusTone(value: AssuranceParityStatus['status'] | null | undefined): 'success' | 'danger' | 'neutral' {
   switch (value) {
     case 'pass':
-      return 'badge-success';
+      return 'success';
     case 'fail':
-      return 'badge-danger';
+      return 'danger';
     case 'attention':
     default:
-      return 'badge-neutral';
+      return 'neutral';
   }
 }
 
@@ -159,6 +160,7 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
   const [parityStatus, setParityStatus] = useState<AssuranceParityStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [attentionDrawerOpen, setAttentionDrawerOpen] = useState(false);
 
   async function loadOverview() {
     try {
@@ -450,12 +452,18 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
     setSearchParams(params, { replace: true });
   }
 
+  useEffect(() => {
+    if (requestedItemId && selectedAttentionItem?.id === requestedItemId) {
+      setAttentionDrawerOpen(true);
+    }
+  }, [requestedItemId, selectedAttentionItem?.id]);
+
   return (
     <div className="space-y-6">
       <section className="panel">
         <div className="eyebrow">Assurance</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Assurance Overview</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Assurance Overview</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">
           See evidence intake, tracker backlog, package readiness, human review posture, bounded-agent activity, and recent workflow runs in one place.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
@@ -494,7 +502,7 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
         <div className="metric-card">
           <div className="metric-label">Tracker imports</div>
           <div className="metric-value">{summary.trackerImportCount}</div>
-          <div className="mt-2 text-xs text-slate-500">{summary.trackerImportErrorCount} with row errors</div>
+          <div className="mt-2 text-xs text-[#62576a]">{summary.trackerImportErrorCount} with row errors</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Package mismatches</div>
@@ -531,12 +539,12 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="label">Assurance readiness</div>
-            <div className="mt-1 text-sm text-slate-400">
+            <div className="mt-1 text-sm text-[#6f6578]">
               Live view of packages that are validation-clean, reconciliation-matched, and backed by the current evidence and agent review chain.
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-            <span className={parityStatusBadgeClass(parityStatus?.status)}>{humanizeKey(parityStatus?.status ?? 'loading')}</span>
+          <div className="flex flex-wrap items-center gap-2 text-xs text-[#62576a]">
+            <RegStatusPill tone={parityStatusTone(parityStatus?.status)}>{humanizeKey(parityStatus?.status ?? 'loading')}</RegStatusPill>
             <span>
               {summary.observableParityReadyPackageCount} verified package{summary.observableParityReadyPackageCount === 1 ? '' : 's'}
             </span>
@@ -544,12 +552,12 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
         </div>
         <div className="mt-4 grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-white/8 bg-black/15 px-4 py-4">
-              <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Latest verified package</div>
-              <div className="mt-2 text-sm font-medium text-white">
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
+              <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Latest verified package</div>
+              <div className="mt-2 text-sm font-medium text-[#241232]">
                 {paritySource?.packageFileName ?? latestParityReadyPackage?.fileName ?? 'No verified package yet'}
               </div>
-              <div className="mt-2 text-xs text-slate-500">
+              <div className="mt-2 text-xs text-[#62576a]">
                 {formatDate(paritySource?.updatedAt ?? latestParityReadyPackage?.updatedAt ?? null)}
               </div>
               {paritySource?.packageRoute || latestParityReadyPackage ? (
@@ -581,26 +589,26 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
                 </div>
               ) : null}
             </div>
-            <div className="rounded-2xl border border-white/8 bg-black/15 px-4 py-4">
-              <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Readiness posture</div>
-              <div className="mt-2 space-y-2 text-sm text-slate-300">
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
+              <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Readiness posture</div>
+              <div className="mt-2 space-y-2 text-sm text-[#51465e]">
                 <div className="flex items-center justify-between gap-3">
                   <span>Validation clean</span>
-                  <span className="font-mono text-cyan-200">{summary.observableParityReadyPackageCount}</span>
+                  <span className="font-mono text-[#6d28d9]">{summary.observableParityReadyPackageCount}</span>
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <span>Agent-backed</span>
-                  <span className="font-mono text-cyan-200">{summary.agentBackedPackageCount}</span>
+                  <span className="font-mono text-[#6d28d9]">{summary.agentBackedPackageCount}</span>
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <span>Recent agent checks</span>
-                  <span className="font-mono text-cyan-200">
+                  <span className="font-mono text-[#6d28d9]">
                     {latestParityReadyPackage ? readNumber(latestParityReadyPackage.coverage, 'agentEvaluationCount') : parityStatus?.counts.agentRuns ?? 0}
                   </span>
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <span>Recent agent gaps</span>
-                  <span className="font-mono text-cyan-200">
+                  <span className="font-mono text-[#6d28d9]">
                     {latestParityReadyPackage ? readNumber(latestParityReadyPackage.coverage, 'agentGapCount') : 0}
                   </span>
                 </div>
@@ -608,19 +616,19 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
             </div>
           </div>
           <div className="space-y-3">
-            <div className="rounded-2xl border border-white/8 bg-black/15 px-4 py-4">
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Verification checklist</div>
-                  <div className="mt-1 text-sm text-slate-400">
+                  <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Verification checklist</div>
+                  <div className="mt-1 text-sm text-[#6f6578]">
                     Verified {formatDate(parityStatus?.generatedAt ?? null)} against package, evidence, tracker, workflow, and agent artifacts.
                   </div>
                 </div>
-                <span className={parityStatusBadgeClass(parityStatus?.status)}>
+                <RegStatusPill tone={parityStatusTone(parityStatus?.status)}>
                   {humanizeKey(parityStatus?.status ?? 'loading')}
-                </span>
+                </RegStatusPill>
               </div>
-              <div className="mt-4 grid gap-2 text-xs text-slate-400 sm:grid-cols-2">
+              <div className="mt-4 grid gap-2 text-xs text-[#6f6578] sm:grid-cols-2">
                 <div>Bundle kind: {humanizeKey(paritySource?.bundleKind)}</div>
                 <div>Input mode: {humanizeKey(paritySource?.inputMode)}</div>
                 <div>Tracker imports: {parityStatus?.counts.trackerImports ?? 0}</div>
@@ -632,19 +640,19 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
               return (
                 <div
                   key={check.id}
-                  className="rounded-2xl border border-white/8 bg-black/15 px-4 py-4 transition hover:border-cyan-300/25"
+                  className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4 transition hover:border-[#8b35e6]/25"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="font-medium text-white">{check.title}</div>
-                    <span className={parityStatusBadgeClass(check.status)}>{humanizeKey(check.status)}</span>
+                    <div className="font-medium text-[#241232]">{check.title}</div>
+                    <RegStatusPill tone={parityStatusTone(check.status)}>{humanizeKey(check.status)}</RegStatusPill>
                   </div>
-                  <div className="mt-2 text-sm leading-6 text-slate-300">{check.detail}</div>
+                  <div className="mt-2 text-sm leading-6 text-[#51465e]">{check.detail}</div>
                   {metricEntries.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-500">
+                    <div className="mt-3 flex flex-wrap gap-2 text-xs text-[#62576a]">
                       {metricEntries.map((entry) => (
                         <span
                           key={`${check.id}:${entry}`}
-                          className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-1"
+                          className="rounded-full border border-[#ded8e4] bg-white px-3 py-1"
                         >
                           {entry}
                         </span>
@@ -662,7 +670,7 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
               );
             })}
             {parityChecks.length === 0 && (
-              <div className="rounded-2xl border border-white/8 bg-black/15 px-4 py-4 text-sm text-slate-400">
+              <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4 text-sm text-[#6f6578]">
                 {loading ? 'Loading readiness checks...' : 'No readiness checks are available yet.'}
               </div>
             )}
@@ -670,19 +678,19 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
               {parityReadyPackages.map((item) => (
                 <Link
                   key={item.id}
-                  className="block rounded-2xl border border-white/8 bg-black/15 px-4 py-4 transition hover:border-cyan-300/25"
+                  className="block rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4 transition hover:border-[#8b35e6]/25"
                   to={`/assurance/packages?packageId=${encodeURIComponent(item.id)}`}
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <div className="font-medium text-white">{item.fileName}</div>
-                      <div className="mt-1 text-xs text-slate-500">
+                      <div className="font-medium text-[#241232]">{item.fileName}</div>
+                      <div className="mt-1 text-xs text-[#62576a]">
                         {humanizeKey(item.validationStatus ?? 'pass')} · {humanizeKey(item.reconciliationStatus ?? 'matched')}
                       </div>
                     </div>
-                    <span className="badge-success">Ready</span>
+                    <RegStatusPill tone="success">Ready</RegStatusPill>
                   </div>
-                  <div className="mt-3 grid gap-2 text-xs text-slate-400 sm:grid-cols-4">
+                  <div className="mt-3 grid gap-2 text-xs text-[#6f6578] sm:grid-cols-4">
                     <div>{readNumber(item.coverage, 'evaluationCount')} eval(s)</div>
                     <div>{readNumber(item.coverage, 'agentEvaluationCount')} agent check(s)</div>
                     <div>{readNumber(item.coverage, 'agentGapCount')} agent gap(s)</div>
@@ -691,7 +699,7 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
                 </Link>
               ))}
               {parityReadyPackages.length === 0 && (
-                <div className="rounded-2xl border border-white/8 bg-black/15 px-4 py-4 text-sm text-slate-400">
+                <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4 text-sm text-[#6f6578]">
                   No verified assurance packages are currently available in this scope.
                 </div>
               )}
@@ -705,9 +713,9 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="label">Attention queue</div>
-            <div className="mt-1 text-sm text-slate-400">The highest-signal approvals, exceptions, and review items that still need follow-up.</div>
+            <div className="mt-1 text-sm text-[#6f6578]">The highest-signal approvals, exceptions, and review items that still need follow-up.</div>
           </div>
-          <div className="text-xs text-slate-500">
+          <div className="text-xs text-[#62576a]">
             Showing {attentionItems.length} actionable item{attentionItems.length === 1 ? '' : 's'}
           </div>
         </div>
@@ -716,36 +724,31 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
             <div
               key={item.id}
               className={`block rounded-2xl border px-4 py-4 transition ${attentionToneClass(item.tone)} ${
-                selectedAttentionItem?.id === item.id ? 'ring-1 ring-cyan-300/40' : ''
+                selectedAttentionItem?.id === item.id ? 'ring-1 ring-[#8b35e6]/35' : ''
               }`}
             >
               <div className="flex flex-wrap items-center gap-2">
-                <span className="badge-neutral">{item.kindLabel}</span>
-                <span
-                  className={
-                    item.tone === 'danger'
-                      ? 'badge-danger'
-                      : 'rounded-full border border-amber-300/20 bg-amber-400/[0.08] px-2 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-amber-100'
-                  }
-                >
+                <RegStatusPill tone="neutral">{item.kindLabel}</RegStatusPill>
+                <RegStatusPill tone={item.tone === 'danger' ? 'danger' : 'warning'}>
                   {item.statusLabel}
-                </span>
+                </RegStatusPill>
               </div>
-              <div className="mt-2 font-medium text-white">{item.title}</div>
-              <div className="mt-2 text-sm leading-6 text-slate-300">{item.detail}</div>
+              <div className="mt-2 font-medium text-[#241232]">{item.title}</div>
+              <div className="mt-2 text-sm leading-6 text-[#51465e]">{item.detail}</div>
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-                <div className="text-xs text-slate-500">{formatDate(item.createdAt)}</div>
+                <div className="text-xs text-[#62576a]">{formatDate(item.createdAt)}</div>
                 <div className="flex flex-wrap gap-2">
                   <button
                     className="button-secondary"
-                    onClick={() =>
+                    onClick={() => {
                       updateSearchState({
                         itemId: item.id,
                         explainId: selectedExplainItem?.id === item.id ? item.id : null,
                         audience: selectedExplainItem?.id === item.id ? selectedExplainAudience : null,
                         focusId: selectedExplainItem?.id === item.id ? selectedExplainFocusId : null,
-                      })
-                    }
+                      });
+                      setAttentionDrawerOpen(true);
+                    }}
                     type="button"
                   >
                     {selectedAttentionItem?.id === item.id ? 'Inspecting' : 'Inspect here'}
@@ -774,9 +777,9 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
             </div>
           ))}
           {!loading && attentionItems.length === 0 && (
-            <div className="text-sm text-slate-400">No high-priority assurance actions are waiting right now.</div>
+            <div className="text-sm text-[#6f6578]">No high-priority assurance actions are waiting right now.</div>
           )}
-          {loading && <div className="text-sm text-slate-400">Loading the assurance attention queue...</div>}
+          {loading && <div className="text-sm text-[#6f6578]">Loading the assurance attention queue...</div>}
         </div>
       </section>
 
@@ -818,73 +821,94 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
       />
 
       {selectedAttentionItem && (
-        <section className="grid gap-4 xl:grid-cols-[0.72fr_1.28fr]">
-          <section className="panel-subtle">
-            <div className="label">Selected queue item</div>
-            <div className="mt-3 rounded-2xl border border-white/8 bg-black/15 px-4 py-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="badge-neutral">{selectedAttentionItem.kindLabel}</span>
-                <span className={selectedAttentionItem.tone === 'danger' ? 'badge-danger' : 'badge-neutral'}>
-                  {selectedAttentionItem.statusLabel}
-                </span>
-              </div>
-              <div className="mt-3 text-lg font-semibold text-white">{selectedAttentionItem.title}</div>
-              <div className="mt-2 text-sm leading-6 text-slate-300">{selectedAttentionItem.detail}</div>
-              <div className="mt-3 text-xs text-slate-500">{formatDate(selectedAttentionItem.createdAt)}</div>
-              {selectedAttentionReferenceChips.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {selectedAttentionReferenceChips.map((chip) => (
-                    <span
-                      key={`${selectedAttentionItem.id}:${chip.label}:${chip.value}`}
-                      className="rounded-full border border-cyan-400/20 bg-cyan-400/[0.05] px-3 py-1 text-xs text-cyan-200"
-                    >
-                      {chip.label}: <span className="font-mono">{chip.value}</span>
-                    </span>
-                  ))}
-                </div>
-              )}
-              <div className="mt-4">
-                <Link className="button-secondary" to={selectedAttentionItem.route}>
-                  Open selected workbench
-                </Link>
-              </div>
+        <RegRightDrawer
+          description="Review the selected queue item, linked evidence references, and downstream workflow lineage without leaving the overview."
+          footer={
+            <div className="flex flex-wrap justify-end gap-2">
+              <button
+                className="button-secondary"
+                onClick={() => {
+                  setAttentionDrawerOpen(false);
+                  updateSearchState({ itemId: null });
+                }}
+                type="button"
+              >
+                Close
+              </button>
+              <Link className="button-primary" to={selectedAttentionItem.route}>
+                Open workbench
+              </Link>
             </div>
-          </section>
+          }
+          onOpenChange={(open) => {
+            setAttentionDrawerOpen(open);
+            if (!open) {
+              updateSearchState({ itemId: null });
+            }
+          }}
+          open={attentionDrawerOpen}
+          title="Inspect assurance action"
+        >
+          <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <RegStatusPill tone="neutral">{selectedAttentionItem.kindLabel}</RegStatusPill>
+              <RegStatusPill tone={selectedAttentionItem.tone === 'danger' ? 'danger' : 'neutral'}>
+                {selectedAttentionItem.statusLabel}
+              </RegStatusPill>
+            </div>
+            <div className="mt-3 text-lg font-semibold text-[#241232]">{selectedAttentionItem.title}</div>
+            <div className="mt-2 text-sm leading-6 text-[#51465e]">{selectedAttentionItem.detail}</div>
+            <div className="mt-3 text-xs text-[#62576a]">{formatDate(selectedAttentionItem.createdAt)}</div>
+            {selectedAttentionReferenceChips.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {selectedAttentionReferenceChips.map((chip) => (
+                  <span
+                    key={`${selectedAttentionItem.id}:${chip.label}:${chip.value}`}
+                    className="rounded-full border border-[#d7c3f1] bg-[#f2e8ff] px-3 py-1 text-xs text-[#6d28d9]"
+                  >
+                    {chip.label}: <span className="font-mono">{chip.value}</span>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
 
-          <AssuranceWorkflowPanel
-            disabledMessage="Select an explainable attention item to inspect its workflow lineage."
-            emptyMessage="No workflow runs are linked to the selected queue item yet."
-            heading="Selected item workflow lineage"
-            helperText="Workflow runs, approvals, packaging steps, and review decisions connected to the currently selected overview item."
-            linkedRecordIds={selectedAttentionLinkedRecords}
-            limit={12}
-          />
-        </section>
+          <div className="mt-5">
+            <AssuranceWorkflowPanel
+              disabledMessage="Select an explainable attention item to inspect its workflow lineage."
+              emptyMessage="No workflow runs are linked to the selected queue item yet."
+              heading="Selected item workflow lineage"
+              helperText="Workflow runs, approvals, packaging steps, and review decisions connected to the currently selected overview item."
+              linkedRecordIds={selectedAttentionLinkedRecords}
+              limit={12}
+            />
+          </div>
+        </RegRightDrawer>
       )}
 
       <section className="grid gap-4 xl:grid-cols-3">
         <section className="panel-subtle">
           <div className="label">Backlog posture</div>
           <div className="mt-3 space-y-2">
-            <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
-              <div className="text-slate-300">Running workflows</div>
-              <div className="font-mono text-cyan-200">{summary.runningWorkflowCount}</div>
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm">
+              <div className="text-[#51465e]">Running workflows</div>
+              <div className="font-mono text-[#6d28d9]">{summary.runningWorkflowCount}</div>
             </div>
-            <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
-              <div className="text-slate-300">Awaiting review</div>
-              <div className="font-mono text-cyan-200">{summary.awaitingReviewWorkflowCount}</div>
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm">
+              <div className="text-[#51465e]">Awaiting review</div>
+              <div className="font-mono text-[#6d28d9]">{summary.awaitingReviewWorkflowCount}</div>
             </div>
-            <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
-              <div className="text-slate-300">Review decisions</div>
-              <div className="font-mono text-cyan-200">{summary.reviewDecisionCount}</div>
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm">
+              <div className="text-[#51465e]">Review decisions</div>
+              <div className="font-mono text-[#6d28d9]">{summary.reviewDecisionCount}</div>
             </div>
-            <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
-              <div className="text-slate-300">Validation drift</div>
-              <div className="font-mono text-cyan-200">{summary.packageValidationReviewCount}</div>
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm">
+              <div className="text-[#51465e]">Validation drift</div>
+              <div className="font-mono text-[#6d28d9]">{summary.packageValidationReviewCount}</div>
             </div>
-            <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
-              <div className="text-slate-300">Agent runs</div>
-              <div className="font-mono text-cyan-200">{summary.agentRunCount}</div>
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm">
+              <div className="text-[#51465e]">Agent runs</div>
+              <div className="font-mono text-[#6d28d9]">{summary.agentRunCount}</div>
             </div>
           </div>
         </section>
@@ -893,28 +917,28 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
           <div className="label">Latest handoffs</div>
           <div className="mt-3 space-y-2">
             {latestEvidenceJob && (
-              <Link className="block rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm transition hover:border-cyan-300/20 hover:bg-cyan-400/[0.03]" to={`/assurance/evidence?evidenceJobId=${encodeURIComponent(latestEvidenceJob.id)}`}>
-                <div className="font-medium text-white">Evidence bundle</div>
-                <div className="mt-1 font-mono text-xs text-cyan-200">{latestEvidenceJob.id}</div>
-                <div className="mt-1 text-xs text-slate-500">{formatDate(latestEvidenceJob.finishedAt ?? latestEvidenceJob.startedAt ?? latestEvidenceJob.scheduledFor)}</div>
+              <Link className="block rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm transition hover:border-[#8b35e6]/25 hover:bg-[#f8f3ff]" to={`/assurance/evidence?evidenceJobId=${encodeURIComponent(latestEvidenceJob.id)}`}>
+                <div className="font-medium text-[#241232]">Evidence bundle</div>
+                <div className="mt-1 font-mono text-xs text-[#6d28d9]">{latestEvidenceJob.id}</div>
+                <div className="mt-1 text-xs text-[#62576a]">{formatDate(latestEvidenceJob.finishedAt ?? latestEvidenceJob.startedAt ?? latestEvidenceJob.scheduledFor)}</div>
               </Link>
             )}
             {latestPackage && (
-              <Link className="block rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm transition hover:border-cyan-300/20 hover:bg-cyan-400/[0.03]" to={`/assurance/packages?packageId=${encodeURIComponent(latestPackage.id)}`}>
-                <div className="font-medium text-white">20x package</div>
-                <div className="mt-1 font-mono text-xs text-cyan-200">{latestPackage.id}</div>
-                <div className="mt-1 text-xs text-slate-500">{latestPackage.fileName}</div>
+              <Link className="block rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm transition hover:border-[#8b35e6]/25 hover:bg-[#f8f3ff]" to={`/assurance/packages?packageId=${encodeURIComponent(latestPackage.id)}`}>
+                <div className="font-medium text-[#241232]">20x package</div>
+                <div className="mt-1 font-mono text-xs text-[#6d28d9]">{latestPackage.id}</div>
+                <div className="mt-1 text-xs text-[#62576a]">{latestPackage.fileName}</div>
               </Link>
             )}
             {latestAgentRun && (
-              <Link className="block rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm transition hover:border-cyan-300/20 hover:bg-cyan-400/[0.03]" to={`/assurance/agent-runs?runId=${encodeURIComponent(latestAgentRun.id)}`}>
-                <div className="font-medium text-white">Agent run</div>
-                <div className="mt-1 font-mono text-xs text-cyan-200">{latestAgentRun.id}</div>
-                <div className="mt-1 text-xs text-slate-500">{humanizeKey(latestAgentRun.status)}</div>
+              <Link className="block rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm transition hover:border-[#8b35e6]/25 hover:bg-[#f8f3ff]" to={`/assurance/agent-runs?runId=${encodeURIComponent(latestAgentRun.id)}`}>
+                <div className="font-medium text-[#241232]">Agent run</div>
+                <div className="mt-1 font-mono text-xs text-[#6d28d9]">{latestAgentRun.id}</div>
+                <div className="mt-1 text-xs text-[#62576a]">{humanizeKey(latestAgentRun.status)}</div>
               </Link>
             )}
             {!latestEvidenceJob && !latestPackage && !latestAgentRun && (
-              <div className="text-sm text-slate-400">{loading ? 'Loading recent assurance handoffs...' : 'No assurance handoffs are available yet.'}</div>
+              <div className="text-sm text-[#6f6578]">{loading ? 'Loading recent assurance handoffs...' : 'No assurance handoffs are available yet.'}</div>
             )}
           </div>
         </section>
@@ -925,13 +949,13 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
             {reviewBacklog.map((item, index) => (
               <Link
                 key={item.id}
-                className="block rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm transition hover:border-cyan-300/20 hover:bg-cyan-400/[0.03]"
+                className="block rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm transition hover:border-[#8b35e6]/25 hover:bg-[#f8f3ff]"
                 to={buildReviewRoute(item.id, item.evidenceJobId)}
               >
-                <div className="font-medium text-white">{index === 0 ? 'Pending recommendation' : `Pending recommendation ${index + 1}`}</div>
-                <div className="mt-1 text-sm text-slate-300">{item.title}</div>
-                <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-500">
-                  <span className="font-mono text-cyan-200">{item.id}</span>
+                <div className="font-medium text-[#241232]">{index === 0 ? 'Pending recommendation' : `Pending recommendation ${index + 1}`}</div>
+                <div className="mt-1 text-sm text-[#51465e]">{item.title}</div>
+                <div className="mt-2 flex flex-wrap gap-3 text-xs text-[#62576a]">
+                  <span className="font-mono text-[#6d28d9]">{item.id}</span>
                   <span>{humanizeKey(item.targetType)}</span>
                   <span>{formatDate(item.createdAt)}</span>
                 </div>
@@ -940,23 +964,23 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
             {recentDecisions.map((item, index) => (
               <Link
                 key={item.id}
-                className="block rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm transition hover:border-cyan-300/20 hover:bg-cyan-400/[0.03]"
+                className="block rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm transition hover:border-[#8b35e6]/25 hover:bg-[#f8f3ff]"
                 to={`/assurance/reviews?decisionId=${encodeURIComponent(item.id)}${item.evidenceJobId ? `&evidenceJobId=${encodeURIComponent(item.evidenceJobId)}` : ''}`}
               >
-                <div className="font-medium text-white">{index === 0 ? 'Latest decision' : 'Recent decision'}</div>
-                <div className="mt-1 text-sm text-slate-300">{item.recommendationTitle ?? item.recommendationId}</div>
-                <div className="mt-1 text-xs text-slate-500">{humanizeKey(item.decision)} · {formatDate(item.createdAt)}</div>
+                <div className="font-medium text-[#241232]">{index === 0 ? 'Latest decision' : 'Recent decision'}</div>
+                <div className="mt-1 text-sm text-[#51465e]">{item.recommendationTitle ?? item.recommendationId}</div>
+                <div className="mt-1 text-xs text-[#62576a]">{humanizeKey(item.decision)} · {formatDate(item.createdAt)}</div>
               </Link>
             ))}
             {latestTrackerImport && (
-              <Link className="block rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm transition hover:border-cyan-300/20 hover:bg-cyan-400/[0.03]" to={`/assurance/tracker?importId=${encodeURIComponent(latestTrackerImport.id)}`}>
-                <div className="font-medium text-white">Latest tracker import</div>
-                <div className="mt-1 font-mono text-xs text-cyan-200">{latestTrackerImport.id}</div>
-                <div className="mt-1 text-xs text-slate-500">{latestTrackerImport.name}</div>
+              <Link className="block rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm transition hover:border-[#8b35e6]/25 hover:bg-[#f8f3ff]" to={`/assurance/tracker?importId=${encodeURIComponent(latestTrackerImport.id)}`}>
+                <div className="font-medium text-[#241232]">Latest tracker import</div>
+                <div className="mt-1 font-mono text-xs text-[#6d28d9]">{latestTrackerImport.id}</div>
+                <div className="mt-1 text-xs text-[#62576a]">{latestTrackerImport.name}</div>
               </Link>
             )}
             {!latestPendingReview && !latestReviewDecision && !latestTrackerImport && (
-              <div className="text-sm text-slate-400">{loading ? 'Loading review activity...' : 'No review or tracker activity is available yet.'}</div>
+              <div className="text-sm text-[#6f6578]">{loading ? 'Loading review activity...' : 'No review or tracker activity is available yet.'}</div>
             )}
           </div>
         </section>
@@ -967,7 +991,7 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="label">Package mismatches</div>
-              <div className="mt-1 text-sm text-slate-400">Packages whose reconciliation no longer matches the underlying evidence bundle.</div>
+              <div className="mt-1 text-sm text-[#6f6578]">Packages whose reconciliation no longer matches the underlying evidence bundle.</div>
             </div>
             <Link className="button-secondary" to="/assurance/packages">
               Open packages
@@ -977,12 +1001,12 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
             {mismatchedPackages.map((item) => (
               <Link
                 key={item.id}
-                className="block rounded-2xl border border-amber-300/15 bg-amber-400/[0.04] px-3 py-3 text-sm transition hover:border-amber-300/30"
+                className="block rounded-2xl border border-[#f3bf62] bg-[#fff8ea] px-3 py-3 text-sm transition hover:border-[#f3bf62]"
                 to={`/assurance/packages?packageId=${encodeURIComponent(item.id)}`}
               >
-                <div className="font-medium text-white">{item.fileName}</div>
-                <div className="mt-1 font-mono text-xs text-amber-200">{item.id}</div>
-                <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-400">
+                <div className="font-medium text-[#241232]">{item.fileName}</div>
+                <div className="mt-1 font-mono text-xs text-[#8a4d00]">{item.id}</div>
+                <div className="mt-2 flex flex-wrap gap-3 text-xs text-[#6f6578]">
                   <span>{humanizeKey(item.reconciliationStatus ?? 'mismatch')}</span>
                   <span>Validation {humanizeKey(item.validationStatus ?? 'unknown')}</span>
                   <span>{readNumber(item.coverage, 'gapCount')} gap(s)</span>
@@ -991,9 +1015,9 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
               </Link>
             ))}
             {!loading && mismatchedPackages.length === 0 && (
-              <div className="text-sm text-slate-400">No package mismatches are waiting right now.</div>
+              <div className="text-sm text-[#6f6578]">No package mismatches are waiting right now.</div>
             )}
-            {loading && <div className="text-sm text-slate-400">Loading package mismatches...</div>}
+            {loading && <div className="text-sm text-[#6f6578]">Loading package mismatches...</div>}
           </div>
         </section>
 
@@ -1001,7 +1025,7 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="label">Validation drift</div>
-              <div className="mt-1 text-sm text-slate-400">Packages whose validation contract, lineage, or report integrity checks still need assessor attention.</div>
+              <div className="mt-1 text-sm text-[#6f6578]">Packages whose validation contract, lineage, or report integrity checks still need assessor attention.</div>
             </div>
             <Link className="button-secondary" to="/assurance/packages">
               Open packages
@@ -1011,12 +1035,12 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
             {validationDriftPackages.map((item) => (
               <Link
                 key={item.id}
-                className="block rounded-2xl border border-cyan-300/15 bg-cyan-400/[0.04] px-3 py-3 text-sm transition hover:border-cyan-300/30"
+                className="block rounded-2xl border border-[#8b35e6]/20 bg-[#f8f3ff] px-3 py-3 text-sm transition hover:border-[#8b35e6]/30"
                 to={`/assurance/packages?packageId=${encodeURIComponent(item.id)}`}
               >
-                <div className="font-medium text-white">{item.fileName}</div>
-                <div className="mt-1 font-mono text-xs text-cyan-200">{item.id}</div>
-                <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-400">
+                <div className="font-medium text-[#241232]">{item.fileName}</div>
+                <div className="mt-1 font-mono text-xs text-[#6d28d9]">{item.id}</div>
+                <div className="mt-2 flex flex-wrap gap-3 text-xs text-[#6f6578]">
                   <span>{humanizeKey(item.validationStatus ?? 'unknown')}</span>
                   <span>{item.validationCheckCount ?? readNumber(item.coverage, 'validationCheckCount')} check(s)</span>
                   <span>{formatDate(item.updatedAt)}</span>
@@ -1024,9 +1048,9 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
               </Link>
             ))}
             {!loading && validationDriftPackages.length === 0 && (
-              <div className="text-sm text-slate-400">No standalone validation-drift packages are waiting right now.</div>
+              <div className="text-sm text-[#6f6578]">No standalone validation-drift packages are waiting right now.</div>
             )}
-            {loading && <div className="text-sm text-slate-400">Loading package validation drift...</div>}
+            {loading && <div className="text-sm text-[#6f6578]">Loading package validation drift...</div>}
           </div>
         </section>
 
@@ -1034,7 +1058,7 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="label">Pending writebacks</div>
-              <div className="mt-1 text-sm text-slate-400">Approval-gated external actions queued by the bounded assurance agent.</div>
+              <div className="mt-1 text-sm text-[#6f6578]">Approval-gated external actions queued by the bounded assurance agent.</div>
             </div>
             <Link className="button-secondary" to="/assurance/agent-runs">
               Open agent runs
@@ -1044,24 +1068,24 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
             {pendingWritebacks.map((item) => (
               <Link
                 key={item.id}
-                className="block rounded-2xl border border-cyan-300/15 bg-cyan-400/[0.04] px-3 py-3 text-sm transition hover:border-cyan-300/30"
+                className="block rounded-2xl border border-[#8b35e6]/20 bg-[#f8f3ff] px-3 py-3 text-sm transition hover:border-[#8b35e6]/30"
                 to={`/assurance/agent-runs?runId=${encodeURIComponent(item.agentRunId)}&writebackId=${encodeURIComponent(item.id)}`}
               >
-                <div className="font-medium text-white">
+                <div className="font-medium text-[#241232]">
                   {item.connectorName ? `${item.connectorName} ${humanizeKey(item.requestType)}` : humanizeKey(item.requestType)}
                 </div>
-                <div className="mt-1 text-sm text-slate-300">{item.summary}</div>
-                <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-400">
-                  <span className="font-mono text-cyan-200">{item.id}</span>
+                <div className="mt-1 text-sm text-[#51465e]">{item.summary}</div>
+                <div className="mt-2 flex flex-wrap gap-3 text-xs text-[#6f6578]">
+                  <span className="font-mono text-[#6d28d9]">{item.id}</span>
                   <span>{item.evidenceRefCount} evidence ref(s)</span>
                   <span>{formatDate(item.createdAt)}</span>
                 </div>
               </Link>
             ))}
             {!loading && pendingWritebacks.length === 0 && (
-              <div className="text-sm text-slate-400">No pending writebacks are awaiting approval.</div>
+              <div className="text-sm text-[#6f6578]">No pending writebacks are awaiting approval.</div>
             )}
-            {loading && <div className="text-sm text-slate-400">Loading pending writebacks...</div>}
+            {loading && <div className="text-sm text-[#6f6578]">Loading pending writebacks...</div>}
           </div>
         </section>
 
@@ -1069,7 +1093,7 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="label">Tracker rows with errors</div>
-              <div className="mt-1 text-sm text-slate-400">Imports that still have unresolved parse or classification issues before conversion.</div>
+              <div className="mt-1 text-sm text-[#6f6578]">Imports that still have unresolved parse or classification issues before conversion.</div>
             </div>
             <Link className="button-secondary" to="/assurance/tracker">
               Open tracker
@@ -1079,12 +1103,12 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
             {trackerImportsWithErrors.map((item) => (
               <Link
                 key={item.id}
-                className="block rounded-2xl border border-rose-300/15 bg-rose-400/[0.04] px-3 py-3 text-sm transition hover:border-rose-300/30"
+                className="block rounded-2xl border border-[#f2a1ac] bg-[#fff0f2] px-3 py-3 text-sm transition hover:border-[#f2a1ac]"
                 to={`/assurance/tracker?importId=${encodeURIComponent(item.id)}`}
               >
-                <div className="font-medium text-white">{item.name}</div>
-                <div className="mt-1 font-mono text-xs text-rose-200">{item.id}</div>
-                <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-400">
+                <div className="font-medium text-[#241232]">{item.name}</div>
+                <div className="mt-1 font-mono text-xs text-[#9d1f2c]">{item.id}</div>
+                <div className="mt-2 flex flex-wrap gap-3 text-xs text-[#6f6578]">
                   <span>{item.errorCount} errored row(s)</span>
                   <span>{item.importedCount}/{item.rowCount} imported</span>
                   <span>{formatDate(item.updatedAt)}</span>
@@ -1092,9 +1116,9 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
               </Link>
             ))}
             {!loading && trackerImportsWithErrors.length === 0 && (
-              <div className="text-sm text-slate-400">No tracker imports with row errors are waiting right now.</div>
+              <div className="text-sm text-[#6f6578]">No tracker imports with row errors are waiting right now.</div>
             )}
-            {loading && <div className="text-sm text-slate-400">Loading tracker exceptions...</div>}
+            {loading && <div className="text-sm text-[#6f6578]">Loading tracker exceptions...</div>}
           </div>
         </section>
       </section>
@@ -1103,7 +1127,7 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="label">Recent assurance workflows</div>
-            <div className="mt-1 text-sm text-slate-400">Recent evidence, tracker, package, review, and agent orchestration activity across your current scope.</div>
+            <div className="mt-1 text-sm text-[#6f6578]">Recent evidence, tracker, package, review, and agent orchestration activity across your current scope.</div>
           </div>
           <button className="button-secondary" onClick={() => void loadOverview()} type="button">
             Refresh
@@ -1113,26 +1137,26 @@ export function AssuranceOverviewPage({ showOperationalReadiness = false }: Assu
           {workflowRuns.map((run) => (
             <Link
               key={run.runId}
-              className="block rounded-2xl border border-white/8 bg-black/15 px-4 py-4 transition hover:border-cyan-300/20 hover:bg-cyan-400/[0.03]"
+              className="block rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4 transition hover:border-[#8b35e6]/25 hover:bg-[#f8f3ff]"
               to={run.route}
             >
               <div className="flex flex-wrap items-center gap-2">
-                <div className="font-medium text-white">{run.title}</div>
-                <span className="badge-neutral">{run.module}</span>
-                <span className={workflowBadgeClass(run.status)}>{run.status}</span>
+                <div className="font-medium text-[#241232]">{run.title}</div>
+                <RegStatusPill tone="neutral">{run.module}</RegStatusPill>
+                <RegStatusPill tone={workflowTone(run.status)}>{run.status}</RegStatusPill>
               </div>
-              <div className="mt-2 text-sm leading-6 text-slate-300">{run.detail}</div>
-              <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
+              <div className="mt-2 text-sm leading-6 text-[#51465e]">{run.detail}</div>
+              <div className="mt-3 flex flex-wrap gap-3 text-xs text-[#62576a]">
                 <span>{run.runType}</span>
                 <span>{formatDate(run.createdAt)}</span>
-                {run.sourceRecordId ? <span className="font-mono text-cyan-200">{run.sourceRecordId}</span> : null}
+                {run.sourceRecordId ? <span className="font-mono text-[#6d28d9]">{run.sourceRecordId}</span> : null}
               </div>
             </Link>
           ))}
           {!loading && workflowRuns.length === 0 && (
-            <div className="text-sm text-slate-400">No assurance workflow activity is available yet.</div>
+            <div className="text-sm text-[#6f6578]">No assurance workflow activity is available yet.</div>
           )}
-          {loading && <div className="text-sm text-slate-400">Loading assurance workflow activity...</div>}
+          {loading && <div className="text-sm text-[#6f6578]">Loading assurance workflow activity...</div>}
         </div>
       </section>
     </div>

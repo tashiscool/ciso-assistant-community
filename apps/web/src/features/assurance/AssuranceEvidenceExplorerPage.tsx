@@ -13,7 +13,12 @@ import {
 } from './api';
 import { AssuranceExplainPanel } from './AssuranceExplainPanel';
 import { AssuranceWorkflowPanel } from './AssuranceWorkflowPanel';
-import { CoachMarksPanel } from '../../components/CoachMarksPanel';
+import {
+  RegModal,
+  RegPageHeader,
+  RegStatusPill,
+  RegTableShell,
+} from '../../components/regovise/PagePrimitives';
 import type {
   AssuranceEvidenceJob,
   AssuranceEvidenceJobDetail,
@@ -35,30 +40,30 @@ function toPreview(value: unknown) {
   return JSON.stringify(value, null, 2);
 }
 
-function severityBadgeClass(value: string | null | undefined) {
+function severityTone(value: string | null | undefined): 'success' | 'danger' | 'neutral' {
   if (!value) {
-    return 'badge-neutral';
+    return 'neutral';
   }
   switch (value.toLowerCase()) {
     case 'critical':
     case 'high':
-      return 'badge-danger';
+      return 'danger';
     case 'moderate':
     case 'medium':
-      return 'badge-neutral';
+      return 'neutral';
     default:
-      return 'badge-success';
+      return 'success';
   }
 }
 
-function evalStatusBadgeClass(status: string) {
+function evalStatusTone(status: string): 'success' | 'danger' | 'neutral' {
   switch (status) {
     case 'FAIL':
-      return 'badge-danger';
+      return 'danger';
     case 'PARTIAL':
-      return 'badge-neutral';
+      return 'neutral';
     default:
-      return 'badge-success';
+      return 'success';
   }
 }
 
@@ -70,6 +75,8 @@ function humanizeKey(value: string) {
     .trim()
     .replace(/\b\w/g, (match) => match.toUpperCase());
 }
+
+type EvidenceJobAction = 'evaluate' | 'package' | 'agent';
 
 export function AssuranceEvidenceExplorerPage() {
   const { identity } = useEdgeIdentity();
@@ -86,6 +93,7 @@ export function AssuranceEvidenceExplorerPage() {
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
   const [busyAction, setBusyAction] = useState<string | null>(null);
+  const [pendingJobAction, setPendingJobAction] = useState<EvidenceJobAction | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const requestedEvidenceJobId = searchParams.get('evidenceJobId') ?? '';
@@ -341,40 +349,6 @@ export function AssuranceEvidenceExplorerPage() {
         };
       });
   }, [evaluation, graphNodeLookup, selectedGraphNodeKey]);
-  const coachMarkItems = [
-    {
-      id: 'evidence-bundles',
-      eyebrow: 'Bundles',
-      title: 'Each evidence job becomes a normalized bundle',
-      body: 'This is the grounded record that later evaluations, reviews, packages, and agent runs refer back to.',
-      route: detail?.id ? `/assurance/evidence?evidenceJobId=${encodeURIComponent(detail.id)}` : '/assurance/evidence',
-      ctaLabel: 'Stay in explorer',
-    },
-    {
-      id: 'evidence-evals',
-      eyebrow: 'Deterministic checks',
-      title: 'Run evaluations before asking for explanations',
-      body: 'The pass, partial, and fail states here are meant to come from deterministic checks first, not from AI narration.',
-      tone: 'focus' as const,
-    },
-    {
-      id: 'evidence-packages',
-      eyebrow: 'Outputs',
-      title: 'Packages are downstream of evidence',
-      body: 'Once evidence and evaluations look right, build the 20x package from this same job instead of jumping to a separate export flow.',
-      route: lastBuiltPackageId ? `/assurance/packages?packageId=${encodeURIComponent(lastBuiltPackageId)}` : '/assurance/packages',
-      ctaLabel: 'Open packages',
-    },
-    {
-      id: 'evidence-agent',
-      eyebrow: 'Automation',
-      title: 'Agent runs should stay traceable',
-      body: 'If you hand this bundle to automation, the next stop should still be a bounded, inspectable agent run with explicit review gates.',
-      route: lastAgentRunId ? `/assurance/agent-runs?runId=${encodeURIComponent(lastAgentRunId)}` : '/assurance/agent-runs',
-      ctaLabel: 'Open agent runs',
-    },
-  ];
-
   useEffect(() => {
     const nodeKeys = evaluation?.graph.nodes.map((node) => node.key) ?? [];
     if (nodeKeys.length === 0) {
@@ -386,6 +360,7 @@ export function AssuranceEvidenceExplorerPage() {
 
   async function handleRunEvaluation() {
     if (!selectedJobId) {
+      setPendingJobAction(null);
       return;
     }
     try {
@@ -396,6 +371,7 @@ export function AssuranceEvidenceExplorerPage() {
       setEvaluation(next);
       await loadJobs();
       setNotice(`Deterministic assurance evaluation refreshed for ${selectedJobId}.`);
+      setPendingJobAction(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to run the assurance evaluation.');
     } finally {
@@ -405,6 +381,7 @@ export function AssuranceEvidenceExplorerPage() {
 
   async function handleBuildPackage() {
     if (!selectedJobId) {
+      setPendingJobAction(null);
       return;
     }
     try {
@@ -415,6 +392,7 @@ export function AssuranceEvidenceExplorerPage() {
       const packageJobId = String(result.package.packageJobId ?? '');
       setLastBuiltPackageId(packageJobId);
       setNotice(`20x package ${packageJobId || 'created'} is ready for review.`);
+      setPendingJobAction(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to build the 20x package.');
     } finally {
@@ -424,6 +402,7 @@ export function AssuranceEvidenceExplorerPage() {
 
   async function handleRunAgent() {
     if (!selectedJobId) {
+      setPendingJobAction(null);
       return;
     }
     try {
@@ -437,6 +416,7 @@ export function AssuranceEvidenceExplorerPage() {
       });
       setLastAgentRunId(result.trace.runId);
       setNotice(`Assurance agent run ${result.trace.runId} completed with ${result.trace.pendingWritebacks.length} pending writeback(s).`);
+      setPendingJobAction(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to run the assurance agent.');
     } finally {
@@ -446,80 +426,82 @@ export function AssuranceEvidenceExplorerPage() {
 
   return (
     <div className="space-y-6">
-      <section className="panel">
-        <div className="eyebrow">Assurance</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Evidence Explorer</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-          Inspect normalized evidence bundles, deterministic assurance outputs, artifact previews, and downstream package or agent actions from one explorer.
-        </p>
-      </section>
-
-      <CoachMarksPanel
-        storageKey="assurance-evidence-explorer"
-        title="Use Evidence Explorer to understand the source record before you package it."
-        description="This page is the best place to confirm what was actually collected, what deterministic checks concluded, and what downstream actions will inherit from this evidence bundle."
-        items={coachMarkItems}
+      <RegPageHeader
+        eyebrow="Assurance"
+        title="Evidence Explorer"
+        description="Inspect normalized evidence, deterministic check results, artifact previews, and downstream package or agent actions from one traceable workspace."
+        actions={
+          <>
+            <Link className="button-secondary" to="/assurance/reviews">
+              Review queue
+            </Link>
+            <Link className="button-secondary" to="/assurance/packages">
+              Packages
+            </Link>
+            <button className="button-primary" onClick={() => void loadJobs()} type="button">
+              Refresh jobs
+            </button>
+          </>
+        }
+        className="rounded-lg border border-[#ded8e4]"
       />
 
       {notice && <div className="notice-success">{notice}</div>}
       {error && <div className="notice-error">{error}</div>}
 
       <section className="grid gap-6 xl:grid-cols-[0.82fr_1.18fr]">
-        <section className="space-y-4">
-          <div className="panel">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="label">Evidence jobs</div>
-                <div className="mt-1 text-sm text-slate-400">Latest normalized evidence runs available to your current identity.</div>
-              </div>
-              <button className="button-secondary" onClick={() => void loadJobs()} type="button">
-                Refresh
-              </button>
-            </div>
+        <RegTableShell className="self-start xl:sticky xl:top-4">
+          <div className="border-b border-[#ded8e4] px-4 py-4 sm:px-5">
+            <div className="label">Evidence jobs</div>
+            <div className="mt-1 text-sm text-[#6f6578]">Normalized collection runs visible to your current identity.</div>
           </div>
-
-          <section className="space-y-3">
+          <div className="max-h-[44rem] divide-y divide-[#ece7f0] overflow-y-auto">
             {jobs.map((job) => (
               <button
                 key={job.id}
-                className={`panel w-full text-left transition ${selectedJobId === job.id ? 'border-cyan-400/30 bg-cyan-400/10' : ''}`}
+                aria-pressed={selectedJobId === job.id}
+                className={`w-full border-l-4 px-4 py-4 text-left transition sm:px-5 ${
+                  selectedJobId === job.id
+                    ? 'border-l-[#8b35e6] bg-[#f7f2ff]'
+                    : 'border-l-transparent bg-white hover:bg-[#fbf9fc]'
+                }`}
                 onClick={() => setSelectedJobId(job.id)}
                 type="button"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="eyebrow">{job.bundleKind}</div>
-                    <h2 className="mt-2 text-lg font-semibold text-white">{job.sourceName}</h2>
-                    <div className="mt-2 font-mono text-xs text-cyan-200">{job.id}</div>
+                    <div className="text-xs font-semibold text-[#6f20c9]">{job.bundleKind}</div>
+                    <h2 className="mt-1 font-semibold text-[#241232]">{job.sourceName}</h2>
+                    <div className="mt-1 line-clamp-1 font-mono text-xs text-[#6f6578]">{job.id}</div>
                   </div>
-                  <span className={job.status === 'success' ? 'badge-success' : job.status === 'failed' ? 'badge-danger' : 'badge-neutral'}>
+                  <RegStatusPill tone={job.status === 'success' ? 'success' : job.status === 'failed' ? 'danger' : 'neutral'}>
                     {job.status}
-                  </span>
+                  </RegStatusPill>
                 </div>
-                <div className="mt-3 grid gap-3 text-xs text-slate-400 sm:grid-cols-2">
+                <div className="mt-3 grid gap-x-4 gap-y-1 text-xs text-[#6f6578] sm:grid-cols-2">
                   <div>Input: {job.inputMode}</div>
-                  <div>Normalized: {job.normalizationStatus}</div>
                   <div>Artifacts: {job.artifactCount}</div>
+                  <div>Normalized: {job.normalizationStatus}</div>
                   <div>Started: {formatDate(job.startedAt)}</div>
                 </div>
               </button>
             ))}
 
             {!loading && jobs.length === 0 && (
-              <div className="panel text-sm text-slate-400">No evidence jobs are available for the current scope.</div>
+              <div className="px-5 py-8 text-sm text-[#6f6578]">No evidence jobs are available for the current scope.</div>
             )}
-            {loading && <div className="panel text-sm text-slate-400">Loading evidence jobs...</div>}
-          </section>
-        </section>
+            {loading && <div className="px-5 py-8 text-sm text-[#6f6578]">Loading evidence jobs...</div>}
+          </div>
+        </RegTableShell>
 
         <section className="space-y-4">
           <section className="panel">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
               <div>
                 <div className="label">Selected evidence job</div>
-                <h2 className="mt-2 text-2xl font-semibold text-white">{detail?.sourceName ?? 'Select a job'}</h2>
-                <div className="mt-2 font-mono text-xs text-cyan-200">{detail?.id ?? '—'}</div>
-                <div className="mt-3 grid gap-2 text-sm text-slate-400 sm:grid-cols-2">
+                <h2 className="mt-2 text-2xl font-semibold text-[#241232]">{detail?.sourceName ?? 'Select a job'}</h2>
+                <div className="mt-2 font-mono text-xs text-[#6f20c9]">{detail?.id ?? '—'}</div>
+                <div className="mt-3 grid gap-2 text-sm text-[#6f6578] sm:grid-cols-2">
                   <div>Scheduled: {formatDate(detail?.scheduledFor)}</div>
                   <div>Finished: {formatDate(detail?.finishedAt)}</div>
                   <div>Folder: {detail?.folderId ?? 'Tenant-wide'}</div>
@@ -544,15 +526,15 @@ export function AssuranceEvidenceExplorerPage() {
                 )}
               </div>
               <div className="flex flex-wrap gap-2">
-                <button className="button-primary" disabled={!detail || busyAction === 'evaluate'} onClick={() => void handleRunEvaluation()} type="button">
+                <button className="button-primary" disabled={!detail || busyAction !== null} onClick={() => setPendingJobAction('evaluate')} type="button">
                   <PlayCircle className="mr-2 h-4 w-4" />
                   {busyAction === 'evaluate' ? 'Running...' : 'Run eval'}
                 </button>
-                <button className="button-secondary" disabled={!detail || busyAction === 'package'} onClick={() => void handleBuildPackage()} type="button">
+                <button className="button-secondary" disabled={!detail || busyAction !== null} onClick={() => setPendingJobAction('package')} type="button">
                   <FileOutput className="mr-2 h-4 w-4" />
                   {busyAction === 'package' ? 'Building...' : 'Build 20x'}
                 </button>
-                <button className="button-secondary" disabled={!detail || busyAction === 'agent'} onClick={() => void handleRunAgent()} type="button">
+                <button className="button-secondary" disabled={!detail || busyAction !== null} onClick={() => setPendingJobAction('agent')} type="button">
                   <Bot className="mr-2 h-4 w-4" />
                   {busyAction === 'agent' ? 'Running...' : 'Run agent'}
                 </button>
@@ -560,7 +542,7 @@ export function AssuranceEvidenceExplorerPage() {
             </div>
           </section>
 
-          {detailLoading && <div className="panel text-sm text-slate-400">Loading evidence detail...</div>}
+          {detailLoading && <div className="panel text-sm text-[#6f6578]">Loading evidence detail...</div>}
 
           {detail && (
             <>
@@ -590,8 +572,8 @@ export function AssuranceEvidenceExplorerPage() {
                 linkedRecordIds={[selectedJobId, lastBuiltPackageId, lastAgentRunId]}
               />
 
-              <section className="grid gap-4 xl:grid-cols-[0.72fr_1.28fr]">
-                <section className="panel-subtle">
+              <section className="grid min-w-0 gap-4 2xl:grid-cols-[0.82fr_1.18fr]">
+                <section className="panel-subtle min-w-0">
                   <div className="label">Artifact preview</div>
                   <select className="input mt-3" onChange={(event) => selectPreviewFamily(event.target.value)} value={previewFamily}>
                     {families.map((family) => (
@@ -600,12 +582,12 @@ export function AssuranceEvidenceExplorerPage() {
                       </option>
                     ))}
                   </select>
-                  <pre className="mt-4 max-h-[460px] overflow-auto rounded-2xl border border-white/10 bg-slate-950/80 p-4 text-xs leading-6 text-slate-300">
+                  <pre className="mt-4 max-h-[460px] overflow-auto rounded-2xl border border-[#ded8e4] bg-[#f7f4f9] p-4 text-xs leading-6 text-[#4f435c]">
                     {preview ? toPreview(preview) : 'No preview available for the selected artifact family.'}
                   </pre>
                 </section>
 
-                <section className="space-y-4">
+                <section className="min-w-0 space-y-4">
                   <AssuranceExplainPanel
                     audiences={[
                       { value: 'assessor', label: 'Assessor' },
@@ -637,19 +619,19 @@ export function AssuranceEvidenceExplorerPage() {
                           key={artifact.id}
                           className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-3 py-2 text-left text-sm transition ${
                             previewFamily === artifact.artifactFamily
-                              ? 'border-cyan-300/30 bg-cyan-400/[0.06]'
-                              : 'border-white/8 bg-black/15 hover:border-cyan-300/20 hover:bg-cyan-400/[0.03]'
+                              ? 'border-[#b891f2] bg-[#f2e8ff]'
+                              : 'border-[#ded8e4] bg-white hover:border-[#d7c3f1] hover:bg-[#f7f2ff]'
                           }`}
                           onClick={() => selectPreviewFamily(artifact.artifactFamily)}
                           type="button"
                         >
-                          <div>
-                            <div className="font-medium text-white">{artifact.artifactFamily}</div>
-                            <div className="font-mono text-xs text-slate-500">{artifact.objectKey}</div>
+                          <div className="min-w-0">
+                            <div className="font-medium text-[#241232]">{artifact.artifactFamily}</div>
+                            <div className="font-mono text-xs text-[#62576a]">{artifact.objectKey}</div>
                           </div>
                           <div className="text-right">
-                            <div className="text-xs text-slate-400">{formatDate(artifact.createdAt)}</div>
-                            {previewFamily === artifact.artifactFamily ? <div className="mt-1 text-[11px] text-cyan-200">Previewing</div> : null}
+                            <div className="text-xs text-[#6f6578]">{formatDate(artifact.createdAt)}</div>
+                            {previewFamily === artifact.artifactFamily ? <div className="mt-1 text-[11px] text-[#6f20c9]">Previewing</div> : null}
                           </div>
                         </button>
                       ))}
@@ -678,36 +660,36 @@ export function AssuranceEvidenceExplorerPage() {
                         </div>
                       </div>
                     ) : (
-                      <div className="mt-3 text-sm text-slate-400">No assurance evaluation has been generated for this evidence job yet.</div>
+                      <div className="mt-3 text-sm text-[#6f6578]">No assurance evaluation has been generated for this evidence job yet.</div>
                     )}
                   </div>
 
                   {evaluation && (
                     <>
-                      <div className="grid gap-4 xl:grid-cols-3">
+                      <div className="grid min-w-0 gap-4 2xl:grid-cols-3">
                         <div className="panel-subtle">
                           <div className="label">Collection coverage</div>
                           <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                            <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
-                              <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Provider</div>
-                              <div className="mt-2 font-medium text-white">
+                            <div className="rounded-2xl border border-[#ded8e4] bg-white px-3 py-3 text-sm">
+                              <div className="text-xs uppercase tracking-normal text-[#62576a]">Provider</div>
+                              <div className="mt-2 font-medium text-[#241232]">
                                 {String(evaluation.liveCollectionCoverage.provider ?? detail.sourceName ?? 'unknown')}
                               </div>
                             </div>
-                            <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
-                              <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Collected</div>
-                              <div className="mt-2 font-medium text-white">{formatDate(String(evaluation.liveCollectionCoverage.collectedAt ?? detail.finishedAt ?? ''))}</div>
+                            <div className="rounded-2xl border border-[#ded8e4] bg-white px-3 py-3 text-sm">
+                              <div className="text-xs uppercase tracking-normal text-[#62576a]">Collected</div>
+                              <div className="mt-2 font-medium text-[#241232]">{formatDate(String(evaluation.liveCollectionCoverage.collectedAt ?? detail.finishedAt ?? ''))}</div>
                             </div>
                           </div>
                           <div className="mt-3 space-y-2">
                             {coverageEntries.map(([key, value]) => (
-                              <div key={key} className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
-                                <div className="text-slate-300">{humanizeKey(key)}</div>
-                                <div className="font-mono text-cyan-200">{String(value)}</div>
+                              <div key={key} className="flex items-center justify-between gap-3 rounded-2xl border border-[#ded8e4] bg-white px-3 py-3 text-sm">
+                                <div className="text-[#4f435c]">{humanizeKey(key)}</div>
+                                <div className="font-mono text-[#6f20c9]">{String(value)}</div>
                               </div>
                             ))}
                             {coverageEntries.length === 0 && (
-                              <div className="text-sm text-slate-400">No live coverage metrics were published for this evidence job.</div>
+                              <div className="text-sm text-[#6f6578]">No live coverage metrics were published for this evidence job.</div>
                             )}
                           </div>
                         </div>
@@ -716,14 +698,14 @@ export function AssuranceEvidenceExplorerPage() {
                           <div className="label">Reasonableness findings</div>
                           <div className="mt-3 space-y-2">
                             {evaluation.reasonablenessFindings.map((item) => (
-                              <div key={item.id} className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                                <div className="flex items-center justify-between gap-3">
-                                  <div className="text-sm font-medium text-white">{item.title}</div>
-                                  <span className={evalStatusBadgeClass(item.status)}>{item.status}</span>
+                              <div key={item.id} className="rounded-2xl border border-[#ded8e4] bg-white px-3 py-3">
+                                <div className="flex min-w-0 items-center justify-between gap-3">
+                                  <div className="min-w-0 break-words text-sm font-medium text-[#241232]">{item.title}</div>
+                                  <RegStatusPill tone={evalStatusTone(item.status)}>{item.status}</RegStatusPill>
                                 </div>
-                                <div className="mt-2 text-xs leading-5 text-slate-400">{item.detail}</div>
+                                <div className="mt-2 text-xs leading-5 text-[#6f6578]">{item.detail}</div>
                                 {(item.cadence || item.coverage || (item.controlRefs?.length ?? 0) > 0) && (
-                                  <div className="mt-3 flex flex-wrap gap-3 text-[11px] text-slate-500">
+                                  <div className="mt-3 flex flex-wrap gap-3 text-[11px] text-[#62576a]">
                                     {item.cadence ? <span>Cadence: {item.cadence}</span> : null}
                                     {item.coverage ? <span>Coverage: {item.coverage}</span> : null}
                                     {(item.controlRefs?.length ?? 0) > 0 ? <span>Controls: {item.controlRefs?.join(', ')}</span> : null}
@@ -732,7 +714,7 @@ export function AssuranceEvidenceExplorerPage() {
                               </div>
                             ))}
                             {evaluation.reasonablenessFindings.length === 0 && (
-                              <div className="text-sm text-slate-400">No reasonableness exceptions are open for the current evidence bundle.</div>
+                              <div className="text-sm text-[#6f6578]">No reasonableness exceptions are open for the current evidence bundle.</div>
                             )}
                           </div>
                         </div>
@@ -743,83 +725,83 @@ export function AssuranceEvidenceExplorerPage() {
                             {evaluation.reviewRecommendations.slice(0, 6).map((item) => (
                               <Link
                                 key={item.id}
-                                className="block rounded-2xl border border-white/8 bg-black/15 px-3 py-3 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
+                                className="block rounded-2xl border border-[#ded8e4] bg-white px-3 py-3 transition hover:border-[#b891f2] hover:bg-[#f7f2ff]"
                                 to={`/assurance/reviews?recommendationId=${encodeURIComponent(item.id)}&evidenceJobId=${encodeURIComponent(selectedJobId)}`}
                               >
-                                <div className="flex items-center justify-between gap-3">
-                                  <div className="text-sm font-medium text-white">{item.title}</div>
-                                  <span className={severityBadgeClass(String(item.recommendation.severity ?? 'unknown'))}>
+                                <div className="flex min-w-0 items-center justify-between gap-3">
+                                  <div className="min-w-0 break-words text-sm font-medium text-[#241232]">{item.title}</div>
+                                  <RegStatusPill tone={severityTone(String(item.recommendation.severity ?? 'unknown'))}>
                                     {String(item.recommendation.severity ?? 'pending')}
-                                  </span>
+                                  </RegStatusPill>
                                 </div>
-                                <div className="mt-2 text-xs leading-5 text-slate-400">{item.summary}</div>
+                                <div className="mt-2 text-xs leading-5 text-[#6f6578]">{item.summary}</div>
                               </Link>
                             ))}
                             {evaluation.reviewRecommendations.length === 0 && (
-                              <div className="text-sm text-slate-400">No review recommendations are waiting on this evidence job.</div>
+                              <div className="text-sm text-[#6f6578]">No review recommendations are waiting on this evidence job.</div>
                             )}
                           </div>
                         </div>
                       </div>
 
-                      <div className="grid gap-4 xl:grid-cols-2">
-                      <div className="panel-subtle">
+                      <div className="grid min-w-0 gap-4 2xl:grid-cols-2">
+                      <div className="panel-subtle min-w-0">
                         <div className="label">Top failing checks</div>
                         <div className="mt-3 space-y-2">
                           {evaluation.evalResults
                             .filter((item) => item.status !== 'PASS')
                             .slice(0, 6)
                             .map((item) => (
-                              <div key={item.id} className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                                <div className="flex items-center justify-between gap-3">
-                                  <div className="text-sm font-medium text-white">{item.title}</div>
-                                  <span className={item.status === 'FAIL' ? 'badge-danger' : 'badge-neutral'}>{item.status}</span>
+                              <div key={item.id} className="rounded-2xl border border-[#ded8e4] bg-white px-3 py-3">
+                                <div className="flex min-w-0 items-center justify-between gap-3">
+                                  <div className="min-w-0 break-words text-sm font-medium text-[#241232]">{item.title}</div>
+                                  <RegStatusPill tone={evalStatusTone(item.status)}>{item.status}</RegStatusPill>
                                 </div>
-                                <div className="mt-2 text-xs leading-5 text-slate-400">{item.summary}</div>
+                                <div className="mt-2 text-xs leading-5 text-[#6f6578]">{item.summary}</div>
                               </div>
                             ))}
                           {evaluation.evalResults.filter((item) => item.status !== 'PASS').length === 0 && (
-                            <div className="text-sm text-slate-400">All deterministic checks currently pass.</div>
+                            <div className="text-sm text-[#6f6578]">All deterministic checks currently pass.</div>
                           )}
                         </div>
                       </div>
 
-                      <div className="panel-subtle">
+                      <div className="panel-subtle min-w-0">
                         <div className="label">Open gaps</div>
                         <div className="mt-3 space-y-2">
                           {evaluation.gaps.slice(0, 6).map((gap) => (
-                            <div key={gap.id} className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                              <div className="flex items-center justify-between gap-3">
-                                <div className="text-sm font-medium text-white">{gap.title}</div>
-                                <span className={gap.severity === 'critical' || gap.severity === 'high' ? 'badge-danger' : 'badge-neutral'}>
+                            <div key={gap.id} className="rounded-2xl border border-[#ded8e4] bg-white px-3 py-3">
+                              <div className="flex min-w-0 items-center justify-between gap-3">
+                                <div className="min-w-0 break-words text-sm font-medium text-[#241232]">{gap.title}</div>
+                                <RegStatusPill tone={severityTone(gap.severity)}>
                                   {gap.severity}
-                                </span>
+                                </RegStatusPill>
                               </div>
-                              <div className="mt-2 text-xs leading-5 text-slate-400">{gap.detail}</div>
+                              <div className="mt-2 text-xs leading-5 text-[#6f6578]">{gap.detail}</div>
                             </div>
                           ))}
                           {evaluation.gaps.length === 0 && (
-                            <div className="text-sm text-slate-400">No open evidence gaps were generated from the current run.</div>
+                            <div className="text-sm text-[#6f6578]">No open evidence gaps were generated from the current run.</div>
                           )}
                         </div>
                       </div>
                       </div>
 
-                      <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-                        <div className="panel-subtle">
+                      <div className="grid min-w-0 gap-4 2xl:grid-cols-[0.9fr_1.1fr]">
+                        <div className="panel-subtle min-w-0">
                           <div className="label">POA&amp;M queue</div>
                           <div className="mt-3 space-y-2">
                             {evaluation.poamItems.slice(0, 6).map((item) => (
-                              <div key={item.id} className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                                <div className="flex items-center justify-between gap-3">
-                                  <div>
-                                    <div className="text-sm font-medium text-white">{item.identifier}</div>
-                                    <div className="mt-1 text-xs text-slate-500">{item.weaknessName}</div>
+                              <div key={item.id} className="rounded-2xl border border-[#ded8e4] bg-white px-3 py-3">
+                                <div className="flex min-w-0 items-center justify-between gap-3">
+                                  <div className="min-w-0">
+                                    <div className="break-words text-sm font-medium text-[#241232]">{item.identifier}</div>
+                                    <div className="mt-1 text-xs text-[#62576a]">{item.weaknessName}</div>
                                   </div>
-                                  <span className={severityBadgeClass(item.severity)}>{item.severity}</span>
+                                  <RegStatusPill tone={severityTone(item.severity)}>{item.severity}</RegStatusPill>
                                 </div>
-                                <div className="mt-2 text-xs leading-5 text-slate-400">{item.plannedRemediation}</div>
-                                <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
+                                <div className="mt-2 text-xs leading-5 text-[#6f6578]">{item.plannedRemediation}</div>
+                                <div className="mt-3 flex flex-wrap gap-3 text-xs text-[#62576a]">
                                   <span>Status: {item.status}</span>
                                   <span>Due: {formatDate(item.milestoneDueDate)}</span>
                                   {item.sourceEvalCode && <span>{item.sourceEvalCode}</span>}
@@ -827,14 +809,14 @@ export function AssuranceEvidenceExplorerPage() {
                               </div>
                             ))}
                             {evaluation.poamItems.length === 0 && (
-                              <div className="text-sm text-slate-400">No POA&amp;M items were generated for this evidence job.</div>
+                              <div className="text-sm text-[#6f6578]">No POA&amp;M items were generated for this evidence job.</div>
                             )}
                           </div>
                         </div>
 
-                        <div className="panel-subtle">
+                        <div className="panel-subtle min-w-0">
                           <div className="label">Evidence graph</div>
-                          <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                          <div className="mt-3 grid min-w-0 gap-3 sm:grid-cols-2 2xl:grid-cols-4">
                             <div className="metric-card">
                               <div className="metric-label">Nodes</div>
                               <div className="metric-value">{evaluation.graph.nodes.length}</div>
@@ -852,14 +834,14 @@ export function AssuranceEvidenceExplorerPage() {
                               <div className="metric-value">{graphEdgeTypeCounts.length}</div>
                             </div>
                           </div>
-                          <div className="mt-4 grid gap-4 xl:grid-cols-[0.78fr_1.22fr]">
-                            <div className="space-y-4">
+                          <div className="mt-4 grid min-w-0 gap-4 2xl:grid-cols-[0.78fr_1.22fr]">
+                            <div className="min-w-0 space-y-4">
                               <div>
                                 <div className="label">Node types</div>
                                 <div className="mt-3 flex flex-wrap gap-2">
                                   {graphNodeTypeCounts.map(([type, count]) => (
-                                    <span key={type} className="rounded-full border border-white/10 bg-black/20 px-3 py-1 text-xs text-slate-300">
-                                      {humanizeKey(type)}: <span className="font-mono text-cyan-200">{count}</span>
+                                    <span key={type} className="rounded-full border border-[#ded8e4] bg-[#f7f4f9] px-3 py-1 text-xs text-[#4f435c]">
+                                      {humanizeKey(type)}: <span className="font-mono text-[#6f20c9]">{count}</span>
                                     </span>
                                   ))}
                                 </div>
@@ -868,8 +850,8 @@ export function AssuranceEvidenceExplorerPage() {
                                 <div className="label">Edge types</div>
                                 <div className="mt-3 flex flex-wrap gap-2">
                                   {graphEdgeTypeCounts.map(([type, count]) => (
-                                    <span key={type} className="rounded-full border border-white/10 bg-black/20 px-3 py-1 text-xs text-slate-300">
-                                      {humanizeKey(type)}: <span className="font-mono text-cyan-200">{count}</span>
+                                    <span key={type} className="rounded-full border border-[#ded8e4] bg-[#f7f4f9] px-3 py-1 text-xs text-[#4f435c]">
+                                      {humanizeKey(type)}: <span className="font-mono text-[#6f20c9]">{count}</span>
                                     </span>
                                   ))}
                                 </div>
@@ -886,45 +868,45 @@ export function AssuranceEvidenceExplorerPage() {
                               </div>
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="min-w-0 space-y-4">
                               {selectedGraphNode ? (
                                 <>
-                                  <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                                    <div className="flex items-center justify-between gap-3">
-                                      <div>
-                                        <div className="text-sm font-medium text-white">{selectedGraphNode.label}</div>
-                                        <div className="mt-1 text-xs text-slate-500">{humanizeKey(selectedGraphNode.type)}</div>
+                                  <div className="rounded-2xl border border-[#ded8e4] bg-white px-3 py-3">
+                                    <div className="flex min-w-0 items-center justify-between gap-3">
+                                      <div className="min-w-0">
+                                        <div className="break-words text-sm font-medium text-[#241232]">{selectedGraphNode.label}</div>
+                                        <div className="mt-1 text-xs text-[#62576a]">{humanizeKey(selectedGraphNode.type)}</div>
                                       </div>
-                                      <span className="font-mono text-xs text-cyan-200">{selectedGraphNode.key}</span>
+                                      <span className="max-w-[45%] overflow-hidden text-ellipsis font-mono text-xs text-[#6f20c9]">{selectedGraphNode.key}</span>
                                     </div>
-                                    <pre className="mt-3 max-h-[180px] overflow-auto rounded-2xl border border-white/10 bg-slate-950/70 p-3 text-xs leading-6 text-slate-300">
+                                    <pre className="mt-3 max-h-[180px] overflow-auto rounded-2xl border border-[#ded8e4] bg-[#f7f4f9] p-3 text-xs leading-6 text-[#4f435c]">
                                       {JSON.stringify(selectedGraphNode.attributes, null, 2)}
                                     </pre>
                                   </div>
-                                  <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
+                                  <div className="rounded-2xl border border-[#ded8e4] bg-white px-3 py-3">
                                     <div className="label">Connected records</div>
                                     <div className="mt-3 space-y-2">
                                       {selectedGraphConnections.map((connection, index) => (
-                                        <div key={`${connection.relatedNodeKey}:${connection.edgeType}:${index}`} className="rounded-2xl border border-white/8 bg-slate-950/50 px-3 py-3">
+                                        <div key={`${connection.relatedNodeKey}:${connection.edgeType}:${index}`} className="rounded-2xl border border-[#ded8e4] bg-[#f7f4f9] px-3 py-3">
                                           <div className="flex items-center justify-between gap-3">
-                                            <div className="text-sm font-medium text-white">
+                                            <div className="text-sm font-medium text-[#241232]">
                                               {connection.relatedNode?.label ?? connection.relatedNodeKey}
                                             </div>
-                                            <span className="badge-neutral">{connection.direction}</span>
+                                            <RegStatusPill tone="neutral">{connection.direction}</RegStatusPill>
                                           </div>
-                                          <div className="mt-2 text-xs text-slate-400">
+                                          <div className="mt-2 text-xs text-[#6f6578]">
                                             {humanizeKey(connection.edgeType)} · {connection.relatedNode ? humanizeKey(connection.relatedNode.type) : 'Unknown node'}
                                           </div>
                                         </div>
                                       ))}
                                       {selectedGraphConnections.length === 0 && (
-                                        <div className="text-sm text-slate-400">This graph node does not have any linked edges.</div>
+                                        <div className="text-sm text-[#6f6578]">This graph node does not have any linked edges.</div>
                                       )}
                                     </div>
                                   </div>
                                 </>
                               ) : (
-                                <div className="text-sm text-slate-400">No graph nodes are available for inspection.</div>
+                                <div className="text-sm text-[#6f6578]">No graph nodes are available for inspection.</div>
                               )}
                             </div>
                           </div>
@@ -938,6 +920,74 @@ export function AssuranceEvidenceExplorerPage() {
           )}
         </section>
       </section>
+
+      <RegModal
+        open={pendingJobAction !== null}
+        onOpenChange={(open) => {
+          if (!open && busyAction === null) {
+            setPendingJobAction(null);
+          }
+        }}
+        title={
+          pendingJobAction === 'evaluate'
+            ? 'Run deterministic evaluation'
+            : pendingJobAction === 'package'
+              ? 'Build 20x package'
+              : 'Run assurance agent'
+        }
+        description="Review the selected evidence job before starting a downstream assurance action."
+        footer={
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button className="button-secondary" disabled={busyAction !== null} onClick={() => setPendingJobAction(null)} type="button">
+              Cancel
+            </button>
+            {pendingJobAction === 'evaluate' ? (
+              <button className="button-primary" disabled={busyAction !== null || !detail} onClick={() => void handleRunEvaluation()} type="button">
+                {busyAction === 'evaluate' ? 'Running evaluation...' : 'Run evaluation'}
+              </button>
+            ) : null}
+            {pendingJobAction === 'package' ? (
+              <button className="button-primary" disabled={busyAction !== null || !detail} onClick={() => void handleBuildPackage()} type="button">
+                {busyAction === 'package' ? 'Building package...' : 'Build package'}
+              </button>
+            ) : null}
+            {pendingJobAction === 'agent' ? (
+              <button className="button-primary" disabled={busyAction !== null || !detail} onClick={() => void handleRunAgent()} type="button">
+                {busyAction === 'agent' ? 'Running agent...' : 'Run agent'}
+              </button>
+            ) : null}
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div className="rounded-lg border border-[#ded8e4] bg-[#f7f4f9] p-4">
+            <div className="text-sm font-semibold text-[#241232]">{detail?.sourceName ?? 'No evidence job selected'}</div>
+            <div className="mt-2 break-all font-mono text-xs text-[#6f20c9]">{selectedJobId || 'No evidence job id'}</div>
+            <div className="mt-3 grid gap-2 text-sm text-[#4f435c] sm:grid-cols-2">
+              <div>Folder: {detail?.folderId ?? 'Tenant-wide'}</div>
+              <div>Artifacts: {detail?.artifacts.length ?? 0}</div>
+              <div>Finished: {formatDate(detail?.finishedAt)}</div>
+              <div>Evaluation: {evaluation ? `generated ${formatDate(evaluation.summary.generatedAt)}` : 'not generated yet'}</div>
+            </div>
+          </div>
+
+          {pendingJobAction === 'evaluate' ? (
+            <div className="text-sm leading-6 text-[#4f435c]">
+              This will refresh deterministic pass, partial, and fail outputs for the selected evidence bundle. These checks remain the source of status truth before explanations or downstream packages are generated.
+            </div>
+          ) : null}
+          {pendingJobAction === 'package' ? (
+            <div className="text-sm leading-6 text-[#4f435c]">
+              This will create a downstream 20x package from the current evidence job and folder context. Review deterministic outputs first when possible so package readiness reflects the latest checks.
+            </div>
+          ) : null}
+          {pendingJobAction === 'agent' ? (
+            <div className="text-sm leading-6 text-[#4f435c]">
+              This will start a bounded assurance agent run with requested writebacks enabled. Any suggested writebacks still need explicit review in the agent run inspector before they affect mapped records.
+            </div>
+          ) : null}
+        </div>
+      </RegModal>
     </div>
   );
 }

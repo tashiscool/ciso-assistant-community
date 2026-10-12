@@ -887,6 +887,43 @@ function coerceRuleAnswerValue(question: QuestionnaireQuestion | undefined, valu
   return value;
 }
 
+function validTableDate(value: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(`${value}T00:00:00Z`)) && new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value;
+}
+
+function answerShapeError(question: QuestionnaireQuestion, value: unknown, requireCells = false): string | null {
+  if (value === undefined || value === null || value === '') return null;
+  if (question.type === 'multi-select') {
+    return Array.isArray(value) && value.length <= 1000 && value.every((entry) => typeof entry === 'string' && (!question.options?.length || question.options.includes(entry)))
+      ? null : `${question.prompt} must contain a list of valid selections.`;
+  }
+  if (question.type !== 'table') return null;
+  if (!Array.isArray(value) || value.length > 1000 || value.some((row) => !row || typeof row !== 'object' || Array.isArray(row))) return `${question.prompt} must contain table rows.`;
+  for (const row of value as Record<string, unknown>[]) {
+    for (const column of question.tableColumns ?? []) {
+      const cell = row[column.id];
+      if (cell === undefined || cell === null || cell === '') {
+        if (requireCells && column.required) return `${question.prompt}: ${column.title} is required in every row.`;
+        continue;
+      }
+      const valid = column.dataType === 'number' ? typeof cell === 'number' && Number.isFinite(cell)
+        : column.dataType === 'date' ? typeof cell === 'string' && validTableDate(cell)
+        : column.dataType === 'dropdown' ? typeof cell === 'string' && (column.options ?? []).some((option) => option.value === cell)
+        : typeof cell === 'string';
+      if (!valid) return `${question.prompt}: ${column.title} contains an invalid value.`;
+    }
+  }
+  return null;
+}
+
+function changedAnswerShapeErrors(questions: QuestionnaireQuestion[], original: Record<string, unknown>, incoming: Record<string, unknown>): Array<{ ref: string; message: string }> {
+  return questions.flatMap((question) => {
+    if (!Object.prototype.hasOwnProperty.call(incoming, question.ref) || JSON.stringify(incoming[question.ref]) === JSON.stringify(original[question.ref])) return [];
+    const message = answerShapeError(question, incoming[question.ref]);
+    return message ? [{ ref: question.ref, message }] : [];
+  });
+}
+
 function buildQuestionValidationErrors(
   questions: QuestionnaireQuestion[],
   answers: Record<string, unknown>,
@@ -901,6 +938,8 @@ function buildQuestionValidationErrors(
     if (requiredQuestions.has(question.ref) && !hasQuestionAnswer(answers[question.ref])) {
       errors.push({ ref: question.ref, message: `${question.prompt} is required by questionnaire rules.` });
     }
+    const shapeError = answerShapeError(question, answers[question.ref], true);
+    if (shapeError) errors.push({ ref: question.ref, message: shapeError });
     if (question.type === 'email' && hasQuestionAnswer(answers[question.ref]) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(answers[question.ref]))) {
       errors.push({ ref: question.ref, message: `${question.prompt} must be a valid email address.` });
     }
@@ -1764,7 +1803,9 @@ function buildPreviewTestRun(args: {
 }
 
 function generateAccessCode() {
-  return String(Math.floor(100000000 + Math.random() * 900000000));
+  const values = new Uint32Array(1);
+  do { crypto.getRandomValues(values); } while (values[0] >= 3_600_000_000);
+  return String(100_000_000 + values[0] % 900_000_000);
 }
 
 function defaultAnswerForQuestion(question: QuestionnaireQuestion): unknown {
@@ -1896,18 +1937,28 @@ async function listQuestionnaireInstances(
   return rows.results.map((row) => toQuestionnaireInstance(row, template.name));
 }
 
-async function writeQuestionnaireHistory(args: {
+const QUESTIONNAIRE_SNAPSHOT_PREDICATE = `tenant_id = ? AND questionnaire_template_id = ? AND id = ?
+  AND archived = 0 AND status = ? AND updated_at = ? AND answers_json = ? AND collaboration_json = ?`;
+
+function questionnaireSnapshotBindings(row: QuestionnaireInstanceRow) {
+  return [row.tenant_id, row.questionnaire_template_id, row.id, row.status, row.updated_at, row.answers_json, row.collaboration_json];
+}
+
+function questionnaireHistoryStatement(args: {
   env: WorkerRequestContext['env'];
   tenantId: string;
   instanceId: string;
   discriminator: string;
   payload: unknown;
   userId: string | null;
+  row: QuestionnaireInstanceRow;
+  timestamp: string;
 }) {
-  await args.env.D1_MAIN.prepare(
+  return args.env.D1_MAIN.prepare(
     `INSERT INTO questionnaire_history_entries (
       id, tenant_id, questionnaire_instance_id, discriminator, json_data, created_by_user_id, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    ) SELECT ?, ?, ?, ?, ?, ?, ? FROM questionnaire_instances
+      WHERE ${QUESTIONNAIRE_SNAPSHOT_PREDICATE}`,
   )
     .bind(
       crypto.randomUUID(),
@@ -1916,28 +1967,32 @@ async function writeQuestionnaireHistory(args: {
       args.discriminator,
       JSON.stringify(args.payload),
       args.userId,
-      nowIso(),
-    )
-    .run();
+      args.timestamp,
+      ...questionnaireSnapshotBindings(args.row),
+    );
 }
 
-async function upsertQuestionnaireProperties(args: {
+function questionnairePropertyStatements(args: {
   env: WorkerRequestContext['env'];
   tenantId: string;
   templateId: string;
   instanceId: string;
   questions: QuestionnaireQuestion[];
   answers: Record<string, unknown>;
+  row?: QuestionnaireInstanceRow;
+  timestamp?: string;
 }) {
-  const timestamp = nowIso();
-  const statements = args.questions
+  const timestamp = args.timestamp ?? nowIso();
+  return args.questions
     .filter((question) => question.type !== 'instructional')
     .map((question) =>
       args.env.D1_MAIN.prepare(
         `INSERT INTO questionnaire_response_properties (
           id, tenant_id, questionnaire_instance_id, questionnaire_template_id, key, label, value,
           secondary_id, secondary_module, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) ${args.row
+          ? `SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? FROM questionnaire_instances WHERE ${QUESTIONNAIRE_SNAPSHOT_PREDICATE}`
+          : 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'}
         ON CONFLICT(tenant_id, questionnaire_instance_id, key)
         DO UPDATE SET label = excluded.label, value = excluded.value, secondary_id = excluded.secondary_id,
                       secondary_module = excluded.secondary_module, updated_at = excluded.updated_at`,
@@ -1953,11 +2008,14 @@ async function upsertQuestionnaireProperties(args: {
         question.requirementRef ? 'security-controls' : null,
         timestamp,
         timestamp,
+        ...(args.row ? questionnaireSnapshotBindings(args.row) : []),
       ),
     );
-  if (statements.length > 0) {
-    await args.env.D1_MAIN.batch(statements);
-  }
+}
+
+async function upsertQuestionnaireProperties(args: Parameters<typeof questionnairePropertyStatements>[0]) {
+  const statements = questionnairePropertyStatements(args);
+  if (statements.length > 0) await args.env.D1_MAIN.batch(statements);
 }
 
 async function createQuestionnaireInstance(args: {
@@ -2057,36 +2115,46 @@ async function updateQuestionnaireInstanceState(args: {
     collaboration.push(args.collaborationEntry);
   }
   const feedback = args.feedback ?? asJson<Record<string, { rating?: string | null; comment?: string | null }>>(args.row.feedback_json, {});
-  await args.env.D1_MAIN.prepare(
+  const next: QuestionnaireInstanceRow = {
+    ...args.row,
+    status: args.status,
+    feedback_json: JSON.stringify(feedback),
+    collaboration_json: JSON.stringify(collaboration),
+    submitted_at: args.status === 'Submitted' ? timestamp : args.row.submitted_at,
+    reviewed_at: ['Accepted', 'RequestChanges', 'Closed'].includes(args.status) ? timestamp : args.row.reviewed_at,
+    updated_by_user_id: args.userId,
+    updated_at: timestamp,
+  };
+  const update = args.env.D1_MAIN.prepare(
     `UPDATE questionnaire_instances
         SET status = ?, feedback_json = ?, collaboration_json = ?, submitted_at = ?,
             reviewed_at = ?, updated_by_user_id = ?, updated_at = ?
-      WHERE tenant_id = ? AND questionnaire_template_id = ? AND id = ?`,
+      WHERE ${QUESTIONNAIRE_SNAPSHOT_PREDICATE}`,
   )
     .bind(
-      args.status,
-      JSON.stringify(feedback),
-      JSON.stringify(collaboration),
-      args.status === 'Submitted' ? timestamp : args.row.submitted_at,
-      args.status === 'Accepted' || args.status === 'RequestChanges' || args.status === 'Closed' ? timestamp : args.row.reviewed_at,
-      args.userId,
+      next.status,
+      next.feedback_json,
+      next.collaboration_json,
+      next.submitted_at,
+      next.reviewed_at,
+      next.updated_by_user_id,
       timestamp,
-      args.tenantId,
-      args.template.id,
-      args.row.id,
-    )
-    .run();
-  const next = await getQuestionnaireInstanceRow(args.env, args.tenantId, args.template.id, args.row.id);
-  if (next) {
-    await writeQuestionnaireHistory({
+      ...questionnaireSnapshotBindings(args.row),
+    );
+  const results = await args.env.D1_MAIN.batch([
+    questionnaireHistoryStatement({
       env: args.env,
       tenantId: args.tenantId,
       instanceId: args.row.id,
       discriminator: args.status,
       payload: toQuestionnaireInstance(next, args.template.name),
       userId: args.userId,
-    });
-  }
+      row: args.row,
+      timestamp,
+    }),
+    update,
+  ]);
+  if (!results[results.length - 1]?.meta.changes) throw Object.assign(new Error('This response changed. Reload it before continuing.'), { status: 409, code: 'response_conflict' });
 }
 
 async function handlePublicQuestionnaireAccess(
@@ -2100,6 +2168,9 @@ async function handlePublicQuestionnaireAccess(
   const row = await getQuestionnaireInstanceByToken(ctx.env, shareToken);
   if (!row) {
     return json({ error: 'not_found', message: 'Questionnaire response link was not found.' }, { status: 404 });
+  }
+  if (row.login_required && (ctx.authStrategy !== 'd1-session' || !ctx.userId || ctx.tenantId !== row.tenant_id)) {
+    return json({ error: 'questionnaire_login_required', message: 'Sign in to the assigned organization to access this questionnaire.' }, { status: 401 });
   }
   const templateRow = await getQuestionnaireTemplateRow(ctx.env, row.tenant_id, row.questionnaire_template_id);
   const detail = await getQuestionnaireDetail(ctx.env, row.tenant_id, row.questionnaire_template_id);
@@ -2125,6 +2196,7 @@ async function handlePublicQuestionnaireAccess(
           helpText: question.helpText ?? null,
           evidenceHint: question.evidenceHint ?? null,
           enableUpload: Boolean(question.enableUpload || question.type === 'file-upload'),
+          tableColumns: question.type === 'table' ? question.tableColumns?.map(({ id, title, dataType, required, options }) => ({ id, title, dataType, required, options: options?.map(({ value }) => ({ value })) })) : undefined,
         })),
         runtime: runtimeStateFromEvaluation(runtime),
       },
@@ -2144,15 +2216,20 @@ async function handlePublicQuestionnaireAccess(
     if (!['Open', 'RequestChanges'].includes(row.status)) {
       return json({ error: 'locked_response', message: 'Submitted or closed questionnaire responses are locked.' }, { status: 409 });
     }
-    const mergedAnswers = { ...asJson<Record<string, unknown>>(row.answers_json, {}), ...asRecord(body.answers) };
+    const originalAnswers = asJson<Record<string, unknown>>(row.answers_json, {});
+    const incomingAnswers = asRecord(body.answers);
+    const shapeErrors = changedAnswerShapeErrors(templateDetail.questions, originalAnswers, incomingAnswers);
+    if (shapeErrors.length) return json({ error: 'invalid_answer_shape', message: 'Answers contain invalid structured values.', validationErrors: shapeErrors }, { status: 400 });
+    const mergedAnswers = { ...originalAnswers, ...incomingAnswers };
     const responseRuntime = evaluateQuestionnaireRuntime(templateDetail.questions, detail.ruleSet.rules, mergedAnswers);
     const answers = responseRuntime.answers;
     const uploads = { ...asJson<Record<string, unknown>>(row.uploads_json, {}), ...asRecord(body.uploads) };
-    await ctx.env.D1_MAIN.prepare(
+    const timestamp = nowIso();
+    const update = ctx.env.D1_MAIN.prepare(
       `UPDATE questionnaire_instances
           SET answers_json = ?, uploads_json = ?, score = ?, max_score = ?, grade = ?,
               percent_complete = ?, passing_status = ?, updated_at = ?
-        WHERE share_token = ?`,
+        WHERE ${QUESTIONNAIRE_SNAPSHOT_PREDICATE}`,
     )
       .bind(
         JSON.stringify(answers),
@@ -2162,18 +2239,23 @@ async function handlePublicQuestionnaireAccess(
         responseRuntime.grade,
         responseRuntime.percentComplete,
         responseRuntime.passingStatus,
-        nowIso(),
-        shareToken,
-      )
-      .run();
-    await upsertQuestionnaireProperties({
-      env: ctx.env,
-      tenantId: row.tenant_id,
-      templateId: row.questionnaire_template_id,
-      instanceId: row.id,
-      questions: templateDetail.questions,
-      answers,
-    });
+        timestamp,
+        ...questionnaireSnapshotBindings(row),
+      );
+    const results = await ctx.env.D1_MAIN.batch([
+      ...questionnairePropertyStatements({
+        env: ctx.env,
+        tenantId: row.tenant_id,
+        templateId: row.questionnaire_template_id,
+        instanceId: row.id,
+        questions: templateDetail.questions,
+        answers,
+        row,
+        timestamp,
+      }),
+      update,
+    ]);
+    if (!results[results.length - 1]?.meta.changes) return json({ error: 'response_conflict', message: 'This response changed. Reload it before continuing.' }, { status: 409 });
     const updated = await getQuestionnaireInstanceByToken(ctx.env, shareToken);
     return updated
       ? json({ data: attachQuestionnaireRuntime(toQuestionnaireInstance(updated, templateRow.name), templateDetail.questions, detail.ruleSet.rules) })
@@ -2181,6 +2263,7 @@ async function handlePublicQuestionnaireAccess(
   }
 
   if (action === 'submit' && ctx.request.method === 'POST') {
+    if (!['Open', 'RequestChanges'].includes(row.status)) return json({ error: 'locked_response', message: 'Submitted or closed questionnaire responses are locked.' }, { status: 409 });
     const submitRuntime = evaluateQuestionnaireRuntime(templateDetail.questions, detail.ruleSet.rules, asJson<Record<string, unknown>>(row.answers_json, {}));
     if (submitRuntime.percentComplete < 100 || submitRuntime.validationErrors.length > 0) {
       return json(
@@ -2747,7 +2830,11 @@ export async function handleBuilderRoutes(
         return json({ error: 'locked_response', message: 'Submitted or accepted questionnaire responses are locked.' }, { status: 409 });
       }
       const body = await readJson<ResponseUpdateInput>(ctx.request);
-      const mergedAnswers = { ...asJson<Record<string, unknown>>(row.answers_json, {}), ...asRecord(body.answers) };
+      const originalAnswers = asJson<Record<string, unknown>>(row.answers_json, {});
+      const incomingAnswers = asRecord(body.answers);
+      const shapeErrors = changedAnswerShapeErrors(detail.template.questions, originalAnswers, incomingAnswers);
+      if (shapeErrors.length) return json({ error: 'invalid_answer_shape', message: 'Answers contain invalid structured values.', validationErrors: shapeErrors }, { status: 400 });
+      const mergedAnswers = { ...originalAnswers, ...incomingAnswers };
       const responseRuntime = evaluateQuestionnaireRuntime(detail.template.questions, detail.ruleSet.rules, mergedAnswers);
       const answers = responseRuntime.answers;
       const uploads = { ...asJson<Record<string, unknown>>(row.uploads_json, {}), ...asRecord(body.uploads) };
@@ -2762,12 +2849,13 @@ export async function handleBuilderRoutes(
           createdAt: nowIso(),
         });
       }
-      await ctx.env.D1_MAIN.prepare(
+      const timestamp = nowIso();
+      const update = ctx.env.D1_MAIN.prepare(
         `UPDATE questionnaire_instances
             SET answers_json = ?, uploads_json = ?, header_values_json = ?, collaboration_json = ?,
                 score = ?, max_score = ?, grade = ?, percent_complete = ?, passing_status = ?,
                 updated_by_user_id = ?, updated_at = ?
-          WHERE tenant_id = ? AND questionnaire_template_id = ? AND id = ?`,
+          WHERE ${QUESTIONNAIRE_SNAPSHOT_PREDICATE}`,
       )
         .bind(
           JSON.stringify(answers),
@@ -2780,20 +2868,23 @@ export async function handleBuilderRoutes(
           responseRuntime.percentComplete,
           responseRuntime.passingStatus,
           userIdOrResponse,
-          nowIso(),
+          timestamp,
+          ...questionnaireSnapshotBindings(row),
+        );
+      const results = await ctx.env.D1_MAIN.batch([
+        ...questionnairePropertyStatements({
+          env: ctx.env,
           tenantId,
-          id,
+          templateId: id,
           instanceId,
-        )
-        .run();
-      await upsertQuestionnaireProperties({
-        env: ctx.env,
-        tenantId,
-        templateId: id,
-        instanceId,
-        questions: detail.template.questions,
-        answers,
-      });
+          questions: detail.template.questions,
+          answers,
+          row,
+          timestamp,
+        }),
+        update,
+      ]);
+      if (!results[results.length - 1]?.meta.changes) return json({ error: 'response_conflict', message: 'This response changed. Reload it before continuing.' }, { status: 409 });
       const updated = await getQuestionnaireInstanceRow(ctx.env, tenantId, id, instanceId);
       return updated
         ? json({ data: attachQuestionnaireRuntime(toQuestionnaireInstance(updated, detail.template.name), detail.template.questions, detail.ruleSet.rules) })

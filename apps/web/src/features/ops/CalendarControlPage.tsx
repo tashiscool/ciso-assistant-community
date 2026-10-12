@@ -12,7 +12,7 @@ export function CalendarControlPage() {
   const [query, setQuery] = useState('');
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading operational calendar...</div>;
+    return <div className="panel p-6 text-sm text-[#51465e]">Loading operational calendar...</div>;
   }
 
   if (error || !overview) {
@@ -31,12 +31,12 @@ export function CalendarControlPage() {
   return (
     <div className="space-y-6">
       <section className="panel overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-emerald-400/0 via-emerald-300/60 to-emerald-400/0" />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-[#1aa854]/0 via-[#1aa854]/35 to-[#1aa854]/0" />
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">Operational Timeline</div>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Calendar</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">Calendar</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">
               The canonical operational calendar now combines live module lifecycle dates, manual assessment schedules,
               portal deadlines, and privacy obligations surfaced by the Worker.
             </p>
@@ -60,43 +60,43 @@ export function CalendarControlPage() {
         <div className="metric-card">
           <div className="metric-label">Upcoming events</div>
           <div className="metric-value">{overview.calendar.length}</div>
-          <div className="mt-2 text-xs text-slate-500">Module, assessment, portal, and privacy commitments currently visible in the tenant.</div>
+          <div className="mt-2 text-xs text-[#62576a]">Module, assessment, portal, and privacy commitments currently visible in the tenant.</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Next due</div>
           <div className="metric-value text-lg">{nextEvent ? formatDate(nextEvent.date) : 'None'}</div>
-          <div className="mt-2 text-xs text-slate-500">Earliest dated module or operational milestone known to the Worker.</div>
+          <div className="mt-2 text-xs text-[#62576a]">Earliest dated module or operational milestone known to the Worker.</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Portal load</div>
           <div className="metric-value">{overview.analytics.find((item) => item.id === 'portal')?.value ?? 0}</div>
-          <div className="mt-2 text-xs text-slate-500">Assignments that can contribute external due dates and evidence pressure.</div>
+          <div className="mt-2 text-xs text-[#62576a]">Assignments that can contribute external due dates and evidence pressure.</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Processings</div>
           <div className="metric-value">{overview.analytics.find((item) => item.id === 'processings')?.value ?? 0}</div>
-          <div className="mt-2 text-xs text-slate-500">Privacy registry activity that can generate rights-response timelines.</div>
+          <div className="mt-2 text-xs text-[#62576a]">Privacy registry activity that can generate rights-response timelines.</div>
         </div>
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
         <div className="panel-subtle">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-400/10 text-emerald-300">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#e9f9ef] text-[#126b36]">
               <CalendarDays className="h-5 w-5" />
             </div>
               <div>
-                <h2 className="text-lg font-semibold text-white">Scheduled events</h2>
-              <p className="text-sm text-slate-400">The canonical time-ordered queue of module milestones, assessment windows, portal deadlines, and privacy response dates.</p>
+                <h2 className="text-lg font-semibold text-[#241232]">Scheduled events</h2>
+              <p className="text-sm text-[#6f6578]">The canonical time-ordered queue of module milestones, assessment windows, portal deadlines, and privacy response dates.</p>
               </div>
           </div>
           <label className="mt-5 block">
             <span className="sr-only">Search calendar</span>
             <span className="relative block">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#62576a]" />
               <input
                 aria-label="Search calendar"
-                className="w-full rounded-2xl border border-white/10 bg-slate-950/50 py-3 pl-11 pr-4 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300/60 focus:ring-2 focus:ring-cyan-300/15"
+                className="w-full rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] py-3 pl-11 pr-4 text-sm text-[#241232] outline-none transition placeholder:text-[#8a8192] focus:border-[#8b35e6]/50 focus:ring-2 focus:ring-[#8b35e6]/20"
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search calendar events, modules, milestones..."
                 type="search"
@@ -105,30 +105,30 @@ export function CalendarControlPage() {
             </span>
           </label>
           {normalizedQuery ? (
-            <div className="mt-3 text-xs uppercase tracking-[0.18em] text-slate-500">
+            <div className="mt-3 text-xs uppercase tracking-[0.18em] text-[#62576a]">
               Showing {filteredCalendar.length} of {overview.calendar.length} events
             </div>
           ) : null}
           <div className="mt-5 space-y-3">
             {filteredCalendar.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-white/10 bg-slate-950/20 p-4 text-sm text-slate-400">
+              <div className="rounded-3xl border border-dashed border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#6f6578]">
                 {normalizedQuery ? 'No calendar events match that search.' : 'No dated events are queued for this tenant yet.'}
               </div>
             ) : (
               visibleCalendar.map((item) => (
                 <Link
                   key={item.id}
-                  className="block rounded-3xl border border-white/10 bg-slate-950/30 p-4 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
+                  className="block rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4 transition hover:border-[#8b35e6]/30 hover:bg-[#f8f3ff]"
                   to={item.route}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="font-medium text-white">{item.title}</div>
-                      <div className="mt-1 text-sm text-slate-400">{formatDate(item.date)}</div>
+                      <div className="font-medium text-[#241232]">{item.title}</div>
+                      <div className="mt-1 text-sm text-[#6f6578]">{formatDate(item.date)}</div>
                     </div>
-                    <span className="badge-neutral">Scheduled</span>
+                    <span className="status-pill-neutral">Scheduled</span>
                   </div>
-                  <div className="mt-3 text-sm leading-6 text-slate-300">{item.detail}</div>
+                  <div className="mt-3 text-sm leading-6 text-[#51465e]">{item.detail}</div>
                 </Link>
               ))
             )}
@@ -138,27 +138,27 @@ export function CalendarControlPage() {
         <div className="space-y-4">
           <div className="panel-subtle">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#f3e9ff] text-[#7a2ed6]">
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-white">Operational readiness</h2>
-                <p className="text-sm text-slate-400">Quick-start completion influences whether dated work can actually be acted on cleanly.</p>
+                <h2 className="text-lg font-semibold text-[#241232]">Operational readiness</h2>
+                <p className="text-sm text-[#6f6578]">Quick-start completion influences whether dated work can actually be acted on cleanly.</p>
               </div>
             </div>
             <div className="mt-5 space-y-3">
               {overview.quickStart.map((step) => (
                 <Link
                   key={step.id}
-                  className="block rounded-3xl border border-white/10 bg-slate-950/30 p-4 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
+                  className="block rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4 transition hover:border-[#8b35e6]/30 hover:bg-[#f8f3ff]"
                   to={step.route}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="font-medium text-white">{step.title}</div>
-                      <div className="mt-1 text-sm text-slate-400">{step.detail}</div>
+                      <div className="font-medium text-[#241232]">{step.title}</div>
+                      <div className="mt-1 text-sm text-[#6f6578]">{step.detail}</div>
                     </div>
-                    <span className={step.completed ? 'badge-positive' : 'badge-neutral'}>
+                    <span className={step.completed ? 'status-pill-positive' : 'status-pill-neutral'}>
                       {step.completed ? 'Complete' : 'Pending'}
                     </span>
                   </div>
@@ -169,24 +169,24 @@ export function CalendarControlPage() {
 
           <div className="panel-subtle">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-400/10 text-amber-300">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#fff2d9] text-[#8a4d00]">
                 <TimerReset className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-white">Deadline context</h2>
-                <p className="text-sm text-slate-400">Searchable module and workflow records that most often produce dated work in the canonical platform.</p>
+                <h2 className="text-lg font-semibold text-[#241232]">Deadline context</h2>
+                <p className="text-sm text-[#6f6578]">Searchable module and workflow records that most often produce dated work in the canonical platform.</p>
               </div>
             </div>
             <div className="mt-5 space-y-3">
               {overview.searchIndex.slice(0, 5).map((entry) => (
                 <Link
                   key={`${entry.section}-${entry.id}`}
-                  className="block rounded-3xl border border-white/10 bg-slate-950/30 p-4 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
+                  className="block rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4 transition hover:border-[#8b35e6]/30 hover:bg-[#f8f3ff]"
                   to={entry.route}
                 >
-                  <div className="font-medium text-white">{entry.title}</div>
-                  <div className="mt-1 text-sm text-slate-400">{entry.section}</div>
-                  <div className="mt-3 text-xs uppercase tracking-[0.18em] text-slate-500">
+                  <div className="font-medium text-[#241232]">{entry.title}</div>
+                  <div className="mt-1 text-sm text-[#6f6578]">{entry.section}</div>
+                  <div className="mt-3 text-xs uppercase tracking-[0.18em] text-[#62576a]">
                     {entry.keywords.slice(0, 3).join(' · ')}
                   </div>
                 </Link>

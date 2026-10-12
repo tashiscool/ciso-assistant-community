@@ -60,7 +60,7 @@ export function WorkbenchControlPage() {
   }, [moduleFilter, ownerFilter, search, snapshot, statusFilter]);
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading workbench...</div>;
+    return <div className="panel p-6 text-sm text-[#51465e]">Loading workbench...</div>;
   }
 
   if (error || !snapshot) {
@@ -77,8 +77,8 @@ export function WorkbenchControlPage() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">Operations</div>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Workbench</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">Workbench</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">
               Review cross-module operational work from shared module records, assessments, applied controls, portal
               assignments, imports, exports, and monitoring runs in one canonical Worker-backed queue.
             </p>
@@ -111,7 +111,7 @@ export function WorkbenchControlPage() {
 
       <section className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
         <div className="panel-subtle space-y-4">
-          <h2 className="text-lg font-semibold text-white">Filters</h2>
+          <h2 className="text-lg font-semibold text-[#241232]">Filters</h2>
           <label className="space-y-1">
             <span className="label">Search</span>
             <input className="input" onChange={(event) => setSearch(event.target.value)} value={search} />
@@ -151,26 +151,26 @@ export function WorkbenchControlPage() {
 
           <div className="grid gap-3 md:grid-cols-2">
             {snapshot.moduleVolume.map((entry) => (
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4" key={entry.module}>
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={entry.module}>
                 <div className="label">{entry.module}</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{entry.count}</div>
+                <div className="mt-2 text-2xl font-semibold text-[#241232]">{entry.count}</div>
               </div>
             ))}
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+          <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
             <div className="eyebrow">Recent cadence</div>
             <div className="mt-4 space-y-3">
               {snapshot.activity.map((point) => (
                 <div key={point.bucket}>
-                  <div className="flex items-center justify-between text-sm text-slate-300">
+                  <div className="flex items-center justify-between text-sm text-[#51465e]">
                     <span>{point.bucket}</span>
                     <span>
                       {point.active} active · {point.completed} complete · {point.attention} attention
                     </span>
                   </div>
-                  <div className="mt-2 h-2 rounded-full bg-white/5">
-                    <div className="h-2 rounded-full bg-cyan-400" style={{ width: `${Math.min(100, (point.active + point.completed + point.attention) * 12)}%` }} />
+                  <div className="mt-2 h-2 rounded-full bg-[#f6f1fa]">
+                    <div className="h-2 rounded-full bg-[#8b35e6]" style={{ width: `${Math.min(100, (point.active + point.completed + point.attention) * 12)}%` }} />
                   </div>
                 </div>
               ))}
@@ -179,32 +179,32 @@ export function WorkbenchControlPage() {
         </div>
 
         <section className="panel overflow-hidden p-0">
-          <div className="border-b border-white/10 px-6 py-4">
+          <div className="border-b border-[#ded8e4] px-6 py-4">
             <div className="eyebrow">Operational queue</div>
-            <p className="mt-1 text-sm text-slate-400">Live work derived from canonical Worker tables and tenant-facing module records.</p>
+            <p className="mt-1 text-sm text-[#6f6578]">Live work derived from canonical Worker tables and tenant-facing module records.</p>
           </div>
-          <div className="divide-y divide-white/6">
+          <div className="divide-y divide-[#ded8e4]">
             {filteredItems.map((item) => (
               <div className="px-6 py-4" key={item.id}>
                 <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <div className="font-medium text-white">{item.title}</div>
-                      <span className="badge-neutral">{item.module}</span>
+                      <div className="font-medium text-[#241232]">{item.title}</div>
+                      <span className="status-pill-neutral">{item.module}</span>
                       <span
                         className={
                           item.status === 'Action Needed'
-                            ? 'badge-neutral'
+                            ? 'status-pill-neutral'
                             : item.status === 'Done'
-                              ? 'badge-positive'
-                              : 'badge-neutral'
+                              ? 'status-pill-positive'
+                              : 'status-pill-neutral'
                         }
                       >
                         {item.status}
                       </span>
                     </div>
-                    <div className="mt-2 text-sm text-slate-300">{item.summary}</div>
-                    <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                    <div className="mt-2 text-sm text-[#51465e]">{item.summary}</div>
+                    <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-[#62576a]">
                       <span className="inline-flex items-center gap-1">
                         <Users className="h-3.5 w-3.5" />
                         {item.owner}
@@ -222,9 +222,9 @@ export function WorkbenchControlPage() {
                   </div>
                   <div className="flex items-center gap-3 xl:w-[220px] xl:justify-end">
                     <div className="w-full max-w-[120px]">
-                      <div className="mb-1 text-xs uppercase tracking-[0.16em] text-slate-500">Progress</div>
-                      <div className="h-2 rounded-full bg-white/5">
-                        <div className="h-2 rounded-full bg-cyan-400" style={{ width: `${item.progress}%` }} />
+                      <div className="mb-1 text-xs uppercase tracking-[0.16em] text-[#62576a]">Progress</div>
+                      <div className="h-2 rounded-full bg-[#f6f1fa]">
+                        <div className="h-2 rounded-full bg-[#8b35e6]" style={{ width: `${item.progress}%` }} />
                       </div>
                     </div>
                     <Link className="button-secondary" to={item.route}>
@@ -239,21 +239,21 @@ export function WorkbenchControlPage() {
       </section>
 
       <section className="panel overflow-hidden p-0">
-        <div className="border-b border-white/10 px-6 py-4">
+        <div className="border-b border-[#ded8e4] px-6 py-4">
           <div className="eyebrow">Recently completed</div>
-          <p className="mt-1 text-sm text-slate-400">Recently closed or ready items across canonical operations.</p>
+          <p className="mt-1 text-sm text-[#6f6578]">Recently closed or ready items across canonical operations.</p>
         </div>
-        <div className="divide-y divide-white/6">
+        <div className="divide-y divide-[#ded8e4]">
           {snapshot.completedItems.map((item) => (
             <div className="flex flex-col gap-2 px-6 py-4 md:flex-row md:items-center md:justify-between" key={item.id}>
               <div>
-                <div className="font-medium text-white">{item.title}</div>
-                <div className="mt-1 text-sm text-slate-400">
+                <div className="font-medium text-[#241232]">{item.title}</div>
+                <div className="mt-1 text-sm text-[#6f6578]">
                   {item.module} · {item.owner} · {new Date(item.lastActivity).toLocaleString()}
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="badge-positive">{item.status}</span>
+                <span className="status-pill-positive">{item.status}</span>
                 <Link className="button-secondary" to={item.route}>
                   Open
                 </Link>

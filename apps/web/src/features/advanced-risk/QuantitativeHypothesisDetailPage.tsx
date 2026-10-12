@@ -55,7 +55,7 @@ export function QuantitativeHypothesisDetailPage() {
   }, [identity.tenantId, identity.userId, hypothesisId]);
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading quantitative hypothesis...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading quantitative hypothesis...</div>;
   }
 
   if (!study || !scenario || !hypothesis) {
@@ -65,38 +65,38 @@ export function QuantitativeHypothesisDetailPage() {
   return (
     <div className="space-y-6">
       <section className="panel">
-        <Link className="text-sm text-cyan-200 transition hover:text-cyan-100" to={`/quantitative-risk-scenarios/${scenario.id}`}>
+        <Link className="text-sm text-[#6d28d9] transition hover:text-[#5f1aa8]" to={`/quantitative-risk-scenarios/${scenario.id}`}>
           Back to quantitative scenario
         </Link>
         <div className="eyebrow mt-4">{hypothesis.riskStage}</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">{hypothesis.name}</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">{hypothesis.name}</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
           This hypothesis belongs to {scenario.name} in {study.name}.
         </p>
       </section>
 
       {error && <div className="notice-error">{error}</div>}
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="metric-card">
           <div className="metric-label">Probability</div>
           <div className="metric-value">{Math.round(hypothesis.probability * 100)}%</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Impact low</div>
-          <div className="mt-3 text-sm font-semibold text-white">
+          <div className="mt-3 text-sm font-semibold text-[#241232]">
             {formatCurrency(hypothesis.impactLow, study.currency)}
           </div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Impact high</div>
-          <div className="mt-3 text-sm font-semibold text-white">
+          <div className="mt-3 text-sm font-semibold text-[#241232]">
             {formatCurrency(hypothesis.impactHigh, study.currency)}
           </div>
         </div>
         <div className="metric-card">
           <div className="metric-label">ALE</div>
-          <div className="mt-3 text-sm font-semibold text-white">
+          <div className="mt-3 text-sm font-semibold text-[#241232]">
             {formatCurrency(hypothesis.ale, study.currency)}
           </div>
         </div>

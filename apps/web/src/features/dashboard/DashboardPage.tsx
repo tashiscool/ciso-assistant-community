@@ -97,8 +97,8 @@ function MetricCard({ label, value, loading, icon, trend, accent }: MetricCardPr
   return (
     <Card
       className={cn(
-        'group relative overflow-hidden transition-all duration-200 hover:border-white/20 hover:shadow-[0_8px_40px_rgba(2,8,23,0.6)]',
-        accent && 'border-cyan-400/20 bg-cyan-400/[0.03]',
+        'group relative overflow-hidden transition-all duration-200 hover:border-[#d7c3f1] hover:shadow-[0_8px_40px_rgba(2,8,23,0.6)]',
+        accent && 'border-[#d7c3f1] bg-[#f6f1fa]',
       )}
     >
       <CardContent className="p-5">
@@ -107,25 +107,25 @@ function MetricCard({ label, value, loading, icon, trend, accent }: MetricCardPr
             className={cn(
               'flex h-9 w-9 items-center justify-center rounded-xl',
               accent
-                ? 'bg-cyan-400/15 text-cyan-400'
-                : 'bg-white/[0.05] text-slate-400',
+                ? 'bg-[#f2e8ff] text-[#7a3ccf]'
+                : 'bg-[#f6f1fa] text-[#6f6578]',
             )}
           >
             {icon}
           </div>
           {trend === 'up' && (
-            <TrendingUp className="h-3.5 w-3.5 text-emerald-400 opacity-60" />
+            <TrendingUp className="h-3.5 w-3.5 text-[#126b36] opacity-60" />
           )}
         </div>
         <div className="mt-4">
           {loading ? (
             <Skeleton className="h-8 w-16 rounded-xl" />
           ) : (
-            <div className={cn('text-3xl font-semibold', accent ? 'text-cyan-100' : 'text-white')}>
+            <div className={cn('text-3xl font-semibold', accent ? 'text-[#5f1aa8]' : 'text-[#241232]')}>
               {value ?? 0}
             </div>
           )}
-          <div className="mt-1.5 text-xs uppercase tracking-[0.18em] text-slate-500">{label}</div>
+          <div className="mt-1.5 text-xs uppercase tracking-[0.18em] text-[#62576a]">{label}</div>
         </div>
       </CardContent>
     </Card>
@@ -268,8 +268,8 @@ export function DashboardPage() {
       <section className="panel grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <div className="eyebrow">Overview</div>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-white">CISO Assistant</h1>
-          <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300">
+          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-[#241232]">CISO Assistant</h1>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-[#4f435c]">
             Centralize governance, risk, continuous monitoring, and evidence operations in one
             workspace. This dashboard gives you a quick read on readiness, activity, and the core
             areas that teams need day to day.
@@ -293,23 +293,23 @@ export function DashboardPage() {
             </Button>
           </div>
         </div>
-        <Card className="border-white/8">
+        <Card className="border-[#ded8e4]">
           <CardHeader className="pb-3">
             <div className="eyebrow">Active Identity</div>
           </CardHeader>
           <CardContent className="space-y-3 pt-0">
             <div className="space-y-1">
-              <div className="text-[10px] uppercase tracking-[0.18em] text-slate-500">Tenant</div>
-              <div className="font-mono text-sm text-cyan-200 truncate">{identity.tenantId}</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] text-[#62576a]">Tenant</div>
+              <div className="font-mono text-sm text-[#6d28d9] truncate">{identity.tenantId}</div>
             </div>
             <Separator />
             <div className="space-y-1">
-              <div className="text-[10px] uppercase tracking-[0.18em] text-slate-500">User</div>
-              <div className="font-mono text-sm text-cyan-200 truncate">{identity.userId}</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] text-[#62576a]">User</div>
+              <div className="font-mono text-sm text-[#6d28d9] truncate">{identity.userId}</div>
             </div>
             <Separator />
             <div className="flex items-center justify-between">
-              <div className="text-[10px] uppercase tracking-[0.18em] text-slate-500">Runtime</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] text-[#62576a]">Runtime</div>
               {loading ? (
                 <Skeleton className="h-5 w-20 rounded-lg" />
               ) : (
@@ -351,12 +351,12 @@ export function DashboardPage() {
           <CardContent className="space-y-2">
             {migrationPhases.map((phase, i) => (
               <div key={phase.title}>
-                <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 transition hover:border-white/10 hover:bg-white/[0.04]">
+                <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3 transition hover:border-[#ded8e4] hover:bg-[#f6f1fa]">
                   <div className="flex items-center justify-between">
-                    <div className="font-medium text-sm text-white">{phase.title}</div>
+                    <div className="font-medium text-sm text-[#241232]">{phase.title}</div>
                     <Badge variant="secondary" className="text-[9px] py-0.5">Active</Badge>
                   </div>
-                  <div className="mt-1.5 text-xs leading-5 text-slate-400">{phase.description}</div>
+                  <div className="mt-1.5 text-xs leading-5 text-[#6f6578]">{phase.description}</div>
                 </div>
                 {i < migrationPhases.length - 1 && <div className="h-px" />}
               </div>
@@ -375,7 +375,7 @@ export function DashboardPage() {
                 ) : (
                   <>
                     <Progress value={healthPercent} />
-                    <div className="flex justify-between text-xs text-slate-500">
+                    <div className="flex justify-between text-xs text-[#62576a]">
                       <span>{healthyCount} of {bindingChecks.length} bindings ready</span>
                       <span>{Math.round(healthPercent)}%</span>
                     </div>
@@ -391,15 +391,15 @@ export function DashboardPage() {
                 : bindingChecks.map(({ label, enabled }) => (
                     <div
                       key={label}
-                      className="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] px-4 py-3"
+                      className="flex items-center justify-between rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3"
                     >
                       <div className="flex items-center gap-2.5">
                         {enabled ? (
-                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                          <CheckCircle2 className="h-3.5 w-3.5 text-[#126b36]" />
                         ) : (
-                          <XCircle className="h-3.5 w-3.5 text-rose-400" />
+                          <XCircle className="h-3.5 w-3.5 text-[#9d1f2c]" />
                         )}
-                        <span className="text-sm text-slate-300">{label}</span>
+                        <span className="text-sm text-[#4f435c]">{label}</span>
                       </div>
                       <Badge variant={enabled ? 'success' : 'destructive'}>
                         {enabled ? 'ready' : 'missing'}
@@ -407,7 +407,7 @@ export function DashboardPage() {
                     </div>
                   ))}
               {!health && !loading && (
-                <p className="text-sm text-slate-400">Binding status unavailable.</p>
+                <p className="text-sm text-[#6f6578]">Binding status unavailable.</p>
               )}
             </CardContent>
           </Card>
@@ -426,24 +426,24 @@ export function DashboardPage() {
                 workflowSnapshot.activeLeases.map((lease) => (
                   <div
                     key={lease.leaseKey}
-                    className="rounded-2xl border border-white/[0.06] bg-white/[0.02] px-4 py-3"
+                    className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3"
                   >
                     <div className="flex items-center gap-2">
-                      <Clock className="h-3 w-3 text-cyan-400/60 shrink-0" />
-                      <div className="font-mono text-xs text-cyan-200 truncate">{lease.leaseKey}</div>
+                      <Clock className="h-3 w-3 text-[#7a3ccf] shrink-0" />
+                      <div className="font-mono text-xs text-[#6d28d9] truncate">{lease.leaseKey}</div>
                     </div>
-                    <div className="mt-1.5 text-xs text-slate-500">
+                    <div className="mt-1.5 text-xs text-[#62576a]">
                       Acquired {lease.acquiredAt} &middot; expires {lease.expiresAt}
                     </div>
                   </div>
                 ))
               ) : (
                 <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/[0.04] mb-3">
-                    <Activity className="h-5 w-5 text-slate-500" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#f6f1fa] mb-3">
+                    <Activity className="h-5 w-5 text-[#62576a]" />
                   </div>
-                  <p className="text-sm text-slate-400">No active background activity</p>
-                  <p className="text-xs text-slate-600 mt-1">All systems idle</p>
+                  <p className="text-sm text-[#6f6578]">No active background activity</p>
+                  <p className="text-xs text-[#4f435c] mt-1">All systems idle</p>
                 </div>
               )}
             </CardContent>

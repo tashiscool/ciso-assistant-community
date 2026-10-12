@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { ApiClient } from '../../shared/api/client';
+import { RegStatusPill } from '../../components/regovise/PagePrimitives';
 import { useEdgeIdentity } from '../../shared/session/identity';
 import type { AppliedControl } from './types';
 
@@ -115,32 +116,32 @@ export function AppliedControlsFlashPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading flash workspace...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading flash workspace...</div>;
   }
 
   if (!current) {
-    return <div className="panel text-sm text-slate-400">No applied controls are available for this view.</div>;
+    return <div className="panel text-sm text-[#6f6578]">No applied controls are available for this view.</div>;
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center">
-      <div className="panel w-full max-w-5xl space-y-6">
+    <div className="flex min-h-[calc(100vh-8rem)] min-w-0 items-center justify-center">
+      <div className="panel min-w-0 w-full max-w-5xl space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link className="text-sm text-cyan-200 transition hover:text-cyan-100" to={backUrl}>
+          <Link className="text-sm text-[#6d28d9] transition hover:text-[#5f1aa8]" to={backUrl}>
             {backLabel}
           </Link>
-          <div className="badge-neutral">
+          <RegStatusPill tone="neutral">
             {index + 1} / {controls.length}
-          </div>
+          </RegStatusPill>
         </div>
 
         <div className="text-center">
           <div className="eyebrow">Flash Mode</div>
-          <h1 className="mt-2 text-3xl font-semibold text-white">
+          <h1 className="mt-2 text-3xl font-semibold text-[#241232]">
             {current.refId ? `${current.refId} ` : ''}
             {current.name}
           </h1>
-          <p className="mt-3 text-sm leading-6 text-slate-300">
+          <p className="mt-3 text-sm leading-6 text-[#4f435c]">
             {current.description || 'No applied control description available.'}
           </p>
         </div>
@@ -268,12 +269,12 @@ export function AppliedControlsFlashPage() {
             Next
           </button>
           {current.requirementAssessment && (
-            <div className="ml-auto text-xs text-cyan-200">
+            <div className="ml-auto text-xs text-[#6d28d9]">
               Requirement: {current.requirementAssessment.ref} {current.requirementAssessment.name}
             </div>
           )}
           {current.assessmentPlanItem && (
-            <div className="ml-auto text-xs text-cyan-200">
+            <div className="ml-auto text-xs text-[#6d28d9]">
               Line of inquiry: {current.assessmentPlanItem.ref} {current.assessmentPlanItem.prompt}
             </div>
           )}

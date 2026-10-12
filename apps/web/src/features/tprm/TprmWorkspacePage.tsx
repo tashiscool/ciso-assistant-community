@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  RegModal,
+  RegRightDrawer,
+  RegStatusPill,
+  RegTableShell,
+} from '../../components/regovise/PagePrimitives';
 import { ApiClient } from '../../shared/api/client';
 import { useEdgeIdentity } from '../../shared/session/identity';
 import type { WorkspaceFolder } from '../iam/types';
@@ -11,6 +17,44 @@ import type {
 } from './types';
 
 const client = new ApiClient();
+
+type PillTone = 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'purple';
+
+type VendorImportRow = {
+  vendor: string;
+  solution: string;
+  contract: string;
+  owner: string;
+  action: string;
+  status: 'Ready' | 'Needs mapping' | 'Review';
+};
+
+const STAGED_VENDOR_IMPORT_ROWS: VendorImportRow[] = [
+  {
+    vendor: 'TaskNimbus',
+    solution: 'Questionnaire automation',
+    contract: 'MSA-2026-014',
+    owner: 'Security Operations',
+    action: 'Create entity, solution, and contract records',
+    status: 'Ready',
+  },
+  {
+    vendor: 'CloudLedger',
+    solution: 'Finance data warehouse',
+    contract: 'Renewal pending',
+    owner: 'Finance',
+    action: 'Map provider to existing risk assessment',
+    status: 'Needs mapping',
+  },
+  {
+    vendor: 'DataForge Labs',
+    solution: 'Model evaluation workspace',
+    contract: 'DPA draft',
+    owner: 'AI Governance',
+    action: 'Review privacy and resilience dependencies first',
+    status: 'Review',
+  },
+];
 
 function formatDate(value: string | null | undefined) {
   return value ? new Date(value).toLocaleDateString() : 'n/a';
@@ -28,6 +72,20 @@ function formatMoney(amount: number | null | undefined, currency = 'USD') {
   }).format(amount);
 }
 
+function statusTone(value: string | null | undefined): PillTone {
+  const normalized = (value ?? '').toLowerCase();
+  if (['active', 'approved', 'complete', 'completed', 'compliant', 'accepted'].includes(normalized)) {
+    return 'success';
+  }
+  if (['draft', 'planned', 'pending', 'in_progress', 'partially_compliant'].includes(normalized)) {
+    return 'warning';
+  }
+  if (['expired', 'terminated', 'failed', 'non_compliant', 'rejected'].includes(normalized)) {
+    return 'danger';
+  }
+  return 'neutral';
+}
+
 export function TprmWorkspacePage() {
   const { identity } = useEdgeIdentity();
   const [folders, setFolders] = useState<WorkspaceFolder[]>([]);
@@ -41,6 +99,11 @@ export function TprmWorkspacePage() {
   const [entityBusy, setEntityBusy] = useState(false);
   const [solutionBusy, setSolutionBusy] = useState(false);
   const [contractBusy, setContractBusy] = useState(false);
+  const [entityDrawerOpen, setEntityDrawerOpen] = useState(false);
+  const [solutionDrawerOpen, setSolutionDrawerOpen] = useState(false);
+  const [contractDrawerOpen, setContractDrawerOpen] = useState(false);
+  const [vendorImportOpen, setVendorImportOpen] = useState(false);
+  const [bulkReviewOpen, setBulkReviewOpen] = useState(false);
 
   const [entityFolderId, setEntityFolderId] = useState('');
   const [entityName, setEntityName] = useState('');
@@ -70,6 +133,47 @@ export function TprmWorkspacePage() {
   const domainFolders = useMemo(
     () => folders.filter((folder) => folder.contentType === 'domain'),
     [folders],
+  );
+  const entitiesWithoutContracts = useMemo(
+    () => entities.filter((entity) => entity.contractCount === 0),
+    [entities],
+  );
+  const entitiesWithoutAssessments = useMemo(
+    () => entities.filter((entity) => entity.assessmentCount === 0),
+    [entities],
+  );
+  const inactiveEntities = useMemo(
+    () => entities.filter((entity) => !entity.isActive),
+    [entities],
+  );
+  const contractsWithoutSolutions = useMemo(
+    () => contracts.filter((contract) => contract.solutions.length === 0),
+    [contracts],
+  );
+  const bulkReviewRows = useMemo(
+    () => [
+      {
+        label: 'Entities without contracts',
+        count: entitiesWithoutContracts.length,
+        review: entitiesWithoutContracts.map((entity) => entity.name).join(', ') || 'No gaps found',
+      },
+      {
+        label: 'Entities without assessments',
+        count: entitiesWithoutAssessments.length,
+        review: entitiesWithoutAssessments.map((entity) => entity.name).join(', ') || 'No gaps found',
+      },
+      {
+        label: 'Contracts without solutions',
+        count: contractsWithoutSolutions.length,
+        review: contractsWithoutSolutions.map((contract) => contract.name).join(', ') || 'No gaps found',
+      },
+      {
+        label: 'Inactive entities',
+        count: inactiveEntities.length,
+        review: inactiveEntities.map((entity) => entity.name).join(', ') || 'No gaps found',
+      },
+    ],
+    [contractsWithoutSolutions, entitiesWithoutAssessments, entitiesWithoutContracts, inactiveEntities],
   );
 
   async function loadWorkspace() {
@@ -143,6 +247,7 @@ export function TprmWorkspacePage() {
       setEntityRelationship('ict_provider');
       setNotice('Third-party entity created.');
       await loadWorkspace();
+      setEntityDrawerOpen(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
@@ -169,6 +274,7 @@ export function TprmWorkspacePage() {
       setSolutionCriticality('3');
       setNotice('Solution record created.');
       await loadWorkspace();
+      setSolutionDrawerOpen(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
@@ -201,6 +307,7 @@ export function TprmWorkspacePage() {
       setContractAnnualExpense('');
       setNotice('Contract record created.');
       await loadWorkspace();
+      setContractDrawerOpen(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
@@ -209,24 +316,45 @@ export function TprmWorkspacePage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading third-party workspace...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading third-party workspace...</div>;
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       <section className="panel">
-        <div className="eyebrow">Third Party</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Third-Party Management</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-          Manage provider entities, map their solutions and contracts, and keep vendor assessment
-          coverage close to the compliance and resilience work already in the workspace.
-        </p>
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+          <div>
+            <div className="eyebrow">Third Party</div>
+            <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Third-Party Management</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
+              Manage provider entities, map their solutions and contracts, and keep vendor assessment
+              coverage close to the compliance and resilience work already in the workspace.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button className="button-secondary" onClick={() => setVendorImportOpen(true)} type="button">
+              Review vendor import
+            </button>
+            <button className="button-secondary" onClick={() => setBulkReviewOpen(true)} type="button">
+              Bulk review
+            </button>
+            <button className="button-secondary" onClick={() => setEntityDrawerOpen(true)} type="button">
+              New entity
+            </button>
+            <button className="button-secondary" onClick={() => setSolutionDrawerOpen(true)} type="button">
+              New solution
+            </button>
+            <button className="button-primary" onClick={() => setContractDrawerOpen(true)} type="button">
+              New contract
+            </button>
+          </div>
+        </div>
       </section>
 
       {notice && <div className="notice-success">{notice}</div>}
       {error && <div className="notice-error">{error}</div>}
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
         <div className="metric-card">
           <div className="metric-label">Entities</div>
           <div className="metric-value">{entities.length}</div>
@@ -245,250 +373,28 @@ export function TprmWorkspacePage() {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-3">
-        <section className="panel">
-          <div className="eyebrow">New Entity</div>
-          <form
-            className="mt-4 space-y-3"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void createEntity();
-            }}
-          >
-            <label className="space-y-1">
-              <span className="label">Domain folder</span>
-              <select className="input" onChange={(event) => setEntityFolderId(event.target.value)} value={entityFolderId}>
-                {domainFolders.map((folder) => (
-                  <option key={folder.id} value={folder.id}>
-                    {folder.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="space-y-1">
-                <span className="label">Name</span>
-                <input className="input" onChange={(event) => setEntityName(event.target.value)} value={entityName} />
-              </label>
-              <label className="space-y-1">
-                <span className="label">Reference</span>
-                <input className="input" onChange={(event) => setEntityRefId(event.target.value)} value={entityRefId} />
-              </label>
-            </div>
-            <label className="space-y-1">
-              <span className="label">Description</span>
-              <textarea
-                className="input min-h-[92px]"
-                onChange={(event) => setEntityDescription(event.target.value)}
-                value={entityDescription}
-              />
-            </label>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <label className="space-y-1">
-                <span className="label">Relationship</span>
-                <input
-                  className="input"
-                  onChange={(event) => setEntityRelationship(event.target.value)}
-                  value={entityRelationship}
-                />
-              </label>
-              <label className="space-y-1">
-                <span className="label">Country</span>
-                <input className="input" onChange={(event) => setEntityCountry(event.target.value)} value={entityCountry} />
-              </label>
-              <label className="space-y-1">
-                <span className="label">Currency</span>
-                <input className="input" onChange={(event) => setEntityCurrency(event.target.value)} value={entityCurrency} />
-              </label>
-            </div>
-            <button className="button-primary" disabled={entityBusy} type="submit">
-              {entityBusy ? 'Creating...' : 'Create Entity'}
-            </button>
-          </form>
-        </section>
-
-        <section className="panel">
-          <div className="eyebrow">New Solution</div>
-          <form
-            className="mt-4 space-y-3"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void createSolution();
-            }}
-          >
-            <label className="space-y-1">
-              <span className="label">Provider</span>
-              <select className="input" onChange={(event) => setSolutionProviderId(event.target.value)} value={solutionProviderId}>
-                {entities.map((entity) => (
-                  <option key={entity.id} value={entity.id}>
-                    {entity.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="space-y-1">
-                <span className="label">Domain folder</span>
-                <select className="input" onChange={(event) => setSolutionFolderId(event.target.value)} value={solutionFolderId}>
-                  {domainFolders.map((folder) => (
-                    <option key={folder.id} value={folder.id}>
-                      {folder.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="space-y-1">
-                <span className="label">Criticality</span>
-                <input
-                  className="input"
-                  max="5"
-                  min="0"
-                  onChange={(event) => setSolutionCriticality(event.target.value)}
-                  type="number"
-                  value={solutionCriticality}
-                />
-              </label>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="space-y-1">
-                <span className="label">Name</span>
-                <input className="input" onChange={(event) => setSolutionName(event.target.value)} value={solutionName} />
-              </label>
-              <label className="space-y-1">
-                <span className="label">Reference</span>
-                <input className="input" onChange={(event) => setSolutionRefId(event.target.value)} value={solutionRefId} />
-              </label>
-            </div>
-            <label className="space-y-1">
-              <span className="label">Description</span>
-              <textarea
-                className="input min-h-[92px]"
-                onChange={(event) => setSolutionDescription(event.target.value)}
-                value={solutionDescription}
-              />
-            </label>
-            <button className="button-primary" disabled={solutionBusy} type="submit">
-              {solutionBusy ? 'Creating...' : 'Create Solution'}
-            </button>
-          </form>
-        </section>
-
-        <section className="panel">
-          <div className="eyebrow">New Contract</div>
-          <form
-            className="mt-4 space-y-3"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void createContract();
-            }}
-          >
-            <label className="space-y-1">
-              <span className="label">Provider</span>
-              <select className="input" onChange={(event) => setContractProviderId(event.target.value)} value={contractProviderId}>
-                {entities.map((entity) => (
-                  <option key={entity.id} value={entity.id}>
-                    {entity.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="space-y-1">
-              <span className="label">Beneficiary</span>
-              <select className="input" onChange={(event) => setContractBeneficiaryId(event.target.value)} value={contractBeneficiaryId}>
-                <option value="">Unassigned</option>
-                {entities.map((entity) => (
-                  <option key={entity.id} value={entity.id}>
-                    {entity.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="space-y-1">
-                <span className="label">Name</span>
-                <input className="input" onChange={(event) => setContractName(event.target.value)} value={contractName} />
-              </label>
-              <label className="space-y-1">
-                <span className="label">Reference</span>
-                <input className="input" onChange={(event) => setContractRefId(event.target.value)} value={contractRefId} />
-              </label>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="space-y-1">
-                <span className="label">Status</span>
-                <select className="input" onChange={(event) => setContractStatus(event.target.value)} value={contractStatus}>
-                  <option value="draft">Draft</option>
-                  <option value="active">Active</option>
-                  <option value="expired">Expired</option>
-                  <option value="terminated">Terminated</option>
-                </select>
-              </label>
-              <label className="space-y-1">
-                <span className="label">Solution</span>
-                <select className="input" onChange={(event) => setContractSolutionId(event.target.value)} value={contractSolutionId}>
-                  <option value="">No linked solution</option>
-                  {solutions.map((solution) => (
-                    <option key={solution.id} value={solution.id}>
-                      {solution.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <label className="space-y-1">
-                <span className="label">Folder</span>
-                <select className="input" onChange={(event) => setContractFolderId(event.target.value)} value={contractFolderId}>
-                  {domainFolders.map((folder) => (
-                    <option key={folder.id} value={folder.id}>
-                      {folder.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="space-y-1">
-                <span className="label">Currency</span>
-                <input className="input" onChange={(event) => setContractCurrency(event.target.value)} value={contractCurrency} />
-              </label>
-              <label className="space-y-1">
-                <span className="label">Annual expense</span>
-                <input
-                  className="input"
-                  onChange={(event) => setContractAnnualExpense(event.target.value)}
-                  type="number"
-                  value={contractAnnualExpense}
-                />
-              </label>
-            </div>
-            <button className="button-primary" disabled={contractBusy} type="submit">
-              {contractBusy ? 'Creating...' : 'Create Contract'}
-            </button>
-          </form>
-        </section>
-      </section>
-
-      <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+      <section className="grid min-w-0 gap-6 2xl:grid-cols-[1.1fr_0.9fr]">
         <section className="panel">
           <div className="eyebrow">Entities</div>
           <div className="mt-4 space-y-3">
             {entities.map((entity) => (
               <Link
                 key={entity.id}
-                className="panel-subtle block transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
+                className="panel-subtle block transition hover:border-[#d7c3f1] hover:bg-[#f6f1fa]"
                 to={`/third-party/entities/${entity.id}`}
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <div className="text-lg font-semibold text-white">{entity.name}</div>
-                    <div className="mt-1 text-sm text-slate-400">
+                    <div className="break-words text-lg font-semibold text-[#241232]">{entity.name}</div>
+                    <div className="mt-1 text-sm text-[#6f6578]">
                       {entity.folderName} · {entity.country ?? 'n/a'} · criticality {entity.defaultCriticality}
                     </div>
                   </div>
-                  <span className={entity.isActive ? 'badge-success' : 'badge-neutral'}>
+                  <RegStatusPill tone={entity.isActive ? 'success' : 'neutral'}>
                     {entity.isActive ? 'Active' : 'Inactive'}
-                  </span>
+                  </RegStatusPill>
                 </div>
-                <p className="mt-3 text-sm leading-6 text-slate-300">
+                <p className="mt-3 text-sm leading-6 text-[#4f435c]">
                   {entity.description || 'No entity description provided.'}
                 </p>
                 <div className="mt-4 grid gap-3 sm:grid-cols-3">
@@ -517,13 +423,15 @@ export function TprmWorkspacePage() {
               {contracts.map((contract) => (
                 <div className="panel-subtle" key={contract.id}>
                   <div className="flex items-center justify-between gap-3">
-                    <div className="text-sm font-medium text-white">{contract.name}</div>
-                    <span className="badge-neutral">{contract.status}</span>
+                    <div className="min-w-0 break-words text-sm font-medium text-[#241232]">{contract.name}</div>
+                    <RegStatusPill className="shrink-0 capitalize" tone={statusTone(contract.status)}>
+                      {contract.status}
+                    </RegStatusPill>
                   </div>
-                  <div className="mt-2 text-sm text-slate-400">
+                  <div className="mt-2 text-sm text-[#6f6578]">
                     {contract.providerEntityName} → {contract.beneficiaryEntityName ?? 'Unassigned'}
                   </div>
-                  <div className="mt-2 text-xs text-slate-500">
+                  <div className="mt-2 text-xs text-[#62576a]">
                     {formatMoney(contract.annualExpense, contract.currency ?? 'USD')} ·{' '}
                     {contract.solutions.map((solution) => solution.name).join(', ') || 'No linked solution'}
                   </div>
@@ -538,13 +446,15 @@ export function TprmWorkspacePage() {
               {assessments.map((assessment) => (
                 <div className="panel-subtle" key={assessment.id}>
                   <div className="flex items-center justify-between gap-3">
-                    <div className="text-sm font-medium text-white">{assessment.name}</div>
-                    <span className="badge-neutral">{assessment.conclusion ?? assessment.status}</span>
+                    <div className="min-w-0 break-words text-sm font-medium text-[#241232]">{assessment.name}</div>
+                    <RegStatusPill className="shrink-0 capitalize" tone={statusTone(assessment.conclusion ?? assessment.status)}>
+                      {(assessment.conclusion ?? assessment.status).replace(/_/g, ' ')}
+                    </RegStatusPill>
                   </div>
-                  <div className="mt-2 text-sm text-slate-400">
+                  <div className="mt-2 text-sm text-[#6f6578]">
                     {assessment.entityName} · {assessment.perimeterName ?? 'No perimeter'}
                   </div>
-                  <div className="mt-2 text-xs text-slate-500">
+                  <div className="mt-2 text-xs text-[#62576a]">
                     Next review {formatDate(assessment.nextReviewOn)} · Criticality {assessment.criticality}
                   </div>
                 </div>
@@ -553,6 +463,380 @@ export function TprmWorkspacePage() {
           </section>
         </div>
       </section>
+
+      <RegModal
+        description="Stage vendor rows and confirm the mapping posture before any records are created."
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setVendorImportOpen(false)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-primary"
+              onClick={() => {
+                setNotice('Vendor import staging reviewed. Persisted bulk import still requires an approved import API.');
+                setVendorImportOpen(false);
+              }}
+              type="button"
+            >
+              Mark review complete
+            </button>
+          </div>
+        }
+        onOpenChange={setVendorImportOpen}
+        open={vendorImportOpen}
+        title="Review vendor import staging"
+      >
+        <div className="space-y-4">
+          <div className="notice-warning">
+            No bulk-import API exists in the current route contract. This review flow keeps the operator workflow
+            visible without changing backend persistence.
+          </div>
+          <RegTableShell>
+            <div className="max-h-[360px] overflow-auto">
+              <table className="min-w-[820px] w-full text-left text-sm">
+                <thead className="sticky top-0 bg-[#f7f3fa] text-xs uppercase tracking-wide text-[#6f6578]">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold">Vendor</th>
+                    <th className="px-4 py-3 font-semibold">Solution</th>
+                    <th className="px-4 py-3 font-semibold">Contract</th>
+                    <th className="px-4 py-3 font-semibold">Owner</th>
+                    <th className="px-4 py-3 font-semibold">Review action</th>
+                    <th className="px-4 py-3 font-semibold">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#ede7f2] text-[#241232]">
+                  {STAGED_VENDOR_IMPORT_ROWS.map((row) => (
+                    <tr key={row.vendor}>
+                      <td className="px-4 py-3 font-medium">{row.vendor}</td>
+                      <td className="px-4 py-3 text-[#4f435c]">{row.solution}</td>
+                      <td className="px-4 py-3 text-[#4f435c]">{row.contract}</td>
+                      <td className="px-4 py-3 text-[#4f435c]">{row.owner}</td>
+                      <td className="px-4 py-3 text-[#4f435c]">{row.action}</td>
+                      <td className="px-4 py-3">
+                        <RegStatusPill
+                          tone={row.status === 'Ready' ? 'success' : row.status === 'Needs mapping' ? 'warning' : 'info'}
+                        >
+                          {row.status}
+                        </RegStatusPill>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </RegTableShell>
+        </div>
+      </RegModal>
+
+      <RegModal
+        description="Review vendor coverage gaps across the currently loaded entities, contracts, solutions, and assessments."
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setBulkReviewOpen(false)} type="button">
+              Close
+            </button>
+            <button
+              className="button-primary"
+              onClick={() => {
+                setNotice('Bulk vendor coverage review completed.');
+                setBulkReviewOpen(false);
+              }}
+              type="button"
+            >
+              Complete review
+            </button>
+          </div>
+        }
+        onOpenChange={setBulkReviewOpen}
+        open={bulkReviewOpen}
+        title="Bulk review vendor coverage"
+      >
+        <div className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="metric-card">
+              <div className="metric-label">Entities reviewed</div>
+              <div className="metric-value">{entities.length}</div>
+            </div>
+            <div className="metric-card">
+              <div className="metric-label">Coverage gaps</div>
+              <div className="metric-value">
+                {entitiesWithoutContracts.length + entitiesWithoutAssessments.length + contractsWithoutSolutions.length}
+              </div>
+            </div>
+          </div>
+          <RegTableShell>
+            <div className="max-h-[340px] overflow-auto">
+              <table className="min-w-[720px] w-full text-left text-sm">
+                <thead className="sticky top-0 bg-[#f7f3fa] text-xs uppercase tracking-wide text-[#6f6578]">
+                  <tr>
+                    <th className="px-4 py-3 font-semibold">Review area</th>
+                    <th className="px-4 py-3 font-semibold">Count</th>
+                    <th className="px-4 py-3 font-semibold">Review notes</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#ede7f2] text-[#241232]">
+                  {bulkReviewRows.map((row) => (
+                    <tr key={row.label}>
+                      <td className="px-4 py-3 font-medium">{row.label}</td>
+                      <td className="px-4 py-3">
+                        <RegStatusPill tone={row.count === 0 ? 'success' : 'warning'}>
+                          {row.count === 0 ? 'Clear' : `${row.count} to review`}
+                        </RegStatusPill>
+                      </td>
+                      <td className="max-w-[420px] px-4 py-3 text-[#4f435c]">{row.review}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </RegTableShell>
+        </div>
+      </RegModal>
+
+      <RegRightDrawer
+        description="Create a provider, customer, or internal third-party entity that can be linked to solutions, contracts, and assessments."
+        footer={
+          <>
+            <button className="button-secondary" onClick={() => setEntityDrawerOpen(false)} type="button">
+              Cancel
+            </button>
+            <button className="button-primary" disabled={entityBusy} form="tprm-entity-form" type="submit">
+              {entityBusy ? 'Creating...' : 'Create entity'}
+            </button>
+          </>
+        }
+        onOpenChange={setEntityDrawerOpen}
+        open={entityDrawerOpen}
+        title="New entity"
+      >
+        <form
+          className="space-y-4"
+          id="tprm-entity-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void createEntity();
+          }}
+        >
+          <label className="space-y-1">
+            <span className="label">Domain folder</span>
+            <select className="input" onChange={(event) => setEntityFolderId(event.target.value)} value={entityFolderId}>
+              {domainFolders.map((folder) => (
+                <option key={folder.id} value={folder.id}>
+                  {folder.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1">
+            <span className="label">Name</span>
+            <input className="input" onChange={(event) => setEntityName(event.target.value)} placeholder="TaskNimbus" value={entityName} />
+          </label>
+          <label className="space-y-1">
+            <span className="label">Reference</span>
+            <input className="input" onChange={(event) => setEntityRefId(event.target.value)} placeholder="VEN-001" value={entityRefId} />
+          </label>
+          <label className="space-y-1">
+            <span className="label">Description</span>
+            <textarea
+              className="input min-h-[112px]"
+              onChange={(event) => setEntityDescription(event.target.value)}
+              value={entityDescription}
+            />
+          </label>
+          <label className="space-y-1">
+            <span className="label">Relationship</span>
+            <input className="input" onChange={(event) => setEntityRelationship(event.target.value)} value={entityRelationship} />
+          </label>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="space-y-1">
+              <span className="label">Country</span>
+              <input className="input" onChange={(event) => setEntityCountry(event.target.value)} value={entityCountry} />
+            </label>
+            <label className="space-y-1">
+              <span className="label">Currency</span>
+              <input className="input" onChange={(event) => setEntityCurrency(event.target.value)} value={entityCurrency} />
+            </label>
+          </div>
+        </form>
+      </RegRightDrawer>
+
+      <RegRightDrawer
+        description="Create a solution record and connect it to the provider entity that operates it."
+        footer={
+          <>
+            <button className="button-secondary" onClick={() => setSolutionDrawerOpen(false)} type="button">
+              Cancel
+            </button>
+            <button className="button-primary" disabled={solutionBusy} form="tprm-solution-form" type="submit">
+              {solutionBusy ? 'Creating...' : 'Create solution'}
+            </button>
+          </>
+        }
+        onOpenChange={setSolutionDrawerOpen}
+        open={solutionDrawerOpen}
+        title="New solution"
+      >
+        <form
+          className="space-y-4"
+          id="tprm-solution-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void createSolution();
+          }}
+        >
+          <label className="space-y-1">
+            <span className="label">Provider</span>
+            <select className="input" onChange={(event) => setSolutionProviderId(event.target.value)} value={solutionProviderId}>
+              {entities.map((entity) => (
+                <option key={entity.id} value={entity.id}>
+                  {entity.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1">
+            <span className="label">Domain folder</span>
+            <select className="input" onChange={(event) => setSolutionFolderId(event.target.value)} value={solutionFolderId}>
+              {domainFolders.map((folder) => (
+                <option key={folder.id} value={folder.id}>
+                  {folder.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1">
+            <span className="label">Criticality</span>
+            <input
+              className="input"
+              max="5"
+              min="0"
+              onChange={(event) => setSolutionCriticality(event.target.value)}
+              type="number"
+              value={solutionCriticality}
+            />
+          </label>
+          <label className="space-y-1">
+            <span className="label">Name</span>
+            <input className="input" onChange={(event) => setSolutionName(event.target.value)} placeholder="TaskNimbus SSO" value={solutionName} />
+          </label>
+          <label className="space-y-1">
+            <span className="label">Reference</span>
+            <input className="input" onChange={(event) => setSolutionRefId(event.target.value)} placeholder="SOL-001" value={solutionRefId} />
+          </label>
+          <label className="space-y-1">
+            <span className="label">Description</span>
+            <textarea
+              className="input min-h-[112px]"
+              onChange={(event) => setSolutionDescription(event.target.value)}
+              value={solutionDescription}
+            />
+          </label>
+        </form>
+      </RegRightDrawer>
+
+      <RegRightDrawer
+        description="Create a contract record, link it to provider and beneficiary entities, and attach the covered solution."
+        footer={
+          <>
+            <button className="button-secondary" onClick={() => setContractDrawerOpen(false)} type="button">
+              Cancel
+            </button>
+            <button className="button-primary" disabled={contractBusy} form="tprm-contract-form" type="submit">
+              {contractBusy ? 'Creating...' : 'Create contract'}
+            </button>
+          </>
+        }
+        onOpenChange={setContractDrawerOpen}
+        open={contractDrawerOpen}
+        title="New contract"
+      >
+        <form
+          className="space-y-4"
+          id="tprm-contract-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void createContract();
+          }}
+        >
+          <label className="space-y-1">
+            <span className="label">Provider</span>
+            <select className="input" onChange={(event) => setContractProviderId(event.target.value)} value={contractProviderId}>
+              {entities.map((entity) => (
+                <option key={entity.id} value={entity.id}>
+                  {entity.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1">
+            <span className="label">Beneficiary</span>
+            <select className="input" onChange={(event) => setContractBeneficiaryId(event.target.value)} value={contractBeneficiaryId}>
+              <option value="">Unassigned</option>
+              {entities.map((entity) => (
+                <option key={entity.id} value={entity.id}>
+                  {entity.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-1">
+            <span className="label">Name</span>
+            <input className="input" onChange={(event) => setContractName(event.target.value)} placeholder="Master services agreement" value={contractName} />
+          </label>
+          <label className="space-y-1">
+            <span className="label">Reference</span>
+            <input className="input" onChange={(event) => setContractRefId(event.target.value)} placeholder="CTR-001" value={contractRefId} />
+          </label>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="space-y-1">
+              <span className="label">Status</span>
+              <select className="input" onChange={(event) => setContractStatus(event.target.value)} value={contractStatus}>
+                <option value="draft">Draft</option>
+                <option value="active">Active</option>
+                <option value="expired">Expired</option>
+                <option value="terminated">Terminated</option>
+              </select>
+            </label>
+            <label className="space-y-1">
+              <span className="label">Solution</span>
+              <select className="input" onChange={(event) => setContractSolutionId(event.target.value)} value={contractSolutionId}>
+                <option value="">No linked solution</option>
+                {solutions.map((solution) => (
+                  <option key={solution.id} value={solution.id}>
+                    {solution.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <label className="space-y-1">
+            <span className="label">Folder</span>
+            <select className="input" onChange={(event) => setContractFolderId(event.target.value)} value={contractFolderId}>
+              {domainFolders.map((folder) => (
+                <option key={folder.id} value={folder.id}>
+                  {folder.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="space-y-1">
+              <span className="label">Currency</span>
+              <input className="input" onChange={(event) => setContractCurrency(event.target.value)} value={contractCurrency} />
+            </label>
+            <label className="space-y-1">
+              <span className="label">Annual expense</span>
+              <input
+                className="input"
+                onChange={(event) => setContractAnnualExpense(event.target.value)}
+                type="number"
+                value={contractAnnualExpense}
+              />
+            </label>
+          </div>
+        </form>
+      </RegRightDrawer>
     </div>
   );
 }

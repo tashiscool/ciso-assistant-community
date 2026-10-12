@@ -1,0 +1,100 @@
+name: Verify Regovise
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/**'
+      - 'cloudflare/**'
+      - 'ops/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/verify-regovise.yml'
+      - '.github/workflows/deploy-regovise-edge.yml'
+      - '.nvmrc'
+      - '.node-version'
+      - '.npmrc'
+      - '.editorconfig'
+      - 'AGENTS.md'
+      - 'ARCHITECTURE.md'
+      - 'README.md'
+      - 'documentation/engineering/**'
+      - 'apps/web/README.md'
+      - 'cloudflare/README.md'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/**'
+      - 'cloudflare/**'
+      - 'ops/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/verify-regovise.yml'
+      - '.github/workflows/deploy-regovise-edge.yml'
+      - '.nvmrc'
+      - '.node-version'
+      - '.npmrc'
+      - '.editorconfig'
+      - 'AGENTS.md'
+      - 'ARCHITECTURE.md'
+      - 'README.md'
+      - 'documentation/engineering/**'
+      - 'apps/web/README.md'
+      - 'cloudflare/README.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: regovise-verify-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22.22.0'
+  CI: '1'
+  WRANGLER_SEND_METRICS: 'false'
+
+jobs:
+  verify:
+    name: Canonical Checks and Local Integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: |
+            apps/web/package-lock.json
+            cloudflare/package-lock.json
+
+      - name: Install locked web dependencies
+        run: npm ci
+        working-directory: apps/web
+
+      - name: Install locked Worker dependencies
+        run: npm ci
+        working-directory: cloudflare
+
+      - name: Gate high and critical dependency advisories
+        run: npm run audit:dependencies
+
+      - name: Verify canonical application and isolated Worker journeys
+        run: npm run verify:full
+
+      - name: Upload verification reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: regovise-verification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            artifacts/verification/
+            artifacts/local-worker/
+            artifacts/traceability/
+          if-no-files-found: warn
+          retention-days: 7

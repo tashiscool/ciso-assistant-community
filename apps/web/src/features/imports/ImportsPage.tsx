@@ -72,15 +72,15 @@ export function ImportsPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading import pipelines...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading import pipelines...</div>;
   }
 
   return (
     <div className="space-y-6">
       <section className="panel">
         <div className="eyebrow">Imports</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Import Pipelines</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Import Pipelines</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
           Stage incoming workbook-style imports into the Cloudflare workspace and keep a durable
           audit trail of what was created.
         </p>
@@ -147,12 +147,12 @@ export function ImportsPage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="eyebrow">{job.targetKind.replace(/_/g, ' ')}</div>
-                  <h2 className="mt-2 text-xl font-semibold text-white">{job.name}</h2>
-                  <div className="mt-2 text-sm text-slate-400">
+                  <h2 className="mt-2 text-xl font-semibold text-[#241232]">{job.name}</h2>
+                  <div className="mt-2 text-sm text-[#6f6578]">
                     {job.folderName} · {job.sourceType} · {formatDate(job.createdAt)}
                   </div>
                 </div>
-                <span className="badge-neutral">{job.status}</span>
+                <span className="status-pill-neutral">{job.status}</span>
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
                 <div className="metric-card">
@@ -173,9 +173,9 @@ export function ImportsPage() {
                   <div className="label">Pipeline steps</div>
                   <div className="mt-3 space-y-2">
                     {job.steps.map((step) => (
-                      <div key={step.key} className="flex items-center justify-between gap-3 text-sm text-slate-300">
+                      <div key={step.key} className="flex items-center justify-between gap-3 text-sm text-[#4f435c]">
                         <span>{step.label}</span>
-                        <span className="badge-neutral">{step.status}</span>
+                        <span className="status-pill-neutral">{step.status}</span>
                       </div>
                     ))}
                   </div>
@@ -184,12 +184,12 @@ export function ImportsPage() {
                   <div className="label">Created objects</div>
                   <div className="mt-3 space-y-2">
                     {job.createdObjects.map((item) => (
-                      <div key={item.id} className="text-sm text-slate-300">
+                      <div key={item.id} className="text-sm text-[#4f435c]">
                         {item.name}
                       </div>
                     ))}
                     {job.createdObjects.length === 0 && (
-                      <div className="text-sm text-slate-400">No objects were created for this run.</div>
+                      <div className="text-sm text-[#6f6578]">No objects were created for this run.</div>
                     )}
                   </div>
                 </div>

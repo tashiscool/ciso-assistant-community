@@ -8,6 +8,7 @@ function manualChunks(id: string): string | undefined {
     if (
       normalized.includes('/react/') ||
       normalized.includes('/react-dom/') ||
+      normalized.includes('/react-router/') ||
       normalized.includes('/react-router-dom/')
     ) {
       return 'react-vendor';
@@ -82,9 +83,16 @@ export default defineConfig({
     port: 5174,
   },
   build: {
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        manualChunks,
+        codeSplitting: {
+          groups: [
+            'react-vendor', 'radix-ui', 'lucide', 'assurance-workbench',
+            'evidence-operations', 'advanced-risk', 'scale-modules',
+            'grc-governance', 'builders-ai', 'ops-surfaces',
+            'program-operations', 'workspace-utilities',
+          ].map((name) => ({ name, test: (id: string) => manualChunks(id) === name })),
+        },
       },
     },
   },

@@ -69,7 +69,7 @@ export function FoldersPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading workspace folders...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading workspace folders...</div>;
   }
 
   return (
@@ -77,8 +77,8 @@ export function FoldersPage() {
       <section className="panel grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
           <div className="eyebrow">Workspace</div>
-          <h1 className="mt-2 text-3xl font-semibold text-white">Domains & Folders</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Domains & Folders</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f435c]">
             Shape the operating perimeter of the workspace. Domains, enclaves, and shared root
             folders drive ownership, visibility, and scoped access across the product.
           </p>
@@ -150,9 +150,9 @@ export function FoldersPage() {
       {notice && <div className="notice-success">{notice}</div>}
       {error && <div className="notice-error">{error}</div>}
 
-      <section className="panel overflow-hidden p-0">
+      <section className="panel overflow-x-auto p-0">
         <table className="min-w-full text-left text-sm">
-          <thead className="border-b border-white/10 bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
+          <thead className="border-b border-[#ded8e4] bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
             <tr>
               <th className="px-4 py-3">Folder</th>
               <th className="px-4 py-3">Type</th>
@@ -162,24 +162,24 @@ export function FoldersPage() {
           </thead>
           <tbody>
             {folders.map((folder) => (
-              <tr key={folder.id} className="border-t border-white/5 align-top">
+              <tr key={folder.id} className="border-t border-[#eeeaf2] align-top">
                 <td className="px-4 py-4">
-                  <div className="font-medium text-white">{folder.name}</div>
-                  <div className="mt-1 text-xs text-cyan-200">{folder.pathLabel}</div>
+                  <div className="font-medium text-[#241232]">{folder.name}</div>
+                  <div className="mt-1 text-xs text-[#6d28d9]">{folder.pathLabel}</div>
                   {folder.description && (
-                    <div className="mt-2 text-sm leading-6 text-slate-300">{folder.description}</div>
+                    <div className="mt-2 text-sm leading-6 text-[#4f435c]">{folder.description}</div>
                   )}
                 </td>
                 <td className="px-4 py-4">
-                  <span className="badge-neutral">{folder.contentType}</span>
+                  <span className="status-pill-neutral">{folder.contentType}</span>
                 </td>
-                <td className="px-4 py-4 text-slate-300">{folder.childCount}</td>
-                <td className="px-4 py-4 text-slate-300">{folder.updatedAt}</td>
+                <td className="px-4 py-4 text-[#4f435c]">{folder.childCount}</td>
+                <td className="px-4 py-4 text-[#4f435c]">{folder.updatedAt}</td>
               </tr>
             ))}
             {folders.length === 0 && (
               <tr>
-                <td className="px-4 py-8 text-center text-slate-400" colSpan={4}>
+                <td className="px-4 py-8 text-center text-[#6f6578]" colSpan={4}>
                   No workspace folders found for tenant{' '}
                   <span className="font-mono">{identity.tenantId}</span>.
                 </td>

@@ -22,7 +22,7 @@ import {
 } from './services/fedramp/http';
 import { withAuth } from './auth';
 import type { AuthStrategy, EnvBindings } from './types/env';
-import { corsPreflight, json, withCors } from './utils/http';
+import { corsPreflight, isAllowedMutationOrigin, json, withCors } from './utils/http';
 
 export type WorkerRequestContext = {
   env: EnvBindings;
@@ -40,14 +40,17 @@ export async function handleRequest(
   ctx: ExecutionContext,
 ): Promise<Response> {
   if (request.method === 'OPTIONS') {
-    return corsPreflight(request);
+    return corsPreflight(request, env);
   }
 
   const url = new URL(request.url);
+  if (!isAllowedMutationOrigin(request, env)) {
+    return withCors(request, json({ error: 'untrusted_origin', message: 'The request origin is not allowed.' }, { status: 403, headers: { 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' } }), env);
+  }
 
   // Basic API prefix check
   if (!url.pathname.startsWith('/_api/')) {
-    return withCors(request, new Response('Not Found', { status: 404 }));
+    return withCors(request, new Response('Not Found', { status: 404 }), env);
   }
 
   const segments = url.pathname.slice('/_api/'.length).split('/').filter(Boolean);
@@ -156,12 +159,17 @@ export async function handleRequest(
       response = json(
         {
           error: 'request_failed',
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: env.APP_ENV === 'development' && error instanceof Error ? error.message : 'The request could not be completed.',
         },
         { status: 500 },
       );
     }
   }
 
-  return withCors(request, response);
+  // API data and session identifiers must never enter a shared browser/edge cache.
+  const headers = new Headers(response.headers);
+  headers.set('cache-control', 'no-store');
+  headers.set('x-content-type-options', 'nosniff');
+  response = new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+  return withCors(request, response, env);
 }

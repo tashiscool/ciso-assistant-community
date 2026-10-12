@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ApiClient } from '../../shared/api/client';
+import { RegStatusPill } from '../../components/regovise/PagePrimitives';
 import { useEdgeIdentity } from '../../shared/session/identity';
 import type { WorkspaceFolder, WorkspaceUser, WorkspaceUserGroup } from '../iam/types';
 import type { Framework, FrameworkControl } from '../core/types';
@@ -350,15 +351,15 @@ export function AssessmentsPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading assessment workspace...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading assessment workspace...</div>;
   }
 
   return (
     <div className="space-y-6">
       <section className="panel">
         <div className="eyebrow">Assessments</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Assessment Workbench</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Assessment Workbench</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
           Define operating perimeters, then launch risk and compliance assessments against live
           registers and frameworks already present in the workspace.
         </p>
@@ -386,8 +387,8 @@ export function AssessmentsPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <div className="space-y-6">
+      <section className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <div className="min-w-0 space-y-6">
           <section className="panel">
             <div className="eyebrow">Perimeters</div>
             <div className="mt-4 space-y-3">
@@ -395,18 +396,18 @@ export function AssessmentsPage() {
                 <div className="panel-subtle" key={perimeter.id}>
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <div className="font-medium text-white">{perimeter.name}</div>
-                      <div className="mt-1 text-xs text-cyan-200">{perimeter.folderName}</div>
+                      <div className="font-medium text-[#241232]">{perimeter.name}</div>
+                      <div className="mt-1 text-xs text-[#6d28d9]">{perimeter.folderName}</div>
                     </div>
-                    <span className="badge-neutral">{perimeter.lcStatus}</span>
+                    <RegStatusPill tone="neutral">{perimeter.lcStatus}</RegStatusPill>
                   </div>
                   {perimeter.description && (
-                    <div className="mt-3 text-sm leading-6 text-slate-300">{perimeter.description}</div>
+                    <div className="mt-3 text-sm leading-6 text-[#4f435c]">{perimeter.description}</div>
                   )}
                 </div>
               ))}
               {perimeters.length === 0 && (
-                <div className="text-sm text-slate-400">No perimeters created yet.</div>
+                <div className="text-sm text-[#6f6578]">No perimeters created yet.</div>
               )}
             </div>
           </section>
@@ -636,12 +637,12 @@ export function AssessmentsPage() {
                     ))}
                   </select>
                 </label>
-                <div className="sm:col-span-3 rounded-2xl border border-cyan-400/15 bg-cyan-400/[0.04] px-4 py-3 text-sm text-slate-300">
+                <div className="sm:col-span-3 rounded-2xl border border-[#d7c3f1] bg-[#f6f1fa] px-4 py-3 text-sm text-[#4f435c]">
                   {selectedAssessmentPlan ? (
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <div className="font-medium text-white">{selectedAssessmentPlan.name}</div>
-                        <div className="mt-1 text-xs text-cyan-200">
+                        <div className="font-medium text-[#241232]">{selectedAssessmentPlan.name}</div>
+                        <div className="mt-1 text-xs text-[#6d28d9]">
                           {selectedAssessmentPlan.mappedRequirementCount} mapped requirements · {selectedAssessmentPlan.questionCount} lines of inquiry
                           {selectedAssessmentPlan.sourceFramework ? ` · ${selectedAssessmentPlan.sourceFramework}` : ''}
                         </div>
@@ -809,7 +810,7 @@ export function AssessmentsPage() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <div className="eyebrow">Controls in Scope</div>
-                    <div className="mt-2 text-sm text-slate-300">
+                    <div className="mt-2 text-sm text-[#4f435c]">
                       {selectedAssessmentPlan && complianceAssessmentKind === 'manual'
                         ? 'Leave all controls unselected to execute the linked assessment plan only, or select specific controls to add scoped control reviews alongside the lines of inquiry.'
                         : 'Leave all controls unselected to include the full framework. Select specific controls to create a scoped manual audit.'}
@@ -831,7 +832,7 @@ export function AssessmentsPage() {
                 <div className="mt-4 max-h-56 space-y-2 overflow-auto pr-1">
                   {frameworkControls.map((control) => (
                     <label
-                      className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3 text-sm text-slate-300"
+                      className="flex items-start gap-3 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-3 text-sm text-[#4f435c]"
                       key={control.id}
                     >
                       <input
@@ -840,17 +841,17 @@ export function AssessmentsPage() {
                         type="checkbox"
                       />
                       <span>
-                        <span className="font-mono text-xs uppercase tracking-[0.18em] text-cyan-200">{control.ref}</span>
-                        <span className="mt-1 block text-white">{control.title}</span>
+                        <span className="font-mono text-xs uppercase tracking-[0.18em] text-[#6d28d9]">{control.ref}</span>
+                        <span className="mt-1 block text-[#241232]">{control.title}</span>
                       </span>
                     </label>
                   ))}
                   {frameworkControls.length === 0 ? (
-                    <div className="text-sm text-slate-400">No framework controls are loaded for the selected framework.</div>
+                    <div className="text-sm text-[#6f6578]">No framework controls are loaded for the selected framework.</div>
                   ) : null}
                 </div>
               </div>
-              <label className="flex items-center gap-3 text-sm text-slate-300">
+              <label className="flex items-center gap-3 text-sm text-[#4f435c]">
                 <input
                   checked={recurrenceEnabled}
                   onChange={(event) => setRecurrenceEnabled(event.target.checked)}
@@ -907,10 +908,10 @@ export function AssessmentsPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-2">
-        <section className="panel overflow-hidden p-0">
-          <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-white/10 bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
+      <section className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-2">
+        <section className="panel overflow-x-auto p-0">
+          <table className="min-w-[760px] text-left text-sm">
+            <thead className="border-b border-[#ded8e4] bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
               <tr>
                 <th className="px-4 py-3">Risk assessment</th>
                 <th className="px-4 py-3">Perimeter</th>
@@ -920,29 +921,29 @@ export function AssessmentsPage() {
             </thead>
             <tbody>
               {riskAssessments.map((assessment) => (
-                <tr key={assessment.id} className="border-t border-white/5 align-top">
+                <tr key={assessment.id} className="border-t border-[#eeeaf2] align-top">
                   <td className="px-4 py-4">
                     <Link
-                      className="font-medium text-white transition hover:text-cyan-200"
+                      className="font-medium text-[#241232] transition hover:text-[#6d28d9]"
                       to={`/risk-assessments/${assessment.id}`}
                     >
                       {assessment.name}
                     </Link>
-                    <div className="mt-1 text-xs text-cyan-200">{assessment.status}</div>
-                    <div className="mt-2 text-xs text-slate-500">Version {assessment.version}</div>
+                    <div className="mt-1 text-xs text-[#6d28d9]">{assessment.status}</div>
+                    <div className="mt-2 text-xs text-[#62576a]">Version {assessment.version}</div>
                   </td>
-                  <td className="px-4 py-4 text-slate-300">{assessment.perimeterName ?? 'n/a'}</td>
-                  <td className="px-4 py-4 text-slate-300">{assessment.riskRegisterName ?? 'n/a'}</td>
-                  <td className="px-4 py-4 text-slate-300">{assessment.scenarioCount}</td>
+                  <td className="px-4 py-4 text-[#4f435c]">{assessment.perimeterName ?? 'n/a'}</td>
+                  <td className="px-4 py-4 text-[#4f435c]">{assessment.riskRegisterName ?? 'n/a'}</td>
+                  <td className="px-4 py-4 text-[#4f435c]">{assessment.scenarioCount}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </section>
 
-        <section className="panel overflow-hidden p-0">
-          <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-white/10 bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
+        <section className="panel overflow-x-auto p-0">
+          <table className="min-w-[840px] text-left text-sm">
+            <thead className="border-b border-[#ded8e4] bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
               <tr>
                 <th className="px-4 py-3">Compliance assessment</th>
                 <th className="px-4 py-3">Type</th>
@@ -953,26 +954,26 @@ export function AssessmentsPage() {
             </thead>
             <tbody>
               {complianceAssessments.map((assessment) => (
-                <tr key={assessment.id} className="border-t border-white/5 align-top">
+                <tr key={assessment.id} className="border-t border-[#eeeaf2] align-top">
                   <td className="px-4 py-4">
                     <Link
-                      className="font-medium text-white transition hover:text-cyan-200"
+                      className="font-medium text-[#241232] transition hover:text-[#6d28d9]"
                       to={`/compliance-assessments/${assessment.id}`}
                     >
                       {assessment.name}
                     </Link>
-                    <div className="mt-1 text-xs text-cyan-200">{assessment.status}</div>
+                    <div className="mt-1 text-xs text-[#6d28d9]">{assessment.status}</div>
                     {assessment.assessmentPlanName ? (
-                      <div className="mt-2 text-xs text-cyan-100">Plan: {assessment.assessmentPlanName}</div>
+                      <div className="mt-2 text-xs text-[#5f1aa8]">Plan: {assessment.assessmentPlanName}</div>
                     ) : null}
-                    <div className="mt-2 text-xs text-slate-500">Version {assessment.version}</div>
+                    <div className="mt-2 text-xs text-[#62576a]">Version {assessment.version}</div>
                   </td>
-                  <td className="px-4 py-4 text-slate-300">{assessment.assessmentKind.replace(/_/g, ' ')}</td>
-                  <td className="px-4 py-4 text-slate-300">{assessment.frameworkName}</td>
-                  <td className="px-4 py-4 text-slate-300">{assessment.perimeterName ?? 'n/a'}</td>
-                  <td className="px-4 py-4 text-slate-300">
+                  <td className="px-4 py-4 text-[#4f435c]">{assessment.assessmentKind.replace(/_/g, ' ')}</td>
+                  <td className="px-4 py-4 text-[#4f435c]">{assessment.frameworkName}</td>
+                  <td className="px-4 py-4 text-[#4f435c]">{assessment.perimeterName ?? 'n/a'}</td>
+                  <td className="px-4 py-4 text-[#4f435c]">
                     <div>{assessment.progressPercent}%</div>
-                    <div className="mt-1 text-xs text-slate-500">
+                    <div className="mt-1 text-xs text-[#62576a]">
                       {assessment.controlsAssessed}/{assessment.controlsTotal}{' '}
                       {assessment.assessmentPlanTemplateId ? 'review items' : 'controls'}
                     </div>

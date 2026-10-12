@@ -35,6 +35,7 @@ import type {
   WayfinderTemplateSummary,
 } from './wayfinderTypes';
 import { useEdgeIdentity } from '../../shared/session/identity';
+import { RegModal } from '../../components/regovise/PagePrimitives';
 
 function clone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
@@ -126,6 +127,7 @@ export function WayfinderBuilderWorkspace() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [busyAction, setBusyAction] = useState<string | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const importRef = useRef<HTMLInputElement | null>(null);
@@ -269,11 +271,6 @@ export function WayfinderBuilderWorkspace() {
     if (!draft) {
       return;
     }
-    const confirmation = window.prompt(`Type "${draft.title}" to confirm delete.`);
-    if (confirmation !== draft.title) {
-      setNotice('Delete cancelled.');
-      return;
-    }
     try {
       setBusyAction('delete');
       setError(null);
@@ -281,6 +278,7 @@ export function WayfinderBuilderWorkspace() {
       await deleteWayfinderTemplate(draft.id);
       setSelectedId(null);
       await loadTemplates();
+      setDeleteModalOpen(false);
       setNotice('Wayfinder template deleted.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete Wayfinder template.');
@@ -373,7 +371,7 @@ export function WayfinderBuilderWorkspace() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading Wayfinder Builder...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading Wayfinder Builder...</div>;
   }
 
   return (
@@ -395,8 +393,8 @@ export function WayfinderBuilderWorkspace() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">Builders</div>
-            <h1 className="mt-2 text-3xl font-semibold text-white">Wayfinder Builder</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Wayfinder Builder</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
               Create and manage step-by-step compliance guides tailored to internal processes
               and regulatory frameworks, with clear stage progression, nested activities,
               and JSON import/export support in the canonical Cloudflare runtime.
@@ -433,7 +431,7 @@ export function WayfinderBuilderWorkspace() {
               <FileJson className="mr-2 h-4 w-4" />
               Import JSON as New
             </button>
-            <button className="button-secondary" onClick={() => void handleDelete()} type="button">
+            <button className="button-secondary" onClick={() => setDeleteModalOpen(true)} type="button">
               <Trash2 className="mr-2 h-4 w-4" />
               {busyAction === 'delete' ? 'Deleting...' : 'Delete'}
             </button>
@@ -453,7 +451,7 @@ export function WayfinderBuilderWorkspace() {
           <div key={metric.label} className="metric-card">
             <div className="metric-label">{metric.label}</div>
             <div className="metric-value">{metric.value}</div>
-            <div className="mt-2 text-xs text-slate-500">{metric.detail}</div>
+            <div className="mt-2 text-xs text-[#62576a]">{metric.detail}</div>
           </div>
         ))}
       </section>
@@ -463,12 +461,12 @@ export function WayfinderBuilderWorkspace() {
           <div className="flex items-center justify-between">
             <div>
               <div className="eyebrow">Template Library</div>
-              <h2 className="mt-2 text-xl font-semibold text-white">Wayfinders</h2>
+              <h2 className="mt-2 text-xl font-semibold text-[#241232]">Wayfinders</h2>
             </div>
-            <FolderKanban className="h-5 w-5 text-cyan-300" />
+            <FolderKanban className="h-5 w-5 text-[#7a3ccf]" />
           </div>
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-500" />
+            <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-[#62576a]" />
             <input
               className="input pl-10"
               placeholder="Search templates"
@@ -540,30 +538,30 @@ export function WayfinderBuilderWorkspace() {
               <div
                 key={template.id}
                 className={`panel-subtle w-full text-left transition ${
-                  selectedId === template.id ? 'border-cyan-300/30 bg-cyan-400/[0.04]' : 'hover:border-cyan-300/20'
+                  selectedId === template.id ? 'border-[#d7c3f1] bg-[#f6f1fa]' : 'hover:border-[#d7c3f1]'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="font-medium text-white">{template.title}</div>
-                    <div className="mt-1 text-xs text-slate-500">ID {template.id}</div>
-                    <div className="mt-2 text-sm text-slate-400">
+                    <div className="font-medium text-[#241232]">{template.title}</div>
+                    <div className="mt-1 text-xs text-[#62576a]">ID {template.id}</div>
+                    <div className="mt-2 text-sm text-[#6f6578]">
                       Creator {template.creator} · Owner {template.owner}
                     </div>
                   </div>
-                  <span className={template.status === 'Active' ? 'badge-success' : 'badge-neutral'}>
+                  <span className={template.status === 'Active' ? 'status-pill-success' : 'status-pill-neutral'}>
                     {template.status}
                   </span>
                 </div>
                 {template.description && (
-                  <div className="mt-3 text-sm leading-6 text-slate-300">{template.description}</div>
+                  <div className="mt-3 text-sm leading-6 text-[#4f435c]">{template.description}</div>
                 )}
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="badge-neutral">{template.stageCount} stages</span>
-                  <span className="badge-neutral">{template.activityCount} activities</span>
+                  <span className="status-pill-neutral">{template.stageCount} stages</span>
+                  <span className="status-pill-neutral">{template.activityCount} activities</span>
                 </div>
                 <div className="mt-4 flex items-center justify-between gap-3">
-                  <div className="text-xs text-slate-500">Updated {formatDate(template.lastUpdated)}</div>
+                  <div className="text-xs text-[#62576a]">Updated {formatDate(template.lastUpdated)}</div>
                   <button className="button-secondary px-3 py-2" onClick={() => setSelectedId(template.id)} type="button">
                     <Eye className="mr-2 h-4 w-4" />
                     View
@@ -576,7 +574,7 @@ export function WayfinderBuilderWorkspace() {
 
         <section className="panel">
           {detailLoading || !draft ? (
-            <div className="text-sm text-slate-300">Loading wayfinder detail...</div>
+            <div className="text-sm text-[#4f435c]">Loading wayfinder detail...</div>
           ) : (
             <div className="space-y-6">
               <div className="panel-subtle">
@@ -635,7 +633,7 @@ export function WayfinderBuilderWorkspace() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="eyebrow">Stage Builder</div>
-                      <h3 className="mt-2 text-lg font-semibold text-white">Ordered workflow stages</h3>
+                      <h3 className="mt-2 text-lg font-semibold text-[#241232]">Ordered workflow stages</h3>
                     </div>
                     <button
                       className="button-secondary"
@@ -660,10 +658,10 @@ export function WayfinderBuilderWorkspace() {
                           onClick={() => setSelectedStageId(stage.id)}
                           type="button"
                         >
-                          <GripVertical className="h-4 w-4 text-slate-500" />
+                          <GripVertical className="h-4 w-4 text-[#62576a]" />
                           <div>
-                            <div className="font-medium text-white">{stage.name}</div>
-                            <div className="mt-1 text-xs text-slate-500">
+                            <div className="font-medium text-[#241232]">{stage.name}</div>
+                            <div className="mt-1 text-xs text-[#62576a]">
                               {stage.activities.length} activities
                             </div>
                           </div>
@@ -694,7 +692,7 @@ export function WayfinderBuilderWorkspace() {
                             <ArrowDown className="h-4 w-4" />
                           </button>
                           <button
-                            className="button-secondary px-3 py-2 text-rose-200"
+                            className="button-secondary px-3 py-2 text-[#9d1f2c]"
                             onClick={() =>
                               setDraft({
                                 ...draft,
@@ -767,11 +765,11 @@ export function WayfinderBuilderWorkspace() {
                         </div>
                         <div className="space-y-3">
                           {stage.activities.map((activity, activityIndex) => (
-                            <div key={activity.id} className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+                            <div key={activity.id} className="rounded-2xl border border-[#ded8e4] bg-white p-4">
                               <div className="flex flex-wrap items-center justify-between gap-3">
                                 <div>
-                                  <div className="font-medium text-white">{activity.title}</div>
-                                  <div className="mt-1 text-xs text-slate-500">{activity.type}</div>
+                                  <div className="font-medium text-[#241232]">{activity.title}</div>
+                                  <div className="mt-1 text-xs text-[#62576a]">{activity.type}</div>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                   <button
@@ -813,7 +811,7 @@ export function WayfinderBuilderWorkspace() {
                                     <ArrowDown className="h-4 w-4" />
                                   </button>
                                   <button
-                                    className="button-secondary px-3 py-2 text-rose-200"
+                                    className="button-secondary px-3 py-2 text-[#9d1f2c]"
                                     onClick={() =>
                                       setDraft({
                                         ...draft,
@@ -956,7 +954,7 @@ export function WayfinderBuilderWorkspace() {
                                     ).map((docLink, docLinkIndex) => (
                                       <div
                                         key={docLink.id}
-                                        className="grid gap-3 rounded-2xl border border-white/10 bg-slate-950/50 p-3 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)_auto]"
+                                        className="grid gap-3 rounded-2xl border border-[#ded8e4] bg-white p-3 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)_auto]"
                                       >
                                         <input
                                           className="input"
@@ -1028,7 +1026,7 @@ export function WayfinderBuilderWorkspace() {
                                           }
                                         />
                                         <button
-                                          className="button-secondary px-3 py-2 text-rose-200"
+                                          className="button-secondary px-3 py-2 text-[#9d1f2c]"
                                           onClick={() =>
                                             setDraft({
                                               ...draft,
@@ -1074,16 +1072,16 @@ export function WayfinderBuilderWorkspace() {
                   <div className="panel-subtle">
                     <div className="eyebrow">Selected Stage</div>
                     {selectedStage ? (
-                      <div className="mt-4 space-y-3 text-sm text-slate-300">
-                        <div className="font-medium text-white">{selectedStage.name}</div>
+                      <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
+                        <div className="font-medium text-[#241232]">{selectedStage.name}</div>
                         <div>{selectedStage.description}</div>
                         <div className="flex flex-wrap gap-2">
-                          <span className="badge-neutral">{selectedStage.activities.length} activities</span>
-                          <span className="badge-neutral">{draft.status}</span>
+                          <span className="status-pill-neutral">{selectedStage.activities.length} activities</span>
+                          <span className="status-pill-neutral">{draft.status}</span>
                         </div>
                       </div>
                     ) : (
-                      <div className="mt-4 text-sm text-slate-400">
+                      <div className="mt-4 text-sm text-[#6f6578]">
                         Select a stage to focus the builder on its activities.
                       </div>
                     )}
@@ -1091,7 +1089,7 @@ export function WayfinderBuilderWorkspace() {
 
                   <div className="panel-subtle">
                     <div className="eyebrow">Suggested Uses</div>
-                    <div className="mt-4 space-y-3 text-sm text-slate-300">
+                    <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
                       <div>RMF Authorization Wayfinder</div>
                       <div>FedRAMP Readiness Wayfinder</div>
                       <div>Internal Audit Preparation Wayfinder</div>
@@ -1101,7 +1099,7 @@ export function WayfinderBuilderWorkspace() {
 
                   <div className="panel-subtle">
                     <div className="eyebrow">Template Notes</div>
-                    <div className="mt-4 space-y-3 text-sm text-slate-300">
+                    <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
                       <div>Export JSON for backup or transfer between environments.</div>
                       <div>Import JSON into the same editor surface to continue refining it.</div>
                       <div>Use activity links to route operators into modules, dashboards, or evidence views.</div>
@@ -1115,13 +1113,13 @@ export function WayfinderBuilderWorkspace() {
       </section>
 
       {hasUnsavedChanges && (
-        <section className="panel sticky bottom-4 border-cyan-300/20 bg-slate-950/85 backdrop-blur-xl">
+        <section className="panel sticky bottom-4 border-[#d7c3f1] bg-white backdrop-blur-xl">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-300" />
+              <AlertTriangle className="mt-0.5 h-5 w-5 text-[#8a4d00]" />
               <div>
-                <div className="font-medium text-white">Unsaved changes</div>
-                <div className="mt-1 text-sm text-slate-300">
+                <div className="font-medium text-[#241232]">Unsaved changes</div>
+                <div className="mt-1 text-sm text-[#4f435c]">
                   Saving updates the ordered stage and activity flow for every operator using this template.
                 </div>
               </div>
@@ -1133,6 +1131,47 @@ export function WayfinderBuilderWorkspace() {
           </div>
         </section>
       )}
+      <RegModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        title="Delete Wayfinder template"
+        description={draft ? `Review this template before deleting "${draft.title}".` : undefined}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setDeleteModalOpen(false)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary border-[#f1b7bd] text-[#a51f2b] hover:border-[#df7d89] hover:bg-[#fff3f4]"
+              disabled={!draft || busyAction === 'delete'}
+              onClick={() => void handleDelete()}
+              type="button"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              {busyAction === 'delete' ? 'Deleting...' : 'Delete template'}
+            </button>
+          </div>
+        }
+      >
+        {draft ? (
+          <div className="space-y-3 text-sm leading-6 text-[#4f435c]">
+            <p>
+              This permanently removes the guidance workflow, stage ordering, nested activities, documentation links, and operator path from the Wayfinder library.
+            </p>
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+              <div className="font-semibold text-[#241232]">{draft.title}</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="status-pill-neutral">{draft.status}</span>
+                <span className="status-pill-neutral">{draft.owner}</span>
+                <span className="status-pill-neutral">{draft.stages.length} stages</span>
+                <span className="status-pill-neutral">
+                  {draft.stages.reduce((total, stage) => total + stage.activities.length, 0)} activities
+                </span>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
     </div>
   );
 }

@@ -1,276 +1,417 @@
-import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import {
-  Activity,
-  BarChart3,
-  BookOpen,
-  Bot,
-  Boxes,
-  Building2,
-  ChevronLeft,
-  ChevronRight,
-  ClipboardCheck,
-  Compass,
-  Cpu,
-  Database,
-  Eye,
-  FileOutput,
-  FileText,
-  Gauge,
-  GitBranch,
-  Link2,
-  Lock,
-  MessageSquare,
-  PlayCircle,
-  Search,
-  ServerCog,
-  Shield,
-  User,
-  Users,
-  SlidersHorizontal,
-  Sparkles,
-  ShieldCheck,
-  Upload,
-  Workflow,
-  type LucideIcon,
-} from 'lucide-react';
-import { Separator } from '../components/ui/separator';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { ChevronDown, ChevronLeft, ChevronRight, Search, ShieldCheck, X } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
 import { cn } from '../lib/utils';
-import { canAccessShellRoute, type ShellAccessProfile } from './shellAccess';
-
-interface NavItem {
-  to: string;
-  label: string;
-  section: string;
-  icon: LucideIcon;
-  audience: 'standard' | 'admin' | 'internal';
-}
-
-const navigation: NavItem[] = [
-  { to: '/', label: 'Home', section: 'Home', icon: Gauge, audience: 'standard' },
-  { to: '/search', label: 'Search', section: 'Home', icon: Search, audience: 'standard' },
-  { to: '/analytics', label: 'Analytics', section: 'Home', icon: BarChart3, audience: 'standard' },
-  { to: '/program', label: 'Program Workspace', section: 'Program', icon: Compass, audience: 'standard' },
-  { to: '/modules', label: 'Modules', section: 'Program', icon: Boxes, audience: 'standard' },
-  { to: '/libraries', label: 'Libraries', section: 'Program', icon: BookOpen, audience: 'standard' },
-  { to: '/frameworks', label: 'Frameworks', section: 'Program', icon: GitBranch, audience: 'standard' },
-  { to: '/framework-library', label: 'Framework Library', section: 'Program', icon: BookOpen, audience: 'standard' },
-  { to: '/assessments', label: 'Assessments', section: 'Program', icon: ClipboardCheck, audience: 'standard' },
-  { to: '/gap-assessments', label: 'Gap Assessments', section: 'Program', icon: ClipboardCheck, audience: 'standard' },
-  { to: '/third-party', label: 'Third Party', section: 'Program', icon: Building2, audience: 'standard' },
-  { to: '/privacy', label: 'Privacy', section: 'Program', icon: Lock, audience: 'standard' },
-  { to: '/resilience', label: 'Resilience', section: 'Program', icon: Activity, audience: 'standard' },
-  { to: '/portal', label: 'External Portal', section: 'Program', icon: Link2, audience: 'standard' },
-  { to: '/advanced-risk/ebios', label: 'EBIOS RM', section: 'Program', icon: ShieldCheck, audience: 'standard' },
-  {
-    to: '/advanced-risk/quantitative',
-    label: 'Quantitative Risk',
-    section: 'Program',
-    icon: BarChart3,
-    audience: 'standard',
-  },
-  { to: '/evidence-management', label: 'Evidence Workspace', section: 'Evidence & Monitoring', icon: Database, audience: 'standard' },
-  { to: '/assessment-evidence-packages', label: 'Assessment Packages', section: 'Evidence & Monitoring', icon: ClipboardCheck, audience: 'standard' },
-  { to: '/evidence/jobs', label: 'Collection Jobs', section: 'Evidence & Monitoring', icon: Cpu, audience: 'standard' },
-  { to: '/conmon/executions', label: 'Monitoring Runs', section: 'Evidence & Monitoring', icon: PlayCircle, audience: 'standard' },
-  { to: '/findings', label: 'Findings Explorer', section: 'Evidence & Monitoring', icon: Search, audience: 'standard' },
-  { to: '/reports', label: 'Reports', section: 'Evidence & Monitoring', icon: FileOutput, audience: 'standard' },
-  { to: '/report-bundles', label: 'Report Bundles', section: 'Evidence & Monitoring', icon: FileOutput, audience: 'standard' },
-  { to: '/assurance', label: 'Assurance Overview', section: 'Assurance', icon: Gauge, audience: 'standard' },
-  { to: '/assurance/evidence', label: 'Evidence Explorer', section: 'Assurance', icon: Search, audience: 'standard' },
-  { to: '/assurance/tracker', label: 'Tracker Workbench', section: 'Assurance', icon: Upload, audience: 'standard' },
-  { to: '/assurance/packages', label: '20x Packages', section: 'Assurance', icon: FileOutput, audience: 'standard' },
-  { to: '/assurance/reviews', label: 'Review Queue', section: 'Assurance', icon: ClipboardCheck, audience: 'standard' },
-  { to: '/assurance/agent-runs', label: 'Agent Runs', section: 'Assurance', icon: Bot, audience: 'standard' },
-  { to: '/workspace/me', label: 'My Access', section: 'Home', icon: User, audience: 'standard' },
-  { to: '/chat', label: 'Workspace AI', section: 'Automation', icon: MessageSquare, audience: 'standard' },
-  { to: '/program/setup', label: 'Guided Setup', section: 'Administration', icon: PlayCircle, audience: 'admin' },
-  { to: '/policies', label: 'Policies', section: 'Administration', icon: FileText, audience: 'admin' },
-  { to: '/workspace/domains', label: 'Domains', section: 'Administration', icon: Boxes, audience: 'admin' },
-  { to: '/workspace/team', label: 'Team', section: 'Administration', icon: Users, audience: 'admin' },
-  { to: '/evidence/sources', label: 'Evidence Sources', section: 'Administration', icon: Database, audience: 'admin' },
-  { to: '/conmon/profiles', label: 'Monitoring Profiles', section: 'Administration', icon: Eye, audience: 'admin' },
-  { to: '/workspace/access', label: 'Permissions', section: 'Administration', icon: Shield, audience: 'admin' },
-  { to: '/setup/general', label: 'Workspace Settings', section: 'Administration', icon: SlidersHorizontal, audience: 'admin' },
-  { to: '/setup/security', label: 'Security', section: 'Administration', icon: ShieldCheck, audience: 'admin' },
-  { to: '/automation-manager', label: 'Integrations', section: 'Administration', icon: ServerCog, audience: 'admin' },
-  { to: '/grc-admin', label: 'GRC Content & AI', section: 'Administration', icon: ServerCog, audience: 'admin' },
-  { to: '/grc-admin/scrutiny-engine', label: 'Scrutiny Engine', section: 'Administration', icon: ClipboardCheck, audience: 'admin' },
-  { to: '/trust-center', label: 'FedRAMP Trust Center', section: 'Administration', icon: ShieldCheck, audience: 'admin' },
-  { to: '/response-automation', label: 'Response Automation', section: 'Administration', icon: Bot, audience: 'admin' },
-  { to: '/evidence-mapping', label: 'Evidence Mapping', section: 'Administration', icon: Link2, audience: 'admin' },
-  { to: '/features/regml', label: 'AI Authoring', section: 'Administration', icon: Sparkles, audience: 'admin' },
-  { to: '/builders/form-builder', label: 'Form Builder', section: 'Builders', icon: SlidersHorizontal, audience: 'admin' },
-  { to: '/builders/rules-builder', label: 'Rules Builder', section: 'Builders', icon: Workflow, audience: 'admin' },
-  { to: '/builders/export-builder', label: 'Export Builder', section: 'Builders', icon: FileOutput, audience: 'admin' },
-  { to: '/builders/report-builder', label: 'Report Builder', section: 'Builders', icon: BarChart3, audience: 'standard' },
-  { to: '/builders/dashboard-builder', label: 'Dashboard Builder', section: 'Builders', icon: Gauge, audience: 'admin' },
-  { to: '/builders/questionnaire-builder', label: 'Questionnaire Builder', section: 'Builders', icon: ClipboardCheck, audience: 'admin' },
-  { to: '/builders/wayfinder-builder', label: 'Wayfinder Builder', section: 'Builders', icon: Compass, audience: 'admin' },
-  { to: '/settings', label: 'Platform Settings', section: 'Internal', icon: ServerCog, audience: 'internal' },
-  { to: '/workflow', label: 'Workflow Console', section: 'Internal', icon: Workflow, audience: 'internal' },
-];
-
-const sections = ['Home', 'Program', 'Evidence & Monitoring', 'Assurance', 'Automation', 'Administration', 'Builders', 'Internal'];
-
-const SECTION_SEPARATORS_BEFORE = new Set(['Program', 'Evidence & Monitoring', 'Assurance', 'Automation', 'Administration', 'Builders', 'Internal']);
+import { getVisibleIaGroups, type IaNavGroup, type IaNavItem } from './iaNavigation';
+import type { ShellAccessProfile } from './shellAccess';
 
 type SidebarProps = {
   access: ShellAccessProfile;
+  mobileOpen: boolean;
+  onMobileOpenChange: (open: boolean) => void;
 };
 
-function canSeeNavItem(item: NavItem, access: ShellAccessProfile) {
-  if (item.audience === 'admin' && !access.canViewAdminNavigation) {
-    return false;
+function isRouteActive(pathname: string, to: string): boolean {
+  const canonicalPathname = canonicalizeActivePathname(pathname);
+
+  if (to === '/') {
+    return canonicalPathname === '/';
   }
 
-  if (item.audience === 'internal' && !access.canViewInternalTools) {
-    return false;
-  }
-
-  return canAccessShellRoute(item.to, access);
+  return canonicalPathname === to || canonicalPathname.startsWith(`${to}/`);
 }
 
-export function Sidebar({ access }: SidebarProps) {
+function canonicalizeActivePathname(pathname: string): string {
+  const exactAliases: Record<string, string> = {
+    '/audits': '/assessment-evidence-packages',
+    '/controls': '/security-controls',
+    '/documents': '/evidence-locker',
+    '/fedramp/provider': '/trust-center',
+    '/features/compliance-exports': '/compliance-exports',
+    '/features/news-feed': '/news-feed',
+    '/features/subsystems': '/subsystems',
+    '/features/utilities': '/utilities',
+    '/features/workbench': '/workbench',
+    '/features/workflow': '/workflow',
+    '/risk-assessments': '/risk-scenarios',
+    '/scrutiny-engine': '/grc-admin/scrutiny-engine',
+    '/setup-mfa': '/setup/mfa',
+    '/setup/user-management-roles': '/workspace/team',
+    '/setup/user-management-roles/mfa': '/setup/mfa',
+    '/setup/user-management-roles/roles': '/workspace/access',
+    '/sso': '/setup/sso',
+    '/users': '/workspace/team',
+    '/vendors': '/third-party',
+  };
+
+  const prefixAliases: Array<[string, string]> = [
+    ['/audits/', '/assessment-evidence-packages/'],
+    ['/controls/', '/security-controls/'],
+    ['/documents/', '/evidence-locker/'],
+    ['/features/compliance-exports/', '/compliance-exports/'],
+    ['/features/news-feed/', '/news-feed/'],
+    ['/features/subsystems/', '/subsystems/'],
+    ['/features/utilities/', '/utilities/'],
+    ['/features/workbench/', '/workbench/'],
+    ['/features/workflow/', '/workflow/'],
+    ['/risk-assessments/', '/risk-scenarios/'],
+    ['/setup/user-management-roles/mfa/', '/setup/mfa/'],
+    ['/setup/user-management-roles/roles/', '/workspace/access/'],
+    ['/setup/user-management-roles/', '/workspace/team/'],
+    ['/users/', '/workspace/team/'],
+    ['/vendors/', '/third-party/'],
+  ];
+
+  if (exactAliases[pathname]) {
+    return exactAliases[pathname];
+  }
+
+  const prefixMatch = prefixAliases.find(([alias]) => pathname.startsWith(alias));
+  if (prefixMatch) {
+    const [alias, canonical] = prefixMatch;
+    return `${canonical}${pathname.slice(alias.length)}`;
+  }
+
+  return pathname;
+}
+
+function hasActiveItem(group: IaNavGroup, pathname: string): boolean {
+  return group.items.some((item) => isRouteActive(pathname, item.to));
+}
+
+function groupFallbackRoute(group: IaNavGroup): string {
+  return group.items[0]?.to ?? '/';
+}
+
+function ExpandedItem({ item, pathname, closeOnNavigate }: { item: IaNavItem; pathname: string; closeOnNavigate?: () => void }) {
+  const Icon = item.icon;
+  const routeActive = isRouteActive(pathname, item.to);
+
+  return (
+    <NavLink
+      aria-current={routeActive ? 'page' : undefined}
+      data-active={routeActive ? 'true' : undefined}
+      to={item.to}
+      onClick={closeOnNavigate}
+      className={({ isActive }) =>
+        cn(
+          'group flex min-h-9 items-center gap-3 rounded-md px-3 py-2 text-[14px] leading-5 transition',
+          isActive || routeActive
+            ? 'bg-[#ece7f0] font-medium text-[#8a35e8]'
+            : 'text-[#44275f] hover:bg-white hover:text-[#2b0b4d]',
+        )
+      }
+    >
+      {({ isActive }) => (
+        <>
+          <Icon className={cn('h-4 w-4 shrink-0', isActive || routeActive ? 'text-[#9d3df2]' : 'text-[#7c7087]')} strokeWidth={1.8} />
+          <span className="truncate">{item.label}</span>
+        </>
+      )}
+    </NavLink>
+  );
+}
+
+function ExpandedNavigation({
+  groups,
+  openGroupIds,
+  pathname,
+  toggleGroup,
+  closeOnNavigate,
+}: {
+  groups: IaNavGroup[];
+  openGroupIds: Set<string>;
+  pathname: string;
+  toggleGroup: (groupId: string) => void;
+  closeOnNavigate?: () => void;
+}) {
+  const navigationId = useId();
+  return (
+    <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-3">
+      <div className="space-y-1">
+        {groups.map((group) => {
+          const Icon = group.icon;
+          const isOpen = openGroupIds.has(group.id);
+          const isActive = hasActiveItem(group, pathname);
+          const controlsId = `${navigationId}-${group.id}`;
+
+          return (
+            <section key={group.id} className="space-y-1">
+              <button
+                aria-expanded={isOpen}
+                aria-controls={controlsId}
+                data-active={isActive ? 'true' : undefined}
+                type="button"
+                onClick={() => toggleGroup(group.id)}
+                className={cn(
+                  'flex min-h-10 w-full items-center gap-3 rounded-md px-3 py-2 text-left text-[15px] font-medium leading-5 transition',
+                  isActive
+                    ? 'bg-[#f2eaf9] text-[#2b0b4d]'
+                    : 'text-[#2f173f] hover:bg-white',
+                )}
+              >
+                <Icon className={cn('h-4.5 w-4.5 shrink-0', isActive ? 'text-[#9d3df2]' : 'text-[#7b7082]')} strokeWidth={1.8} />
+                <span className="min-w-0 flex-1 truncate">{group.label}</span>
+                <ChevronDown className={cn('h-4 w-4 shrink-0 text-[#62576a] transition', isOpen ? 'rotate-180' : '')} />
+              </button>
+
+                <div id={controlsId} hidden={!isOpen} className="ml-5 border-l border-[#dfd7e6] pl-2">
+                  {group.items.map((item) => (
+                    <ExpandedItem key={item.to} closeOnNavigate={closeOnNavigate} item={item} pathname={pathname} />
+                  ))}
+                </div>
+            </section>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+
+function CollapsedNavigation({ groups, pathname }: { groups: IaNavGroup[]; pathname: string }) {
+  return (
+    <nav className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-3">
+      <div className="space-y-1">
+        {groups.map((group) => {
+          const Icon = group.icon;
+          const isActive = hasActiveItem(group, pathname);
+
+          return (
+            <Tooltip key={group.id}>
+              <TooltipTrigger asChild>
+                <NavLink
+                  aria-current={isActive ? 'page' : undefined}
+                  data-active={isActive ? 'true' : undefined}
+                  to={groupFallbackRoute(group)}
+                  className={cn(
+                    'flex h-10 w-10 items-center justify-center rounded-md transition',
+                    isActive
+                      ? 'bg-[#ece7f0] text-[#9d3df2]'
+                      : 'text-[#746a7b] hover:bg-white hover:text-[#2b0b4d]',
+                  )}
+                >
+                  <Icon className="h-4.5 w-4.5" strokeWidth={1.8} />
+                </NavLink>
+              </TooltipTrigger>
+              <TooltipContent side="right">{group.label}</TooltipContent>
+            </Tooltip>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+
+function SidebarChrome({
+  collapsed,
+  groups,
+  pathname,
+  openGroupIds,
+  setCollapsed,
+  toggleGroup,
+  closeOnNavigate,
+}: {
+  collapsed: boolean;
+  groups: IaNavGroup[];
+  pathname: string;
+  openGroupIds: Set<string>;
+  setCollapsed?: (collapsed: boolean) => void;
+  toggleGroup: (groupId: string) => void;
+  closeOnNavigate?: () => void;
+}) {
+  return (
+    <>
+      <div className={cn('flex h-[72px] items-center border-b border-[#ded7e5] px-4', collapsed ? 'justify-center' : 'justify-between')}>
+        <Link className={cn('flex items-center gap-3', collapsed && 'justify-center')} to="/" onClick={closeOnNavigate}>
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#efe4ff] text-[#8a35e8]">
+            <ShieldCheck className="h-4.5 w-4.5" strokeWidth={2} />
+          </div>
+          {!collapsed ? (
+            <div className="min-w-0">
+              <div className="font-serif text-[25px] font-semibold leading-none tracking-tight text-[#250640]">Regovise</div>
+              <div className="mt-1 flex items-center gap-1.5">
+                <span className="truncate rounded border border-[#d7d1dc] bg-white px-2 py-0.5 text-[11px] font-medium text-[#412057]">
+                  Workspace console
+                </span>
+                <span className="rounded-full border border-[#d7c3f1] bg-[#f2e8ff] px-2 py-0.5 text-[10px] font-semibold text-[#5f1aa8]">
+                  Staging
+                </span>
+              </div>
+            </div>
+          ) : null}
+        </Link>
+
+        {!collapsed && setCollapsed ? (
+          <button
+            aria-label="Collapse sidebar"
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-[#d8d0de] bg-white text-[#6d6475] shadow-sm transition hover:bg-[#f8f5fa]"
+            type="button"
+            onClick={() => setCollapsed(true)}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+        ) : null}
+      </div>
+
+      {collapsed && setCollapsed ? (
+        <button
+          aria-label="Expand sidebar"
+          className="mx-auto mt-3 flex h-8 w-8 items-center justify-center rounded-md border border-[#d8d0de] bg-white text-[#6d6475] shadow-sm transition hover:bg-[#f8f5fa]"
+          type="button"
+          onClick={() => setCollapsed(false)}
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      ) : null}
+
+      {!collapsed ? (
+        <div className="px-3 py-3">
+          <Link
+            className="flex h-10 items-center gap-2 rounded-full bg-[#e9e3ec] px-3 text-[14px] text-[#5f5468] transition hover:bg-[#e1d9e6]"
+            to="/search"
+            onClick={closeOnNavigate}
+          >
+            <Search className="h-4 w-4" strokeWidth={1.8} />
+            <span className="flex-1 truncate">Help...</span>
+            <span className="text-[12px] text-[#5f5468]">⌘+K</span>
+          </Link>
+        </div>
+      ) : null}
+
+      {collapsed ? (
+        <CollapsedNavigation groups={groups} pathname={pathname} />
+      ) : (
+        <ExpandedNavigation
+          closeOnNavigate={closeOnNavigate}
+          groups={groups}
+          openGroupIds={openGroupIds}
+          pathname={pathname}
+          toggleGroup={toggleGroup}
+        />
+      )}
+
+    </>
+  );
+}
+
+export function Sidebar({ access, mobileOpen, onMobileOpenChange }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const groups = useMemo(() => getVisibleIaGroups(access), [access]);
+  const location = useLocation();
+  const { pathname } = location;
+  const previousLocationKey = useRef(location.key);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const activeGroupIds = useMemo(() => groups.filter((group) => hasActiveItem(group, pathname)).map((group) => group.id), [groups, pathname]);
+  const [openGroupIds, setOpenGroupIds] = useState<Set<string>>(() => new Set(['home', 'starter-guide', 'work-queue', 'compliance']));
+
+  useEffect(() => {
+    if (activeGroupIds.length === 0) {
+      return;
+    }
+
+    setOpenGroupIds((current) => {
+      const next = new Set(current);
+      activeGroupIds.forEach((groupId) => next.add(groupId));
+      return next;
+    });
+  }, [activeGroupIds]);
+
+  useEffect(() => {
+    if (previousLocationKey.current !== location.key) {
+      previousLocationKey.current = location.key;
+      onMobileOpenChange(false);
+    }
+  }, [location.key, onMobileOpenChange]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const desktop = window.matchMedia('(min-width: 768px)');
+    const closeOnDesktop = () => {
+      if (desktop.matches) onMobileOpenChange(false);
+    };
+    closeOnDesktop();
+    desktop.addEventListener('change', closeOnDesktop);
+    return () => desktop.removeEventListener('change', closeOnDesktop);
+  }, [mobileOpen, onMobileOpenChange]);
+
+  function toggleGroup(groupId: string) {
+    setOpenGroupIds((current) => {
+      const next = new Set(current);
+      if (next.has(groupId)) {
+        next.delete(groupId);
+      } else {
+        next.add(groupId);
+      }
+      return next;
+    });
+  }
 
   return (
     <TooltipProvider delayDuration={100}>
+      <aside className="sticky top-0 hidden h-screen w-[76px] shrink-0 flex-col border-r border-[#ded7e5] bg-[#f7f2fa] text-[#2b0b4d] shadow-[1px_0_0_rgba(43,11,77,0.02)] md:flex xl:hidden">
+        <SidebarChrome
+          collapsed
+          groups={groups}
+          openGroupIds={openGroupIds}
+          pathname={pathname}
+          toggleGroup={toggleGroup}
+        />
+      </aside>
+
       <aside
         className={cn(
-          'glass-panel sticky top-0 flex h-screen flex-col border-r border-white/10 transition-all duration-300',
-          collapsed ? 'w-[68px]' : 'w-72',
+          'sticky top-0 hidden h-screen shrink-0 flex-col border-r border-[#ded7e5] bg-[#f7f2fa] text-[#2b0b4d] shadow-[1px_0_0_rgba(43,11,77,0.02)] transition-all duration-200 xl:flex',
+          collapsed ? 'w-[76px]' : 'w-[292px]',
         )}
       >
-        {/* Logo header */}
-        <div
-          className={cn(
-            'flex h-20 items-center border-b border-white/10 px-4',
-            collapsed ? 'justify-center' : 'justify-between',
-          )}
-        >
-          <div className={cn('flex items-center gap-3', collapsed && 'justify-center')}>
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400/25 to-cyan-600/15 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.25)]">
-              <ShieldCheck className="h-4.5 w-4.5 text-cyan-400" strokeWidth={1.8} />
-            </div>
-            {!collapsed && (
-              <div>
-                <div className="text-[10px] uppercase tracking-[0.32em] text-cyan-300/60">Regovise</div>
-                <div className="text-sm font-semibold tracking-tight text-white">Compliance Operations</div>
-              </div>
-            )}
-          </div>
-          {!collapsed && (
-            <button
-              onClick={() => setCollapsed(true)}
-              className="flex h-7 w-7 items-center justify-center rounded-xl text-slate-500 transition hover:bg-white/[0.07] hover:text-white"
-              aria-label="Collapse sidebar"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-
-        {/* Expand button when collapsed */}
-        {collapsed && (
-          <button
-            onClick={() => setCollapsed(false)}
-            className="mx-auto mt-3 flex h-7 w-7 items-center justify-center rounded-xl text-slate-500 transition hover:bg-white/[0.07] hover:text-white"
-            aria-label="Expand sidebar"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        )}
-
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3 scrollbar-thin">
-          {sections.map((section, sectionIndex) => {
-            const items = navigation.filter((item) => item.section === section && canSeeNavItem(item, access));
-            if (items.length === 0) return null;
-
-            return (
-              <div key={section}>
-                {SECTION_SEPARATORS_BEFORE.has(section) && sectionIndex > 0 && (
-                  <div className={cn('my-2', collapsed ? 'px-3' : 'px-4')}>
-                    <Separator />
-                  </div>
-                )}
-
-                <div className={cn('mb-1', !collapsed && 'px-4')}>
-                  {!collapsed && (
-                    <div className="mb-1 px-2 pt-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">
-                      {section}
-                    </div>
-                  )}
-                  <div className={cn('space-y-0.5', collapsed && 'flex flex-col items-center px-2')}>
-                    {items.map((item) => {
-                      const Icon = item.icon;
-
-                      if (collapsed) {
-                        return (
-                          <Tooltip key={item.to}>
-                            <TooltipTrigger asChild>
-                              <NavLink
-                                to={item.to}
-                                className={({ isActive }) =>
-                                  cn(
-                                    'flex h-9 w-9 items-center justify-center rounded-xl transition',
-                                    isActive
-                                      ? 'bg-cyan-400/15 text-cyan-300 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.2)]'
-                                      : 'text-slate-400 hover:bg-white/[0.06] hover:text-white',
-                                  )
-                                }
-                              >
-                                <Icon className="h-4 w-4" strokeWidth={1.7} />
-                              </NavLink>
-                            </TooltipTrigger>
-                            <TooltipContent side="right">{item.label}</TooltipContent>
-                          </Tooltip>
-                        );
-                      }
-
-                      return (
-                        <NavLink
-                          key={item.to}
-                          to={item.to}
-                          className={({ isActive }) =>
-                            cn(
-                              'flex items-center gap-3 rounded-2xl px-3 py-2 text-sm transition',
-                              isActive
-                                ? 'bg-cyan-400/15 text-cyan-100 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.2)]'
-                                : 'text-slate-300 hover:bg-white/[0.05] hover:text-white',
-                            )
-                          }
-                        >
-                          {({ isActive }) => (
-                            <>
-                              <Icon
-                                className={cn('h-4 w-4 shrink-0', isActive ? 'text-cyan-400' : 'text-slate-500')}
-                                strokeWidth={1.7}
-                              />
-                              <span className="truncate">{item.label}</span>
-                            </>
-                          )}
-                        </NavLink>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </nav>
-
-        {/* Footer */}
-        {!collapsed && (
-          <div className="border-t border-white/10 px-5 py-4">
-            <p className="text-[11px] leading-5 text-slate-500">
-              One workspace for governance, risk, portal operations, advanced studies, monitoring, and evidence.
-            </p>
-          </div>
-        )}
+        <SidebarChrome
+          collapsed={collapsed}
+          groups={groups}
+          openGroupIds={openGroupIds}
+          pathname={pathname}
+          setCollapsed={setCollapsed}
+          toggleGroup={toggleGroup}
+        />
       </aside>
+
+      <DialogPrimitive.Root open={mobileOpen} onOpenChange={onMobileOpenChange}>
+        <DialogPrimitive.Portal>
+          <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-[#1b1224]/45 md:hidden" />
+          <DialogPrimitive.Content
+            aria-describedby={undefined}
+            className="fixed inset-y-0 left-0 z-50 flex h-full w-[292px] max-w-[86vw] flex-col border-r border-[#ded7e5] bg-[#f7f2fa] text-[#2b0b4d] shadow-2xl md:hidden"
+            onOpenAutoFocus={() => {
+              const focused = document.activeElement;
+              returnFocusRef.current = focused instanceof HTMLElement && focused !== document.body
+                ? focused
+                : document.querySelector<HTMLButtonElement>('button[aria-label="Open navigation"]');
+            }}
+            onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              if (returnFocusRef.current?.isConnected) returnFocusRef.current.focus({ preventScroll: true });
+              returnFocusRef.current = null;
+            }}
+          >
+            <DialogPrimitive.Title className="sr-only">Navigation</DialogPrimitive.Title>
+            <DialogPrimitive.Close
+              aria-label="Close navigation"
+              className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-md border border-[#d8d0de] bg-white text-[#6d6475] shadow-sm"
+            >
+              <X className="h-4 w-4" />
+            </DialogPrimitive.Close>
+            <SidebarChrome
+              closeOnNavigate={() => onMobileOpenChange(false)}
+              collapsed={false}
+              groups={groups}
+              openGroupIds={openGroupIds}
+              pathname={pathname}
+              toggleGroup={toggleGroup}
+            />
+          </DialogPrimitive.Content>
+        </DialogPrimitive.Portal>
+      </DialogPrimitive.Root>
     </TooltipProvider>
   );
 }

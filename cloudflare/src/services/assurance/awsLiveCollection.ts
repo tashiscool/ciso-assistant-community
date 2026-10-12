@@ -1,5 +1,6 @@
 import { AwsClient } from 'aws4fetch';
 import { XMLParser } from 'fast-xml-parser';
+import { providerRequest } from '../../utils/providerRequest';
 
 import type { BundleKind, EvidenceInputMode } from './types';
 
@@ -314,22 +315,27 @@ async function callAwsQueryXml(args: {
     }
     body.set(key, String(value));
   }
-  const response = await args.aws.fetch(`https://${endpoint.host}/`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/x-www-form-urlencoded; charset=utf-8',
+  return providerRequest(
+    (signal) => args.aws.fetch(`https://${endpoint.host}/`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded; charset=utf-8',
+      },
+      body: body.toString(),
+      aws: {
+        service: endpoint.service,
+        region: endpoint.region,
+      },
+      signal,
+    }),
+    async (response) => {
+      const payload = await responsePayload(response);
+      if (!response.ok) {
+        throw buildServiceError(payload, response.status, `${args.service}.${args.action}`);
+      }
+      return parseXml(payload);
     },
-    body: body.toString(),
-    aws: {
-      service: endpoint.service,
-      region: endpoint.region,
-    },
-  });
-  const payload = await responsePayload(response);
-  if (!response.ok) {
-    throw buildServiceError(payload, response.status, `${args.service}.${args.action}`);
-  }
-  return parseXml(payload);
+  );
 }
 
 async function callAwsJson(args: {
@@ -340,23 +346,28 @@ async function callAwsJson(args: {
   body: Record<string, unknown>;
 }): Promise<Record<string, unknown>> {
   const endpoint = endpointFor(args.service, args.region);
-  const response = await args.aws.fetch(`https://${endpoint.host}/`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/x-amz-json-1.1',
-      'x-amz-target': args.target,
+  return providerRequest(
+    (signal) => args.aws.fetch(`https://${endpoint.host}/`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/x-amz-json-1.1',
+        'x-amz-target': args.target,
+      },
+      body: JSON.stringify(args.body),
+      aws: {
+        service: endpoint.service,
+        region: endpoint.region,
+      },
+      signal,
+    }),
+    async (response) => {
+      const payload = await responsePayload(response);
+      if (!response.ok) {
+        throw buildServiceError(payload, response.status, args.target);
+      }
+      return payload ? (JSON.parse(payload) as Record<string, unknown>) : {};
     },
-    body: JSON.stringify(args.body),
-    aws: {
-      service: endpoint.service,
-      region: endpoint.region,
-    },
-  });
-  const payload = await responsePayload(response);
-  if (!response.ok) {
-    throw buildServiceError(payload, response.status, args.target);
-  }
-  return payload ? (JSON.parse(payload) as Record<string, unknown>) : {};
+  );
 }
 
 async function callAwsS3(args: {
@@ -371,18 +382,23 @@ async function callAwsS3(args: {
   const path = args.path ?? '/';
   const host = args.bucket ? `${args.bucket}.${endpoint.host}` : endpoint.host;
   const query = args.query ? `?${args.query}` : '';
-  const response = await args.aws.fetch(`https://${host}${path}${query}`, {
-    method: args.method,
-    aws: {
-      service: endpoint.service,
-      region: endpoint.region,
+  return providerRequest(
+    (signal) => args.aws.fetch(`https://${host}${path}${query}`, {
+      method: args.method,
+      aws: {
+        service: endpoint.service,
+        region: endpoint.region,
+      },
+      signal,
+    }),
+    async (response) => {
+      const payload = await responsePayload(response);
+      if (!response.ok) {
+        throw buildServiceError(payload, response.status, `s3${path}`);
+      }
+      return payload ? parseXml(payload) : {};
     },
-  });
-  const payload = await responsePayload(response);
-  if (!response.ok) {
-    throw buildServiceError(payload, response.status, `s3${path}`);
-  }
-  return payload ? parseXml(payload) : {};
+  );
 }
 
 async function safeCall<T>(

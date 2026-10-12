@@ -16,8 +16,27 @@ import {
 import { AssuranceExplainPanel } from './AssuranceExplainPanel';
 import { AssuranceWorkflowPanel } from './AssuranceWorkflowPanel';
 import { CoachMarksPanel } from '../../components/CoachMarksPanel';
+import { RegActionMenu, RegModal, RegRightDrawer, RegStatusPill } from '../../components/regovise/PagePrimitives';
 import type { AgentRunDetail, AgentRunListItem, AgentRunTrace, AssuranceArtifactPreview, AssuranceExplainAudience, WritebackApproval } from './types';
 import { useEdgeIdentity } from '../../shared/session/identity';
+
+type WritebackDecision = 'approve' | 'reject' | 'request_more_evidence' | 'duplicate' | 'export';
+
+const writebackDecisionLabels: Record<WritebackDecision, string> = {
+  approve: 'Approve',
+  reject: 'Reject',
+  request_more_evidence: 'Request more evidence',
+  duplicate: 'Mark duplicate',
+  export: 'Export draft',
+};
+
+const writebackDecisionDescriptions: Record<WritebackDecision, string> = {
+  approve: 'Record this writeback as approved for local draft handling. No external dispatch is performed by this approval.',
+  reject: 'Reject this writeback request and preserve the reviewer note as the decision rationale.',
+  request_more_evidence: 'Move this writeback into a needs-more-evidence state so it cannot proceed without additional source support.',
+  duplicate: 'Mark this writeback as a duplicate of existing work and preserve the reviewer note as the rationale.',
+  export: 'Export the draft writeback payload locally for review. No external dispatch is performed.',
+};
 
 function formatDate(value: string | null | undefined) {
   if (!value) {
@@ -146,6 +165,11 @@ export function AgentRunInspectorPage() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [approvalNote, setApprovalNote] = useState('Validated by reviewer after trace inspection.');
+  const [inspectedWriteback, setInspectedWriteback] = useState<WritebackApproval | null>(null);
+  const [writebackDecisionToReview, setWritebackDecisionToReview] = useState<{
+    writeback: WritebackApproval;
+    decision: WritebackDecision;
+  } | null>(null);
   const [observableImportText, setObservableImportText] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -484,7 +508,7 @@ export function AgentRunInspectorPage() {
 
   async function handleWritebackDecision(
     writeback: WritebackApproval,
-    decision: 'approve' | 'reject' | 'request_more_evidence' | 'duplicate' | 'export',
+    decision: WritebackDecision,
   ) {
     try {
       setBusyAction(`${decision}:${writeback.id}`);
@@ -517,19 +541,23 @@ export function AgentRunInspectorPage() {
       setTrace(runTrace);
       setRuns(nextRuns);
       setSelectedWritebackId(writeback.id);
+      return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to update the writeback decision.');
+      return false;
     } finally {
       setBusyAction(null);
     }
   }
 
+  const decisionReview = writebackDecisionToReview;
+
   return (
     <div className="space-y-6">
       <section className="panel">
         <div className="eyebrow">Assurance</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Agent Run Inspector</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Agent Run Inspector</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">
           Inspect bounded assurance-agent traces, policy decisions, and approval-gated writebacks without leaving the workspace.
         </p>
       </section>
@@ -548,7 +576,7 @@ export function AgentRunInspectorPage() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="label">Observable Security Agent import</div>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#51465e]">
               Paste a JSON object with a <code>manifest</code> field from <code>agent_run_manifest.json</code>. Optional <code>trace</code> and <code>artifacts</code> fields are preserved as previews; writebacks remain pending human approval.
             </p>
           </div>
@@ -575,7 +603,7 @@ export function AgentRunInspectorPage() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="label">Agent runs</div>
-                <div className="mt-1 text-sm text-slate-400">Completed runs and their current approval posture.</div>
+                <div className="mt-1 text-sm text-[#6f6578]">Completed runs and their current approval posture.</div>
               </div>
               <button className="button-secondary" onClick={() => void loadRuns()} type="button">
                 Refresh
@@ -586,7 +614,7 @@ export function AgentRunInspectorPage() {
           {runs.map((item) => (
             <button
               key={item.id}
-              className={`panel w-full text-left transition ${selectedRunId === item.id ? 'border-cyan-400/30 bg-cyan-400/10' : ''}`}
+              className={`panel w-full text-left transition ${selectedRunId === item.id ? 'border-[#d7c3f1] bg-[#f3e9ff]' : ''}`}
               onClick={() => {
                 setSelectedRunId(item.id);
                 updateSearchState({
@@ -601,12 +629,12 @@ export function AgentRunInspectorPage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="eyebrow">{item.workflowName}</div>
-                  <h2 className="mt-2 text-lg font-semibold text-white">{item.status}</h2>
-                  <div className="mt-2 font-mono text-xs text-cyan-200">{item.id}</div>
+                  <h2 className="mt-2 text-lg font-semibold text-[#241232]">{item.status}</h2>
+                  <div className="mt-2 font-mono text-xs text-[#6d28d9]">{item.id}</div>
                 </div>
-                <span className="badge-neutral">{item.pendingWritebackCount} pending</span>
+                <RegStatusPill tone="neutral">{item.pendingWritebackCount} pending</RegStatusPill>
               </div>
-              <div className="mt-3 grid gap-2 text-xs text-slate-400 sm:grid-cols-2">
+              <div className="mt-3 grid gap-2 text-xs text-[#6f6578] sm:grid-cols-2">
                 <div>Created: {formatDate(item.createdAt)}</div>
                 <div>Evidence: {item.evidenceJobId ?? '—'}</div>
                 <div>Approvals: {item.approvalCount}</div>
@@ -616,27 +644,27 @@ export function AgentRunInspectorPage() {
           ))}
 
           {!loading && runs.length === 0 && (
-            <div className="panel text-sm text-slate-400">No assurance agent runs are available yet.</div>
+            <div className="panel text-sm text-[#6f6578]">No assurance agent runs are available yet.</div>
           )}
-          {loading && <div className="panel text-sm text-slate-400">Loading agent runs...</div>}
+          {loading && <div className="panel text-sm text-[#6f6578]">Loading agent runs...</div>}
         </section>
 
         <section className="space-y-4">
-          {detailLoading && <div className="panel text-sm text-slate-400">Loading agent run detail...</div>}
+          {detailLoading && <div className="panel text-sm text-[#6f6578]">Loading agent run detail...</div>}
 
           {detail && trace && (
             <>
               <section className="panel">
                 <div className="label">Selected run</div>
-                <h2 className="mt-2 text-2xl font-semibold text-white">{trace.workflowName}</h2>
-                <div className="mt-2 font-mono text-xs text-cyan-200">{detail.id}</div>
-                <div className="mt-3 grid gap-2 text-sm text-slate-400 sm:grid-cols-2">
+                <h2 className="mt-2 text-2xl font-semibold text-[#241232]">{trace.workflowName}</h2>
+                <div className="mt-2 font-mono text-xs text-[#6d28d9]">{detail.id}</div>
+                <div className="mt-3 grid gap-2 text-sm text-[#6f6578] sm:grid-cols-2">
                   <div>Generated: {formatDate(trace.generatedAt)}</div>
                   <div>Status: {trace.status}</div>
                   <div>
                     Evidence job:{' '}
                     {trace.evidenceJobId ? (
-                      <Link className="font-mono text-cyan-200 transition hover:text-cyan-100" to={`/assurance/evidence?evidenceJobId=${encodeURIComponent(trace.evidenceJobId)}`}>
+                      <Link className="font-mono text-[#6d28d9] transition hover:text-[#5f1aa8]" to={`/assurance/evidence?evidenceJobId=${encodeURIComponent(trace.evidenceJobId)}`}>
                         {trace.evidenceJobId}
                       </Link>
                     ) : (
@@ -677,27 +705,27 @@ export function AgentRunInspectorPage() {
               <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <div className="panel-subtle">
                   <div className="label">Proof chain</div>
-                  <div className="mt-3 text-sm leading-6 text-slate-300">
+                  <div className="mt-3 text-sm leading-6 text-[#51465e]">
                     Manifest completeness:{' '}
                     {String((detail.summary.manifestCompleteness as Record<string, unknown> | null | undefined)?.complete ?? detail.summary.manifest_complete ?? 'unknown')}
                   </div>
-                  <div className="mt-2 text-xs text-slate-500">Deterministic artifacts remain authoritative; LLM output is explanatory only.</div>
+                  <div className="mt-2 text-xs text-[#62576a]">Deterministic artifacts remain authoritative; LLM output is explanatory only.</div>
                 </div>
                 <div className="panel-subtle">
                   <div className="label">Source confidence</div>
-                  <pre className="mt-3 max-h-[180px] overflow-auto rounded-2xl border border-white/10 bg-slate-950/80 p-3 text-xs leading-5 text-slate-300">
+                  <pre className="mt-3 max-h-[180px] overflow-auto rounded-2xl border border-[#ded8e4] bg-[#f7f2fa] p-3 text-xs leading-5 text-[#51465e]">
                     {toPreview(detail.summary.sourceConfidence ?? detail.summary.source_confidence ?? 'No source confidence payload imported yet.')}
                   </pre>
                 </div>
                 <div className="panel-subtle">
                   <div className="label">Rejected records</div>
-                  <pre className="mt-3 max-h-[180px] overflow-auto rounded-2xl border border-white/10 bg-slate-950/80 p-3 text-xs leading-5 text-slate-300">
+                  <pre className="mt-3 max-h-[180px] overflow-auto rounded-2xl border border-[#ded8e4] bg-[#f7f2fa] p-3 text-xs leading-5 text-[#51465e]">
                     {toPreview(detail.summary.rejectionDiagnostics ?? detail.summary.rejection_diagnostics ?? detail.summary.unavailableArtifactFamilies ?? 'No rejection diagnostics imported yet.')}
                   </pre>
                 </div>
                 <div className="panel-subtle">
                   <div className="label">Live collection coverage</div>
-                  <pre className="mt-3 max-h-[180px] overflow-auto rounded-2xl border border-white/10 bg-slate-950/80 p-3 text-xs leading-5 text-slate-300">
+                  <pre className="mt-3 max-h-[180px] overflow-auto rounded-2xl border border-[#ded8e4] bg-[#f7f2fa] p-3 text-xs leading-5 text-[#51465e]">
                     {toPreview(detail.summary.liveCollectionCoverage ?? detail.summary.live_collection_coverage ?? 'No live coverage payload imported yet.')}
                   </pre>
                 </div>
@@ -745,8 +773,8 @@ export function AgentRunInspectorPage() {
                         key={step.id}
                         className={`w-full rounded-2xl border px-3 py-3 text-left transition ${
                           selectedStepId === step.id
-                            ? 'border-cyan-300/30 bg-cyan-400/[0.06]'
-                            : 'border-white/8 bg-black/15 hover:border-cyan-300/20 hover:bg-cyan-400/[0.03]'
+                            ? 'border-[#8b35e6]/30 bg-[#f2e8ff]'
+                            : 'border-[#ded8e4] bg-[#fbf9fc] hover:border-[#8b35e6]/25 hover:bg-[#f8f3ff]'
                         }`}
                         onClick={() => {
                           setSelectedStepId(step.id);
@@ -755,12 +783,12 @@ export function AgentRunInspectorPage() {
                         type="button"
                       >
                         <div className="flex items-center justify-between gap-3">
-                          <div className="text-sm font-medium text-white">
+                          <div className="text-sm font-medium text-[#241232]">
                             {step.order}. {step.actionId}
                           </div>
-                          <span className="badge-neutral">{step.status}</span>
+                          <RegStatusPill tone="neutral">{step.status}</RegStatusPill>
                         </div>
-                        <div className="mt-2 text-xs text-slate-500">{step.actionCategory}</div>
+                        <div className="mt-2 text-xs text-[#62576a]">{step.actionCategory}</div>
                       </button>
                     ))}
                   </div>
@@ -774,8 +802,8 @@ export function AgentRunInspectorPage() {
                         key={decision.id}
                         className={`w-full rounded-2xl border px-3 py-3 text-left transition ${
                           selectedPolicyDecisionId === decision.id
-                            ? 'border-cyan-300/30 bg-cyan-400/[0.06]'
-                            : 'border-white/8 bg-black/15 hover:border-cyan-300/20 hover:bg-cyan-400/[0.03]'
+                            ? 'border-[#8b35e6]/30 bg-[#f2e8ff]'
+                            : 'border-[#ded8e4] bg-[#fbf9fc] hover:border-[#8b35e6]/25 hover:bg-[#f8f3ff]'
                         }`}
                         onClick={() => {
                           setSelectedPolicyDecisionId(decision.id);
@@ -784,12 +812,12 @@ export function AgentRunInspectorPage() {
                         type="button"
                       >
                         <div className="flex items-center justify-between gap-3">
-                          <div className="text-sm font-medium text-white">{decision.actionId}</div>
-                          <span className={decision.allowed ? 'badge-success' : 'badge-danger'}>
+                          <div className="text-sm font-medium text-[#241232]">{decision.actionId}</div>
+                          <RegStatusPill tone={decision.allowed ? 'success' : 'danger'}>
                             {decision.allowed ? 'allowed' : 'blocked'}
-                          </span>
+                          </RegStatusPill>
                         </div>
-                        <div className="mt-2 text-xs leading-5 text-slate-400">{decision.reason}</div>
+                        <div className="mt-2 text-xs leading-5 text-[#6f6578]">{decision.reason}</div>
                       </button>
                     ))}
                   </div>
@@ -801,22 +829,22 @@ export function AgentRunInspectorPage() {
                   <div className="label">Selected trace step</div>
                   {selectedStep ? (
                     <div className="mt-3 space-y-4">
-                      <div className="rounded-2xl border border-white/8 bg-black/15 px-4 py-4">
+                      <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
                         <div className="flex items-center justify-between gap-3">
                           <div>
-                            <div className="text-sm font-medium text-white">
+                            <div className="text-sm font-medium text-[#241232]">
                               {selectedStep.order}. {selectedStep.actionId}
                             </div>
-                            <div className="mt-1 text-xs text-slate-500">{selectedStep.actionCategory}</div>
+                            <div className="mt-1 text-xs text-[#62576a]">{selectedStep.actionCategory}</div>
                           </div>
-                          <span className="badge-neutral">{selectedStep.status}</span>
+                          <RegStatusPill tone="neutral">{selectedStep.status}</RegStatusPill>
                         </div>
-                        <div className="mt-3 grid gap-2 text-sm text-slate-400 sm:grid-cols-2">
+                        <div className="mt-3 grid gap-2 text-sm text-[#6f6578] sm:grid-cols-2">
                           <div>Started: {formatDate(selectedStep.startedAt)}</div>
                           <div>Finished: {formatDate(selectedStep.finishedAt)}</div>
                         </div>
                       </div>
-                      <pre className="max-h-[320px] overflow-auto rounded-2xl border border-white/10 bg-slate-950/80 p-4 text-xs leading-6 text-slate-300">
+                      <pre className="max-h-[320px] overflow-auto rounded-2xl border border-[#ded8e4] bg-[#f7f2fa] p-4 text-xs leading-6 text-[#51465e]">
                         {toPreview({
                           input: selectedStep.input,
                           output: selectedStep.output,
@@ -824,7 +852,7 @@ export function AgentRunInspectorPage() {
                       </pre>
                     </div>
                   ) : (
-                    <div className="mt-3 text-sm text-slate-400">Select a trace step to inspect its input and output payloads.</div>
+                    <div className="mt-3 text-sm text-[#6f6578]">Select a trace step to inspect its input and output payloads.</div>
                   )}
                 </section>
 
@@ -832,24 +860,24 @@ export function AgentRunInspectorPage() {
                   <div className="label">Selected policy decision</div>
                   {selectedPolicyDecision ? (
                     <div className="mt-3 space-y-4">
-                      <div className="rounded-2xl border border-white/8 bg-black/15 px-4 py-4">
+                      <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
                         <div className="flex items-center justify-between gap-3">
                           <div>
-                            <div className="text-sm font-medium text-white">{selectedPolicyDecision.actionId}</div>
-                            <div className="mt-1 text-xs text-slate-500">{humanizeKey(selectedPolicyDecision.category)}</div>
+                            <div className="text-sm font-medium text-[#241232]">{selectedPolicyDecision.actionId}</div>
+                            <div className="mt-1 text-xs text-[#62576a]">{humanizeKey(selectedPolicyDecision.category)}</div>
                           </div>
-                          <span className={selectedPolicyDecision.allowed ? 'badge-success' : 'badge-danger'}>
+                          <RegStatusPill tone={selectedPolicyDecision.allowed ? 'success' : 'danger'}>
                             {selectedPolicyDecision.allowed ? 'Allowed' : 'Blocked'}
-                          </span>
+                          </RegStatusPill>
                         </div>
-                        <div className="mt-3 text-sm leading-6 text-slate-300">{selectedPolicyDecision.reason}</div>
+                        <div className="mt-3 text-sm leading-6 text-[#51465e]">{selectedPolicyDecision.reason}</div>
                       </div>
-                      <pre className="max-h-[320px] overflow-auto rounded-2xl border border-white/10 bg-slate-950/80 p-4 text-xs leading-6 text-slate-300">
+                      <pre className="max-h-[320px] overflow-auto rounded-2xl border border-[#ded8e4] bg-[#f7f2fa] p-4 text-xs leading-6 text-[#51465e]">
                         {toPreview(selectedPolicyDecision.detail)}
                       </pre>
                     </div>
                   ) : (
-                    <div className="mt-3 text-sm text-slate-400">Select a policy decision to inspect the bounded-agent governance detail.</div>
+                    <div className="mt-3 text-sm text-[#6f6578]">Select a policy decision to inspect the bounded-agent governance detail.</div>
                   )}
                 </section>
               </section>
@@ -880,78 +908,78 @@ export function AgentRunInspectorPage() {
                     <option value="reconciliation_links">reconciliation_links</option>
                   </select>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
-                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Retrieval</div>
-                      <div className="mt-2 font-medium text-white">{previewState?.retrieval.kind ?? 'preview'}</div>
-                      <div className="mt-1 text-xs text-slate-500">
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm">
+                      <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Retrieval</div>
+                      <div className="mt-2 font-medium text-[#241232]">{previewState?.retrieval.kind ?? 'preview'}</div>
+                      <div className="mt-1 text-xs text-[#62576a]">
                         {previewState?.retrieval.previewAvailable === false ? 'Preview unavailable' : 'Preview available'}
                       </div>
                     </div>
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
-                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Artifact family</div>
-                      <div className="mt-2 font-medium text-white">{previewState?.family ?? previewFamily}</div>
-                      <div className="mt-1 text-xs text-slate-500">
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm">
+                      <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Artifact family</div>
+                      <div className="mt-2 font-medium text-[#241232]">{previewState?.family ?? previewFamily}</div>
+                      <div className="mt-1 text-xs text-[#62576a]">
                         {previewState?.items.length ?? 0} object{(previewState?.items.length ?? 0) === 1 ? '' : 's'}
                       </div>
                     </div>
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm sm:col-span-2">
-                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Object key</div>
-                      <div className="mt-2 break-all font-mono text-xs text-cyan-200">{selectedPreviewItem?.objectKey ?? 'No object metadata loaded.'}</div>
-                      <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-500">
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm sm:col-span-2">
+                      <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Object key</div>
+                      <div className="mt-2 break-all font-mono text-xs text-[#6d28d9]">{selectedPreviewItem?.objectKey ?? 'No object metadata loaded.'}</div>
+                      <div className="mt-2 flex flex-wrap gap-3 text-xs text-[#62576a]">
                         <span>{selectedPreviewItem?.contentType ?? 'unknown content type'}</span>
                         <span>{formatBytes(selectedPreviewItem?.sizeBytes ?? null)}</span>
                         {selectedPreviewItem?.createdAt ? <span>{formatDate(selectedPreviewItem.createdAt)}</span> : null}
                       </div>
                     </div>
                   </div>
-                  <pre className="mt-4 max-h-[460px] overflow-auto rounded-2xl border border-white/10 bg-slate-950/80 p-4 text-xs leading-6 text-slate-300">
+                  <pre className="mt-4 max-h-[460px] overflow-auto rounded-2xl border border-[#ded8e4] bg-[#f7f2fa] p-4 text-xs leading-6 text-[#51465e]">
                     {preview ? toPreview(preview) : 'No preview is available for the selected agent artifact.'}
                   </pre>
                 </section>
 
                 <section className="panel-subtle">
                   <div className="label">Run summary</div>
-                  <div className="mt-3 space-y-2 text-sm text-slate-300">
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                      <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Workflow</div>
-                      <div className="mt-2 font-medium text-white">{detail.workflowName}</div>
+                  <div className="mt-3 space-y-2 text-sm text-[#51465e]">
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                      <div className="text-xs uppercase tracking-[0.24em] text-[#62576a]">Workflow</div>
+                      <div className="mt-2 font-medium text-[#241232]">{detail.workflowName}</div>
                     </div>
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                      <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Requested writebacks</div>
-                      <div className="mt-2 font-medium text-white">{detail.requestedWritebacks ? 'Enabled' : 'Disabled'}</div>
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                      <div className="text-xs uppercase tracking-[0.24em] text-[#62576a]">Requested writebacks</div>
+                      <div className="mt-2 font-medium text-[#241232]">{detail.requestedWritebacks ? 'Enabled' : 'Disabled'}</div>
                     </div>
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                      <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Package job</div>
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                      <div className="text-xs uppercase tracking-[0.24em] text-[#62576a]">Package job</div>
                       {typeof detail.summary.packageJobId === 'string' ? (
                         <Link
-                          className="mt-2 block font-mono text-xs text-cyan-200 transition hover:text-cyan-100"
+                          className="mt-2 block font-mono text-xs text-[#6d28d9] transition hover:text-[#5f1aa8]"
                           to={`/assurance/packages?packageId=${encodeURIComponent(detail.summary.packageJobId)}`}
                         >
                           {detail.summary.packageJobId}
                         </Link>
                       ) : (
-                        <div className="mt-2 font-mono text-xs text-slate-400">—</div>
+                        <div className="mt-2 font-mono text-xs text-[#6f6578]">—</div>
                       )}
                     </div>
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                      <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Workflow rationale</div>
-                      <div className="mt-2 text-sm leading-6 text-slate-300">{String(detail.summary.workflowRationale ?? '—')}</div>
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                      <div className="text-xs uppercase tracking-[0.24em] text-[#62576a]">Workflow rationale</div>
+                      <div className="mt-2 text-sm leading-6 text-[#51465e]">{String(detail.summary.workflowRationale ?? '—')}</div>
                     </div>
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                      <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Awaiting review reasons</div>
-                      <div className="mt-2 text-sm leading-6 text-slate-300">
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                      <div className="text-xs uppercase tracking-[0.24em] text-[#62576a]">Awaiting review reasons</div>
+                      <div className="mt-2 text-sm leading-6 text-[#51465e]">
                         {Array.isArray(detail.summary.awaitingReviewReasons) && detail.summary.awaitingReviewReasons.length > 0
                           ? detail.summary.awaitingReviewReasons.join(', ')
                           : '—'}
                       </div>
                     </div>
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                      <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Trace artifact</div>
-                      <div className="mt-2 font-mono text-xs text-slate-400">{detail.traceKey ?? '—'}</div>
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                      <div className="text-xs uppercase tracking-[0.24em] text-[#62576a]">Trace artifact</div>
+                      <div className="mt-2 font-mono text-xs text-[#6f6578]">{detail.traceKey ?? '—'}</div>
                     </div>
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                      <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Summary artifact</div>
-                      <div className="mt-2 font-mono text-xs text-slate-400">{detail.summaryKey ?? '—'}</div>
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                      <div className="text-xs uppercase tracking-[0.24em] text-[#62576a]">Summary artifact</div>
+                      <div className="mt-2 font-mono text-xs text-[#6f6578]">{detail.summaryKey ?? '—'}</div>
                     </div>
                   </div>
                 </section>
@@ -969,82 +997,81 @@ export function AgentRunInspectorPage() {
                 </label>
                 <div className="mt-4 space-y-2">
                   {detail.writebacks.map((item) => (
-                    <button
+                    <div
                       key={item.id}
                       className={`w-full rounded-2xl border px-3 py-3 text-left transition ${
                         selectedWritebackId === item.id
-                          ? 'border-cyan-300/30 bg-cyan-400/[0.06]'
-                          : 'border-white/8 bg-black/15 hover:border-cyan-300/20 hover:bg-cyan-400/[0.03]'
+                          ? 'border-[#8b35e6]/30 bg-[#f2e8ff]'
+                          : 'border-[#ded8e4] bg-[#fbf9fc] hover:border-[#8b35e6]/25 hover:bg-[#f8f3ff]'
                       }`}
-                      onClick={() => {
-                        setSelectedWritebackId(item.id);
-                        updateSearchState({ writebackId: item.id });
-                      }}
-                      type="button"
                     >
-                      <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
-                        <div>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <button
+                          className="min-w-0 flex-1 text-left"
+                          onClick={() => {
+                            setSelectedWritebackId(item.id);
+                            updateSearchState({ writebackId: item.id });
+                          }}
+                          type="button"
+                        >
                           <div className="flex items-center gap-2">
-                            <div className="text-sm font-medium text-white">{item.requestType}</div>
-                            <span className="badge-neutral">{item.status}</span>
+                            <div className="text-sm font-medium text-[#241232]">{item.requestType}</div>
+                            <RegStatusPill tone="neutral">{item.status}</RegStatusPill>
                           </div>
-                          <div className="mt-2 font-mono text-xs text-cyan-200">{item.id}</div>
-                          <div className="mt-2 text-xs leading-5 text-slate-400">
+                          <div className="mt-2 font-mono text-xs text-[#6d28d9]">{item.id}</div>
+                          <div className="mt-2 text-xs leading-5 text-[#6f6578]">
                             Connector: {item.connectorId ?? '—'} · Evidence refs: {item.evidenceRefs.join(', ') || '—'}
                           </div>
                           {item.integrationRunId && (
-                            <div className="mt-2 font-mono text-xs text-slate-500">Integration run: {item.integrationRunId}</div>
+                            <div className="mt-2 font-mono text-xs text-[#62576a]">Integration run: {item.integrationRunId}</div>
                           )}
+                        </button>
+                        <div className="shrink-0">
+                          <RegActionMenu
+                            actions={[
+                              {
+                                label: 'Inspect writeback',
+                                onSelect: () => {
+                                  setSelectedWritebackId(item.id);
+                                  updateSearchState({ writebackId: item.id });
+                                  setInspectedWriteback(item);
+                                },
+                              },
+                              {
+                                label: busyAction === `export:${item.id}` ? 'Exporting...' : 'Export draft',
+                                disabled: busyAction !== null,
+                                onSelect: () => void handleWritebackDecision(item, 'export'),
+                              },
+                              {
+                                label: 'Approve',
+                                disabled: item.status !== 'pending' || busyAction !== null,
+                                onSelect: () => setWritebackDecisionToReview({ writeback: item, decision: 'approve' }),
+                              },
+                              {
+                                label: 'Reject',
+                                disabled: item.status !== 'pending' || busyAction !== null,
+                                destructive: true,
+                                onSelect: () => setWritebackDecisionToReview({ writeback: item, decision: 'reject' }),
+                              },
+                              {
+                                label: 'Request more evidence',
+                                disabled: item.status !== 'pending' || busyAction !== null,
+                                onSelect: () => setWritebackDecisionToReview({ writeback: item, decision: 'request_more_evidence' }),
+                              },
+                              {
+                                label: 'Mark duplicate',
+                                disabled: item.status !== 'pending' || busyAction !== null,
+                                onSelect: () => setWritebackDecisionToReview({ writeback: item, decision: 'duplicate' }),
+                              },
+                            ]}
+                            label={`Open writeback actions for ${item.id}`}
+                          />
                         </div>
-                        {item.status === 'pending' && (
-                          <div className="flex flex-wrap gap-2" onClick={(event) => event.stopPropagation()}>
-                            <button
-                              className="button-primary"
-                              disabled={busyAction !== null}
-                              onClick={() => void handleWritebackDecision(item, 'approve')}
-                              type="button"
-                            >
-                              {busyAction === `approve:${item.id}` ? 'Approving...' : 'Approve'}
-                            </button>
-                            <button
-                              className="button-secondary"
-                              disabled={busyAction !== null}
-                              onClick={() => void handleWritebackDecision(item, 'reject')}
-                              type="button"
-                            >
-                              {busyAction === `reject:${item.id}` ? 'Rejecting...' : 'Reject'}
-                            </button>
-                            <button
-                              className="button-secondary"
-                              disabled={busyAction !== null}
-                              onClick={() => void handleWritebackDecision(item, 'request_more_evidence')}
-                              type="button"
-                            >
-                              {busyAction === `request_more_evidence:${item.id}` ? 'Requesting...' : 'More evidence'}
-                            </button>
-                            <button
-                              className="button-secondary"
-                              disabled={busyAction !== null}
-                              onClick={() => void handleWritebackDecision(item, 'duplicate')}
-                              type="button"
-                            >
-                              {busyAction === `duplicate:${item.id}` ? 'Marking...' : 'Duplicate'}
-                            </button>
-                            <button
-                              className="button-secondary"
-                              disabled={busyAction !== null}
-                              onClick={() => void handleWritebackDecision(item, 'export')}
-                              type="button"
-                            >
-                              {busyAction === `export:${item.id}` ? 'Exporting...' : 'Export draft'}
-                            </button>
-                          </div>
-                        )}
                       </div>
-                    </button>
+                    </div>
                   ))}
                   {detail.writebacks.length === 0 && (
-                    <div className="text-sm text-slate-400">No external writeback approvals were generated for this run.</div>
+                    <div className="text-sm text-[#6f6578]">No external writeback approvals were generated for this run.</div>
                   )}
                 </div>
               </section>
@@ -1053,35 +1080,35 @@ export function AgentRunInspectorPage() {
                 <section className="panel-subtle">
                   <div className="label">Selected writeback</div>
                   <div className="mt-3 grid gap-4 xl:grid-cols-[0.92fr_1.08fr]">
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-4 py-4">
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
                       <div className="flex items-center justify-between gap-3">
                         <div>
-                          <div className="text-sm font-medium text-white">{selectedWriteback.requestType}</div>
-                          <div className="mt-1 font-mono text-xs text-cyan-200">{selectedWriteback.id}</div>
+                          <div className="text-sm font-medium text-[#241232]">{selectedWriteback.requestType}</div>
+                          <div className="mt-1 font-mono text-xs text-[#6d28d9]">{selectedWriteback.id}</div>
                         </div>
-                        <span className="badge-neutral">{selectedWriteback.status}</span>
+                        <RegStatusPill tone="neutral">{selectedWriteback.status}</RegStatusPill>
                       </div>
-                      <div className="mt-3 grid gap-2 text-sm text-slate-400 sm:grid-cols-2">
+                      <div className="mt-3 grid gap-2 text-sm text-[#6f6578] sm:grid-cols-2">
                         <div>Connector: {selectedWriteback.connectorId ?? '—'}</div>
                         <div>Integration run: {selectedWriteback.integrationRunId ?? '—'}</div>
                         <div>Requested by: {selectedWriteback.requestedByUserId ?? '—'}</div>
                         <div>Reviewed by: {selectedWriteback.reviewedByUserId ?? '—'}</div>
                       </div>
-                      <div className="mt-3 text-sm leading-6 text-slate-300">
+                      <div className="mt-3 text-sm leading-6 text-[#51465e]">
                         {selectedWriteback.justification ?? 'No reviewer justification has been recorded yet.'}
                       </div>
                       <div className="mt-4 flex flex-wrap gap-2">
                         {selectedWriteback.evidenceRefs.map((item) => (
-                          <span key={item} className="rounded-full border border-white/10 bg-slate-950/60 px-3 py-1 font-mono text-xs text-cyan-200">
+                          <span key={item} className="rounded-full border border-[#ded8e4] bg-[#f7f2fa] px-3 py-1 font-mono text-xs text-[#6d28d9]">
                             {item}
                           </span>
                         ))}
                         {selectedWriteback.evidenceRefs.length === 0 && (
-                          <span className="text-xs text-slate-500">No evidence refs were attached to this writeback request.</span>
+                          <span className="text-xs text-[#62576a]">No evidence refs were attached to this writeback request.</span>
                         )}
                       </div>
                     </div>
-                    <pre className="max-h-[360px] overflow-auto rounded-2xl border border-white/10 bg-slate-950/80 p-4 text-xs leading-6 text-slate-300">
+                    <pre className="max-h-[360px] overflow-auto rounded-2xl border border-[#ded8e4] bg-[#f7f2fa] p-4 text-xs leading-6 text-[#51465e]">
                       {toPreview(selectedWriteback.payload)}
                     </pre>
                   </div>
@@ -1091,6 +1118,174 @@ export function AgentRunInspectorPage() {
           )}
         </section>
       </section>
+
+      <RegRightDrawer
+        className="flex flex-col"
+        description={inspectedWriteback ? `${inspectedWriteback.requestType} · ${inspectedWriteback.status}` : undefined}
+        footer={
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button className="button-secondary" onClick={() => setInspectedWriteback(null)} type="button">
+              Close
+            </button>
+            <button
+              className="button-primary"
+              disabled={!inspectedWriteback || busyAction !== null}
+              onClick={() => {
+                if (!inspectedWriteback) {
+                  return;
+                }
+                void handleWritebackDecision(inspectedWriteback, 'export');
+              }}
+              type="button"
+            >
+              {inspectedWriteback && busyAction === `export:${inspectedWriteback.id}` ? 'Exporting...' : 'Export draft'}
+            </button>
+          </div>
+        }
+        onOpenChange={(open) => {
+          if (!open) {
+            setInspectedWriteback(null);
+          }
+        }}
+        open={inspectedWriteback !== null}
+        title="Writeback request"
+      >
+        {inspectedWriteback ? (
+          <div className="space-y-5">
+            <section className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-[#241232]">{inspectedWriteback.requestType}</div>
+                  <div className="mt-1 break-all font-mono text-xs text-[#6d28d9]">{inspectedWriteback.id}</div>
+                </div>
+                <RegStatusPill tone="neutral">{inspectedWriteback.status}</RegStatusPill>
+              </div>
+              <div className="mt-4 grid gap-2 text-sm text-[#6f6578]">
+                <div>Connector: {inspectedWriteback.connectorId ?? '—'}</div>
+                <div>Integration run: {inspectedWriteback.integrationRunId ?? '—'}</div>
+                <div>Requested by: {inspectedWriteback.requestedByUserId ?? '—'}</div>
+                <div>Reviewed by: {inspectedWriteback.reviewedByUserId ?? '—'}</div>
+                <div>Created: {formatDate(inspectedWriteback.createdAt)}</div>
+                <div>Updated: {formatDate(inspectedWriteback.updatedAt)}</div>
+              </div>
+            </section>
+
+            <section>
+              <div className="label">Review rationale</div>
+              <p className="mt-2 text-sm leading-6 text-[#51465e]">
+                {inspectedWriteback.justification ?? 'No reviewer justification has been recorded yet.'}
+              </p>
+            </section>
+
+            <section>
+              <div className="label">Evidence refs</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {inspectedWriteback.evidenceRefs.map((item) => (
+                  <span key={item} className="rounded-full border border-[#ded8e4] bg-[#f7f2fa] px-3 py-1 font-mono text-xs text-[#6d28d9]">
+                    {item}
+                  </span>
+                ))}
+                {inspectedWriteback.evidenceRefs.length === 0 && (
+                  <span className="text-sm text-[#6f6578]">No evidence refs were attached.</span>
+                )}
+              </div>
+            </section>
+
+            <section>
+              <div className="label">Payload</div>
+              <pre className="mt-3 max-h-[420px] overflow-auto rounded-2xl border border-[#ded8e4] bg-[#f7f2fa] p-4 text-xs leading-6 text-[#51465e]">
+                {toPreview(inspectedWriteback.payload)}
+              </pre>
+            </section>
+          </div>
+        ) : null}
+      </RegRightDrawer>
+
+      {decisionReview ? (
+        <RegModal
+          className="max-w-3xl"
+          description={writebackDecisionDescriptions[decisionReview.decision]}
+          footer={
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button className="button-secondary" onClick={() => setWritebackDecisionToReview(null)} type="button">
+                Cancel
+              </button>
+              <button
+                className={decisionReview.decision === 'reject' ? 'button-danger' : 'button-primary'}
+                disabled={busyAction !== null}
+                onClick={async () => {
+                  const currentDecision = writebackDecisionToReview;
+                  if (!currentDecision) {
+                    return;
+                  }
+                  const ok = await handleWritebackDecision(currentDecision.writeback, currentDecision.decision);
+                  if (ok) {
+                    setWritebackDecisionToReview(null);
+                  }
+                }}
+                type="button"
+              >
+                {busyAction === `${decisionReview.decision}:${decisionReview.writeback.id}` ? 'Saving...' : writebackDecisionLabels[decisionReview.decision]}
+              </button>
+            </div>
+          }
+          onOpenChange={(open) => {
+            if (!open) {
+              setWritebackDecisionToReview(null);
+            }
+          }}
+          open
+          title={`${writebackDecisionLabels[decisionReview.decision]} writeback?`}
+        >
+          <div className="space-y-5">
+            <section className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-[#241232]">{decisionReview.writeback.requestType}</div>
+                  <div className="mt-1 break-all font-mono text-xs text-[#6d28d9]">{decisionReview.writeback.id}</div>
+                </div>
+                <RegStatusPill tone="neutral">{decisionReview.writeback.status}</RegStatusPill>
+              </div>
+              <div className="mt-4 grid gap-2 text-sm text-[#6f6578] sm:grid-cols-2">
+                <div>Connector: {decisionReview.writeback.connectorId ?? '—'}</div>
+                <div>Integration run: {decisionReview.writeback.integrationRunId ?? '—'}</div>
+                <div>Requested by: {decisionReview.writeback.requestedByUserId ?? '—'}</div>
+                <div>Reviewed by: {decisionReview.writeback.reviewedByUserId ?? '—'}</div>
+              </div>
+            </section>
+
+            <label className="block space-y-2">
+              <span className="label">Reviewer note</span>
+              <textarea
+                className="input min-h-[120px]"
+                onChange={(event) => setApprovalNote(event.target.value)}
+                value={approvalNote}
+              />
+            </label>
+
+            <section>
+              <div className="label">Evidence refs</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {decisionReview.writeback.evidenceRefs.map((item) => (
+                  <span key={item} className="rounded-full border border-[#ded8e4] bg-[#f7f2fa] px-3 py-1 font-mono text-xs text-[#6d28d9]">
+                    {item}
+                  </span>
+                ))}
+                {decisionReview.writeback.evidenceRefs.length === 0 && (
+                  <span className="text-sm text-[#6f6578]">No evidence refs were attached.</span>
+                )}
+              </div>
+            </section>
+
+            <section>
+              <div className="label">Payload</div>
+              <pre className="mt-3 max-h-[280px] overflow-auto rounded-2xl border border-[#ded8e4] bg-[#f7f2fa] p-4 text-xs leading-6 text-[#51465e]">
+                {toPreview(decisionReview.writeback.payload)}
+              </pre>
+            </section>
+          </div>
+        </RegModal>
+      ) : null}
     </div>
   );
 }

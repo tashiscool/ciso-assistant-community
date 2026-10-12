@@ -1,0 +1,101 @@
+{
+  "note": "Reviewed pre-existing exact-clone debt retained to avoid an unapproved broad domain refactor. New clones and expanded callers fail; stale entries must be removed.",
+  "groups": [
+    {
+      "hash": "22ed5fb5d85c56c1d8f695fcab71b8fbc78221b6c7355cf5fb6ed8ce5a05d6a0",
+      "records": [
+        {
+          "file": "apps/web/src/features/assurance/AgentRunInspectorPage.tsx",
+          "line": 67,
+          "name": "formatBytes"
+        },
+        {
+          "file": "apps/web/src/features/assurance/PackageExplorerPage.tsx",
+          "line": 112,
+          "name": "formatBytes"
+        }
+      ],
+      "reason": "Existing domain/UI helpers with separate callers; preserve current behavior until an approved consolidation slice has regression evidence."
+    },
+    {
+      "hash": "711bf9125dc3c5acc98753121d5f50138e600a240b761e6d66a6c4a261ec6a27",
+      "records": [
+        {
+          "file": "cloudflare/src/services/core/http.ts",
+          "line": 2602,
+          "name": "normalizeNamedReference"
+        },
+        {
+          "file": "cloudflare/src/services/ops/http.ts",
+          "line": 1384,
+          "name": "normalizeNamedReference"
+        }
+      ],
+      "reason": "Existing domain/UI helpers with separate callers; preserve current behavior until an approved consolidation slice has regression evidence."
+    },
+    {
+      "hash": "794977788a174341a60d291981335059f59e55d367092092463b13ba1a83850a",
+      "records": [
+        {
+          "file": "apps/web/src/features/privacy/PrivacyWorkspacePage.tsx",
+          "line": 45,
+          "name": "statusTone"
+        },
+        {
+          "file": "apps/web/src/features/privacy/ProcessingDetailPage.tsx",
+          "line": 17,
+          "name": "statusTone"
+        }
+      ],
+      "reason": "Existing domain/UI helpers with separate callers; preserve current behavior until an approved consolidation slice has regression evidence."
+    },
+    {
+      "hash": "b6a8b347881d5aa10cc1bddac84bce45680a08db6fd5cd846c12d8aa957eb50f",
+      "records": [
+        {
+          "file": "apps/web/src/features/resilience/BusinessImpactAnalysisDetailPage.tsx",
+          "line": 17,
+          "name": "statusTone"
+        },
+        {
+          "file": "apps/web/src/features/resilience/ResiliencePage.tsx",
+          "line": 18,
+          "name": "statusTone"
+        }
+      ],
+      "reason": "Existing domain/UI helpers with separate callers; preserve current behavior until an approved consolidation slice has regression evidence."
+    },
+    {
+      "hash": "c8e93ce0e9ca53b044f31b3edbf948ca50234923f4955bbca9957e7b09406423",
+      "records": [
+        {
+          "file": "apps/web/src/features/reports/DoraReportPage.tsx",
+          "line": 37,
+          "name": "reportStatusTone"
+        },
+        {
+          "file": "apps/web/src/features/reports/ReportsPage.tsx",
+          "line": 24,
+          "name": "reportStatusTone"
+        }
+      ],
+      "reason": "Existing domain/UI helpers with separate callers; preserve current behavior until an approved consolidation slice has regression evidence."
+    },
+    {
+      "hash": "e3763d28d3617e0aebccc000fa94f8d23e7a0177bf888c85887a4ca2c121d3ec",
+      "records": [
+        {
+          "file": "apps/web/src/features/tprm/EntityDetailPage.tsx",
+          "line": 47,
+          "name": "statusTone"
+        },
+        {
+          "file": "apps/web/src/features/tprm/TprmWorkspacePage.tsx",
+          "line": 75,
+          "name": "statusTone"
+        }
+      ],
+      "reason": "Existing domain/UI helpers with separate callers; preserve current behavior until an approved consolidation slice has regression evidence."
+    }
+  ]
+}

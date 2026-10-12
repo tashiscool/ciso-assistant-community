@@ -92,8 +92,8 @@ export function SsoCallbackPage() {
     <section className="panel mx-auto max-w-2xl space-y-4">
       <div>
         <div className="eyebrow">Single Sign-On</div>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Finishing sign-in</h1>
-        <p className="mt-3 text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">Finishing sign-in</h1>
+        <p className="mt-3 text-sm leading-6 text-[#4f435c]">
           Regovise is exchanging the identity-provider callback for a secure workspace session.
         </p>
       </div>
@@ -102,13 +102,13 @@ export function SsoCallbackPage() {
         <div className="space-y-3">
           <div className="notice-warning">{error}</div>
           {roleMappingHint ? (
-            <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3 text-sm text-[#4f435c]">
               {roleMappingHint}
             </div>
           ) : null}
         </div>
       ) : (
-        <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+        <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3 text-sm text-[#4f435c]">
           Validating the provider response and opening the tenant session...
         </div>
       )}

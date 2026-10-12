@@ -16,13 +16,6 @@ function getBearerIdentity(request: Request): string | null {
 }
 
 export async function withAuth(baseCtx: WorkerRequestContext): Promise<WorkerRequestContext> {
-  if (baseCtx.url.pathname === '/_api/core/session/exchange') {
-    const headerCtx = resolveHeaderAuth(baseCtx);
-    if (headerCtx.authStrategy === 'headers') {
-      return headerCtx;
-    }
-  }
-
   const sessionId = getSessionIdFromRequest(baseCtx.request);
   if (!sessionId) {
     return resolveHeaderAuth(baseCtx);
@@ -51,9 +44,7 @@ function resolveHeaderAuth(baseCtx: WorkerRequestContext): WorkerRequestContext 
   const tenantIdHeader = baseCtx.request.headers.get('x-tenant-id');
   const userIdHeader = baseCtx.request.headers.get('x-user-id');
   const bearerUserId = getBearerIdentity(baseCtx.request);
-  const allowHeaderAuth =
-    baseCtx.env.APP_ENV !== 'production' ||
-    baseCtx.url.pathname === '/_api/core/session/exchange';
+  const allowHeaderAuth = baseCtx.env.APP_ENV === 'development';
 
   if (allowHeaderAuth && tenantIdHeader && (userIdHeader || bearerUserId)) {
     return {

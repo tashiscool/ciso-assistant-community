@@ -1,0 +1,7086 @@
+.vanta-app {
+  --vanta-ink: #2b0b45;
+  --vanta-ink-soft: #4c315f;
+  --vanta-muted: #817988;
+  --vanta-faint: #f8f4fb;
+  --vanta-soft: #f2edf6;
+  --vanta-soft-2: #ebe5ef;
+  --vanta-border: #ddd8e2;
+  --vanta-border-dark: #d3ced8;
+  --vanta-purple: #a64dff;
+  --vanta-purple-dark: #7d2cdc;
+  --vanta-purple-soft: #f4e9ff;
+  --vanta-green: #12c94b;
+  --vanta-blue: #4d9cf6;
+  --vanta-yellow: #ffc21a;
+  --vanta-red: #f5575f;
+  min-height: 100vh;
+  background: #ffffff;
+  color: var(--vanta-ink);
+  font-family: "Avenir Next", "Inter", "Segoe UI", sans-serif;
+}
+
+.vanta-app *,
+.vanta-app *::before,
+.vanta-app *::after {
+  box-sizing: border-box;
+}
+
+.vanta-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  border-bottom: 2px solid var(--vanta-border-dark);
+  background: #ffffff;
+  padding: 0 28px;
+  color: var(--vanta-ink);
+}
+
+.vanta-brand-area {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.vanta-logo {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 33px;
+  font-weight: 800;
+  line-height: 1;
+  color: #250437;
+}
+
+.vanta-workspace {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 46px;
+  min-width: 186px;
+  border: 1px solid var(--vanta-border);
+  border-radius: 6px;
+  background: #ffffff;
+  padding: 0 14px;
+  color: var(--vanta-ink);
+  font-size: 20px;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(43, 11, 69, 0.08);
+}
+
+.vanta-workspace-mark {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  border-radius: 3px;
+  background: #f0e4ff;
+  color: var(--vanta-purple);
+}
+
+.vanta-workspace-mark.trusecure {
+  border-radius: 9px;
+  background: #4f5df8;
+  color: #ffffff;
+}
+
+.vanta-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: #8f8997;
+}
+
+.vanta-icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.vanta-icon-button:hover {
+  background: var(--vanta-soft);
+  color: var(--vanta-ink);
+}
+
+.vanta-avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 2px solid #e2c8ff;
+  background: #efd7ff;
+  color: #8d31dd;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.vanta-shell {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  min-height: calc(100vh - 72px);
+  background: #ffffff;
+}
+
+.vanta-shell.vanta-shell-compact {
+  grid-template-columns: 92px minmax(0, 1fr) minmax(390px, 28vw);
+}
+
+.vanta-sidebar {
+  position: sticky;
+  top: 72px;
+  height: calc(100vh - 72px);
+  overflow-y: auto;
+  border-right: 2px solid var(--vanta-border-dark);
+  background: #f8f4fb;
+  padding: 18px 12px 30px;
+}
+
+.vanta-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 46px;
+  border-radius: 999px;
+  background: #eee8f1;
+  color: #9a94a0;
+  padding: 0 14px;
+  margin-bottom: 22px;
+}
+
+.vanta-search svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+}
+
+.vanta-search input,
+.vanta-search span {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  margin-left: 12px;
+  color: #a09aa5;
+  font: inherit;
+  font-size: 20px;
+}
+
+.vanta-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--vanta-ink-soft);
+  font-size: 21px;
+  line-height: 1.1;
+}
+
+.vanta-nav-divider {
+  height: 1px;
+  background: var(--vanta-border);
+  margin: 22px 6px;
+}
+
+.vanta-nav-item,
+.vanta-nav-child {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vanta-nav-item {
+  gap: 14px;
+  min-height: 48px;
+  border-radius: 9px;
+  padding: 0 14px;
+  font-weight: 500;
+}
+
+.vanta-nav-item svg {
+  width: 21px;
+  height: 21px;
+  color: #b565ff;
+}
+
+.vanta-nav-item.is-active {
+  position: relative;
+  color: var(--vanta-ink);
+}
+
+.vanta-nav-item.is-active::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  width: 4px;
+  height: 52px;
+  border-radius: 0 4px 4px 0;
+  background: var(--vanta-purple);
+}
+
+.vanta-nav-caret {
+  margin-left: auto;
+  color: #9d96a5;
+}
+
+.vanta-nav-children {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 2px 4px 6px;
+}
+
+.vanta-nav-child {
+  min-height: 44px;
+  border-radius: 9px;
+  padding: 0 18px 0 48px;
+  color: #4f3b61;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.vanta-nav-child.is-active {
+  background: #eee8f1;
+  color: var(--vanta-purple);
+}
+
+.vanta-main {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  background: #ffffff;
+  color: var(--vanta-ink);
+}
+
+.vanta-page {
+  width: 100%;
+  padding: 58px 72px 68px 84px;
+}
+
+.vanta-page.narrow-top {
+  padding-top: 38px;
+}
+
+.vanta-page-title {
+  margin: 0;
+  color: var(--vanta-ink);
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.12;
+}
+
+.vanta-eyebrow {
+  margin-bottom: 10px;
+  color: #8d8794;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.vanta-status-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-top: 24px;
+  color: #827985;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.vanta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  border-radius: 999px;
+  padding: 0 12px;
+  background: var(--vanta-soft);
+  color: var(--vanta-ink);
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.vanta-pill.purple {
+  background: #ead4ff;
+  color: var(--vanta-ink);
+}
+
+.vanta-pill.blue {
+  background: #d8ecff;
+  color: #116cc9;
+}
+
+.vanta-pill.green {
+  background: #cef7dc;
+  color: #19753f;
+}
+
+.vanta-pill.yellow {
+  background: #fff0c8;
+  color: #684c00;
+}
+
+.vanta-pill.red {
+  background: #ffe2e5;
+  color: #6b2a3b;
+}
+
+.vanta-pill.gray {
+  background: #eeeaf1;
+  color: #4d4655;
+}
+
+.vanta-tabs {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  border-bottom: 2px solid var(--vanta-border);
+  margin-top: 38px;
+}
+
+.vanta-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  border: 0;
+  background: transparent;
+  color: #7f7883;
+  cursor: pointer;
+  font-size: 19px;
+  font-weight: 700;
+  padding: 0 0 12px;
+}
+
+.vanta-tab.is-active {
+  color: var(--vanta-ink);
+}
+
+.vanta-tab.is-active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 5px;
+  border-radius: 5px 5px 0 0;
+  background: var(--vanta-purple);
+}
+
+.vanta-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: var(--vanta-soft-2);
+  color: var(--vanta-ink);
+  padding: 0 9px;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.vanta-section-heading {
+  margin: 38px 0 20px;
+  color: var(--vanta-ink);
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.vanta-table {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--vanta-border-dark);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.vanta-table-header,
+.vanta-table-row {
+  display: grid;
+  align-items: center;
+  border-bottom: 1px solid var(--vanta-border-dark);
+}
+
+.vanta-table-header {
+  min-height: 50px;
+  background: #faf6fb;
+  color: #7b7580;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.vanta-table-row {
+  min-height: 84px;
+  color: var(--vanta-ink);
+  font-size: 18px;
+  font-weight: 650;
+}
+
+.vanta-table-row:last-child {
+  border-bottom: 0;
+}
+
+.vanta-table-cell {
+  padding: 0 24px;
+  min-width: 0;
+}
+
+.vanta-doc-table .vanta-table-header,
+.vanta-doc-table .vanta-table-row {
+  grid-template-columns: 36% 14% 22% 28%;
+}
+
+.vanta-question-table .vanta-table-header,
+.vanta-question-table .vanta-table-row {
+  grid-template-columns: 40% 60%;
+}
+
+.vanta-question-table .vanta-table-row {
+  min-height: 84px;
+}
+
+.vanta-question-text {
+  max-width: 560px;
+  line-height: 1.28;
+}
+
+.vanta-ai-cell {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 18px;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.vanta-doc-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 10px 0 20px;
+}
+
+.vanta-filter-tabs {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.vanta-filter-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #7a737e;
+  cursor: pointer;
+  padding: 0 14px;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.vanta-filter-tab.is-active {
+  background: #fbf5ff;
+  color: #8d23ff;
+}
+
+.vanta-outline-button,
+.vanta-primary-button,
+.vanta-ghost-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 42px;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0 16px;
+  font-size: 18px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.vanta-outline-button {
+  border: 1px solid var(--vanta-border-dark);
+  background: #ffffff;
+  color: var(--vanta-ink);
+}
+
+.vanta-outline-button:hover,
+.vanta-ghost-button:hover {
+  border-color: #c6b9d3;
+  background: #fbf8fd;
+}
+
+.vanta-primary-button {
+  border: 1px solid var(--vanta-purple-dark);
+  background: #8d23e8;
+  color: #ffffff;
+}
+
+.vanta-ghost-button {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--vanta-ink);
+}
+
+.vanta-spark {
+  color: var(--vanta-purple);
+  flex: 0 0 auto;
+}
+
+.vanta-trust-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 800;
+}
+
+.vanta-mini-v {
+  display: inline-grid;
+  place-items: center;
+  width: 13px;
+  height: 13px;
+  border-radius: 2px;
+  background: #2a073b;
+  color: #ffffff;
+  font-size: 9px;
+  line-height: 1;
+}
+
+.vanta-ask-bubble {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  height: 78px;
+  min-width: 572px;
+  border-bottom-left-radius: 38px;
+  background: #ffffff;
+  padding: 0 34px;
+  box-shadow: -14px 18px 34px rgba(43, 11, 69, 0.08);
+  color: var(--vanta-ink);
+  font-size: 40px;
+  font-weight: 850;
+}
+
+.vanta-commitment-page {
+  padding-right: 430px;
+}
+
+.vanta-commitment-tabs {
+  display: flex;
+  gap: 34px;
+  height: 52px;
+  align-items: flex-end;
+  border-bottom: 2px solid var(--vanta-border);
+  margin-top: 12px;
+}
+
+.vanta-commitment-card {
+  border: 1px solid var(--vanta-border-dark);
+  border-radius: 8px;
+  background: #ffffff;
+  min-height: 238px;
+  margin-bottom: 22px;
+  padding: 32px;
+}
+
+.vanta-commitment-card h3 {
+  margin: 0 0 14px;
+  color: #222;
+  font-size: 28px;
+  font-weight: 750;
+}
+
+.vanta-commitment-meta {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: #68626c;
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.vanta-logo-stack {
+  display: flex;
+  align-items: center;
+  min-height: 54px;
+  margin: 16px 0;
+}
+
+.vanta-logo-chip {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  border-radius: 8px;
+  border: 0;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 850;
+  margin-left: -4px;
+  box-shadow: 0 0 0 2px #ffffff;
+}
+
+.vanta-logo-chip:first-child {
+  margin-left: 0;
+}
+
+.vanta-sla-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #6f6873;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.vanta-sla-row span {
+  background: #fbfafb;
+  padding: 4px 6px;
+}
+
+.vanta-ai-rail {
+  position: fixed;
+  top: 72px;
+  right: 0;
+  z-index: 30;
+  width: 420px;
+  height: calc(100vh - 72px);
+  border-left: 1px solid var(--vanta-border);
+  background: #ffffff;
+  padding: 24px 26px;
+  box-shadow: -12px 0 26px rgba(43, 11, 69, 0.06);
+}
+
+.vanta-ai-rail h2 {
+  margin: 0 0 28px;
+  color: var(--vanta-ink);
+  font-size: 35px;
+  font-weight: 850;
+  line-height: 1.08;
+}
+
+.vanta-doc-preview {
+  width: 320px;
+  min-height: 520px;
+  border: 1px solid var(--vanta-border-dark);
+  border-radius: 4px;
+  background: linear-gradient(90deg, #f6f6f8 0 28px, #fff 28px);
+  padding: 30px 28px 20px 58px;
+}
+
+.vanta-doc-line {
+  height: 7px;
+  background: #d8d8db;
+  margin-bottom: 7px;
+}
+
+.vanta-doc-line.blue {
+  height: 10px;
+  background: #c7dbef;
+}
+
+.vanta-doc-preview h4 {
+  margin: 24px 0 8px;
+  color: #111;
+  font-size: 12px;
+  line-height: 1.1;
+}
+
+.vanta-floating-detail {
+  position: fixed;
+  top: 420px;
+  right: 234px;
+  z-index: 35;
+  width: 620px;
+  border: 1px solid var(--vanta-border);
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px 42px rgba(43, 11, 69, 0.16);
+  padding: 28px 34px 30px;
+}
+
+.vanta-floating-detail h3 {
+  margin: 0 0 24px;
+  color: var(--vanta-ink);
+  font-size: 34px;
+  font-weight: 850;
+  line-height: 1.08;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.vanta-detail-list {
+  display: grid;
+  gap: 26px;
+  color: #39313e;
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.vanta-detail-list div {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.vanta-detail-list code {
+  border-radius: 4px;
+  background: #faf8fb;
+  padding: 5px 8px;
+  color: #5f5966;
+  font: inherit;
+}
+
+.vanta-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 36px 0 22px;
+}
+
+.vanta-people-search {
+  display: flex;
+  align-items: center;
+  width: 312px;
+  height: 46px;
+  border: 1px solid var(--vanta-border-dark);
+  border-radius: 6px;
+  background: #ffffff;
+  color: #908996;
+  padding: 0 13px;
+}
+
+.vanta-people-search input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  margin-left: 12px;
+  color: var(--vanta-ink);
+  font-size: 20px;
+}
+
+.vanta-people-table .vanta-table-header,
+.vanta-people-table .vanta-table-row {
+  grid-template-columns: 21% 14% 14% 12% 14% 14% 11%;
+}
+
+.vanta-people-table .vanta-table-row {
+  min-height: 84px;
+}
+
+.vanta-person {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.vanta-person img,
+.vanta-person-fallback {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+
+.vanta-person-fallback {
+  display: grid;
+  place-items: center;
+  background: #e8d7ff;
+  color: var(--vanta-purple-dark);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.vanta-person-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.vanta-person-email {
+  overflow: hidden;
+  color: #8f8795;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 16px;
+  font-weight: 550;
+  margin-top: 3px;
+}
+
+.vanta-source-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.vanta-okta-dot {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 6px solid #004b9f;
+}
+
+.vanta-v-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  background: var(--vanta-ink);
+  color: #ffffff;
+  font-size: 16px;
+  font-family: Georgia, serif;
+  font-weight: 800;
+}
+
+.vanta-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.vanta-card {
+  border: 1px solid var(--vanta-border-dark);
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 30px 34px;
+}
+
+.vanta-card h2,
+.vanta-card h3 {
+  margin: 0;
+  color: var(--vanta-ink);
+  font-size: 24px;
+  font-weight: 850;
+}
+
+.vanta-card.large {
+  min-height: 472px;
+}
+
+.vanta-card.risk-wide {
+  min-height: 450px;
+}
+
+.vanta-chart {
+  width: 100%;
+  height: 330px;
+  margin-top: 18px;
+}
+
+.vanta-chart text {
+  fill: #8c8790;
+  font-family: "Avenir Next", "Inter", "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.vanta-chart .grid {
+  stroke: #e2dee5;
+  stroke-dasharray: 6 6;
+  stroke-width: 1.5;
+}
+
+.vanta-chart .axis {
+  stroke: #d7d2da;
+  stroke-width: 1.5;
+}
+
+.vanta-chart .line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.vanta-chart-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 28px;
+  color: #665a70;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.vanta-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vanta-legend-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: var(--swatch, var(--vanta-purple));
+}
+
+.vanta-legend-line {
+  width: 28px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--swatch, var(--vanta-purple));
+}
+
+.vanta-audit-chart {
+  display: grid;
+  grid-template-columns: 118px 1fr;
+  gap: 8px 18px;
+  margin-top: 24px;
+  min-height: 302px;
+}
+
+.vanta-audit-months {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  color: #918b94;
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.vanta-audit-label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: #8a858d;
+  font-size: 18px;
+  font-weight: 650;
+}
+
+.vanta-audit-row {
+  position: relative;
+  height: 74px;
+  border-left: 2px solid #e0dde4;
+  background-image: linear-gradient(to right, #e0dde4 1px, transparent 1px);
+  background-size: calc(100% / 6) 100%;
+}
+
+.vanta-audit-bar {
+  position: absolute;
+  top: 22px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--vanta-blue);
+}
+
+.vanta-owner-bars {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 13px;
+  margin-top: 22px;
+}
+
+.vanta-owner-label {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  color: #8b858e;
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.vanta-stacked-bar {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  max-width: 100%;
+  background: transparent;
+}
+
+.vanta-stacked-segment {
+  height: 30px;
+  min-width: 8px;
+}
+
+.vanta-stacked-segment:first-child {
+  border-radius: 3px 0 0 3px;
+}
+
+.vanta-stacked-segment:last-child {
+  border-radius: 0 3px 3px 0;
+}
+
+.vanta-floating-mini {
+  position: fixed;
+  top: 120px;
+  right: 0;
+  z-index: 36;
+  width: 276px;
+  border-radius: 28px 0 0 28px;
+  background: #ffffff;
+  padding: 20px 22px;
+  box-shadow: 0 16px 34px rgba(43, 11, 69, 0.12);
+}
+
+.vanta-floating-mini h3 {
+  margin: 0 0 20px;
+  color: var(--vanta-ink);
+  font-size: 22px;
+  line-height: 1.12;
+  font-weight: 850;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.vanta-score-row {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 16px;
+  padding-right: 12px;
+  border-right: 1px solid #e6e1e9;
+  margin-bottom: 16px;
+}
+
+.vanta-score-row small {
+  color: #8b858f;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.vanta-score-row strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.vanta-meter {
+  width: 100%;
+  height: 7px;
+  border-radius: 999px;
+  background: #ecebed;
+  margin-top: 26px;
+  overflow: hidden;
+}
+
+.vanta-meter span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--vanta-green);
+}
+
+.vanta-risk-score-layout {
+  margin-top: 24px;
+}
+
+.vanta-risk-grid {
+  display: grid;
+  grid-template-columns: 42% 58%;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.vanta-heatmap {
+  display: grid;
+  grid-template-columns: 100px repeat(5, 1fr);
+  gap: 4px;
+  align-items: stretch;
+  margin-top: 34px;
+}
+
+.vanta-heatmap-cell,
+.vanta-heatmap-label,
+.vanta-heatmap-axis {
+  display: grid;
+  place-items: center;
+  min-height: 72px;
+  text-align: center;
+  color: #2b2430;
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.vanta-heatmap-label,
+.vanta-heatmap-axis {
+  color: #8d8791;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.vanta-heatmap-cell {
+  border-radius: 4px;
+}
+
+.vanta-risk-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 46;
+  width: 380px;
+  min-height: 510px;
+  border-bottom-left-radius: 24px;
+  background: #ffffff;
+  box-shadow: -14px 18px 36px rgba(43, 11, 69, 0.12);
+  padding: 0 22px 22px;
+  color: var(--vanta-ink);
+}
+
+.vanta-risk-drawer h3 {
+  margin: 0 -22px 18px;
+  border-bottom: 1px solid var(--vanta-border);
+  padding: 0 22px 24px;
+  font-size: 19px;
+  font-weight: 850;
+  line-height: 1.15;
+  max-height: 48px;
+  overflow: hidden;
+}
+
+.vanta-risk-drawer-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 14px;
+  min-height: 36px;
+  color: #51465d;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.vanta-risk-drawer label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--vanta-ink);
+  font-size: 14px;
+  font-weight: 650;
+  margin: 13px 0;
+}
+
+.vanta-radio {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 1px solid var(--vanta-border-dark);
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+.vanta-radio.on {
+  border: 5px solid var(--vanta-purple);
+}
+
+.vanta-compact-sidebar {
+  position: sticky;
+  top: 72px;
+  height: calc(100vh - 72px);
+  border-right: 1px solid var(--vanta-border);
+  background: #faf7fc;
+  padding-top: 22px;
+}
+
+.vanta-compact-search {
+  display: grid;
+  place-items: center;
+  height: 42px;
+  color: #7f7884;
+}
+
+.vanta-rail-icons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.vanta-rail-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #1f1924;
+  cursor: pointer;
+}
+
+.vanta-rail-icon.is-active::before {
+  content: "";
+  position: absolute;
+  left: -23px;
+  width: 4px;
+  height: 50px;
+  border-radius: 0 4px 4px 0;
+  background: var(--vanta-purple);
+}
+
+.vanta-rail-divider {
+  width: 46px;
+  height: 1px;
+  background: var(--vanta-border);
+}
+
+.vanta-questionnaire-main {
+  min-width: 0;
+  overflow: hidden;
+  padding: 36px 34px 42px 38px;
+}
+
+.vanta-q-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: start;
+}
+
+.vanta-q-table .vanta-table-header,
+.vanta-q-table .vanta-table-row {
+  grid-template-columns: 56px minmax(0, 1.1fr) minmax(0, 1fr) 110px 172px;
+}
+
+.vanta-q-table .vanta-table-row {
+  min-height: 84px;
+}
+
+.vanta-checkbox {
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid #8d8794;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.vanta-q-text {
+  color: var(--vanta-ink);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.26;
+}
+
+.vanta-q-answer {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  color: var(--vanta-ink);
+  font-size: 20px;
+  line-height: 1.25;
+  font-weight: 500;
+}
+
+.vanta-owner-bubble {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid #ddc4ff;
+  background: #ecd8ff;
+  color: #8b2cff;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.vanta-agent-panel {
+  position: sticky;
+  top: 94px;
+  height: calc(100vh - 96px);
+  border-left: 1px solid var(--vanta-border);
+  background: #ffffff;
+  padding: 40px 30px;
+}
+
+.vanta-agent-card {
+  min-height: calc(100vh - 148px);
+  border: 1px solid var(--vanta-border);
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 36px 30px;
+}
+
+.vanta-agent-card h2 {
+  margin: 0;
+  color: var(--vanta-ink);
+  font-size: 24px;
+  font-weight: 850;
+}
+
+.vanta-agent-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #8b8491;
+  margin-bottom: 80px;
+}
+
+.vanta-agent-copy {
+  color: #5f5665;
+  font-size: 21px;
+  line-height: 1.35;
+  font-weight: 650;
+}
+
+.vanta-agent-copy strong {
+  display: block;
+  color: var(--vanta-ink);
+  margin: 28px 0 24px;
+  font-size: 20px;
+}
+
+.vanta-tiny-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: #faf8fb;
+  color: #8d8495;
+  padding: 0 18px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.vanta-audit-page {
+  padding-right: 420px;
+}
+
+.vanta-audit-card {
+  border: 1px solid var(--vanta-border-dark);
+  border-radius: 12px;
+  background: #ffffff;
+  margin-top: 28px;
+  padding: 40px;
+}
+
+.vanta-audit-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.vanta-audit-title {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.vanta-audit-badge {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  border: 2px solid #ffffff;
+  background: var(--vanta-ink);
+  color: #ffffff;
+  box-shadow: 0 0 0 1px #34104b;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.vanta-audit-title h2 {
+  margin: 0;
+  font-size: 36px;
+  line-height: 1.1;
+  font-weight: 850;
+}
+
+.vanta-audit-detail-grid {
+  display: grid;
+  grid-template-columns: 326px minmax(0, 1fr);
+  gap: 68px;
+  margin-top: 40px;
+}
+
+.vanta-timeline-card,
+.vanta-tracker-card {
+  border: 1px solid var(--vanta-border-dark);
+  border-radius: 9px;
+  background: #faf6fc;
+  padding: 38px 42px;
+}
+
+.vanta-timeline-card h3,
+.vanta-tracker-card h3 {
+  margin: 0 0 30px;
+  color: var(--vanta-ink);
+  font-size: 24px;
+  font-weight: 850;
+}
+
+.vanta-timeline {
+  display: grid;
+  gap: 26px;
+  color: var(--vanta-ink);
+  font-size: 18px;
+  font-weight: 750;
+}
+
+.vanta-timeline small {
+  display: block;
+  color: #817988;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.vanta-progress-track {
+  display: flex;
+  width: 100%;
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #d8d6db;
+  margin: 6px 0 28px;
+}
+
+.vanta-progress-track span {
+  height: 100%;
+}
+
+.vanta-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 46;
+  width: 380px;
+  min-height: 545px;
+  border-bottom-left-radius: 24px;
+  background: #ffffff;
+  box-shadow: -14px 18px 36px rgba(43, 11, 69, 0.12);
+  color: var(--vanta-ink);
+}
+
+.vanta-drawer h2 {
+  margin: 0;
+  border-bottom: 1px solid var(--vanta-border);
+  padding: 28px 28px 26px;
+  font-size: 24px;
+  font-weight: 850;
+}
+
+.vanta-drawer-body {
+  display: grid;
+  gap: 28px;
+  padding: 30px 28px;
+}
+
+.vanta-drawer-field label,
+.vanta-drawer-label {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--vanta-ink);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.vanta-select-like {
+  display: flex;
+  align-items: center;
+  height: 54px;
+  border: 1px solid var(--vanta-border-dark);
+  border-radius: 4px;
+  background: #ffffff;
+  color: var(--vanta-ink-soft);
+  padding: 0 24px;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.vanta-radio-row {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  color: var(--vanta-ink-soft);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.vanta-documents-shell {
+  display: grid;
+  grid-template-columns: 244px minmax(0, 1fr) 560px;
+  min-height: calc(100vh - 72px);
+}
+
+.vanta-doc-review-page {
+  padding: 28px 0 72px 34px;
+}
+
+.vanta-doc-review-inner {
+  max-width: 980px;
+}
+
+.vanta-doc-review-title {
+  margin: 0;
+  color: #111;
+  font-size: 29px;
+  line-height: 1.12;
+  font-weight: 850;
+}
+
+.vanta-doc-subtitle-lines {
+  margin-top: 18px;
+  max-width: 760px;
+}
+
+.vanta-doc-subtitle-lines div {
+  height: 8px;
+  border-radius: 999px;
+  background: #efedf1;
+  margin-bottom: 13px;
+}
+
+.vanta-evidence-card {
+  margin-top: 26px;
+  border: 1px solid var(--vanta-border-dark);
+  border-radius: 7px;
+  background: #fcf8fb;
+  overflow: hidden;
+}
+
+.vanta-evidence-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 80px;
+  border-bottom: 1px solid var(--vanta-border);
+  padding: 0 24px;
+}
+
+.vanta-file-row {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 20px;
+  min-height: 94px;
+  border-top: 1px solid var(--vanta-border);
+  padding: 16px 22px;
+  background: #ffffff;
+}
+
+.vanta-file-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 4px;
+  background: #eee8f1;
+  color: #8a8191;
+}
+
+.vanta-file-row h4 {
+  margin: 6px 0 5px;
+  color: #1f1728;
+  font-size: 17px;
+  font-weight: 850;
+}
+
+.vanta-file-row p {
+  margin: 0;
+  color: #7b7280;
+  font-size: 14px;
+}
+
+.vanta-success-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border: 1px solid #0ec261;
+  border-radius: 8px;
+  background: #f1fff7;
+  color: #28432f;
+  padding: 15px 16px;
+  margin: 20px 24px;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.vanta-doc-agent {
+  border-left: 1px solid var(--vanta-border);
+  background: #ffffff;
+  padding: 30px 36px;
+}
+
+.vanta-doc-agent h2 {
+  margin: 0 0 70px;
+  color: #1f1728;
+  font-size: 20px;
+  font-weight: 850;
+}
+
+.vanta-doc-agent-body {
+  color: #2b2430;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.vanta-doc-agent-body h3 {
+  margin: 24px 0 8px;
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.vanta-agent-input {
+  position: fixed;
+  right: 36px;
+  bottom: 64px;
+  width: 492px;
+  height: 50px;
+  border-radius: 3px;
+  background: #faf5fb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  color: #8d8495;
+  font-size: 14px;
+}
+
+.vanta-agent-disclaimer {
+  position: fixed;
+  right: 66px;
+  bottom: 36px;
+  color: #b0a9b6;
+  font-size: 12px;
+}
+
+@media (max-width: 1180px) {
+  .vanta-shell,
+  .vanta-shell.vanta-shell-compact,
+  .vanta-documents-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .vanta-sidebar,
+  .vanta-compact-sidebar,
+  .vanta-agent-panel,
+  .vanta-doc-agent,
+  .vanta-ai-rail,
+  .vanta-floating-detail,
+  .vanta-floating-mini,
+  .vanta-risk-drawer,
+  .vanta-drawer,
+  .vanta-ask-bubble,
+  .vanta-agent-input,
+  .vanta-agent-disclaimer {
+    position: static;
+    width: auto;
+    height: auto;
+    min-height: 0;
+    border-radius: 0;
+  }
+
+  .vanta-sidebar {
+    height: auto;
+  }
+
+  .vanta-page,
+  .vanta-questionnaire-main,
+  .vanta-doc-review-page {
+    padding: 28px;
+  }
+
+  .vanta-commitment-page,
+  .vanta-audit-page {
+    padding-right: 28px;
+  }
+
+  .vanta-dashboard-grid,
+  .vanta-risk-grid,
+  .vanta-audit-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Additional Vanta clone screens */
+.vanta-flat-app {
+  --flat-ink: #1f1f22;
+  --flat-copy: #5f5a63;
+  --flat-muted: #77727b;
+  --flat-border: #d9d6dc;
+  --flat-border-strong: #c8c4cc;
+  --flat-soft: #f7f5f7;
+  --flat-lavender: #f2e8fb;
+  --flat-purple: #943fe3;
+  --flat-purple-dark: #7d26d8;
+  --flat-red: #df4d5a;
+  --flat-yellow: #d57508;
+  --flat-green: #1d9d46;
+  color: var(--flat-ink);
+  background: #fff;
+  font-family: Inter, "Avenir Next", "Segoe UI", Arial, sans-serif;
+}
+
+.vanta-flat-logo {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 0;
+  color: #230038;
+}
+
+.vanta-flat-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  border-bottom: 1px solid #dedbe1;
+  background: rgba(255, 255, 255, 0.98);
+  padding: 0 26px;
+}
+
+.vanta-flat-brand-area,
+.vanta-flat-top-actions,
+.vanta-page-action-row,
+.vanta-filter-bar,
+.vanta-test-actions,
+.vanta-test-meta,
+.vanta-policy-preview-head,
+.vanta-settings-banner,
+.vanta-config-panel-head,
+.vanta-config-assets-head {
+  display: flex;
+  align-items: center;
+}
+
+.vanta-flat-brand-area {
+  gap: 18px;
+}
+
+.vanta-flat-top-actions {
+  gap: 21px;
+  color: #77727b;
+}
+
+.vanta-flat-workspace {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 42px;
+  max-width: 290px;
+  border: 1px solid var(--flat-border);
+  border-radius: 5px;
+  background: #fff;
+  padding: 0 12px;
+  color: var(--flat-ink);
+  font-size: 18px;
+  font-weight: 750;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.vanta-staging-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  border-radius: 8px;
+  background: #b72ebd;
+  color: #fff;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.vanta-flat-avatar {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid #d8b5ff;
+  background: #ead2ff;
+  color: #812be1;
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.vanta-glyph {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 5px;
+  background: #efe2ff;
+  color: #8b35df;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.vanta-glyph.blue {
+  background: #e9f5ff;
+  color: #0783df;
+}
+
+.vanta-glyph.green {
+  background: #effbf1;
+  color: #1a9f48;
+}
+
+.vanta-glyph.black {
+  background: #f4f3f5;
+  color: #111;
+}
+
+.vanta-glyph.orange {
+  background: #fff3e5;
+  color: #d47109;
+}
+
+.vanta-mini-wordmark {
+  font-family: Georgia, "Times New Roman", serif;
+  color: #230038;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.vanta-flat-layout {
+  display: grid;
+  grid-template-columns: 286px minmax(0, 1fr);
+  min-height: calc(100vh - 72px);
+}
+
+.vanta-flat-layout.compact {
+  grid-template-columns: 92px minmax(0, 1fr);
+}
+
+.vanta-flat-sidebar {
+  position: sticky;
+  top: 72px;
+  height: calc(100vh - 72px);
+  overflow-y: auto;
+  border-right: 1px solid #eeecef;
+  background: #fbfafc;
+  padding: 18px 16px 42px;
+}
+
+.vanta-flat-sidebar.compact {
+  padding: 20px 0;
+}
+
+.vanta-flat-sidebar.compact .vanta-flat-nav-item {
+  width: calc(100% - 16px);
+  margin: 0 8px 8px;
+  justify-content: flex-start;
+}
+
+.vanta-flat-search,
+.vanta-input-like {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: #efedf0;
+  color: #62576a;
+  padding: 0 14px;
+  font-size: 18px;
+}
+
+.vanta-flat-search {
+  margin-bottom: 18px;
+}
+
+.vanta-flat-search kbd {
+  margin-left: auto;
+  color: #62576a;
+  font: inherit;
+  font-weight: 700;
+}
+
+.vanta-flat-divider {
+  height: 1px;
+  background: #ece9ef;
+  margin: 17px 0;
+}
+
+.vanta-flat-nav-item,
+.vanta-flat-subnav button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #242027;
+  padding: 0 12px;
+  text-align: left;
+  font-size: 18px;
+  font-weight: 730;
+  cursor: pointer;
+}
+
+.vanta-flat-nav-item.is-active {
+  background: #ece9ee;
+  color: #8d32e2;
+}
+
+.vanta-flat-nav-item.is-active::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  width: 5px;
+  height: 48px;
+  border-radius: 0 5px 5px 0;
+  background: #943fe3;
+}
+
+.vanta-flat-nav-item svg:last-child {
+  margin-left: auto;
+}
+
+.vanta-flat-subnav {
+  display: grid;
+  gap: 2px;
+  margin: 4px 0 6px;
+}
+
+.vanta-flat-subnav button {
+  min-height: 40px;
+  padding-left: 48px;
+  color: #2b252f;
+  font-size: 16px;
+  font-weight: 680;
+}
+
+.vanta-flat-subnav button.is-active {
+  background: #e8e3eb;
+  color: #8c32e1;
+}
+
+.vanta-sidebar-collapse {
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  border: 0;
+  background: transparent;
+  color: #8b858e;
+  font-size: 18px;
+}
+
+.vanta-flat-main {
+  min-width: 0;
+  background: #fff;
+}
+
+.vanta-flat-page,
+.vanta-console-page,
+.vanta-settings-page,
+.vanta-integrations-page,
+.vanta-users-page {
+  padding: 42px 36px 72px;
+}
+
+.vanta-flat-page h1,
+.vanta-console-page h1,
+.vanta-settings-page h1,
+.vanta-integrations-page h1,
+.vanta-users-page h1,
+.vanta-bare-page h1 {
+  margin: 0 0 18px;
+  color: #1b181d;
+  font-size: 34px;
+  line-height: 1.12;
+  font-weight: 850;
+  letter-spacing: 0;
+}
+
+.vanta-flat-page h2,
+.vanta-console-page h2,
+.vanta-settings-page h2,
+.vanta-integrations-page h2 {
+  margin: 24px 0 10px;
+  font-size: 23px;
+  font-weight: 830;
+}
+
+.vanta-muted-copy,
+.vanta-flat-page p,
+.vanta-console-page p,
+.vanta-settings-page p,
+.vanta-integrations-page p,
+.vanta-users-page p {
+  margin: 0;
+  color: #5f5a63;
+  font-size: 16px;
+  line-height: 1.36;
+}
+
+.vanta-page-action-row {
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.vanta-page-action-row > div:last-child,
+.vanta-page-action-row > span {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vanta-page-action-row.compact {
+  align-items: center;
+  margin: 24px 0 14px;
+}
+
+.vanta-page-action-row.compact h2 {
+  margin: 0;
+}
+
+.vanta-flat-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  border: 1px solid #cfcbd2;
+  border-radius: 5px;
+  background: #fff;
+  color: #221e25;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 750;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+}
+
+.vanta-flat-button.primary {
+  border-color: #943fe3;
+  background: linear-gradient(180deg, #a64bff, #8a2fe2);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(94, 20, 147, 0.22);
+}
+
+.vanta-flat-button.disabled,
+.vanta-modal-radios .disabled .vanta-modal-select,
+.vanta-modal-select:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.vanta-flat-button.pink-outline {
+  border: 3px solid #df3676;
+  box-shadow: none;
+}
+
+.vanta-flat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: max-content;
+  min-height: 26px;
+  border-radius: 999px;
+  background: #f0edf2;
+  color: #5f5a63;
+  padding: 0 9px;
+  font-size: 14px;
+  font-weight: 760;
+  white-space: nowrap;
+}
+
+.vanta-flat-pill.purple {
+  background: #ebd4ff;
+  color: #7a2cc9;
+}
+
+.vanta-flat-pill.green {
+  background: #d9f4df;
+  color: #166e31;
+}
+
+.vanta-flat-pill.red {
+  background: #fde0e2;
+  color: #9f1f2d;
+}
+
+.vanta-flat-pill.yellow {
+  background: #feeccf;
+  color: #875000;
+}
+
+.vanta-flat-pill.blue {
+  background: #dceeff;
+  color: #186bb7;
+}
+
+.vanta-flat-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border-radius: 4px;
+  background: #f4f2f4;
+  color: #615d64;
+  padding: 0 6px;
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.vanta-tag-cloud {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.vanta-mini-check {
+  display: inline-grid;
+  place-items: center;
+  width: 21px;
+  height: 21px;
+  flex: 0 0 21px;
+  border: 1px solid #c9c5cc;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.vanta-mini-check.is-checked {
+  border-color: #943fe3;
+  background: #943fe3;
+  color: #fff;
+}
+
+.vanta-toggle-flat {
+  display: inline-flex;
+  align-items: center;
+  width: 36px;
+  height: 21px;
+  border: 0;
+  border-radius: 999px;
+  background: #d7d3db;
+  padding: 2px;
+}
+
+.vanta-toggle-flat span {
+  width: 17px;
+  height: 17px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
+}
+
+.vanta-toggle-flat.is-on {
+  justify-content: flex-end;
+  background: #943fe3;
+}
+
+.vanta-input-like {
+  width: 280px;
+  border-radius: 5px;
+  background: #fff;
+  border-color: #cfcbd2;
+  color: #62576a;
+}
+
+.vanta-input-like.small {
+  width: 220px;
+  height: 34px;
+  font-size: 14px;
+}
+
+.vanta-input-like.focused {
+  border: 2px solid #7124d6;
+  box-shadow: 0 0 0 1px rgba(113, 36, 214, 0.12);
+}
+
+.vanta-filter-bar {
+  position: relative;
+  gap: 22px;
+  min-height: 48px;
+  margin: 20px 0 28px;
+  color: #5b565e;
+  font-size: 18px;
+  font-weight: 760;
+}
+
+.vanta-filter-bar button,
+.vanta-link-button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.vanta-filter-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #342e38;
+}
+
+.vanta-sort-label {
+  margin-left: auto;
+}
+
+.vanta-spacer {
+  flex: 1;
+}
+
+.vanta-purple-link,
+.vanta-link-button,
+.vanta-flat-page a,
+.vanta-integrations-page a {
+  color: #7c20dc;
+  font-weight: 750;
+  text-decoration: underline;
+}
+
+.vanta-modern-table {
+  overflow: hidden;
+  border: 1px solid var(--flat-border);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.vanta-modern-header,
+.vanta-modern-row {
+  display: grid;
+  align-items: center;
+  min-width: 0;
+  border-bottom: 1px solid #e7e4e8;
+}
+
+.vanta-modern-header {
+  min-height: 54px;
+  background: #f7f4f8;
+  color: #706b73;
+  font-size: 15px;
+  font-weight: 820;
+  text-transform: none;
+}
+
+.vanta-modern-header span,
+.vanta-modern-row > span,
+.vanta-modern-row > strong,
+.vanta-modern-row > svg,
+.vanta-modern-row > button {
+  min-width: 0;
+  padding: 0 18px;
+}
+
+.vanta-modern-row {
+  min-height: 80px;
+  color: #1e1b20;
+  font-size: 18px;
+  font-weight: 520;
+}
+
+.vanta-modern-row:last-child {
+  border-bottom: 0;
+}
+
+.vanta-modern-row strong {
+  font-weight: 760;
+}
+
+.vanta-modern-row small {
+  display: block;
+  color: #655f68;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.vanta-modern-row.as-button {
+  width: 100%;
+  border-width: 0 0 1px;
+  background: #fff;
+  text-align: left;
+}
+
+.vanta-policy-table .vanta-modern-header,
+.vanta-policy-table .vanta-modern-row {
+  grid-template-columns: minmax(300px, 1.9fr) minmax(220px, 1.3fr) minmax(190px, 1fr) minmax(250px, 1.25fr) 160px 220px 58px;
+}
+
+.vanta-policy-table .vanta-modern-row {
+  min-height: 84px;
+}
+
+.vanta-pink-column {
+  position: relative;
+  min-height: 100%;
+  border-left: 7px solid #df3676;
+  border-right: 7px solid #df3676;
+}
+
+.vanta-modern-header .vanta-pink-column {
+  border-top: 7px solid #df3676;
+}
+
+.vanta-modern-row:last-child .vanta-pink-column {
+  border-bottom: 7px solid #df3676;
+}
+
+.ok-status,
+.bad-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 750;
+}
+
+.bad-status {
+  color: #1f1c20;
+}
+
+.vanta-spinner,
+.vanta-linked-rings,
+.vanta-ring {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px dashed #a7a2aa;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+.vanta-linked-rings {
+  position: relative;
+  border-color: #b5b2b8;
+  margin-left: 8px;
+}
+
+.vanta-linked-rings::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 8px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #b5b2b8;
+  border-radius: 999px;
+}
+
+.vanta-tabs-flat {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  min-height: 42px;
+  border-bottom: 1px solid #ddd9e0;
+  margin: 18px 0 20px;
+}
+
+.vanta-tabs-flat button {
+  align-self: stretch;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: #5d5861;
+  padding: 0;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 760;
+}
+
+.vanta-tabs-flat button.is-active {
+  color: #1d1920;
+  border-color: #943fe3;
+}
+
+.vanta-tabs-flat.wide {
+  margin: 22px 38px 0;
+}
+
+.vanta-tabs-flat.framework {
+  margin: 6px 0 18px;
+}
+
+.vanta-bare-page {
+  min-height: 100vh;
+  padding: 24px 38px 72px;
+}
+
+.vanta-breadcrumb {
+  color: #56515a;
+  font-size: 14px;
+  font-weight: 650;
+  margin-bottom: 9px;
+}
+
+.vanta-pink-arrow {
+  position: absolute;
+  width: 4px;
+  height: 70px;
+  background: #df3676;
+}
+
+.vanta-pink-arrow::after {
+  content: "";
+  position: absolute;
+  left: -10px;
+  bottom: -2px;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 18px solid #df3676;
+}
+
+.vanta-pink-arrow.task-status-arrow {
+  right: 37%;
+  top: -56px;
+  transform: rotate(-45deg);
+  height: 92px;
+}
+
+.vanta-pink-arrow.down {
+  top: -116px;
+  left: 120px;
+}
+
+.vanta-pink-arrow.configure {
+  right: 36px;
+  bottom: 44px;
+}
+
+.vanta-policy-builder-layout {
+  display: grid;
+  grid-template-columns: 55px minmax(560px, 1.07fr) minmax(520px, 0.93fr);
+  min-height: calc(100vh - 72px);
+  background: #fafafa;
+}
+
+.vanta-icon-rail {
+  border-right: 1px solid #ece9ef;
+  background: #fff;
+  padding-top: 16px;
+}
+
+.vanta-icon-rail button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 43px;
+  border: 0;
+  background: transparent;
+  color: #6f6973;
+}
+
+.vanta-icon-rail button.is-active {
+  color: #943fe3;
+}
+
+.vanta-icon-rail button.is-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  height: 36px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: #943fe3;
+}
+
+.vanta-policy-editor {
+  position: relative;
+  border-right: 1px solid #ddd9e0;
+  padding: 34px 32px;
+}
+
+.vanta-policy-editor h1 {
+  margin: 0 0 18px;
+  font-size: 30px;
+  line-height: 1.14;
+  font-weight: 850;
+}
+
+.vanta-policy-editor .vanta-lead {
+  max-width: 760px;
+  color: #666068;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.vanta-policy-editor hr {
+  border: 0;
+  border-top: 1px solid #d4d0d7;
+  margin: 62px 0 44px;
+}
+
+.vanta-floating-more {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #d2cdd5;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.vanta-policy-question {
+  margin: 0 0 32px 20px;
+  max-width: 700px;
+}
+
+.vanta-policy-question h3,
+.vanta-policy-preview-section h3 {
+  margin: 0 0 10px;
+  font-size: 17px;
+  font-weight: 820;
+}
+
+.vanta-policy-question p {
+  margin: 0 0 18px;
+  color: #5f5a63;
+  line-height: 1.35;
+}
+
+.vanta-user-mini {
+  width: 19px;
+  height: 19px;
+  border-radius: 999px;
+  background: #f2edf6;
+}
+
+.vanta-radio-option {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 8px;
+  margin: 12px 0;
+  color: #1e1a20;
+  font-size: 14px;
+}
+
+.vanta-radio-option small {
+  grid-column: 2;
+  color: #5d5861;
+}
+
+.vanta-radio-option.inline {
+  display: flex;
+  align-items: center;
+}
+
+.vanta-radio-dot {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #c7c2ca;
+  border-radius: 999px;
+  background: #fff;
+}
+
+.vanta-radio-option.selected .vanta-radio-dot,
+.vanta-radio-dot.is-on {
+  border: 5px solid #943fe3;
+}
+
+.vanta-policy-preview {
+  overflow-y: auto;
+  padding: 34px 28px 80px;
+  background: #fff;
+}
+
+.vanta-policy-preview-card {
+  min-height: 170px;
+  border: 1px solid #d0ccd3;
+  background: #fff;
+  padding: 28px 24px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.11);
+}
+
+.vanta-policy-preview-head {
+  gap: 26px;
+  margin-bottom: 28px;
+}
+
+.vanta-policy-preview-head h2 {
+  margin: 0 auto 0 0;
+  font-size: 22px;
+}
+
+.vanta-policy-preview-card p {
+  margin: 10px 0;
+  font-size: 15px;
+}
+
+.vanta-policy-preview mark {
+  background: #f2e2ff;
+  color: #7a18dc;
+  padding: 1px 3px;
+}
+
+.vanta-policy-preview-section {
+  margin: 28px 28px 60px;
+}
+
+.vanta-policy-preview-section > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.vanta-policy-preview-section h3 {
+  color: #6b666e;
+  font-size: 21px;
+}
+
+.vanta-policy-preview-section p {
+  color: #615b64;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.vanta-people-task-table .vanta-modern-header,
+.vanta-people-task-table .vanta-modern-row {
+  grid-template-columns: 50px minmax(250px, 1.5fr) 190px 170px 170px 250px minmax(310px, 1.3fr) 54px;
+}
+
+.vanta-initial-dot {
+  display: inline-grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  margin-right: 10px;
+  border-radius: 999px;
+  background: #e4c7ff;
+  color: #943fe3;
+  font-size: 12px;
+}
+
+.vanta-test-summary-grid {
+  display: grid;
+  grid-template-columns: minmax(520px, 1fr) minmax(520px, 1fr);
+  gap: 42px;
+}
+
+.vanta-test-score-card,
+.vanta-test-attention-card,
+.vanta-console-card,
+.vanta-settings-card,
+.vanta-audit-ghost-card,
+.vanta-config-panel {
+  position: relative;
+  border: 1px solid var(--flat-border-strong);
+  border-radius: 8px;
+  background: #fff;
+  padding: 32px 36px;
+}
+
+.vanta-score-bubble {
+  position: absolute;
+  top: 30px;
+  right: 36px;
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 999px;
+  background: #ebe9eb;
+  font-size: 24px;
+}
+
+.vanta-test-score-card h2,
+.vanta-test-attention-card h2 {
+  margin: 0 0 26px;
+  font-size: 30px;
+}
+
+.vanta-score-main {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.vanta-score-main strong {
+  font-size: 50px;
+  line-height: 1;
+}
+
+.vanta-score-main span {
+  color: #4f4a53;
+  font-size: 24px;
+  font-weight: 750;
+}
+
+.vanta-big-meter,
+.vanta-mini-meter {
+  overflow: hidden;
+  height: 14px;
+  border-radius: 999px;
+  background: #dcdbde;
+}
+
+.vanta-big-meter span,
+.vanta-mini-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #53bf6c;
+}
+
+.vanta-test-score-card .vanta-big-meter {
+  margin: 12px 0 28px 145px;
+  max-width: 600px;
+}
+
+.vanta-score-subcards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.vanta-score-subcards > div,
+.vanta-attention-list {
+  border-radius: 5px;
+  background: #fbf9fa;
+  padding: 18px 30px;
+}
+
+.vanta-score-subcards h3 {
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+
+.vanta-score-subcards p {
+  margin-top: 10px;
+  font-size: 22px;
+}
+
+.vanta-attention-list {
+  display: grid;
+  grid-template-columns: 1fr 80px;
+  gap: 22px;
+  min-height: 215px;
+  align-items: center;
+  color: #555057;
+  font-size: 24px;
+  font-weight: 750;
+}
+
+.vanta-attention-list strong {
+  text-align: right;
+  color: #555057;
+  font-weight: 600;
+}
+
+.vanta-test-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 44px;
+  margin: 72px 0 30px;
+  font-size: 24px;
+  font-weight: 760;
+}
+
+.vanta-tests-table .vanta-modern-header,
+.vanta-tests-table .vanta-modern-row {
+  grid-template-columns: 74px minmax(440px, 1.7fr) 210px 300px 240px 70px;
+}
+
+.vanta-tests-table .vanta-modern-row {
+  min-height: 106px;
+  font-size: 26px;
+}
+
+.vanta-tests-table .vanta-modern-row strong {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vanta-dotted-link {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 4px;
+}
+
+.vanta-program-popover {
+  position: absolute;
+  z-index: 15;
+  top: 153px;
+  left: 50%;
+  width: 566px;
+  transform: translateX(-50%);
+  border: 1px solid #d6d2d9;
+  border-radius: 9px;
+  background: #fff;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.16);
+  padding: 25px 30px 30px;
+}
+
+.vanta-program-popover > span {
+  color: #5f5a63;
+  font-size: 23px;
+}
+
+.vanta-program-popover h2 {
+  margin: 6px 0 28px;
+  font-size: 32px;
+  line-height: 1.2;
+}
+
+.vanta-popover-callout {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--flat-border-strong);
+  border-radius: 6px;
+  background: #f7f5f6;
+  padding: 22px;
+  color: #565158;
+  font-size: 22px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.vanta-popover-table {
+  display: grid;
+  grid-template-columns: 1fr 190px;
+  gap: 20px 24px;
+  margin-top: 28px;
+  font-size: 22px;
+}
+
+.vanta-popover-table span:nth-child(2n) {
+  color: #555057;
+  text-align: right;
+}
+
+.vanta-test-detail-page {
+  padding: 26px 38px 44px;
+}
+
+.vanta-test-detail-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.vanta-test-detail-head h1 {
+  margin-bottom: 11px;
+  font-size: 30px;
+}
+
+.vanta-test-detail-head p {
+  max-width: 820px;
+  color: #222;
+  font-size: 19px;
+  line-height: 1.25;
+}
+
+.vanta-test-meta {
+  gap: 24px;
+  margin-top: 22px;
+  color: #5f5a63;
+  font-size: 18px;
+  font-weight: 730;
+}
+
+.vanta-test-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vanta-test-actions {
+  gap: 18px;
+  align-self: flex-start;
+}
+
+.vanta-test-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(780px, 1fr) 440px;
+  gap: 38px;
+}
+
+.vanta-framework-button {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 38px;
+  border: 0;
+  background: #f4f2f4;
+  padding: 0 14px;
+  color: #56515a;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.vanta-framework-dropdown {
+  position: absolute;
+  z-index: 10;
+  left: 170px;
+  top: 285px;
+  width: 450px;
+  border: 3px solid #df3676;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.12);
+  padding: 58px 10px 12px;
+}
+
+.vanta-framework-dropdown .vanta-input-like {
+  position: absolute;
+  top: 58px;
+  left: 12px;
+  width: calc(100% - 24px);
+}
+
+.vanta-framework-dropdown label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  margin-top: 0;
+  color: #262228;
+  font-size: 17px;
+}
+
+.vanta-framework-dropdown label:first-of-type {
+  margin-top: 52px;
+}
+
+.vanta-result-table .vanta-modern-header,
+.vanta-result-table .vanta-modern-row {
+  grid-template-columns: 42px minmax(360px, 1.6fr) minmax(130px, 0.7fr) 180px 180px 54px;
+}
+
+.vanta-result-table .vanta-modern-header {
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  background: #f8f6f7;
+}
+
+.vanta-result-table .vanta-modern-header span:first-child {
+  color: #222;
+  font-size: 17px;
+  font-weight: 820;
+}
+
+.vanta-result-table .vanta-modern-row {
+  min-height: 68px;
+}
+
+.vanta-result-table .select-row {
+  min-height: 56px;
+  grid-template-columns: 42px 1fr 1fr 1fr 1fr;
+}
+
+.date-red {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #c93243;
+}
+
+.vanta-table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 68px;
+  border: 1px solid var(--flat-border);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  padding: 0 20px;
+  font-size: 18px;
+}
+
+.vanta-table-footer button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  border: 1px solid #d2cfd5;
+  border-radius: 5px;
+  background: #fff;
+  padding: 0 14px;
+  font: inherit;
+}
+
+.vanta-test-side-panel {
+  position: relative;
+  border-left: 1px solid #ddd9e0;
+  padding: 28px 0 0 38px;
+}
+
+.vanta-test-side-panel h3 {
+  margin: 0 0 14px;
+  font-size: 20px;
+}
+
+.vanta-test-side-panel hr {
+  border: 0;
+  border-top: 1px solid #d6d2d9;
+  margin: 28px 0 34px;
+}
+
+.vanta-scope-toggle-row {
+  display: flex;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.vanta-scope-toggle-row button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  width: 226px;
+  height: 46px;
+  border: 1px solid var(--flat-border-strong);
+  border-radius: 4px;
+  background: #fff;
+  color: #1e1a20;
+  padding: 0 16px;
+  font: inherit;
+  font-weight: 760;
+}
+
+.vanta-scope-toggle-row button.is-active {
+  border-color: #943fe3;
+  background: #f4eafe;
+  color: #7d26d8;
+}
+
+.vanta-scope-toggle-row .vanta-feedback {
+  margin-left: auto;
+  width: auto;
+  border: 0;
+  color: #1e1a20;
+}
+
+.vanta-framework-scope-page,
+.vanta-privacy-scope-page {
+  max-width: 1180px;
+  padding-left: 24px;
+}
+
+.vanta-framework-scope-page h1,
+.vanta-privacy-scope-page h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 25px;
+}
+
+.vanta-integration-scope-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.vanta-integration-scope-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 182px;
+  border: 1px solid var(--flat-border-strong);
+  border-radius: 5px;
+  background: #fff;
+}
+
+.vanta-integration-card-body {
+  min-height: 126px;
+  padding: 24px;
+}
+
+.vanta-integration-card-body h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 10px;
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.vanta-integration-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--flat-border-strong);
+  padding: 12px 22px;
+}
+
+.vanta-integration-config-page {
+  padding: 0;
+  background: #fafafa;
+}
+
+.vanta-integration-config-page header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 96px;
+  border-bottom: 1px solid #e4e1e6;
+  background: #fff;
+  padding: 0 24px;
+}
+
+.vanta-integration-config-page header h1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.vanta-integration-config-page header > div:last-child {
+  display: flex;
+  gap: 12px;
+}
+
+.vanta-config-panel {
+  max-width: 728px;
+  margin: 28px auto;
+  padding: 0;
+  border-radius: 0;
+}
+
+.vanta-config-panel-head {
+  justify-content: space-between;
+  height: 66px;
+  border-bottom: 1px solid #e2dfe4;
+  padding: 0 22px;
+}
+
+.vanta-config-panel h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.vanta-config-panel-head strong {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vanta-config-assets {
+  padding: 24px 22px 22px;
+}
+
+.vanta-config-assets-head {
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.vanta-config-assets h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.vanta-config-assets-head label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.vanta-asset-dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 56px;
+  margin-top: 10px;
+  border: 1px solid var(--flat-border-strong);
+  border-radius: 5px;
+  background: #fff;
+  padding: 0 14px;
+  text-align: left;
+}
+
+.vanta-asset-dropdown small {
+  display: block;
+  color: #5f5a63;
+}
+
+.vanta-inventory-page {
+  padding: 18px 28px 28px;
+}
+
+.vanta-inventory-page .vanta-page-action-row h1 {
+  margin-bottom: 4px;
+  font-size: 26px;
+}
+
+.vanta-inventory-layout {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 22px;
+}
+
+.vanta-inventory-layout aside h4 {
+  color: #4f4a53;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.vanta-inventory-layout aside button {
+  display: block;
+  width: 100%;
+  min-height: 28px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: #252126;
+  text-align: left;
+  padding: 0 8px;
+  font-size: 14px;
+}
+
+.vanta-inventory-layout aside button.is-active {
+  background: #f0e7fb;
+}
+
+.vanta-info-banner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 78px;
+  border: 1px solid #ddd9e0;
+  border-radius: 4px;
+  background: #fff;
+  padding: 0 22px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+  font-size: 14px;
+}
+
+.vanta-info-banner span {
+  flex: 1;
+}
+
+.vanta-inventory-table {
+  margin-top: 20px;
+}
+
+.vanta-inventory-table .vanta-modern-header,
+.vanta-inventory-table .vanta-modern-row {
+  grid-template-columns: 48px minmax(250px, 1.4fr) 130px minmax(190px, 1fr) 160px 180px 46px;
+}
+
+.vanta-inventory-table .vanta-modern-row {
+  min-height: 88px;
+  font-size: 13px;
+}
+
+.vanta-inventory-table .vanta-modern-row strong {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  align-items: center;
+  column-gap: 8px;
+}
+
+.vanta-inventory-table .vanta-modern-row strong small {
+  grid-column: 2;
+}
+
+.vanta-privacy-scope-page .vanta-page-action-row {
+  align-items: flex-end;
+}
+
+.vanta-settings-banner {
+  justify-content: space-between;
+  min-height: 44px;
+  border: 1px solid #d8d4dc;
+  border-radius: 4px;
+  background: #fbf9fa;
+  padding: 0 24px;
+  margin: 16px 0 18px;
+  font-size: 16px;
+  font-weight: 680;
+}
+
+.vanta-scope-settings-page {
+  max-width: 760px;
+  padding: 26px 24px;
+}
+
+.vanta-scope-settings-page h1 {
+  font-size: 25px;
+  margin-bottom: 6px;
+}
+
+.vanta-scope-settings-page p {
+  max-width: 610px;
+  color: #504b54;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.vanta-scope-settings-page section {
+  margin-top: 24px;
+}
+
+.vanta-scope-settings-page h2 {
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+
+.audit-modal-bg {
+  min-height: calc(100vh - 72px);
+  filter: blur(1.5px);
+}
+
+.vanta-audit-ghost-card {
+  min-height: 260px;
+}
+
+.vanta-progress-track.mini {
+  height: 8px;
+  margin-top: 120px;
+}
+
+.vanta-modal-backdrop {
+  position: fixed;
+  inset: 72px 0 0;
+  z-index: 95;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.vanta-audit-modal,
+.vanta-add-user-modal {
+  position: fixed;
+  z-index: 100;
+  left: 50%;
+  top: 50%;
+  width: 576px;
+  max-width: calc(100vw - 48px);
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.28);
+  transform: translate(-50%, -50%);
+}
+
+.vanta-audit-modal {
+  padding: 26px 22px;
+}
+
+.vanta-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  border: 0;
+  background: transparent;
+  color: #6b666e;
+}
+
+.vanta-audit-modal h2 {
+  margin: 0 0 20px;
+  font-size: 21px;
+}
+
+.vanta-audit-modal h3 {
+  margin: 0 0 7px;
+  font-size: 16px;
+}
+
+.vanta-audit-modal p {
+  margin: 0 0 20px;
+  color: #332f35;
+  line-height: 1.32;
+}
+
+.vanta-audit-modal label {
+  display: grid;
+  gap: 7px;
+  margin: 14px 0;
+  font-size: 14px;
+  font-weight: 780;
+}
+
+.vanta-modal-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 34px;
+  border: 1px solid #cfcbd2;
+  border-radius: 3px;
+  background: #fff;
+  padding: 0 10px;
+  font: inherit;
+  font-weight: 680;
+}
+
+.vanta-modal-select.highlight {
+  border: 4px solid #df3676;
+}
+
+.vanta-modal-radios {
+  display: grid;
+  grid-template-columns: 1fr 130px 130px;
+  align-items: center;
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.vanta-modal-radios strong,
+.vanta-modal-radios button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vanta-modal-radios button {
+  border: 0;
+  background: transparent;
+  font: inherit;
+}
+
+.vanta-audit-modal footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+.vanta-audit-modal footer span {
+  display: flex;
+  gap: 10px;
+}
+
+.vanta-workspace-dropdown {
+  position: absolute;
+  z-index: 120;
+  top: 70px;
+  left: 138px;
+  width: 344px;
+  border: 1px solid #ddd9e0;
+  border-radius: 9px;
+  background: #fff;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.17);
+  padding: 18px;
+}
+
+.vanta-workspace-dropdown.nested {
+  left: 476px;
+  top: 126px;
+}
+
+.vanta-workspace-dropdown h4 {
+  margin: 0 0 14px;
+  color: #5f5a63;
+  font-size: 17px;
+}
+
+.vanta-workspace-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 50px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 20px;
+  font-weight: 730;
+  text-align: left;
+}
+
+.vanta-workspace-dropdown button svg {
+  margin-left: auto;
+}
+
+.vanta-console-page {
+  padding: 38px 32px 80px;
+}
+
+.vanta-console-page h1 {
+  font-size: 32px;
+}
+
+.vanta-console-card {
+  border-radius: 5px;
+}
+
+.vanta-card-filter {
+  position: absolute;
+  top: 42px;
+  right: 32px;
+}
+
+.vanta-program-table {
+  margin-top: 30px;
+}
+
+.vanta-program-header,
+.vanta-program-row {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr 1fr 1fr;
+  align-items: center;
+  min-height: 72px;
+  border-bottom: 1px solid #ebe8ed;
+  font-size: 18px;
+}
+
+.vanta-program-header {
+  min-height: 48px;
+  color: #7a757d;
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 820;
+}
+
+.vanta-program-row > span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vanta-console-progress-grid,
+.vanta-compliance-progress-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(260px, 1fr));
+  gap: 22px;
+}
+
+.vanta-compliance-progress-grid {
+  grid-template-columns: repeat(2, minmax(320px, 1fr));
+}
+
+.vanta-console-card.progress {
+  min-height: 238px;
+}
+
+.vanta-console-card.progress > svg {
+  position: absolute;
+  top: 28px;
+  right: 26px;
+}
+
+.vanta-console-card.progress h3 {
+  margin: 0 0 28px;
+  font-size: 28px;
+}
+
+.vanta-console-card.progress strong {
+  display: block;
+  margin-bottom: 18px;
+  font-size: 38px;
+}
+
+.vanta-console-card.progress p {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  color: #454047;
+  font-size: 18px;
+}
+
+.vanta-warning-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 100px;
+  border: 1px solid #e4e0e6;
+  background: #fff;
+  padding: 0 30px;
+  margin-bottom: 28px;
+  font-size: 20px;
+  font-weight: 760;
+}
+
+.vanta-warning-card .vanta-flat-button {
+  margin-left: auto;
+}
+
+.vanta-health-tooltip {
+  position: absolute;
+  z-index: 8;
+  top: -18px;
+  left: 44%;
+  width: 392px;
+  border: 1px solid #d8d4dc;
+  border-radius: 8px;
+  background: #fff;
+  padding: 20px 22px;
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.16);
+}
+
+.vanta-health-tooltip h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.vanta-health-tooltip p {
+  color: #5f5a63;
+}
+
+.vanta-health-tooltip hr {
+  border: 0;
+  border-top: 1px solid #dedbe1;
+  margin: 18px 0;
+}
+
+.vanta-health-tooltip > span {
+  display: grid;
+  grid-template-columns: 24px 1fr 54px;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+}
+
+.vanta-health-tooltip > span strong {
+  text-align: right;
+}
+
+.vanta-settings-layout {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 28px;
+}
+
+.vanta-settings-layout aside {
+  padding-top: 40px;
+}
+
+.vanta-settings-layout aside h4 {
+  margin: 0 0 8px;
+  color: #6c6770;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.vanta-settings-layout aside button {
+  display: block;
+  width: 100%;
+  min-height: 46px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  text-align: left;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 19px;
+  color: #332f35;
+}
+
+.vanta-settings-layout aside button.is-active-soft {
+  background: #ece9ee;
+}
+
+.vanta-settings-card {
+  margin-bottom: 32px;
+  padding: 36px 34px 0;
+}
+
+.vanta-settings-card > h2 {
+  margin-top: 0;
+  font-size: 30px;
+}
+
+.vanta-settings-section {
+  border-top: 1px solid #ddd9e0;
+  margin: 34px -34px 0;
+  padding: 34px;
+}
+
+.vanta-settings-section h3 {
+  margin: 0 0 18px;
+  font-size: 17px;
+}
+
+.vanta-integrations-page h1 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.vanta-category-dropdown {
+  position: absolute;
+  z-index: 20;
+  top: 349px;
+  left: 688px;
+  width: 398px;
+  border: 1px solid #d8d4dc;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.14);
+  padding: 18px 18px 0;
+}
+
+.vanta-category-dropdown label {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 42px;
+  font-size: 20px;
+  font-weight: 740;
+}
+
+.vanta-category-dropdown label.is-hovered {
+  background: #f2f0f3;
+}
+
+.vanta-category-dropdown > button {
+  width: calc(100% + 36px);
+  height: 64px;
+  margin: 14px -18px 0;
+  border: 0;
+  border-top: 1px solid #e3e0e5;
+  background: #f3f1f3;
+  color: #b2adb5;
+  font-size: 20px;
+  font-weight: 760;
+}
+
+.vanta-integrations-copy {
+  max-width: 1150px;
+  margin: 18px 0 28px;
+  font-size: 20px;
+  font-weight: 680;
+}
+
+.vanta-integration-catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  gap: 28px;
+}
+
+.vanta-catalog-card {
+  position: relative;
+  min-height: 274px;
+  border: 1px solid #d8d4dc;
+  border-radius: 5px;
+  background: #fff;
+  padding: 30px 28px 22px;
+}
+
+.vanta-catalog-card .vanta-bookmark {
+  position: absolute;
+  top: 34px;
+  right: 24px;
+  width: 10px;
+  height: 18px;
+  border-radius: 1px;
+  background: #8b858e;
+}
+
+.vanta-catalog-logo {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 5px;
+  background: #f3f1f3;
+  color: #222;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.vanta-catalog-card h3 {
+  margin: 18px 0 28px;
+  font-size: 22px;
+}
+
+.vanta-catalog-card footer {
+  position: absolute;
+  left: 28px;
+  right: 28px;
+  bottom: 22px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.vanta-users-page {
+  padding: 36px;
+}
+
+.vanta-filter-bar.users {
+  gap: 22px;
+}
+
+.vanta-users-table .vanta-modern-header,
+.vanta-users-table .vanta-modern-row {
+  grid-template-columns: 70px minmax(250px, 1fr) minmax(260px, 1.1fr) minmax(330px, 1.3fr) 180px 60px;
+}
+
+.vanta-users-table .vanta-modern-row {
+  min-height: 80px;
+}
+
+.vanta-users-table .vanta-modern-row > span:nth-child(3) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vanta-users-table.is-faded {
+  filter: blur(1px);
+  opacity: 0.42;
+}
+
+.vanta-pink-arrow.link-users {
+  left: 725px;
+  top: -66px;
+  height: 112px;
+  transform: rotate(90deg);
+}
+
+.vanta-add-user-modal {
+  width: 1020px;
+  padding: 32px 32px 100px;
+}
+
+.vanta-add-user-modal h2 {
+  margin: 0 0 8px;
+  font-size: 30px;
+}
+
+.vanta-add-user-modal p {
+  margin: 0 0 26px;
+  color: #5f5a63;
+  font-size: 19px;
+}
+
+.vanta-add-user-modal h3 {
+  margin: 0 0 20px 32px;
+  font-size: 18px;
+  text-transform: uppercase;
+}
+
+.vanta-access-card {
+  border: 1px solid #d8d4dc;
+  border-radius: 6px;
+  margin: 0 30px 30px;
+  background: #fff;
+}
+
+.vanta-access-card > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 98px;
+  padding: 0 34px;
+  font-size: 22px;
+}
+
+.vanta-access-card.is-expanded {
+  border-color: #cfcbd2;
+}
+
+.vanta-access-role-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 104px;
+  border-top: 1px solid #e2dfe4;
+  padding: 0 32px;
+  font-size: 18px;
+}
+
+.vanta-add-user-modal footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+  border-top: 1px solid #e2dfe4;
+  background: #fff;
+  padding: 30px 34px;
+  border-radius: 0 0 13px 13px;
+}
+
+.vanta-simple-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  border-bottom: 1px solid #e5e2e7;
+  background: #fff;
+  padding: 0 16px;
+}
+
+.vanta-simple-topbar .vanta-flat-logo {
+  font-size: 34px;
+}
+
+.vanta-simple-layout {
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr);
+  min-height: calc(100vh - 72px);
+}
+
+.vanta-simple-layout.is-dimmed {
+  filter: grayscale(0.05);
+  opacity: 0.55;
+}
+
+.vanta-simple-main {
+  min-width: 0;
+  background: #fff;
+}
+
+.vanta-controls-page,
+.vanta-frameworks-page,
+.vanta-framework-detail-page,
+.vanta-policy-detail-page,
+.vanta-test-deactivate-page,
+.vanta-deactivated-tests-page,
+.vanta-risk-library-page,
+.vanta-welcome-page {
+  padding: 28px 28px 64px;
+}
+
+.vanta-controls-page h1,
+.vanta-frameworks-page h1,
+.vanta-framework-detail-page h1,
+.vanta-policy-detail-page h1,
+.vanta-test-deactivate-page h1,
+.vanta-deactivated-tests-page h1,
+.vanta-risk-library-page h1,
+.vanta-welcome-page h1 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.15;
+  font-weight: 850;
+}
+
+.vanta-controls-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 14px;
+}
+
+.vanta-control-summary-card {
+  display: grid;
+  min-height: 194px;
+  border: 1px solid #cfcbd2;
+  border-radius: 5px;
+  background: #fff;
+  padding: 20px;
+}
+
+.vanta-control-summary-card h2 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.vanta-control-summary-card.assignment {
+  grid-template-columns: 1fr 150px 1fr;
+  gap: 18px;
+  align-items: center;
+}
+
+.vanta-donut {
+  display: grid;
+  place-items: center;
+  width: 116px;
+  height: 116px;
+  border: 9px solid #eee9ed;
+  border-radius: 999px;
+  color: #111;
+  font-size: 26px;
+  font-weight: 850;
+}
+
+.vanta-donut small {
+  display: block;
+  color: #5f5a63;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.vanta-assignment-legend {
+  display: grid;
+  gap: 14px;
+  color: #5f5a63;
+  font-size: 13px;
+}
+
+.vanta-assignment-legend span {
+  display: grid;
+  grid-template-columns: 10px 1fr 45px;
+  align-items: center;
+  gap: 10px;
+}
+
+.vanta-assignment-legend i {
+  width: 6px;
+  height: 6px;
+  background: #eee9ed;
+}
+
+.vanta-assignment-legend i.purple {
+  background: #8f35e4;
+}
+
+.vanta-assignment-legend i.orange {
+  background: #d96e00;
+}
+
+.vanta-control-summary-card.completion {
+  grid-template-columns: 1fr 190px;
+  gap: 24px;
+}
+
+.vanta-control-summary-card.completion strong {
+  display: block;
+  font-size: 28px;
+}
+
+.vanta-control-summary-card.completion p {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.vanta-completion-mini {
+  display: grid;
+  align-content: center;
+  gap: 7px;
+  border-radius: 5px;
+  background: #f7f5f7;
+  padding: 12px;
+  font-size: 12px;
+}
+
+.vanta-completion-mini span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vanta-completion-mini strong {
+  margin-left: auto;
+  font-size: 11px !important;
+}
+
+.vanta-filter-bar.controls {
+  gap: 20px;
+  margin: 10px 0 12px;
+  font-size: 13px;
+}
+
+.vanta-controls-table .vanta-modern-header,
+.vanta-controls-table .vanta-modern-row {
+  grid-template-columns: 44px 100px minmax(360px, 1fr) 160px 120px 170px 100px 48px;
+}
+
+.vanta-controls-table .vanta-modern-row {
+  min-height: 64px;
+  font-size: 13px;
+}
+
+.vanta-controls-table .vanta-modern-row > span:nth-child(4),
+.vanta-controls-table .vanta-modern-row > span:nth-child(5),
+.vanta-controls-table .vanta-modern-row > span:nth-child(7) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vanta-modal-backdrop.light {
+  inset: 0;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.vanta-file-upload-modal,
+.vanta-import-review-modal {
+  position: fixed;
+  z-index: 120;
+  left: 88px;
+  right: 88px;
+  top: 153px;
+  min-height: 445px;
+  border-radius: 3px;
+  background: #fff;
+  color: #211a28;
+  box-shadow: 0 12px 42px rgba(0, 0, 0, 0.22);
+}
+
+.vanta-file-upload-modal header,
+.vanta-import-review-modal header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  border-bottom: 1px solid #e2dfe4;
+  padding: 0 14px;
+}
+
+.vanta-file-upload-modal h2,
+.vanta-import-review-modal h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #211a28;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.vanta-file-upload-modal header button,
+.vanta-import-review-modal header button,
+.vanta-framework-import-modal header button,
+.vanta-add-controls-modal header button,
+.vanta-risk-scenario-modal header button {
+  border: 0;
+  background: transparent;
+  color: #77727b;
+}
+
+.vanta-upload-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  min-height: 365px;
+}
+
+.vanta-upload-layout aside {
+  border-right: 1px solid #dfdce1;
+  padding: 20px;
+}
+
+.vanta-import-note {
+  display: flex;
+  gap: 10px;
+  border-radius: 3px;
+  background: #f0e9ff;
+  color: #2d2540;
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.vanta-upload-layout aside h4 {
+  margin: 20px 0 10px;
+  color: #8b858e;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.vanta-upload-layout aside p {
+  display: flex;
+  justify-content: space-between;
+  min-height: 30px;
+  border-top: 1px solid #e5e2e7;
+  color: #211a28;
+  margin: 0;
+  padding-top: 9px;
+  font-size: 14px;
+}
+
+.vanta-upload-layout aside .vanta-flat-button {
+  position: absolute;
+  left: 20px;
+  bottom: 9px;
+  min-height: 25px;
+  border-color: #7c4def;
+  background: #7c4def;
+  color: #fff;
+  font-size: 12px;
+}
+
+.vanta-drop-zone {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  margin: 20px 18px;
+  border: 1px dashed #7c4def;
+  background: #f7f7fb;
+  text-align: center;
+}
+
+.vanta-file-icons {
+  position: relative;
+  height: 88px;
+  color: #d3d2d6;
+}
+
+.vanta-file-icons svg:first-child {
+  transform: rotate(-10deg);
+}
+
+.vanta-file-icons svg:nth-child(2) {
+  transform: rotate(9deg);
+}
+
+.vanta-file-icons span {
+  position: absolute;
+  left: 45%;
+  bottom: 10px;
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border-radius: 999px;
+  background: #9b9aa0;
+  color: #fff;
+  font-size: 26px;
+}
+
+.vanta-drop-zone h3 {
+  margin: 0 0 8px;
+  color: #211a28;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.vanta-drop-zone p {
+  margin: 0;
+  color: #4f4a53;
+  font-size: 11px;
+}
+
+.vanta-file-upload-modal footer,
+.vanta-import-review-modal footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  border-top: 1px solid #e5e2e7;
+  color: #8b858e;
+  font-size: 11px;
+}
+
+.vanta-import-review-modal {
+  top: 153px;
+  min-height: 447px;
+}
+
+.vanta-review-toolbar {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  gap: 26px;
+  border-bottom: 1px solid #d9d6dc;
+  padding: 0 14px;
+  font-size: 12px;
+}
+
+.vanta-review-toolbar > button {
+  align-self: stretch;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font: inherit;
+}
+
+.vanta-review-toolbar > button.is-active {
+  border-color: #6f2ee8;
+}
+
+.vanta-review-toolbar button span {
+  border-radius: 4px;
+  background: #ece9f8;
+  padding: 1px 4px;
+  color: #6f2ee8;
+}
+
+.vanta-import-grid {
+  display: grid;
+  grid-template-columns: 76px 205px 205px 205px 205px 205px 90px;
+  overflow-x: auto;
+  min-height: 270px;
+  font-size: 12px;
+}
+
+.vanta-import-grid > div {
+  min-height: 24px;
+  border-right: 1px solid #e0dde2;
+  border-bottom: 1px solid #e0dde2;
+  padding: 6px 10px;
+}
+
+.vanta-import-grid .vanta-import-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 32px;
+  background: #f3f1f6;
+  font-weight: 700;
+}
+
+.vanta-import-review-modal footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  justify-content: center;
+}
+
+.vanta-import-review-modal footer > div {
+  position: absolute;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.vanta-welcome-hero {
+  display: grid;
+  grid-template-columns: 340px 380px;
+  gap: 110px;
+  justify-content: center;
+  align-items: center;
+  min-height: 430px;
+}
+
+.vanta-welcome-hero h2 {
+  margin: 0 0 28px;
+  font-size: 24px;
+}
+
+.vanta-welcome-hero p {
+  color: #5f5a63;
+  font-size: 14px;
+  line-height: 1.35;
+  margin: 0 0 18px;
+}
+
+.vanta-welcome-hero .vanta-flat-button {
+  min-height: 26px;
+  font-size: 12px;
+}
+
+.vanta-mascot-art {
+  position: relative;
+  width: 360px;
+  height: 250px;
+  color: #250437;
+}
+
+.vanta-mascot-art span {
+  position: absolute;
+  display: block;
+  background: currentColor;
+}
+
+.vanta-mascot-art .body {
+  width: 105px;
+  height: 108px;
+  left: 135px;
+  top: 95px;
+  border-radius: 46% 48% 42% 50%;
+}
+
+.vanta-mascot-art .neck {
+  width: 42px;
+  height: 126px;
+  left: 128px;
+  top: 38px;
+  border-radius: 24px;
+}
+
+.vanta-mascot-art .head {
+  width: 70px;
+  height: 42px;
+  left: 99px;
+  top: 50px;
+  border-radius: 48% 42% 42% 52%;
+}
+
+.vanta-mascot-art .ear {
+  width: 14px;
+  height: 46px;
+  top: 11px;
+  border-radius: 14px;
+}
+
+.vanta-mascot-art .ear.a {
+  left: 137px;
+  transform: rotate(-10deg);
+}
+
+.vanta-mascot-art .ear.b {
+  left: 158px;
+  transform: rotate(12deg);
+}
+
+.vanta-mascot-art .rock {
+  width: 72px;
+  height: 28px;
+  left: 28px;
+  bottom: 42px;
+  border-radius: 50% 50% 6px 6px;
+}
+
+.vanta-mascot-art .grass {
+  width: 6px;
+  height: 138px;
+  right: 45px;
+  bottom: 42px;
+  transform: rotate(10deg);
+  box-shadow: 18px -28px 0 currentColor, 34px -6px 0 currentColor;
+}
+
+.vanta-frameworks-page {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.vanta-tabs-flat.compact {
+  gap: 22px;
+  min-height: 28px;
+  margin-top: 0;
+}
+
+.vanta-tabs-flat.compact button {
+  font-size: 12px;
+}
+
+.vanta-frameworks-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(280px, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.vanta-framework-card {
+  overflow: hidden;
+  border: 1px solid #cfcbd2;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.vanta-framework-card > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 126px;
+  background: #ead8f6;
+  padding: 0 18px;
+}
+
+.vanta-framework-card h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.vanta-framework-card > div span {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border: 4px solid #fff;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  color: #d5b8ef;
+  font-size: 12px;
+  text-align: center;
+}
+
+.vanta-framework-card footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 52px;
+  padding: 0 18px;
+}
+
+.vanta-framework-card footer .vanta-flat-button {
+  margin-left: auto;
+  min-height: 25px;
+  font-size: 12px;
+}
+
+.vanta-framework-import-modal {
+  position: fixed;
+  z-index: 120;
+  top: 136px;
+  left: 50%;
+  width: 600px;
+  border-radius: 9px;
+  background: #fff;
+  box-shadow: 0 18px 56px rgba(0, 0, 0, 0.28);
+  transform: translateX(-50%);
+}
+
+.vanta-framework-import-modal header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 55px;
+  border-bottom: 1px solid #d7d4da;
+  padding: 0 18px;
+}
+
+.vanta-framework-import-modal h2 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.vanta-framework-import-modal label {
+  display: grid;
+  gap: 7px;
+  margin: 14px 18px;
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.vanta-framework-import-modal label small {
+  margin-left: 5px;
+  color: #77727b;
+  font-weight: 500;
+}
+
+.vanta-framework-import-modal input,
+.vanta-framework-import-modal textarea {
+  width: 100%;
+  border: 1px solid #bbb7bf;
+  border-radius: 3px;
+  padding: 7px 8px;
+  font: inherit;
+  font-size: 12px;
+}
+
+.vanta-framework-import-modal textarea {
+  height: 60px;
+  resize: none;
+}
+
+.vanta-framework-import-modal footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #d7d4da;
+  padding: 16px 18px;
+}
+
+.vanta-framework-detail-page {
+  padding-top: 26px;
+}
+
+.vanta-framework-detail-page h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vanta-filter-bar.inline {
+  margin: 14px 0 0;
+  gap: 26px;
+}
+
+.vanta-framework-detail-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 22px;
+  border-top: 1px solid #d8d4dc;
+  margin: 10px -28px 0;
+  padding: 20px 18px 0;
+}
+
+.vanta-framework-detail-layout aside h4 {
+  color: #6b666e;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.vanta-framework-detail-layout aside button {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 7px 0;
+  text-align: left;
+  font-size: 12px;
+}
+
+.vanta-framework-detail-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.vanta-framework-detail-cards section {
+  position: relative;
+  min-height: 170px;
+  border: 1px solid #cfcbd2;
+  border-radius: 5px;
+  background: #fff;
+  padding: 22px 20px;
+}
+
+.vanta-framework-detail-cards h2 {
+  margin: 0 0 22px;
+  font-size: 17px;
+}
+
+.vanta-framework-detail-cards strong {
+  display: block;
+  font-size: 25px;
+}
+
+.vanta-framework-detail-cards p {
+  color: #5f5a63;
+  font-size: 12px;
+}
+
+.vanta-dot-timeline {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 28px;
+  color: #77727b;
+  font-size: 11px;
+}
+
+.vanta-dot-timeline span::before {
+  content: "";
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #dedbe1;
+  margin-bottom: 14px;
+}
+
+.vanta-parent-section {
+  position: relative;
+  margin-top: 14px;
+  border-radius: 3px;
+  background: #fbf9fa;
+  padding: 20px;
+}
+
+.vanta-parent-section h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.vanta-parent-section h2 span {
+  color: #77727b;
+}
+
+.vanta-section-more {
+  position: absolute;
+  right: 54px;
+  top: 18px;
+}
+
+.vanta-child-section {
+  margin-top: 20px;
+  border: 1px solid #cfcbd2;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.vanta-child-section header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  padding: 0 18px;
+}
+
+.vanta-framework-control-table {
+  border-width: 1px 0 0;
+  border-radius: 0;
+}
+
+.vanta-framework-control-table .vanta-modern-header,
+.vanta-framework-control-table .vanta-modern-row {
+  grid-template-columns: 1fr 200px 220px 40px;
+}
+
+.vanta-toast {
+  position: absolute;
+  left: 160px;
+  bottom: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border-left: 4px solid #1aa64b;
+  border-radius: 5px;
+  background: #fff;
+  padding: 12px 18px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+  font-size: 12px;
+}
+
+.vanta-policy-detail-page {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.vanta-policy-detail-page h1 {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 8px;
+  font-size: 34px;
+}
+
+.vanta-policy-detail-page .vanta-page-action-row > div:first-child {
+  max-width: 900px;
+}
+
+.vanta-policy-detail-page p {
+  color: #706b73;
+  font-size: 20px;
+  line-height: 1.35;
+}
+
+.vanta-tabs-flat.policy-tabs {
+  margin-top: 26px;
+}
+
+.vanta-tabs-flat.policy-tabs .highlighted,
+.highlighted {
+  outline: 6px solid #df3676;
+  outline-offset: 2px;
+}
+
+.add-control-highlight {
+  margin: 16px 0 28px;
+  min-width: 140px;
+}
+
+.vanta-policy-controls-table .vanta-modern-header,
+.vanta-policy-controls-table .vanta-modern-row {
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.vanta-policy-controls-table .vanta-modern-row {
+  min-height: 80px;
+  font-size: 20px;
+}
+
+.vanta-add-controls-modal {
+  position: fixed;
+  z-index: 130;
+  inset: 14px 14px auto;
+  min-height: calc(100vh - 28px);
+  border-radius: 24px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 18px 70px rgba(0, 0, 0, 0.38);
+}
+
+.vanta-add-controls-modal header,
+.vanta-risk-scenario-modal header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 104px;
+  border-bottom: 1px solid #d7d4da;
+  padding: 0 40px;
+}
+
+.vanta-add-controls-modal h2,
+.vanta-risk-scenario-modal h2 {
+  margin: 0;
+  font-size: 36px;
+}
+
+.vanta-add-controls-info {
+  display: flex;
+  gap: 18px;
+  border-bottom: 1px solid #d7d4da;
+  padding: 30px 40px;
+  font-size: 24px;
+  line-height: 1.35;
+}
+
+.vanta-add-controls-info a {
+  color: #943fe3;
+}
+
+.vanta-filter-bar.add-controls {
+  border-bottom: 1px solid #d7d4da;
+  margin: 0;
+  padding: 28px 40px;
+}
+
+.vanta-add-controls-grid {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  min-height: 560px;
+}
+
+.vanta-add-controls-grid aside {
+  overflow-y: auto;
+  border-right: 1px solid #d7d4da;
+}
+
+.vanta-add-controls-grid aside button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 94px;
+  border: 0;
+  border-bottom: 1px solid #d7d4da;
+  background: #fff;
+  padding: 0 42px;
+  font-size: 25px;
+  text-align: left;
+}
+
+.vanta-add-controls-grid aside button.is-active {
+  border-left: 7px solid #943fe3;
+}
+
+.vanta-add-controls-grid main {
+  position: relative;
+  padding: 42px;
+}
+
+.vanta-add-controls-grid main h3 {
+  margin: 0 0 50px;
+  font-size: 30px;
+}
+
+.vanta-remove-row {
+  display: grid;
+  grid-template-columns: 1fr 64px;
+  gap: 14px;
+  align-items: center;
+}
+
+.vanta-remove-row .vanta-flat-button.primary {
+  height: 54px;
+  font-size: 24px;
+}
+
+.vanta-pink-arrow.remove {
+  top: -88px;
+  left: 55%;
+  height: 176px;
+  transform: rotate(49deg);
+}
+
+.vanta-add-controls-grid main hr {
+  border: 0;
+  border-top: 1px solid #d8d4dc;
+  margin: 40px 0;
+}
+
+.vanta-add-controls-grid main h4 {
+  margin: 22px 0 12px;
+  font-size: 25px;
+}
+
+.vanta-add-controls-grid main p {
+  color: #706b73;
+  font-size: 25px;
+  line-height: 1.15;
+}
+
+.vanta-test-deactivate-page {
+  position: relative;
+  max-width: 1420px;
+  margin: 0 auto;
+}
+
+.vanta-test-deactivate-page h1 {
+  font-size: 34px;
+}
+
+.vanta-test-deactivate-page p {
+  font-size: 21px;
+}
+
+.vanta-menu-trigger {
+  position: absolute;
+  top: 50px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 42px;
+  border: 1px solid #d8d4dc;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.vanta-test-overflow-menu {
+  position: absolute;
+  top: 103px;
+  right: 18px;
+  width: 248px;
+  border: 1px solid #dedbe1;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.12);
+  padding: 14px;
+}
+
+.vanta-test-overflow-menu button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 42px;
+  border: 0;
+  background: #fff;
+  padding: 0 12px;
+  font-size: 19px;
+  text-align: left;
+}
+
+.vanta-pink-arrow.deactivate-arrow {
+  top: 146px;
+  right: 326px;
+  height: 140px;
+  transform: rotate(90deg);
+}
+
+.vanta-needs-card {
+  border: 1px solid #e5e2e7;
+  border-radius: 5px;
+  margin-top: 24px;
+}
+
+.vanta-needs-card > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  border-bottom: 1px solid #e5e2e7;
+  padding: 0 26px;
+  font-size: 19px;
+}
+
+.vanta-needs-card > div span {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.vanta-needs-card p {
+  margin: 0;
+  padding: 34px 32px;
+  color: #706b73;
+}
+
+.vanta-tests-category-layout {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 24px;
+}
+
+.vanta-tests-category-layout aside h4 {
+  margin: 24px 0 12px;
+  color: #706b73;
+  text-transform: uppercase;
+  font-size: 16px;
+}
+
+.vanta-tests-category-layout aside button {
+  display: block;
+  width: 100%;
+  height: 45px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 0 14px;
+  font-size: 20px;
+}
+
+.vanta-tests-category-layout aside button.is-active {
+  background: #f1e8fa;
+}
+
+.vanta-deactivated-table .vanta-modern-header,
+.vanta-deactivated-table .vanta-modern-row {
+  grid-template-columns: 70px minmax(360px, 1.4fr) 170px 120px 190px 210px 250px;
+}
+
+.vanta-deactivated-table .vanta-modern-row {
+  min-height: 76px;
+}
+
+.vanta-deactivated-table .vanta-modern-row strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vanta-risk-library-page {
+  padding: 32px 30px;
+}
+
+.vanta-risk-library-page h1 {
+  font-size: 34px;
+}
+
+.vanta-risk-library-page > p {
+  max-width: 930px;
+  color: #706b73;
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+.vanta-risk-library-table .vanta-modern-header,
+.vanta-risk-library-table .vanta-modern-row {
+  grid-template-columns: minmax(560px, 1.5fr) minmax(420px, 0.95fr) 170px;
+}
+
+.vanta-risk-library-table .vanta-modern-row {
+  min-height: 80px;
+  font-size: 19px;
+}
+
+.vanta-risk-library-table .vanta-modern-row strong {
+  line-height: 1.15;
+}
+
+.vanta-risk-library-table .vanta-modern-row > span:nth-child(2) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vanta-risk-library-table .vanta-pink-column {
+  border-left-width: 6px;
+  border-right-width: 6px;
+}
+
+.vanta-risk-scenario-modal {
+  position: fixed;
+  z-index: 130;
+  top: 32px;
+  left: 24px;
+  width: 1280px;
+  max-width: calc(100vw - 48px);
+  height: calc(100vh - 64px);
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 22px 72px rgba(0, 0, 0, 0.4);
+}
+
+.vanta-risk-scenario-body {
+  overflow-y: auto;
+  height: calc(100% - 208px);
+  padding: 14px 48px 44px;
+}
+
+.vanta-sensitive-check {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 60px;
+  font-size: 30px;
+}
+
+.vanta-score-panel {
+  margin-bottom: 46px;
+}
+
+.vanta-score-panel h3 {
+  margin: 0 0 16px;
+  font-size: 30px;
+}
+
+.vanta-score-panel p {
+  max-width: 1080px;
+  color: #706b73;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.vanta-score-scale {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  border-radius: 6px;
+  background: #f5f4f5;
+  margin-top: 18px;
+  padding: 90px 40px 46px;
+}
+
+.vanta-score-scale div {
+  grid-column: 1 / -1;
+  height: 12px;
+  border-radius: 999px;
+  background: #d6d5d8;
+  margin-bottom: 18px;
+}
+
+.vanta-score-scale span {
+  font-size: 25px;
+}
+
+.vanta-score-scale span:not(:first-of-type) {
+  text-align: center;
+}
+
+.vanta-score-scale span:last-of-type {
+  text-align: right;
+}
+
+.vanta-score-scale strong {
+  grid-column: 1 / -1;
+  margin-top: 60px;
+  color: #77727b;
+  font-size: 25px;
+  font-weight: 500;
+}
+
+.vanta-notes-label {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 12px;
+  color: #111;
+  font-size: 30px;
+  font-weight: 760;
+}
+
+.vanta-notes-label span {
+  color: #77727b;
+  font-weight: 500;
+}
+
+.vanta-notes-label textarea {
+  grid-column: 1 / -1;
+  height: 160px;
+  border: 1px solid #d6d2d9;
+  border-radius: 6px;
+  resize: none;
+}
+
+.vanta-risk-scenario-modal footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 30px;
+  border-top: 1px solid #d7d4da;
+  background: #fff;
+  padding: 48px;
+}
+
+.vanta-create-risk-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 64px;
+  border: 0;
+  border-radius: 8px;
+  background: #b678e9;
+  color: #fff;
+  padding: 0 22px;
+  font-size: 29px;
+  font-weight: 800;
+}
+
+.vanta-starter-page {
+  min-height: 100vh;
+  padding: 0 36px 64px;
+  background: #fff;
+  color: #161316;
+}
+
+.vanta-starter-hero {
+  min-height: 110px;
+  border-bottom: 2px solid #dedbdd;
+  padding-top: 0;
+}
+
+.vanta-starter-hero h1 {
+  margin: 0 0 4px;
+  color: #151316;
+  font-size: 43px;
+  line-height: 1.05;
+  font-weight: 860;
+  letter-spacing: 0;
+}
+
+.vanta-starter-hero p {
+  margin: 0;
+  color: #6f6a70;
+  font-size: 21px;
+  line-height: 1.35;
+  font-weight: 560;
+}
+
+.vanta-starter-stepper {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  max-width: 1500px;
+  min-height: 78px;
+  margin: 90px auto 0;
+}
+
+.vanta-starter-stepper::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: 17px;
+  right: 17px;
+  height: 5px;
+  border-radius: 999px;
+  background: #d7d5d6;
+}
+
+.vanta-starter-step {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  color: #747071;
+  text-align: center;
+}
+
+.vanta-starter-step:first-child {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.vanta-starter-step:nth-child(2) {
+  align-items: center;
+}
+
+.vanta-starter-step:last-child {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.vanta-starter-step span {
+  display: inline-grid;
+  place-items: center;
+  width: 33px;
+  height: 33px;
+  border: 4px solid #d7d5d6;
+  border-radius: 999px;
+  background: #fff;
+  color: #807c7f;
+  font-size: 18px;
+  font-weight: 820;
+  line-height: 1;
+}
+
+.vanta-starter-step.is-current {
+  color: #151316;
+}
+
+.vanta-starter-step.is-current span {
+  border-color: #250437;
+  background: #250437;
+  color: #fff;
+}
+
+.vanta-starter-step strong {
+  display: block;
+  color: inherit;
+  font-size: 25px;
+  line-height: 1.22;
+  font-weight: 760;
+}
+
+.vanta-starter-card {
+  max-width: 1500px;
+  margin: 42px auto 0;
+  border-radius: 24px;
+  background: #f8f5f6;
+  padding: 51px 50px 25px;
+}
+
+.vanta-starter-card h2 {
+  margin: 0 0 14px;
+  color: #151316;
+  font-size: 34px;
+  line-height: 1.15;
+  font-weight: 850;
+  letter-spacing: 0;
+}
+
+.vanta-starter-card-copy {
+  max-width: 1258px;
+  margin: 0 0 50px;
+  color: #706c70;
+  font-size: 26px;
+  line-height: 1.3;
+  font-weight: 560;
+}
+
+.vanta-starter-task {
+  overflow: hidden;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(29, 20, 30, 0.04);
+}
+
+.vanta-starter-task + .vanta-starter-task {
+  margin-top: 27px;
+}
+
+.vanta-starter-task-header {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 25px;
+  min-height: 127px;
+  padding: 24px 26px;
+}
+
+.vanta-starter-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 77px;
+  height: 77px;
+  border-radius: 8px;
+  background: #f3e8ff;
+  color: #a246e8;
+}
+
+.vanta-starter-task-copy h3 {
+  margin: 0 0 11px;
+  color: #171416;
+  font-size: 26px;
+  line-height: 1.12;
+  font-weight: 830;
+  letter-spacing: 0;
+}
+
+.vanta-starter-task.is-complete .vanta-starter-task-copy h3 {
+  color: #087d24;
+  text-decoration: line-through;
+  text-decoration-thickness: 3px;
+  text-decoration-color: #087d24;
+}
+
+.vanta-starter-task-copy p {
+  margin: 0;
+  color: #706c70;
+  font-size: 23px;
+  line-height: 1.26;
+  font-weight: 560;
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.vanta-starter-task-status {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 18px;
+  min-width: 260px;
+  color: #706c70;
+  font-size: 25px;
+  font-weight: 660;
+  white-space: nowrap;
+}
+
+.vanta-starter-task-status svg:last-child {
+  color: #070507;
+}
+
+.vanta-starter-ring {
+  width: 26px;
+  height: 26px;
+  border: 4px solid #d8d7d8;
+  border-top-color: #0b8d33;
+  border-right-color: #0b8d33;
+  border-radius: 999px;
+}
+
+.vanta-starter-chevron-up {
+  transform: rotate(180deg);
+}
+
+.vanta-starter-subtasks {
+  display: grid;
+  gap: 44px;
+  padding: 17px 39px 30px;
+}
+
+.vanta-starter-subtask {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #087d24;
+  font-size: 25px;
+  line-height: 1.2;
+  font-weight: 560;
+}
+
+.vanta-starter-subtask span {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  text-decoration-color: #087d24;
+}
+
+.vanta-starter-next-task {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 15px;
+  min-height: 71px;
+  margin-top: 2px;
+  background: #f7f4f4;
+  padding: 13px 39px;
+}
+
+.vanta-starter-empty-check {
+  width: 26px;
+  height: 26px;
+  border: 4px dashed #c9c5c7;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.vanta-starter-next-task strong {
+  color: #8f31e6;
+  font-size: 25px;
+  line-height: 1.25;
+  font-weight: 720;
+}
+
+.vanta-starter-policy-button {
+  min-width: 170px;
+  height: 50px;
+  border: 0;
+  border-radius: 7px;
+  background: #9837e5;
+  color: #fff;
+  font-size: 25px;
+  font-weight: 820;
+  box-shadow: 0 2px 5px rgba(64, 20, 96, 0.18);
+}
+
+.vanta-starter-continue {
+  display: flex;
+  justify-content: flex-end;
+  max-width: 1500px;
+  margin: 25px auto 0;
+}
+
+.vanta-starter-continue button {
+  min-width: 475px;
+  height: 52px;
+  border: 1px solid #d8d4d9;
+  border-radius: 6px;
+  background: #fff;
+  color: #151316;
+  font-size: 25px;
+  font-weight: 760;
+  box-shadow: 0 2px 6px rgba(29, 20, 30, 0.11);
+}
+
+.vanta-framework-file-modal {
+  top: 120px;
+  left: 344px;
+  right: 344px;
+  min-height: 954px;
+}
+
+.vanta-framework-file-modal .vanta-upload-layout {
+  min-height: 868px;
+}
+
+.vanta-framework-file-modal .vanta-drop-zone {
+  min-height: 830px;
+}
+
+.vanta-framework-review-modal {
+  top: 135px;
+  left: 102px;
+  right: 102px;
+  min-height: 466px;
+  border-radius: 10px 10px 3px 3px;
+}
+
+.vanta-framework-import-grid {
+  grid-template-columns: 80px 205px 205px 205px 205px 205px 160px;
+}
+
+.vanta-framework-import-grid .is-focused-cell {
+  outline: 2px solid #6f2ee8;
+  outline-offset: -2px;
+}
+
+.vanta-framework-drawer {
+  position: fixed;
+  z-index: 150;
+  top: 84px;
+  right: 0;
+  width: 515px;
+  height: calc(100vh - 84px);
+  overflow-y: auto;
+  border-left: 1px solid #d9d5dc;
+  background: #fff;
+  padding: 34px 22px 40px;
+  box-shadow: -18px 0 40px rgba(26, 18, 31, 0.12);
+}
+
+.vanta-drawer-actions {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  display: flex;
+  gap: 22px;
+  color: #77727b;
+}
+
+.vanta-framework-drawer h2 {
+  margin: 20px 0 16px;
+  color: #161316;
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.vanta-framework-drawer > p {
+  color: #5f5a63;
+  font-size: 13px;
+}
+
+.vanta-control-dl {
+  display: grid;
+  grid-template-columns: 68px 1fr;
+  gap: 17px 20px;
+  margin: 32px 0 20px;
+  font-size: 13px;
+}
+
+.vanta-control-dl dt {
+  color: #706b73;
+}
+
+.vanta-control-dl dd {
+  margin: 0;
+  color: #141214;
+  font-weight: 700;
+}
+
+.drawer-tabs {
+  margin-bottom: 14px;
+}
+
+.vanta-drawer-map-card {
+  overflow: hidden;
+  border: 1px solid #d2ced5;
+  border-radius: 4px;
+  background: #fff;
+  margin-bottom: 18px;
+}
+
+.vanta-drawer-map-card header,
+.vanta-drawer-map-card.small header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 45px;
+  border-bottom: 1px solid #dedbe1;
+  padding: 0 14px;
+  color: #151216;
+  font-size: 14px;
+}
+
+.vanta-drawer-map-card header button {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  border: 1px solid #d6d2da;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.vanta-ai-suggestion-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  background: #ead5ff;
+  color: #301a42;
+  padding: 0 12px;
+  font-size: 11px;
+}
+
+.vanta-ai-suggestion-bar button,
+.vanta-ai-suggestion-row button {
+  border: 0;
+  border-radius: 3px;
+  background: #9135e4;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 760;
+  padding: 4px 8px;
+}
+
+.vanta-ai-suggestion-row {
+  display: grid;
+  grid-template-columns: 1fr 24px 24px;
+  align-items: center;
+  min-height: 38px;
+  border-bottom: 1px solid #d8c7e8;
+  background: #f6effd;
+  padding: 0 10px 0 18px;
+  font-size: 12px;
+}
+
+.vanta-ai-suggestion-row a {
+  color: #8128dd;
+  text-decoration: underline;
+}
+
+.vanta-ai-suggestion-row button:last-child {
+  border: 1px solid #d0c8d5;
+  background: #fff;
+  color: #77727b;
+}
+
+.vanta-show-more {
+  width: 100%;
+  height: 36px;
+  border: 0;
+  border-bottom: 1px solid #d8c7e8;
+  background: #f4ebfb;
+  color: #8c32e1;
+  font-size: 11px;
+  font-weight: 760;
+}
+
+.vanta-drawer-map-card p {
+  display: grid;
+  place-items: center;
+  min-height: 62px;
+  margin: 0;
+  color: #77727b;
+  font-size: 12px;
+}
+
+.vanta-drawer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 16px;
+  border: 1px solid #d6d2da;
+  border-radius: 999px;
+  padding: 5px 10px;
+  color: #6d6770;
+  font-size: 12px;
+}
+
+.vanta-custom-tests-page,
+.vanta-documents-list-page,
+.vanta-policy-templates-page {
+  padding: 32px 30px 72px;
+}
+
+.vanta-documents-list-page {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.vanta-custom-tests-page .vanta-page-action-row h1 {
+  font-size: 36px;
+}
+
+.vanta-custom-tests-page .vanta-tests-category-layout {
+  grid-template-columns: 320px minmax(0, 1fr);
+}
+
+.vanta-custom-tests-page .vanta-tests-category-layout aside {
+  padding-top: 12px;
+}
+
+.vanta-custom-tests-page .vanta-tests-category-layout aside button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  border-radius: 5px;
+}
+
+.vanta-custom-tests-page .vanta-tests-category-layout aside button strong {
+  color: #c8274a;
+  font-weight: 700;
+}
+
+.vanta-test-dashboard-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 26px;
+}
+
+.vanta-test-dashboard-cards section {
+  min-height: 250px;
+  border: 1px solid #d7d4da;
+  border-radius: 8px;
+  padding: 32px;
+}
+
+.vanta-test-dashboard-cards h2 {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 38px;
+  font-size: 32px;
+}
+
+.vanta-test-dashboard-cards b {
+  display: block;
+  margin-bottom: 28px;
+  font-size: 30px;
+}
+
+.vanta-test-dashboard-cards p {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 22px 0 0;
+  color: #6e6871;
+  font-size: 20px;
+  font-weight: 760;
+}
+
+.vanta-test-dashboard-cards p strong:last-child {
+  margin-left: auto;
+}
+
+.vanta-custom-tests-table {
+  overflow-x: auto;
+}
+
+.vanta-custom-tests-table .vanta-modern-header,
+.vanta-custom-tests-table .vanta-modern-row {
+  grid-template-columns: 72px minmax(280px, 1.4fr) 180px 110px 190px 210px 160px 230px;
+  min-width: 1250px;
+}
+
+.vanta-custom-test-modal,
+.vanta-new-document-modal,
+.vanta-create-policy-modal {
+  position: fixed;
+  z-index: 150;
+  inset: 10px 38px 28px;
+  display: grid;
+  grid-template-rows: 116px minmax(0, 1fr) 130px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 22px 80px rgba(0, 0, 0, 0.36);
+}
+
+.vanta-custom-test-modal header,
+.vanta-new-document-modal header,
+.vanta-create-policy-modal header,
+.vanta-upload-details-modal header,
+.vanta-edit-document-request-modal header,
+.vanta-policy-step-modal header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #dcd9de;
+  padding: 0 40px;
+}
+
+.vanta-custom-test-modal h2,
+.vanta-new-document-modal h2,
+.vanta-create-policy-modal h2,
+.vanta-upload-details-modal h2,
+.vanta-edit-document-request-modal h2,
+.vanta-policy-step-modal h2 {
+  margin: 0;
+  color: #181518;
+  font-size: 36px;
+  line-height: 1.12;
+}
+
+.vanta-custom-test-modal header button,
+.vanta-new-document-modal header button,
+.vanta-create-policy-modal header button,
+.vanta-upload-details-modal header button,
+.vanta-edit-document-request-modal header button,
+.vanta-policy-step-modal header button {
+  border: 0;
+  background: transparent;
+  color: #625d66;
+}
+
+.vanta-custom-test-form {
+  overflow-y: auto;
+  padding: 34px 40px;
+}
+
+.vanta-custom-test-form label {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 36px;
+  color: #161316;
+  font-size: 26px;
+  font-weight: 780;
+}
+
+.vanta-custom-test-form label span,
+.vanta-custom-test-form label small,
+.vanta-radio-block h3 span {
+  color: #706b73;
+  font-size: 22px;
+  font-weight: 520;
+}
+
+.vanta-custom-test-form input,
+.vanta-custom-test-form textarea {
+  width: 100%;
+  border: 1px solid #d2ced5;
+  border-radius: 5px;
+  background: #fff;
+  color: #28242a;
+  padding: 16px 20px;
+  font: inherit;
+  font-size: 27px;
+  font-weight: 500;
+}
+
+.vanta-custom-test-form input {
+  min-height: 56px;
+}
+
+.vanta-custom-test-form textarea {
+  min-height: 242px;
+  resize: none;
+}
+
+.vanta-large-select {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  border: 1px solid #d2ced5;
+  border-radius: 5px;
+  background: #fff;
+  color: #171416;
+  padding: 0 18px;
+  font-size: 28px;
+  font-weight: 780;
+}
+
+.vanta-large-select.focused {
+  border-color: #8132d8;
+  box-shadow: 0 0 0 6px #eadcff;
+}
+
+.vanta-custom-test-form > a {
+  float: right;
+  color: #9639e7;
+  font-size: 24px;
+  font-weight: 720;
+}
+
+.vanta-custom-test-modal footer,
+.vanta-new-document-modal footer,
+.vanta-create-policy-modal footer,
+.vanta-upload-details-modal footer,
+.vanta-edit-document-request-modal footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 24px;
+  border-top: 1px solid #dcd9de;
+  padding: 0 40px;
+}
+
+.vanta-new-document-modal {
+  inset: 0 auto 0 0;
+  width: 1240px;
+  border-radius: 0;
+}
+
+.vanta-new-document-modal footer,
+.vanta-edit-document-request-modal footer {
+  justify-content: space-between;
+}
+
+.vanta-new-document-modal footer span,
+.vanta-edit-document-request-modal footer span,
+.vanta-policy-step-modal footer span {
+  display: flex;
+  gap: 24px;
+}
+
+.vanta-radio-block {
+  color: #161316;
+  font-size: 24px;
+}
+
+.vanta-radio-block h3 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.vanta-radio-block p {
+  color: #706b73;
+  font-size: 26px;
+}
+
+.vanta-jira-test-page {
+  position: relative;
+  max-width: 1450px;
+  margin: 0 auto;
+  padding: 32px 30px 80px;
+}
+
+.vanta-jira-test-page h1 {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 10px 0;
+  font-size: 48px;
+}
+
+.vanta-jira-test-page > p {
+  font-size: 24px;
+}
+
+.vanta-empty-controls-card {
+  border: 1px solid #dad6dd;
+  border-radius: 6px;
+  min-height: 238px;
+  margin-top: 32px;
+  padding: 42px;
+}
+
+.vanta-empty-controls-card h2 {
+  margin: 0 0 16px;
+  font-size: 28px;
+}
+
+.vanta-empty-controls-card p {
+  margin: 0 0 34px;
+  color: #706b73;
+  font-size: 22px;
+}
+
+.vanta-empty-controls-card button,
+.vanta-full-purple-button {
+  border: 0;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #a64bff, #8a2fe2);
+  color: #fff;
+  padding: 14px 26px;
+  font-size: 24px;
+  font-weight: 820;
+  box-shadow: 0 2px 5px rgba(94, 20, 147, 0.22);
+}
+
+.vanta-empty-controls-card button {
+  outline: 10px solid #df3676;
+  outline-offset: 18px;
+}
+
+.vanta-control-picker-modal {
+  position: fixed;
+  z-index: 150;
+  inset: 26px 24px auto;
+  min-height: calc(100vh - 52px);
+  overflow: hidden;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.35);
+}
+
+.vanta-control-picker-modal header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 110px;
+  border-bottom: 1px solid #d8d4dc;
+  padding: 0 40px;
+}
+
+.vanta-control-picker-modal h2 {
+  margin: 0;
+  font-size: 36px;
+}
+
+.vanta-control-picker-modal header button {
+  border: 0;
+  background: transparent;
+  color: #706b73;
+}
+
+.vanta-control-picker-filters {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 108px;
+  border-bottom: 1px solid #d8d4dc;
+  background: #f7f5f7;
+  padding: 0 40px;
+}
+
+.vanta-control-picker-filters button:not(.vanta-flat-button) {
+  min-height: 52px;
+  border: 0;
+  border-radius: 5px;
+  background: #fff;
+  color: #706b73;
+  padding: 0 24px;
+  font-size: 23px;
+  font-weight: 780;
+}
+
+.vanta-control-picker-grid {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  min-height: 720px;
+}
+
+.vanta-control-picker-grid aside {
+  overflow-y: auto;
+  border-right: 1px solid #d8d4dc;
+}
+
+.vanta-control-picker-grid aside h4 {
+  margin: 0;
+  min-height: 94px;
+  border-bottom: 1px solid #d8d4dc;
+  padding: 38px 44px 0;
+  color: #706b73;
+  font-size: 21px;
+  text-transform: uppercase;
+}
+
+.vanta-control-picker-grid aside button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 92px;
+  border: 0;
+  border-bottom: 1px solid #d8d4dc;
+  background: #fff;
+  padding: 0 44px;
+  color: #161316;
+  text-align: left;
+  font-size: 27px;
+}
+
+.vanta-control-picker-grid aside button.is-active {
+  border-left: 5px solid #943fe3;
+  background: #faf8fb;
+}
+
+.vanta-control-picker-grid main {
+  padding: 44px;
+}
+
+.vanta-control-picker-grid main h3 {
+  margin: 0 0 48px;
+  font-size: 29px;
+  font-weight: 520;
+}
+
+.vanta-control-picker-grid main hr {
+  border: 0;
+  border-top: 1px solid #d8d4dc;
+  margin: 40px 0;
+}
+
+.vanta-control-picker-grid main h4 {
+  margin: 22px 0 12px;
+  font-size: 24px;
+}
+
+.vanta-control-picker-grid main p {
+  color: #706b73;
+  font-size: 24px;
+  line-height: 1.16;
+}
+
+.vanta-document-layout {
+  display: grid;
+  grid-template-columns: 274px minmax(0, 1fr);
+  border-top: 1px solid #d8d4dc;
+}
+
+.vanta-document-layout aside {
+  border-right: 1px solid #d8d4dc;
+  padding: 30px 20px 0;
+}
+
+.vanta-document-layout aside h4 {
+  margin: 0 0 18px;
+  color: #706b73;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.vanta-document-layout aside button {
+  display: block;
+  width: 100%;
+  height: 48px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #181518;
+  text-align: left;
+  padding: 0 12px;
+  font-size: 20px;
+}
+
+.vanta-document-layout aside button.is-active {
+  background: #f1e8fa;
+}
+
+.vanta-document-layout main {
+  min-width: 0;
+  padding: 30px 30px;
+}
+
+.vanta-modern-table.vanta-documents-table {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.vanta-documents-table .vanta-modern-header,
+.vanta-documents-table .vanta-modern-row {
+  grid-template-columns: 80px minmax(360px, 1.5fr) 250px 190px minmax(270px, 1fr);
+  min-width: 1180px;
+}
+
+.vanta-doc-view-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 88px;
+  border-bottom: 1px solid #dedbe1;
+  background: #fff;
+  padding: 0 24px;
+}
+
+.vanta-doc-view-topbar > div {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.vanta-doc-view-topbar button[aria-label="Close"] {
+  border: 0;
+  background: transparent;
+  color: #66616a;
+}
+
+.vanta-doc-view-topbar strong {
+  font-size: 18px;
+  font-weight: 820;
+}
+
+.vanta-doc-more-menu {
+  position: absolute;
+  top: 60px;
+  right: 30px;
+  width: 154px;
+  border: 1px solid #d8d4dc;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.13);
+  padding: 10px 0;
+}
+
+.vanta-doc-more-menu button {
+  display: block;
+  width: 100%;
+  height: 38px;
+  border: 0;
+  background: #fff;
+  text-align: left;
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+.vanta-doc-more-menu button:last-child {
+  color: #c8274a;
+}
+
+.vanta-document-detail-page,
+.vanta-document-upload-page,
+.vanta-custom-policy-detail-page {
+  padding: 0;
+}
+
+.vanta-doc-upload-zone {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  width: 710px;
+  min-height: 365px;
+  border: 1px dashed #c9c5cc;
+  margin: 46px auto;
+  text-align: center;
+}
+
+.vanta-doc-upload-zone.large {
+  width: 1050px;
+  min-height: 334px;
+  margin-top: 72px;
+}
+
+.vanta-doc-upload-zone.compact {
+  width: auto;
+  min-height: 150px;
+  margin: 20px 0 0;
+}
+
+.vanta-doc-upload-zone h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+
+.vanta-doc-upload-zone p,
+.vanta-doc-upload-zone small {
+  color: #96919a;
+  font-size: 15px;
+}
+
+.vanta-doc-upload-zone div {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.vanta-doc-details-panel {
+  width: calc(100% - 540px);
+  margin: 0 auto;
+  border: 1px solid #dedbe1;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.vanta-doc-details-panel > header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 58px;
+  border-bottom: 1px solid #dedbe1;
+  padding: 0 24px;
+}
+
+.vanta-doc-details-panel h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.vanta-doc-detail-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.vanta-doc-detail-columns.single {
+  grid-template-columns: 1fr;
+}
+
+.vanta-doc-detail-columns > div {
+  min-height: 220px;
+  padding: 24px;
+}
+
+.vanta-doc-detail-columns > div + div {
+  border-left: 1px solid #dedbe1;
+}
+
+.vanta-doc-detail-columns h3 {
+  margin: 0 0 18px;
+  font-size: 18px;
+}
+
+.vanta-doc-detail-columns p {
+  color: #6e6871;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.vanta-doc-detail-columns textarea {
+  width: 100%;
+  min-height: 80px;
+  border: 1px solid #dedbe1;
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.vanta-help-bubble {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border: 0;
+  border-radius: 999px;
+  background: #dda1ff;
+  color: #220b36;
+}
+
+.red-dot,
+.gray-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #e0525d;
+}
+
+.gray-dot {
+  background: #77727b;
+}
+
+.vanta-upload-details-modal,
+.vanta-edit-document-request-modal,
+.vanta-policy-step-modal,
+.vanta-create-policy-modal {
+  position: fixed;
+  z-index: 160;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 22px 80px rgba(0, 0, 0, 0.36);
+}
+
+.vanta-upload-details-modal {
+  top: 36px;
+  left: 34px;
+  width: 960px;
+  min-height: 982px;
+}
+
+.vanta-upload-details-modal header {
+  min-height: 146px;
+}
+
+.vanta-upload-details-modal footer {
+  min-height: 134px;
+}
+
+.vanta-edit-document-request-modal {
+  inset: 0 auto 0 0;
+  width: 944px;
+  display: grid;
+  grid-template-rows: 136px minmax(0, 1fr) 128px;
+  border-radius: 0;
+}
+
+.vanta-edit-document-request-modal .is-disabled {
+  opacity: 0.45;
+}
+
+.vanta-policy-template-table {
+  border: 0;
+  border-radius: 0;
+}
+
+.vanta-policy-template-table .vanta-modern-row {
+  grid-template-columns: minmax(360px, 1fr) 170px 210px 1fr 90px;
+  min-height: 92px;
+  font-size: 24px;
+}
+
+.vanta-policy-editor-page {
+  padding: 0;
+  background: #f7f8fa;
+}
+
+.vanta-policy-editor-status {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  min-height: 92px;
+  border-bottom: 1px solid #dedbe1;
+  background: #fff;
+  padding: 0 18px;
+}
+
+.vanta-editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  min-height: 56px;
+  border-bottom: 1px solid #dedbe1;
+  background: #fff;
+}
+
+.vanta-editor-toolbar button {
+  border: 0;
+  background: transparent;
+  color: #39353c;
+  font-size: 22px;
+}
+
+.vanta-editor-toolbar span {
+  margin-left: auto;
+  padding-right: 38px;
+  color: #78737c;
+  font-size: 18px;
+}
+
+.vanta-policy-paper {
+  width: calc(100% - 170px);
+  min-height: 620px;
+  margin: 70px auto;
+  border: 1px solid #dedbe1;
+  background: #fff;
+  padding: 150px 170px;
+}
+
+.vanta-vantaroo-logo {
+  color: #111;
+  font-size: 100px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.vanta-policy-step-modal {
+  top: 56px;
+  left: 50%;
+  width: 960px;
+  max-height: calc(100vh - 112px);
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) 120px;
+}
+
+.vanta-policy-step-modal header {
+  min-height: 144px;
+}
+
+.vanta-policy-step-body {
+  overflow-y: auto;
+  padding: 48px;
+}
+
+.vanta-note-box,
+.vanta-policy-option-card,
+.vanta-policy-groups-box {
+  border: 1px solid #dedbe1;
+  border-radius: 6px;
+  background: #fafbfc;
+  padding: 34px 48px;
+  color: #65606a;
+  font-size: 28px;
+  line-height: 1.25;
+}
+
+.vanta-note-box {
+  margin-bottom: 36px;
+}
+
+.vanta-note-box h3 {
+  margin: 0 0 14px;
+  color: #181518;
+  font-size: 32px;
+}
+
+.vanta-note-box a,
+.vanta-policy-step-body a,
+.vanta-create-policy-modal a {
+  color: #9135e4;
+}
+
+.vanta-policy-step-body label {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 36px;
+  font-size: 28px;
+  font-weight: 780;
+}
+
+.vanta-policy-step-modal footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #dedbe1;
+  padding: 0 48px;
+  font-size: 30px;
+}
+
+.vanta-policy-option-card {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 8px 20px;
+  margin-bottom: 48px;
+  background: #fff;
+}
+
+.vanta-policy-option-card strong {
+  color: #353137;
+  font-size: 28px;
+}
+
+.vanta-policy-option-card p {
+  grid-column: 2;
+  margin: 0;
+  color: #8a848d;
+  font-size: 26px;
+}
+
+.vanta-policy-groups-box {
+  background: #f5f6f7;
+  border: 0;
+}
+
+.vanta-policy-groups-box p {
+  margin-top: 0;
+}
+
+.vanta-policy-groups-box li {
+  margin: 6px 0;
+}
+
+.vanta-policy-version-page {
+  display: grid;
+  place-items: start center;
+  padding-top: 38px;
+  background: #fff;
+}
+
+.vanta-version-card {
+  position: relative;
+  width: 1425px;
+  min-height: 240px;
+  border: 1px solid #dedbe1;
+  border-radius: 8px;
+  background: #f7f8fa;
+  padding: 52px 86px;
+}
+
+.vanta-version-card .version-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-height: 64px;
+  transform: translate(-50%, -50%);
+  font-size: 30px;
+}
+
+.vanta-version-card > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vanta-version-card > header h1 {
+  margin: 0;
+  font-size: 42px;
+}
+
+.vanta-version-language {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin: 50px 0 32px;
+  font-size: 28px;
+}
+
+.vanta-version-choice {
+  position: relative;
+  display: grid;
+  grid-template-columns: 72px 1fr 36px;
+  gap: 24px;
+  align-items: center;
+  width: 100%;
+  min-height: 150px;
+  border: 1px solid #dedbe1;
+  border-radius: 5px;
+  background: #fff;
+  padding: 0 40px;
+  margin: 0 0 40px;
+  text-align: left;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.vanta-version-choice span:first-child {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 5px;
+}
+
+.vanta-version-choice .purple { background: #cdb2f8; color: #8e35e4; }
+.vanta-version-choice .green { background: #bce8cd; color: #0b9d45; }
+.vanta-version-choice .blue { background: #d4e9ff; color: #2c83e8; }
+
+.vanta-version-choice strong {
+  grid-column: 2;
+  color: #181518;
+  font-size: 30px;
+}
+
+.vanta-version-choice p {
+  grid-column: 2;
+  margin: -28px 0 0;
+  color: #9b959e;
+  font-size: 26px;
+}
+
+.vanta-version-choice svg:last-child {
+  grid-row: 1 / span 2;
+  grid-column: 3;
+  transform: rotate(-90deg);
+}
+
+.vanta-or-divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 54px;
+  color: #77727b;
+  font-size: 30px;
+  margin: 18px 8px 40px;
+}
+
+.vanta-or-divider::before,
+.vanta-or-divider::after {
+  content: "";
+  height: 3px;
+  background: #e2e0e4;
+}
+
+.vanta-confluence-search {
+  width: 100%;
+  height: 66px;
+  margin: 44px 0 64px;
+  font-size: 30px;
+}
+
+.vanta-confluence-card {
+  display: grid;
+  grid-template-columns: 62px 1fr 36px;
+  align-items: center;
+  width: 100%;
+  min-height: 150px;
+  border: 1px solid #dedbe1;
+  border-radius: 5px;
+  background: #fff;
+  padding: 0 48px;
+  text-align: left;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.vanta-confluence-card strong {
+  font-size: 28px;
+}
+
+.vanta-confluence-card small {
+  display: block;
+  color: #9b959e;
+  font-size: 24px;
+}
+
+.vanta-create-policy-modal {
+  top: 14px;
+  left: 56px;
+  right: auto;
+  bottom: 36px;
+  width: 960px;
+}
+
+.vanta-create-policy-modal .vanta-note-box {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 24px;
+}
+
+.vanta-custom-policy-detail-page {
+  background: #fff;
+}
+
+.vanta-custom-policy-draft-card {
+  position: relative;
+  width: 1090px;
+  min-height: 462px;
+  margin: 76px auto;
+  border: 1px solid #dedbe1;
+  border-radius: 5px;
+  background: #fafafa;
+  padding: 42px;
+}
+
+.vanta-custom-policy-draft-card h2 {
+  margin: 0 0 20px;
+  font-size: 30px;
+}
+
+.vanta-custom-policy-draft-card p {
+  color: #77727b;
+  font-size: 22px;
+}
+
+.vanta-custom-policy-actions {
+  position: absolute;
+  top: 38px;
+  right: 38px;
+  display: flex;
+  gap: 22px;
+}
+
+.vanta-editor-preview {
+  width: 890px;
+  margin: 42px auto 0;
+  background: #fff;
+  box-shadow: 0 12px 50px rgba(0, 0, 0, 0.10);
+}
+
+.vanta-editor-preview div {
+  height: 64px;
+  border-bottom: 1px solid #ece9ef;
+  color: #8d8794;
+  padding: 20px 70px;
+  word-spacing: 32px;
+  font-size: 20px;
+}
+
+.vanta-editor-preview p {
+  width: 70%;
+  height: 8px;
+  border-radius: 999px;
+  background: #e5e2e7;
+  margin: 28px 70px;
+}
+
+.vanta-editor-preview p:nth-child(3) {
+  width: 86%;
+}
+
+.vanta-policy-step-modal.employee {
+  width: 960px;
+}
+
+.vanta-policy-step-modal.employee .vanta-policy-step-body > p {
+  color: #181518;
+  font-size: 30px;
+  line-height: 1.38;
+}
+
+@media (max-width: 1280px) {
+  .vanta-flat-layout,
+  .vanta-flat-layout.compact,
+  .vanta-policy-builder-layout,
+  .vanta-test-detail-grid,
+  .vanta-inventory-layout,
+  .vanta-settings-layout,
+  .vanta-simple-layout,
+  .vanta-framework-detail-layout,
+  .vanta-tests-category-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .vanta-flat-sidebar,
+  .vanta-icon-rail,
+  .vanta-test-side-panel {
+    position: static;
+    height: auto;
+  }
+
+  .vanta-integration-scope-grid,
+  .vanta-console-progress-grid,
+  .vanta-compliance-progress-grid,
+  .vanta-integration-catalog-grid,
+  .vanta-test-summary-grid,
+  .vanta-controls-card-grid,
+  .vanta-frameworks-grid,
+  .vanta-framework-detail-cards,
+  .vanta-add-controls-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vanta-framework-dropdown,
+  .vanta-program-popover,
+  .vanta-category-dropdown,
+  .vanta-workspace-dropdown,
+  .vanta-health-tooltip {
+    position: static;
+    transform: none;
+    width: auto;
+    margin: 16px 0;
+  }
+
+  .vanta-file-upload-modal,
+  .vanta-import-review-modal,
+  .vanta-add-controls-modal,
+  .vanta-risk-scenario-modal {
+    position: static;
+    width: auto;
+    min-height: 0;
+    height: auto;
+    margin: 20px;
+  }
+
+  .vanta-starter-page {
+    padding: 0 20px 48px;
+  }
+
+  .vanta-starter-stepper,
+  .vanta-starter-card,
+  .vanta-starter-continue {
+    max-width: 100%;
+  }
+
+  .vanta-starter-task-header,
+  .vanta-starter-next-task {
+    grid-template-columns: 1fr;
+  }
+
+  .vanta-starter-task-status,
+  .vanta-starter-continue {
+    justify-content: flex-start;
+  }
+
+  .vanta-starter-continue button {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .vanta-tests-overview-page,
+  .vanta-controls-page,
+  .vanta-documents-list-page {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .vanta-page-action-row,
+  .vanta-filter-bar,
+  .vanta-filter-bar.controls {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .vanta-page-action-row > div:last-child {
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+
+  .vanta-input-like {
+    max-width: 100%;
+  }
+
+  .vanta-test-summary-grid {
+    gap: 18px;
+  }
+
+  .vanta-test-score-card,
+  .vanta-test-attention-card,
+  .vanta-control-summary-card {
+    min-width: 0;
+    padding: 22px;
+  }
+
+  .vanta-score-bubble {
+    position: static;
+    margin-bottom: 12px;
+  }
+
+  .vanta-test-score-card .vanta-big-meter {
+    margin-left: 0;
+  }
+
+  .vanta-score-main,
+  .vanta-score-subcards,
+  .vanta-attention-list,
+  .vanta-control-summary-card.assignment,
+  .vanta-control-summary-card.completion {
+    grid-template-columns: 1fr;
+  }
+
+  .vanta-score-main {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .vanta-document-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .vanta-document-layout aside {
+    border-right: 0;
+    border-bottom: 1px solid #d8d4dc;
+  }
+
+  .vanta-document-layout main {
+    min-width: 0;
+    padding: 22px;
+  }
+
+  .vanta-modern-table.vanta-tests-table,
+  .vanta-modern-table.vanta-controls-table,
+  .vanta-modern-table.vanta-documents-table {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .vanta-tests-table .vanta-modern-header,
+  .vanta-tests-table .vanta-modern-row {
+    min-width: 1040px;
+  }
+
+  .vanta-controls-table .vanta-modern-header,
+  .vanta-controls-table .vanta-modern-row {
+    min-width: 1120px;
+  }
+
+  .vanta-documents-table .vanta-modern-header,
+  .vanta-documents-table .vanta-modern-row {
+    min-width: 1180px;
+  }
+}
+
+@media (max-width: 640px) {
+  .vanta-flat-app,
+  .vanta-flat-app * {
+    min-width: 0;
+  }
+
+  .vanta-flat-topbar {
+    height: auto;
+    min-height: 60px;
+    gap: 10px;
+    padding: 10px 14px;
+  }
+
+  .vanta-flat-logo {
+    font-size: 24px;
+  }
+
+  .vanta-tests-overview-page {
+    padding: 18px;
+  }
+
+  .vanta-tests-overview-page .vanta-test-summary-grid {
+    gap: 14px;
+  }
+
+  .vanta-tests-overview-page .vanta-test-score-card,
+  .vanta-tests-overview-page .vanta-test-attention-card {
+    padding: 18px;
+  }
+
+  .vanta-tests-overview-page .vanta-test-score-card h2,
+  .vanta-tests-overview-page .vanta-test-attention-card h2 {
+    font-size: 20px;
+    line-height: 1.25;
+  }
+
+  .vanta-tests-overview-page .vanta-score-main strong {
+    font-size: 34px;
+  }
+
+  .vanta-tests-overview-page .vanta-score-main span,
+  .vanta-tests-overview-page .vanta-attention-list,
+  .vanta-tests-overview-page .vanta-score-subcards h3,
+  .vanta-tests-overview-page .vanta-score-subcards p {
+    font-size: 15px;
+  }
+
+  .vanta-tests-overview-page .vanta-score-subcards > div,
+  .vanta-tests-overview-page .vanta-attention-list {
+    padding: 14px;
+  }
+
+  .vanta-tests-overview-page .vanta-test-filter-row {
+    gap: 10px;
+    margin: 28px 0 14px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    font-size: 14px;
+  }
+
+  .vanta-tests-overview-page .vanta-test-filter-row > * {
+    flex: 0 0 auto;
+  }
+
+  .vanta-tests-overview-page .vanta-test-filter-row .vanta-input-like {
+    width: 150px;
+    height: 38px;
+  }
+
+  .vanta-modern-table.vanta-tests-table {
+    border-radius: 6px;
+  }
+
+  .vanta-tests-table .vanta-modern-header,
+  .vanta-tests-table .vanta-modern-row {
+    min-width: 760px;
+    grid-template-columns: 52px minmax(260px, 1fr) 130px 190px 150px 52px;
+  }
+
+  .vanta-tests-table .vanta-modern-row {
+    min-height: 74px;
+    font-size: 16px;
+  }
+
+  .vanta-tests-table .vanta-modern-row strong {
+    gap: 8px;
+  }
+
+  .vanta-tests-table .vanta-modern-row svg {
+    flex: 0 0 auto;
+  }
+
+  .vanta-tests-overview-page .vanta-program-popover {
+    position: static;
+    transform: none;
+    width: 100%;
+    margin: 16px 0 0;
+    padding: 18px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+  }
+
+  .vanta-tests-overview-page .vanta-program-popover > span {
+    font-size: 15px;
+  }
+
+  .vanta-tests-overview-page .vanta-program-popover h2 {
+    margin: 5px 0 16px;
+    font-size: 22px;
+  }
+
+  .vanta-tests-overview-page .vanta-popover-callout {
+    align-items: flex-start;
+    padding: 14px;
+    font-size: 14px;
+  }
+
+  .vanta-tests-overview-page .vanta-popover-table {
+    grid-template-columns: minmax(0, 1fr) 78px;
+    gap: 10px 12px;
+    font-size: 13px;
+  }
+}

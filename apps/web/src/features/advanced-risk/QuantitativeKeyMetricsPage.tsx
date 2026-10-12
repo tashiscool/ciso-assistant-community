@@ -56,7 +56,7 @@ export function QuantitativeKeyMetricsPage() {
   }, [identity.tenantId, identity.userId, studyId]);
 
   if (loading || !payload) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading key metrics...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading key metrics...</div>;
   }
 
   const { metrics } = payload;
@@ -64,31 +64,31 @@ export function QuantitativeKeyMetricsPage() {
   return (
     <div className="space-y-6">
       <section className="panel">
-        <Link className="text-sm text-cyan-200 transition hover:text-cyan-100" to={`/advanced-risk/quantitative/${payload.studyId}`}>
+        <Link className="text-sm text-[#6d28d9] transition hover:text-[#5f1aa8]" to={`/advanced-risk/quantitative/${payload.studyId}`}>
           Back to quantitative study
         </Link>
         <div className="eyebrow mt-4">Key Metrics</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Portfolio Metrics</h1>
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Portfolio Metrics</h1>
       </section>
 
       {error && <div className="notice-error">{error}</div>}
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+      <section className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2 xl:grid-cols-5">
         <div className="metric-card">
           <div className="metric-label">Current ALE</div>
-          <div className="mt-3 text-sm font-semibold text-white">
+          <div className="mt-3 text-sm font-semibold text-[#241232]">
             {formatCurrency(metrics.currentAleCombined, metrics.currency)}
           </div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Residual ALE</div>
-          <div className="mt-3 text-sm font-semibold text-white">
+          <div className="mt-3 text-sm font-semibold text-[#241232]">
             {formatCurrency(metrics.residualAleCombined, metrics.currency)}
           </div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Risk reduction</div>
-          <div className="mt-3 text-sm font-semibold text-white">
+          <div className="mt-3 text-sm font-semibold text-[#241232]">
             {formatCurrency(metrics.riskReduction, metrics.currency)}
           </div>
         </div>

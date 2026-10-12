@@ -1,0 +1,42 @@
+{
+  "source": "platform-core/shared/service-runtime-entry.ts",
+  "runtime_sha256": "35881c34fa614db4d8d58a55ebfb77915255b65a85f9f8450cf51d0bae760007",
+  "sources": [
+    {
+      "path": "shared/jwt.ts",
+      "sha256": "323032ffe766e1b9a9c638308ae1b90f1f63da65c7a18652cf70e345a903e25a"
+    },
+    {
+      "path": "shared/product-auth.ts",
+      "sha256": "9ab9d556d6eb4d4e447ebbbcad4f70f57f1614397d1d3a65ceac28d141c4a602"
+    },
+    {
+      "path": "shared/product-coordinator-do.ts",
+      "sha256": "cb9862ace10496fca3e71377125b0f1bef3ed90535aa0cd6ea6a64397ab547f5"
+    },
+    {
+      "path": "shared/service-contracts.ts",
+      "sha256": "d6cd73b62bd08d9aea72bf0a6de668f76299ed1621479dea1f3ae572b2aac311"
+    },
+    {
+      "path": "shared/service-delivery.ts",
+      "sha256": "9590b1442bb6f57ea34e1b6f2bd83a80ef035aa0e9f7e1eff727d178db6d499a"
+    },
+    {
+      "path": "shared/service-donations.ts",
+      "sha256": "7408be93fc56c46bc1ee278bce9c1f5456fd00cb2900129476770927aaacd9f9"
+    },
+    {
+      "path": "shared/service-gateway.ts",
+      "sha256": "e2b4d0dc9f1d9131dbc667b5148719baf7073f8d3aafd08b5821098df3765266"
+    },
+    {
+      "path": "shared/service-runtime-entry.ts",
+      "sha256": "a7a8afae8588257b615b058d578396731708eae1c63bb1af339670527a7aa9ff"
+    },
+    {
+      "path": "shared/utils.ts",
+      "sha256": "7f7703d7f83d6612de4a6037b1441eec867a9b5e16c49591610ba358a953c46c"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { RegStatusPill } from '../../components/regovise/PagePrimitives';
 import { ApiClient } from '../../shared/api/client';
 import { useEdgeIdentity } from '../../shared/session/identity';
 
@@ -41,8 +42,8 @@ export function EvidenceJobsPage() {
     <div className="space-y-6">
       <section className="panel">
         <div className="eyebrow">Evidence</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Queue-Driven Evidence Jobs</h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Queue-Driven Evidence Jobs</h1>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f435c]">
           Review evidence collection activity, confirm successful runs, and see whether artifacts
           were produced for each job.
         </p>
@@ -52,7 +53,7 @@ export function EvidenceJobsPage() {
 
       <section className="panel overflow-hidden p-0">
         <table className="min-w-full text-left text-sm">
-          <thead className="border-b border-white/10 bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
+          <thead className="border-b border-[#ded8e4] bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
             <tr>
               <th className="px-4 py-3">Job</th>
               <th className="px-4 py-3">Source</th>
@@ -62,46 +63,38 @@ export function EvidenceJobsPage() {
           </thead>
           <tbody>
             {jobs.map((job) => (
-              <tr key={job.id} className="border-t border-white/5 align-top">
+              <tr key={job.id} className="border-t border-[#eeeaf2] align-top">
                 <td className="px-4 py-4">
-                  <div className="font-mono text-xs text-cyan-200">{job.id}</div>
-                  <div className="mt-2 text-xs text-slate-500">
+                  <div className="font-mono text-xs text-[#6d28d9]">{job.id}</div>
+                  <div className="mt-2 text-xs text-[#62576a]">
                     Scheduled {job.scheduledFor}
                     {job.finishedAt ? `, finished ${job.finishedAt}` : ''}
                   </div>
                 </td>
-                <td className="px-4 py-4 text-white">{job.sourceName}</td>
+                <td className="px-4 py-4 text-[#241232]">{job.sourceName}</td>
                 <td className="px-4 py-4">
-                  <span
-                    className={
-                      job.status === 'success'
-                        ? 'badge-success'
-                        : job.status === 'failed'
-                          ? 'badge-danger'
-                          : 'badge-neutral'
-                    }
-                  >
+                  <RegStatusPill tone={job.status === 'success' ? 'success' : job.status === 'failed' ? 'danger' : 'neutral'}>
                     {job.status}
-                  </span>
+                  </RegStatusPill>
                   {job.statusDetail && (
-                    <div className="mt-2 max-w-md text-xs leading-5 text-slate-400">
+                    <div className="mt-2 max-w-md text-xs leading-5 text-[#6f6578]">
                       {job.statusDetail}
                     </div>
                   )}
                 </td>
-                <td className="px-4 py-4 text-slate-300">{job.artifactCount}</td>
+                <td className="px-4 py-4 text-[#4f435c]">{job.artifactCount}</td>
               </tr>
             ))}
             {!loading && jobs.length === 0 && (
               <tr>
-                <td className="px-4 py-8 text-center text-slate-400" colSpan={4}>
+                <td className="px-4 py-8 text-center text-[#6f6578]" colSpan={4}>
                   No evidence jobs found for tenant <span className="font-mono">{identity.tenantId}</span>.
                 </td>
               </tr>
             )}
             {loading && (
               <tr>
-                <td className="px-4 py-8 text-center text-slate-400" colSpan={4}>
+                <td className="px-4 py-8 text-center text-[#6f6578]" colSpan={4}>
                   Loading evidence jobs...
                 </td>
               </tr>

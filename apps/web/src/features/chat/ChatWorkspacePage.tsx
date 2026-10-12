@@ -99,7 +99,7 @@ export function ChatWorkspacePage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading chat workspace...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading chat workspace...</div>;
   }
 
   return (
@@ -107,8 +107,8 @@ export function ChatWorkspacePage() {
       <section className="panel grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
           <div className="eyebrow">Chat</div>
-          <h1 className="mt-2 text-3xl font-semibold text-white">Workspace Guidance Chat</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Workspace Guidance Chat</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
             Open a tenant-scoped conversation to query the local governance and risk workspace while
             the Cloudflare migration keeps replacing the older chat surface.
           </p>
@@ -116,7 +116,7 @@ export function ChatWorkspacePage() {
         <div className="panel-subtle grid gap-3 sm:grid-cols-3">
           <div className="metric-card">
             <div className="metric-label">Provider</div>
-            <div className="mt-3 text-sm font-semibold text-white">{status?.provider ?? 'n/a'}</div>
+            <div className="mt-3 text-sm font-semibold text-[#241232]">{status?.provider ?? 'n/a'}</div>
           </div>
           <div className="metric-card">
             <div className="metric-label">Sessions</div>
@@ -124,7 +124,7 @@ export function ChatWorkspacePage() {
           </div>
           <div className="metric-card">
             <div className="metric-label">Ready</div>
-            <div className="mt-3 text-sm font-semibold text-white">{status?.available ? 'Yes' : 'No'}</div>
+            <div className="mt-3 text-sm font-semibold text-[#241232]">{status?.available ? 'Yes' : 'No'}</div>
           </div>
         </div>
       </section>
@@ -165,14 +165,14 @@ export function ChatWorkspacePage() {
               <button
                 key={session.id}
                 className={`panel-subtle block w-full text-left transition ${
-                  selectedSession?.id === session.id ? 'border-cyan-300/30 bg-cyan-400/[0.03]' : ''
+                  selectedSession?.id === session.id ? 'border-[#d7c3f1] bg-[#f6f1fa]' : ''
                 }`}
                 onClick={() => setSelectedSession(session)}
                 type="button"
               >
-                <div className="font-medium text-white">{session.title || 'Untitled session'}</div>
-                <div className="mt-1 text-xs text-slate-500">{session.folderName}</div>
-                <div className="mt-3 text-sm text-slate-300">{session.lastMessagePreview || 'No messages yet.'}</div>
+                <div className="font-medium text-[#241232]">{session.title || 'Untitled session'}</div>
+                <div className="mt-1 text-xs text-[#62576a]">{session.folderName}</div>
+                <div className="mt-3 text-sm text-[#4f435c]">{session.lastMessagePreview || 'No messages yet.'}</div>
               </button>
             ))}
           </div>
@@ -188,19 +188,19 @@ export function ChatWorkspacePage() {
                     key={message.id}
                     className={`rounded-3xl px-4 py-4 ${
                       message.role === 'assistant'
-                        ? 'bg-cyan-500/10 text-cyan-50'
-                        : 'bg-slate-900/80 text-slate-200'
+                        ? 'bg-[#f2e8ff] text-[#4f227d]'
+                        : 'bg-white text-[#38254a]'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <div className="text-xs uppercase tracking-[0.16em] text-slate-400">{message.role}</div>
-                      <div className="text-xs text-slate-500">{formatDate(message.createdAt)}</div>
+                      <div className="text-xs uppercase tracking-[0.16em] text-[#6f6578]">{message.role}</div>
+                      <div className="text-xs text-[#62576a]">{formatDate(message.createdAt)}</div>
                     </div>
                     <div className="mt-3 whitespace-pre-wrap text-sm leading-6">{message.content}</div>
                     {message.citations && message.citations.length > 0 && (
                       <div className="mt-3 flex flex-wrap gap-2">
                         {message.citations.map((citation) => (
-                          <span key={`${citation.label}-${citation.value}`} className="badge-neutral">
+                          <span key={`${citation.label}-${citation.value}`} className="status-pill-neutral">
                             {citation.label}: {citation.value}
                           </span>
                         ))}
@@ -228,7 +228,7 @@ export function ChatWorkspacePage() {
               </form>
             </>
           ) : (
-            <div className="mt-4 text-sm text-slate-400">Create a session to start a conversation.</div>
+            <div className="mt-4 text-sm text-[#6f6578]">Create a session to start a conversation.</div>
           )}
         </section>
       </section>

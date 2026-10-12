@@ -71,7 +71,7 @@ export function UtilitiesControlPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading utilities...</div>;
+    return <div className="panel p-6 text-sm text-[#51465e]">Loading utilities...</div>;
   }
 
   if (error && !snapshot) {
@@ -84,8 +84,8 @@ export function UtilitiesControlPage() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">Operations</div>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Utilities</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">Utilities</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">
               Launch guided utility runs for builder acceleration, inheritance carry-forward, categorization, and
               governance packaging from the canonical Worker-backed control room.
             </p>
@@ -121,8 +121,8 @@ export function UtilitiesControlPage() {
 
       <section className="grid gap-4 xl:grid-cols-[0.92fr_1.08fr]">
         <div className="panel-subtle space-y-4">
-          <div className="flex items-center gap-2 text-white">
-            <Wrench className="h-4 w-4 text-cyan-300" />
+          <div className="flex items-center gap-2 text-[#241232]">
+            <Wrench className="h-4 w-4 text-[#7a2ed6]" />
             <h2 className="text-lg font-semibold">Launch utility</h2>
           </div>
           <label className="space-y-1">
@@ -153,8 +153,8 @@ export function UtilitiesControlPage() {
             <span className="label">Launch note</span>
             <textarea className="input min-h-[110px]" onChange={(event) => setNotes(event.target.value)} value={notes} />
           </label>
-          <label className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3">
-            <span className="text-sm text-slate-300">Preview mode</span>
+          <label className="flex items-center justify-between rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3">
+            <span className="text-sm text-[#51465e]">Preview mode</span>
             <input checked={previewMode} onChange={(event) => setPreviewMode(event.target.checked)} type="checkbox" />
           </label>
           <button className="button-primary" disabled={saving || !selectedUtility} onClick={() => void handleLaunch()} type="button">
@@ -163,15 +163,15 @@ export function UtilitiesControlPage() {
           </button>
 
           {selectedUtility && (
-            <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+            <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
               <div className="eyebrow">Selected utility</div>
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                <div className="font-medium text-white">{selectedUtility.title}</div>
-                <span className="badge-neutral">{selectedUtility.status}</span>
-                <span className="badge-neutral">{selectedUtility.module}</span>
+                <div className="font-medium text-[#241232]">{selectedUtility.title}</div>
+                <span className="status-pill-neutral">{selectedUtility.status}</span>
+                <span className="status-pill-neutral">{selectedUtility.module}</span>
               </div>
-              <div className="mt-2 text-sm text-slate-300">{selectedUtility.description}</div>
-              <div className="mt-3 text-xs text-slate-500">{selectedUtility.notes}</div>
+              <div className="mt-2 text-sm text-[#51465e]">{selectedUtility.description}</div>
+              <div className="mt-3 text-xs text-[#62576a]">{selectedUtility.notes}</div>
               <div className="mt-4">
                 <Link className="button-secondary" to={selectedUtility.route}>
                   Open module
@@ -183,22 +183,22 @@ export function UtilitiesControlPage() {
 
         <div className="space-y-4">
           <section className="panel overflow-hidden p-0">
-            <div className="border-b border-white/10 px-6 py-4">
+            <div className="border-b border-[#ded8e4] px-6 py-4">
               <div className="eyebrow">Utility catalog</div>
-              <p className="mt-1 text-sm text-slate-400">Canonical launch surfaces and their target modules.</p>
+              <p className="mt-1 text-sm text-[#6f6578]">Canonical launch surfaces and their target modules.</p>
             </div>
-            <div className="divide-y divide-white/6">
+            <div className="divide-y divide-[#ded8e4]">
               {snapshot?.utilities.map((item) => (
                 <div className="px-6 py-4" key={item.key}>
                   <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <div className="font-medium text-white">{item.title}</div>
-                        <span className="badge-neutral">{item.status}</span>
-                        <span className="badge-neutral">{item.runCount} runs</span>
+                        <div className="font-medium text-[#241232]">{item.title}</div>
+                        <span className="status-pill-neutral">{item.status}</span>
+                        <span className="status-pill-neutral">{item.runCount} runs</span>
                       </div>
-                      <div className="mt-2 text-sm text-slate-300">{item.description}</div>
-                      <div className="mt-2 text-xs text-slate-500">
+                      <div className="mt-2 text-sm text-[#51465e]">{item.description}</div>
+                      <div className="mt-2 text-xs text-[#62576a]">
                         Queue {item.queueName}
                         {item.lastRun ? ` · Last run ${new Date(item.lastRun).toLocaleString()}` : ' · No runs yet'}
                       </div>
@@ -213,30 +213,30 @@ export function UtilitiesControlPage() {
           </section>
 
           <section className="panel overflow-hidden p-0">
-            <div className="border-b border-white/10 px-6 py-4">
+            <div className="border-b border-[#ded8e4] px-6 py-4">
               <div className="eyebrow">Recent runs</div>
-              <p className="mt-1 text-sm text-slate-400">Latest utility launches persisted in the canonical Worker.</p>
+              <p className="mt-1 text-sm text-[#6f6578]">Latest utility launches persisted in the canonical Worker.</p>
             </div>
-            <div className="divide-y divide-white/6">
+            <div className="divide-y divide-[#ded8e4]">
               {snapshot?.recentRuns.length ? (
                 snapshot.recentRuns.map((run) => (
                   <div className="px-6 py-4" key={run.id}>
                     <div className="flex flex-wrap items-center gap-2">
-                      <div className="font-medium text-white">{run.title}</div>
-                      <span className="badge-neutral">{run.status}</span>
-                      {run.previewMode && <span className="badge-neutral">Preview</span>}
+                      <div className="font-medium text-[#241232]">{run.title}</div>
+                      <span className="status-pill-neutral">{run.status}</span>
+                      {run.previewMode && <span className="status-pill-neutral">Preview</span>}
                     </div>
-                    <div className="mt-2 text-sm text-slate-300">
+                    <div className="mt-2 text-sm text-[#51465e]">
                       {run.scope} · {run.records} records · {run.module}
                     </div>
-                    <div className="mt-2 flex items-center gap-2 text-xs text-slate-500">
+                    <div className="mt-2 flex items-center gap-2 text-xs text-[#62576a]">
                       <Cpu className="h-3.5 w-3.5" />
                       <span>{new Date(run.updatedAt).toLocaleString()}</span>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="px-6 py-6 text-sm text-slate-400">No utility runs have been launched in this tenant yet.</div>
+                <div className="px-6 py-6 text-sm text-[#6f6578]">No utility runs have been launched in this tenant yet.</div>
               )}
             </div>
           </section>

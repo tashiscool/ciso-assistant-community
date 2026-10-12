@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Building2, CalendarDays, Clock3, Globe2, Save, Users } from 'lucide-react';
+import { RegModal } from '../../components/regovise/PagePrimitives';
 import { getSetupGeneral, updateSetupGeneral } from './api';
 import type { SetupGeneralSnapshot } from './types';
 
@@ -42,6 +43,7 @@ export function GeneralPage() {
   const [draft, setDraft] = useState(defaultDraft);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [reviewSaveOpen, setReviewSaveOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -85,6 +87,7 @@ export function GeneralPage() {
       setNotice(null);
       const next = await updateSetupGeneral(draft);
       hydrate(next);
+      setReviewSaveOpen(false);
       setNotice('General tenant settings saved.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to save general settings.');
@@ -94,7 +97,7 @@ export function GeneralPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading general settings...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading general settings...</div>;
   }
 
   if (error && !snapshot) {
@@ -106,8 +109,8 @@ export function GeneralPage() {
       <section className="panel grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
         <div>
           <div className="eyebrow">Setup</div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">General</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">General</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
             Set tenant operating defaults for organization identity, calendar cadence, reviewer routing, and runtime
             presentation so downstream workflows inherit consistent behavior.
           </p>
@@ -182,29 +185,29 @@ export function GeneralPage() {
               <span className="label">Working days</span>
               <div className="grid gap-2 sm:grid-cols-2">
                 {weekdayOptions.map((day) => (
-                  <label className="flex items-start gap-3 rounded-3xl border border-white/10 bg-slate-950/30 p-3" key={day}>
+                  <label className="flex items-start gap-3 rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-3" key={day}>
                     <input
                       checked={draft.workingDays.includes(day)}
-                      className="mt-1 h-4 w-4 rounded border-white/15 bg-slate-950 text-cyan-400"
+                      className="mt-1 h-4 w-4 rounded border-[#ded8e4] bg-white text-[#7a3ccf]"
                       onChange={() => setDraft((current) => ({ ...current, workingDays: toggleDay(current.workingDays, day) }))}
                       type="checkbox"
                     />
-                    <div className="text-sm text-white">{day}</div>
+                    <div className="text-sm text-[#241232]">{day}</div>
                   </label>
                 ))}
               </div>
             </div>
 
-            <label className="flex items-start gap-3 rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+            <label className="flex items-start gap-3 rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
               <input
                 checked={draft.changeFreezeEnabled}
-                className="mt-1 h-4 w-4 rounded border-white/15 bg-slate-950 text-cyan-400"
+                className="mt-1 h-4 w-4 rounded border-[#ded8e4] bg-white text-[#7a3ccf]"
                 onChange={() => setDraft((current) => ({ ...current, changeFreezeEnabled: !current.changeFreezeEnabled }))}
                 type="checkbox"
               />
               <div>
-                <div className="font-medium text-white">Enable change freeze guidance</div>
-                <div className="mt-2 text-sm text-slate-400">Show advisory windows for sensitive admin and workflow changes.</div>
+                <div className="font-medium text-[#241232]">Enable change freeze guidance</div>
+                <div className="mt-2 text-sm text-[#6f6578]">Show advisory windows for sensitive admin and workflow changes.</div>
               </div>
             </label>
 
@@ -213,7 +216,7 @@ export function GeneralPage() {
               <input className="input" value={draft.changeFreezeWindow} onChange={(e) => setDraft((c) => ({ ...c, changeFreezeWindow: e.target.value }))} />
             </label>
 
-            <button className="button-primary" disabled={saving} onClick={() => void handleSave()} type="button">
+            <button className="button-primary" disabled={saving} onClick={() => setReviewSaveOpen(true)} type="button">
               <Save className="mr-2 h-4 w-4" />
               {saving ? 'Saving...' : 'Save general settings'}
             </button>
@@ -223,15 +226,15 @@ export function GeneralPage() {
         <div className="space-y-4">
           <section className="panel-subtle">
             <div className="flex items-center gap-3">
-              <Building2 className="h-5 w-5 text-cyan-300" />
-              <h2 className="text-lg font-semibold text-white">Operating defaults</h2>
+              <Building2 className="h-5 w-5 text-[#7a3ccf]" />
+              <h2 className="text-lg font-semibold text-[#241232]">Operating defaults</h2>
             </div>
             <div className="mt-5 space-y-3">
               {snapshot?.records.operatingDefaults.map((item) => (
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4" key={item.label}>
-                  <div className="font-medium text-white">{item.label}</div>
-                  <div className="mt-2 text-sm text-slate-300">{item.value}</div>
-                  <div className="mt-2 text-xs text-slate-500">{item.hint}</div>
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={item.label}>
+                  <div className="font-medium text-[#241232]">{item.label}</div>
+                  <div className="mt-2 text-sm text-[#4f435c]">{item.value}</div>
+                  <div className="mt-2 text-xs text-[#62576a]">{item.hint}</div>
                 </div>
               ))}
             </div>
@@ -239,19 +242,19 @@ export function GeneralPage() {
 
           <section className="panel-subtle">
             <div className="flex items-center gap-3">
-              <Users className="h-5 w-5 text-cyan-300" />
-              <h2 className="text-lg font-semibold text-white">Coordination signals</h2>
+              <Users className="h-5 w-5 text-[#7a3ccf]" />
+              <h2 className="text-lg font-semibold text-[#241232]">Coordination signals</h2>
             </div>
             <div className="mt-5 space-y-3">
               {snapshot?.records.coordinationSignals.map((item) => (
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4" key={item.title}>
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={item.title}>
                   <div className="flex items-center justify-between gap-3">
-                    <div className="font-medium text-white">{item.title}</div>
-                    <span className={item.status === 'Healthy' || item.status === 'Configured' || item.status === 'Enabled' ? 'badge-positive' : 'badge-neutral'}>
+                    <div className="font-medium text-[#241232]">{item.title}</div>
+                    <span className={item.status === 'Healthy' || item.status === 'Configured' || item.status === 'Enabled' ? 'status-pill-positive' : 'status-pill-neutral'}>
                       {item.status}
                     </span>
                   </div>
-                  <div className="mt-2 text-sm text-slate-400">{item.detail}</div>
+                  <div className="mt-2 text-sm text-[#6f6578]">{item.detail}</div>
                 </div>
               ))}
             </div>
@@ -259,12 +262,12 @@ export function GeneralPage() {
 
           <section className="panel-subtle">
             <div className="flex items-center gap-3">
-              <CalendarDays className="h-5 w-5 text-cyan-300" />
-              <h2 className="text-lg font-semibold text-white">Downstream effects</h2>
+              <CalendarDays className="h-5 w-5 text-[#7a3ccf]" />
+              <h2 className="text-lg font-semibold text-[#241232]">Downstream effects</h2>
             </div>
             <div className="mt-5 space-y-3">
               {snapshot?.records.downstreamEffects.map((item) => (
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4 text-sm text-slate-300" key={item}>
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#4f435c]" key={item}>
                   {item}
                 </div>
               ))}
@@ -272,6 +275,43 @@ export function GeneralPage() {
           </section>
         </div>
       </section>
+
+      <RegModal
+        description="Review the tenant operating defaults before they are applied to downstream due dates, reviewer routing, and workspace presentation."
+        footer={
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button className="button-secondary" disabled={saving} onClick={() => setReviewSaveOpen(false)} type="button">
+              Cancel
+            </button>
+            <button className="button-primary" disabled={saving} onClick={() => void handleSave()} type="button">
+              {saving ? 'Saving...' : 'Save general settings'}
+            </button>
+          </div>
+        }
+        onOpenChange={setReviewSaveOpen}
+        open={reviewSaveOpen}
+        title="Save general settings"
+      >
+        <div className="space-y-4 text-sm text-[#4f435c]">
+          <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+            <div className="font-semibold text-[#241232]">{draft.organizationName || 'Unnamed organization'}</div>
+            <div className="mt-2 text-[#6f6578]">Workspace label: {draft.workspaceLabel || 'Not set'}</div>
+            <div className="mt-1 text-[#6f6578]">
+              Timezone: {draft.timezone} · Locale: {draft.locale} · Due time: {draft.defaultDueTime}
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-3xl border border-[#ded8e4] bg-white p-4">
+              <div className="label">Working days</div>
+              <div className="mt-2 font-semibold text-[#241232]">{draft.workingDays.length} selected</div>
+            </div>
+            <div className="rounded-3xl border border-[#ded8e4] bg-white p-4">
+              <div className="label">Change freeze</div>
+              <div className="mt-2 font-semibold text-[#241232]">{draft.changeFreezeEnabled ? 'Enabled' : 'Disabled'}</div>
+            </div>
+          </div>
+        </div>
+      </RegModal>
     </div>
   );
 }

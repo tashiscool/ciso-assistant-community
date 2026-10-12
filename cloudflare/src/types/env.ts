@@ -33,6 +33,11 @@ export type VectorizeBinding = {
 };
 
 export type EnvBindings = {
+  SERVICE_DELIVERY_ENABLED?: string;
+  SERVICE_COORDINATOR?: DurableObjectNamespace;
+  SERVICE_DONATION_STRIPE_KEY?: string;
+  SERVICE_DONATION_WEBHOOK_SECRET?: string;
+  SERVICE_DONATION_RETURN_URL?: string;
   APP_ENV: string;
   APP_ORIGIN?: string;
   ASSETS: Fetcher;
@@ -76,7 +81,7 @@ export type ConMonJobMessage = {
   requestedBy: string | null;
 };
 
-export type QueueMessagePayload = EvidenceJobMessage | ConMonJobMessage;
+export type QueueMessagePayload = EvidenceJobMessage | ConMonJobMessage | GrcQueueMessage;
 
 export type GrcQueueMessage =
   | {

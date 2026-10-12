@@ -97,8 +97,8 @@ export function ExportBuilderDocxGuidePage() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">Builders</div>
-            <h1 className="mt-2 text-3xl font-semibold text-white">Creating an Export Builder DOCX Template</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Creating an Export Builder DOCX Template</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
               Help administrators and content authors design DOCX templates that use <code>{'{{field_name}}'}</code>{' '}
               placeholder tags for Regovise exports, preserve Word formatting, and stay friendly to auto-mapping and preview validation.
             </p>
@@ -118,22 +118,22 @@ export function ExportBuilderDocxGuidePage() {
         <div className="metric-card">
           <div className="metric-label">DOCX Starters</div>
           <div className="metric-value">{loading ? '…' : starterTemplates.length}</div>
-          <div className="mt-2 text-xs text-slate-500">System templates available for copy-and-customize.</div>
+          <div className="mt-2 text-xs text-[#62576a]">System templates available for copy-and-customize.</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Placeholder Syntax</div>
           <div className="metric-value">{'{{ }}'}</div>
-          <div className="mt-2 text-xs text-slate-500">Use double curly braces for every field token.</div>
+          <div className="mt-2 text-xs text-[#62576a]">Use double curly braces for every field token.</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Best Practice</div>
           <div className="metric-value">Preview + lint</div>
-          <div className="mt-2 text-xs text-slate-500">Validate before activation inside Export Builder.</div>
+          <div className="mt-2 text-xs text-[#62576a]">Validate before activation inside Export Builder.</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Image Support</div>
           <div className="metric-value">Textbox</div>
-          <div className="mt-2 text-xs text-slate-500">Place images in Word textboxes for better scaling behavior.</div>
+          <div className="mt-2 text-xs text-[#62576a]">Place images in Word textboxes for better scaling behavior.</div>
         </div>
       </section>
 
@@ -141,21 +141,21 @@ export function ExportBuilderDocxGuidePage() {
         <div className="space-y-6">
           <div className="panel-subtle">
             <div className="eyebrow">Authoring Rules</div>
-            <div className="mt-4 space-y-3 text-sm text-slate-300">
+            <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 text-cyan-300" />
+                <CheckCircle2 className="mt-0.5 h-4 w-4 text-[#7a3ccf]" />
                 <div>Use <code>{'{{double_curly_braces}}'}</code> for every placeholder tag.</div>
               </div>
               <div className="flex items-start gap-3">
-                <Sparkles className="mt-0.5 h-4 w-4 text-cyan-300" />
+                <Sparkles className="mt-0.5 h-4 w-4 text-[#7a3ccf]" />
                 <div>Tag names should mirror field names where possible so auto-mapping scores stay high.</div>
               </div>
               <div className="flex items-start gap-3">
-                <ImageIcon className="mt-0.5 h-4 w-4 text-cyan-300" />
+                <ImageIcon className="mt-0.5 h-4 w-4 text-[#7a3ccf]" />
                 <div>Place image placeholders inside Word textboxes for more predictable export rendering.</div>
               </div>
               <div className="flex items-start gap-3">
-                <ListTree className="mt-0.5 h-4 w-4 text-cyan-300" />
+                <ListTree className="mt-0.5 h-4 w-4 text-[#7a3ccf]" />
                 <div>Keep repeating child-record placeholders inside a consistent repeated row or block.</div>
               </div>
             </div>
@@ -165,14 +165,14 @@ export function ExportBuilderDocxGuidePage() {
             <div className="eyebrow">Placeholder Reference</div>
             <div className="mt-4 overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="text-left text-slate-400">
+                <thead className="text-left text-[#6f6578]">
                   <tr>
                     <th className="pb-3 pr-4 font-medium">Type</th>
                     <th className="pb-3 pr-4 font-medium">Example</th>
                     <th className="pb-3 font-medium">Usage</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/10 text-slate-300">
+                <tbody className="divide-y divide-[#ded8e4] text-[#4f435c]">
                   {[
                     ['Text', '{{systemname}}', 'Direct system metadata and headings'],
                     ['Date (MM/DD/YYYY)', '{{authorizationDate}}', 'UTC date output for approvals and cover sheets'],
@@ -197,28 +197,28 @@ export function ExportBuilderDocxGuidePage() {
 
           <div className="panel-subtle">
             <div className="eyebrow">Tables, Lists, And Checkbox Patterns</div>
-            <div className="mt-4 space-y-4 text-sm text-slate-300">
+            <div className="mt-4 space-y-4 text-sm text-[#4f435c]">
               <div>
-                <div className="font-medium text-white">Static table</div>
-                <div className="mt-2 rounded-2xl border border-white/10 bg-slate-950/60 p-3 font-mono">
+                <div className="font-medium text-[#241232]">Static table</div>
+                <div className="mt-2 rounded-2xl border border-[#ded8e4] bg-white p-3 font-mono">
                   Security Plan ID: {'{{securityplanid}}'} · System Name: {'{{systemname}}'} · Categorization: {'{{categorization}}'}
                 </div>
               </div>
               <div>
-                <div className="font-medium text-white">Repeating table row</div>
-                <div className="mt-2 rounded-2xl border border-white/10 bg-slate-950/60 p-3 font-mono">
+                <div className="font-medium text-[#241232]">Repeating table row</div>
+                <div className="mt-2 rounded-2xl border border-[#ded8e4] bg-white p-3 font-mono">
                   {'{{issueid}}'} | {'{{title}}'} | {'{{severity}}'} | {'{{issueowner}}'}
                 </div>
               </div>
               <div>
-                <div className="font-medium text-white">Bullet list</div>
-                <div className="mt-2 rounded-2xl border border-white/10 bg-slate-950/60 p-3 font-mono">
+                <div className="font-medium text-[#241232]">Bullet list</div>
+                <div className="mt-2 rounded-2xl border border-[#ded8e4] bg-white p-3 font-mono">
                   • {'{{levauthtitle}}'}
                 </div>
               </div>
               <div>
-                <div className="font-medium text-white">Standard and Yes/No checkboxes</div>
-                <div className="mt-2 rounded-2xl border border-white/10 bg-slate-950/60 p-3 font-mono">
+                <div className="font-medium text-[#241232]">Standard and Yes/No checkboxes</div>
+                <div className="mt-2 rounded-2xl border border-[#ded8e4] bg-white p-3 font-mono">
                   {'{{chkbox-01}}'} Authorization · {'{{chkbox-02}}'} Capture · {'{{chkboxYN-01}}'} Yes/No
                 </div>
               </div>
@@ -229,14 +229,14 @@ export function ExportBuilderDocxGuidePage() {
             <div className="eyebrow">Starter DOCX Templates</div>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {starterTemplates.map((template) => (
-                <div key={template.id} className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
-                  <div className="font-medium text-white">{template.title}</div>
-                  <div className="mt-1 text-sm text-slate-400">
+                <div key={template.id} className="rounded-2xl border border-[#ded8e4] bg-white p-4">
+                  <div className="font-medium text-[#241232]">{template.title}</div>
+                  <div className="mt-1 text-sm text-[#6f6578]">
                     {template.module} · {template.defaultFileName}
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="badge-neutral">{template.exportGroup}</span>
-                    <span className="badge-neutral">{template.defaultTags.length} starter tags</span>
+                    <span className="status-pill-neutral">{template.exportGroup}</span>
+                    <span className="status-pill-neutral">{template.defaultTags.length} starter tags</span>
                   </div>
                 </div>
               ))}
@@ -253,8 +253,8 @@ export function ExportBuilderDocxGuidePage() {
                   key={example.id}
                   className={`rounded-2xl border px-3 py-2 text-sm transition ${
                     selectedExample.id === example.id
-                      ? 'border-cyan-300/30 bg-cyan-400/[0.06] text-cyan-100'
-                      : 'border-white/10 bg-slate-950/60 text-slate-300 hover:border-cyan-300/20'
+                      ? 'border-[#d7c3f1] bg-[#f2e8ff] text-[#5f1aa8]'
+                      : 'border-[#ded8e4] bg-white text-[#4f435c] hover:border-[#d7c3f1]'
                   }`}
                   onClick={() => setSelectedExampleId(example.id)}
                   type="button"
@@ -267,18 +267,18 @@ export function ExportBuilderDocxGuidePage() {
 
           <div className="panel-subtle">
             <div className="eyebrow">Live Example Preview</div>
-            <h3 className="mt-2 text-lg font-semibold text-white">{selectedExample.label}</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-300">{selectedExample.summary}</p>
+            <h3 className="mt-2 text-lg font-semibold text-[#241232]">{selectedExample.label}</h3>
+            <p className="mt-2 text-sm leading-6 text-[#4f435c]">{selectedExample.summary}</p>
             <div className="mt-4 space-y-3">
               {selectedExample.preview.map((line) => (
-                <div key={line} className="rounded-2xl border border-white/10 bg-slate-950/60 p-3 font-mono text-sm text-slate-300">
+                <div key={line} className="rounded-2xl border border-[#ded8e4] bg-white p-3 font-mono text-sm text-[#4f435c]">
                   {line}
                 </div>
               ))}
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
               {selectedExample.placeholders.map((placeholder) => (
-                <span key={placeholder} className="badge-neutral">
+                <span key={placeholder} className="status-pill-neutral">
                   <code>{placeholder}</code>
                 </span>
               ))}
@@ -289,11 +289,11 @@ export function ExportBuilderDocxGuidePage() {
             <div className="eyebrow">Template Lint Panel</div>
             <div className="mt-4 space-y-3">
               {lintNotes.map((note) => (
-                <div key={note} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-sm text-slate-300">
+                <div key={note} className="flex items-start gap-3 rounded-2xl border border-[#ded8e4] bg-white p-3 text-sm text-[#4f435c]">
                   {note.includes('malformed') ? (
-                    <AlertTriangle className="mt-0.5 h-4 w-4 text-amber-300" />
+                    <AlertTriangle className="mt-0.5 h-4 w-4 text-[#8a4d00]" />
                   ) : (
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-cyan-300" />
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-[#7a3ccf]" />
                   )}
                   <div>{note}</div>
                 </div>

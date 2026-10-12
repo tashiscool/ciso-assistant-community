@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Archive, Eye, History, Link2, Pencil, ShieldCheck } from 'lucide-react';
 import { getFormBuilderModule, listFormBuilderModules } from '../builders/formApi';
 import { evaluateFormRuntime, type FormRuntimeResult } from '../builders/formRules';
 import type { FormBuilderDetail, FormField, FormSection } from '../builders/formTypes';
 import type { WorkspaceFolder } from '../iam/types';
+import { RegActionMenu, RegModal, RegRightDrawer, RegStatusPill } from '../../components/regovise/PagePrimitives';
 import { ApiClient } from '../../shared/api/client';
 import {
   archiveModuleRecord,
@@ -59,6 +61,8 @@ type ModuleDraft = {
   links: ModuleRecordLink[];
   note: string;
 };
+
+type RecordActionDrawer = 'overview' | 'edit' | 'links' | 'activity' | null;
 
 const MODULE_WORKSPACE_GUIDANCE: Record<
   string,
@@ -583,6 +587,50 @@ function isoDateOnly(value: string | null | undefined) {
 
 function normalizeText(value: unknown) {
   return typeof value === 'string' ? value : value == null ? '' : String(value);
+}
+
+function humanizeDataKey(key: string) {
+  return key
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function formatRecordValue(value: unknown) {
+  if (Array.isArray(value)) {
+    return value.map((item) => normalizeText(item).trim()).filter(Boolean).join(', ');
+  }
+  if (value && typeof value === 'object') {
+    return JSON.stringify(value);
+  }
+  if (typeof value === 'boolean') {
+    return value ? 'Yes' : 'No';
+  }
+  return normalizeText(value).trim();
+}
+
+function recordDataEntries(data: Record<string, unknown>, sections: RenderableSection[]) {
+  const labels = new Map<string, string>();
+  for (const section of sections) {
+    for (const field of section.fields) {
+      labels.set(field.systemName, field.displayName);
+    }
+  }
+
+  return Object.entries(data)
+    .map(([key, value]) => ({
+      key,
+      label: labels.get(key) ?? humanizeDataKey(key),
+      value: formatRecordValue(value),
+    }))
+    .filter((entry) => entry.value.length > 0);
+}
+
+function findTitleDataKey(sections: RenderableSection[]) {
+  const preferred = ['title', 'name', 'vendor_name', 'policy_name', 'plan_name'];
+  const fields = sections.flatMap((section) => section.fields);
+  return preferred.find((key) => fields.some((field) => field.systemName === key)) ?? 'title';
 }
 
 function joinControlRefs(value: unknown) {
@@ -3608,6 +3656,8 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
   const [notice, setNotice] = useState<string | null>(null);
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [recordActionDrawer, setRecordActionDrawer] = useState<RecordActionDrawer>(null);
+  const [archiveReviewOpen, setArchiveReviewOpen] = useState(false);
   const [filters, setFilters] = useState({
     q: '',
     status: '',
@@ -3646,6 +3696,19 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
   const activeRecordData = draft?.data ?? selectedRecord?.data ?? {};
   const highlights = moduleEntry ? moduleRecordHighlights(moduleEntry.moduleKey, activeRecordData) : [];
   const workspaceMetrics = moduleEntry ? moduleWorkspaceMetrics(moduleEntry.moduleKey, records) : null;
+  const detailDataEntries = useMemo(
+    () => recordDataEntries(selectedRecord?.data ?? activeRecordData, renderableSections),
+    [activeRecordData, renderableSections, selectedRecord],
+  );
+  const titleDataKey = useMemo(() => findTitleDataKey(baseRenderableSections), [baseRenderableSections]);
+  const drawerFields = useMemo(
+    () =>
+      renderableSections
+        .flatMap((section) => section.fields)
+        .filter((field) => field.systemName !== titleDataKey && field.systemName !== 'status')
+        .slice(0, 8),
+    [renderableSections, titleDataKey],
+  );
 
   async function loadMetadata() {
     if (!moduleKey) {
@@ -3716,6 +3779,11 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
   useEffect(() => {
     void loadRecords();
   }, [moduleKey, filters.q, filters.status, filters.folderId, filters.includeArchived, requestedRecordId]);
+
+  useEffect(() => {
+    setRecordActionDrawer(null);
+    setArchiveReviewOpen(false);
+  }, [moduleKey, selectedRecordId, isCreating]);
 
   useEffect(() => {
     if (searchParams.get('create') === 'true') {
@@ -3799,6 +3867,7 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
         return next;
       }, { replace: true });
       await loadRecords();
+      setRecordActionDrawer(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to save the current module record.');
     } finally {
@@ -3825,6 +3894,8 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
         return next;
       }, { replace: true });
       await loadRecords();
+      setArchiveReviewOpen(false);
+      setRecordActionDrawer(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to archive the current record.');
     } finally {
@@ -3832,8 +3903,170 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
     }
   }
 
+  function updateDraftField(field: RenderableField, value: unknown) {
+    setDraft((current) =>
+      current
+        ? {
+            ...current,
+            status: field.systemName === 'status' ? normalizeText(value) : current.status,
+            data: {
+              ...current.data,
+              [field.systemName]: value,
+            },
+          }
+        : current,
+    );
+  }
+
+  function updateDraftDataValue(key: string, value: unknown) {
+    setDraft((current) =>
+      current
+        ? {
+            ...current,
+            status: key === 'status' ? normalizeText(value) : current.status,
+            data: {
+              ...current.data,
+              [key]: value,
+            },
+          }
+        : current,
+    );
+  }
+
+  function addDraftLink(preset?: { relationType: string; label: string; route: string }) {
+    setDraft((current) =>
+      current
+        ? {
+            ...current,
+            links: [
+              ...current.links,
+              {
+                id: crypto.randomUUID(),
+                relationType: preset?.relationType ?? 'evidence',
+                targetType: 'route',
+                targetId: null,
+                label: preset?.label ?? '',
+                route: preset?.route ?? '',
+              },
+            ],
+          }
+        : current,
+    );
+  }
+
+  function updateDraftLink(index: number, patch: Partial<ModuleRecordLink>) {
+    setDraft((current) =>
+      current
+        ? {
+            ...current,
+            links: current.links.map((link, linkIndex) => (linkIndex === index ? { ...link, ...patch } : link)),
+          }
+        : current,
+    );
+  }
+
+  function removeDraftLink(index: number) {
+    setDraft((current) =>
+      current
+        ? {
+            ...current,
+            links: current.links.filter((_, linkIndex) => linkIndex !== index),
+          }
+        : current,
+    );
+  }
+
+  function renderDrawerDraftField(field: RenderableField) {
+    const commonLabel = (
+      <span className="label">
+        {field.displayName}
+        {field.required ? ' *' : ''}
+      </span>
+    );
+
+    if (isSelectField(field)) {
+      return (
+        <label className="space-y-1" key={field.id}>
+          {commonLabel}
+          <select
+            className="input"
+            disabled={!field.editable}
+            onChange={(event) => updateDraftField(field, event.target.value)}
+            value={normalizeText(draft?.data[field.systemName])}
+          >
+            <option value="">Not set</option>
+            {field.choices.map((choice) => (
+              <option key={choice} value={choice}>
+                {choice}
+              </option>
+            ))}
+          </select>
+          {field.helpText ? <div className="text-xs text-[#62576a]">{field.helpText}</div> : null}
+        </label>
+      );
+    }
+
+    if (isTextAreaField(field)) {
+      return (
+        <label className="space-y-1 md:col-span-2" key={field.id}>
+          {commonLabel}
+          <textarea
+            className="input min-h-[96px]"
+            disabled={!field.editable}
+            onChange={(event) => updateDraftField(field, event.target.value)}
+            value={normalizeText(draft?.data[field.systemName])}
+          />
+          {field.helpText ? <div className="text-xs text-[#62576a]">{field.helpText}</div> : null}
+        </label>
+      );
+    }
+
+    if (isBooleanField(field)) {
+      return (
+        <div className="space-y-1" key={field.id}>
+          {commonLabel}
+          <label className="flex items-center gap-3 rounded-lg border border-[#ded8e4] bg-white px-3 py-2 text-sm text-[#51465e]">
+            <input
+              checked={Boolean(draft?.data[field.systemName])}
+              disabled={!field.editable}
+              onChange={(event) => updateDraftField(field, event.target.checked)}
+              type="checkbox"
+            />
+            Enabled
+          </label>
+          {field.helpText ? <div className="text-xs text-[#62576a]">{field.helpText}</div> : null}
+        </div>
+      );
+    }
+
+    return (
+      <label className="space-y-1" key={field.id}>
+        {commonLabel}
+        <input
+          className="input"
+          disabled={!field.editable}
+          onChange={(event) =>
+            updateDraftField(
+              field,
+              isNumericField(field) ? (event.target.value ? Number(event.target.value) : '') : event.target.value,
+            )
+          }
+          type={isDateField(field) ? 'date' : isNumericField(field) ? 'number' : 'text'}
+          value={
+            isNumericField(field)
+              ? draft?.data[field.systemName] === ''
+                ? ''
+                : String(draft?.data[field.systemName] ?? '')
+              : normalizeText(draft?.data[field.systemName])
+          }
+        />
+        {field.helpText ? <div className="text-xs text-[#62576a]">{field.helpText}</div> : null}
+      </label>
+    );
+  }
+
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading tenant module workspace...</div>;
+    return <div className="panel p-6 text-sm text-[#51465e]">Loading tenant module workspace...</div>;
   }
 
   if (!moduleEntry) {
@@ -3845,8 +4078,8 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
       <div className="space-y-6">
         <section className="panel">
           <div className="eyebrow">Modules</div>
-          <h1 className="mt-2 text-3xl font-semibold text-white">{moduleEntry.pluralName}</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold text-[#241232]">{moduleEntry.pluralName}</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">
             {moduleEntry.pluralName} use a stronger tenant-facing surface outside the shared records workspace.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
@@ -3868,8 +4101,8 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="eyebrow">Modules</div>
-            <h1 className="mt-2 text-3xl font-semibold text-white">{moduleEntry.pluralName}</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">{moduleEntry.description}</p>
+            <h1 className="mt-2 text-3xl font-semibold text-[#241232]">{moduleEntry.pluralName}</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">{moduleEntry.description}</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <button
@@ -3898,20 +4131,20 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
           <div className="mt-5 grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
             <div className="panel-subtle">
               <div className="eyebrow">Module Definition</div>
-              <h2 className="mt-2 text-lg font-semibold text-white">What this module manages</h2>
-              <p className="mt-3 text-sm leading-6 text-slate-300">{moduleGuidance.definition}</p>
+              <h2 className="mt-2 text-lg font-semibold text-[#241232]">What this module manages</h2>
+              <p className="mt-3 text-sm leading-6 text-[#51465e]">{moduleGuidance.definition}</p>
             </div>
             <div className="panel-subtle">
               <div className="eyebrow">How to use it</div>
-              <h2 className="mt-2 text-lg font-semibold text-white">
+              <h2 className="mt-2 text-lg font-semibold text-[#241232]">
                 {moduleGuidance.usageHeading ?? 'Workspace focus'}
               </h2>
-              <div className="mt-3 space-y-2 text-sm leading-6 text-slate-300">
+              <div className="mt-3 space-y-2 text-sm leading-6 text-[#51465e]">
                 {moduleGuidance.focusAreas.map((item) => (
                   <div key={item}>- {item}</div>
                 ))}
               </div>
-              <div className="mt-3 text-xs uppercase tracking-[0.18em] text-slate-500">
+              <div className="mt-3 text-xs uppercase tracking-[0.18em] text-[#62576a]">
                 {moduleGuidance.relationshipHint}
               </div>
             </div>
@@ -3926,7 +4159,7 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
           ]).map((metric) => (
             <div className="metric-card" key={metric.label}>
               <div className="metric-label">{metric.label}</div>
-              <div className="mt-3 text-lg font-semibold text-white">{metric.value}</div>
+              <div className="mt-3 text-lg font-semibold text-[#241232]">{metric.value}</div>
             </div>
           ))}
         </div>
@@ -3935,15 +4168,15 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
       {notice ? <div className="notice-success">{notice}</div> : null}
       {error ? <div className="notice-error">{error}</div> : null}
 
-      <section className="grid gap-6 xl:grid-cols-[0.88fr_1.12fr]">
-        <section className="space-y-6">
+      <section className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)]">
+        <section className="min-w-0 space-y-6">
           <div className="panel space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="eyebrow">Registry</div>
-                <h2 className="mt-2 text-xl font-semibold text-white">{moduleEntry.pluralName} register</h2>
+                <h2 className="mt-2 text-xl font-semibold text-[#241232]">{moduleEntry.pluralName} register</h2>
               </div>
-              <div className="badge-neutral">{records.length} records</div>
+              <RegStatusPill tone="purple">{records.length} records</RegStatusPill>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               <label className="space-y-1">
@@ -3979,7 +4212,7 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                   value={filters.status}
                 />
               </label>
-              <label className="mt-7 flex items-center gap-3 text-sm text-slate-300">
+              <label className="mt-7 flex items-center gap-3 text-sm text-[#51465e]">
                 <input
                   checked={filters.includeArchived}
                   onChange={(event) =>
@@ -3994,9 +4227,9 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
 
           <section className="panel space-y-3">
             {recordsLoading ? (
-              <div className="text-sm text-slate-300">Loading register records...</div>
+              <div className="text-sm text-[#51465e]">Loading register records...</div>
             ) : records.length === 0 ? (
-              <div className="panel-subtle text-sm text-slate-300">
+              <div className="panel-subtle text-sm text-[#51465e]">
                 {moduleGuidance?.emptyState ??
                   `No ${moduleEntry.pluralName.toLowerCase()} have been created yet. Use the shared module workspace to add the first tenant-facing record.`}
               </div>
@@ -4006,8 +4239,8 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                   className={[
                     'w-full rounded-3xl border p-4 text-left transition',
                     !isCreating && selectedRecordId === record.id
-                      ? 'border-cyan-300/50 bg-cyan-400/10'
-                      : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.05]',
+                      ? 'border-[#8b35e6]/45 bg-[#f3e9ff]'
+                      : 'border-[#ded8e4] bg-white hover:bg-[#f6f1fa]',
                   ].join(' ')}
                   key={record.id}
                   onClick={() => {
@@ -4025,31 +4258,31 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                   {moduleRecordBadges(moduleEntry.moduleKey, record).length > 0 ? (
                     <div className="mb-3 flex flex-wrap gap-2">
                       {moduleRecordBadges(moduleEntry.moduleKey, record).map((badge) => (
-                        <span className="badge-neutral" key={`${record.id}-${badge}`}>
+                        <RegStatusPill tone="neutral" key={`${record.id}-${badge}`}>
                           {badge}
-                        </span>
+                        </RegStatusPill>
                       ))}
                     </div>
                   ) : null}
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="font-medium text-white">{record.title}</div>
-                    <span className={record.archived ? 'badge-neutral' : 'badge-success'}>
+                    <div className="font-medium text-[#241232]">{record.title}</div>
+                    <RegStatusPill tone={record.archived ? 'neutral' : 'success'}>
                       {record.status || 'draft'}
-                    </span>
+                    </RegStatusPill>
                   </div>
-                  <div className="mt-2 text-xs uppercase tracking-[0.18em] text-slate-500">
+                  <div className="mt-2 text-xs uppercase tracking-[0.18em] text-[#62576a]">
                     {domainFolders.find((folder) => folder.id === record.folderId)?.pathLabel ?? 'Domain scope unavailable'}
                   </div>
                   {moduleRecordSecondaryText(moduleEntry.moduleKey, record) ? (
-                    <div className="mt-3 max-h-[4.5rem] overflow-hidden text-sm leading-6 text-slate-400">
+                    <div className="mt-3 max-h-[4.5rem] overflow-hidden text-sm leading-6 text-[#6f6578]">
                       {moduleRecordSecondaryText(moduleEntry.moduleKey, record)}
                     </div>
                   ) : null}
                   <div className="mt-3 flex flex-wrap gap-2">
                     {recordDateChips(record).slice(0, 3).map(([label, value]) => (
-                      <span className="badge-neutral" key={`${record.id}-${label}`}>
+                      <RegStatusPill tone="neutral" key={`${record.id}-${label}`}>
                         {label}: {formatDate(value)}
-                      </span>
+                      </RegStatusPill>
                     ))}
                   </div>
                 </button>
@@ -4058,12 +4291,12 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
           </section>
         </section>
 
-        <section className="space-y-6">
+        <section className="min-w-0 space-y-6">
           <section className="panel">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="eyebrow">{isCreating || !selectedRecord ? 'Create Record' : 'Record Detail'}</div>
-                <h2 className="mt-2 text-2xl font-semibold text-white">
+                <h2 className="mt-2 text-2xl font-semibold text-[#241232]">
                   {isCreating || !selectedRecord ? `New ${moduleEntry.moduleName}` : selectedRecord.title}
                 </h2>
               </div>
@@ -4077,9 +4310,47 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                   </Link>
                 ) : null}
                 {!isCreating && selectedRecord ? (
-                  <button className="button-secondary" disabled={busy} onClick={() => void archiveRecord()} type="button">
-                    Archive
-                  </button>
+                  <RegActionMenu
+                    actions={[
+                      {
+                        label: 'Inspect record',
+                        icon: Eye,
+                        onSelect: () => setRecordActionDrawer('overview'),
+                      },
+                      {
+                        label: 'Edit core fields',
+                        icon: Pencil,
+                        onSelect: () => setRecordActionDrawer('edit'),
+                      },
+                      {
+                        label: 'Manage relationships',
+                        icon: Link2,
+                        onSelect: () => setRecordActionDrawer('links'),
+                      },
+                      {
+                        label: 'Review activity',
+                        icon: History,
+                        onSelect: () => setRecordActionDrawer('activity'),
+                      },
+                      ...(SCRUTINY_SOURCE_MODULES.has(moduleEntry.moduleKey)
+                        ? [
+                            {
+                              label: 'Generate scrutiny run',
+                              icon: ShieldCheck,
+                              to: `/grc-admin/scrutiny-engine?moduleKey=${encodeURIComponent(moduleEntry.moduleKey)}&recordId=${encodeURIComponent(selectedRecord.id)}&controlRefs=${encodeURIComponent(joinControlRefs(selectedRecord.data.controlRefs))}`,
+                            },
+                          ]
+                        : []),
+                      {
+                        label: 'Archive record',
+                        icon: Archive,
+                        destructive: true,
+                        disabled: busy,
+                        onSelect: () => setArchiveReviewOpen(true),
+                      },
+                    ]}
+                    label={`Open record actions for ${selectedRecord.title}`}
+                  />
                 ) : null}
                 <button className="button-primary" disabled={busy || !draft} onClick={() => void saveRecord()} type="button">
                   {busy ? 'Saving...' : isCreating || !selectedRecord ? 'Create Record' : 'Save Changes'}
@@ -4124,7 +4395,7 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                   <div className="space-y-4" key={section.id}>
                     <div className="panel-subtle">
                       <div className="eyebrow">Schema Section</div>
-                      <h3 className="mt-2 text-lg font-semibold text-white">{section.displayName}</h3>
+                      <h3 className="mt-2 text-lg font-semibold text-[#241232]">{section.displayName}</h3>
                     </div>
                     <div className="grid gap-4 md:grid-cols-2">
                       {section.fields.map((field) => (
@@ -4184,7 +4455,7 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                               value={normalizeText(draft.data[field.systemName])}
                             />
                           ) : isBooleanField(field) ? (
-                            <label className="mt-3 flex items-center gap-3 text-sm text-slate-300">
+                            <label className="mt-3 flex items-center gap-3 text-sm text-[#51465e]">
                               <input
                                 checked={Boolean(draft.data[field.systemName])}
                                 disabled={!field.editable}
@@ -4238,10 +4509,10 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                               }
                             />
                           )}
-                          {field.helpText ? <div className="text-xs text-slate-500">{field.helpText}</div> : null}
-                          {!field.editable ? <div className="text-xs text-slate-500">Read-only by Form Builder rule.</div> : null}
+                          {field.helpText ? <div className="text-xs text-[#62576a]">{field.helpText}</div> : null}
+                          {!field.editable ? <div className="text-xs text-[#62576a]">Read-only by Form Builder rule.</div> : null}
                           {field.errors.map((message) => (
-                            <div className="text-xs text-rose-200" key={`${field.systemName}-${message}`}>
+                            <div className="text-xs text-[#9d1f2c]" key={`${field.systemName}-${message}`}>
                               {message}
                             </div>
                           ))}
@@ -4255,7 +4526,7 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <div className="eyebrow">Relationships</div>
-                      <h3 className="mt-2 text-lg font-semibold text-white">Linked records and evidence</h3>
+                      <h3 className="mt-2 text-lg font-semibold text-[#241232]">Linked records and evidence</h3>
                     </div>
                     <button
                       className="button-secondary"
@@ -4318,12 +4589,12 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
                     </div>
                   ) : null}
                   {draft.links.length === 0 ? (
-                    <div className="panel-subtle text-sm text-slate-400">
+                    <div className="panel-subtle text-sm text-[#6f6578]">
                       Add evidence, assessment, task, or cross-module links so this record can participate in related workflows.
                     </div>
                   ) : (
                     draft.links.map((link, index) => (
-                      <div className="grid gap-3 rounded-3xl border border-white/10 bg-white/[0.03] p-4 md:grid-cols-3" key={link.id}>
+                      <div className="grid gap-3 rounded-3xl border border-[#ded8e4] bg-white p-4 md:grid-cols-3" key={link.id}>
                         <label className="space-y-1">
                           <span className="label">Relationship</span>
                           <input
@@ -4399,19 +4670,19 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
             ) : null}
           </section>
 
-          <section className="grid gap-6 xl:grid-cols-2">
+          <section className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-2">
             {highlights.length > 0 ? (
               <div className="panel-subtle xl:col-span-2">
                 <div className="eyebrow">Module Summary</div>
-                <h3 className="mt-2 text-lg font-semibold text-white">Capability posture</h3>
+                <h3 className="mt-2 text-lg font-semibold text-[#241232]">Capability posture</h3>
                 <div className="mt-4 grid gap-4 md:grid-cols-2">
                   {highlights.map((highlight) => (
-                    <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-4" key={highlight.title + highlight.body}>
+                    <div className="rounded-3xl border border-[#ded8e4] bg-white p-4" key={highlight.title + highlight.body}>
                       {highlight.eyebrow ? (
-                        <div className="text-xs uppercase tracking-[0.18em] text-slate-500">{highlight.eyebrow}</div>
+                        <div className="text-xs uppercase tracking-[0.18em] text-[#62576a]">{highlight.eyebrow}</div>
                       ) : null}
-                      <div className="mt-2 font-medium text-white">{highlight.title}</div>
-                      <div className="mt-3 text-sm leading-6 text-slate-300">{highlight.body}</div>
+                      <div className="mt-2 font-medium text-[#241232]">{highlight.title}</div>
+                      <div className="mt-3 text-sm leading-6 text-[#51465e]">{highlight.body}</div>
                     </div>
                   ))}
                 </div>
@@ -4420,7 +4691,7 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
 
             <div className="panel-subtle">
               <div className="eyebrow">Quick Actions</div>
-              <h3 className="mt-2 text-lg font-semibold text-white">Builder and reporting hooks</h3>
+              <h3 className="mt-2 text-lg font-semibold text-[#241232]">Builder and reporting hooks</h3>
               <div className="mt-4 flex flex-wrap gap-3">
                 <Link className="button-secondary" to={`/builders/form-builder?moduleKey=${encodeURIComponent(moduleEntry.moduleKey)}`}>
                   Form Builder
@@ -4453,33 +4724,33 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
 
             <div className="panel-subtle">
               <div className="eyebrow">Related Modules</div>
-              <h3 className="mt-2 text-lg font-semibold text-white">Program context</h3>
+              <h3 className="mt-2 text-lg font-semibold text-[#241232]">Program context</h3>
               <div className="mt-4 flex flex-wrap gap-2">
                 {moduleEntry.relatedModules.map((related) => (
-                  <Link className="badge-neutral transition hover:text-white" key={related} to={`/modules/${related}`}>
-                    {related}
+                  <Link className="transition hover:opacity-80" key={related} to={`/modules/${related}`}>
+                    <RegStatusPill tone="neutral">{related}</RegStatusPill>
                   </Link>
                 ))}
               </div>
             </div>
           </section>
 
-          <section className="grid gap-6 xl:grid-cols-2">
+          <section className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-2">
             <div className="panel-subtle">
               <div className="eyebrow">Evidence</div>
-              <h3 className="mt-2 text-lg font-semibold text-white">Evidence links</h3>
+              <h3 className="mt-2 text-lg font-semibold text-[#241232]">Evidence links</h3>
               <div className="mt-4 space-y-3">
                 {(selectedRecord?.links ?? []).filter((link) => link.relationType.toLowerCase().includes('evidence')).length === 0 ? (
-                  <div className="text-sm text-slate-400">No evidence links recorded yet.</div>
+                  <div className="text-sm text-[#6f6578]">No evidence links recorded yet.</div>
                 ) : (
                   (selectedRecord?.links ?? [])
                     .filter((link) => link.relationType.toLowerCase().includes('evidence'))
                     .map((link) => (
-                      <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-4" key={link.id}>
-                        <div className="font-medium text-white">{link.label || 'Evidence link'}</div>
-                        <div className="mt-2 text-xs uppercase tracking-[0.18em] text-slate-500">{link.relationType}</div>
+                      <div className="rounded-3xl border border-[#ded8e4] bg-white p-4" key={link.id}>
+                        <div className="font-medium text-[#241232]">{link.label || 'Evidence link'}</div>
+                        <div className="mt-2 text-xs uppercase tracking-[0.18em] text-[#62576a]">{link.relationType}</div>
                         {link.route ? (
-                          <Link className="mt-3 inline-flex text-sm text-cyan-200 transition hover:text-cyan-100" to={link.route}>
+                          <Link className="mt-3 inline-flex text-sm text-[#6d28d9] transition hover:text-[#5f1aa8]" to={link.route}>
                             Open route
                           </Link>
                         ) : null}
@@ -4491,18 +4762,18 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
 
             <div className="panel-subtle">
               <div className="eyebrow">Activity</div>
-              <h3 className="mt-2 text-lg font-semibold text-white">Timeline and audit notes</h3>
+              <h3 className="mt-2 text-lg font-semibold text-[#241232]">Timeline and audit notes</h3>
               <div className="mt-4 space-y-3">
                 {(selectedRecord?.activity ?? []).length === 0 ? (
-                  <div className="text-sm text-slate-400">No activity has been recorded yet.</div>
+                  <div className="text-sm text-[#6f6578]">No activity has been recorded yet.</div>
                 ) : (
                   (selectedRecord?.activity ?? []).map((entry) => (
-                    <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-4" key={entry.id}>
+                    <div className="rounded-3xl border border-[#ded8e4] bg-white p-4" key={entry.id}>
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="font-medium capitalize text-white">{entry.type}</div>
-                        <div className="text-xs text-slate-500">{formatTimestamp(entry.createdAt)}</div>
+                        <div className="font-medium capitalize text-[#241232]">{entry.type}</div>
+                        <div className="text-xs text-[#62576a]">{formatTimestamp(entry.createdAt)}</div>
                       </div>
-                      <div className="mt-2 text-sm leading-6 text-slate-300">{entry.message}</div>
+                      <div className="mt-2 text-sm leading-6 text-[#51465e]">{entry.message}</div>
                     </div>
                   ))
                 )}
@@ -4511,6 +4782,362 @@ export function SharedModuleWorkspacePage({ fixedModuleKey }: SharedModuleWorksp
           </section>
         </section>
       </section>
+
+      <RegRightDrawer
+        description={moduleEntry ? `${moduleEntry.moduleName} detail, scope, dates, relationships, and captured field values.` : undefined}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setRecordActionDrawer(null)} type="button">
+              Close
+            </button>
+            <button className="button-secondary" onClick={() => setRecordActionDrawer('links')} type="button">
+              Manage relationships
+            </button>
+            <button className="button-primary" onClick={() => setRecordActionDrawer('edit')} type="button">
+              Edit details
+            </button>
+          </div>
+        }
+        onOpenChange={(open) => {
+          if (!open) {
+            setRecordActionDrawer(null);
+          }
+        }}
+        open={recordActionDrawer === 'overview' && Boolean(selectedRecord)}
+        title={selectedRecord?.title ?? 'Record detail'}
+      >
+        {selectedRecord ? (
+          <div className="space-y-5">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="panel-subtle">
+                <div className="eyebrow">Status</div>
+                <div className="mt-2">
+                  <RegStatusPill tone={selectedRecord.archived ? 'neutral' : 'success'}>
+                    {selectedRecord.status || 'draft'}
+                  </RegStatusPill>
+                </div>
+              </div>
+              <div className="panel-subtle">
+                <div className="eyebrow">Scope</div>
+                <div className="mt-2 text-sm font-semibold text-[#241232]">
+                  {domainFolders.find((folder) => folder.id === selectedRecord.folderId)?.pathLabel ?? 'Domain scope unavailable'}
+                </div>
+              </div>
+              <div className="panel-subtle">
+                <div className="eyebrow">Created</div>
+                <div className="mt-2 text-sm text-[#51465e]">{formatTimestamp(selectedRecord.createdAt)}</div>
+              </div>
+              <div className="panel-subtle">
+                <div className="eyebrow">Updated</div>
+                <div className="mt-2 text-sm text-[#51465e]">{formatTimestamp(selectedRecord.updatedAt)}</div>
+              </div>
+            </div>
+
+            {recordDateChips(selectedRecord).length > 0 ? (
+              <div>
+                <div className="eyebrow">Lifecycle Dates</div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {recordDateChips(selectedRecord).map(([label, value]) => (
+                    <RegStatusPill tone="neutral" key={`${selectedRecord.id}-${label}`}>
+                      {label}: {formatDate(value)}
+                    </RegStatusPill>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            <div>
+              <div className="eyebrow">Captured Fields</div>
+              <div className="mt-3 overflow-hidden rounded-lg border border-[#ded8e4] bg-white">
+                {detailDataEntries.length === 0 ? (
+                  <div className="p-4 text-sm text-[#6f6578]">No populated fields are available for this record yet.</div>
+                ) : (
+                  detailDataEntries.slice(0, 16).map((entry) => (
+                    <div className="grid gap-1 border-b border-[#eeeaf2] p-4 last:border-b-0 sm:grid-cols-[160px_minmax(0,1fr)]" key={entry.key}>
+                      <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[#62576a]">{entry.label}</div>
+                      <div className="min-w-0 break-words text-sm leading-6 text-[#241232]">{entry.value}</div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div>
+              <div className="eyebrow">Relationships</div>
+              <div className="mt-3 space-y-3">
+                {selectedRecord.links.length === 0 ? (
+                  <div className="panel-subtle text-sm text-[#6f6578]">No relationships are linked yet.</div>
+                ) : (
+                  selectedRecord.links.map((link) => (
+                    <div className="rounded-lg border border-[#ded8e4] bg-white p-4" key={link.id}>
+                      <div className="font-semibold text-[#241232]">{link.label || 'Untitled relationship'}</div>
+                      <div className="mt-1 text-xs uppercase tracking-[0.16em] text-[#62576a]">{link.relationType}</div>
+                      {link.route ? (
+                        <Link className="mt-3 inline-flex text-sm font-semibold text-[#6d28d9]" to={link.route}>
+                          Open linked route
+                        </Link>
+                      ) : null}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </RegRightDrawer>
+
+      <RegRightDrawer
+        description="Edit the record fields operators need most often. The full schema form remains available on the page."
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setRecordActionDrawer(null)} type="button">
+              Close
+            </button>
+            <button className="button-primary" disabled={busy || !draft} onClick={() => void saveRecord()} type="button">
+              {busy ? 'Saving...' : 'Save record'}
+            </button>
+          </div>
+        }
+        onOpenChange={(open) => {
+          if (!open) {
+            setRecordActionDrawer(null);
+          }
+        }}
+        open={recordActionDrawer === 'edit' && Boolean(draft)}
+        title={selectedRecord ? `Edit ${selectedRecord.title}` : `Edit ${moduleEntry.moduleName}`}
+      >
+        {draft ? (
+          <div className="space-y-5">
+            {formRuntime.errors.length > 0 ? (
+              <div className="notice-error">
+                {formRuntime.errors.length} Form Builder validation issue{formRuntime.errors.length === 1 ? '' : 's'} must be resolved before saving.
+              </div>
+            ) : null}
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="space-y-1 sm:col-span-2">
+                <span className="label">Record title</span>
+                <input
+                  className="input"
+                  onChange={(event) => updateDraftDataValue(titleDataKey, event.target.value)}
+                  value={normalizeText(draft.data[titleDataKey]) || selectedRecord?.title || ''}
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="label">Domain</span>
+                <select
+                  className="input"
+                  onChange={(event) => setDraft((current) => (current ? { ...current, folderId: event.target.value } : current))}
+                  value={draft.folderId}
+                >
+                  <option value="">Select a domain</option>
+                  {domainFolders.map((folder) => (
+                    <option key={folder.id} value={folder.id}>
+                      {folder.pathLabel}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="space-y-1">
+                <span className="label">Record status</span>
+                <input
+                  className="input"
+                  onChange={(event) => {
+                    setDraft((current) => (current ? { ...current, status: event.target.value } : current));
+                    updateDraftDataValue('status', event.target.value);
+                  }}
+                  value={draft.status}
+                />
+              </label>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <div className="eyebrow">Important Fields</div>
+                <p className="mt-1 text-sm text-[#62576a]">Use the full page form for the entire schema.</p>
+              </div>
+              {drawerFields.length === 0 ? (
+                <div className="panel-subtle text-sm text-[#6f6578]">No schema fields are available for quick editing.</div>
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {drawerFields.map((field) => renderDrawerDraftField(field))}
+                </div>
+              )}
+            </div>
+
+            <label className="space-y-1">
+              <span className="label">Activity note</span>
+              <textarea
+                className="input min-h-[110px]"
+                onChange={(event) => setDraft((current) => (current ? { ...current, note: event.target.value } : current))}
+                value={draft.note}
+              />
+            </label>
+          </div>
+        ) : null}
+      </RegRightDrawer>
+
+      <RegRightDrawer
+        description="Add evidence, assessment, task, and cross-module relationships that keep the record connected to the wider GRC program."
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setRecordActionDrawer(null)} type="button">
+              Close
+            </button>
+            <button className="button-primary" disabled={busy || !draft} onClick={() => void saveRecord()} type="button">
+              {busy ? 'Saving...' : 'Save relationships'}
+            </button>
+          </div>
+        }
+        onOpenChange={(open) => {
+          if (!open) {
+            setRecordActionDrawer(null);
+          }
+        }}
+        open={recordActionDrawer === 'links' && Boolean(draft)}
+        title="Manage relationships"
+      >
+        {draft ? (
+          <div className="space-y-5">
+            <div className="flex flex-wrap gap-2">
+              <button className="button-secondary" onClick={() => addDraftLink()} type="button">
+                Add link
+              </button>
+              {moduleGuidance?.relationshipPresets?.map((preset) => (
+                <button className="button-secondary" key={`${preset.relationType}-${preset.label}`} onClick={() => addDraftLink(preset)} type="button">
+                  Add {preset.label}
+                </button>
+              ))}
+            </div>
+
+            {draft.links.length === 0 ? (
+              <div className="panel-subtle text-sm text-[#6f6578]">
+                No links have been added yet. Add at least one relationship to connect evidence, tasks, assessments, or related records.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {draft.links.map((link, index) => (
+                  <div className="rounded-lg border border-[#ded8e4] bg-white p-4" key={link.id}>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <label className="space-y-1">
+                        <span className="label">Relationship</span>
+                        <input
+                          className="input"
+                          onChange={(event) => updateDraftLink(index, { relationType: event.target.value })}
+                          value={link.relationType}
+                        />
+                      </label>
+                      <label className="space-y-1">
+                        <span className="label">Label</span>
+                        <input
+                          className="input"
+                          onChange={(event) => updateDraftLink(index, { label: event.target.value })}
+                          value={link.label}
+                        />
+                      </label>
+                      <label className="space-y-1 sm:col-span-2">
+                        <span className="label">Route</span>
+                        <input
+                          className="input"
+                          onChange={(event) => updateDraftLink(index, { route: event.target.value })}
+                          placeholder="/assessments"
+                          value={link.route ?? ''}
+                        />
+                      </label>
+                    </div>
+                    <div className="mt-3 flex justify-end">
+                      <button className="button-secondary" onClick={() => removeDraftLink(index)} type="button">
+                        Remove link
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : null}
+      </RegRightDrawer>
+
+      <RegRightDrawer
+        description="Review immutable activity and add a new activity note through the same save flow."
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setRecordActionDrawer(null)} type="button">
+              Close
+            </button>
+            <button className="button-primary" disabled={busy || !draft} onClick={() => void saveRecord()} type="button">
+              {busy ? 'Saving...' : 'Save note'}
+            </button>
+          </div>
+        }
+        onOpenChange={(open) => {
+          if (!open) {
+            setRecordActionDrawer(null);
+          }
+        }}
+        open={recordActionDrawer === 'activity' && Boolean(draft)}
+        title="Review activity"
+      >
+        <div className="space-y-5">
+          <div className="space-y-3">
+            {(selectedRecord?.activity ?? []).length === 0 ? (
+              <div className="panel-subtle text-sm text-[#6f6578]">No activity has been recorded yet.</div>
+            ) : (
+              (selectedRecord?.activity ?? []).map((entry) => (
+                <div className="rounded-lg border border-[#ded8e4] bg-white p-4" key={entry.id}>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="font-semibold capitalize text-[#241232]">{entry.type}</div>
+                    <div className="text-xs text-[#62576a]">{formatTimestamp(entry.createdAt)}</div>
+                  </div>
+                  <div className="mt-2 text-sm leading-6 text-[#51465e]">{entry.message}</div>
+                </div>
+              ))
+            )}
+          </div>
+          {draft ? (
+            <label className="space-y-1">
+              <span className="label">New activity note</span>
+              <textarea
+                className="input min-h-[120px]"
+                onChange={(event) => setDraft((current) => (current ? { ...current, note: event.target.value } : current))}
+                value={draft.note}
+              />
+            </label>
+          ) : null}
+        </div>
+      </RegRightDrawer>
+
+      <RegModal
+        description="Archive hides this record from the active register while preserving its audit history and existing route family."
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setArchiveReviewOpen(false)} type="button">
+              Cancel
+            </button>
+            <button className="button-primary" disabled={busy} onClick={() => void archiveRecord()} type="button">
+              {busy ? 'Archiving...' : 'Archive record'}
+            </button>
+          </div>
+        }
+        onOpenChange={setArchiveReviewOpen}
+        open={archiveReviewOpen && Boolean(selectedRecord)}
+        title="Archive record"
+      >
+        <div className="space-y-4">
+          <div className="notice-warning">
+            This does not delete the record or change backend persistence. It moves the record out of the active working set.
+          </div>
+          <div className="rounded-lg border border-[#ded8e4] bg-white p-4">
+            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[#62576a]">Record</div>
+            <div className="mt-2 text-lg font-semibold text-[#241232]">{selectedRecord?.title ?? 'Selected record'}</div>
+            <div className="mt-2 text-sm text-[#51465e]">
+              {selectedRecord
+                ? domainFolders.find((folder) => folder.id === selectedRecord.folderId)?.pathLabel ?? 'Domain scope unavailable'
+                : null}
+            </div>
+          </div>
+        </div>
+      </RegModal>
     </div>
   );
 }

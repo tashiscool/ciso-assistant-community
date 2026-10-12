@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { Eye, FileJson, History, PackageCheck } from 'lucide-react';
 import { explainAssurance, getPackage, getPackageArtifactPreview, getPackageDocument, listPackages, listReviewHistory } from './api';
 import { AssuranceExplainPanel } from './AssuranceExplainPanel';
 import { AssuranceWorkflowPanel } from './AssuranceWorkflowPanel';
 import { CoachMarksPanel } from '../../components/CoachMarksPanel';
+import { RegActionMenu, RegRightDrawer, RegStatusPill } from '../../components/regovise/PagePrimitives';
 import type { AssuranceArtifactPreview, AssuranceExplainAudience, PackageDetail, PackageListItem, ReviewDecision, TwentyXPackageDocument } from './types';
 import { useEdgeIdentity } from '../../shared/session/identity';
 
@@ -21,9 +23,9 @@ function toPreview(value: unknown) {
   return JSON.stringify(value, null, 2);
 }
 
-function packageStatusBadgeClass(value: string | null | undefined) {
+function packageStatusTone(value: string | null | undefined): 'success' | 'danger' | 'neutral' {
   if (!value) {
-    return 'badge-neutral';
+    return 'neutral';
   }
   switch (value.toLowerCase()) {
     case 'matched':
@@ -33,40 +35,40 @@ function packageStatusBadgeClass(value: string | null | undefined) {
     case 'complete':
     case 'completed':
     case 'closed':
-      return 'badge-success';
+      return 'success';
     case 'mismatch':
     case 'failed':
     case 'fail':
     case 'rejected':
     case 'blocked':
-      return 'badge-danger';
+      return 'danger';
     default:
-      return 'badge-neutral';
+      return 'neutral';
   }
 }
 
-function evaluationStatusBadgeClass(value: string) {
+function evaluationStatusTone(value: string): 'success' | 'danger' | 'neutral' {
   switch (value) {
     case 'FAIL':
-      return 'badge-danger';
+      return 'danger';
     case 'PARTIAL':
-      return 'badge-neutral';
+      return 'neutral';
     default:
-      return 'badge-success';
+      return 'success';
   }
 }
 
-function severityBadgeClass(value: string | null | undefined) {
+function severityTone(value: string | null | undefined): 'success' | 'danger' | 'neutral' {
   switch ((value ?? '').toLowerCase()) {
     case 'critical':
     case 'high':
-      return 'badge-danger';
+      return 'danger';
     case 'medium':
-      return 'badge-neutral';
+      return 'neutral';
     case 'low':
-      return 'badge-success';
+      return 'success';
     default:
-      return 'badge-neutral';
+      return 'neutral';
   }
 }
 
@@ -166,6 +168,9 @@ export function PackageExplorerPage() {
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [packageDrawerOpen, setPackageDrawerOpen] = useState(false);
+  const [artifactDrawerOpen, setArtifactDrawerOpen] = useState(false);
+  const [reviewDrawerOpen, setReviewDrawerOpen] = useState(false);
   const requestedPackageId = searchParams.get('packageId') ?? '';
   const requestedPreviewFamily = searchParams.get('artifact');
   const requestedExplainAudience = searchParams.get('audience');
@@ -470,8 +475,8 @@ export function PackageExplorerPage() {
     <div className="space-y-6">
       <section className="panel">
         <div className="eyebrow">Assurance</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">20x Package Explorer</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">20x Package Explorer</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">
           Browse generated package jobs, inspect deterministic rollups, and validate machine-to-human reconciliation before export or handoff.
         </p>
       </section>
@@ -491,7 +496,7 @@ export function PackageExplorerPage() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="label">Package jobs</div>
-                <div className="mt-1 text-sm text-slate-400">Latest assurance packages available in your current scope.</div>
+                <div className="mt-1 text-sm text-[#6f6578]">Latest assurance packages available in your current scope.</div>
               </div>
               <button className="button-secondary" onClick={() => void loadPackages()} type="button">
                 Refresh
@@ -502,7 +507,7 @@ export function PackageExplorerPage() {
           {packages.map((item) => (
             <button
               key={item.id}
-              className={`panel w-full text-left transition ${selectedPackageId === item.id ? 'border-cyan-400/30 bg-cyan-400/10' : ''}`}
+              className={`panel w-full text-left transition ${selectedPackageId === item.id ? 'border-[#d7c3f1] bg-[#f3e9ff]' : ''}`}
               onClick={() => {
                 setSelectedPackageId(item.id);
                 updateSearchState({ packageId: item.id, focusId: null });
@@ -512,12 +517,12 @@ export function PackageExplorerPage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="eyebrow">{item.reconciliationStatus ?? 'pending'}</div>
-                  <h2 className="mt-2 text-lg font-semibold text-white">{item.fileName}</h2>
-                  <div className="mt-2 font-mono text-xs text-cyan-200">{item.id}</div>
+                  <h2 className="mt-2 text-lg font-semibold text-[#241232]">{item.fileName}</h2>
+                  <div className="mt-2 font-mono text-xs text-[#6d28d9]">{item.id}</div>
                 </div>
-                <span className="badge-neutral">{item.status}</span>
+                <RegStatusPill tone="neutral">{item.status}</RegStatusPill>
               </div>
-              <div className="mt-3 grid gap-2 text-xs text-slate-400 sm:grid-cols-2">
+              <div className="mt-3 grid gap-2 text-xs text-[#6f6578] sm:grid-cols-2">
                 <div>Created: {formatDate(item.createdAt)}</div>
                 <div>Evidence: {String(item.coverage.evaluationCount ?? 0)} evals</div>
               </div>
@@ -525,39 +530,77 @@ export function PackageExplorerPage() {
           ))}
 
           {!loading && packages.length === 0 && (
-            <div className="panel text-sm text-slate-400">No assurance packages are available yet.</div>
+            <div className="panel text-sm text-[#6f6578]">No assurance packages are available yet.</div>
           )}
-          {loading && <div className="panel text-sm text-slate-400">Loading package jobs...</div>}
+          {loading && <div className="panel text-sm text-[#6f6578]">Loading package jobs...</div>}
         </section>
 
         <section className="space-y-4">
-          {detailLoading && <div className="panel text-sm text-slate-400">Loading package detail...</div>}
+          {detailLoading && <div className="panel text-sm text-[#6f6578]">Loading package detail...</div>}
 
-          {detail && (
-            <>
-              <section className="panel">
-                <div className="label">Selected package</div>
-                <h2 className="mt-2 text-2xl font-semibold text-white">{detail.job.fileName}</h2>
-                <div className="mt-2 font-mono text-xs text-cyan-200">{detail.job.id}</div>
-                <div className="mt-3 grid gap-2 text-sm text-slate-400 sm:grid-cols-2">
-                  <div>Created: {formatDate(detail.job.createdAt)}</div>
-                  <div>Updated: {formatDate(detail.job.updatedAt)}</div>
-                  <div>Status: {detail.job.status}</div>
-                  <div>Validation: {String(detail.job.coverage.validationStatus ?? 'unknown')}</div>
-                  <div>Folder: {detail.job.folderId ?? 'Tenant-wide'}</div>
-                  <div>Reconciliation: {String(detail.job.coverage.reconciliationStatus ?? detail.reconciliation?.status ?? 'pending')}</div>
-                </div>
-                {detail.summary?.evidenceJobId && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <Link className="button-secondary" to={`/assurance/evidence?evidenceJobId=${encodeURIComponent(detail.summary.evidenceJobId)}`}>
-                      Open evidence bundle
-                    </Link>
-                    <Link className="button-secondary" to={`/assurance/reviews?evidenceJobId=${encodeURIComponent(detail.summary.evidenceJobId)}`}>
-                      Open review history
-                    </Link>
-                  </div>
-                )}
-              </section>
+              {detail && (
+                <>
+                  <section className="panel">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                      <div className="min-w-0">
+                        <div className="label">Selected package</div>
+                        <h2 className="mt-2 text-2xl font-semibold text-[#241232]">{detail.job.fileName}</h2>
+                        <div className="mt-2 break-all font-mono text-xs text-[#6d28d9]">{detail.job.id}</div>
+                        <div className="mt-3 grid gap-2 text-sm text-[#6f6578] sm:grid-cols-2">
+                          <div>Created: {formatDate(detail.job.createdAt)}</div>
+                          <div>Updated: {formatDate(detail.job.updatedAt)}</div>
+                          <div>Status: {detail.job.status}</div>
+                          <div>Validation: {String(detail.job.coverage.validationStatus ?? 'unknown')}</div>
+                          <div>Folder: {detail.job.folderId ?? 'Tenant-wide'}</div>
+                          <div>Reconciliation: {String(detail.job.coverage.reconciliationStatus ?? detail.reconciliation?.status ?? 'pending')}</div>
+                        </div>
+                        {detail.summary?.evidenceJobId && (
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            <Link className="button-secondary" to={`/assurance/evidence?evidenceJobId=${encodeURIComponent(detail.summary.evidenceJobId)}`}>
+                              Open evidence bundle
+                            </Link>
+                            <Link className="button-secondary" to={`/assurance/reviews?evidenceJobId=${encodeURIComponent(detail.summary.evidenceJobId)}`}>
+                              Open review history
+                            </Link>
+                          </div>
+                        )}
+                      </div>
+                      <RegActionMenu
+                        label="Open package actions"
+                        actions={[
+                          {
+                            label: 'Inspect readiness',
+                            icon: PackageCheck,
+                            onSelect: () => setPackageDrawerOpen(true),
+                          },
+                          {
+                            label: 'Inspect current artifact',
+                            icon: FileJson,
+                            onSelect: () => setArtifactDrawerOpen(true),
+                          },
+                          {
+                            label: 'Inspect review history',
+                            icon: History,
+                            onSelect: () => setReviewDrawerOpen(true),
+                          },
+                          {
+                            label: 'Open evidence explorer',
+                            icon: Eye,
+                            to: detail.summary?.evidenceJobId
+                              ? `/assurance/evidence?evidenceJobId=${encodeURIComponent(detail.summary.evidenceJobId)}`
+                              : '/assurance/evidence',
+                          },
+                          {
+                            label: 'Open review queue',
+                            icon: History,
+                            to: detail.summary?.evidenceJobId
+                              ? `/assurance/reviews?evidenceJobId=${encodeURIComponent(detail.summary.evidenceJobId)}`
+                              : '/assurance/reviews',
+                          },
+                        ]}
+                      />
+                    </div>
+                  </section>
 
               {detail.summary && (
                 <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
@@ -589,14 +632,14 @@ export function PackageExplorerPage() {
               )}
 
               {mismatchChecks.length > 0 && (
-                <section className="panel border-rose-500/20 bg-rose-500/[0.08]">
+                <section className="panel border-[#f2b7bf] bg-[#ffe2e5]">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <div className="label text-rose-200">Mismatch triage</div>
-                      <h3 className="mt-2 text-xl font-semibold text-white">
+                      <div className="label text-[#9d1f2c]">Mismatch triage</div>
+                      <h3 className="mt-2 text-xl font-semibold text-[#241232]">
                         {mismatchChecks.length} reconciliation check{mismatchChecks.length === 1 ? '' : 's'} require attention
                       </h3>
-                      <p className="mt-2 max-w-3xl text-sm leading-6 text-rose-100/85">
+                      <p className="mt-2 max-w-3xl text-sm leading-6 text-[#9d1f2c]/85">
                         These mismatches mean the rendered handoff package does not fully align with the deterministic source state yet.
                       </p>
                     </div>
@@ -608,12 +651,12 @@ export function PackageExplorerPage() {
                   </div>
                   <div className="mt-4 grid gap-3 md:grid-cols-2">
                     {mismatchChecks.map((check) => (
-                      <div key={check.id} className="rounded-2xl border border-rose-400/20 bg-black/20 px-4 py-4">
+                      <div key={check.id} className="rounded-2xl border border-[#f2b7bf] bg-[#fff7f8] px-4 py-4">
                         <div className="flex items-center justify-between gap-3">
-                          <div className="font-medium text-white">{humanizeKey(check.id)}</div>
-                          <span className="badge-danger">{check.status}</span>
+                          <div className="font-medium text-[#241232]">{humanizeKey(check.id)}</div>
+                          <RegStatusPill tone="danger">{check.status}</RegStatusPill>
                         </div>
-                        <div className="mt-3 grid gap-2 text-sm text-rose-50/90 sm:grid-cols-2">
+                        <div className="mt-3 grid gap-2 text-sm text-[#8d1723]/90 sm:grid-cols-2">
                           <div>Expected: {check.expected}</div>
                           <div>Actual: {check.actual}</div>
                         </div>
@@ -628,25 +671,25 @@ export function PackageExplorerPage() {
                   <div className="panel-subtle">
                     <div className="label">Validation rollup</div>
                     <div className="mt-3 grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
-                      <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                        <div className="text-xs uppercase tracking-[0.2em] text-slate-500">PASS</div>
-                        <div className="mt-2 text-2xl font-semibold text-white">{packageDocument.summary.pass_count}</div>
+                      <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                        <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">PASS</div>
+                        <div className="mt-2 text-2xl font-semibold text-[#241232]">{packageDocument.summary.pass_count}</div>
                       </div>
-                      <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                        <div className="text-xs uppercase tracking-[0.2em] text-slate-500">PARTIAL</div>
-                        <div className="mt-2 text-2xl font-semibold text-white">{packageDocument.summary.partial_count}</div>
+                      <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                        <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">PARTIAL</div>
+                        <div className="mt-2 text-2xl font-semibold text-[#241232]">{packageDocument.summary.partial_count}</div>
                       </div>
-                      <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                        <div className="text-xs uppercase tracking-[0.2em] text-slate-500">FAIL</div>
-                        <div className="mt-2 text-2xl font-semibold text-white">{packageDocument.summary.fail_count}</div>
+                      <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                        <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">FAIL</div>
+                        <div className="mt-2 text-2xl font-semibold text-[#241232]">{packageDocument.summary.fail_count}</div>
                       </div>
-                      <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                        <div className="text-xs uppercase tracking-[0.2em] text-slate-500">GAPS</div>
-                        <div className="mt-2 text-2xl font-semibold text-white">{packageDocument.summary.gap_count}</div>
+                      <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                        <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">GAPS</div>
+                        <div className="mt-2 text-2xl font-semibold text-[#241232]">{packageDocument.summary.gap_count}</div>
                       </div>
-                      <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                        <div className="text-xs uppercase tracking-[0.2em] text-slate-500">REVIEWS</div>
-                        <div className="mt-2 text-2xl font-semibold text-white">{packageDocument.summary.review_decision_count}</div>
+                      <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                        <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">REVIEWS</div>
+                        <div className="mt-2 text-2xl font-semibold text-[#241232]">{packageDocument.summary.review_decision_count}</div>
                       </div>
                     </div>
                   </div>
@@ -654,19 +697,19 @@ export function PackageExplorerPage() {
                   <div className="panel-subtle">
                     <div className="label">Reconciliation posture</div>
                     <div className="mt-3 space-y-2">
-                      <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                        <div className="text-sm text-slate-300">Status</div>
-                        <span className={packageStatusBadgeClass(detail.reconciliation?.status ?? detail.job.status)}>
+                      <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                        <div className="text-sm text-[#51465e]">Status</div>
+                        <RegStatusPill tone={packageStatusTone(detail.reconciliation?.status ?? detail.job.status)}>
                           {detail.reconciliation?.status ?? detail.job.status}
-                        </span>
+                        </RegStatusPill>
                       </div>
-                      <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                        <div className="text-sm text-slate-300">Checks</div>
-                        <div className="font-mono text-cyan-200">{detail.reconciliation?.checks.length ?? 0}</div>
+                      <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                        <div className="text-sm text-[#51465e]">Checks</div>
+                        <div className="font-mono text-[#6d28d9]">{detail.reconciliation?.checks.length ?? 0}</div>
                       </div>
-                      <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                        <div className="text-sm text-slate-300">Mismatches</div>
-                        <div className="font-mono text-cyan-200">{mismatchChecks.length}</div>
+                      <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                        <div className="text-sm text-[#51465e]">Mismatches</div>
+                        <div className="font-mono text-[#6d28d9]">{mismatchChecks.length}</div>
                       </div>
                     </div>
                   </div>
@@ -674,36 +717,36 @@ export function PackageExplorerPage() {
                   <div className="panel-subtle">
                     <div className="label">Review ledger</div>
                     <div className="mt-3 space-y-2">
-                      <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                        <div className="text-sm text-slate-300">Accepted</div>
-                        <div className="font-mono text-cyan-200">{reviewLedger?.accepted_count ?? acceptedReviewCount}</div>
+                      <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                        <div className="text-sm text-[#51465e]">Accepted</div>
+                        <div className="font-mono text-[#6d28d9]">{reviewLedger?.accepted_count ?? acceptedReviewCount}</div>
                       </div>
-                      <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                        <div className="text-sm text-slate-300">Rejected</div>
-                        <div className="font-mono text-cyan-200">{reviewLedger?.rejected_count ?? 0}</div>
+                      <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                        <div className="text-sm text-[#51465e]">Rejected</div>
+                        <div className="font-mono text-[#6d28d9]">{reviewLedger?.rejected_count ?? 0}</div>
                       </div>
-                      <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                        <div className="text-sm text-slate-300">Other</div>
-                        <div className="font-mono text-cyan-200">{reviewLedger?.other_count ?? 0}</div>
+                      <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                        <div className="text-sm text-[#51465e]">Other</div>
+                        <div className="font-mono text-[#6d28d9]">{reviewLedger?.other_count ?? 0}</div>
                       </div>
                     </div>
                   </div>
 
                   <div className="panel-subtle">
                     <div className="label">Package lineage</div>
-                    <div className="mt-3 space-y-2 text-sm text-slate-300">
-                      <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                        <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Schema</div>
-                        <div className="mt-2 font-medium text-white">{packageDocument.metadata.schema_version}</div>
+                    <div className="mt-3 space-y-2 text-sm text-[#51465e]">
+                      <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                        <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Schema</div>
+                        <div className="mt-2 font-medium text-[#241232]">{packageDocument.metadata.schema_version}</div>
                       </div>
-                      <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                        <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Generated</div>
-                        <div className="mt-2 font-medium text-white">{formatDate(packageDocument.metadata.generated_at)}</div>
+                      <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                        <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Generated</div>
+                        <div className="mt-2 font-medium text-[#241232]">{formatDate(packageDocument.metadata.generated_at)}</div>
                       </div>
-                      <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                        <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Bundle kind</div>
-                        <div className="mt-2 font-medium text-white">{humanizeKey(packageDocument.metadata.bundle_kind ?? 'assessment')}</div>
-                        <div className="mt-1 text-xs text-slate-500">{humanizeKey(packageDocument.metadata.input_mode ?? 'live')}</div>
+                      <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                        <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Bundle kind</div>
+                        <div className="mt-2 font-medium text-[#241232]">{humanizeKey(packageDocument.metadata.bundle_kind ?? 'assessment')}</div>
+                        <div className="mt-1 text-xs text-[#62576a]">{humanizeKey(packageDocument.metadata.input_mode ?? 'live')}</div>
                       </div>
                     </div>
                   </div>
@@ -748,7 +791,7 @@ export function PackageExplorerPage() {
               <section className="grid gap-4 xl:grid-cols-2">
                 <section className="panel-subtle">
                   <div className="label">Package artifact preview</div>
-                  <div className="mt-2 text-sm text-slate-400">
+                  <div className="mt-2 text-sm text-[#6f6578]">
                     Preview the canonical package JSON, reconciliation artifact, or rendered report output that will be handed off downstream.
                   </div>
                   <select className="input mt-3" onChange={(event) => selectPreviewFamily(event.target.value)} value={previewFamily}>
@@ -763,24 +806,24 @@ export function PackageExplorerPage() {
                     <option value="assessor_poam_md">assessor_poam_md</option>
                   </select>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
-                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Retrieval</div>
-                      <div className="mt-2 font-medium text-white">{previewState?.retrieval.kind ?? 'preview'}</div>
-                      <div className="mt-1 text-xs text-slate-500">
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm">
+                      <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Retrieval</div>
+                      <div className="mt-2 font-medium text-[#241232]">{previewState?.retrieval.kind ?? 'preview'}</div>
+                      <div className="mt-1 text-xs text-[#62576a]">
                         {previewState?.retrieval.previewAvailable === false ? 'Preview unavailable' : 'Preview available'}
                       </div>
                     </div>
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
-                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Artifact family</div>
-                      <div className="mt-2 font-medium text-white">{previewState?.family ?? previewFamily}</div>
-                      <div className="mt-1 text-xs text-slate-500">
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm">
+                      <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Artifact family</div>
+                      <div className="mt-2 font-medium text-[#241232]">{previewState?.family ?? previewFamily}</div>
+                      <div className="mt-1 text-xs text-[#62576a]">
                         {previewState?.items.length ?? 0} object{(previewState?.items.length ?? 0) === 1 ? '' : 's'}
                       </div>
                     </div>
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm sm:col-span-2">
-                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Object key</div>
-                      <div className="mt-2 break-all font-mono text-xs text-cyan-200">{selectedPreviewItem?.objectKey ?? 'No object metadata loaded.'}</div>
-                      <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-500">
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm sm:col-span-2">
+                      <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Object key</div>
+                      <div className="mt-2 break-all font-mono text-xs text-[#6d28d9]">{selectedPreviewItem?.objectKey ?? 'No object metadata loaded.'}</div>
+                      <div className="mt-2 flex flex-wrap gap-3 text-xs text-[#62576a]">
                         <span>{selectedPreviewItem?.contentType ?? 'unknown content type'}</span>
                         <span>{formatBytes(selectedPreviewItem?.sizeBytes ?? null)}</span>
                         {selectedPreviewItem?.createdAt ? <span>{formatDate(selectedPreviewItem.createdAt)}</span> : null}
@@ -788,34 +831,34 @@ export function PackageExplorerPage() {
                     </div>
                   </div>
                   {validationPreview && (
-                    <div className="mt-4 rounded-2xl border border-white/8 bg-black/15 px-4 py-4">
+                    <div className="mt-4 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
                       <div className="flex items-center justify-between gap-3">
                         <div>
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Validation posture</div>
-                          <div className="mt-2 text-sm font-medium text-white">{readString(validationPreview.summary, 'No validation summary attached.')}</div>
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Validation posture</div>
+                          <div className="mt-2 text-sm font-medium text-[#241232]">{readString(validationPreview.summary, 'No validation summary attached.')}</div>
                         </div>
-                        <span className={packageStatusBadgeClass(readString(validationPreview.status, 'unknown'))}>
+                        <RegStatusPill tone={packageStatusTone(readString(validationPreview.status, 'unknown'))}>
                           {readString(validationPreview.status, 'unknown')}
-                        </span>
+                        </RegStatusPill>
                       </div>
                       {validationChecks.length > 0 && (
                         <div className="mt-4 grid gap-2">
                           {validationChecks.slice(0, 8).map((item, index) => (
-                            <div key={readString(item.id, `validation-check-${index}`)} className="rounded-2xl border border-white/8 bg-slate-950/60 px-3 py-3">
+                            <div key={readString(item.id, `validation-check-${index}`)} className="rounded-2xl border border-[#ded8e4] bg-[#f7f2fa] px-3 py-3">
                               <div className="flex items-center justify-between gap-3">
-                                <div className="text-sm font-medium text-white">{readString(item.title, 'Validation check')}</div>
-                                <span className={packageStatusBadgeClass(readString(item.status, 'unknown'))}>
+                                <div className="text-sm font-medium text-[#241232]">{readString(item.title, 'Validation check')}</div>
+                                <RegStatusPill tone={packageStatusTone(readString(item.status, 'unknown'))}>
                                   {readString(item.status, 'unknown')}
-                                </span>
+                                </RegStatusPill>
                               </div>
-                              <div className="mt-2 text-xs leading-5 text-slate-400">{readString(item.detail, 'No detail available.')}</div>
+                              <div className="mt-2 text-xs leading-5 text-[#6f6578]">{readString(item.detail, 'No detail available.')}</div>
                             </div>
                           ))}
                         </div>
                       )}
                     </div>
                   )}
-                  <pre className="mt-4 max-h-[460px] overflow-auto rounded-2xl border border-white/10 bg-slate-950/80 p-4 text-xs leading-6 text-slate-300">
+                  <pre className="mt-4 max-h-[460px] overflow-auto rounded-2xl border border-[#ded8e4] bg-[#f7f2fa] p-4 text-xs leading-6 text-[#51465e]">
                     {preview ? toPreview(preview) : 'No preview is available for the selected package artifact.'}
                   </pre>
                 </section>
@@ -825,21 +868,21 @@ export function PackageExplorerPage() {
                     <section className="panel-subtle">
                       <div className="label">Package summary</div>
                       <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                        <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Accepted reviews</div>
-                          <div className="mt-2 text-xl font-semibold text-white">{packageSummary.accepted_review_count}</div>
+                        <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Accepted reviews</div>
+                          <div className="mt-2 text-xl font-semibold text-[#241232]">{packageSummary.accepted_review_count}</div>
                         </div>
-                        <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Rejected reviews</div>
-                          <div className="mt-2 text-xl font-semibold text-white">{packageSummary.rejected_review_count}</div>
+                        <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Rejected reviews</div>
+                          <div className="mt-2 text-xl font-semibold text-[#241232]">{packageSummary.rejected_review_count}</div>
                         </div>
-                        <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">POA&amp;M items</div>
-                          <div className="mt-2 text-xl font-semibold text-white">{packageSummary.poam_count}</div>
+                        <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">POA&amp;M items</div>
+                          <div className="mt-2 text-xl font-semibold text-[#241232]">{packageSummary.poam_count}</div>
                         </div>
-                        <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Evidence bundle</div>
-                          <div className="mt-2 font-mono text-xs text-cyan-200">{packageDocument?.metadata.evidence_job_id ?? '—'}</div>
+                        <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Evidence bundle</div>
+                          <div className="mt-2 font-mono text-xs text-[#6d28d9]">{packageDocument?.metadata.evidence_job_id ?? '—'}</div>
                         </div>
                       </div>
                     </section>
@@ -848,48 +891,48 @@ export function PackageExplorerPage() {
                   {packageDocument && (packageDocument.metadata.agent_run_id || agentValidationResults.length > 0) && (
                     <section className="panel-subtle">
                       <div className="label">Embedded agent security</div>
-                      <div className="mt-2 text-sm text-slate-400">
+                      <div className="mt-2 text-sm text-[#6f6578]">
                         This package includes bounded-agent governance outputs inside the canonical 20x contract, including agent evaluations, findings, POA&amp;M items, and linked architecture artifacts.
                       </div>
                       <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                        <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Agent run</div>
-                          <div className="mt-2 font-mono text-xs text-cyan-200">
+                        <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Agent run</div>
+                          <div className="mt-2 font-mono text-xs text-[#6d28d9]">
                             {agentSecuritySummary?.run_id ?? packageDocument.metadata.agent_run_id ?? 'Not linked'}
                           </div>
                         </div>
-                        <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Agent checks</div>
-                          <div className="mt-2 text-xl font-semibold text-white">
+                        <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Agent checks</div>
+                          <div className="mt-2 text-xl font-semibold text-[#241232]">
                             {agentSecuritySummary?.evaluation_count ?? agentValidationResults.length}
                           </div>
                         </div>
-                        <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Open agent findings</div>
-                          <div className="mt-2 text-xl font-semibold text-white">
+                        <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Open agent findings</div>
+                          <div className="mt-2 text-xl font-semibold text-[#241232]">
                             {agentSecuritySummary?.gap_count ?? agentFindings.length}
                           </div>
                         </div>
-                        <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Agent POA&amp;M</div>
-                          <div className="mt-2 text-xl font-semibold text-white">
+                        <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Agent POA&amp;M</div>
+                          <div className="mt-2 text-xl font-semibold text-[#241232]">
                             {agentSecuritySummary?.poam_count ?? agentPoamItems.length}
                           </div>
                         </div>
                       </div>
                       {agentSecuritySummary ? (
                         <div className="mt-3 grid gap-3 sm:grid-cols-3">
-                          <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                            <div className="text-xs uppercase tracking-[0.2em] text-slate-500">PASS</div>
-                            <div className="mt-2 text-xl font-semibold text-white">{agentSecuritySummary.pass_count}</div>
+                          <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                            <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">PASS</div>
+                            <div className="mt-2 text-xl font-semibold text-[#241232]">{agentSecuritySummary.pass_count}</div>
                           </div>
-                          <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                            <div className="text-xs uppercase tracking-[0.2em] text-slate-500">PARTIAL</div>
-                            <div className="mt-2 text-xl font-semibold text-white">{agentSecuritySummary.partial_count}</div>
+                          <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                            <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">PARTIAL</div>
+                            <div className="mt-2 text-xl font-semibold text-[#241232]">{agentSecuritySummary.partial_count}</div>
                           </div>
-                          <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                            <div className="text-xs uppercase tracking-[0.2em] text-slate-500">FAIL</div>
-                            <div className="mt-2 text-xl font-semibold text-white">{agentSecuritySummary.fail_count}</div>
+                          <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                            <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">FAIL</div>
+                            <div className="mt-2 text-xl font-semibold text-[#241232]">{agentSecuritySummary.fail_count}</div>
                           </div>
                         </div>
                       ) : null}
@@ -914,42 +957,42 @@ export function PackageExplorerPage() {
                       </div>
                       {agentSecuritySummary && (agentSecuritySummary.top_non_pass_eval_codes.length > 0 || agentSecuritySummary.top_gap_titles.length > 0) ? (
                         <div className="mt-4 grid gap-3 md:grid-cols-2">
-                          <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                            <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Top non-pass checks</div>
-                            <div className="mt-2 flex flex-wrap gap-2 text-xs text-cyan-200">
+                          <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                            <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Top non-pass checks</div>
+                            <div className="mt-2 flex flex-wrap gap-2 text-xs text-[#6d28d9]">
                               {agentSecuritySummary.top_non_pass_eval_codes.length > 0
                                 ? agentSecuritySummary.top_non_pass_eval_codes.map((item) => (
-                                    <span key={item} className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2 py-1">
+                                    <span key={item} className="rounded-full border border-[#d7c3f1] bg-[#f3e9ff] px-2 py-1">
                                       {item}
                                     </span>
                                   ))
-                                : <span className="text-slate-500">None</span>}
+                                : <span className="text-[#62576a]">None</span>}
                             </div>
                           </div>
-                          <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                            <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Top agent gaps</div>
-                            <div className="mt-2 space-y-1 text-xs text-slate-300">
+                          <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                            <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Top agent gaps</div>
+                            <div className="mt-2 space-y-1 text-xs text-[#51465e]">
                               {agentSecuritySummary.top_gap_titles.length > 0
                                 ? agentSecuritySummary.top_gap_titles.map((item) => <div key={item}>{item}</div>)
-                                : <div className="text-slate-500">None</div>}
+                                : <div className="text-[#62576a]">None</div>}
                             </div>
                           </div>
                         </div>
                       ) : null}
                       <div className="mt-4 space-y-2">
                         {agentValidationResults.slice(0, 4).map((item) => (
-                          <div key={item.eval_code} className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
+                          <div key={item.eval_code} className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
                             <div className="flex items-center justify-between gap-3">
                               <div>
-                                <div className="text-sm font-medium text-white">{item.title}</div>
-                                <div className="mt-1 text-xs text-slate-500">
+                                <div className="text-sm font-medium text-[#241232]">{item.title}</div>
+                                <div className="mt-1 text-xs text-[#62576a]">
                                   {item.eval_code} · {item.ksi_id}
                                 </div>
                               </div>
-                              <span className={evaluationStatusBadgeClass(item.status)}>{item.status}</span>
+                              <RegStatusPill tone={evaluationStatusTone(item.status)}>{item.status}</RegStatusPill>
                             </div>
-                            <div className="mt-2 text-xs leading-5 text-slate-400">{item.summary}</div>
-                            <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
+                            <div className="mt-2 text-xs leading-5 text-[#6f6578]">{item.summary}</div>
+                            <div className="mt-3 flex flex-wrap gap-3 text-xs text-[#62576a]">
                               <span>{humanizeKey(item.severity)}</span>
                               <span>{item.evidence_refs.length} evidence refs</span>
                             </div>
@@ -967,22 +1010,22 @@ export function PackageExplorerPage() {
                       </div>
                       {agentFindings.length > 0 && (
                         <div className="mt-4 space-y-2">
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Agent findings</div>
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Agent findings</div>
                           {agentFindings.slice(0, 3).map((item) => (
                             <div
                               key={readString(item.id, `${readString(item.source_eval_code)}:${readString(item.title)}`)}
-                              className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3"
+                              className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3"
                             >
                               <div className="flex items-center justify-between gap-3">
                                 <div>
-                                  <div className="text-sm font-medium text-white">{readString(item.title, 'Untitled agent gap')}</div>
-                                  <div className="mt-1 text-xs text-slate-500">{readString(item.source_eval_code, 'AGENT_UNKNOWN')}</div>
+                                  <div className="text-sm font-medium text-[#241232]">{readString(item.title, 'Untitled agent gap')}</div>
+                                  <div className="mt-1 text-xs text-[#62576a]">{readString(item.source_eval_code, 'AGENT_UNKNOWN')}</div>
                                 </div>
-                                <span className={severityBadgeClass(readString(item.severity))}>
+                                <RegStatusPill tone={severityTone(readString(item.severity))}>
                                   {readString(item.severity)}
-                                </span>
+                                </RegStatusPill>
                               </div>
-                              <div className="mt-2 text-xs leading-5 text-slate-400">
+                              <div className="mt-2 text-xs leading-5 text-[#6f6578]">
                                 {readString(item.detail, 'No agent finding detail recorded.')}
                               </div>
                             </div>
@@ -991,17 +1034,17 @@ export function PackageExplorerPage() {
                       )}
                       {agentPoamItems.length > 0 && (
                         <div className="mt-4 space-y-2">
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Agent POA&amp;M</div>
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Agent POA&amp;M</div>
                           {agentPoamItems.slice(0, 3).map((item) => (
-                            <div key={item.id} className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
+                            <div key={item.id} className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
                               <div className="flex items-center justify-between gap-3">
                                 <div>
-                                  <div className="text-sm font-medium text-white">{item.identifier}</div>
-                                  <div className="mt-1 text-xs text-slate-500">{item.sourceEvalCode ?? 'Agent remediation item'}</div>
+                                  <div className="text-sm font-medium text-[#241232]">{item.identifier}</div>
+                                  <div className="mt-1 text-xs text-[#62576a]">{item.sourceEvalCode ?? 'Agent remediation item'}</div>
                                 </div>
-                                <span className={packageStatusBadgeClass(item.status)}>{item.status}</span>
+                                <RegStatusPill tone={packageStatusTone(item.status)}>{item.status}</RegStatusPill>
                               </div>
-                              <div className="mt-2 text-xs leading-5 text-slate-400">{item.plannedRemediation}</div>
+                              <div className="mt-2 text-xs leading-5 text-[#6f6578]">{item.plannedRemediation}</div>
                             </div>
                           ))}
                         </div>
@@ -1014,18 +1057,18 @@ export function PackageExplorerPage() {
                       <div className="label">Validation failures</div>
                       <div className="mt-3 space-y-2">
                         {failedValidationResults.slice(0, 6).map((item) => (
-                          <div key={`${item.eval_code}:${item.ksi_id}`} className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
+                          <div key={`${item.eval_code}:${item.ksi_id}`} className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
                             <div className="flex items-center justify-between gap-3">
                               <div>
-                                <div className="text-sm font-medium text-white">{item.title}</div>
-                                <div className="mt-1 text-xs text-slate-500">
+                                <div className="text-sm font-medium text-[#241232]">{item.title}</div>
+                                <div className="mt-1 text-xs text-[#62576a]">
                                   {item.eval_code} · {item.ksi_id}
                                 </div>
                               </div>
-                              <span className={evaluationStatusBadgeClass(item.status)}>{item.status}</span>
+                              <RegStatusPill tone={evaluationStatusTone(item.status)}>{item.status}</RegStatusPill>
                             </div>
-                            <div className="mt-2 text-xs leading-5 text-slate-400">{item.summary}</div>
-                            <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
+                            <div className="mt-2 text-xs leading-5 text-[#6f6578]">{item.summary}</div>
+                            <div className="mt-3 flex flex-wrap gap-3 text-xs text-[#62576a]">
                               <span>{humanizeKey(item.severity)}</span>
                               <span>{item.evidence_refs.length} evidence refs</span>
                             </div>
@@ -1041,7 +1084,7 @@ export function PackageExplorerPage() {
                           </div>
                         ))}
                         {failedValidationResults.length === 0 && (
-                          <div className="text-sm text-slate-400">All KSI validation results currently pass in this package.</div>
+                          <div className="text-sm text-[#6f6578]">All KSI validation results currently pass in this package.</div>
                         )}
                       </div>
                     </section>
@@ -1058,17 +1101,17 @@ export function PackageExplorerPage() {
                           return (
                             <div
                               key={readString(item.id, `${readString(item.gap_type)}:${readString(item.title)}`)}
-                              className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3"
+                              className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3"
                             >
                               <div className="flex items-center justify-between gap-3">
                                 <div>
-                                  <div className="text-sm font-medium text-white">{readString(item.title, 'Untitled gap')}</div>
-                                  <div className="mt-1 text-xs text-slate-500">{humanizeKey(readString(item.gap_type, 'gap'))}</div>
+                                  <div className="text-sm font-medium text-[#241232]">{readString(item.title, 'Untitled gap')}</div>
+                                  <div className="mt-1 text-xs text-[#62576a]">{humanizeKey(readString(item.gap_type, 'gap'))}</div>
                                 </div>
-                                <span className={severityBadgeClass(severity)}>{severity}</span>
+                                <RegStatusPill tone={severityTone(severity)}>{severity}</RegStatusPill>
                               </div>
-                              <div className="mt-2 text-xs leading-5 text-slate-400">{readString(item.detail, 'No detail recorded.')}</div>
-                              <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
+                              <div className="mt-2 text-xs leading-5 text-[#6f6578]">{readString(item.detail, 'No detail recorded.')}</div>
+                              <div className="mt-3 flex flex-wrap gap-3 text-xs text-[#62576a]">
                                 <span>{controlRefs.length} control refs</span>
                                 <span>{ksiRefs.length} KSI refs</span>
                                 <span>{readString(item.recommended_artifact, 'No recommended artifact')}</span>
@@ -1094,16 +1137,16 @@ export function PackageExplorerPage() {
                       <div className="label">POA&amp;M readiness</div>
                       <div className="mt-3 space-y-2">
                         {highlightedPoamItems.map((item) => (
-                          <div key={item.id} className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
+                          <div key={item.id} className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
                             <div className="flex items-center justify-between gap-3">
                               <div>
-                                <div className="text-sm font-medium text-white">{item.identifier}</div>
-                                <div className="mt-1 text-xs text-slate-500">{item.weaknessName}</div>
+                                <div className="text-sm font-medium text-[#241232]">{item.identifier}</div>
+                                <div className="mt-1 text-xs text-[#62576a]">{item.weaknessName}</div>
                               </div>
-                              <span className={packageStatusBadgeClass(item.status)}>{item.status}</span>
+                              <RegStatusPill tone={packageStatusTone(item.status)}>{item.status}</RegStatusPill>
                             </div>
-                            <div className="mt-2 text-xs leading-5 text-slate-400">{item.plannedRemediation}</div>
-                            <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
+                            <div className="mt-2 text-xs leading-5 text-[#6f6578]">{item.plannedRemediation}</div>
+                            <div className="mt-3 flex flex-wrap gap-3 text-xs text-[#62576a]">
                               <span>{humanizeKey(item.severity)}</span>
                               <span>Due {formatDate(item.milestoneDueDate)}</span>
                               {item.sourceEvalCode ? <span>{item.sourceEvalCode}</span> : null}
@@ -1127,21 +1170,21 @@ export function PackageExplorerPage() {
                     <div className="label">Reconciliation checks</div>
                     <div className="mt-3 space-y-2">
                       {detail.reconciliation?.checks.map((check) => (
-                        <div key={check.id} className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
+                        <div key={check.id} className="flex items-center justify-between gap-3 rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm">
                           <div>
-                            <div className="font-medium text-white">{check.id}</div>
-                            <div className="text-xs text-slate-400">
+                            <div className="font-medium text-[#241232]">{check.id}</div>
+                            <div className="text-xs text-[#6f6578]">
                               Expected {check.expected} · Actual {check.actual}
                             </div>
                           </div>
-                          <span className={check.status === 'match' ? 'badge-success' : 'badge-danger'}>{check.status}</span>
+                          <RegStatusPill tone={check.status === 'match' ? 'success' : 'danger'}>{check.status}</RegStatusPill>
                         </div>
                       ))}
                       {!detail.reconciliation && (
-                        <div className="text-sm text-slate-400">No reconciliation summary is attached to this package job yet.</div>
+                        <div className="text-sm text-[#6f6578]">No reconciliation summary is attached to this package job yet.</div>
                       )}
                       {mismatchChecks.length > 0 && (
-                        <div className="rounded-2xl border border-rose-500/20 bg-rose-500/[0.08] px-3 py-3 text-xs leading-5 text-rose-100">
+                        <div className="rounded-2xl border border-[#f2b7bf] bg-[#ffe2e5] px-3 py-3 text-xs leading-5 text-[#9d1f2c]">
                           {mismatchChecks.length} reconciliation check(s) are mismatched and should be resolved before external handoff.
                         </div>
                       )}
@@ -1154,14 +1197,14 @@ export function PackageExplorerPage() {
                       {reportBundleEntries.map((item) => (
                         <div
                           key={item.role}
-                          className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm"
+                          className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm"
                         >
                           <div className="flex items-center justify-between gap-3">
-                            <div className="font-medium text-white">{humanizeKey(item.role)}</div>
-                            {previewFamily === item.role ? <span className="badge-success">Previewing</span> : null}
+                            <div className="font-medium text-[#241232]">{humanizeKey(item.role)}</div>
+                            {previewFamily === item.role ? <RegStatusPill tone="success">Previewing</RegStatusPill> : null}
                           </div>
-                          <div className="mt-1 text-xs text-slate-400">{reportRoleDescription(item.role)}</div>
-                          <div className="mt-2 font-mono text-xs text-slate-500">{item.path}</div>
+                          <div className="mt-1 text-xs text-[#6f6578]">{reportRoleDescription(item.role)}</div>
+                          <div className="mt-2 font-mono text-xs text-[#62576a]">{item.path}</div>
                           <div className="mt-3 flex flex-wrap gap-2">
                             <button className="button-secondary" onClick={() => selectPreviewFamily(item.role)} type="button">
                               Preview report
@@ -1179,7 +1222,7 @@ export function PackageExplorerPage() {
                         </div>
                       ))}
                       {reportBundleEntries.length === 0 && (
-                        <div className="text-sm text-slate-400">The package JSON exists, but no report manifest has been loaded yet.</div>
+                        <div className="text-sm text-[#6f6578]">The package JSON exists, but no report manifest has been loaded yet.</div>
                       )}
                     </div>
                   </section>
@@ -1187,7 +1230,7 @@ export function PackageExplorerPage() {
                   {packageDocument && (
                     <section className="panel-subtle">
                       <div className="label">Evidence lineage</div>
-                      <div className="mt-2 text-sm text-slate-400">
+                      <div className="mt-2 text-sm text-[#6f6578]">
                         These artifact families live on the source evidence bundle, so open the evidence explorer to inspect the full payload behind each lineage link.
                       </div>
                       {detail.summary?.evidenceJobId && (
@@ -1208,19 +1251,19 @@ export function PackageExplorerPage() {
                                   ? `/assurance/evidence?evidenceJobId=${encodeURIComponent(detail.summary.evidenceJobId)}&artifact=${encodeURIComponent(item.family)}`
                                   : '/assurance/evidence'
                             }
-                            className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm"
+                            className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm"
                           >
                             <div className="flex items-center justify-between gap-3">
-                              <div className="font-medium text-white">{humanizeKey(item.family)}</div>
-                              <span className="text-xs text-cyan-200">
+                              <div className="font-medium text-[#241232]">{humanizeKey(item.family)}</div>
+                              <span className="text-xs text-[#6d28d9]">
                                 {isAgentLineageFamily(item.family) ? 'Inspect agent artifact' : 'Inspect artifact'}
                               </span>
                             </div>
-                            <div className="mt-1 font-mono text-xs text-slate-500">{item.path}</div>
+                            <div className="mt-1 font-mono text-xs text-[#62576a]">{item.path}</div>
                           </Link>
                         ))}
                         {evidenceLinks.length === 0 && (
-                          <div className="text-sm text-slate-400">No evidence lineage entries were embedded in the package JSON.</div>
+                          <div className="text-sm text-[#6f6578]">No evidence lineage entries were embedded in the package JSON.</div>
                         )}
                       </div>
                     </section>
@@ -1231,18 +1274,18 @@ export function PackageExplorerPage() {
                       <div className="label">Review ledger decisions</div>
                       <div className="mt-3 space-y-2">
                         {reviewLedgerDecisions.map((item) => (
-                          <div key={item.id} className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
+                          <div key={item.id} className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm">
                             <div className="flex items-center justify-between gap-3">
                               <div>
-                                <div className="font-medium text-white">{item.recommendation_title}</div>
-                                <div className="mt-1 text-xs text-slate-500">
+                                <div className="font-medium text-[#241232]">{item.recommendation_title}</div>
+                                <div className="mt-1 text-xs text-[#62576a]">
                                   {humanizeKey(item.target_type)} · {item.target_id}
                                 </div>
                               </div>
-                              <span className={packageStatusBadgeClass(item.decision)}>{item.decision}</span>
+                              <RegStatusPill tone={packageStatusTone(item.decision)}>{item.decision}</RegStatusPill>
                             </div>
-                            <div className="mt-2 text-xs leading-5 text-slate-400">{item.justification}</div>
-                            <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
+                            <div className="mt-2 text-xs leading-5 text-[#6f6578]">{item.justification}</div>
+                            <div className="mt-3 flex flex-wrap gap-3 text-xs text-[#62576a]">
                               <span>{item.evidence_refs.length} evidence refs</span>
                               <span>{item.finding_refs.length} finding refs</span>
                               <span>{item.control_refs.length} control refs</span>
@@ -1267,17 +1310,17 @@ export function PackageExplorerPage() {
                     <div className="label">Recent review decisions</div>
                     <div className="mt-3 space-y-2">
                       {reviewHistory.slice(0, 5).map((item) => (
-                        <div key={item.id} className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3 text-sm">
+                        <div key={item.id} className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3 text-sm">
                           <div className="flex items-center justify-between gap-3">
-                            <div className="font-medium text-white">{item.decision}</div>
-                            <div className="text-xs text-slate-500">{formatDate(item.createdAt)}</div>
+                            <div className="font-medium text-[#241232]">{item.decision}</div>
+                            <div className="text-xs text-[#62576a]">{formatDate(item.createdAt)}</div>
                           </div>
-                          <div className="mt-2 font-mono text-xs text-cyan-200">{item.recommendationId}</div>
-                          <div className="mt-2 text-xs leading-5 text-slate-400">{item.justification}</div>
+                          <div className="mt-2 font-mono text-xs text-[#6d28d9]">{item.recommendationId}</div>
+                          <div className="mt-2 text-xs leading-5 text-[#6f6578]">{item.justification}</div>
                         </div>
                       ))}
                       {reviewHistory.length === 0 && (
-                        <div className="text-sm text-slate-400">No review decisions have been recorded for this package’s evidence bundle yet.</div>
+                        <div className="text-sm text-[#6f6578]">No review decisions have been recorded for this package’s evidence bundle yet.</div>
                       )}
                     </div>
                   </section>
@@ -1287,6 +1330,229 @@ export function PackageExplorerPage() {
           )}
         </section>
       </section>
+
+      <RegRightDrawer
+        open={packageDrawerOpen}
+        onOpenChange={setPackageDrawerOpen}
+        title="Package readiness"
+        description="Review the deterministic package posture before downstream handoff."
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            {detail?.summary?.evidenceJobId ? (
+              <Link className="button-secondary" to={`/assurance/evidence?evidenceJobId=${encodeURIComponent(detail.summary.evidenceJobId)}`}>
+                Evidence explorer
+              </Link>
+            ) : null}
+            <button className="button-secondary" onClick={() => setPackageDrawerOpen(false)} type="button">
+              Close
+            </button>
+          </div>
+        }
+      >
+        {detail ? (
+          <div className="space-y-4">
+            <section className="rounded-lg border border-[#ded8e4] bg-white px-4 py-4">
+              <div className="label">Package job</div>
+              <h3 className="mt-2 text-lg font-semibold text-[#241232]">{detail.job.fileName}</h3>
+              <div className="mt-2 break-all font-mono text-xs text-[#6d28d9]">{detail.job.id}</div>
+              <div className="mt-4 grid gap-3 text-sm text-[#51465e]">
+                <div className="flex items-center justify-between gap-3">
+                  <span>Status</span>
+                  <RegStatusPill tone={packageStatusTone(detail.job.status)}>{detail.job.status}</RegStatusPill>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span>Validation</span>
+                  <RegStatusPill tone={packageStatusTone(String(detail.job.coverage.validationStatus ?? 'unknown'))}>
+                    {String(detail.job.coverage.validationStatus ?? 'unknown')}
+                  </RegStatusPill>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span>Reconciliation</span>
+                  <RegStatusPill tone={packageStatusTone(String(detail.job.coverage.reconciliationStatus ?? detail.reconciliation?.status ?? 'pending'))}>
+                    {String(detail.job.coverage.reconciliationStatus ?? detail.reconciliation?.status ?? 'pending')}
+                  </RegStatusPill>
+                </div>
+              </div>
+            </section>
+
+            <section className="grid gap-3 sm:grid-cols-2">
+              <div className="metric-card">
+                <div className="metric-label">Evaluations</div>
+                <div className="metric-value">{detail.summary?.evaluationCount ?? 0}</div>
+              </div>
+              <div className="metric-card">
+                <div className="metric-label">Gaps</div>
+                <div className="metric-value">{detail.summary?.gapCount ?? 0}</div>
+              </div>
+              <div className="metric-card">
+                <div className="metric-label">POA&amp;M</div>
+                <div className="metric-value">{detail.summary?.poamCount ?? 0}</div>
+              </div>
+              <div className="metric-card">
+                <div className="metric-label">Accepted Reviews</div>
+                <div className="metric-value">{acceptedReviewCount}</div>
+              </div>
+            </section>
+
+            <section className="rounded-lg border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
+              <div className="label">Handoff health</div>
+              <div className="mt-3 space-y-2 text-sm text-[#51465e]">
+                <div className="flex justify-between gap-3">
+                  <span>Reconciliation checks</span>
+                  <span className="font-mono text-[#6d28d9]">{detail.reconciliation?.checks.length ?? 0}</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span>Mismatches</span>
+                  <span className="font-mono text-[#6d28d9]">{mismatchChecks.length}</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span>Generated</span>
+                  <span>{formatDate(detail.summary?.generatedAt)}</span>
+                </div>
+                <div className="flex justify-between gap-3">
+                  <span>Evidence job</span>
+                  <span className="max-w-[220px] truncate font-mono text-[#6d28d9]">{detail.summary?.evidenceJobId ?? 'Not linked'}</span>
+                </div>
+              </div>
+            </section>
+          </div>
+        ) : (
+          <div className="text-sm text-[#6f6578]">Select a package to inspect readiness.</div>
+        )}
+      </RegRightDrawer>
+
+      <RegRightDrawer
+        open={artifactDrawerOpen}
+        onOpenChange={setArtifactDrawerOpen}
+        title="Current package artifact"
+        description="Inspect the currently selected artifact family and preview payload."
+        footer={
+          <div className="flex justify-end">
+            <button className="button-secondary" onClick={() => setArtifactDrawerOpen(false)} type="button">
+              Close
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <section className="rounded-lg border border-[#ded8e4] bg-white px-4 py-4">
+            <div className="label">Artifact family</div>
+            <div className="mt-2 text-lg font-semibold text-[#241232]">{previewState?.family ?? previewFamily}</div>
+            <div className="mt-3 grid gap-2 text-sm text-[#51465e]">
+              <div className="flex justify-between gap-3">
+                <span>Retrieval</span>
+                <span>{previewState?.retrieval.kind ?? 'preview'}</span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span>Preview</span>
+                <span>{previewState?.retrieval.previewAvailable === false ? 'Unavailable' : 'Available'}</span>
+              </div>
+              <div className="flex justify-between gap-3">
+                <span>Objects</span>
+                <span>{previewState?.items.length ?? 0}</span>
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
+            <div className="label">Object metadata</div>
+            <div className="mt-3 break-all font-mono text-xs text-[#6d28d9]">{selectedPreviewItem?.objectKey ?? 'No object metadata loaded.'}</div>
+            <div className="mt-3 flex flex-wrap gap-3 text-xs text-[#62576a]">
+              <span>{selectedPreviewItem?.contentType ?? 'unknown content type'}</span>
+              <span>{formatBytes(selectedPreviewItem?.sizeBytes ?? null)}</span>
+              {selectedPreviewItem?.createdAt ? <span>{formatDate(selectedPreviewItem.createdAt)}</span> : null}
+            </div>
+          </section>
+
+          <pre className="max-h-[48dvh] overflow-auto rounded-lg border border-[#ded8e4] bg-[#f7f2fa] p-4 text-xs leading-6 text-[#51465e]">
+            {preview ? toPreview(preview) : 'No preview is available for the selected package artifact.'}
+          </pre>
+        </div>
+      </RegRightDrawer>
+
+      <RegRightDrawer
+        open={reviewDrawerOpen}
+        onOpenChange={setReviewDrawerOpen}
+        title="Package review history"
+        description="Review human decisions carried by or linked to this package."
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            {detail?.summary?.evidenceJobId ? (
+              <Link className="button-secondary" to={`/assurance/reviews?evidenceJobId=${encodeURIComponent(detail.summary.evidenceJobId)}`}>
+                Review queue
+              </Link>
+            ) : null}
+            <button className="button-secondary" onClick={() => setReviewDrawerOpen(false)} type="button">
+              Close
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <section className="rounded-lg border border-[#ded8e4] bg-white px-4 py-4">
+            <div className="label">Decision rollup</div>
+            <div className="mt-3 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-lg border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                <div className="metric-label">Accepted</div>
+                <div className="text-xl font-semibold text-[#241232]">{reviewLedger?.accepted_count ?? acceptedReviewCount}</div>
+              </div>
+              <div className="rounded-lg border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                <div className="metric-label">Rejected</div>
+                <div className="text-xl font-semibold text-[#241232]">{reviewLedger?.rejected_count ?? 0}</div>
+              </div>
+              <div className="rounded-lg border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                <div className="metric-label">Linked</div>
+                <div className="text-xl font-semibold text-[#241232]">{reviewHistory.length}</div>
+              </div>
+            </div>
+          </section>
+
+          {reviewLedgerDecisions.length > 0 ? (
+            <section className="space-y-2">
+              <div className="label">Embedded ledger decisions</div>
+              {reviewLedgerDecisions.map((item) => (
+                <div key={item.id} className="rounded-lg border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4 text-sm">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="font-medium text-[#241232]">{item.recommendation_title}</div>
+                      <div className="mt-1 text-xs text-[#62576a]">{humanizeKey(item.target_type)} · {item.target_id}</div>
+                    </div>
+                    <RegStatusPill tone={packageStatusTone(item.decision)}>{item.decision}</RegStatusPill>
+                  </div>
+                  <div className="mt-2 text-xs leading-5 text-[#6f6578]">{item.justification}</div>
+                </div>
+              ))}
+            </section>
+          ) : null}
+
+          <section className="space-y-2">
+            <div className="label">Recent linked decisions</div>
+            {reviewHistory.slice(0, 8).map((item) => (
+              <div key={item.id} className="rounded-lg border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4 text-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="font-medium text-[#241232]">{item.recommendationTitle ?? item.recommendationId}</div>
+                    <div className="mt-1 font-mono text-xs text-[#6d28d9]">{item.recommendationId}</div>
+                  </div>
+                  <RegStatusPill tone={packageStatusTone(item.decision)}>{item.decision}</RegStatusPill>
+                </div>
+                <div className="mt-2 text-xs leading-5 text-[#6f6578]">{item.justification}</div>
+                <div className="mt-3 flex flex-wrap gap-3 text-xs text-[#62576a]">
+                  <span>{formatDate(item.createdAt)}</span>
+                  <span>{item.evidenceRefs.length} evidence refs</span>
+                  <span>{item.findingRefs.length} finding refs</span>
+                  <span>{item.controlRefs.length} control refs</span>
+                </div>
+              </div>
+            ))}
+            {reviewHistory.length === 0 && reviewLedgerDecisions.length === 0 ? (
+              <div className="rounded-lg border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4 text-sm text-[#6f6578]">
+                No review decisions have been recorded for this package yet.
+              </div>
+            ) : null}
+          </section>
+        </div>
+      </RegRightDrawer>
     </div>
   );
 }

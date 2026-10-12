@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ApiClient } from '../../shared/api/client';
+import { RegStatusPill } from '../../components/regovise/PagePrimitives';
 import { useEdgeIdentity } from '../../shared/session/identity';
 import type { RiskAssessment, RiskScenario } from './types';
 
@@ -24,12 +25,12 @@ function toMatrixBucket(value: number | null | undefined) {
 
 function riskTone(score: number) {
   if (score >= 16) {
-    return 'bg-rose-500/15 text-rose-200';
+    return 'bg-rose-500/15 text-[#9d1f2c]';
   }
   if (score >= 10) {
-    return 'bg-amber-500/15 text-amber-200';
+    return 'bg-amber-500/15 text-[#8a4d00]';
   }
-  return 'bg-emerald-500/15 text-emerald-200';
+  return 'bg-emerald-500/15 text-[#126b36]';
 }
 
 export function RiskAssessmentDetailPage() {
@@ -139,7 +140,7 @@ export function RiskAssessmentDetailPage() {
   }, [scenarios]);
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading risk assessment workspace...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading risk assessment workspace...</div>;
   }
 
   if (!assessment) {
@@ -148,27 +149,27 @@ export function RiskAssessmentDetailPage() {
 
   return (
     <div className="space-y-6">
-      <section className="panel grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-        <div>
-          <Link className="text-sm text-cyan-200 transition hover:text-cyan-100" to="/assessments">
+      <section className="panel grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+        <div className="min-w-0">
+          <Link className="text-sm text-[#6d28d9] transition hover:text-[#5f1aa8]" to="/assessments">
             Back to assessments
           </Link>
           <div className="eyebrow mt-4">Risk</div>
-          <h1 className="mt-2 text-3xl font-semibold text-white">{assessment.name}</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold text-[#241232]">{assessment.name}</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f435c]">
             Review the attached risk register, add scenarios directly into scope, and watch how the
             inherent and residual posture changes over time.
           </p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <div className="metric-card">
               <div className="metric-label">Perimeter</div>
-              <div className="mt-3 text-lg font-semibold text-white">
+              <div className="mt-3 text-lg font-semibold text-[#241232]">
                 {assessment.perimeterName ?? assessment.folderName}
               </div>
             </div>
             <div className="metric-card">
               <div className="metric-label">Register</div>
-              <div className="mt-3 text-lg font-semibold text-white">
+              <div className="mt-3 text-lg font-semibold text-[#241232]">
                 {assessment.riskRegisterName ?? 'Unassigned'}
               </div>
             </div>
@@ -178,13 +179,13 @@ export function RiskAssessmentDetailPage() {
             </div>
             <div className="metric-card">
               <div className="metric-label">Status</div>
-              <div className="mt-3 text-lg font-semibold capitalize text-white">{assessment.status}</div>
+              <div className="mt-3 text-lg font-semibold capitalize text-[#241232]">{assessment.status}</div>
             </div>
           </div>
-          <div className="mt-5 panel-subtle grid gap-3 text-sm text-slate-300 sm:grid-cols-2">
+          <div className="mt-5 panel-subtle grid gap-3 text-sm text-[#4f435c] sm:grid-cols-2">
             <div>
               <div className="label">Reference</div>
-              <div className="mt-2 font-mono text-xs text-cyan-200">{assessment.refId ?? 'n/a'}</div>
+              <div className="mt-2 font-mono text-xs text-[#6d28d9]">{assessment.refId ?? 'n/a'}</div>
             </div>
             <div>
               <div className="label">Updated</div>
@@ -192,7 +193,7 @@ export function RiskAssessmentDetailPage() {
             </div>
             <div className="sm:col-span-2">
               <div className="label">Observation</div>
-              <div className="mt-2 whitespace-pre-line leading-6 text-slate-300">
+              <div className="mt-2 whitespace-pre-line leading-6 text-[#4f435c]">
                 {assessment.observation || 'No observation recorded yet.'}
               </div>
             </div>
@@ -200,7 +201,7 @@ export function RiskAssessmentDetailPage() {
         </div>
 
         <form
-          className="space-y-3"
+          className="min-w-0 space-y-3"
           onSubmit={(event) => {
             event.preventDefault();
             void createScenario();
@@ -269,7 +270,7 @@ export function RiskAssessmentDetailPage() {
       {notice && <div className="notice-success">{notice}</div>}
       {error && <div className="notice-error">{error}</div>}
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="metric-card">
           <div className="metric-label">Scenarios in scope</div>
           <div className="metric-value">{metrics.total}</div>
@@ -288,15 +289,15 @@ export function RiskAssessmentDetailPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-        <section className="panel">
+      <section className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+        <section className="panel min-w-0 overflow-hidden">
           <div className="eyebrow">Matrix View</div>
-          <h2 className="mt-2 text-xl font-semibold text-white">Likelihood x Impact Heatmap</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-300">
+          <h2 className="mt-2 text-xl font-semibold text-[#241232]">Likelihood x Impact Heatmap</h2>
+          <p className="mt-2 text-sm leading-6 text-[#4f435c]">
             Scenarios are placed using the currently stored likelihood and impact values from the
             attached risk register.
           </p>
-          <div className="mt-5 overflow-x-auto">
+          <div className="mt-5 max-w-full overflow-x-auto">
             <div className="grid min-w-[640px] grid-cols-[72px_repeat(5,minmax(0,1fr))] gap-2">
               <div />
               {[1, 2, 3, 4, 5].map((value) => (
@@ -316,17 +317,17 @@ export function RiskAssessmentDetailPage() {
                       return (
                         <div
                           key={`${impactValue}-${columnIndex + 1}`}
-                          className={`min-h-[108px] rounded-3xl border border-white/10 p-3 ${riskTone(riskLevel)}`}
+                          className={`min-h-[108px] rounded-3xl border border-[#ded8e4] p-3 ${riskTone(riskLevel)}`}
                         >
                           <div className="text-xs uppercase tracking-[0.16em]">{cell.length} items</div>
                           <div className="mt-3 space-y-2">
                             {cell.slice(0, 2).map((scenario) => (
-                              <div key={scenario.id} className="rounded-2xl bg-slate-950/35 px-3 py-2 text-xs text-white">
+                              <div key={scenario.id} className="rounded-2xl bg-white px-3 py-2 text-xs text-[#241232]">
                                 {scenario.title}
                               </div>
                             ))}
                             {cell.length > 2 && (
-                              <div className="text-xs text-slate-200">+{cell.length - 2} more</div>
+                              <div className="text-xs text-[#38254a]">+{cell.length - 2} more</div>
                             )}
                           </div>
                         </div>
@@ -339,47 +340,49 @@ export function RiskAssessmentDetailPage() {
           </div>
         </section>
 
-        <section className="panel overflow-hidden p-0">
-          <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-white/10 bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
-              <tr>
-                <th className="px-4 py-3">Scenario</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Likelihood / Impact</th>
-                <th className="px-4 py-3">Scores</th>
-              </tr>
-            </thead>
-            <tbody>
-              {scenarios.map((scenario) => (
-                <tr key={scenario.id} className="border-t border-white/5 align-top">
-                  <td className="px-4 py-4">
-                    <div className="font-medium text-white">{scenario.title}</div>
-                    {scenario.description && (
-                      <div className="mt-2 max-w-xl text-sm leading-6 text-slate-400">{scenario.description}</div>
-                    )}
-                    <div className="mt-2 text-xs text-slate-500">{formatTimestamp(scenario.updatedAt)}</div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <span className="badge-neutral capitalize">{scenario.status}</span>
-                  </td>
-                  <td className="px-4 py-4 text-slate-300">
-                    {scenario.likelihood ?? 'n/a'} / {scenario.impact ?? 'n/a'}
-                  </td>
-                  <td className="px-4 py-4 text-slate-300">
-                    <div>Inherent {formatScore(scenario.inherentScore)}</div>
-                    <div className="mt-1 text-xs text-slate-500">Residual {formatScore(scenario.residualScore)}</div>
-                  </td>
-                </tr>
-              ))}
-              {scenarios.length === 0 && (
+        <section className="panel min-w-0 overflow-hidden p-0">
+          <div className="max-w-full overflow-x-auto">
+            <table className="min-w-[760px] text-left text-sm">
+              <thead className="border-b border-[#ded8e4] bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
                 <tr>
-                  <td className="px-4 py-8 text-center text-slate-400" colSpan={4}>
-                    No risk scenarios are linked to this assessment yet.
-                  </td>
+                  <th className="px-4 py-3">Scenario</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Likelihood / Impact</th>
+                  <th className="px-4 py-3">Scores</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {scenarios.map((scenario) => (
+                  <tr key={scenario.id} className="border-t border-[#eeeaf2] align-top">
+                    <td className="px-4 py-4">
+                      <div className="font-medium text-[#241232]">{scenario.title}</div>
+                      {scenario.description && (
+                        <div className="mt-2 max-w-xl text-sm leading-6 text-[#6f6578]">{scenario.description}</div>
+                      )}
+                      <div className="mt-2 text-xs text-[#62576a]">{formatTimestamp(scenario.updatedAt)}</div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <RegStatusPill tone="neutral" className="capitalize">{scenario.status}</RegStatusPill>
+                    </td>
+                    <td className="px-4 py-4 text-[#4f435c]">
+                      {scenario.likelihood ?? 'n/a'} / {scenario.impact ?? 'n/a'}
+                    </td>
+                    <td className="px-4 py-4 text-[#4f435c]">
+                      <div>Inherent {formatScore(scenario.inherentScore)}</div>
+                      <div className="mt-1 text-xs text-[#62576a]">Residual {formatScore(scenario.residualScore)}</div>
+                    </td>
+                  </tr>
+                ))}
+                {scenarios.length === 0 && (
+                  <tr>
+                    <td className="px-4 py-8 text-center text-[#6f6578]" colSpan={4}>
+                      No risk scenarios are linked to this assessment yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </section>
       </section>
     </div>

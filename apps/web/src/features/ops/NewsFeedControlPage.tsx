@@ -59,7 +59,7 @@ export function NewsFeedControlPage() {
   }, [moduleFilter, priorityFilter, search, snapshot, typeFilter]);
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading news feed...</div>;
+    return <div className="panel p-6 text-sm text-[#51465e]">Loading news feed...</div>;
   }
 
   if (error || !snapshot) {
@@ -76,8 +76,8 @@ export function NewsFeedControlPage() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">Operations</div>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">News Feed</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">News Feed</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">
               Track exports, imports, portal workflows, evidence collection, and workspace guidance activity from a
               canonical Worker-backed event stream.
             </p>
@@ -110,14 +110,14 @@ export function NewsFeedControlPage() {
 
       <section className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
         <div className="panel-subtle space-y-4">
-          <div className="flex items-center gap-2 text-white">
-            <Filter className="h-4 w-4 text-cyan-300" />
+          <div className="flex items-center gap-2 text-[#241232]">
+            <Filter className="h-4 w-4 text-[#7a2ed6]" />
             <h2 className="text-lg font-semibold">Feed filters</h2>
           </div>
           <label className="space-y-1">
             <span className="label">Search</span>
             <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-500" />
+              <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-[#62576a]" />
               <input
                 className="input pl-10"
                 onChange={(event) => setSearch(event.target.value)}
@@ -159,19 +159,19 @@ export function NewsFeedControlPage() {
             </label>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+          <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
             <div className="eyebrow">Timeline</div>
             <div className="mt-4 space-y-3">
               {snapshot.timeline.map((point) => (
                 <div key={point.bucket}>
-                  <div className="flex items-center justify-between text-sm text-slate-300">
+                  <div className="flex items-center justify-between text-sm text-[#51465e]">
                     <span>{point.bucket}</span>
                     <span>
                       {point.events} total · {point.workflow} workflow · {point.action} action
                     </span>
                   </div>
-                  <div className="mt-2 h-2 rounded-full bg-white/5">
-                    <div className="h-2 rounded-full bg-cyan-400" style={{ width: `${Math.min(100, point.events * 12)}%` }} />
+                  <div className="mt-2 h-2 rounded-full bg-[#f6f1fa]">
+                    <div className="h-2 rounded-full bg-[#8b35e6]" style={{ width: `${Math.min(100, point.events * 12)}%` }} />
                   </div>
                 </div>
               ))}
@@ -180,37 +180,37 @@ export function NewsFeedControlPage() {
 
           <div className="grid gap-3 md:grid-cols-2">
             {snapshot.moduleVolume.map((entry) => (
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4" key={entry.module}>
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={entry.module}>
                 <div className="label">{entry.module}</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{entry.count}</div>
+                <div className="mt-2 text-2xl font-semibold text-[#241232]">{entry.count}</div>
               </div>
             ))}
           </div>
         </div>
 
         <section className="panel overflow-hidden p-0">
-          <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+          <div className="flex items-center justify-between border-b border-[#ded8e4] px-6 py-4">
             <div>
               <div className="eyebrow">Recent activity</div>
-              <p className="mt-1 text-sm text-slate-400">Canonical feed events sorted by latest tenant activity.</p>
+              <p className="mt-1 text-sm text-[#6f6578]">Canonical feed events sorted by latest tenant activity.</p>
             </div>
-            <BellRing className="h-5 w-5 text-cyan-300" />
+            <BellRing className="h-5 w-5 text-[#7a2ed6]" />
           </div>
-          <div className="divide-y divide-white/6">
+          <div className="divide-y divide-[#ded8e4]">
             {filteredEvents.map((event) => (
               <div className="px-6 py-4" key={`${event.type}:${event.id}`}>
                 <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <div className="font-medium text-white">{event.title}</div>
-                      <span className="badge-neutral">{event.module}</span>
-                      <span className="badge-neutral">{event.type}</span>
-                      <span className={event.priority === 'Action' ? 'badge-neutral' : 'badge-positive'}>
+                      <div className="font-medium text-[#241232]">{event.title}</div>
+                      <span className="status-pill-neutral">{event.module}</span>
+                      <span className="status-pill-neutral">{event.type}</span>
+                      <span className={event.priority === 'Action' ? 'status-pill-neutral' : 'status-pill-positive'}>
                         {event.priority}
                       </span>
                     </div>
-                    <div className="mt-2 text-sm text-slate-300">{event.summary}</div>
-                    <div className="mt-2 text-xs text-slate-500">
+                    <div className="mt-2 text-sm text-[#51465e]">{event.summary}</div>
+                    <div className="mt-2 text-xs text-[#62576a]">
                       {event.actor ? `${event.actor} · ` : ''}
                       {new Date(event.occurredAt).toLocaleString()} · {event.status}
                     </div>

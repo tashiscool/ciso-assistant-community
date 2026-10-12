@@ -2,6 +2,14 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 const baseUrl = process.env.CLOUDFLARE_LOCAL_URL ?? 'http://127.0.0.1:8787';
+const syntheticScf = process.argv.includes('--scf-fixtures');
+const fixtureProviders = process.argv.includes('--fixture-providers') || syntheticScf;
+if (fixtureProviders) {
+  const target = new URL(baseUrl);
+  if (!['http:', 'https:'].includes(target.protocol) || !['127.0.0.1', 'localhost', '[::1]'].includes(target.hostname) || target.username || target.password) {
+    throw new Error('Provider fixture smoke requires a loopback target without credentials.');
+  }
+}
 const headers = {
   'content-type': 'application/json',
   'x-tenant-id': 'tenant-demo',
@@ -11,11 +19,15 @@ const headers = {
 const cloudflareRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const bannedFrameworkTerms = [/\/plugin\b/i, /\/grc-engineer:/i, /claude-grc/i, /\bmarketplace\b/i];
 
-async function request(pathname, init = {}) {
-  const response = await fetch(`${baseUrl}${pathname}`, init);
+async function request(pathname, init = {}, expectedStatus = null) {
+  const response = await fetch(`${baseUrl}${pathname}`, { ...init, signal: AbortSignal.timeout(30000), redirect: 'manual' });
   const text = await response.text();
-  if (!response.ok) {
+  if (expectedStatus !== null ? response.status !== expectedStatus : !response.ok) {
     throw new Error(`${init.method ?? 'GET'} ${pathname} failed (${response.status}): ${text}`);
+  }
+  if (fixtureProviders && pathname === '/_api/core/health') {
+    const expectedMode = syntheticScf ? 'synthetic-scf-outbound-blocked-no-credentials' : 'outbound-blocked-no-credentials';
+    assert(response.headers.get('x-regovise-verification-run') && response.headers.get('x-regovise-provider-mode') === expectedMode, 'Fixture smoke requires the matching isolated Worker verification wrapper.');
   }
   return text ? JSON.parse(text) : null;
 }
@@ -83,16 +95,28 @@ async function main() {
   const refreshTargets = frameworks.data
     .filter((item) => item.slug === 'soc2' || item.slug === 'fedramp-rev5')
     .map((item) => item.id);
+  const scfBefore = fixtureProviders ? await request('/_api/grc/admin/settings', { headers }) : null;
   const refreshResult = await request('/_api/grc/admin/scf/refresh', {
     method: 'POST',
     headers,
     body: JSON.stringify({ frameworkIds: refreshTargets }),
   });
   const refreshedJob = await waitForJob(refreshResult.data.jobId);
-  assert(
-    Array.isArray(refreshedJob?.result?.refreshedFrameworks) && refreshedJob.result.refreshedFrameworks.length >= 2,
-    'Expected SCF refresh to process two frameworks.',
-  );
+  if (fixtureProviders && !syntheticScf) {
+    assert(refreshedJob.status === 'failed', 'Blocked outbound SCF refresh must report a failed job.');
+    assert(Array.isArray(refreshedJob.diagnostics) && refreshedJob.diagnostics.some((diagnostic) => String(diagnostic).includes('Outbound HTTP is blocked in isolated verification.')), 'Expected the explicit outbound-block diagnostic on the failed SCF refresh.');
+    assert(!refreshedJob.result?.refreshedFrameworks?.length, 'A blocked SCF refresh must not claim successfully refreshed frameworks.');
+    const scfAfter = await request('/_api/grc/admin/settings', { headers });
+    const frameworksAfter = await request('/_api/grc/frameworks', { headers });
+    assert(scfAfter.data.scfVersion === scfBefore.data.scfVersion && scfAfter.data.scfFrameworkCount === scfBefore.data.scfFrameworkCount, 'Blocked refresh must preserve the existing SCF version and mapping count.');
+    assert(JSON.stringify(frameworksAfter.data.map((item) => [item.id, item.crosswalkReady])) === JSON.stringify(frameworks.data.map((item) => [item.id, item.crosswalkReady])), 'Blocked refresh must preserve each framework mapping readiness state.');
+  } else {
+    assert(
+      Array.isArray(refreshedJob?.result?.refreshedFrameworks) && refreshedJob.result.refreshedFrameworks.length >= 2,
+      'Expected SCF refresh to process two frameworks.',
+    );
+    if (syntheticScf) assert(refreshedJob.status === 'completed' && refreshedJob.result.scfVersion === 'regovise-test-fixture', 'Expected a completed refresh of explicitly synthetic SCF data.');
+  }
 
   const githubFinding = await readFixture('github-branch-protection.json');
   const wizFinding = await readFixture('wiz-public-storage.json');
@@ -110,6 +134,7 @@ async function main() {
 
   const connectorStatus = await request('/_api/grc/connectors', { headers });
   assert(Array.isArray(connectorStatus?.data) && connectorStatus.data.some((item) => item.source === 'github'), 'Expected collector status payload.');
+  if (fixtureProviders) assert(connectorStatus.data.find((item) => item.source === 'github')?.authReady === false, 'Isolated native GitHub collection must start without live connector credentials.');
 
   const githubCollect = await request('/_api/grc/connectors/github/collect', {
     method: 'POST',
@@ -117,12 +142,23 @@ async function main() {
   });
   const githubJob = await waitForJob(githubCollect.data.jobId);
   assert(githubJob?.result?.source === 'github', 'Expected GitHub native collection run.');
+  if (fixtureProviders) assert(githubJob.status === 'completed' && githubJob.result.mode === 'fixture' && githubJob.result.diagnostics?.fixture === true, 'Unconfigured local GitHub collection must explicitly identify fixture findings.');
 
   const githubRuns = await request('/_api/grc/connectors/github/runs', { headers });
   assert(Array.isArray(githubRuns?.data) && githubRuns.data.length >= 1, 'Expected GitHub collector run history.');
 
+  if (fixtureProviders && !syntheticScf) {
+    const fixtureDetails = await Promise.all(findings.data.map((finding) => request(`/_api/grc/findings/${encodeURIComponent(finding.id)}`, { headers })));
+    assert(fixtureDetails.every((finding) => finding.data.evaluations.every((evaluation) => evaluation.scfControlIds.length === 0)), 'Without an SCF dataset, fixture ingestion must not fabricate mapped SCF ids.');
+    const blockedMap = await request('/_api/grc/controls/map?framework=soc2&controlId=CC6.1', { headers }, 500);
+    assert(String(blockedMap?.message).includes('Outbound HTTP is blocked in isolated verification.'), 'An uncached SCF map must expose the real blocked-provider failure.');
+    console.log(JSON.stringify({ providerMode: 'outbound-blocked-no-credentials', frameworkCount: frameworks.data.length, findingCount: findings.data.length, refreshJobId: refreshedJob.id, refreshStatus: refreshedJob.status, refreshDiagnostics: refreshedJob.diagnostics, githubCollectionMode: githubJob.result.mode, skippedAssertions: ['successful live SCF refresh', 'positive SCF control mappings', 'mapped gap assessment', 'assessment evidence package', 'assessment report bundle', 'assessment executive summary'], proofLimit: 'Normalized findings and unconfigured fixture collection verified; no SCF crosswalk dataset was imported and no live provider success is claimed.' }, null, 2));
+    return;
+  }
+
   const controlMap = await request('/_api/grc/controls/map?framework=soc2&controlId=CC6.1', { headers });
   assert(Array.isArray(controlMap?.data?.scfControls) && controlMap.data.scfControls.length >= 1, 'Expected SCF control mappings.');
+  if (syntheticScf) assert(controlMap.data.scfControls.every((control) => control.controlId.startsWith('TEST-') && control.title.startsWith('SYNTHETIC TEST ONLY:')), 'Synthetic SCF mapping must retain its artificial ids and labels.');
 
   const assessment = await request('/_api/grc/assessments', {
     method: 'POST',
@@ -169,6 +205,8 @@ async function main() {
   console.log(
     JSON.stringify(
       {
+        providerMode: syntheticScf ? 'synthetic-scf-outbound-blocked-no-credentials' : 'live-provider-required',
+        ...(syntheticScf ? { fixtureVersion: 'regovise-test-fixture', githubCollectionMode: githubJob.result.mode, skippedAssertions: ['successful live SCF network transport', 'genuine SCF mapping accuracy', 'live GitHub connector collection'], proofLimit: 'Artificial exact-URL SCF responses exercise persisted queue/mapping/assessment/report mechanics; these mappings have no regulatory meaning.' } : {}),
         frameworkCount: frameworks.data.length,
         findingCount: findings.data.length,
         gapCount: assessment.data.gapCount,

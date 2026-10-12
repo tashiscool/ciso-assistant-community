@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { RegStatusPill } from '../../components/regovise/PagePrimitives';
 import { ApiClient } from '../../shared/api/client';
 import { getSetupRiskModel } from '../setup/api';
 import type { SetupRiskModelSnapshot } from '../setup/types';
@@ -233,16 +234,16 @@ export function ThreatModelsPage({ canConfigureModel, canUseRiskAssessments }: T
   const maxScaleScore = (riskModel?.config.likelihoodScale ?? 0) * (riskModel?.config.impactScale ?? 0);
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading threat model workspace...</div>;
+    return <div className="panel p-6 text-sm text-[#51465e]">Loading threat model workspace...</div>;
   }
 
   return (
     <div className="space-y-6">
-      <section className="panel grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
-        <div>
+      <section className="panel grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
+        <div className="min-w-0">
           <div className="eyebrow">Risk Modeling</div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Threat Models</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">Threat Models</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">
             Threat models provide a structured way to analyze threats, vulnerabilities, and security scenarios so teams
             can prioritize mitigations, strengthen system designs, and apply the right risk workflow to the right system.
           </p>
@@ -268,7 +269,7 @@ export function ThreatModelsPage({ canConfigureModel, canUseRiskAssessments }: T
             ) : null}
           </div>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2">
           <div className="metric-card">
             <div className="metric-label">Model type</div>
             <div className="metric-value">{riskModel?.metrics.modelType ?? 'Unavailable'}</div>
@@ -298,7 +299,7 @@ export function ThreatModelsPage({ canConfigureModel, canUseRiskAssessments }: T
 
       {error && <div className="notice-error">{error}</div>}
       {warnings.length > 0 && (
-        <div className="panel-subtle space-y-2 text-sm text-slate-300">
+        <div className="panel-subtle space-y-2 text-sm text-[#51465e]">
           <div className="eyebrow">Workspace Notes</div>
           {warnings.map((warning) => (
             <div key={warning}>{warning}</div>
@@ -306,36 +307,36 @@ export function ThreatModelsPage({ canConfigureModel, canUseRiskAssessments }: T
         </div>
       )}
 
-      <section className="grid gap-6 xl:grid-cols-[1.02fr_0.98fr]">
+      <section className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)]">
         <div className="space-y-6">
           <section className="panel">
             <div className="eyebrow">How Threat Models Work</div>
             <div className="mt-4 grid gap-3">
               <div className="panel-subtle">
-                <div className="font-medium text-white">1. Define the modeling logic</div>
-                <div className="mt-2 text-sm leading-6 text-slate-300">
+                <div className="font-medium text-[#241232]">1. Define the modeling logic</div>
+                <div className="mt-2 text-sm leading-6 text-[#51465e]">
                   Set the tenant risk methodology, scoring scales, escalation posture, and threshold bands so every modeled
                   scenario is evaluated from one explainable baseline.
                 </div>
               </div>
               <div className="panel-subtle">
-                <div className="font-medium text-white">2. Build the scenario portfolio</div>
-                <div className="mt-2 text-sm leading-6 text-slate-300">
+                <div className="font-medium text-[#241232]">2. Build the scenario portfolio</div>
+                <div className="mt-2 text-sm leading-6 text-[#51465e]">
                   Use threat-model registers as reusable modeling lanes for business domains, applications, or shared
                   services, then capture the scenarios that describe likely attack paths, vulnerable conditions, and
                   material business consequences.
                 </div>
               </div>
               <div className="panel-subtle">
-                <div className="font-medium text-white">3. Review model posture and reusable coverage</div>
-                <div className="mt-2 text-sm leading-6 text-slate-300">
+                <div className="font-medium text-[#241232]">3. Review model posture and reusable coverage</div>
+                <div className="mt-2 text-sm leading-6 text-[#51465e]">
                   Track which registers are actively modeled, which scenarios carry residual scoring, and where elevated
                   exposure still needs mitigation or review before teams reuse the model elsewhere.
                 </div>
               </div>
               <div className="panel-subtle">
-                <div className="font-medium text-white">4. Apply the model in system risk workflows</div>
-                <div className="mt-2 text-sm leading-6 text-slate-300">
+                <div className="font-medium text-[#241232]">4. Apply the model in system risk workflows</div>
+                <div className="mt-2 text-sm leading-6 text-[#51465e]">
                   Carry the tenant scoring contract and modeled scenarios into risk assessments so system owners can apply
                   the same taxonomy, treatment expectations, and escalation posture consistently.
                 </div>
@@ -347,64 +348,66 @@ export function ThreatModelsPage({ canConfigureModel, canUseRiskAssessments }: T
             <div className="eyebrow">Scenario Portfolio</div>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <div className="panel-subtle">
-                <div className="text-xs uppercase tracking-[0.16em] text-slate-500">Open</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{openScenarios.length}</div>
-                <div className="mt-1 text-sm text-slate-400">Scenarios still in active analysis or treatment</div>
+                <div className="text-xs uppercase tracking-[0.16em] text-[#62576a]">Open</div>
+                <div className="mt-2 text-2xl font-semibold text-[#241232]">{openScenarios.length}</div>
+                <div className="mt-1 text-sm text-[#6f6578]">Scenarios still in active analysis or treatment</div>
               </div>
               <div className="panel-subtle">
-                <div className="text-xs uppercase tracking-[0.16em] text-slate-500">Elevated</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{elevatedScenarios.length}</div>
-                <div className="mt-1 text-sm text-slate-400">Scenarios at or above the tenant mitigation threshold</div>
+                <div className="text-xs uppercase tracking-[0.16em] text-[#62576a]">Elevated</div>
+                <div className="mt-2 text-2xl font-semibold text-[#241232]">{elevatedScenarios.length}</div>
+                <div className="mt-1 text-sm text-[#6f6578]">Scenarios at or above the tenant mitigation threshold</div>
               </div>
               <div className="panel-subtle">
-                <div className="text-xs uppercase tracking-[0.16em] text-slate-500">Monitoring</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{monitoredScenarios.length}</div>
-                <div className="mt-1 text-sm text-slate-400">Scenarios sitting in monitor or accepted posture</div>
+                <div className="text-xs uppercase tracking-[0.16em] text-[#62576a]">Monitoring</div>
+                <div className="mt-2 text-2xl font-semibold text-[#241232]">{monitoredScenarios.length}</div>
+                <div className="mt-1 text-sm text-[#6f6578]">Scenarios sitting in monitor or accepted posture</div>
               </div>
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <div className="panel-subtle">
-                <div className="text-xs uppercase tracking-[0.16em] text-slate-500">Residual scored</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{residualScoredScenarios.length}</div>
-                <div className="mt-1 text-sm text-slate-400">Scenarios with explicit residual-risk posture captured</div>
+                <div className="text-xs uppercase tracking-[0.16em] text-[#62576a]">Residual scored</div>
+                <div className="mt-2 text-2xl font-semibold text-[#241232]">{residualScoredScenarios.length}</div>
+                <div className="mt-1 text-sm text-[#6f6578]">Scenarios with explicit residual-risk posture captured</div>
               </div>
               <div className="panel-subtle">
-                <div className="text-xs uppercase tracking-[0.16em] text-slate-500">Assessment ready</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{assessmentReadyCount}</div>
-                <div className="mt-1 text-sm text-slate-400">Scenarios already sitting in monitor, accepted, or mitigate flow</div>
+                <div className="text-xs uppercase tracking-[0.16em] text-[#62576a]">Assessment ready</div>
+                <div className="mt-2 text-2xl font-semibold text-[#241232]">{assessmentReadyCount}</div>
+                <div className="mt-1 text-sm text-[#6f6578]">Scenarios already sitting in monitor, accepted, or mitigate flow</div>
               </div>
               <div className="panel-subtle">
-                <div className="text-xs uppercase tracking-[0.16em] text-slate-500">Described</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{describedScenarios.length}</div>
-                <div className="mt-1 text-sm text-slate-400">Scenarios with narrative context captured for reviewer reuse</div>
+                <div className="text-xs uppercase tracking-[0.16em] text-[#62576a]">Described</div>
+                <div className="mt-2 text-2xl font-semibold text-[#241232]">{describedScenarios.length}</div>
+                <div className="mt-1 text-sm text-[#6f6578]">Scenarios with narrative context captured for reviewer reuse</div>
               </div>
             </div>
 
             <div className="mt-5 space-y-3">
               {recentScenarios.map((scenario) => (
                 <div className="panel-subtle" key={scenario.id}>
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <div className="font-medium text-white">{scenario.title}</div>
-                      <div className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">{scenario.registerName}</div>
+                  <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <div className="font-medium text-[#241232]">{scenario.title}</div>
+                      <div className="mt-1 text-xs uppercase tracking-[0.16em] text-[#62576a]">{scenario.registerName}</div>
                     </div>
-                    <span className="badge-neutral">{scenario.status}</span>
+                    <RegStatusPill tone="neutral" className="shrink-0 capitalize">
+                      {scenario.status}
+                    </RegStatusPill>
                   </div>
-                  <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-400">
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs text-[#6f6578]">
                     <span>Likelihood: {formatScore(scenario.likelihood)}</span>
                     <span>Impact: {formatScore(scenario.impact)}</span>
                     <span>Inherent: {formatScore(scenario.inherentScore)}</span>
                     <span>Residual: {formatScore(scenario.residualScore)}</span>
                     <span>Updated: {formatDate(scenario.updatedAt)}</span>
                   </div>
-                  <div className="mt-3 text-sm leading-6 text-slate-300">
+                  <div className="mt-3 text-sm leading-6 text-[#51465e]">
                     {scenario.description || 'Scenario description is still being captured.'}
                   </div>
                 </div>
               ))}
               {recentScenarios.length === 0 && (
-                <div className="text-sm text-slate-400">
+                <div className="text-sm text-[#6f6578]">
                   No threat-model scenarios are visible yet. Use the scenario workspace to begin modeling security situations.
                 </div>
               )}
@@ -415,19 +418,19 @@ export function ThreatModelsPage({ canConfigureModel, canUseRiskAssessments }: T
             <div className="eyebrow">Modeling Coverage</div>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <div className="panel-subtle">
-                <div className="text-xs uppercase tracking-[0.16em] text-slate-500">Modeled registers</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{modeledRegisters.length}</div>
-                <div className="mt-1 text-sm text-slate-400">Registers already acting as reusable scenario libraries</div>
+                <div className="text-xs uppercase tracking-[0.16em] text-[#62576a]">Modeled registers</div>
+                <div className="mt-2 text-2xl font-semibold text-[#241232]">{modeledRegisters.length}</div>
+                <div className="mt-1 text-sm text-[#6f6578]">Registers already acting as reusable scenario libraries</div>
               </div>
               <div className="panel-subtle">
-                <div className="text-xs uppercase tracking-[0.16em] text-slate-500">Total registers</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{registerSummaries.length}</div>
-                <div className="mt-1 text-sm text-slate-400">Available modeling lanes across domains and business contexts</div>
+                <div className="text-xs uppercase tracking-[0.16em] text-[#62576a]">Total registers</div>
+                <div className="mt-2 text-2xl font-semibold text-[#241232]">{registerSummaries.length}</div>
+                <div className="mt-1 text-sm text-[#6f6578]">Available modeling lanes across domains and business contexts</div>
               </div>
               <div className="panel-subtle">
-                <div className="text-xs uppercase tracking-[0.16em] text-slate-500">Top scoring ceiling</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{maxScaleScore || 'n/a'}</div>
-                <div className="mt-1 text-sm text-slate-400">Maximum score from the current tenant likelihood and impact scales</div>
+                <div className="text-xs uppercase tracking-[0.16em] text-[#62576a]">Top scoring ceiling</div>
+                <div className="mt-2 text-2xl font-semibold text-[#241232]">{maxScaleScore || 'n/a'}</div>
+                <div className="mt-1 text-sm text-[#6f6578]">Maximum score from the current tenant likelihood and impact scales</div>
               </div>
             </div>
 
@@ -436,27 +439,27 @@ export function ThreatModelsPage({ canConfigureModel, canUseRiskAssessments }: T
                 <div className="panel-subtle" key={summary.registerName}>
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <div className="font-medium text-white">{summary.registerName}</div>
-                      <div className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-500">
+                      <div className="font-medium text-[#241232]">{summary.registerName}</div>
+                      <div className="mt-1 text-xs uppercase tracking-[0.16em] text-[#62576a]">
                         {summary.folderName || 'Tenant-wide register'}
                       </div>
                     </div>
-                    <div className="flex flex-wrap gap-2 text-xs text-slate-400">
+                    <div className="flex flex-wrap gap-2 text-xs text-[#6f6578]">
                       <span>Scenarios: {summary.scenarioCount}</span>
                       <span>Open: {summary.openCount}</span>
                       <span>Elevated: {summary.elevatedCount}</span>
                       <span>Max score: {formatScore(summary.maxScore)}</span>
                     </div>
                   </div>
-                  <div className="mt-3 text-sm leading-6 text-slate-300">
+                  <div className="mt-3 text-sm leading-6 text-[#51465e]">
                     {summary.description ||
                       'This register can act as a reusable threat-model lane for scenario templates and applied system reviews.'}
                   </div>
-                  <div className="mt-3 text-xs text-slate-500">Latest activity {formatDate(summary.updatedAt)}</div>
+                  <div className="mt-3 text-xs text-[#62576a]">Latest activity {formatDate(summary.updatedAt)}</div>
                 </div>
               ))}
               {registerSummaries.length === 0 && (
-                <div className="text-sm text-slate-400">
+                <div className="text-sm text-[#6f6578]">
                   No threat-model registers are visible yet, so reusable scenario coverage has not been established.
                 </div>
               )}
@@ -469,32 +472,32 @@ export function ThreatModelsPage({ canConfigureModel, canUseRiskAssessments }: T
             <div className="eyebrow">Risk Taxonomy & Scoring</div>
             {riskModel ? (
               <div className="mt-4 space-y-3">
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                  <div className="font-medium text-white">Scoring contract</div>
-                  <div className="mt-2 text-sm text-slate-300">
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+                  <div className="font-medium text-[#241232]">Scoring contract</div>
+                  <div className="mt-2 text-sm text-[#51465e]">
                     {riskModel.config.formulaPreset} · Residual method: {riskModel.config.residualRiskMethod} · Owner role:{' '}
                     {riskModel.config.riskOwnerRole}
                   </div>
-                  <div className="mt-2 text-sm text-slate-400">
+                  <div className="mt-2 text-sm text-[#6f6578]">
                     Updated {formatDate(riskModel.config.updatedAt)} · Escalation {riskModel.config.autoEscalationEnabled ? 'enabled' : 'disabled'}
                   </div>
-                  <div className="mt-2 text-sm text-slate-400">
+                  <div className="mt-2 text-sm text-[#6f6578]">
                     Scale ceiling {maxScaleScore || 'n/a'} · Avoid threshold {riskModel.config.autoEscalationThreshold} ·{' '}
                     {riskModel.config.autoEscalationDays} day escalation window
                   </div>
                 </div>
                 {riskModel.records.thresholdBands.map((band) => (
-                  <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4" key={band.label}>
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="font-medium text-white">{band.label}</div>
-                      <span className="badge-neutral">{band.value}</span>
+                  <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={band.label}>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="font-medium text-[#241232]">{band.label}</div>
+                      <RegStatusPill tone="neutral">{band.value}</RegStatusPill>
                     </div>
-                    <div className="mt-2 text-sm text-slate-400">{band.hint}</div>
+                    <div className="mt-2 text-sm text-[#6f6578]">{band.hint}</div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="mt-4 text-sm text-slate-400">
+              <div className="mt-4 text-sm text-[#6f6578]">
                 Risk taxonomy and scoring details are not currently visible in this workspace.
               </div>
             )}
@@ -504,12 +507,12 @@ export function ThreatModelsPage({ canConfigureModel, canUseRiskAssessments }: T
             <div className="eyebrow">Runtime Contracts</div>
             <div className="mt-4 space-y-3">
               {runtimeContracts.map((contract) => (
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4 text-sm leading-6 text-slate-300" key={contract}>
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm leading-6 text-[#51465e]" key={contract}>
                   {contract}
                 </div>
               ))}
               {runtimeContracts.length === 0 && (
-                <div className="text-sm text-slate-400">
+                <div className="text-sm text-[#6f6578]">
                   Threat-model runtime contracts are not visible right now.
                 </div>
               )}
@@ -520,16 +523,24 @@ export function ThreatModelsPage({ canConfigureModel, canUseRiskAssessments }: T
             <div className="eyebrow">Governance Signals</div>
             <div className="mt-4 space-y-3">
               {riskModel?.records.governanceSignals.map((signal) => (
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4" key={signal.title}>
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={signal.title}>
                   <div className="flex items-center justify-between gap-3">
-                    <div className="font-medium text-white">{signal.title}</div>
-                    <span className={signal.status === 'Active' || signal.status === 'Configured' || signal.status === 'Deterministic' ? 'badge-positive' : 'badge-neutral'}>
+                    <div className="font-medium text-[#241232]">{signal.title}</div>
+                    <RegStatusPill
+                      tone={
+                        signal.status === 'Active' ||
+                        signal.status === 'Configured' ||
+                        signal.status === 'Deterministic'
+                          ? 'success'
+                          : 'neutral'
+                      }
+                    >
                       {signal.status}
-                    </span>
+                    </RegStatusPill>
                   </div>
-                  <div className="mt-2 text-sm text-slate-400">{signal.detail}</div>
+                  <div className="mt-2 text-sm text-[#6f6578]">{signal.detail}</div>
                 </div>
-              )) ?? <div className="text-sm text-slate-400">Governance signals are not available right now.</div>}
+              )) ?? <div className="text-sm text-[#6f6578]">Governance signals are not available right now.</div>}
             </div>
           </section>
 
@@ -537,18 +548,18 @@ export function ThreatModelsPage({ canConfigureModel, canUseRiskAssessments }: T
             <div className="eyebrow">Scenario Status Mix</div>
             <div className="mt-4 space-y-3">
               {statusBreakdown.slice(0, 5).map((item) => (
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4" key={item.status}>
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={item.status}>
                   <div className="flex items-center justify-between gap-3">
-                    <div className="font-medium text-white">{formatStatusLabel(item.status)}</div>
-                    <span className="badge-neutral">{item.count}</span>
+                    <div className="font-medium text-[#241232]">{formatStatusLabel(item.status)}</div>
+                    <RegStatusPill tone="neutral">{item.count}</RegStatusPill>
                   </div>
-                  <div className="mt-2 text-sm text-slate-400">
+                  <div className="mt-2 text-sm text-[#6f6578]">
                     Threat scenarios currently sitting in {formatStatusLabel(item.status).toLowerCase()} posture.
                   </div>
                 </div>
               ))}
               {statusBreakdown.length === 0 && (
-                <div className="text-sm text-slate-400">No threat-model scenarios are visible yet.</div>
+                <div className="text-sm text-[#6f6578]">No threat-model scenarios are visible yet.</div>
               )}
             </div>
           </section>
@@ -556,23 +567,23 @@ export function ThreatModelsPage({ canConfigureModel, canUseRiskAssessments }: T
           <section className="panel-subtle">
             <div className="eyebrow">Apply To Systems</div>
             <div className="mt-4 grid gap-3">
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="font-medium text-white">1. Configure the tenant scoring logic</div>
-                <div className="mt-2 text-sm leading-6 text-slate-400">
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+                <div className="font-medium text-[#241232]">1. Configure the tenant scoring logic</div>
+                <div className="mt-2 text-sm leading-6 text-[#6f6578]">
                   Keep the risk model authoritative so the same likelihood, impact, residual, and escalation rules follow
                   every applied threat-model review.
                 </div>
               </div>
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="font-medium text-white">2. Reuse scenario libraries by system or domain</div>
-                <div className="mt-2 text-sm leading-6 text-slate-400">
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+                <div className="font-medium text-[#241232]">2. Reuse scenario libraries by system or domain</div>
+                <div className="mt-2 text-sm leading-6 text-[#6f6578]">
                   Use registers and scenarios as reusable starting points for applications, environments, or shared
                   services instead of rebuilding the same threat logic each time.
                 </div>
               </div>
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="font-medium text-white">3. Carry the model into assessments</div>
-                <div className="mt-2 text-sm leading-6 text-slate-400">
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+                <div className="font-medium text-[#241232]">3. Carry the model into assessments</div>
+                <div className="mt-2 text-sm leading-6 text-[#6f6578]">
                   Apply the modeled scenarios through the risk-assessment workflow so reviewers can confirm ownership,
                   treatment, and system-specific exposure without leaving the canonical scoring contract.
                 </div>
@@ -589,7 +600,7 @@ export function ThreatModelsPage({ canConfigureModel, canUseRiskAssessments }: T
                   </Link>
                 </>
               ) : (
-                <span className="text-sm text-slate-400">
+                <span className="text-sm text-[#6f6578]">
                   Risk assessment access is required to apply modeled scenarios in system reviews.
                 </span>
               )}

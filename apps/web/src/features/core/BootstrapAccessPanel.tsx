@@ -612,8 +612,8 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
         <div className="eyebrow">
           {showInitializeSurface ? 'Workspace Setup' : showRecoverySurface ? 'Administrator Recovery' : 'Secure Sign-In'}
         </div>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">{title}</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">{title}</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
           {showInitializeSurface
             ? 'Create the first Regovise workspace, establish the first administrator account, and start the first secure session.'
             : showRecoverySurface
@@ -621,13 +621,13 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
               : 'Use the simplest sign-in path available for this workspace. Setup and recovery live on separate guarded routes so the main entry stays focused.'}
         </p>
         {showLoginSurface && pendingRoute !== '/' ? (
-          <div className="mt-4 rounded-2xl border border-cyan-300/15 bg-cyan-400/[0.06] px-4 py-3 text-sm text-cyan-100">
+          <div className="mt-4 rounded-2xl border border-[#d7c3f1] bg-[#f2e8ff] px-4 py-3 text-sm text-[#5f1aa8]">
             Sign in to continue to <span className="font-medium">{pendingRoute}</span>.
           </div>
         ) : null}
       </div>
 
-      {loading && <div className="text-sm text-slate-400">Loading access status…</div>}
+      {loading && <div className="text-sm text-[#6f6578]">Loading access status…</div>}
       {error && <div className="notice-warning">{error}</div>}
       {notice && <div className="notice-success">{notice}</div>}
 
@@ -636,18 +636,18 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
           <section className="panel-subtle space-y-5">
             <div className="space-y-2">
               <div>
-                <div className="text-sm font-semibold text-white">Workspace sign-in</div>
-                <p className="mt-1 text-sm leading-6 text-slate-400">
+                <div className="text-sm font-semibold text-[#241232]">Workspace sign-in</div>
+                <p className="mt-1 text-sm leading-6 text-[#6f6578]">
                   Regovise workspaces usually use one of three paths: enterprise SSO, local password fallback, or
                   email-code fallback. Start with the workspace slug and we will show the path that fits that tenant.
                 </p>
               </div>
-              {signInPosture ? <div className="text-xs text-slate-500">{signInPosture}</div> : null}
+              {signInPosture ? <div className="text-xs text-[#62576a]">{signInPosture}</div> : null}
             </div>
 
             <div className="mx-auto max-w-xl space-y-4">
               <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Workspace slug</span>
+                <span className="text-[#4f435c]">Workspace slug</span>
                 <input
                   className="input"
                   value={tenantSlug}
@@ -657,31 +657,31 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
               </label>
 
               {tenantOptionsLoading ? (
-                <div className="text-xs text-slate-500">Checking workspace sign-in methods...</div>
+                <div className="text-xs text-[#62576a]">Checking workspace sign-in methods...</div>
               ) : tenantOptions?.tenantName ? (
-                <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
-                  Workspace detected: <span className="font-medium text-white">{tenantOptions.tenantName}</span>
+                <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3 text-sm text-[#4f435c]">
+                  Workspace detected: <span className="font-medium text-[#241232]">{tenantOptions.tenantName}</span>
                 </div>
               ) : null}
 
               {tenantOptions?.sso.message ? (
-                <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3 text-sm text-[#4f435c]">
                   {tenantOptions.sso.message}
                 </div>
               ) : loginConfig?.message ? (
-                <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3 text-sm text-[#4f435c]">
                   {loginConfig.message}
-                  {loginConfig.statusNote ? <div className="mt-2 text-xs text-slate-500">{loginConfig.statusNote}</div> : null}
+                  {loginConfig.statusNote ? <div className="mt-2 text-xs text-[#62576a]">{loginConfig.statusNote}</div> : null}
                 </div>
               ) : null}
             </div>
 
-            <div className="inline-flex flex-wrap rounded-full border border-white/10 bg-slate-950/40 p-1">
+            <div className="inline-flex flex-wrap rounded-full border border-[#ded8e4] bg-white p-1">
               {tenantSsoReady ? (
                 <button
                   className={cn(
                     'rounded-full px-4 py-2 text-sm transition',
-                    loginMethod === 'sso' ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white',
+                    loginMethod === 'sso' ? 'bg-white text-[#241232]' : 'text-[#6f6578] hover:text-[#241232]',
                   )}
                   onClick={() => setLoginMethod('sso')}
                   type="button"
@@ -693,7 +693,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
                 <button
                   className={cn(
                     'rounded-full px-4 py-2 text-sm transition',
-                    loginMethod === 'password' ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white',
+                    loginMethod === 'password' ? 'bg-white text-[#241232]' : 'text-[#6f6578] hover:text-[#241232]',
                     !tenantPasswordEnabled && 'cursor-not-allowed opacity-50',
                   )}
                   disabled={!tenantPasswordEnabled}
@@ -707,7 +707,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
                 <button
                   className={cn(
                     'rounded-full px-4 py-2 text-sm transition',
-                    loginMethod === 'email' ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white',
+                    loginMethod === 'email' ? 'bg-white text-[#241232]' : 'text-[#6f6578] hover:text-[#241232]',
                     !tenantEmailEnabled && 'cursor-not-allowed opacity-50',
                   )}
                   disabled={!tenantEmailEnabled}
@@ -721,7 +721,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
 
             {loginMethod === 'sso' ? (
               <div className="mx-auto max-w-xl space-y-4">
-                <div className="rounded-2xl border border-cyan-300/15 bg-cyan-400/[0.06] px-4 py-4 text-sm text-cyan-100">
+                <div className="rounded-2xl border border-[#d7c3f1] bg-[#f2e8ff] px-4 py-4 text-sm text-[#5f1aa8]">
                   {tenantSsoEnforced
                     ? `${tenantSsoProvider} is required for this workspace. Sign in with the same email address your workspace account uses. Existing tenant records are linked on the first successful SSO sign-in, and Regovise returns you here with the tenant session open.`
                     : `Use the enterprise identity provider configured for this workspace. After the provider confirms the account, Regovise opens the tenant session and returns you here.`}
@@ -735,7 +735,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
                   {busy === 'sso-start' ? 'Redirecting…' : ssoButtonLabel}
                 </button>
                 {!tenantSsoReady ? (
-                  <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                  <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3 text-sm text-[#4f435c]">
                     Enter a workspace slug with an active OIDC provider to continue with SSO.
                   </div>
                 ) : null}
@@ -745,7 +745,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
             {loginMethod === 'password' ? (
               <div className="mx-auto max-w-xl space-y-4">
                 <label className="block space-y-2 text-sm">
-                  <span className="text-slate-300">Email</span>
+                  <span className="text-[#4f435c]">Email</span>
                   <input
                     className="input"
                     value={loginEmail}
@@ -756,7 +756,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
                 </label>
 
                 <label className="block space-y-2 text-sm">
-                  <span className="text-slate-300">Password</span>
+                  <span className="text-[#4f435c]">Password</span>
                   <input
                     className="input"
                     value={loginPassword}
@@ -767,11 +767,11 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
                 </label>
 
                 {!tenantLocalAllowed ? (
-                  <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                  <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3 text-sm text-[#4f435c]">
                     This workspace requires SSO for normal sign-in. Use the SSO tab instead.
                   </div>
                 ) : !tenantPasswordEnabled ? (
-                  <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                  <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3 text-sm text-[#4f435c]">
                     No local password is configured yet for this account.
                   </div>
                 ) : (
@@ -790,7 +790,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
             {loginMethod === 'email' ? (
               <div className="mx-auto max-w-xl space-y-4">
                 <label className="block space-y-2 text-sm">
-                  <span className="text-slate-300">Email</span>
+                  <span className="text-[#4f435c]">Email</span>
                   <input
                     className="input"
                     value={loginEmail}
@@ -802,7 +802,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
 
                 {loginStep === 'verify' ? (
                   <label className="block space-y-2 text-sm">
-                    <span className="text-slate-300">Six-digit code</span>
+                    <span className="text-[#4f435c]">Six-digit code</span>
                     <input
                       className="input"
                       inputMode="numeric"
@@ -815,18 +815,18 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
                 ) : null}
 
                 {loginStep === 'verify' ? (
-                  <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                  <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3 text-sm text-[#4f435c]">
                     {formatExpiresAt(loginExpiresAt)}
-                    {loginPreviewCode ? <div className="mt-2 text-xs text-cyan-300">Preview code: {loginPreviewCode}</div> : null}
+                    {loginPreviewCode ? <div className="mt-2 text-xs text-[#7a3ccf]">Preview code: {loginPreviewCode}</div> : null}
                   </div>
                 ) : null}
 
                 {!tenantLocalAllowed ? (
-                  <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                  <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3 text-sm text-[#4f435c]">
                     This workspace requires SSO for normal sign-in. Use the SSO tab instead.
                   </div>
                 ) : !tenantEmailEnabled ? (
-                  <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-300">
+                  <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3 text-sm text-[#4f435c]">
                     Email-code sign-in is not available for this workspace.
                   </div>
                 ) : loginStep === 'request' ? (
@@ -861,7 +861,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
               </div>
             ) : null}
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4 text-sm text-slate-400">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#ded8e4] pt-4 text-sm text-[#6f6578]">
               <div>
                 Workspace access is usually provisioned by a tenant administrator or through enterprise SSO.
               </div>
@@ -877,26 +877,26 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
           </section>
 
           <section className="space-y-3">
-            <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">How access works</div>
+            <div className="text-[11px] uppercase tracking-[0.18em] text-[#62576a]">How access works</div>
             <div className="grid gap-3 md:grid-cols-3">
-              <div className="rounded-3xl border border-white/10 bg-white/[0.02] px-4 py-4">
-                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">1. Workspace</div>
-                <div className="mt-2 text-sm font-medium text-white">Choose the right tenant</div>
-                <div className="mt-2 text-sm leading-6 text-slate-400">
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-[#62576a]">1. Workspace</div>
+                <div className="mt-2 text-sm font-medium text-[#241232]">Choose the right tenant</div>
+                <div className="mt-2 text-sm leading-6 text-[#6f6578]">
                   The workspace slug tells Regovise which tenant policy and identity path should be used.
                 </div>
               </div>
-              <div className="rounded-3xl border border-white/10 bg-white/[0.02] px-4 py-4">
-                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">2. Identity</div>
-                <div className="mt-2 text-sm font-medium text-white">Use the tenant method</div>
-                <div className="mt-2 text-sm leading-6 text-slate-400">
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-[#62576a]">2. Identity</div>
+                <div className="mt-2 text-sm font-medium text-[#241232]">Use the tenant method</div>
+                <div className="mt-2 text-sm leading-6 text-[#6f6578]">
                   Some workspaces use OIDC SSO, some keep local fallback during rollout, and all keep guarded recovery separate.
                 </div>
               </div>
-              <div className="rounded-3xl border border-white/10 bg-white/[0.02] px-4 py-4">
-                <div className="text-[11px] uppercase tracking-[0.18em] text-slate-500">3. Session</div>
-                <div className="mt-2 text-sm font-medium text-white">Open a secure workspace session</div>
-                <div className="mt-2 text-sm leading-6 text-slate-400">
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
+                <div className="text-[11px] uppercase tracking-[0.18em] text-[#62576a]">3. Session</div>
+                <div className="mt-2 text-sm font-medium text-[#241232]">Open a secure workspace session</div>
+                <div className="mt-2 text-sm leading-6 text-[#6f6578]">
                   After identity is verified, Regovise creates a secure tenant session and returns you to the workspace.
                 </div>
               </div>
@@ -906,7 +906,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
       ) : null}
 
       {showInitializeSurface && status?.initialized ? (
-        <div className="panel-subtle space-y-3 text-sm text-slate-300">
+        <div className="panel-subtle space-y-3 text-sm text-[#4f435c]">
           <div>This workspace is already initialized. Use the normal sign-in path to continue.</div>
           <div>
             <Link className="button-primary" to={`/login${pendingRoute !== '/' ? `?next=${encodeURIComponent(pendingRoute)}` : ''}`}>
@@ -915,11 +915,11 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
           </div>
         </div>
       ) : showInitializeSurface && status?.mode === 'disabled' ? (
-        <div className="panel-subtle text-sm text-slate-300">
+        <div className="panel-subtle text-sm text-[#4f435c]">
           Set a `BOOTSTRAP_SETUP_SECRET` Worker secret to enable first-run initialization and administrator recovery.
         </div>
       ) : showLoginSurface && status && !status.initialized ? (
-        <div className="panel-subtle space-y-3 text-sm text-slate-300">
+        <div className="panel-subtle space-y-3 text-sm text-[#4f435c]">
           <div>No workspace has been initialized yet, so normal sign-in is not available.</div>
           <div>
             <Link className="button-primary" to={`/setup/initialize${pendingRoute !== '/' ? `?next=${encodeURIComponent(pendingRoute)}` : ''}`}>
@@ -928,7 +928,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
           </div>
         </div>
       ) : showRecoverySurface && status && !status.initialized ? (
-        <div className="panel-subtle space-y-3 text-sm text-slate-300">
+        <div className="panel-subtle space-y-3 text-sm text-[#4f435c]">
           <div>Administrator recovery is only available after the first workspace has been initialized.</div>
           <div>
             <Link className="button-primary" to="/setup/initialize">
@@ -937,7 +937,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
           </div>
         </div>
       ) : showRecoverySurface && status?.mode === 'disabled' ? (
-        <div className="panel-subtle space-y-3 text-sm text-slate-300">
+        <div className="panel-subtle space-y-3 text-sm text-[#4f435c]">
           <div>Administrator recovery is not enabled for this environment.</div>
           <div>
             <Link className="button-primary" to={`/login${pendingRoute !== '/' ? `?next=${encodeURIComponent(pendingRoute)}` : ''}`}>
@@ -950,14 +950,14 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
           {showInitializeSurface && isInitialize ? (
             <section className="panel-subtle space-y-4">
               <div>
-                <div className="text-sm font-semibold text-white">Initialize first tenant</div>
-                <p className="mt-1 text-sm text-slate-400">
+                <div className="text-sm font-semibold text-[#241232]">Initialize first tenant</div>
+                <p className="mt-1 text-sm text-[#6f6578]">
                   Creates the first tenant, root workspace, primary domain, administrator role, and first secure session.
                 </p>
               </div>
 
               <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Workspace name</span>
+                <span className="text-[#4f435c]">Workspace name</span>
                 <input
                   className="input"
                   value={tenantName}
@@ -967,7 +967,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
               </label>
 
               <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Tenant slug</span>
+                <span className="text-[#4f435c]">Tenant slug</span>
                 <input
                   className="input"
                   value={tenantSlug}
@@ -977,7 +977,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
               </label>
 
               <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Administrator name</span>
+                <span className="text-[#4f435c]">Administrator name</span>
                 <input
                   className="input"
                   value={adminDisplayName}
@@ -987,7 +987,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
               </label>
 
               <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Administrator email</span>
+                <span className="text-[#4f435c]">Administrator email</span>
                 <input
                   className="input"
                   value={adminEmail}
@@ -998,7 +998,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
               </label>
 
               <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Bootstrap secret</span>
+                <span className="text-[#4f435c]">Bootstrap secret</span>
                 <input
                   className="input"
                   value={secret}
@@ -1022,14 +1022,14 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
           {showRecoverySurface && status?.initialized ? (
             <section className="panel-subtle space-y-4">
               <div>
-                <div className="text-sm font-semibold text-white">Administrator recovery</div>
-                <p className="mt-1 text-sm text-slate-400">
+                <div className="text-sm font-semibold text-[#241232]">Administrator recovery</div>
+                <p className="mt-1 text-sm text-[#6f6578]">
                   Use the guarded bootstrap secret to recover an administrator session when normal sign-in is unavailable.
                 </p>
               </div>
 
               <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Tenant slug</span>
+                <span className="text-[#4f435c]">Tenant slug</span>
                 <input
                   className="input"
                   value={tenantSlug}
@@ -1039,7 +1039,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
               </label>
 
               <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Administrator email</span>
+                <span className="text-[#4f435c]">Administrator email</span>
                 <input
                   className="input"
                   value={adminEmail}
@@ -1050,7 +1050,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
               </label>
 
               <label className="block space-y-2 text-sm">
-                <span className="text-slate-300">Bootstrap secret</span>
+                <span className="text-[#4f435c]">Bootstrap secret</span>
                 <input
                   className="input"
                   value={secret}
@@ -1062,7 +1062,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block space-y-2 text-sm">
-                  <span className="text-slate-300">New local password</span>
+                  <span className="text-[#4f435c]">New local password</span>
                   <input
                     className="input"
                     value={newLocalPassword}
@@ -1073,7 +1073,7 @@ export function BootstrapAccessPanel({ surface = 'login' }: BootstrapAccessPanel
                 </label>
 
                 <label className="block space-y-2 text-sm">
-                  <span className="text-slate-300">Confirm password</span>
+                  <span className="text-[#4f435c]">Confirm password</span>
                   <input
                     className="input"
                     value={confirmLocalPassword}

@@ -36,9 +36,16 @@ cli/db_backup
 /*.png
 /claude-grc-engineering/
 /generated/
+/artifacts/demo-videos/
 /openregscale/
 /vendor/
 /frontend/tests/results-*/
 /.agents/
 /frontend/project.inlang/
 /tools/domain_codegen.js
+
+# Generated local verification receipts and immutable CI web package.
+/artifacts/verification/
+/target/regovise-web-artifact/
+/target/regovise-release-artifact/
+/apps/web/prototypes/ato-workspace/qa/

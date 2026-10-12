@@ -781,11 +781,16 @@ async function enqueueGrcMessage(
 ) {
   switch (message.type) {
     case 'grc.content.import':
-    case 'grc.scf.refresh':
       if (!env.QUEUE_GRC_CONTENT_IMPORT) {
         throw new Error('GRC content operations queue is not configured.');
       }
       await env.QUEUE_GRC_CONTENT_IMPORT.send(message);
+      return;
+    case 'grc.scf.refresh':
+      if (!env.QUEUE_GRC_SCF_REFRESH) {
+        throw new Error('GRC SCF refresh queue is not configured.');
+      }
+      await env.QUEUE_GRC_SCF_REFRESH.send(message);
       return;
     case 'grc.finding.ingest':
     case 'grc.connector.collect':

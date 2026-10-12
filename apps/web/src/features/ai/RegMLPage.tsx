@@ -73,15 +73,15 @@ function formatDate(value: string) {
 }
 
 function availabilityBadgeClass(value: string) {
-  if (value === 'Ready') return 'badge-success';
-  if (value === 'Locked') return 'badge-danger';
-  return 'badge-neutral';
+  if (value === 'Ready') return 'status-pill-success';
+  if (value === 'Locked') return 'status-pill-danger';
+  return 'status-pill-neutral';
 }
 
 function attemptStatusClass(value: string) {
-  if (value === 'Applied') return 'badge-success';
-  if (value === 'Needs Review') return 'badge-neutral';
-  return 'badge-neutral';
+  if (value === 'Applied') return 'status-pill-success';
+  if (value === 'Needs Review') return 'status-pill-neutral';
+  return 'status-pill-neutral';
 }
 
 function paneToMode(pane: RegmlPane): RegmlWorkspaceMode {
@@ -164,7 +164,7 @@ function WorkspaceRunner({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="eyebrow">Prompt Runner</div>
-              <h2 className="mt-2 text-xl font-semibold text-white">{paneTitles[pane].title}</h2>
+              <h2 className="mt-2 text-xl font-semibold text-[#241232]">{paneTitles[pane].title}</h2>
             </div>
             <button className="button-primary" disabled={busy !== null} onClick={onRun} type="button">
               <Sparkles className="mr-2 h-4 w-4" />
@@ -207,12 +207,12 @@ function WorkspaceRunner({
                   ))}
                 </select>
               </label>
-              <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">
+              <div className="rounded-2xl border border-[#ded8e4] bg-white p-4 text-sm text-[#4f435c]">
                 <div className="label">Mode focus</div>
                 <div className="mt-3 space-y-2">
                   {session.context.modeFocus.map((item) => (
                     <div key={item} className="flex items-start gap-2">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-300" />
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 text-[#126b36]" />
                       <span>{item}</span>
                     </div>
                   ))}
@@ -227,39 +227,39 @@ function WorkspaceRunner({
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="eyebrow">Latest Version</div>
-                <h3 className="mt-2 text-xl font-semibold text-white">{selectedAttempt.title}</h3>
+                <h3 className="mt-2 text-xl font-semibold text-[#241232]">{selectedAttempt.title}</h3>
               </div>
               <div className="flex gap-2">
                 <span className={attemptStatusClass(selectedAttempt.status)}>{selectedAttempt.status}</span>
-                <span className="badge-neutral">{selectedAttempt.versionLabel}</span>
+                <span className="status-pill-neutral">{selectedAttempt.versionLabel}</span>
               </div>
             </div>
             <div className="mt-4 grid gap-4 md:grid-cols-3">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
                 <div className="label">Coverage</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{selectedAttempt.coverage}%</div>
+                <div className="mt-2 text-2xl font-semibold text-[#241232]">{selectedAttempt.coverage}%</div>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
                 <div className="label">Confidence</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{selectedAttempt.confidence}%</div>
+                <div className="mt-2 text-2xl font-semibold text-[#241232]">{selectedAttempt.confidence}%</div>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
                 <div className="label">Issues</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{selectedAttempt.issues}</div>
+                <div className="mt-2 text-2xl font-semibold text-[#241232]">{selectedAttempt.issues}</div>
               </div>
             </div>
             <div className="mt-4 grid gap-4 xl:grid-cols-2">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
                 <div className="label">Before</div>
-                <div className="mt-3 space-y-2 text-sm text-slate-300">
+                <div className="mt-3 space-y-2 text-sm text-[#4f435c]">
                   {selectedAttempt.beforeItems.map((item) => (
                     <div key={item}>{item}</div>
                   ))}
                 </div>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
                 <div className="label">After</div>
-                <div className="mt-3 space-y-2 text-sm text-slate-300">
+                <div className="mt-3 space-y-2 text-sm text-[#4f435c]">
                   {selectedAttempt.afterItems.map((item) => (
                     <div key={item}>{item}</div>
                   ))}
@@ -276,7 +276,7 @@ function WorkspaceRunner({
                 <Save className="mr-2 h-4 w-4" />
                 Apply Version
               </button>
-              <span className="self-center text-xs uppercase tracking-[0.18em] text-slate-500">
+              <span className="self-center text-xs uppercase tracking-[0.18em] text-[#62576a]">
                 Human review remains required before publishing plan changes.
               </span>
             </div>
@@ -287,12 +287,12 @@ function WorkspaceRunner({
           <div className="eyebrow">Session Timeline</div>
           <div className="mt-4 space-y-3">
             {session.messages.length === 0 ? (
-              <div className="text-sm text-slate-400">No messages yet.</div>
+              <div className="text-sm text-[#6f6578]">No messages yet.</div>
             ) : (
               session.messages.map((message) => (
-                <div key={message.id} className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
+                <div key={message.id} className="rounded-2xl border border-[#ded8e4] bg-[#f6f1fa]5 p-4">
                   <div className="flex items-center justify-between gap-3">
-                    <div className="text-sm font-medium text-white">
+                    <div className="text-sm font-medium text-[#241232]">
                       {message.type === 'plan'
                         ? message.title
                         : message.type === 'warning'
@@ -303,20 +303,20 @@ function WorkspaceRunner({
                               ? 'Prompt'
                               : 'Assistant'}
                     </div>
-                    <div className="text-xs text-slate-500">{formatDate(message.createdAt)}</div>
+                    <div className="text-xs text-[#62576a]">{formatDate(message.createdAt)}</div>
                   </div>
                   {message.type === 'plan' ? (
-                    <div className="mt-3 space-y-2 text-sm text-slate-300">
+                    <div className="mt-3 space-y-2 text-sm text-[#4f435c]">
                       {message.steps.map((step) => (
                         <div key={step}>{step}</div>
                       ))}
                     </div>
                   ) : message.type === 'warning' ? (
-                    <div className="mt-3 text-sm text-amber-100">{message.content}</div>
+                    <div className="mt-3 text-sm text-[#8a4d00]">{message.content}</div>
                   ) : message.type === 'version' ? (
-                    <div className="mt-3 text-sm text-slate-300">Attempt ID: {message.attemptId}</div>
+                    <div className="mt-3 text-sm text-[#4f435c]">Attempt ID: {message.attemptId}</div>
                   ) : (
-                    <div className="mt-3 text-sm text-slate-300">{message.content}</div>
+                    <div className="mt-3 text-sm text-[#4f435c]">{message.content}</div>
                   )}
                 </div>
               ))
@@ -328,35 +328,35 @@ function WorkspaceRunner({
       <aside className="space-y-4">
         <div className="panel-subtle">
           <div className="eyebrow">Runtime Posture</div>
-          <div className="mt-4 space-y-3 text-sm text-slate-300">
+          <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
             <div className="flex items-center justify-between">
               <span>Credits remaining</span>
-              <span className="font-medium text-white">
+              <span className="font-medium text-[#241232]">
                 {session.creditsRemaining} / {session.creditsQuota}
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span>Queue depth</span>
-              <span className="font-medium text-white">{session.queueDepth}</span>
+              <span className="font-medium text-[#241232]">{session.queueDepth}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Last heartbeat</span>
-              <span className="font-medium text-white">{formatDate(session.lastHeartbeat)}</span>
+              <span className="font-medium text-[#241232]">{formatDate(session.lastHeartbeat)}</span>
             </div>
           </div>
         </div>
         <div className="panel-subtle">
           <div className="eyebrow">Context Coverage</div>
-          <div className="mt-4 space-y-2 text-sm text-slate-300">
+          <div className="mt-4 space-y-2 text-sm text-[#4f435c]">
             {session.context.sourceCoverage.map((item) => (
-              <div key={item} className="rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2">
+              <div key={item} className="rounded-2xl border border-[#ded8e4] bg-white px-3 py-2">
                 {item}
               </div>
             ))}
           </div>
           {session.context.issueThreshold !== null && (
-            <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2 text-sm text-slate-300">
-              Auditor issue threshold: <span className="font-medium text-white">{session.context.issueThreshold}</span>
+            <div className="mt-4 rounded-2xl border border-[#ded8e4] bg-white px-3 py-2 text-sm text-[#4f435c]">
+              Auditor issue threshold: <span className="font-medium text-[#241232]">{session.context.issueThreshold}</span>
             </div>
           )}
         </div>
@@ -364,16 +364,16 @@ function WorkspaceRunner({
           <div className="eyebrow">Recent Versions</div>
           <div className="mt-4 space-y-3">
             {session.attempts.length === 0 ? (
-              <div className="text-sm text-slate-400">No version history yet.</div>
+              <div className="text-sm text-[#6f6578]">No version history yet.</div>
             ) : (
               session.attempts.map((attempt) => (
-                <div key={attempt.id} className="rounded-2xl border border-white/10 bg-slate-950/50 p-3">
+                <div key={attempt.id} className="rounded-2xl border border-[#ded8e4] bg-white p-3">
                   <div className="flex items-center justify-between gap-2">
-                    <div className="text-sm font-medium text-white">{attempt.versionLabel}</div>
+                    <div className="text-sm font-medium text-[#241232]">{attempt.versionLabel}</div>
                     <span className={attemptStatusClass(attempt.status)}>{attempt.status}</span>
                   </div>
-                  <div className="mt-2 text-sm text-slate-300">{attempt.title}</div>
-                  <div className="mt-2 text-xs text-slate-500">{formatDate(attempt.createdAt)}</div>
+                  <div className="mt-2 text-sm text-[#4f435c]">{attempt.title}</div>
+                  <div className="mt-2 text-xs text-[#62576a]">{formatDate(attempt.createdAt)}</div>
                 </div>
               ))
             )}
@@ -556,47 +556,47 @@ export function RegMLWorkspacePage({ initialPane = 'hub' }: Props) {
   }
 
   if (loading || !workspace || !currentSession) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading RegML...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading RegML...</div>;
   }
 
   const statusVariant =
     workspace.settings.statusLabel === 'Not Enabled'
-      ? 'badge-danger'
+      ? 'status-pill-danger'
       : workspace.settings.statusLabel === 'Pending Terms Acceptance'
-        ? 'badge-neutral'
+        ? 'status-pill-neutral'
         : workspace.settings.statusLabel === 'Enabled without Workers AI runtime'
-          ? 'badge-danger'
-          : 'badge-success';
+          ? 'status-pill-danger'
+          : 'status-pill-success';
 
   return (
     <div className="space-y-6">
       <section className="panel grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
         <div>
           <div className="eyebrow">Features</div>
-          <h1 className="mt-2 text-3xl font-semibold text-white">{paneTitles[activePane].title}</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">{paneTitles[activePane].description}</p>
+          <h1 className="mt-2 text-3xl font-semibold text-[#241232]">{paneTitles[activePane].title}</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">{paneTitles[activePane].description}</p>
           <div className="mt-5 flex flex-wrap gap-2">
             <span className={statusVariant}>{workspace.settings.statusLabel}</span>
-            <span className={workspace.settings.backendAvailable ? 'badge-success' : 'badge-danger'}>
+            <span className={workspace.settings.backendAvailable ? 'status-pill-success' : 'status-pill-danger'}>
               {workspace.settings.backendAvailable ? 'Backend available' : 'Backend unavailable'}
             </span>
-            <span className="badge-neutral">{workspace.settings.runtimeProvider}</span>
-            <span className={workspace.settings.chatbotVisible ? 'badge-success' : 'badge-neutral'}>
+            <span className="status-pill-neutral">{workspace.settings.runtimeProvider}</span>
+            <span className={workspace.settings.chatbotVisible ? 'status-pill-success' : 'status-pill-neutral'}>
               {workspace.settings.chatbotVisible ? 'Chatbot visible' : 'Chatbot hidden'}
             </span>
           </div>
         </div>
         <div className="panel-subtle space-y-3">
-          <div className="text-xs uppercase tracking-[0.22em] text-slate-500">Enablement</div>
-          <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4">
+          <div className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Enablement</div>
+          <div className="rounded-2xl border border-[#ded8e4] bg-white p-4">
             <div className="label">How to enable</div>
-            <div className="mt-3 text-sm leading-6 text-slate-300">{workspace.settings.saveInstructions}</div>
+            <div className="mt-3 text-sm leading-6 text-[#4f435c]">{workspace.settings.saveInstructions}</div>
             <Link className="button-secondary mt-4 inline-flex" to={workspace.settings.modulesFeaturesPath}>
               <ExternalLink className="mr-2 h-4 w-4" />
               Open Settings
             </Link>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">
+          <div className="rounded-2xl border border-[#ded8e4] bg-white p-4 text-sm text-[#4f435c]">
             Once enabled and accepted, RegML tools become available on supported records and the chatbot entry point appears in the workspace.
           </div>
         </div>
@@ -608,9 +608,9 @@ export function RegMLWorkspacePage({ initialPane = 'hub' }: Props) {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {metrics.map((metric) => (
           <article key={metric.label} className="panel-subtle">
-            <div className="text-xs uppercase tracking-[0.22em] text-slate-500">{metric.label}</div>
-            <div className="mt-3 text-3xl font-semibold text-white">{metric.value}</div>
-            <div className="mt-2 text-sm text-slate-400">{metric.detail}</div>
+            <div className="text-xs uppercase tracking-[0.22em] text-[#62576a]">{metric.label}</div>
+            <div className="mt-3 text-3xl font-semibold text-[#241232]">{metric.value}</div>
+            <div className="mt-2 text-sm text-[#6f6578]">{metric.detail}</div>
           </article>
         ))}
       </section>
@@ -619,12 +619,12 @@ export function RegMLWorkspacePage({ initialPane = 'hub' }: Props) {
         <aside className="space-y-4">
           <div className="panel-subtle">
             <div className="eyebrow">Status & Deployment</div>
-            <div className="mt-4 space-y-4 text-sm text-slate-300">
+            <div className="mt-4 space-y-4 text-sm text-[#4f435c]">
               <label className="flex items-center justify-between gap-3">
                 <span>RegML enabled</span>
                 <input
                   checked={enabled}
-                  className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                  className="h-4 w-4 rounded border-[#d7c3f1] bg-white"
                   onChange={(event) => setEnabled(event.target.checked)}
                   type="checkbox"
                 />
@@ -633,7 +633,7 @@ export function RegMLWorkspacePage({ initialPane = 'hub' }: Props) {
                 <span>Terms accepted</span>
                 <input
                   checked={termsAccepted}
-                  className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                  className="h-4 w-4 rounded border-[#d7c3f1] bg-white"
                   onChange={(event) => setTermsAccepted(event.target.checked)}
                   type="checkbox"
                 />
@@ -657,10 +657,10 @@ export function RegMLWorkspacePage({ initialPane = 'hub' }: Props) {
           </div>
           <div className="panel-subtle">
             <div className="eyebrow">{deploymentMode === 'Local' ? 'Local deployment guide' : 'SaaS deployment guide'}</div>
-            <div className="mt-4 space-y-3 text-sm text-slate-300">
+            <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
               {(deploymentMode === 'Local' ? workspace.deploymentGuidance.local : workspace.deploymentGuidance.saas).map((item) => (
                 <div key={item} className="flex items-start gap-2">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-300" />
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 text-[#126b36]" />
                   <span>{item}</span>
                 </div>
               ))}
@@ -672,17 +672,17 @@ export function RegMLWorkspacePage({ initialPane = 'hub' }: Props) {
               {workspace.features.map((feature) => (
                 <Link
                   key={feature.id}
-                  className="block rounded-2xl border border-white/10 bg-slate-950/50 p-4 transition hover:border-cyan-300/30"
+                  className="block rounded-2xl border border-[#ded8e4] bg-white p-4 transition hover:border-[#d7c3f1]"
                   to={feature.route}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="font-medium text-white">{feature.name}</div>
-                      <div className="mt-1 text-sm text-slate-400">{feature.description}</div>
+                      <div className="font-medium text-[#241232]">{feature.name}</div>
+                      <div className="mt-1 text-sm text-[#6f6578]">{feature.description}</div>
                     </div>
                     <span className={availabilityBadgeClass(feature.availability)}>{feature.availability}</span>
                   </div>
-                  <div className="mt-3 text-xs uppercase tracking-[0.18em] text-slate-500">{feature.supportedContext}</div>
+                  <div className="mt-3 text-xs uppercase tracking-[0.18em] text-[#62576a]">{feature.supportedContext}</div>
                 </Link>
               ))}
             </div>
@@ -708,11 +708,11 @@ export function RegMLWorkspacePage({ initialPane = 'hub' }: Props) {
                     {workspace.features
                       .filter((feature) => feature.id === 'author' || feature.id === 'explainer')
                       .map((feature) => (
-                        <Link key={feature.id} className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 transition hover:border-cyan-300/30" to={feature.route}>
+                        <Link key={feature.id} className="rounded-2xl border border-[#ded8e4] bg-white p-4 transition hover:border-[#d7c3f1]" to={feature.route}>
                           <div className="flex items-start justify-between gap-3">
                             <div>
-                              <div className="font-medium text-white">{feature.name}</div>
-                              <div className="mt-1 text-sm text-slate-400">{feature.description}</div>
+                              <div className="font-medium text-[#241232]">{feature.name}</div>
+                              <div className="mt-1 text-sm text-[#6f6578]">{feature.description}</div>
                             </div>
                             <span className={availabilityBadgeClass(feature.availability)}>{feature.availability}</span>
                           </div>
@@ -726,11 +726,11 @@ export function RegMLWorkspacePage({ initialPane = 'hub' }: Props) {
                     {workspace.features
                       .filter((feature) => feature.id === 'ssp-author' || feature.id === 'auditor' || feature.id === 'ai-generator')
                       .map((feature) => (
-                        <Link key={feature.id} className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 transition hover:border-cyan-300/30" to={feature.route}>
+                        <Link key={feature.id} className="rounded-2xl border border-[#ded8e4] bg-white p-4 transition hover:border-[#d7c3f1]" to={feature.route}>
                           <div className="flex items-start justify-between gap-3">
                             <div>
-                              <div className="font-medium text-white">{feature.name}</div>
-                              <div className="mt-1 text-sm text-slate-400">{feature.description}</div>
+                              <div className="font-medium text-[#241232]">{feature.name}</div>
+                              <div className="mt-1 text-sm text-[#6f6578]">{feature.description}</div>
                             </div>
                             <span className={availabilityBadgeClass(feature.availability)}>{feature.availability}</span>
                           </div>
@@ -742,45 +742,45 @@ export function RegMLWorkspacePage({ initialPane = 'hub' }: Props) {
               <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
                 <div className="panel-subtle">
                   <div className="eyebrow">Availability messaging</div>
-                  <div className="mt-4 space-y-3 text-sm text-slate-300">
+                  <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
                     <div className="flex items-start gap-2">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-300" />
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 text-[#126b36]" />
                       <span>Once enabled, RegML tools become available for supported records and plan-level workflows.</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <Bot className="mt-0.5 h-4 w-4 text-cyan-300" />
+                      <Bot className="mt-0.5 h-4 w-4 text-[#7a3ccf]" />
                       <span>The chatbot entry point appears when RegML is enabled and terms are accepted.</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <AlertTriangle className="mt-0.5 h-4 w-4 text-amber-300" />
+                      <AlertTriangle className="mt-0.5 h-4 w-4 text-[#8a4d00]" />
                       <span>Disabling RegML hides record-context tools and removes the chatbot entry point until re-enabled.</span>
                     </div>
                   </div>
                 </div>
                 <div className="panel-subtle">
                   <div className="eyebrow">Dependencies</div>
-                  <div className="mt-4 space-y-3 text-sm text-slate-300">
+                  <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
                     <div className="flex items-center justify-between">
                       <span>Policies available</span>
-                      <span className={workspace.health.policiesCount > 0 ? 'badge-success' : 'badge-danger'}>
+                      <span className={workspace.health.policiesCount > 0 ? 'status-pill-success' : 'status-pill-danger'}>
                         {workspace.health.policiesCount > 0 ? 'Ready' : 'Missing'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>Questionnaires available</span>
-                      <span className={workspace.health.questionnairesCount > 0 ? 'badge-success' : 'badge-danger'}>
+                      <span className={workspace.health.questionnairesCount > 0 ? 'status-pill-success' : 'status-pill-danger'}>
                         {workspace.health.questionnairesCount > 0 ? 'Ready' : 'Missing'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>Environment healthy</span>
-                      <span className={workspace.health.environmentHealthy ? 'badge-success' : 'badge-danger'}>
+                      <span className={workspace.health.environmentHealthy ? 'status-pill-success' : 'status-pill-danger'}>
                         {workspace.health.environmentHealthy ? 'Healthy' : 'Attention'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>Vector database deployed</span>
-                      <span className={workspace.health.vectorDatabaseDeployed ? 'badge-success' : 'badge-danger'}>
+                      <span className={workspace.health.vectorDatabaseDeployed ? 'status-pill-success' : 'status-pill-danger'}>
                         {workspace.health.vectorDatabaseDeployed ? 'Ready' : 'Missing'}
                       </span>
                     </div>
@@ -794,14 +794,14 @@ export function RegMLWorkspacePage({ initialPane = 'hub' }: Props) {
                 <div className="panel-subtle">
                   <div className="eyebrow">Control Context</div>
                   <div className="mt-4 space-y-3">
-                    <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4">
+                    <div className="rounded-2xl border border-[#ded8e4] bg-white p-4">
                       <div className="label">Control</div>
-                      <div className="mt-2 text-lg font-semibold text-white">SC-13 Cryptographic Protection</div>
-                      <div className="mt-2 text-sm text-slate-300">
+                      <div className="mt-2 text-lg font-semibold text-[#241232]">SC-13 Cryptographic Protection</div>
+                      <div className="mt-2 text-sm text-[#4f435c]">
                         The system protects the confidentiality and integrity of transmitted and stored information using approved cryptographic mechanisms.
                       </div>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">
+                    <div className="rounded-2xl border border-[#ded8e4] bg-white p-4 text-sm text-[#4f435c]">
                       Use RegML Author to draft a first-pass statement or improve an existing one before you insert it into the control implementation.
                     </div>
                   </div>
@@ -825,7 +825,7 @@ export function RegMLWorkspacePage({ initialPane = 'hub' }: Props) {
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <div>
                           <div className="eyebrow">Author Actions</div>
-                          <div className="mt-2 text-lg font-semibold text-white">Reviewable AI-assist output</div>
+                          <div className="mt-2 text-lg font-semibold text-[#241232]">Reviewable AI-assist output</div>
                         </div>
                         <div className="flex gap-2">
                           <button className="button-secondary" onClick={() => void handleCopyOutput(selectedAttempt, 'after')} type="button">
@@ -848,13 +848,13 @@ export function RegMLWorkspacePage({ initialPane = 'hub' }: Props) {
               <div className="grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
                 <div className="panel-subtle">
                   <div className="eyebrow">Original Control</div>
-                  <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/50 p-4">
-                    <div className="text-lg font-semibold text-white">IA-2 Multi-Factor Authentication</div>
-                    <div className="mt-2 text-sm leading-6 text-slate-300">
+                  <div className="mt-4 rounded-2xl border border-[#ded8e4] bg-white p-4">
+                    <div className="text-lg font-semibold text-[#241232]">IA-2 Multi-Factor Authentication</div>
+                    <div className="mt-2 text-sm leading-6 text-[#4f435c]">
                       Multi-factor authentication must be enabled for all privileged accounts to prevent unauthorized access and reduce the impact of credential compromise.
                     </div>
                   </div>
-                  <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">
+                  <div className="mt-4 rounded-2xl border border-[#ded8e4] bg-white p-4 text-sm text-[#4f435c]">
                     Explainer output aids understanding and decision support, but it does not replace expert interpretation or assessor review.
                   </div>
                 </div>
@@ -877,16 +877,16 @@ export function RegMLWorkspacePage({ initialPane = 'hub' }: Props) {
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <div>
                           <div className="eyebrow">Explainer Output</div>
-                          <div className="mt-2 text-lg font-semibold text-white">Plain-language takeaways</div>
+                          <div className="mt-2 text-lg font-semibold text-[#241232]">Plain-language takeaways</div>
                         </div>
                         <button className="button-secondary" onClick={() => void handleCopyOutput(selectedAttempt, 'summary')} type="button">
                           <Copy className="mr-2 h-4 w-4" />
                           Copy Explanation
                         </button>
                       </div>
-                      <div className="mt-4 space-y-2 text-sm text-slate-300">
+                      <div className="mt-4 space-y-2 text-sm text-[#4f435c]">
                         {selectedAttempt.summary.map((item) => (
-                          <div key={item} className="rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2">
+                          <div key={item} className="rounded-2xl border border-[#ded8e4] bg-white px-3 py-2">
                             {item}
                           </div>
                         ))}
@@ -947,20 +947,20 @@ export function RegMLWorkspacePage({ initialPane = 'hub' }: Props) {
           </Tabs>
 
           <section className="grid gap-4 md:grid-cols-3">
-            <Link className="panel-subtle transition hover:border-cyan-300/30" to="/response-automation">
-              <Bot className="h-5 w-5 text-cyan-300" />
-              <div className="mt-4 text-lg font-semibold text-white">Response Automation</div>
-              <div className="mt-2 text-sm text-slate-400">Launch grounded questionnaire-answering jobs from internal sources.</div>
+            <Link className="panel-subtle transition hover:border-[#d7c3f1]" to="/response-automation">
+              <Bot className="h-5 w-5 text-[#7a3ccf]" />
+              <div className="mt-4 text-lg font-semibold text-[#241232]">Response Automation</div>
+              <div className="mt-2 text-sm text-[#6f6578]">Launch grounded questionnaire-answering jobs from internal sources.</div>
             </Link>
-            <Link className="panel-subtle transition hover:border-cyan-300/30" to="/evidence-mapping">
-              <Layers3 className="h-5 w-5 text-cyan-300" />
-              <div className="mt-4 text-lg font-semibold text-white">Evidence Mapping</div>
-              <div className="mt-2 text-sm text-slate-400">Map evidence to plans, controls, and components with recommendation support.</div>
+            <Link className="panel-subtle transition hover:border-[#d7c3f1]" to="/evidence-mapping">
+              <Layers3 className="h-5 w-5 text-[#7a3ccf]" />
+              <div className="mt-4 text-lg font-semibold text-[#241232]">Evidence Mapping</div>
+              <div className="mt-2 text-sm text-[#6f6578]">Map evidence to plans, controls, and components with recommendation support.</div>
             </Link>
-            <Link className="panel-subtle transition hover:border-cyan-300/30" to="/ai-policy-builder">
-              <FileText className="h-5 w-5 text-cyan-300" />
-              <div className="mt-4 text-lg font-semibold text-white">AI Policy Builder</div>
-              <div className="mt-2 text-sm text-slate-400">Generate policy requirements from profiles and catalogue context.</div>
+            <Link className="panel-subtle transition hover:border-[#d7c3f1]" to="/ai-policy-builder">
+              <FileText className="h-5 w-5 text-[#7a3ccf]" />
+              <div className="mt-4 text-lg font-semibold text-[#241232]">AI Policy Builder</div>
+              <div className="mt-2 text-sm text-[#6f6578]">Generate policy requirements from profiles and catalogue context.</div>
             </Link>
           </section>
         </section>

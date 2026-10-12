@@ -1,11 +1,25 @@
 import { useEffect, useMemo, useState } from 'react';
+import { CheckCircle2, ExternalLink, Eye, XCircle } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { explainAssurance, listPendingReviews, listReviewHistory, recordReviewDecision } from './api';
 import { AssuranceExplainPanel } from './AssuranceExplainPanel';
 import { AssuranceWorkflowPanel } from './AssuranceWorkflowPanel';
 import { CoachMarksPanel } from '../../components/CoachMarksPanel';
+import { RegActionMenu, RegModal, RegRightDrawer, RegStatusPill } from '../../components/regovise/PagePrimitives';
 import type { AssuranceExplainAudience, ReviewDecision, ReviewRecommendation } from './types';
 import { useEdgeIdentity } from '../../shared/session/identity';
+
+type ReviewQueueDecision = 'accepted' | 'rejected';
+
+const reviewDecisionLabels: Record<ReviewQueueDecision, string> = {
+  accepted: 'Accept',
+  rejected: 'Reject',
+};
+
+const reviewDecisionDescriptions: Record<ReviewQueueDecision, string> = {
+  accepted: 'Accept this recommendation, preserve the reviewer note, and refresh any downstream assurance package artifacts linked to it.',
+  rejected: 'Reject this recommendation and preserve the reviewer note as the decision rationale for future audits.',
+};
 
 function formatDate(value: string | null | undefined) {
   if (!value) {
@@ -40,8 +54,10 @@ export function ReviewQueuePage() {
   const [lastRefreshedPackageIds, setLastRefreshedPackageIds] = useState<string[]>([]);
   const [lastRefreshRecommendationId, setLastRefreshRecommendationId] = useState('');
   const [justification, setJustification] = useState('Accepted after assurance review.');
+  const [inspectedRecommendation, setInspectedRecommendation] = useState<ReviewRecommendation | null>(null);
+  const [decisionToReview, setDecisionToReview] = useState<ReviewQueueDecision | null>(null);
   const [loading, setLoading] = useState(true);
-  const [busyDecision, setBusyDecision] = useState<string | null>(null);
+  const [busyDecision, setBusyDecision] = useState<ReviewQueueDecision | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const requestedRecommendationId = searchParams.get('recommendationId') ?? '';
@@ -221,9 +237,19 @@ export function ReviewQueuePage() {
     },
   ];
 
-  async function handleDecision(decision: 'accepted' | 'rejected') {
+  function evidenceRefsForRecommendation(item: ReviewRecommendation) {
+    return [String(item.recommendation.recommendedArtifact ?? '')].filter(Boolean);
+  }
+
+  function controlRefsForRecommendation(item: ReviewRecommendation) {
+    return Array.isArray(item.recommendation.controlRefs)
+      ? (item.recommendation.controlRefs as string[])
+      : [];
+  }
+
+  async function handleDecision(decision: ReviewQueueDecision) {
     if (!selectedRecommendation) {
-      return;
+      return false;
     }
     try {
       setBusyDecision(decision);
@@ -233,10 +259,8 @@ export function ReviewQueuePage() {
         recommendationId: selectedRecommendation.id,
         decision,
         justification,
-        evidenceRefs: [String(selectedRecommendation.recommendation.recommendedArtifact ?? '')].filter(Boolean),
-        controlRefs: Array.isArray(selectedRecommendation.recommendation.controlRefs)
-          ? (selectedRecommendation.recommendation.controlRefs as string[])
-          : [],
+        evidenceRefs: evidenceRefsForRecommendation(selectedRecommendation),
+        controlRefs: controlRefsForRecommendation(selectedRecommendation),
       });
       setLastRefreshedPackageIds(result.refreshedPackageIds ?? []);
       setLastRefreshRecommendationId(selectedRecommendation.id);
@@ -250,8 +274,11 @@ export function ReviewQueuePage() {
             : '') +
           (result.packageRefreshError ? ` Package refresh deferred: ${result.packageRefreshError}` : ''),
       );
+      setDecisionToReview(null);
+      return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to record the review decision.');
+      return false;
     } finally {
       setBusyDecision(null);
     }
@@ -261,8 +288,8 @@ export function ReviewQueuePage() {
     <div className="space-y-6">
       <section className="panel">
         <div className="eyebrow">Assurance</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Review Queue</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Review Queue</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">
           Review deterministic recommendations, capture human decisions, and keep an immutable decision history close to the evidence bundle.
         </p>
       </section>
@@ -277,9 +304,9 @@ export function ReviewQueuePage() {
       {notice && <div className="notice-success">{notice}</div>}
       {error && <div className="notice-error">{error}</div>}
       {requestedEvidenceJobId && (
-        <div className="panel-subtle flex flex-wrap items-center justify-between gap-3 text-sm text-slate-300">
+        <div className="panel-subtle flex flex-wrap items-center justify-between gap-3 text-sm text-[#51465e]">
           <div>
-            Decision history is filtered to evidence job <span className="font-mono text-cyan-200">{requestedEvidenceJobId}</span>.
+            Decision history is filtered to evidence job <span className="font-mono text-[#6d28d9]">{requestedEvidenceJobId}</span>.
           </div>
           <Link className="button-secondary" to="/assurance/reviews">
             Clear filter
@@ -293,7 +320,7 @@ export function ReviewQueuePage() {
             <div className="flex items-center justify-between">
               <div>
                 <div className="label">Pending recommendations</div>
-                <div className="mt-1 text-sm text-slate-400">Only recommendations within your accessible domains are shown here.</div>
+                <div className="mt-1 text-sm text-[#6f6578]">Only recommendations within your accessible domains are shown here.</div>
               </div>
               <button className="button-secondary" onClick={() => void loadQueue()} type="button">
                 Refresh
@@ -304,7 +331,7 @@ export function ReviewQueuePage() {
           {pending.map((item) => (
             <button
               key={item.id}
-              className={`panel w-full text-left transition ${selectedRecommendationId === item.id ? 'border-cyan-400/30 bg-cyan-400/10' : ''}`}
+              className={`panel w-full text-left transition ${selectedRecommendationId === item.id ? 'border-[#d7c3f1] bg-[#f3e9ff]' : ''}`}
               onClick={() => {
                 setSelectedRecommendationId(item.id);
                 updateSearchState({
@@ -318,30 +345,72 @@ export function ReviewQueuePage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="eyebrow">{item.targetType}</div>
-                  <h2 className="mt-2 text-lg font-semibold text-white">{item.title}</h2>
-                  <div className="mt-2 font-mono text-xs text-cyan-200">{item.id}</div>
+                  <h2 className="mt-2 text-lg font-semibold text-[#241232]">{item.title}</h2>
+                  <div className="mt-2 font-mono text-xs text-[#6d28d9]">{item.id}</div>
                 </div>
-                <span className="badge-neutral">{String(item.recommendation.severity ?? item.status)}</span>
+                <RegStatusPill tone="neutral">{String(item.recommendation.severity ?? item.status)}</RegStatusPill>
               </div>
-              <div className="mt-3 text-sm leading-6 text-slate-400">{item.summary}</div>
+              <div className="mt-3 text-sm leading-6 text-[#6f6578]">{item.summary}</div>
             </button>
           ))}
 
           {!loading && pending.length === 0 && (
-            <div className="panel text-sm text-slate-400">No pending review recommendations are waiting for your scope.</div>
+            <div className="panel text-sm text-[#6f6578]">No pending review recommendations are waiting for your scope.</div>
           )}
-          {loading && <div className="panel text-sm text-slate-400">Loading review queue...</div>}
+          {loading && <div className="panel text-sm text-[#6f6578]">Loading review queue...</div>}
         </section>
 
         <section className="space-y-4">
-          {selectedRecommendation ? (
+              {selectedRecommendation ? (
             <>
               <section className="panel">
-                <div className="label">Selected recommendation</div>
-                <h2 className="mt-2 text-2xl font-semibold text-white">{selectedRecommendation.title}</h2>
-                <div className="mt-2 font-mono text-xs text-cyan-200">{selectedRecommendation.id}</div>
-                <p className="mt-4 text-sm leading-6 text-slate-300">{selectedRecommendation.summary}</p>
-                <div className="mt-4 grid gap-3 text-sm text-slate-400 sm:grid-cols-2">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="label">Selected recommendation</div>
+                    <h2 className="mt-2 text-2xl font-semibold text-[#241232]">{selectedRecommendation.title}</h2>
+                  </div>
+                  <RegActionMenu
+                    actions={[
+                      {
+                        label: 'Inspect recommendation',
+                        icon: Eye,
+                        onSelect: () => setInspectedRecommendation(selectedRecommendation),
+                      },
+                      ...(selectedRecommendation.evidenceJobId
+                        ? [
+                            {
+                              label: 'Open evidence bundle',
+                              icon: ExternalLink,
+                              to: `/assurance/evidence?evidenceJobId=${encodeURIComponent(selectedRecommendation.evidenceJobId)}`,
+                            },
+                          ]
+                        : []),
+                      {
+                        label: 'Accept',
+                        icon: CheckCircle2,
+                        disabled: busyDecision !== null,
+                        onSelect: () => {
+                          setJustification((current) => current || 'Accepted after assurance review.');
+                          setDecisionToReview('accepted');
+                        },
+                      },
+                      {
+                        label: 'Reject',
+                        icon: XCircle,
+                        disabled: busyDecision !== null,
+                        destructive: true,
+                        onSelect: () => {
+                          setJustification((current) => current || 'Rejected after assurance review.');
+                          setDecisionToReview('rejected');
+                        },
+                      },
+                    ]}
+                    label="Open selected recommendation actions"
+                  />
+                </div>
+                <div className="mt-2 font-mono text-xs text-[#6d28d9]">{selectedRecommendation.id}</div>
+                <p className="mt-4 text-sm leading-6 text-[#51465e]">{selectedRecommendation.summary}</p>
+                <div className="mt-4 grid gap-3 text-sm text-[#6f6578] sm:grid-cols-2">
                   <div>Target type: {selectedRecommendation.targetType}</div>
                   <div>Target id: {selectedRecommendation.targetId}</div>
                   <div>Severity: {String(selectedRecommendation.recommendation.severity ?? 'unknown')}</div>
@@ -356,11 +425,19 @@ export function ReviewQueuePage() {
                   />
                 </label>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <button className="button-primary" disabled={busyDecision !== null} onClick={() => void handleDecision('accepted')} type="button">
-                    {busyDecision === 'accepted' ? 'Accepting...' : 'Accept'}
+                  <button className="button-secondary" onClick={() => setInspectedRecommendation(selectedRecommendation)} type="button">
+                    Inspect recommendation
                   </button>
-                  <button className="button-secondary" disabled={busyDecision !== null} onClick={() => void handleDecision('rejected')} type="button">
-                    {busyDecision === 'rejected' ? 'Rejecting...' : 'Reject'}
+                  <button
+                    className="button-primary"
+                    disabled={busyDecision !== null}
+                    onClick={() => {
+                      setJustification((current) => current || 'Accepted after assurance review.');
+                      setDecisionToReview('accepted');
+                    }}
+                    type="button"
+                  >
+                    Review decision
                   </button>
                   {lastRefreshedPackageIds.length > 0 && lastRefreshRecommendationId === selectedRecommendation.id && (
                     <Link
@@ -376,7 +453,7 @@ export function ReviewQueuePage() {
                     {lastRefreshedPackageIds.map((packageId) => (
                       <Link
                         key={packageId}
-                        className="rounded-full border border-cyan-400/20 bg-cyan-400/[0.05] px-3 py-1 font-mono text-xs text-cyan-200 transition hover:border-cyan-300/30"
+                        className="rounded-full border border-[#d7c3f1] bg-[#f2e8ff] px-3 py-1 font-mono text-xs text-[#6d28d9] transition hover:border-[#8b35e6]/30"
                         to={`/assurance/packages?packageId=${encodeURIComponent(packageId)}`}
                       >
                         {packageId}
@@ -425,7 +502,7 @@ export function ReviewQueuePage() {
               />
             </>
           ) : (
-            <div className="panel text-sm text-slate-400">Select a pending recommendation to review it.</div>
+            <div className="panel text-sm text-[#6f6578]">Select a pending recommendation to review it.</div>
           )}
 
           <section className="grid gap-4 xl:grid-cols-[0.84fr_1.16fr]">
@@ -436,7 +513,7 @@ export function ReviewQueuePage() {
                   {lastRefreshedPackageIds.map((packageId) => (
                     <Link
                       key={packageId}
-                      className="rounded-full border border-cyan-400/20 bg-cyan-400/[0.05] px-3 py-1 font-mono text-xs text-cyan-200 transition hover:border-cyan-300/30"
+                      className="rounded-full border border-[#d7c3f1] bg-[#f2e8ff] px-3 py-1 font-mono text-xs text-[#6d28d9] transition hover:border-[#8b35e6]/30"
                       to={`/assurance/packages?packageId=${encodeURIComponent(packageId)}`}
                     >
                       Refreshed package {packageId}
@@ -450,8 +527,8 @@ export function ReviewQueuePage() {
                     key={item.id}
                     className={`w-full rounded-2xl border px-3 py-3 text-left transition ${
                       selectedDecisionId === item.id
-                        ? 'border-cyan-300/30 bg-cyan-400/[0.06]'
-                        : 'border-white/8 bg-black/15 hover:border-cyan-300/20 hover:bg-cyan-400/[0.03]'
+                        ? 'border-[#8b35e6]/30 bg-[#f2e8ff]'
+                        : 'border-[#ded8e4] bg-[#fbf9fc] hover:border-[#8b35e6]/25 hover:bg-[#f8f3ff]'
                     }`}
                     onClick={() => {
                       setSelectedDecisionId(item.id);
@@ -464,16 +541,16 @@ export function ReviewQueuePage() {
                     type="button"
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <div className="text-sm font-medium text-white">{humanizeKey(item.decision)}</div>
-                      <div className="text-xs text-slate-500">{formatDate(item.createdAt)}</div>
+                      <div className="text-sm font-medium text-[#241232]">{humanizeKey(item.decision)}</div>
+                      <div className="text-xs text-[#62576a]">{formatDate(item.createdAt)}</div>
                     </div>
-                    <div className="mt-2 text-sm text-slate-300">{item.recommendationTitle ?? item.recommendationId}</div>
-                    <div className="mt-2 font-mono text-xs text-cyan-200">{item.id}</div>
-                    <div className="mt-2 text-sm leading-6 text-slate-400">{item.justification}</div>
+                    <div className="mt-2 text-sm text-[#51465e]">{item.recommendationTitle ?? item.recommendationId}</div>
+                    <div className="mt-2 font-mono text-xs text-[#6d28d9]">{item.id}</div>
+                    <div className="mt-2 text-sm leading-6 text-[#6f6578]">{item.justification}</div>
                   </button>
                 ))}
                 {!loading && history.length === 0 && (
-                  <div className="text-sm text-slate-400">No review decisions have been recorded yet.</div>
+                  <div className="text-sm text-[#6f6578]">No review decisions have been recorded yet.</div>
                 )}
               </div>
             </section>
@@ -482,21 +559,21 @@ export function ReviewQueuePage() {
               <div className="label">Selected decision</div>
               {selectedDecision ? (
                 <div className="mt-3 space-y-4">
-                  <div className="rounded-2xl border border-white/8 bg-black/15 px-4 py-4">
+                  <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <div className="text-sm font-medium text-white">{selectedDecision.recommendationTitle ?? selectedDecision.recommendationId}</div>
-                        <div className="mt-1 font-mono text-xs text-cyan-200">{selectedDecision.id}</div>
+                        <div className="text-sm font-medium text-[#241232]">{selectedDecision.recommendationTitle ?? selectedDecision.recommendationId}</div>
+                        <div className="mt-1 font-mono text-xs text-[#6d28d9]">{selectedDecision.id}</div>
                       </div>
-                      <span className="badge-neutral">{humanizeKey(selectedDecision.decision)}</span>
+                      <RegStatusPill tone="neutral">{humanizeKey(selectedDecision.decision)}</RegStatusPill>
                     </div>
-                    <div className="mt-3 grid gap-2 text-sm text-slate-400 sm:grid-cols-2">
+                    <div className="mt-3 grid gap-2 text-sm text-[#6f6578] sm:grid-cols-2">
                       <div>Target type: {humanizeKey(selectedDecision.targetType)}</div>
                       <div>Target id: {selectedDecision.targetId ?? '—'}</div>
                       <div>Evidence refs: {selectedDecision.evidenceRefs.length}</div>
                       <div>Finding refs: {selectedDecision.findingRefs.length}</div>
                     </div>
-                    <div className="mt-3 text-sm leading-6 text-slate-300">{selectedDecision.justification}</div>
+                    <div className="mt-3 text-sm leading-6 text-[#51465e]">{selectedDecision.justification}</div>
                     <div className="mt-4 flex flex-wrap gap-2">
                       {selectedDecision.evidenceJobId && (
                         <Link
@@ -518,48 +595,206 @@ export function ReviewQueuePage() {
                   </div>
 
                   <div className="grid gap-4 md:grid-cols-3">
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Evidence refs</div>
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                      <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Evidence refs</div>
                       <div className="mt-3 flex flex-wrap gap-2">
                         {selectedDecision.evidenceRefs.map((item) => (
-                          <span key={item} className="rounded-full border border-white/10 bg-slate-950/60 px-3 py-1 font-mono text-xs text-cyan-200">
+                          <span key={item} className="rounded-full border border-[#ded8e4] bg-[#f7f2fa] px-3 py-1 font-mono text-xs text-[#6d28d9]">
                             {item}
                           </span>
                         ))}
-                        {selectedDecision.evidenceRefs.length === 0 && <span className="text-xs text-slate-500">None recorded</span>}
+                        {selectedDecision.evidenceRefs.length === 0 && <span className="text-xs text-[#62576a]">None recorded</span>}
                       </div>
                     </div>
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Finding refs</div>
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                      <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Finding refs</div>
                       <div className="mt-3 flex flex-wrap gap-2">
                         {selectedDecision.findingRefs.map((item) => (
-                          <span key={item} className="rounded-full border border-white/10 bg-slate-950/60 px-3 py-1 font-mono text-xs text-cyan-200">
+                          <span key={item} className="rounded-full border border-[#ded8e4] bg-[#f7f2fa] px-3 py-1 font-mono text-xs text-[#6d28d9]">
                             {item}
                           </span>
                         ))}
-                        {selectedDecision.findingRefs.length === 0 && <span className="text-xs text-slate-500">None recorded</span>}
+                        {selectedDecision.findingRefs.length === 0 && <span className="text-xs text-[#62576a]">None recorded</span>}
                       </div>
                     </div>
-                    <div className="rounded-2xl border border-white/8 bg-black/15 px-3 py-3">
-                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Control refs</div>
+                    <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                      <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Control refs</div>
                       <div className="mt-3 flex flex-wrap gap-2">
                         {selectedDecision.controlRefs.map((item) => (
-                          <span key={item} className="rounded-full border border-white/10 bg-slate-950/60 px-3 py-1 font-mono text-xs text-cyan-200">
+                          <span key={item} className="rounded-full border border-[#ded8e4] bg-[#f7f2fa] px-3 py-1 font-mono text-xs text-[#6d28d9]">
                             {item}
                           </span>
                         ))}
-                        {selectedDecision.controlRefs.length === 0 && <span className="text-xs text-slate-500">None recorded</span>}
+                        {selectedDecision.controlRefs.length === 0 && <span className="text-xs text-[#62576a]">None recorded</span>}
                       </div>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="mt-3 text-sm text-slate-400">Select a historical decision to inspect its lineage.</div>
+                <div className="mt-3 text-sm text-[#6f6578]">Select a historical decision to inspect its lineage.</div>
               )}
             </section>
           </section>
         </section>
       </section>
+
+      <RegRightDrawer
+        open={inspectedRecommendation !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setInspectedRecommendation(null);
+          }
+        }}
+        title={inspectedRecommendation?.title ?? 'Recommendation details'}
+        description={inspectedRecommendation ? inspectedRecommendation.summary : undefined}
+        footer={
+          inspectedRecommendation ? (
+            <div className="flex flex-wrap justify-end gap-2">
+              {inspectedRecommendation.evidenceJobId ? (
+                <Link
+                  className="button-secondary"
+                  to={`/assurance/evidence?evidenceJobId=${encodeURIComponent(inspectedRecommendation.evidenceJobId)}`}
+                >
+                  Open evidence bundle
+                </Link>
+              ) : null}
+              <button
+                className="button-secondary"
+                disabled={busyDecision !== null}
+                onClick={() => {
+                  setSelectedRecommendationId(inspectedRecommendation.id);
+                  setJustification((current) => current || 'Rejected after assurance review.');
+                  setDecisionToReview('rejected');
+                }}
+                type="button"
+              >
+                Reject
+              </button>
+              <button
+                className="button-primary"
+                disabled={busyDecision !== null}
+                onClick={() => {
+                  setSelectedRecommendationId(inspectedRecommendation.id);
+                  setJustification((current) => current || 'Accepted after assurance review.');
+                  setDecisionToReview('accepted');
+                }}
+                type="button"
+              >
+                Accept
+              </button>
+            </div>
+          ) : null
+        }
+      >
+        {inspectedRecommendation ? (
+          <div className="space-y-5">
+            <div className="grid gap-3 text-sm text-[#51465e] sm:grid-cols-2">
+              <div className="rounded-lg border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                <div className="label">Target type</div>
+                <div className="mt-2 font-medium text-[#241232]">{humanizeKey(inspectedRecommendation.targetType)}</div>
+              </div>
+              <div className="rounded-lg border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                <div className="label">Target id</div>
+                <div className="mt-2 break-all font-mono text-xs text-[#6d28d9]">{inspectedRecommendation.targetId}</div>
+              </div>
+              <div className="rounded-lg border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                <div className="label">Evidence refs</div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {evidenceRefsForRecommendation(inspectedRecommendation).map((item) => (
+                    <span key={item} className="rounded-full border border-[#d7c3f1] bg-[#f2e8ff] px-2.5 py-1 font-mono text-xs text-[#5f1aa8]">
+                      {item}
+                    </span>
+                  ))}
+                  {evidenceRefsForRecommendation(inspectedRecommendation).length === 0 ? <span className="text-[#62576a]">None suggested</span> : null}
+                </div>
+              </div>
+              <div className="rounded-lg border border-[#ded8e4] bg-[#fbf9fc] px-3 py-3">
+                <div className="label">Control refs</div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {controlRefsForRecommendation(inspectedRecommendation).map((item) => (
+                    <span key={item} className="rounded-full border border-[#ded8e4] bg-white px-2.5 py-1 font-mono text-xs text-[#51465e]">
+                      {item}
+                    </span>
+                  ))}
+                  {controlRefsForRecommendation(inspectedRecommendation).length === 0 ? <span className="text-[#62576a]">None suggested</span> : null}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="label">Recommendation payload</div>
+              <pre className="mt-2 max-h-80 overflow-auto rounded-lg border border-[#ded8e4] bg-[#fbf9fc] p-3 text-xs text-[#241232]">
+                {JSON.stringify(inspectedRecommendation.recommendation, null, 2)}
+              </pre>
+            </div>
+          </div>
+        ) : null}
+      </RegRightDrawer>
+
+      <RegModal
+        open={decisionToReview !== null}
+        onOpenChange={(open) => {
+          if (!open && busyDecision === null) {
+            setDecisionToReview(null);
+          }
+        }}
+        title={decisionToReview ? `${reviewDecisionLabels[decisionToReview]} recommendation` : 'Review recommendation'}
+        description={decisionToReview ? reviewDecisionDescriptions[decisionToReview] : undefined}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" disabled={busyDecision !== null} onClick={() => setDecisionToReview(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className={decisionToReview === 'rejected' ? 'button-secondary' : 'button-primary'}
+              disabled={busyDecision !== null || !decisionToReview}
+              onClick={() => {
+                if (decisionToReview) {
+                  void handleDecision(decisionToReview);
+                }
+              }}
+              type="button"
+            >
+              {decisionToReview && busyDecision === decisionToReview
+                ? `${reviewDecisionLabels[decisionToReview]}ing...`
+                : decisionToReview
+                  ? reviewDecisionLabels[decisionToReview]
+                  : 'Confirm'}
+            </button>
+          </div>
+        }
+      >
+        {selectedRecommendation ? (
+          <div className="space-y-4">
+            <div className="rounded-lg border border-[#ded8e4] bg-[#fbf9fc] px-4 py-4">
+              <div className="label">Recommendation</div>
+              <div className="mt-2 text-base font-semibold text-[#241232]">{selectedRecommendation.title}</div>
+              <div className="mt-1 font-mono text-xs text-[#6d28d9]">{selectedRecommendation.id}</div>
+              <p className="mt-3 text-sm leading-6 text-[#51465e]">{selectedRecommendation.summary}</p>
+            </div>
+            <label className="block space-y-1">
+              <span className="label">Reviewer note</span>
+              <textarea
+                className="input min-h-[160px]"
+                onChange={(event) => setJustification(event.target.value)}
+                value={justification}
+              />
+            </label>
+            <div className="grid gap-3 text-sm text-[#51465e] sm:grid-cols-2">
+              <div className="rounded-lg border border-[#ded8e4] bg-white px-3 py-3">
+                <div className="label">Evidence refs</div>
+                <div className="mt-2">{evidenceRefsForRecommendation(selectedRecommendation).length || 'None suggested'}</div>
+              </div>
+              <div className="rounded-lg border border-[#ded8e4] bg-white px-3 py-3">
+                <div className="label">Control refs</div>
+                <div className="mt-2">{controlRefsForRecommendation(selectedRecommendation).length || 'None suggested'}</div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="text-sm text-[#6f6578]">Select a recommendation before recording a decision.</div>
+        )}
+      </RegModal>
     </div>
   );
 }

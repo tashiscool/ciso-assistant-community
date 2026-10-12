@@ -6,32 +6,50 @@ on:
     paths:
       - 'apps/web/**'
       - 'cloudflare/**'
+      - 'ops/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.nvmrc'
+      - '.node-version'
+      - '.npmrc'
+      - '.github/workflows/deploy-regovise-edge.yml'
   workflow_dispatch:
     inputs:
       apply_migrations:
-        description: 'Apply production D1 migrations before deploy'
+        description: 'Apply validated production D1 migration inventory before deploy'
         required: false
         default: false
         type: boolean
       dry_run:
-        description: 'Dry run (skip the actual deploy)'
+        description: 'Validate and package only; skip migration, deployment and production probe'
         required: false
         default: false
         type: boolean
 
+permissions:
+  contents: read
+
 env:
-  NODE_VERSION: '22'
-  CLOUDFLARE_WORKER_ENV: production
+  NODE_VERSION: '22.22.0'
+  CI: '1'
+  WRANGLER_SEND_METRICS: 'false'
+  RELEASE_COMMIT: ${{ github.sha }}
   REGOVISE_PROD_BASE_URL: https://regovise.com
 
 jobs:
   validate:
-    name: Typecheck and Build
+    name: Validate Release Build
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+    outputs:
+      manifest_sha256: ${{ steps.release_artifact.outputs.manifest_sha256 }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
@@ -45,126 +63,117 @@ jobs:
       - run: npm ci
         working-directory: cloudflare
 
-      - run: npm run typecheck
-        working-directory: apps/web
+      - name: Gate high and critical dependency advisories
+        run: npm run audit:dependencies
 
-      - run: npm run build
-        working-directory: apps/web
+      - name: Verify canonical application and isolated Worker journeys
+        run: npm run verify:full
 
-      - run: npm run typecheck
-        working-directory: cloudflare
+      - name: Package exact validated Worker and web build
+        id: release_artifact
+        run: node ops/release/release_artifact.mjs create --commit "$RELEASE_COMMIT" --github-output "$GITHUB_OUTPUT"
 
-      - name: Dry-run package validation
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx wrangler deploy --dry-run --env production
-        working-directory: cloudflare
+      - name: Upload validated release package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: regovise-edge-${{ github.sha }}
+          path: target/regovise-release-artifact/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload release validation reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: regovise-release-verification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            artifacts/verification/
+            artifacts/local-worker/
+            artifacts/traceability/
+          if-no-files-found: warn
+          retention-days: 7
 
   deploy:
-    name: Deploy to Cloudflare
+    name: Promote Validated Release to Cloudflare
     needs: [validate]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    timeout-minutes: 30
+    if: github.ref == 'refs/heads/main' && (github.event_name != 'workflow_dispatch' || inputs.dry_run != true)
     environment: production
     concurrency:
       group: regovise-cloudflare-deploy
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          cache-dependency-path: |
-            apps/web/package-lock.json
-            cloudflare/package-lock.json
-
-      - run: npm ci
-        working-directory: apps/web
+          cache-dependency-path: cloudflare/package-lock.json
 
       - run: npm ci
         working-directory: cloudflare
 
-      - run: npm run build
-        working-directory: apps/web
+      - name: Download validated release package
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: regovise-edge-${{ github.sha }}
+          path: target/regovise-release-artifact/
 
-      - name: Sync Mailchannels secret
+      - name: Verify exact validated release package
+        env:
+          EXPECTED_MANIFEST_SHA256: ${{ needs.validate.outputs.manifest_sha256 }}
+        run: node ops/release/release_artifact.mjs verify --commit "$RELEASE_COMMIT" --manifest-sha256 "$EXPECTED_MANIFEST_SHA256"
+
+      - name: Validate production probe inputs before cloud mutations
         if: github.event_name != 'workflow_dispatch' || inputs.dry_run != true
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          MAILCHANNELS_API_KEY: ${{ secrets.MAILCHANNELS_API_KEY }}
-          EMAIL_WEBHOOK_BEARER_TOKEN: ${{ secrets.EMAIL_WEBHOOK_BEARER_TOKEN }}
           BOOTSTRAP_SETUP_SECRET: ${{ secrets.BOOTSTRAP_SETUP_SECRET }}
-        run: |
-          if [ -n "${MAILCHANNELS_API_KEY:-}" ]; then
-            printf '%s' "${MAILCHANNELS_API_KEY}" | npx wrangler secret put MAILCHANNELS_API_KEY --env production
-          else
-            echo "[skip] MAILCHANNELS_API_KEY secret not configured"
-          fi
-          if [ -n "${EMAIL_WEBHOOK_BEARER_TOKEN:-}" ]; then
-            printf '%s' "${EMAIL_WEBHOOK_BEARER_TOKEN}" | npx wrangler secret put EMAIL_WEBHOOK_BEARER_TOKEN --env production
-          else
-            echo "[skip] EMAIL_WEBHOOK_BEARER_TOKEN secret not configured"
-          fi
-          if [ -n "${BOOTSTRAP_SETUP_SECRET:-}" ]; then
-            printf '%s' "${BOOTSTRAP_SETUP_SECRET}" | npx wrangler secret put BOOTSTRAP_SETUP_SECRET --env production
-          else
-            echo "[skip] BOOTSTRAP_SETUP_SECRET secret not configured"
-          fi
-        working-directory: cloudflare
+          REGOVISE_VERIFY_TENANT_SLUG: regovise
+          REGOVISE_VERIFY_EMAIL: admin@regovise.com
+          EXPECTED_MANIFEST_SHA256: ${{ needs.validate.outputs.manifest_sha256 }}
+        run: node ops/release/production_probe.mjs --validate-inputs --bootstrap-session --commit "$RELEASE_COMMIT" --manifest-sha256 "$EXPECTED_MANIFEST_SHA256"
 
       - name: Apply D1 migrations
-        if: github.event_name == 'workflow_dispatch' && inputs.apply_migrations == true
+        if: github.event_name == 'workflow_dispatch' && inputs.apply_migrations == true && inputs.dry_run != true
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npm run migrate:production
-        working-directory: cloudflare
+          EXPECTED_MANIFEST_SHA256: ${{ needs.validate.outputs.manifest_sha256 }}
+        run: node ops/release/release_artifact.mjs migrate --commit "$RELEASE_COMMIT" --manifest-sha256 "$EXPECTED_MANIFEST_SHA256"
 
       - name: Deploy worker
         if: github.event_name != 'workflow_dispatch' || inputs.dry_run != true
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npm run deploy:production
-        working-directory: cloudflare
+          EXPECTED_MANIFEST_SHA256: ${{ needs.validate.outputs.manifest_sha256 }}
+        run: |
+          mkdir -p artifacts/verification
+          node ops/release/release_artifact.mjs deploy --commit "$RELEASE_COMMIT" --manifest-sha256 "$EXPECTED_MANIFEST_SHA256" > artifacts/verification/production-deploy.json
+          cat artifacts/verification/production-deploy.json
 
-      - name: Post-deploy smoke
+      - name: Post-deploy release probe
         if: github.event_name != 'workflow_dispatch' || inputs.dry_run != true
         env:
-          REGOVISE_PROD_BASE_URL: ${{ env.REGOVISE_PROD_BASE_URL }}
-          PROD_SMOKE_TENANT_ID: ${{ secrets.PROD_SMOKE_TENANT_ID }}
-          PROD_SMOKE_USER_ID: ${{ secrets.PROD_SMOKE_USER_ID }}
           BOOTSTRAP_SETUP_SECRET: ${{ secrets.BOOTSTRAP_SETUP_SECRET }}
           REGOVISE_VERIFY_TENANT_SLUG: regovise
           REGOVISE_VERIFY_EMAIL: admin@regovise.com
-          PROD_SMOKE_REQUIRE_SESSION: '1'
-        run: npm run smoke:production
-        working-directory: cloudflare
+          EXPECTED_MANIFEST_SHA256: ${{ needs.validate.outputs.manifest_sha256 }}
+        run: node ops/release/production_probe.mjs --bootstrap-session --commit "$RELEASE_COMMIT" --manifest-sha256 "$EXPECTED_MANIFEST_SHA256" --report artifacts/verification/production-release-probe.json
 
-      - name: Ensure observable parity dataset
-        if: github.event_name != 'workflow_dispatch' || inputs.dry_run != true
-        env:
-          REGOVISE_VERIFY_BASE_URL: ${{ env.REGOVISE_PROD_BASE_URL }}
-          REGOVISE_VERIFY_TENANT_ID: ${{ secrets.PROD_SMOKE_TENANT_ID }}
-          REGOVISE_VERIFY_USER_ID: ${{ secrets.PROD_SMOKE_USER_ID }}
-          REGOVISE_VERIFY_BOOTSTRAP_SECRET: ${{ secrets.BOOTSTRAP_SETUP_SECRET }}
-          REGOVISE_VERIFY_TENANT_SLUG: regovise
-          REGOVISE_VERIFY_EMAIL: admin@regovise.com
-        run: npm run ensure:observable-production
-        working-directory: cloudflare
-
-      - name: Post-deploy observable parity verification
-        if: github.event_name != 'workflow_dispatch' || inputs.dry_run != true
-        env:
-          REGOVISE_VERIFY_BASE_URL: ${{ env.REGOVISE_PROD_BASE_URL }}
-          REGOVISE_VERIFY_TENANT_ID: ${{ secrets.PROD_SMOKE_TENANT_ID }}
-          REGOVISE_VERIFY_USER_ID: ${{ secrets.PROD_SMOKE_USER_ID }}
-          REGOVISE_VERIFY_BOOTSTRAP_SECRET: ${{ secrets.BOOTSTRAP_SETUP_SECRET }}
-          REGOVISE_VERIFY_TENANT_SLUG: regovise
-          REGOVISE_VERIFY_EMAIL: admin@regovise.com
-        run: npm run verify:observable-production
-        working-directory: cloudflare
+      - name: Upload sanitized production release receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: regovise-production-probe-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            artifacts/verification/production-deploy.json
+            artifacts/verification/production-release-probe.json
+          if-no-files-found: warn
+          retention-days: 7

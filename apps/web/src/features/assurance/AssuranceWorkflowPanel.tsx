@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { RegStatusPill } from '../../components/regovise/PagePrimitives';
 import { listAssuranceWorkflowRuns } from './api';
 import type { AssuranceWorkflowRun } from './types';
 
@@ -19,14 +20,14 @@ function formatDate(value: string | null | undefined) {
   return new Date(value).toLocaleString();
 }
 
-function badgeClass(status: string) {
+function statusTone(status: string): 'success' | 'danger' | 'neutral' {
   switch (status) {
     case 'Done':
-      return 'badge-success';
+      return 'success';
     case 'Failed':
-      return 'badge-danger';
+      return 'danger';
     default:
-      return 'badge-neutral';
+      return 'neutral';
   }
 }
 
@@ -174,7 +175,7 @@ export function AssuranceWorkflowPanel({
       <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
         <div>
           <div className="label">{heading}</div>
-          <div className="mt-1 text-sm text-slate-400">{helperText}</div>
+          <div className="mt-1 text-sm text-[#6f6578]">{helperText}</div>
         </div>
         <div className="flex flex-wrap gap-2">
           <select className="input min-w-[190px]" onChange={(event) => setStatusFilter(event.target.value as WorkflowStatusFilter)} value={statusFilter}>
@@ -214,37 +215,37 @@ export function AssuranceWorkflowPanel({
       {error && <div className="notice-error mt-4">{error}</div>}
 
       <div className="mt-4 space-y-3">
-        {normalizedLinkedRecordIds.length === 0 && <div className="text-sm text-slate-400">{disabledMessage}</div>}
-        {normalizedLinkedRecordIds.length > 0 && loading && <div className="text-sm text-slate-400">Loading workflow activity...</div>}
-        {normalizedLinkedRecordIds.length > 0 && !loading && runs.length === 0 && <div className="text-sm text-slate-400">{emptyMessage}</div>}
+        {normalizedLinkedRecordIds.length === 0 && <div className="text-sm text-[#6f6578]">{disabledMessage}</div>}
+        {normalizedLinkedRecordIds.length > 0 && loading && <div className="text-sm text-[#6f6578]">Loading workflow activity...</div>}
+        {normalizedLinkedRecordIds.length > 0 && !loading && runs.length === 0 && <div className="text-sm text-[#6f6578]">{emptyMessage}</div>}
         {normalizedLinkedRecordIds.length > 0 && !loading && runs.length > 0 && filteredRuns.length === 0 && (
-          <div className="text-sm text-slate-400">No workflow runs match the current status filter.</div>
+          <div className="text-sm text-[#6f6578]">No workflow runs match the current status filter.</div>
         )}
         {filteredRuns.map((run) => {
           const links = linkedRecords(run);
           const expanded = expandedRunId === run.runId;
           return (
-          <div key={run.runId} className="rounded-2xl border border-white/8 bg-black/15 px-4 py-4">
+          <div key={run.runId} className="rounded-2xl border border-[#ded8e4] bg-white px-4 py-4">
             <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="font-medium text-white">{run.title}</div>
-                  <span className="badge-neutral">{run.module}</span>
-                  <span className={badgeClass(run.status)}>{run.status}</span>
+                  <div className="font-medium text-[#241232]">{run.title}</div>
+                  <RegStatusPill tone="neutral">{run.module}</RegStatusPill>
+                  <RegStatusPill tone={statusTone(run.status)}>{run.status}</RegStatusPill>
                 </div>
-                <div className="mt-2 text-sm leading-6 text-slate-300">{run.detail}</div>
-                <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
+                <div className="mt-2 text-sm leading-6 text-[#4f435c]">{run.detail}</div>
+                <div className="mt-3 flex flex-wrap gap-3 text-xs text-[#62576a]">
                   <span>{run.runType}</span>
                   <span>Created {formatDate(run.createdAt)}</span>
                   <span>{formatDate(run.updatedAt)}</span>
-                  {run.sourceRecordId && <span className="font-mono text-cyan-200">{run.sourceRecordId}</span>}
+                  {run.sourceRecordId && <span className="font-mono text-[#6f20c9]">{run.sourceRecordId}</span>}
                 </div>
                 {links.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {links.map((link) => (
                       <Link
                         key={`${run.runId}:${link.label}:${link.value}`}
-                        className="rounded-full border border-cyan-400/20 bg-cyan-400/[0.05] px-3 py-1 text-xs text-cyan-200 transition hover:border-cyan-300/30"
+                        className="rounded-full border border-[#d7c3f1] bg-[#f7f2ff] px-3 py-1 text-xs text-[#6f20c9] transition hover:border-[#b891f2]"
                         to={link.route}
                       >
                         {link.label}: <span className="font-mono">{link.value}</span>
@@ -268,28 +269,28 @@ export function AssuranceWorkflowPanel({
             </div>
             {expanded && (
               <div className="mt-4 grid gap-4 xl:grid-cols-[0.72fr_1.28fr]">
-                <div className="rounded-2xl border border-white/8 bg-slate-950/50 px-4 py-4 text-sm text-slate-300">
+                <div className="rounded-2xl border border-[#ded8e4] bg-[#f7f4f9] px-4 py-4 text-sm text-[#4f435c]">
                   <div className="label">Run context</div>
                   <div className="mt-3 space-y-2">
                     <div>
-                      <span className="text-slate-500">Route:</span> <span className="font-mono text-cyan-200">{run.route}</span>
+                      <span className="text-[#62576a]">Route:</span> <span className="font-mono text-[#6f20c9]">{run.route}</span>
                     </div>
                     <div>
-                      <span className="text-slate-500">Run id:</span> <span className="font-mono text-cyan-200">{run.runId}</span>
+                      <span className="text-[#62576a]">Run id:</span> <span className="font-mono text-[#6f20c9]">{run.runId}</span>
                     </div>
                     <div>
-                      <span className="text-slate-500">Source record:</span>{' '}
-                      <span className="font-mono text-cyan-200">{run.sourceRecordId ?? '—'}</span>
+                      <span className="text-[#62576a]">Source record:</span>{' '}
+                      <span className="font-mono text-[#6f20c9]">{run.sourceRecordId ?? '—'}</span>
                     </div>
                     <div>
-                      <span className="text-slate-500">Folder scope:</span>{' '}
-                      <span className="font-mono text-cyan-200">{run.folderId ?? 'Tenant-wide'}</span>
+                      <span className="text-[#62576a]">Folder scope:</span>{' '}
+                      <span className="font-mono text-[#6f20c9]">{run.folderId ?? 'Tenant-wide'}</span>
                     </div>
                   </div>
                 </div>
-                <div className="rounded-2xl border border-white/8 bg-slate-950/50 px-4 py-4">
+                <div className="rounded-2xl border border-[#ded8e4] bg-[#f7f4f9] px-4 py-4">
                   <div className="label">Workflow metadata</div>
-                  <pre className="mt-3 max-h-[320px] overflow-auto rounded-2xl border border-white/10 bg-black/25 p-4 text-xs leading-6 text-slate-300">
+                  <pre className="mt-3 max-h-[320px] overflow-auto rounded-2xl border border-[#ded8e4] bg-[#f7f4f9] p-4 text-xs leading-6 text-[#4f435c]">
                     {run.metadata ? JSON.stringify(run.metadata, null, 2) : 'No metadata was attached to this workflow run.'}
                   </pre>
                 </div>

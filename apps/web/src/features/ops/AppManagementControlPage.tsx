@@ -134,7 +134,7 @@ export function AppManagementControlPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading app management...</div>;
+    return <div className="panel p-6 text-sm text-[#51465e]">Loading app management...</div>;
   }
 
   if (error && !snapshot) {
@@ -147,8 +147,8 @@ export function AppManagementControlPage() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">Operations</div>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">App Management</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">App Management</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">
               Manage business-unit partitions, delegated access, automation ownership, and service-account posture from
               a canonical Worker-backed control room.
             </p>
@@ -184,8 +184,8 @@ export function AppManagementControlPage() {
 
       <section className="grid gap-4 xl:grid-cols-[0.88fr_1.12fr]">
         <div className="panel-subtle space-y-4">
-          <div className="flex items-center gap-2 text-white">
-            <ServerCog className="h-4 w-4 text-cyan-300" />
+          <div className="flex items-center gap-2 text-[#241232]">
+            <ServerCog className="h-4 w-4 text-[#7a2ed6]" />
             <h2 className="text-lg font-semibold">Business-unit partitions</h2>
           </div>
           <button className="button-primary" disabled={busy} onClick={() => void handleCreate()} type="button">
@@ -195,18 +195,18 @@ export function AppManagementControlPage() {
           <div className="space-y-3">
             {snapshot?.apps.map((app) => (
               <button
-                className={`panel-subtle w-full text-left transition ${selectedApp?.id === app.id ? 'border-cyan-300/40 bg-cyan-400/[0.04]' : ''}`}
+                className={`panel-subtle w-full text-left transition ${selectedApp?.id === app.id ? 'border-[#8b35e6]/40 bg-[#f8f3ff]' : ''}`}
                 key={app.id}
                 onClick={() => setSelectedId(app.id)}
                 type="button"
               >
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="font-medium text-white">{app.name}</div>
-                  <span className="badge-neutral">{app.automationHealth}</span>
-                  {app.defaultPublic && <span className="badge-neutral">Public</span>}
+                  <div className="font-medium text-[#241232]">{app.name}</div>
+                  <span className="status-pill-neutral">{app.automationHealth}</span>
+                  {app.defaultPublic && <span className="status-pill-neutral">Public</span>}
                 </div>
-                <div className="mt-2 text-sm text-slate-300">{app.description}</div>
-                <div className="mt-2 text-xs text-slate-500">
+                <div className="mt-2 text-sm text-[#51465e]">{app.description}</div>
+                <div className="mt-2 text-xs text-[#62576a]">
                   {app.groups.length} groups · {app.users.length} users · {app.serviceAccounts.length} service accounts
                 </div>
               </button>
@@ -220,8 +220,8 @@ export function AppManagementControlPage() {
               <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                 <div>
                   <div className="eyebrow">Selected app</div>
-                  <h2 className="mt-2 text-2xl font-semibold text-white">{selectedApp.name}</h2>
-                  <p className="mt-2 text-sm text-slate-300">Update the partition metadata and automation ownership.</p>
+                  <h2 className="mt-2 text-2xl font-semibold text-[#241232]">{selectedApp.name}</h2>
+                  <p className="mt-2 text-sm text-[#51465e]">Update the partition metadata and automation ownership.</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <button className="button-secondary" disabled={busy} onClick={() => void handleDuplicate()} type="button">
@@ -248,12 +248,12 @@ export function AppManagementControlPage() {
                   <span className="label">Description</span>
                   <textarea className="input min-h-[96px]" onChange={(event) => setDraft((current) => (current ? { ...current, description: event.target.value } : current))} value={draft.description} />
                 </label>
-                <label className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3">
-                  <span className="text-sm text-slate-300">Default public</span>
+                <label className="flex items-center justify-between rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3">
+                  <span className="text-sm text-[#51465e]">Default public</span>
                   <input checked={draft.defaultPublic} onChange={(event) => setDraft((current) => (current ? { ...current, defaultPublic: event.target.checked } : current))} type="checkbox" />
                 </label>
-                <label className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3">
-                  <span className="text-sm text-slate-300">Inherit parent access</span>
+                <label className="flex items-center justify-between rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] px-4 py-3">
+                  <span className="text-sm text-[#51465e]">Inherit parent access</span>
                   <input checked={draft.inheritParentAccess} onChange={(event) => setDraft((current) => (current ? { ...current, inheritParentAccess: event.target.checked } : current))} type="checkbox" />
                 </label>
                 <label className="space-y-1 md:col-span-2">
@@ -266,9 +266,9 @@ export function AppManagementControlPage() {
             <section className="grid gap-4 lg:grid-cols-3">
               <div className="panel-subtle">
                 <div className="eyebrow">Administrators</div>
-                <div className="mt-4 space-y-2 text-sm text-slate-300">
+                <div className="mt-4 space-y-2 text-sm text-[#51465e]">
                   {selectedApp.administrators.map((item) => (
-                    <div className="rounded-2xl border border-white/8 bg-white/[0.02] px-4 py-3" key={item}>
+                    <div className="rounded-2xl border border-[#ded8e4] bg-white px-4 py-3" key={item}>
                       {item}
                     </div>
                   ))}
@@ -276,11 +276,11 @@ export function AppManagementControlPage() {
               </div>
               <div className="panel-subtle">
                 <div className="eyebrow">Groups</div>
-                <div className="mt-4 space-y-2 text-sm text-slate-300">
+                <div className="mt-4 space-y-2 text-sm text-[#51465e]">
                   {selectedApp.groups.map((item) => (
-                    <div className="rounded-2xl border border-white/8 bg-white/[0.02] px-4 py-3" key={item.name}>
-                      <div className="font-medium text-white">{item.name}</div>
-                      <div className="mt-1 text-xs text-slate-500">
+                    <div className="rounded-2xl border border-[#ded8e4] bg-white px-4 py-3" key={item.name}>
+                      <div className="font-medium text-[#241232]">{item.name}</div>
+                      <div className="mt-1 text-xs text-[#62576a]">
                         {item.create ? 'Create' : 'No create'} · {item.update ? 'Update' : 'Read only'} ·{' '}
                         {item.ssoSync ? 'SSO sync' : 'Manual'}
                       </div>
@@ -290,11 +290,11 @@ export function AppManagementControlPage() {
               </div>
               <div className="panel-subtle">
                 <div className="eyebrow">Service accounts</div>
-                <div className="mt-4 space-y-2 text-sm text-slate-300">
+                <div className="mt-4 space-y-2 text-sm text-[#51465e]">
                   {selectedApp.serviceAccounts.map((item) => (
-                    <div className="rounded-2xl border border-white/8 bg-white/[0.02] px-4 py-3" key={`${item.purpose}-${item.tokenDuration}`}>
-                      <div className="font-medium text-white">{item.purpose}</div>
-                      <div className="mt-1 text-xs text-slate-500">
+                    <div className="rounded-2xl border border-[#ded8e4] bg-white px-4 py-3" key={`${item.purpose}-${item.tokenDuration}`}>
+                      <div className="font-medium text-[#241232]">{item.purpose}</div>
+                      <div className="mt-1 text-xs text-[#62576a]">
                         {item.crudScope} · {item.tokenDuration} · {item.status}
                       </div>
                     </div>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Database, PlayCircle, Plus, Search, Trash2 } from 'lucide-react';
+import { RegModal, RegRightDrawer, RegStatusPill } from '../../components/regovise/PagePrimitives';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { ApiClient } from '../../shared/api/client';
 import { useEdgeIdentity } from '../../shared/session/identity';
@@ -75,6 +76,9 @@ export function EvidenceManagementPage() {
   const [awsSecretAccessKey, setAwsSecretAccessKey] = useState('');
   const [awsSessionToken, setAwsSessionToken] = useState('');
   const [awsAllEnabledRegions, setAwsAllEnabledRegions] = useState(false);
+  const [sourceDrawerOpen, setSourceDrawerOpen] = useState(false);
+  const [sourceToCollect, setSourceToCollect] = useState<EvidenceSource | null>(null);
+  const [sourceToDelete, setSourceToDelete] = useState<EvidenceSource | null>(null);
 
   async function loadWorkspace() {
     try {
@@ -201,6 +205,7 @@ export function EvidenceManagementPage() {
       setAwsAllEnabledRegions(false);
       await loadWorkspace();
       setNotice('Evidence source created in the canonical evidence service.');
+      setSourceDrawerOpen(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to create evidence source.');
     } finally {
@@ -216,6 +221,7 @@ export function EvidenceManagementPage() {
       const response = await client.post<{ data: { jobId: string } }>(`/evidence/sources/${sourceId}/collect`);
       await loadWorkspace();
       setNotice(`Queued evidence collection job ${response.data.jobId}.`);
+      setSourceToCollect(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to queue evidence collection.');
     } finally {
@@ -231,6 +237,7 @@ export function EvidenceManagementPage() {
       await client.delete(`/evidence/sources/${sourceId}`);
       await loadWorkspace();
       setNotice('Evidence source deleted.');
+      setSourceToDelete(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete evidence source.');
     } finally {
@@ -239,7 +246,7 @@ export function EvidenceManagementPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading Evidence Management...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading Evidence Management...</div>;
   }
 
   return (
@@ -248,100 +255,39 @@ export function EvidenceManagementPage() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">Evidence</div>
-            <h1 className="mt-2 text-3xl font-semibold text-white">Evidence Management</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Evidence Management</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
               Manage collection sources, review queue-driven jobs, and inspect stored evidence artifacts from one canonical Cloudflare-backed workspace.
             </p>
           </div>
-          <div className="w-full max-w-xl">
-            <form
-              className="grid gap-3 rounded-2xl border border-white/10 bg-black/20 p-4 md:grid-cols-[1fr_180px_auto]"
-              onSubmit={(event) => {
-                event.preventDefault();
-                void createSource();
-              }}
-            >
-              <input
-                className="input"
-                placeholder="GitHub Org Inventory"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-              />
-              <select className="input" value={provider} onChange={(event) => setProvider(event.target.value)}>
-                <option value="aws">AWS</option>
-                <option value="github">GitHub</option>
-                <option value="snyk">Snyk</option>
-                <option value="wiz">Wiz</option>
-                <option value="custom_http">Custom HTTP</option>
-              </select>
-              <button className="button-primary" disabled={busyAction === 'create' || !canCreateSource} type="submit">
-                <Plus className="mr-2 h-4 w-4" />
-                {busyAction === 'create' ? 'Creating...' : 'Add Source'}
-              </button>
-            </form>
-            {provider === 'aws' && (
-              <div className="mt-3 grid gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/5 p-4 md:grid-cols-2">
-                <input
-                  className="input"
-                  placeholder="AWS region"
-                  value={awsRegion}
-                  onChange={(event) => setAwsRegion(event.target.value)}
-                />
-                <label className="flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-sm text-slate-300">
-                  <input
-                    checked={awsAllEnabledRegions}
-                    onChange={(event) => setAwsAllEnabledRegions(event.target.checked)}
-                    type="checkbox"
-                  />
-                  Collect all enabled regions
-                </label>
-                <input
-                  className="input"
-                  placeholder="AWS access key id"
-                  value={awsAccessKeyId}
-                  onChange={(event) => setAwsAccessKeyId(event.target.value)}
-                />
-                <input
-                  className="input"
-                  placeholder="AWS session token (optional)"
-                  value={awsSessionToken}
-                  onChange={(event) => setAwsSessionToken(event.target.value)}
-                />
-                <input
-                  className="input md:col-span-2"
-                  placeholder="AWS secret access key"
-                  type="password"
-                  value={awsSecretAccessKey}
-                  onChange={(event) => setAwsSecretAccessKey(event.target.value)}
-                />
-                <div className="md:col-span-2 text-xs leading-5 text-slate-400">
-                  Use a read-only AWS credential scoped for evidence collection. Regovise will call AWS APIs directly during live evidence jobs instead of relying on synthetic seed data.
-                </div>
-              </div>
-            )}
+          <div>
+            <button className="button-primary" onClick={() => setSourceDrawerOpen(true)} type="button">
+              <Plus className="mr-2 h-4 w-4" />
+              Add source
+            </button>
           </div>
         </div>
       </section>
 
       <section className="grid gap-4 xl:grid-cols-3">
-        <Link className="panel-subtle transition hover:border-cyan-300/30" to="/assurance/evidence">
+        <Link className="panel-subtle transition hover:border-[#d7c3f1]" to="/assurance/evidence">
           <div className="eyebrow">Assurance</div>
-          <div className="mt-2 text-lg font-semibold text-white">Open Evidence Explorer</div>
-          <div className="mt-2 text-sm leading-6 text-slate-400">
+          <div className="mt-2 text-lg font-semibold text-[#241232]">Open Evidence Explorer</div>
+          <div className="mt-2 text-sm leading-6 text-[#6f6578]">
             Move from raw collection jobs into normalized bundle previews, deterministic checks, and package-ready evidence detail.
           </div>
         </Link>
-        <Link className="panel-subtle transition hover:border-cyan-300/30" to="/assurance/tracker">
+        <Link className="panel-subtle transition hover:border-[#d7c3f1]" to="/assurance/tracker">
           <div className="eyebrow">Assurance</div>
-          <div className="mt-2 text-lg font-semibold text-white">Open Tracker Workbench</div>
-          <div className="mt-2 text-sm leading-6 text-slate-400">
+          <div className="mt-2 text-lg font-semibold text-[#241232]">Open Tracker Workbench</div>
+          <div className="mt-2 text-sm leading-6 text-[#6f6578]">
             Import tracker rows, inspect diagnostics, and convert evidence-gap scenarios into assurance-backed 20x packages.
           </div>
         </Link>
-        <Link className="panel-subtle transition hover:border-cyan-300/30" to="/assurance/packages">
+        <Link className="panel-subtle transition hover:border-[#d7c3f1]" to="/assurance/packages">
           <div className="eyebrow">Assurance</div>
-          <div className="mt-2 text-lg font-semibold text-white">Open 20x Package Explorer</div>
-          <div className="mt-2 text-sm leading-6 text-slate-400">
+          <div className="mt-2 text-lg font-semibold text-[#241232]">Open 20x Package Explorer</div>
+          <div className="mt-2 text-sm leading-6 text-[#6f6578]">
             Review generated packages, reconciliation checks, and report bundles after collection and evaluation complete.
           </div>
         </Link>
@@ -355,14 +301,14 @@ export function EvidenceManagementPage() {
           <div className="metric-card" key={metric.label}>
             <div className="metric-label">{metric.label}</div>
             <div className="metric-value">{metric.value}</div>
-            <div className="mt-2 text-xs text-slate-500">{metric.detail}</div>
+            <div className="mt-2 text-xs text-[#62576a]">{metric.detail}</div>
           </div>
         ))}
       </section>
 
       <section className="panel">
         <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-500" />
+          <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-[#62576a]" />
           <input
             className="input pl-10"
             placeholder="Search sources, jobs, and artifacts"
@@ -381,8 +327,9 @@ export function EvidenceManagementPage() {
 
         <TabsContent value="sources">
           <section className="panel overflow-hidden p-0">
-            <table className="min-w-full text-left text-sm">
-              <thead className="border-b border-white/10 bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
+            <div className="max-w-full overflow-x-auto">
+            <table className="min-w-[860px] text-left text-sm">
+              <thead className="border-b border-[#ded8e4] bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
                 <tr>
                   <th className="px-4 py-3">Source</th>
                   <th className="px-4 py-3">Provider</th>
@@ -392,23 +339,23 @@ export function EvidenceManagementPage() {
               </thead>
               <tbody>
                 {filteredSources.map((source) => (
-                  <tr key={source.id} className="border-t border-white/5 align-top">
+                  <tr key={source.id} className="border-t border-[#eeeaf2] align-top">
                     <td className="px-4 py-4">
-                      <div className="font-medium text-white">{source.name}</div>
-                      <div className="mt-1 text-xs text-slate-500">Updated {formatDate(source.updatedAt)}</div>
+                      <div className="font-medium text-[#241232]">{source.name}</div>
+                      <div className="mt-1 text-xs text-[#62576a]">Updated {formatDate(source.updatedAt)}</div>
                     </td>
-                    <td className="px-4 py-4 text-slate-300">{source.provider}</td>
+                    <td className="px-4 py-4 text-[#4f435c]">{source.provider}</td>
                     <td className="px-4 py-4">
-                      <span className={source.isActive ? 'badge-success' : 'badge-neutral'}>
+                      <RegStatusPill tone={source.isActive ? 'success' : 'neutral'}>
                         {source.isActive ? 'active' : 'inactive'}
-                      </span>
+                      </RegStatusPill>
                     </td>
                     <td className="px-4 py-4 text-right">
                       <div className="flex justify-end gap-2">
                         <button
                           className="button-secondary"
                           disabled={busyAction === `collect:${source.id}`}
-                          onClick={() => void collectEvidence(source.id)}
+                          onClick={() => setSourceToCollect(source)}
                           type="button"
                         >
                           <PlayCircle className="mr-2 h-4 w-4" />
@@ -417,7 +364,7 @@ export function EvidenceManagementPage() {
                         <button
                           className="button-secondary"
                           disabled={busyAction === `delete:${source.id}`}
-                          onClick={() => void deleteSource(source.id)}
+                          onClick={() => setSourceToDelete(source)}
                           type="button"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
@@ -429,20 +376,22 @@ export function EvidenceManagementPage() {
                 ))}
                 {!filteredSources.length && (
                   <tr>
-                    <td className="px-4 py-8 text-center text-slate-400" colSpan={4}>
+                    <td className="px-4 py-8 text-center text-[#6f6578]" colSpan={4}>
                       No evidence sources matched the current search.
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
+            </div>
           </section>
         </TabsContent>
 
         <TabsContent value="jobs">
           <section className="panel overflow-hidden p-0">
-            <table className="min-w-full text-left text-sm">
-              <thead className="border-b border-white/10 bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
+            <div className="max-w-full overflow-x-auto">
+            <table className="min-w-[820px] text-left text-sm">
+              <thead className="border-b border-[#ded8e4] bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
                 <tr>
                   <th className="px-4 py-3">Job</th>
                   <th className="px-4 py-3">Source</th>
@@ -452,50 +401,44 @@ export function EvidenceManagementPage() {
               </thead>
               <tbody>
                 {filteredJobs.map((job) => (
-                  <tr key={job.id} className="border-t border-white/5 align-top">
+                  <tr key={job.id} className="border-t border-[#eeeaf2] align-top">
                     <td className="px-4 py-4">
-                      <div className="font-mono text-xs text-cyan-200">{job.id}</div>
-                      <div className="mt-2 text-xs text-slate-500">
+                      <div className="font-mono text-xs text-[#6d28d9]">{job.id}</div>
+                      <div className="mt-2 text-xs text-[#62576a]">
                         Scheduled {formatDate(job.scheduledFor)}
                         {job.finishedAt ? ` · Finished ${formatDate(job.finishedAt)}` : ''}
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-white">{job.sourceName}</td>
+                    <td className="px-4 py-4 text-[#241232]">{job.sourceName}</td>
                     <td className="px-4 py-4">
-                      <span
-                        className={
-                          job.status === 'success'
-                            ? 'badge-success'
-                            : job.status === 'failed'
-                              ? 'badge-danger'
-                              : 'badge-neutral'
-                        }
-                      >
+                      <RegStatusPill tone={job.status === 'success' ? 'success' : job.status === 'failed' ? 'danger' : 'neutral'}>
                         {job.status}
-                      </span>
+                      </RegStatusPill>
                       {job.statusDetail && (
-                        <div className="mt-2 max-w-md text-xs leading-5 text-slate-400">{job.statusDetail}</div>
+                        <div className="mt-2 max-w-md text-xs leading-5 text-[#6f6578]">{job.statusDetail}</div>
                       )}
                     </td>
-                    <td className="px-4 py-4 text-slate-300">{job.artifactCount}</td>
+                    <td className="px-4 py-4 text-[#4f435c]">{job.artifactCount}</td>
                   </tr>
                 ))}
                 {!filteredJobs.length && (
                   <tr>
-                    <td className="px-4 py-8 text-center text-slate-400" colSpan={4}>
+                    <td className="px-4 py-8 text-center text-[#6f6578]" colSpan={4}>
                       No evidence jobs matched the current search.
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
+            </div>
           </section>
         </TabsContent>
 
         <TabsContent value="artifacts">
           <section className="panel overflow-hidden p-0">
-            <table className="min-w-full text-left text-sm">
-              <thead className="border-b border-white/10 bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
+            <div className="max-w-full overflow-x-auto">
+            <table className="min-w-[820px] text-left text-sm">
+              <thead className="border-b border-[#ded8e4] bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
                 <tr>
                   <th className="px-4 py-3">Artifact</th>
                   <th className="px-4 py-3">Job</th>
@@ -505,28 +448,218 @@ export function EvidenceManagementPage() {
               </thead>
               <tbody>
                 {filteredArtifacts.map((artifact) => (
-                  <tr key={artifact.id} className="border-t border-white/5 align-top">
+                  <tr key={artifact.id} className="border-t border-[#eeeaf2] align-top">
                     <td className="px-4 py-4">
-                      <div className="font-medium text-white">{artifact.objectKey}</div>
-                      <div className="mt-1 text-xs text-slate-500">Created {formatDate(artifact.createdAt)}</div>
+                      <div className="font-medium text-[#241232]">{artifact.objectKey}</div>
+                      <div className="mt-1 text-xs text-[#62576a]">Created {formatDate(artifact.createdAt)}</div>
                     </td>
-                    <td className="px-4 py-4 font-mono text-xs text-cyan-200">{artifact.jobId}</td>
-                    <td className="px-4 py-4 text-slate-300">{artifact.contentType ?? 'unknown'}</td>
-                    <td className="px-4 py-4 text-slate-300">{formatBytes(artifact.sizeBytes)}</td>
+                    <td className="px-4 py-4 font-mono text-xs text-[#6d28d9]">{artifact.jobId}</td>
+                    <td className="px-4 py-4 text-[#4f435c]">{artifact.contentType ?? 'unknown'}</td>
+                    <td className="px-4 py-4 text-[#4f435c]">{formatBytes(artifact.sizeBytes)}</td>
                   </tr>
                 ))}
                 {!filteredArtifacts.length && (
                   <tr>
-                    <td className="px-4 py-8 text-center text-slate-400" colSpan={4}>
+                    <td className="px-4 py-8 text-center text-[#6f6578]" colSpan={4}>
                       No evidence artifacts matched the current search.
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
+            </div>
           </section>
         </TabsContent>
       </Tabs>
+
+      <RegRightDrawer
+        description="Create a collection source for live evidence jobs and configure provider-specific credentials."
+        footer={
+          <>
+            <button className="button-secondary" onClick={() => setSourceDrawerOpen(false)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-primary"
+              disabled={busyAction === 'create' || !canCreateSource}
+              form="evidence-management-source-form"
+              type="submit"
+            >
+              {busyAction === 'create' ? 'Creating...' : 'Create source'}
+            </button>
+          </>
+        }
+        onOpenChange={setSourceDrawerOpen}
+        open={sourceDrawerOpen}
+        title="Add evidence source"
+      >
+        <form
+          className="space-y-4"
+          id="evidence-management-source-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void createSource();
+          }}
+        >
+          <label className="block text-sm font-semibold text-[#241232]">
+            Source name
+            <input
+              className="input mt-2 w-full"
+              placeholder="GitHub Org Inventory"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+            />
+          </label>
+          <label className="block text-sm font-semibold text-[#241232]">
+            Provider
+            <select className="input mt-2 w-full" value={provider} onChange={(event) => setProvider(event.target.value)}>
+              <option value="aws">AWS</option>
+              <option value="github">GitHub</option>
+              <option value="snyk">Snyk</option>
+              <option value="wiz">Wiz</option>
+              <option value="custom_http">Custom HTTP</option>
+            </select>
+          </label>
+          {provider === 'aws' && (
+            <div className="space-y-4 rounded-2xl border border-[#9fdfb7] bg-[#ecfbf1] p-4">
+              <label className="block text-sm font-semibold text-[#241232]">
+                AWS region
+                <input
+                  className="input mt-2 w-full"
+                  placeholder="us-gov-west-1"
+                  value={awsRegion}
+                  onChange={(event) => setAwsRegion(event.target.value)}
+                />
+              </label>
+              <label className="flex items-center gap-2 rounded-xl border border-[#ded8e4] bg-white px-3 py-2 text-sm text-[#4f435c]">
+                <input
+                  checked={awsAllEnabledRegions}
+                  onChange={(event) => setAwsAllEnabledRegions(event.target.checked)}
+                  type="checkbox"
+                />
+                Collect all enabled regions
+              </label>
+              <label className="block text-sm font-semibold text-[#241232]">
+                AWS access key id
+                <input
+                  className="input mt-2 w-full"
+                  placeholder="AWS access key id"
+                  value={awsAccessKeyId}
+                  onChange={(event) => setAwsAccessKeyId(event.target.value)}
+                />
+              </label>
+              <label className="block text-sm font-semibold text-[#241232]">
+                AWS session token
+                <input
+                  className="input mt-2 w-full"
+                  placeholder="AWS session token (optional)"
+                  value={awsSessionToken}
+                  onChange={(event) => setAwsSessionToken(event.target.value)}
+                />
+              </label>
+              <label className="block text-sm font-semibold text-[#241232]">
+                AWS secret access key
+                <input
+                  className="input mt-2 w-full"
+                  placeholder="AWS secret access key"
+                  type="password"
+                  value={awsSecretAccessKey}
+                  onChange={(event) => setAwsSecretAccessKey(event.target.value)}
+                />
+              </label>
+              <p className="text-xs leading-5 text-[#4f435c]">
+                Use a read-only AWS credential scoped for evidence collection. Regovise will call AWS APIs directly during live evidence jobs instead of relying on synthetic seed data.
+              </p>
+            </div>
+          )}
+        </form>
+      </RegRightDrawer>
+
+      <RegModal
+        description="This will enqueue a fresh evidence collection job using the selected source configuration."
+        footer={
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button className="button-secondary" onClick={() => setSourceToCollect(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-primary"
+              disabled={!sourceToCollect || busyAction === `collect:${sourceToCollect?.id}`}
+              onClick={() => sourceToCollect && void collectEvidence(sourceToCollect.id)}
+              type="button"
+            >
+              {busyAction === `collect:${sourceToCollect?.id}` ? 'Queueing...' : 'Queue collection'}
+            </button>
+          </div>
+        }
+        onOpenChange={(open) => {
+          if (!open) setSourceToCollect(null);
+        }}
+        open={Boolean(sourceToCollect)}
+        title="Queue evidence collection"
+      >
+        {sourceToCollect ? (
+          <div className="space-y-4 text-sm text-[#4f435c]">
+            <div className="rounded-lg border border-[#ded8e4] bg-[#fbf9fc] p-4">
+              <div className="font-semibold text-[#241232]">{sourceToCollect.name}</div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <RegStatusPill tone="purple">{sourceToCollect.provider}</RegStatusPill>
+                <RegStatusPill tone={sourceToCollect.isActive ? 'success' : 'neutral'}>
+                  {sourceToCollect.isActive ? 'active' : 'inactive'}
+                </RegStatusPill>
+                <RegStatusPill tone="neutral">Updated {formatDate(sourceToCollect.updatedAt)}</RegStatusPill>
+              </div>
+            </div>
+            <p>
+              Regovise will run the existing evidence collection endpoint for this source and refresh the
+              job and artifact tables when the queue accepts the request.
+            </p>
+          </div>
+        ) : null}
+      </RegModal>
+
+      <RegModal
+        description="Review the source before deleting it. Existing jobs and artifacts remain visible through their own tables."
+        footer={
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button className="button-secondary" onClick={() => setSourceToDelete(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-danger"
+              disabled={!sourceToDelete || busyAction === `delete:${sourceToDelete?.id}`}
+              onClick={() => sourceToDelete && void deleteSource(sourceToDelete.id)}
+              type="button"
+            >
+              {busyAction === `delete:${sourceToDelete?.id}` ? 'Deleting...' : 'Delete source'}
+            </button>
+          </div>
+        }
+        onOpenChange={(open) => {
+          if (!open) setSourceToDelete(null);
+        }}
+        open={Boolean(sourceToDelete)}
+        title="Delete evidence source"
+      >
+        {sourceToDelete ? (
+          <div className="space-y-4 text-sm text-[#4f435c]">
+            <div className="rounded-lg border border-[#f2b7bf] bg-[#fff4f5] p-4">
+              <div className="font-semibold text-[#241232]">{sourceToDelete.name}</div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <RegStatusPill tone="purple">{sourceToDelete.provider}</RegStatusPill>
+                <RegStatusPill tone={sourceToDelete.isActive ? 'success' : 'neutral'}>
+                  {sourceToDelete.isActive ? 'active' : 'inactive'}
+                </RegStatusPill>
+                <RegStatusPill tone="neutral">Created {formatDate(sourceToDelete.createdAt)}</RegStatusPill>
+              </div>
+            </div>
+            <p>
+              This removes the source configuration through the existing evidence source delete API. Use this
+              only when the connector should no longer be available for future collection jobs.
+            </p>
+          </div>
+        ) : null}
+      </RegModal>
     </div>
   );
 }

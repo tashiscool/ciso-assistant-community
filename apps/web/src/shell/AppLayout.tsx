@@ -26,6 +26,7 @@ import { FrameworkDetailPage } from '../features/core/FrameworkDetailPage';
 import { LibrariesPage } from '../features/libraries/LibrariesPage';
 import { LibraryDetailPage } from '../features/libraries/LibraryDetailPage';
 import { RiskScenariosPage } from '../features/risk/RiskScenariosPage';
+import { RiskActionTrackerPage } from '../features/risk/RiskActionTrackerPage';
 import { ThreatModelsPage } from '../features/risk/ThreatModelsPage';
 import { FoldersPage } from '../features/iam/FoldersPage';
 import { TeamPage } from '../features/iam/TeamPage';
@@ -120,6 +121,7 @@ import { UtilitiesControlPage } from '../features/ops/UtilitiesControlPage';
 import { SubsystemsControlPage } from '../features/ops/SubsystemsControlPage';
 import { RMFControlPage } from '../features/ops/RMFControlPage';
 import { AppManagementControlPage } from '../features/ops/AppManagementControlPage';
+import { VantaClonePage } from '../features/vanta/VantaClonePage';
 import { LogsUtilizationPage } from '../features/setup/LogsUtilizationPage';
 import { MFAPage } from '../features/setup/MFAPage';
 import { ModulesFeaturesPage } from '../features/setup/ModulesFeaturesPage';
@@ -260,8 +262,8 @@ function SessionExitScreen() {
   return (
     <section className="panel max-w-3xl">
       <div className="eyebrow">Secure Session</div>
-      <h1 className="mt-2 text-2xl font-semibold text-white">Signing out</h1>
-      <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+      <h1 className="mt-2 text-2xl font-semibold text-[#241232]">Signing out</h1>
+      <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f435c]">
         Regovise is clearing the current workspace session before opening the standard sign-in surface.
       </p>
       {error ? <div className="notice-warning mt-4">{error}</div> : null}
@@ -307,8 +309,8 @@ function AccessEntryRouter() {
     return (
       <section className="panel max-w-3xl">
         <div className="eyebrow">Secure Session</div>
-        <h1 className="mt-2 text-2xl font-semibold text-white">Preparing sign-in</h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-2xl font-semibold text-[#241232]">Preparing sign-in</h1>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f435c]">
           Regovise is checking whether this workspace should open sign-in, first-run setup, or administrator recovery.
         </p>
       </section>
@@ -338,13 +340,14 @@ function AccessEntryRouter() {
   );
 }
 
-export function AppLayout() {
+function WorkspaceAppLayout() {
   const location = useLocation();
   const session = useSessionBootstrap();
   const { identity } = useEdgeIdentity();
   const [passwordResetRequired, setPasswordResetRequired] = useState(false);
   const [accessPayload, setAccessPayload] = useState<IamMePayload | null>(null);
   const [accessReady, setAccessReady] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const showWorkspaceShell = session.ready && session.isAuthenticated;
   const access = deriveShellAccessProfile(accessPayload);
   const forceSignedOutEntry =
@@ -388,7 +391,7 @@ export function AppLayout() {
 
   if (forceSignedOutEntry) {
     return (
-      <div className="min-h-screen bg-transparent text-slate-50">
+      <div className="min-h-screen bg-[#fbfafc] text-[#241232]">
         <main className="mx-auto flex min-h-screen w-full max-w-6xl items-center justify-center px-6 py-10">
           <div className="w-full max-w-4xl space-y-6">
             <SessionExitScreen />
@@ -400,9 +403,12 @@ export function AppLayout() {
 
   if (!showWorkspaceShell && isPublicQuestionnaireResponsePath(location.pathname)) {
     return (
-      <div className="min-h-screen bg-transparent text-slate-50">
+      <div className="min-h-screen bg-[#fbfafc] text-[#241232]">
         <main className="mx-auto w-full max-w-6xl px-6 py-10">
-          <QuestionnaireResponsePage />
+          <Routes>
+            <Route path="/questionnaires/response/:shareToken" element={<QuestionnaireResponsePage />} />
+            <Route path="/questionnaires/response/*" element={<QuestionnaireResponsePage />} />
+          </Routes>
         </main>
       </div>
     );
@@ -410,14 +416,14 @@ export function AppLayout() {
 
   if (!showWorkspaceShell) {
     return (
-      <div className="min-h-screen bg-transparent text-slate-50">
+      <div className="min-h-screen bg-[#fbfafc] text-[#241232]">
         <main className="mx-auto flex min-h-screen w-full max-w-6xl items-center justify-center px-6 py-10">
           <div className="w-full max-w-4xl space-y-6">
             {!session.ready ? (
               <section className="panel max-w-3xl">
                 <div className="eyebrow">Secure Session</div>
-                <h1 className="mt-2 text-2xl font-semibold text-white">Establishing workspace session</h1>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+                <h1 className="mt-2 text-2xl font-semibold text-[#241232]">Establishing workspace session</h1>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f435c]">
                   Regovise is preparing the secure session needed to open the workspace.
                 </p>
               </section>
@@ -435,13 +441,13 @@ export function AppLayout() {
 
   if (!accessReady) {
     return (
-      <div className="flex min-h-screen bg-transparent text-slate-50">
+      <div className="flex min-h-screen bg-[#fbfafc] text-[#241232]">
         <div className="flex flex-1 flex-col">
           <main className="mx-auto flex min-h-screen w-full max-w-5xl items-center justify-center px-6 py-10">
             <section className="panel max-w-3xl">
               <div className="eyebrow">Workspace Access</div>
-              <h1 className="mt-2 text-2xl font-semibold text-white">Preparing your workspace</h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+              <h1 className="mt-2 text-2xl font-semibold text-[#241232]">Preparing your workspace</h1>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f435c]">
                 Regovise is loading the current workspace identity and access profile before rendering the main navigation.
               </p>
             </section>
@@ -460,17 +466,18 @@ export function AppLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-transparent text-slate-50">
-      <Sidebar access={access} />
-      <div className="flex flex-1 flex-col">
+    <div className="flex min-h-screen bg-[#fbfafc] text-[#241232]">
+      <Sidebar access={access} mobileOpen={mobileNavOpen} onMobileOpenChange={setMobileNavOpen} />
+      <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
           access={access}
+          onOpenNavigation={() => setMobileNavOpen(true)}
           profileEmail={accessPayload?.profile?.email ?? null}
           profileName={accessPayload?.profile?.displayName ?? null}
           sessionReady={session.ready}
           sessionSyncing={session.syncing}
         />
-        <main className="flex-1 overflow-auto px-6 py-6">
+          <main className="regovise-workspace-main min-w-0 flex-1 overflow-auto px-4 py-6 sm:px-6 lg:px-8">
           <>
             {session.error && <div className="notice-warning mb-6">{session.error}</div>}
             {passwordResetRequired && (
@@ -676,11 +683,14 @@ export function AppLayout() {
             />
             <Route path="/chat" element={allowedOnly(access.canUseChat, <ChatWorkspacePage />)} />
             <Route path="/imports" element={adminOnly(<ImportsPage />)} />
+            <Route path="/integrations" element={adminOnly(<AutomationManagerPage />)} />
             <Route path="/automation-manager" element={adminOnly(<AutomationManagerPage />)} />
             <Route path="/features/automation-manager" element={adminOnly(<AutomationManagerPage />)} />
+            <Route path="/fedramp/provider" element={adminOnly(<FedrampProviderShellPage />)} />
             <Route path="/features/third-party-risk" element={allowedOnly(access.canUseThirdParty, <TprmWorkspacePage />)} />
             <Route path="/features/continuous-monitoring" element={adminOnly(<ConMonProfilesPage />)} />
             <Route path="/grc-admin" element={adminOnly(<GrcAdministrationPage />)} />
+            <Route path="/scrutiny-engine" element={adminOnly(<ScrutinyEnginePage />)} />
             <Route path="/grc-admin/scrutiny-engine" element={adminOnly(<ScrutinyEnginePage />)} />
             <Route path="/trust-center" element={adminOnly(<FedrampProviderShellPage />)} />
             <Route path="/workflow" element={allowedOnly(access.canUseProgramWorkspace, <WorkflowControlPage />)} />
@@ -697,7 +707,7 @@ export function AppLayout() {
             <Route path="/features/workbench" element={allowedOnly(access.canUseProgramWorkspace, <WorkbenchControlPage />)} />
             <Route path="/news-feed" element={allowedOnly(access.canUseProgramWorkspace, <NewsFeedControlPage />)} />
             <Route path="/features/news-feed" element={allowedOnly(access.canUseProgramWorkspace, <NewsFeedControlPage />)} />
-            {SHARED_MODULE_ALIAS_ROUTES.map((entry) => (
+            {SHARED_MODULE_ALIAS_ROUTES.filter((entry) => entry.route !== '/tasks').map((entry) => (
               <Route
                 key={entry.route}
                 path={entry.route}
@@ -842,6 +852,10 @@ export function AppLayout() {
               element={allowedOnly(access.canUseAnalytics, <XRaysControlPage />)}
             />
             <Route
+              path="/tasks"
+              element={allowedOnly(access.canUseModules, <TaskOperationsControlPage mode="work-queue" />)}
+            />
+            <Route
               path="/task-nodes"
               element={allowedOnly(access.canUseModules, <TaskOperationsControlPage />)}
             />
@@ -925,6 +939,7 @@ export function AppLayout() {
               path="/scoring-assistant"
               element={allowedOnly(access.canUseChat, <ChatWorkspacePage />)}
             />
+            <Route path="/risk-actions" element={allowedOnly(access.canUseRiskAssessments, <RiskActionTrackerPage />)} />
             <Route path="/risk-scenarios" element={allowedOnly(access.canUseRiskAssessments, <RiskScenariosPage />)} />
             <Route path="/conmon/profiles" element={adminOnly(<ConMonProfilesPage />)} />
             <Route path="/conmon/executions" element={allowedOnly(access.canUseConMon, <ConMonExecutionsPage />)} />
@@ -950,7 +965,7 @@ export function AppLayout() {
                 <Route
                   path="*"
                   element={
-                    <div className="panel flex min-h-[240px] items-center justify-center text-slate-300">
+                    <div className="panel flex min-h-[240px] items-center justify-center text-[#4f435c]">
                       Choose a Regovise workspace area from the left navigation.
                     </div>
                   }
@@ -961,4 +976,14 @@ export function AppLayout() {
       </div>
     </div>
   );
+}
+
+export function AppLayout() {
+  const location = useLocation();
+
+  if (import.meta.env.DEV && location.pathname.startsWith('/vanta-clone')) {
+    return <VantaClonePage />;
+  }
+
+  return <WorkspaceAppLayout />;
 }

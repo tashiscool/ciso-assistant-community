@@ -18,6 +18,7 @@ import {
   X,
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { RegModal } from '../../components/regovise/PagePrimitives';
 import {
   createFormBuilderModule,
   getFormBuilderModule,
@@ -234,12 +235,12 @@ function emptyRule(): FormRule {
 
 function severityClass(severity: FormBuilderDiagnostic['severity']) {
   if (severity === 'error') {
-    return 'badge-danger';
+    return 'status-pill-danger';
   }
   if (severity === 'warning') {
-    return 'badge-neutral';
+    return 'status-pill-neutral';
   }
-  return 'badge-success';
+  return 'status-pill-success';
 }
 
 function isSelectLike(field: FormField) {
@@ -274,6 +275,9 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
   const [detailLoading, setDetailLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [validating, setValidating] = useState(false);
+  const [factoryResetModalOpen, setFactoryResetModalOpen] = useState(false);
+  const [pendingSectionDelete, setPendingSectionDelete] = useState<FormSection | null>(null);
+  const [pendingFieldDelete, setPendingFieldDelete] = useState<{ section: FormSection; field: FormField } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [newModuleName, setNewModuleName] = useState('');
@@ -512,12 +516,6 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
     if (!draft) {
       return;
     }
-    const confirmation = window.prompt('Type "RESET" to confirm factory reset. Custom fields are preserved but deactivated.');
-    if (confirmation !== 'RESET') {
-      setNotice('Factory reset cancelled.');
-      return;
-    }
-
     try {
       setSaving(true);
       setError(null);
@@ -526,6 +524,7 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
       setDetail(reset);
       setDraft(clone(reset));
       await loadModules();
+      setFactoryResetModalOpen(false);
       setNotice('Module reset to its factory configuration.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to reset module.');
@@ -557,6 +556,40 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
           }
         : current,
     );
+  }
+
+  function handleDeleteSection(section: FormSection) {
+    setDraft((current) => {
+      if (!current) {
+        return current;
+      }
+      const remainingSections = current.sections.filter((entry) => entry.id !== section.id);
+      if (selectedSectionId === section.id) {
+        const nextSection = remainingSections[0] ?? null;
+        setSelectedSectionId(nextSection?.id ?? null);
+        setSelectedFieldId(nextSection?.fields[0]?.id ?? null);
+      }
+      return {
+        ...current,
+        sections: remainingSections,
+      };
+    });
+    setPendingSectionDelete(null);
+  }
+
+  function handleDeleteField(section: FormSection, field: FormField) {
+    updateDraftSection(section.id, (current) => {
+      const remainingFields = current.fields.filter((entry) => entry.id !== field.id);
+      if (selectedFieldId === field.id) {
+        setSelectedSectionId(section.id);
+        setSelectedFieldId(remainingFields[0]?.id ?? null);
+      }
+      return {
+        ...current,
+        fields: remainingFields,
+      };
+    });
+    setPendingFieldDelete(null);
   }
 
   function updateDraftRule(ruleId: string, updater: (rule: FormRule) => FormRule) {
@@ -591,7 +624,7 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
   );
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading Form Builder...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading Form Builder...</div>;
   }
 
   return (
@@ -613,8 +646,8 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">Builders</div>
-            <h1 className="mt-2 text-3xl font-semibold text-white">Form Builder</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Form Builder</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
               Customize module forms by renaming modules, managing sections, controlling field order and
               visibility, editing validations, and keeping rules inside the same canonical builder surface.
             </p>
@@ -636,7 +669,7 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
               <Upload className="mr-2 h-4 w-4" />
               Import
             </button>
-            <button className="button-secondary" onClick={() => void handleFactoryReset()} type="button">
+            <button className="button-secondary" onClick={() => setFactoryResetModalOpen(true)} type="button">
               <Factory className="mr-2 h-4 w-4" />
               Factory Reset
             </button>
@@ -656,7 +689,7 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
           <div className="metric-card" key={metric.label}>
             <div className="metric-label">{metric.label}</div>
             <div className="metric-value">{metric.value}</div>
-            <div className="mt-2 text-xs text-slate-500">{metric.detail}</div>
+            <div className="mt-2 text-xs text-[#62576a]">{metric.detail}</div>
           </div>
         ))}
       </section>
@@ -666,9 +699,9 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
           <div className="flex items-center justify-between">
             <div>
               <div className="eyebrow">Module Library</div>
-              <h2 className="mt-2 text-xl font-semibold text-white">Builder Packages</h2>
+              <h2 className="mt-2 text-xl font-semibold text-[#241232]">Builder Packages</h2>
             </div>
-            <Sparkles className="h-5 w-5 text-cyan-300" />
+            <Sparkles className="h-5 w-5 text-[#7a3ccf]" />
           </div>
           <form
             className="space-y-3"
@@ -693,24 +726,24 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
               <button
                 key={module.id}
                 className={`panel-subtle w-full text-left transition ${
-                  selectedId === module.id ? 'border-cyan-300/30 bg-cyan-400/[0.04]' : 'hover:border-cyan-300/20'
+                  selectedId === module.id ? 'border-[#d7c3f1] bg-[#f6f1fa]' : 'hover:border-[#d7c3f1]'
                 }`}
                 onClick={() => setSelectedId(module.id)}
                 type="button"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="font-medium text-white">{module.moduleName}</div>
-                    <div className="mt-1 text-sm text-slate-400">{module.pluralName}</div>
+                    <div className="font-medium text-[#241232]">{module.moduleName}</div>
+                    <div className="mt-1 text-sm text-[#6f6578]">{module.pluralName}</div>
                   </div>
-                  <span className="badge-neutral">{module.status}</span>
+                  <span className="status-pill-neutral">{module.status}</span>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="badge-neutral">{module.sectionCount} sections</span>
-                  <span className="badge-neutral">{module.fieldCount} fields</span>
-                  <span className="badge-neutral">{module.ruleCount} rules</span>
+                  <span className="status-pill-neutral">{module.sectionCount} sections</span>
+                  <span className="status-pill-neutral">{module.fieldCount} fields</span>
+                  <span className="status-pill-neutral">{module.ruleCount} rules</span>
                 </div>
-                <div className="mt-3 text-xs text-slate-500">Updated {formatDate(module.updatedAt)}</div>
+                <div className="mt-3 text-xs text-[#62576a]">Updated {formatDate(module.updatedAt)}</div>
               </button>
             ))}
           </div>
@@ -718,14 +751,14 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
 
         <section className="panel">
           {detailLoading || !draft ? (
-            <div className="text-sm text-slate-300">Loading module detail...</div>
+            <div className="text-sm text-[#4f435c]">Loading module detail...</div>
           ) : (
             <div className="space-y-6">
               <div className="panel-subtle">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <div className="eyebrow">Module Display Settings</div>
-                    <h3 className="mt-2 text-xl font-semibold text-white">{draft.moduleName}</h3>
+                    <h3 className="mt-2 text-xl font-semibold text-[#241232]">{draft.moduleName}</h3>
                   </div>
                   <button className="button-secondary" disabled={validating} onClick={() => void handleValidate()} type="button">
                     <CheckCircle2 className="mr-2 h-4 w-4" />
@@ -784,7 +817,7 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
               </div>
 
               <Tabs onValueChange={(value) => setActiveTab(value as BuilderTab)} value={activeTab}>
-                <TabsList className="mb-6 w-fit rounded-2xl border border-white/10 bg-slate-950/70">
+                <TabsList className="mb-6 w-fit rounded-2xl border border-[#ded8e4] bg-white">
                   <TabsTrigger value="builder">Builder</TabsTrigger>
                   <TabsTrigger value="rules">Rules</TabsTrigger>
                 </TabsList>
@@ -795,7 +828,7 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                       <div className="flex items-center justify-between gap-3">
                         <div>
                           <div className="eyebrow">Sections / Tabs</div>
-                          <h3 className="mt-2 text-lg font-semibold text-white">Section Layout</h3>
+                          <h3 className="mt-2 text-lg font-semibold text-[#241232]">Section Layout</h3>
                         </div>
                         <button
                           className="button-secondary"
@@ -816,8 +849,8 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                         <div className="panel-subtle" key={section.id}>
                           <div className="flex flex-wrap items-center justify-between gap-3">
                             <div>
-                              <div className="font-medium text-white">{section.displayName}</div>
-                              <div className="mt-1 text-xs text-slate-500">
+                              <div className="font-medium text-[#241232]">{section.displayName}</div>
+                              <div className="mt-1 text-xs text-[#62576a]">
                                 {section.isSystem ? 'System section' : 'Custom section'} · {section.fields.length} fields
                               </div>
                             </div>
@@ -848,13 +881,9 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                               </button>
                               {!section.isSystem && (
                                 <button
-                                  className="button-secondary px-3 py-2 text-rose-200"
-                                  onClick={() =>
-                                    setDraft({
-                                      ...draft,
-                                      sections: draft.sections.filter((entry) => entry.id !== section.id),
-                                    })
-                                  }
+                                  aria-label={`Remove section ${section.displayName}`}
+                                  className="button-secondary px-3 py-2 text-[#9d1f2c]"
+                                  onClick={() => setPendingSectionDelete(section)}
                                   type="button"
                                 >
                                   <X className="h-4 w-4" />
@@ -877,11 +906,11 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                 value={section.displayName}
                               />
                             </div>
-                            <div className="flex flex-wrap items-center gap-6 pt-7 text-sm text-slate-300">
+                            <div className="flex flex-wrap items-center gap-6 pt-7 text-sm text-[#4f435c]">
                               <label className="flex items-center gap-2">
                                 <input
                                   checked={section.active}
-                                  className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                  className="h-4 w-4 rounded border-[#d7c3f1] bg-white"
                                   onChange={(event) =>
                                     updateDraftSection(section.id, (current) => ({
                                       ...current,
@@ -895,7 +924,7 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                               <label className="flex items-center gap-2">
                                 <input
                                   checked={section.isDefault}
-                                  className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                  className="h-4 w-4 rounded border-[#d7c3f1] bg-white"
                                   onChange={(event) =>
                                     setDraft({
                                       ...draft,
@@ -937,8 +966,8 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                 <div
                                   className={`rounded-2xl border p-3 transition ${
                                     selectedFieldId === field.id
-                                      ? 'border-cyan-300/30 bg-cyan-400/[0.04]'
-                                      : 'border-white/10 bg-slate-950/50'
+                                      ? 'border-[#d7c3f1] bg-[#f6f1fa]'
+                                      : 'border-[#ded8e4] bg-white'
                                   }`}
                                   key={field.id}
                                 >
@@ -951,14 +980,14 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                       }}
                                       type="button"
                                     >
-                                      <div className="font-medium text-white">{field.displayName}</div>
-                                      <div className="mt-1 text-xs text-slate-500">
+                                      <div className="font-medium text-[#241232]">{field.displayName}</div>
+                                      <div className="mt-1 text-xs text-[#62576a]">
                                         {field.systemName} · {field.fieldType}
                                       </div>
                                     </button>
                                     <div className="flex flex-wrap gap-2">
-                                      {field.required && <span className="badge-neutral">Required</span>}
-                                      {!field.active && <span className="badge-danger">Hidden</span>}
+                                      {field.required && <span className="status-pill-neutral">Required</span>}
+                                      {!field.active && <span className="status-pill-danger">Hidden</span>}
                                     </div>
                                   </div>
                                   <div className="mt-3 flex flex-wrap gap-2">
@@ -1003,13 +1032,9 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                       <Copy className="h-4 w-4" />
                                     </button>
                                     <button
-                                      className="button-secondary px-3 py-2 text-rose-200"
-                                      onClick={() =>
-                                        updateDraftSection(section.id, (current) => ({
-                                          ...current,
-                                          fields: current.fields.filter((entry) => entry.id !== field.id),
-                                        }))
-                                      }
+                                      aria-label={`Remove field ${field.displayName}`}
+                                      className="button-secondary px-3 py-2 text-[#9d1f2c]"
+                                      onClick={() => setPendingFieldDelete({ section, field })}
                                       type="button"
                                     >
                                       <X className="h-4 w-4" />
@@ -1074,7 +1099,7 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                 ))}
                               </select>
                               {selectedField.lockedType && (
-                                <div className="mt-2 text-xs text-slate-500">
+                                <div className="mt-2 text-xs text-[#62576a]">
                                   Field type changes are restricted after creation to avoid destructive schema shifts.
                                 </div>
                               )}
@@ -1121,10 +1146,10 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                               </select>
                             </div>
                             <div className="grid gap-3 md:grid-cols-2">
-                              <label className="flex items-center gap-2 text-sm text-slate-300">
+                              <label className="flex items-center gap-2 text-sm text-[#4f435c]">
                                 <input
                                   checked={selectedField.required}
-                                  className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                  className="h-4 w-4 rounded border-[#d7c3f1] bg-white"
                                   onChange={(event) =>
                                     updateDraftField(selectedField.id, (field) => ({
                                       ...field,
@@ -1135,10 +1160,10 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                 />
                                 Required
                               </label>
-                              <label className="flex items-center gap-2 text-sm text-slate-300">
+                              <label className="flex items-center gap-2 text-sm text-[#4f435c]">
                                 <input
                                   checked={selectedField.active}
-                                  className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                  className="h-4 w-4 rounded border-[#d7c3f1] bg-white"
                                   onChange={(event) =>
                                     updateDraftField(selectedField.id, (field) => ({
                                       ...field,
@@ -1149,10 +1174,10 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                 />
                                 Active / Show
                               </label>
-                              <label className="flex items-center gap-2 text-sm text-slate-300 md:col-span-2">
+                              <label className="flex items-center gap-2 text-sm text-[#4f435c] md:col-span-2">
                                 <input
                                   checked={selectedField.editable}
-                                  className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                  className="h-4 w-4 rounded border-[#d7c3f1] bg-white"
                                   onChange={(event) =>
                                     updateDraftField(selectedField.id, (field) => ({
                                       ...field,
@@ -1254,12 +1279,12 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                 </div>
                                 <div className="mt-3 space-y-3">
                                   {selectedField.choices.map((choice, choiceIndex) => (
-                                    <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3" key={choice.id}>
+                                    <div className="rounded-2xl border border-[#ded8e4] bg-white p-3" key={choice.id}>
                                       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                                        <label className="flex items-center gap-2 text-sm text-slate-300">
+                                        <label className="flex items-center gap-2 text-sm text-[#4f435c]">
                                           <input
                                             checked={choice.active}
-                                            className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                            className="h-4 w-4 rounded border-[#d7c3f1] bg-white"
                                             onChange={(event) =>
                                               updateDraftField(selectedField.id, (field) => ({
                                                 ...field,
@@ -1298,7 +1323,7 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                             <ArrowDown className="h-4 w-4" />
                                           </button>
                                           <button
-                                            className="button-secondary px-3 py-2 text-rose-200"
+                                            className="button-secondary px-3 py-2 text-[#9d1f2c]"
                                             onClick={() =>
                                               updateDraftField(selectedField.id, (field) => ({
                                                 ...field,
@@ -1368,10 +1393,10 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                               </div>
                               <div className="mt-3 space-y-3">
                                 {selectedField.validations.map((validation) => (
-                                  <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3" key={validation.id}>
+                                  <div className="rounded-2xl border border-[#ded8e4] bg-white p-3" key={validation.id}>
                                     <div className="mb-3 flex justify-end">
                                       <button
-                                        className="button-secondary px-3 py-2 text-rose-200"
+                                        className="button-secondary px-3 py-2 text-[#9d1f2c]"
                                         onClick={() =>
                                           updateDraftField(selectedField.id, (field) => ({
                                             ...field,
@@ -1481,7 +1506,7 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                             </div>
                           </div>
                         ) : (
-                          <div className="mt-4 text-sm text-slate-400">
+                          <div className="mt-4 text-sm text-[#6f6578]">
                             Select a field to edit its properties, validations, and choice lists.
                           </div>
                         )}
@@ -1491,9 +1516,9 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                         <div className="eyebrow">Diagnostics</div>
                         <div className="mt-4 space-y-3">
                           {draft.diagnostics.map((diagnostic) => (
-                            <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3" key={diagnostic.id}>
+                            <div className="rounded-2xl border border-[#ded8e4] bg-white p-3" key={diagnostic.id}>
                               <div className={severityClass(diagnostic.severity)}>{diagnostic.severity}</div>
-                              <div className="mt-2 text-sm leading-6 text-slate-300">{diagnostic.message}</div>
+                              <div className="mt-2 text-sm leading-6 text-[#4f435c]">{diagnostic.message}</div>
                             </div>
                           ))}
                         </div>
@@ -1506,8 +1531,8 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <div className="eyebrow">Rules Builder</div>
-                      <h3 className="mt-2 text-xl font-semibold text-white">Embedded Form Automation</h3>
-                      <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
+                      <h3 className="mt-2 text-xl font-semibold text-[#241232]">Embedded Form Automation</h3>
+                      <p className="mt-2 max-w-3xl text-sm leading-6 text-[#4f435c]">
                         Build `IF conditions THEN actions` logic for form tabs and fields without leaving the Form Builder.
                       </p>
                     </div>
@@ -1526,8 +1551,8 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                       <div className="panel-subtle" key={rule.id}>
                         <div className="flex items-start justify-between gap-3">
                           <div>
-                            <div className="font-medium text-white">{rule.name}</div>
-                            <div className="mt-1 text-xs text-slate-500">
+                            <div className="font-medium text-[#241232]">{rule.name}</div>
+                            <div className="mt-1 text-xs text-[#62576a]">
                               IF {rule.logic} conditions THEN {rule.actions.length} actions
                             </div>
                           </div>
@@ -1545,7 +1570,7 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                               <Copy className="h-4 w-4" />
                             </button>
                             <button
-                              className="button-secondary px-3 py-2 text-rose-200"
+                              className="button-secondary px-3 py-2 text-[#9d1f2c]"
                               onClick={() => setDraft({ ...draft, rules: draft.rules.filter((entry) => entry.id !== rule.id) })}
                               type="button"
                             >
@@ -1585,10 +1610,10 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                 <option value="OR">OR</option>
                               </select>
                             </div>
-                            <label className="flex items-center gap-2 pt-8 text-sm text-slate-300">
+                            <label className="flex items-center gap-2 pt-8 text-sm text-[#4f435c]">
                               <input
                                 checked={rule.active !== false}
-                                className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                className="h-4 w-4 rounded border-[#d7c3f1] bg-white"
                                 onChange={(event) =>
                                   updateDraftRule(rule.id, (entry) => ({
                                     ...entry,
@@ -1621,10 +1646,10 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                               </div>
                               <div className="mt-3 space-y-3">
                                 {rule.conditions.map((condition) => (
-                                  <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3" key={condition.id}>
+                                  <div className="rounded-2xl border border-[#ded8e4] bg-white p-3" key={condition.id}>
                                     <div className="mb-3 flex justify-end">
                                       <button
-                                        className="button-secondary px-3 py-2 text-rose-200"
+                                        className="button-secondary px-3 py-2 text-[#9d1f2c]"
                                         onClick={() =>
                                           updateDraftRule(rule.id, (entry) => ({
                                             ...entry,
@@ -1795,10 +1820,10 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                               </div>
                               <div className="mt-3 space-y-3">
                                 {rule.actions.map((action) => (
-                                  <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3" key={action.id}>
+                                  <div className="rounded-2xl border border-[#ded8e4] bg-white p-3" key={action.id}>
                                     <div className="mb-3 flex justify-end">
                                       <button
-                                        className="button-secondary px-3 py-2 text-rose-200"
+                                        className="button-secondary px-3 py-2 text-[#9d1f2c]"
                                         onClick={() =>
                                           updateDraftRule(rule.id, (entry) => ({
                                             ...entry,
@@ -1902,10 +1927,10 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                       />
                                       {action.actionType === 'SET_VALUE' && (
                                         <div className="grid gap-3 md:grid-cols-2">
-                                          <label className="flex items-center gap-2 text-sm text-slate-300">
+                                          <label className="flex items-center gap-2 text-sm text-[#4f435c]">
                                             <input
                                               checked={Boolean(action.bypassExistingValue)}
-                                              className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                              className="h-4 w-4 rounded border-[#d7c3f1] bg-white"
                                               onChange={(event) =>
                                                 updateDraftRule(rule.id, (entry) => ({
                                                   ...entry,
@@ -1920,10 +1945,10 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
                                             />
                                             Bypass existing value
                                           </label>
-                                          <label className="flex items-center gap-2 text-sm text-slate-300">
+                                          <label className="flex items-center gap-2 text-sm text-[#4f435c]">
                                             <input
                                               checked={Boolean(action.allowExternalValue)}
-                                              className="h-4 w-4 rounded border-white/20 bg-slate-950"
+                                              className="h-4 w-4 rounded border-[#d7c3f1] bg-white"
                                               onChange={(event) =>
                                                 updateDraftRule(rule.id, (entry) => ({
                                                   ...entry,
@@ -1958,13 +1983,13 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
       </section>
 
       {hasUnsavedChanges && (
-        <section className="panel sticky bottom-4 border-cyan-300/20 bg-slate-950/85 backdrop-blur-xl">
+        <section className="panel sticky bottom-4 border-[#d7c3f1] bg-white backdrop-blur-xl">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-300" />
+              <AlertTriangle className="mt-0.5 h-5 w-5 text-[#8a4d00]" />
               <div>
-                <div className="font-medium text-white">Unsaved changes</div>
-                <div className="mt-1 text-sm text-slate-300">
+                <div className="font-medium text-[#241232]">Unsaved changes</div>
+                <div className="mt-1 text-sm text-[#4f435c]">
                   Saving updates the module configuration globally for all users on the tenant.
                 </div>
               </div>
@@ -1982,6 +2007,150 @@ export function FormBuilderWorkspace({ initialTab = 'builder' }: Props) {
           </div>
         </section>
       )}
+      <RegModal
+        open={Boolean(pendingSectionDelete)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingSectionDelete(null);
+          }
+        }}
+        title="Remove form section"
+        description={
+          pendingSectionDelete
+            ? `Review the section before removing "${pendingSectionDelete.displayName}" from this draft.`
+            : undefined
+        }
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setPendingSectionDelete(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary border-[#f1b7bd] text-[#a51f2b] hover:border-[#df7d89] hover:bg-[#fff3f4]"
+              disabled={!pendingSectionDelete}
+              onClick={() => pendingSectionDelete && handleDeleteSection(pendingSectionDelete)}
+              type="button"
+            >
+              Remove section
+            </button>
+          </div>
+        }
+      >
+        {pendingSectionDelete ? (
+          <div className="space-y-3 text-sm leading-6 text-[#4f435c]">
+            <p>
+              This removes the section and its fields from the local draft. The tenant-wide form does not change until
+              you save the module.
+            </p>
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+              <div className="font-semibold text-[#241232]">{pendingSectionDelete.displayName}</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className={pendingSectionDelete.active ? 'status-pill-success' : 'status-pill-neutral'}>
+                  {pendingSectionDelete.active ? 'Shown' : 'Hidden'}
+                </span>
+                <span className="status-pill-neutral">{pendingSectionDelete.fields.length} fields</span>
+                {pendingSectionDelete.isDefault ? <span className="status-pill-warning">Default section</span> : null}
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
+      <RegModal
+        open={Boolean(pendingFieldDelete)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingFieldDelete(null);
+          }
+        }}
+        title="Remove form field"
+        description={
+          pendingFieldDelete
+            ? `Review the field before removing "${pendingFieldDelete.field.displayName}" from this draft.`
+            : undefined
+        }
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setPendingFieldDelete(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary border-[#f1b7bd] text-[#a51f2b] hover:border-[#df7d89] hover:bg-[#fff3f4]"
+              disabled={!pendingFieldDelete}
+              onClick={() =>
+                pendingFieldDelete && handleDeleteField(pendingFieldDelete.section, pendingFieldDelete.field)
+              }
+              type="button"
+            >
+              Remove field
+            </button>
+          </div>
+        }
+      >
+        {pendingFieldDelete ? (
+          <div className="space-y-3 text-sm leading-6 text-[#4f435c]">
+            <p>
+              This removes the field from the local draft only. Review dependent rules and validations before saving
+              the module globally.
+            </p>
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+              <div className="font-semibold text-[#241232]">{pendingFieldDelete.field.displayName}</div>
+              <div className="mt-1 text-xs text-[#62576a]">
+                {pendingFieldDelete.field.systemName} · {pendingFieldDelete.section.displayName}
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="status-pill-neutral">{pendingFieldDelete.field.fieldType}</span>
+                {pendingFieldDelete.field.required ? <span className="status-pill-warning">Required</span> : null}
+                <span className={pendingFieldDelete.field.active ? 'status-pill-success' : 'status-pill-neutral'}>
+                  {pendingFieldDelete.field.active ? 'Shown' : 'Hidden'}
+                </span>
+                <span className="status-pill-neutral">{pendingFieldDelete.field.validations.length} validations</span>
+                <span className="status-pill-neutral">{pendingFieldDelete.field.choices.length} choices</span>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
+      <RegModal
+        open={factoryResetModalOpen}
+        onOpenChange={setFactoryResetModalOpen}
+        title="Reset factory defaults"
+        description={draft ? `Review the reset before restoring "${draft.moduleName}" to its factory configuration.` : undefined}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setFactoryResetModalOpen(false)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary border-[#f1b7bd] text-[#a51f2b] hover:border-[#df7d89] hover:bg-[#fff3f4]"
+              disabled={!draft || saving}
+              onClick={() => void handleFactoryReset()}
+              type="button"
+            >
+              <Factory className="mr-2 h-4 w-4" />
+              {saving ? 'Resetting...' : 'Reset module'}
+            </button>
+          </div>
+        }
+      >
+        {draft ? (
+          <div className="space-y-3 text-sm leading-6 text-[#4f435c]">
+            <p>
+              This restores default sections, fields, rules, validations, and layout metadata for the module. Custom fields are preserved but deactivated.
+            </p>
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+              <div className="font-semibold text-[#241232]">{draft.moduleName}</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="status-pill-neutral">{draft.moduleKey}</span>
+                <span className="status-pill-neutral">{draft.sections.length} sections</span>
+                <span className="status-pill-neutral">
+                  {draft.sections.reduce((total, section) => total + section.fields.length, 0)} fields
+                </span>
+                <span className="status-pill-neutral">{draft.rules.length} rules</span>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
     </div>
   );
 }

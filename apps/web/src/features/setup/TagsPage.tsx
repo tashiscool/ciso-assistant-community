@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Edit3, Plus, Tags, Trash2 } from 'lucide-react';
+import { RegModal } from '../../components/regovise/PagePrimitives';
 import { createSetupTag, deleteSetupTag, getSetupTags, updateSetupTag } from './api';
 import type { SetupTagRecord, SetupTagsSnapshot } from './types';
 
@@ -13,8 +14,10 @@ export function TagsPage() {
   const [snapshot, setSnapshot] = useState<SetupTagsSnapshot | null>(null);
   const [draft, setDraft] = useState(emptyDraft);
   const [editing, setEditing] = useState<SetupTagRecord | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<SetupTagRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -55,23 +58,27 @@ export function TagsPage() {
     }
   }
 
-  async function handleDelete(tagId: string) {
+  async function handleDelete(tag: SetupTagRecord) {
     try {
+      setDeleting(true);
       setError(null);
       setNotice(null);
-      setSnapshot(await deleteSetupTag(tagId));
-      if (editing?.id === tagId) {
+      setSnapshot(await deleteSetupTag(tag.id));
+      if (editing?.id === tag.id) {
         setDraft(emptyDraft);
         setEditing(null);
       }
+      setPendingDelete(null);
       setNotice('Tag removed from tenant setup.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete tag.');
+    } finally {
+      setDeleting(false);
     }
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading tag setup...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading tag setup...</div>;
   }
 
   if (error && !snapshot) {
@@ -83,8 +90,8 @@ export function TagsPage() {
       <section className="panel grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <div className="eyebrow">Setup</div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Tags</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">Tags</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
             Define reusable tenant tags for evidence, exports, OSCAL packaging, and workflow classification from the
             canonical Cloudflare setup service.
           </p>
@@ -108,7 +115,7 @@ export function TagsPage() {
               <div className="metric-value">{snapshot?.metrics.totalUsage ?? 0}</div>
             </div>
           </div>
-          <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4 text-sm text-slate-300">
+          <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#4f435c]">
             System tags preserve structured export semantics. User tags stay flexible for evidence, assignment, and
             workflow context.
           </div>
@@ -182,23 +189,23 @@ export function TagsPage() {
         </div>
 
         <section className="panel overflow-hidden p-0">
-          <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+          <div className="flex items-center justify-between border-b border-[#ded8e4] px-6 py-4">
             <div>
               <div className="eyebrow">Tag Catalog</div>
-              <p className="mt-1 text-sm text-slate-400">Tenant-scoped metadata available to exports, evidence, and automation.</p>
+              <p className="mt-1 text-sm text-[#6f6578]">Tenant-scoped metadata available to exports, evidence, and automation.</p>
             </div>
-            <Tags className="h-5 w-5 text-cyan-300" />
+            <Tags className="h-5 w-5 text-[#7a3ccf]" />
           </div>
-          <div className="divide-y divide-white/6">
+          <div className="divide-y divide-[#ded8e4]">
             {snapshot?.tags.map((tag) => (
               <div className="flex flex-col gap-3 px-6 py-4 lg:flex-row lg:items-center lg:justify-between" key={tag.id}>
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <div className="font-medium text-white">{tag.title}</div>
-                    <span className={tag.type === 'System' ? 'badge-positive' : 'badge-neutral'}>{tag.type}</span>
-                    {tag.oscalRequired && <span className="badge-neutral">OSCAL</span>}
+                    <div className="font-medium text-[#241232]">{tag.title}</div>
+                    <span className={tag.type === 'System' ? 'status-pill-positive' : 'status-pill-neutral'}>{tag.type}</span>
+                    {tag.oscalRequired && <span className="status-pill-neutral">OSCAL</span>}
                   </div>
-                  <div className="mt-2 text-sm text-slate-400">
+                  <div className="mt-2 text-sm text-[#6f6578]">
                     Usage {tag.usageCount} · Updated {new Date(tag.updatedAt).toLocaleString()}
                   </div>
                 </div>
@@ -218,7 +225,7 @@ export function TagsPage() {
                     <Edit3 className="mr-2 h-4 w-4" />
                     Edit
                   </button>
-                  <button className="button-secondary" onClick={() => void handleDelete(tag.id)} type="button">
+                  <button className="button-secondary" onClick={() => setPendingDelete(tag)} type="button">
                     <Trash2 className="mr-2 h-4 w-4" />
                     Delete
                   </button>
@@ -228,6 +235,48 @@ export function TagsPage() {
           </div>
         </section>
       </section>
+      <RegModal
+        open={Boolean(pendingDelete)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingDelete(null);
+          }
+        }}
+        title="Delete tag"
+        description={pendingDelete ? `Review the impact before removing "${pendingDelete.title}" from tenant setup.` : undefined}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setPendingDelete(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary border-[#f2b7bf] text-[#9d1f2c] hover:bg-[#ffe2e5]"
+              disabled={!pendingDelete || deleting}
+              onClick={() => pendingDelete && void handleDelete(pendingDelete)}
+              type="button"
+            >
+              {deleting ? 'Deleting...' : 'Delete tag'}
+            </button>
+          </div>
+        }
+      >
+        <div className="notice-warning">
+          Removing this tag can change how evidence, exports, and automation rules are categorized. Existing records that
+          reference the tag may lose that setup context.
+        </div>
+        {pendingDelete ? (
+          <div className="mt-4 rounded-lg border border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#4f435c]">
+            <div className="font-semibold text-[#241232]">{pendingDelete.title}</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <span className={pendingDelete.type === 'System' ? 'status-pill-positive' : 'status-pill-neutral'}>
+                {pendingDelete.type}
+              </span>
+              {pendingDelete.oscalRequired ? <span className="status-pill-neutral">OSCAL</span> : null}
+              <span className="status-pill-neutral">Usage {pendingDelete.usageCount}</span>
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ApiClient } from '../../shared/api/client';
 import { useEdgeIdentity } from '../../shared/session/identity';
+import { RegPageHeader, RegStatusPill, RegTableShell } from '../../components/regovise/PagePrimitives';
 import { getFrameworkLibrary } from '../grc/api';
 import type { FrameworkLibrarySummary } from '../grc/types';
 import type { IamMePayload } from '../iam/types';
@@ -300,25 +301,46 @@ export function FrameworksPage() {
   const visiblePackaged = showAllPackaged ? availablePackaged : availablePackaged.slice(0, 8);
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading catalogues...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading catalogues...</div>;
   }
 
   return (
     <div className="space-y-6">
+      <RegPageHeader
+        eyebrow="Compliance"
+        title="Catalogues Workspace"
+        description="Manage the laws, regulations, and governing documents that collect the controls and requirements your tenant uses as a source of truth."
+        actions={
+          <>
+            <Link className="button-secondary" to="/framework-library">
+              Browse library
+            </Link>
+            <Link className="button-secondary" to="/assessment-plans">
+              Assessment plans
+            </Link>
+          </>
+        }
+        meta={
+          <>
+            <RegStatusPill tone="purple">{frameworks.length} active catalogues</RegStatusPill>
+            <RegStatusPill tone="neutral">{totalRequirements} requirements</RegStatusPill>
+            <RegStatusPill tone="info">{availablePackaged.length} packaged ready</RegStatusPill>
+          </>
+        }
+        className="rounded-lg border border-[#ded8e4] shadow-[0_8px_24px_rgba(48,24,72,0.04)]"
+      />
       <section className="panel grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
-          <div className="eyebrow">Catalogues</div>
-          <h1 className="mt-2 text-3xl font-semibold text-white">Catalogues Workspace</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-            Catalogues are the laws, regulations, and governing documents that collect the controls
-            and requirements your tenant uses as a source of truth. Use them to anchor assessments
-            and flow requirements into security plans, policies, components, projects, and supply
-            chain records.
+          <div className="eyebrow">Scope</div>
+          <h2 className="mt-2 text-2xl font-semibold text-[#241232]">Control source of truth</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f435c]">
+            Use catalogues to anchor assessments and flow requirements into security plans, policies,
+            components, projects, and supply chain records.
           </p>
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             <div className="panel-subtle">
               <div className="label">Why catalogues matter</div>
-              <div className="mt-3 space-y-2 text-sm leading-6 text-slate-300">
+              <div className="mt-3 space-y-2 text-sm leading-6 text-[#4f435c]">
                 <div>- Keep one reusable control source for regulations and internal standards.</div>
                 <div>- Reduce manual re-entry when builders generate downstream governance artifacts.</div>
                 <div>- Track changes to governing requirements in one tenant workspace.</div>
@@ -345,8 +367,8 @@ export function FrameworksPage() {
           <div className="space-y-4">
             <div>
               <div className="eyebrow">Import</div>
-              <h2 className="mt-2 text-2xl font-semibold text-white">Bring catalogues into this workspace</h2>
-              <p className="mt-3 text-sm leading-6 text-slate-300">
+              <h2 className="mt-2 text-2xl font-semibold text-[#241232]">Bring catalogues into this workspace</h2>
+              <p className="mt-3 text-sm leading-6 text-[#4f435c]">
                 Install packaged RegScale catalogues from the managed library, or upload a valid
                 catalogue JSON file for urgent updates, licensed frameworks, or tenant-specific
                 migrations.
@@ -373,29 +395,29 @@ export function FrameworksPage() {
             {importMode === 'system' ? (
               <div className="panel-subtle space-y-3">
                 <div className="label">Import from system</div>
-                <p className="text-sm leading-6 text-slate-300">
+                <p className="text-sm leading-6 text-[#4f435c]">
                   Install a packaged catalogue that has not yet been loaded into this tenant. Use
-                  <span className="mx-1 font-medium text-white">Learn more</span>
+                  <span className="mx-1 font-medium text-[#241232]">Learn more</span>
                   to review the catalogue detail before adding it.
                 </p>
                 {availablePackaged.length > 0 ? (
                   <div className="space-y-3">
                     {visiblePackaged.map((framework) => (
-                      <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4" key={framework.id}>
+                      <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={framework.id}>
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
-                            <div className="text-sm font-semibold text-white">{framework.name}</div>
-                            <div className="mt-1 text-xs text-slate-400">
+                            <div className="text-sm font-semibold text-[#241232]">{framework.name}</div>
+                            <div className="mt-1 text-xs text-[#6f6578]">
                               {framework.frameworkKey} · {framework.version ?? 'Unversioned'} ·{' '}
                               {framework.category}
                             </div>
-                            <p className="mt-2 text-sm leading-6 text-slate-300">
+                            <p className="mt-2 text-sm leading-6 text-[#4f435c]">
                               {framework.description || 'No packaged description is available yet.'}
                             </p>
                           </div>
-                          <span className={framework.crosswalkReady ? 'badge-success' : 'badge-neutral'}>
+                          <RegStatusPill tone={framework.crosswalkReady ? 'success' : 'neutral'}>
                             {framework.crosswalkReady ? 'Controls ready' : 'Reference content'}
-                          </span>
+                          </RegStatusPill>
                         </div>
                         <div className="mt-4 flex flex-wrap gap-2">
                           <Link className="button-secondary" to={`/framework-library/${framework.slug}`}>
@@ -412,7 +434,7 @@ export function FrameworksPage() {
                         </div>
                       </div>
                     ))}
-                    <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
+                    <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[#6f6578]">
                       <div>
                         Showing {visiblePackaged.length} of {availablePackaged.length} packaged catalogues
                         available for this tenant.
@@ -429,12 +451,12 @@ export function FrameworksPage() {
                     </div>
                   </div>
                 ) : library.length > 0 ? (
-                  <div className="rounded-2xl border border-dashed border-white/10 bg-slate-950/20 p-4 text-sm text-slate-300">
+                  <div className="rounded-2xl border border-dashed border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#4f435c]">
                     All packaged catalogues in the current library snapshot are already installed in
                     this tenant.
                   </div>
                 ) : (
-                  <div className="rounded-2xl border border-dashed border-white/10 bg-slate-950/20 p-4 text-sm text-slate-300">
+                  <div className="rounded-2xl border border-dashed border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#4f435c]">
                     No packaged catalogue snapshot is loaded yet. Open the catalogue library to
                     refresh curated content before importing from system.
                   </div>
@@ -455,15 +477,15 @@ export function FrameworksPage() {
                   type="file"
                 />
                 <div className="label">Import from file</div>
-                <p className="text-sm leading-6 text-slate-300">
+                <p className="text-sm leading-6 text-[#4f435c]">
                   Upload a valid RegScale catalogue JSON file when you need a licensed framework, an
                   urgent update, or a tenant-specific migration from another installation.
                 </p>
                 <div
                   className={`rounded-2xl border border-dashed p-5 transition ${
                     uploadDragging
-                      ? 'border-cyan-300/60 bg-cyan-400/[0.06]'
-                      : 'border-white/10 bg-slate-950/20'
+                      ? 'border-[#b788ed] bg-[#f2e8ff]'
+                      : 'border-[#ded8e4] bg-[#fbf9fc]'
                   }`}
                   onDragEnter={(event) => {
                     event.preventDefault();
@@ -489,8 +511,8 @@ export function FrameworksPage() {
                     }
                   }}
                 >
-                  <div className="text-sm font-semibold text-white">Drop a catalogue file here</div>
-                  <p className="mt-2 text-sm leading-6 text-slate-300">
+                  <div className="text-sm font-semibold text-[#241232]">Drop a catalogue file here</div>
+                  <p className="mt-2 text-sm leading-6 text-[#4f435c]">
                     Drag and drop a `.json` RegScale catalogue export, or browse to select a file
                     from your system.
                   </p>
@@ -499,9 +521,9 @@ export function FrameworksPage() {
                   </button>
                 </div>
                 {uploadPreview ? (
-                  <div className="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-                    <div className="text-sm font-semibold text-white">{uploadPreview.name}</div>
-                    <div className="mt-2 grid gap-2 text-sm text-slate-300 sm:grid-cols-2">
+                  <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+                    <div className="text-sm font-semibold text-[#241232]">{uploadPreview.name}</div>
+                    <div className="mt-2 grid gap-2 text-sm text-[#4f435c] sm:grid-cols-2">
                       <div>Key: {uploadPreview.key}</div>
                       <div>Version: {uploadPreview.version ?? 'n/a'}</div>
                       <div>Category: {uploadPreview.category ?? 'security'}</div>
@@ -532,7 +554,7 @@ export function FrameworksPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="rounded-2xl border border-dashed border-white/10 bg-slate-950/20 p-4 text-sm text-slate-300">
+                  <div className="rounded-2xl border border-dashed border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#4f435c]">
                     The uploaded file must define a catalogue name plus at least one control or
                     requirement entry.
                   </div>
@@ -543,7 +565,7 @@ export function FrameworksPage() {
         ) : (
           <div className="panel-subtle">
             <div className="label">Read-only access</div>
-            <p className="mt-3 text-sm leading-6 text-slate-300">
+            <p className="mt-3 text-sm leading-6 text-[#4f435c]">
               This session can review catalogue content but cannot create or import catalogues. A
               tenant administrator needs framework management permissions to install packaged
               catalogues or upload new ones.
@@ -575,8 +597,8 @@ export function FrameworksPage() {
         </div>
         <div className="metric-card">
           <div className="metric-label">Latest update</div>
-          <div className="mt-3 text-lg font-semibold text-white">{formatTimestamp(latestUpdatedAt)}</div>
-          <div className="mt-2 text-xs text-slate-500">{categoryCount} categories in use</div>
+          <div className="mt-3 text-lg font-semibold text-[#241232]">{formatTimestamp(latestUpdatedAt)}</div>
+          <div className="mt-2 text-xs text-[#62576a]">{categoryCount} categories in use</div>
         </div>
       </section>
 
@@ -588,8 +610,8 @@ export function FrameworksPage() {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <div className="eyebrow">Manual entry</div>
-              <h2 className="mt-2 text-2xl font-semibold text-white">Create a tenant-specific catalogue</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+              <h2 className="mt-2 text-2xl font-semibold text-[#241232]">Create a tenant-specific catalogue</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f435c]">
                 Use manual entry when a governing document is not part of the packaged library or
                 when you want to create a tenant-only catalogue before loading controls.
               </p>
@@ -651,46 +673,48 @@ export function FrameworksPage() {
         </section>
       ) : null}
 
-      <section className="panel overflow-hidden p-0">
-        <table className="min-w-full text-left text-sm">
-          <thead className="border-b border-white/10 bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
-            <tr>
-              <th className="px-4 py-3">Catalogue</th>
-              <th className="px-4 py-3">Key</th>
-              <th className="px-4 py-3">Version</th>
-              <th className="px-4 py-3">Category</th>
-            </tr>
-          </thead>
-          <tbody>
-            {frameworks.map((framework) => (
-              <tr key={framework.id} className="border-t border-white/5 align-top">
-                <td className="px-4 py-4">
-                  <Link
-                    className="font-medium text-white transition hover:text-cyan-200"
-                    to={`/frameworks/${framework.id}`}
-                  >
-                    {framework.name}
-                  </Link>
-                  <div className="mt-1 text-xs text-slate-500">{framework.updatedAt}</div>
-                </td>
-                <td className="px-4 py-4 font-mono text-xs text-cyan-200">{framework.key}</td>
-                <td className="px-4 py-4 text-slate-300">{framework.version ?? 'n/a'}</td>
-                <td className="px-4 py-4 text-slate-300">
-                  <div>{framework.category ?? 'n/a'}</div>
-                  <div className="mt-1 text-xs text-slate-500">{framework.controlCount} requirements</div>
-                </td>
-              </tr>
-            ))}
-            {frameworks.length === 0 ? (
+      <RegTableShell>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-left text-sm">
+            <thead className="border-b border-[#ded8e4] bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
               <tr>
-                <td className="px-4 py-8 text-center text-slate-400" colSpan={4}>
-                  No catalogues found for tenant <span className="font-mono">{identity.tenantId}</span>.
-                </td>
+                <th className="px-4 py-3">Catalogue</th>
+                <th className="px-4 py-3">Key</th>
+                <th className="px-4 py-3">Version</th>
+                <th className="px-4 py-3">Category</th>
               </tr>
-            ) : null}
-          </tbody>
-        </table>
-      </section>
+            </thead>
+            <tbody>
+              {frameworks.map((framework) => (
+                <tr key={framework.id} className="border-t border-[#eeeaf2] align-top">
+                  <td className="px-4 py-4">
+                    <Link
+                      className="font-medium text-[#241232] transition hover:text-[#6d28d9]"
+                      to={`/frameworks/${framework.id}`}
+                    >
+                      {framework.name}
+                    </Link>
+                    <div className="mt-1 text-xs text-[#62576a]">{framework.updatedAt}</div>
+                  </td>
+                  <td className="px-4 py-4 font-mono text-xs text-[#6d28d9]">{framework.key}</td>
+                  <td className="px-4 py-4 text-[#4f435c]">{framework.version ?? 'n/a'}</td>
+                  <td className="px-4 py-4 text-[#4f435c]">
+                    <RegStatusPill tone="neutral">{framework.category ?? 'n/a'}</RegStatusPill>
+                    <div className="mt-2 text-xs text-[#62576a]">{framework.controlCount} requirements</div>
+                  </td>
+                </tr>
+              ))}
+              {frameworks.length === 0 ? (
+                <tr>
+                  <td className="px-4 py-8 text-center text-[#6f6578]" colSpan={4}>
+                    No catalogues found for tenant <span className="font-mono">{identity.tenantId}</span>.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </RegTableShell>
     </div>
   );
 }

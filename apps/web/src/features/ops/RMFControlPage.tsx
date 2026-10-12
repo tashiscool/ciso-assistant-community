@@ -54,7 +54,7 @@ export function RMFControlPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading RMF...</div>;
+    return <div className="panel p-6 text-sm text-[#51465e]">Loading RMF...</div>;
   }
 
   if (error && !snapshot) {
@@ -67,8 +67,8 @@ export function RMFControlPage() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">Operations</div>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">RMF</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">RMF</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">
               Coordinate authorization packages, RMF handoffs, and supporting artifacts from a canonical Worker-backed
               control room.
             </p>
@@ -104,26 +104,26 @@ export function RMFControlPage() {
 
       <section className="grid gap-4 xl:grid-cols-[0.88fr_1.12fr]">
         <div className="panel-subtle space-y-4">
-          <div className="flex items-center gap-2 text-white">
-            <ShieldCheck className="h-4 w-4 text-cyan-300" />
+          <div className="flex items-center gap-2 text-[#241232]">
+            <ShieldCheck className="h-4 w-4 text-[#7a2ed6]" />
             <h2 className="text-lg font-semibold">Authorization packages</h2>
           </div>
           <div className="space-y-3">
             {snapshot?.packages.map((item) => (
               <button
-                className={`panel-subtle w-full text-left transition ${selectedPackage?.id === item.id ? 'border-cyan-300/40 bg-cyan-400/[0.04]' : ''}`}
+                className={`panel-subtle w-full text-left transition ${selectedPackage?.id === item.id ? 'border-[#8b35e6]/40 bg-[#f8f3ff]' : ''}`}
                 key={item.id}
                 onClick={() => setSelectedId(item.id)}
                 type="button"
               >
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="font-medium text-white">{item.name}</div>
-                  <span className="badge-neutral">{item.authorizationStatus}</span>
-                  <span className="badge-neutral">{item.currentState}</span>
+                  <div className="font-medium text-[#241232]">{item.name}</div>
+                  <span className="status-pill-neutral">{item.authorizationStatus}</span>
+                  <span className="status-pill-neutral">{item.currentState}</span>
                 </div>
-                <div className="mt-2 text-sm text-slate-300">{item.systemCategory}</div>
-                <div className="mt-3 h-2 rounded-full bg-white/5">
-                  <div className="h-2 rounded-full bg-cyan-400" style={{ width: `${item.progress}%` }} />
+                <div className="mt-2 text-sm text-[#51465e]">{item.systemCategory}</div>
+                <div className="mt-3 h-2 rounded-full bg-[#f6f1fa]">
+                  <div className="h-2 rounded-full bg-[#8b35e6]" style={{ width: `${item.progress}%` }} />
                 </div>
               </button>
             ))}
@@ -136,12 +136,12 @@ export function RMFControlPage() {
               <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                 <div>
                   <div className="eyebrow">Selected package</div>
-                  <h2 className="mt-2 text-2xl font-semibold text-white">{selectedPackage.name}</h2>
-                  <p className="mt-2 text-sm text-slate-300">{selectedPackage.authorizationBoundary}</p>
+                  <h2 className="mt-2 text-2xl font-semibold text-[#241232]">{selectedPackage.name}</h2>
+                  <p className="mt-2 text-sm text-[#51465e]">{selectedPackage.authorizationBoundary}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <span className="badge-neutral">{selectedPackage.authorizationStatus}</span>
-                    <span className="badge-neutral">{selectedPackage.currentState}</span>
-                    <span className="badge-neutral">{selectedPackage.progress}% complete</span>
+                    <span className="status-pill-neutral">{selectedPackage.authorizationStatus}</span>
+                    <span className="status-pill-neutral">{selectedPackage.currentState}</span>
+                    <span className="status-pill-neutral">{selectedPackage.progress}% complete</span>
                   </div>
                 </div>
                 <button className="button-primary" disabled={busy} onClick={() => void handleAdvance()} type="button">
@@ -152,11 +152,11 @@ export function RMFControlPage() {
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <div className="panel-subtle">
                   <div className="label">Next handoff</div>
-                  <div className="mt-2 text-sm text-slate-300">{selectedPackage.nextHandoff}</div>
+                  <div className="mt-2 text-sm text-[#51465e]">{selectedPackage.nextHandoff}</div>
                 </div>
                 <div className="panel-subtle">
                   <div className="label">Decision target</div>
-                  <div className="mt-2 text-sm text-slate-300">{selectedPackage.decisionTarget}</div>
+                  <div className="mt-2 text-sm text-[#51465e]">{selectedPackage.decisionTarget}</div>
                 </div>
               </div>
             </section>
@@ -166,14 +166,14 @@ export function RMFControlPage() {
                 <div className="eyebrow">RMF steps</div>
                 <div className="mt-4 space-y-3">
                   {selectedPackage.steps.map((step) => (
-                    <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4" key={step.id}>
+                    <div className="rounded-2xl border border-[#ded8e4] bg-white p-4" key={step.id}>
                       <div className="flex flex-wrap items-center gap-2">
-                        <div className="font-medium text-white">{step.name}</div>
-                        <span className="badge-neutral">{step.status}</span>
-                        <span className="badge-neutral">{step.progress}%</span>
+                        <div className="font-medium text-[#241232]">{step.name}</div>
+                        <span className="status-pill-neutral">{step.status}</span>
+                        <span className="status-pill-neutral">{step.progress}%</span>
                       </div>
-                      <div className="mt-2 text-sm text-slate-300">{step.summary}</div>
-                      <div className="mt-2 text-xs text-slate-500">{step.owner}</div>
+                      <div className="mt-2 text-sm text-[#51465e]">{step.summary}</div>
+                      <div className="mt-2 text-xs text-[#62576a]">{step.owner}</div>
                       <div className="mt-3">
                         <Link className="button-secondary" to={step.route}>
                           Open module
@@ -189,14 +189,14 @@ export function RMFControlPage() {
                   <div className="eyebrow">Artifacts</div>
                   <div className="mt-4 space-y-3">
                     {selectedPackage.artifacts.map((artifact) => (
-                      <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4" key={artifact.id}>
+                      <div className="rounded-2xl border border-[#ded8e4] bg-white p-4" key={artifact.id}>
                         <div className="flex flex-wrap items-center gap-2">
-                          <div className="font-medium text-white">{artifact.title}</div>
-                          <span className="badge-neutral">{artifact.module}</span>
-                          <span className="badge-neutral">{artifact.status}</span>
+                          <div className="font-medium text-[#241232]">{artifact.title}</div>
+                          <span className="status-pill-neutral">{artifact.module}</span>
+                          <span className="status-pill-neutral">{artifact.status}</span>
                         </div>
-                        <div className="mt-2 text-sm text-slate-300">{artifact.helper}</div>
-                        <div className="mt-2 text-xs text-slate-500">
+                        <div className="mt-2 text-sm text-[#51465e]">{artifact.helper}</div>
+                        <div className="mt-2 text-xs text-[#62576a]">
                           {artifact.step} · {artifact.owner}
                         </div>
                       </div>
@@ -205,21 +205,21 @@ export function RMFControlPage() {
                 </section>
 
                 <section className="panel-subtle">
-                  <div className="flex items-center gap-2 text-white">
-                    <TimerReset className="h-4 w-4 text-cyan-300" />
+                  <div className="flex items-center gap-2 text-[#241232]">
+                    <TimerReset className="h-4 w-4 text-[#7a2ed6]" />
                     <div className="eyebrow">Cadence</div>
                   </div>
                   <div className="mt-4 space-y-3">
                     {selectedPackage.timeline.map((point) => (
                       <div key={point.bucket}>
-                        <div className="flex items-center justify-between text-sm text-slate-300">
+                        <div className="flex items-center justify-between text-sm text-[#51465e]">
                           <span>{point.bucket}</span>
                           <span>
                             {point.progress}% · {point.artifacts} artifacts · {point.findings} findings
                           </span>
                         </div>
-                        <div className="mt-2 h-2 rounded-full bg-white/5">
-                          <div className="h-2 rounded-full bg-cyan-400" style={{ width: `${point.progress}%` }} />
+                        <div className="mt-2 h-2 rounded-full bg-[#f6f1fa]">
+                          <div className="h-2 rounded-full bg-[#8b35e6]" style={{ width: `${point.progress}%` }} />
                         </div>
                       </div>
                     ))}
@@ -229,9 +229,9 @@ export function RMFControlPage() {
                 {selectedPackage.blockers.length > 0 && (
                   <section className="panel-subtle">
                     <div className="eyebrow">Blockers</div>
-                    <div className="mt-4 space-y-2 text-sm text-slate-300">
+                    <div className="mt-4 space-y-2 text-sm text-[#51465e]">
                       {selectedPackage.blockers.map((blocker) => (
-                        <div className="rounded-2xl border border-white/8 bg-white/[0.02] px-4 py-3" key={blocker}>
+                        <div className="rounded-2xl border border-[#ded8e4] bg-white px-4 py-3" key={blocker}>
                           {blocker}
                         </div>
                       ))}

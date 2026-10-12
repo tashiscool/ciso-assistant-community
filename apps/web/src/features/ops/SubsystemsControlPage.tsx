@@ -75,7 +75,7 @@ export function SubsystemsControlPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading subsystems...</div>;
+    return <div className="panel p-6 text-sm text-[#51465e]">Loading subsystems...</div>;
   }
 
   if (error && !snapshot) {
@@ -88,8 +88,8 @@ export function SubsystemsControlPage() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">Operations</div>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Subsystems</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">Subsystems</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">
               Manage the shared record tray for comments, files, links, workflow, history, and related subsystems from
               a canonical Worker-backed control room.
             </p>
@@ -125,8 +125,8 @@ export function SubsystemsControlPage() {
 
       <section className="grid gap-4 xl:grid-cols-[0.92fr_1.08fr]">
         <div className="panel-subtle space-y-4">
-          <div className="flex items-center gap-2 text-white">
-            <Layers3 className="h-4 w-4 text-cyan-300" />
+          <div className="flex items-center gap-2 text-[#241232]">
+            <Layers3 className="h-4 w-4 text-[#7a2ed6]" />
             <h2 className="text-lg font-semibold">Active tray selection</h2>
           </div>
           <label className="space-y-1">
@@ -141,14 +141,14 @@ export function SubsystemsControlPage() {
           </label>
 
           {activeSubsystem && (
-            <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+            <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
               <div className="flex flex-wrap items-center gap-2">
-                <div className="font-medium text-white">{activeSubsystem.title}</div>
-                <span className="badge-neutral">{activeSubsystem.category}</span>
-                {activeSubsystem.pinned && <span className="badge-neutral">Pinned</span>}
+                <div className="font-medium text-[#241232]">{activeSubsystem.title}</div>
+                <span className="status-pill-neutral">{activeSubsystem.category}</span>
+                {activeSubsystem.pinned && <span className="status-pill-neutral">Pinned</span>}
               </div>
-              <div className="mt-2 text-sm text-slate-300">{activeSubsystem.description}</div>
-              <div className="mt-3 text-xs text-slate-500">{activeSubsystem.usageExample}</div>
+              <div className="mt-2 text-sm text-[#51465e]">{activeSubsystem.description}</div>
+              <div className="mt-3 text-xs text-[#62576a]">{activeSubsystem.usageExample}</div>
               <div className="mt-4 flex flex-wrap gap-2">
                 <button className="button-primary" disabled={busy} onClick={() => void handleSelect(activeSubsystem.key)} type="button">
                   <Workflow className="mr-2 h-4 w-4" />
@@ -166,13 +166,13 @@ export function SubsystemsControlPage() {
           )}
 
           {activeSubsystem && (
-            <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+            <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
               <div className="eyebrow">Availability matrix</div>
               <div className="mt-4 grid gap-3">
                 {Object.entries(activeSubsystem.availability).map(([key, value]) => (
-                  <div className="flex items-center justify-between rounded-2xl border border-white/8 bg-white/[0.02] px-4 py-3" key={key}>
-                    <span className="text-sm text-slate-300">{key}</span>
-                    <span className="badge-neutral">{value}</span>
+                  <div className="flex items-center justify-between rounded-2xl border border-[#ded8e4] bg-white px-4 py-3" key={key}>
+                    <span className="text-sm text-[#51465e]">{key}</span>
+                    <span className="status-pill-neutral">{value}</span>
                   </div>
                 ))}
               </div>
@@ -181,26 +181,26 @@ export function SubsystemsControlPage() {
         </div>
 
         <section className="panel overflow-hidden p-0">
-          <div className="border-b border-white/10 px-6 py-4">
+          <div className="border-b border-[#ded8e4] px-6 py-4">
             <div className="eyebrow">Subsystem library</div>
-            <p className="mt-1 text-sm text-slate-400">Pinned state, usage, and access contract for each subsystem.</p>
+            <p className="mt-1 text-sm text-[#6f6578]">Pinned state, usage, and access contract for each subsystem.</p>
           </div>
-          <div className="divide-y divide-white/6">
+          <div className="divide-y divide-[#ded8e4]">
             {snapshot?.subsystems.map((item) => (
               <div className="px-6 py-4" key={item.key}>
                 <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <div className="font-medium text-white">{item.title}</div>
-                      <span className="badge-neutral">{item.category}</span>
-                      {item.pinned && <span className="badge-neutral">Pinned</span>}
+                      <div className="font-medium text-[#241232]">{item.title}</div>
+                      <span className="status-pill-neutral">{item.category}</span>
+                      {item.pinned && <span className="status-pill-neutral">Pinned</span>}
                     </div>
-                    <div className="mt-2 text-sm text-slate-300">{item.description}</div>
-                    <div className="mt-2 text-xs text-slate-500">
+                    <div className="mt-2 text-sm text-[#51465e]">{item.description}</div>
+                    <div className="mt-2 text-xs text-[#62576a]">
                       {item.openCount} opens
                       {item.lastOpenedAt ? ` · Last opened ${new Date(item.lastOpenedAt).toLocaleString()}` : ' · Never opened'}
                     </div>
-                    {item.activityNote && <div className="mt-2 text-xs text-slate-500">{item.activityNote}</div>}
+                    {item.activityNote && <div className="mt-2 text-xs text-[#62576a]">{item.activityNote}</div>}
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <button className="button-secondary" disabled={busy} onClick={() => void handleSelect(item.key)} type="button">

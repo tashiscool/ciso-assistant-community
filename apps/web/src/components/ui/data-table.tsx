@@ -50,6 +50,7 @@ export function DataTable<T extends Record<string, unknown>>({
   className,
 }: DataTableProps<T>) {
   const [search, setSearch] = React.useState('');
+  const searchId = React.useId();
 
   const filtered = React.useMemo(() => {
     if (!search.trim()) return data;
@@ -68,9 +69,11 @@ export function DataTable<T extends Record<string, unknown>>({
     <div className={cn('space-y-4', className)}>
       {searchable && (
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <label className="sr-only" htmlFor={searchId}>Search table</label>
+          <Search aria-hidden="true" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6f6578]" />
           <Input
             className="pl-9"
+            id={searchId}
             placeholder={searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -78,10 +81,10 @@ export function DataTable<T extends Record<string, unknown>>({
         </div>
       )}
 
-      <div className="rounded-[20px] border border-white/10 overflow-hidden">
+      <div className="rounded-lg border border-[#ded8e4] overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="hover:bg-transparent border-b border-white/10">
+            <TableRow className="hover:bg-transparent border-b border-[#ded8e4]">
               {columns.map((col) => (
                 <TableHead key={String(col.key)} className={col.className}>
                   {col.header}
@@ -92,7 +95,7 @@ export function DataTable<T extends Record<string, unknown>>({
           <TableBody>
             {loading ? (
               skeletonRows.map((_, i) => (
-                <TableRow key={i} className="hover:bg-transparent border-b border-white/[0.06]">
+                <TableRow key={i} className="hover:bg-transparent border-b border-[#ece7f0]">
                   {columns.map((col) => (
                     <TableCell key={String(col.key)}>
                       <Skeleton className="h-4 w-full rounded-lg" />
@@ -104,7 +107,7 @@ export function DataTable<T extends Record<string, unknown>>({
               <TableRow className="hover:bg-transparent">
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center text-slate-500"
+                  className="h-24 text-center text-[#6f6578]"
                 >
                   {emptyMessage}
                 </TableCell>
@@ -114,9 +117,24 @@ export function DataTable<T extends Record<string, unknown>>({
                 <TableRow
                   key={i}
                   className={cn(
-                    onRowClick && 'cursor-pointer hover:bg-cyan-400/[0.04]',
+                    onRowClick && 'cursor-pointer hover:bg-[#f8f3ff] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#8b35e6]',
                   )}
-                  onClick={() => onRowClick?.(row)}
+                  onClick={(event) => {
+                    if (!onRowClick || event.defaultPrevented) return;
+                    const target = event.target instanceof Element
+                      ? event.target.closest('a[href], button, input, select, textarea, label, summary, [role="button"], [role="link"], [role="checkbox"], [role="switch"], [role="combobox"], [contenteditable]:not([contenteditable="false"]), [tabindex]')
+                      : null;
+                    if (target && target !== event.currentTarget) return;
+                    onRowClick(row);
+                  }}
+                  onKeyDown={(event) => {
+                    if (!onRowClick || event.defaultPrevented || event.target !== event.currentTarget) return;
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      if (!event.repeat) onRowClick(row);
+                    }
+                  }}
+                  tabIndex={onRowClick ? 0 : undefined}
                 >
                   {columns.map((col) => (
                     <TableCell key={String(col.key)} className={col.className}>
@@ -133,7 +151,7 @@ export function DataTable<T extends Record<string, unknown>>({
       </div>
 
       {!loading && filtered.length > 0 && (
-        <p className="text-xs text-slate-500 text-right">
+        <p className="text-xs text-[#6f6578] text-right">
           {filtered.length} of {data.length} {data.length === 1 ? 'row' : 'rows'}
         </p>
       )}

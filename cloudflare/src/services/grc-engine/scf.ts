@@ -1,5 +1,6 @@
 import type { EnvBindings } from '../../types/env';
 import type { CrosswalkResolution } from './types';
+import { providerRequest } from '../../utils/providerRequest';
 
 type FrameworkRow = {
   id: string;
@@ -46,11 +47,15 @@ function normalizeFrameworkToken(value: string) {
 }
 
 async function fetchJson<T>(path: string): Promise<T> {
-  const response = await fetch(`${SCF_BASE_URL}${path}`);
-  if (!response.ok) {
-    throw new Error(`SCF request failed for ${path}: ${response.status}`);
-  }
-  return (await response.json()) as T;
+  return providerRequest(
+    (signal) => fetch(`${SCF_BASE_URL}${path}`, { signal }),
+    async (response) => {
+      if (!response.ok) {
+        throw new Error(`SCF request failed for ${path}: ${response.status}`);
+      }
+      return (await response.json()) as T;
+    },
+  );
 }
 
 async function upsertScfControl(

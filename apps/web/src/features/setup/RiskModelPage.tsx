@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, LayoutGrid, Save, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { RegModal } from '../../components/regovise/PagePrimitives';
 import { getSetupRiskModel, updateSetupRiskModel } from './api';
 import type { SetupRiskModelSnapshot } from './types';
 
@@ -31,6 +32,7 @@ export function RiskModelPage() {
   const [draft, setDraft] = useState(defaultDraft);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [reviewSaveOpen, setReviewSaveOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -76,6 +78,7 @@ export function RiskModelPage() {
       setNotice(null);
       const next = await updateSetupRiskModel(draft);
       hydrate(next);
+      setReviewSaveOpen(false);
       setNotice('Risk model saved.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to save risk model.');
@@ -85,7 +88,7 @@ export function RiskModelPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading risk model...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading risk model...</div>;
   }
 
   if (error && !snapshot) {
@@ -97,8 +100,8 @@ export function RiskModelPage() {
       <section className="panel grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
         <div>
           <div className="eyebrow">Setup</div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Risk Model</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">Risk Model</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
             Define the tenant scoring methodology, appetite bands, and escalation posture so canonical risk workflows
             resolve from one explainable source of truth.
           </p>
@@ -195,16 +198,16 @@ export function RiskModelPage() {
               </label>
             </div>
 
-            <label className="flex items-start gap-3 rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+            <label className="flex items-start gap-3 rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
               <input
                 checked={draft.autoEscalationEnabled}
-                className="mt-1 h-4 w-4 rounded border-white/15 bg-slate-950 text-cyan-400"
+                className="mt-1 h-4 w-4 rounded border-[#ded8e4] bg-white text-[#7a3ccf]"
                 onChange={() => setDraft((c) => ({ ...c, autoEscalationEnabled: !c.autoEscalationEnabled }))}
                 type="checkbox"
               />
               <div>
-                <div className="font-medium text-white">Enable auto escalation</div>
-                <div className="mt-2 text-sm text-slate-400">Automatically escalate high-severity risks after the configured threshold window.</div>
+                <div className="font-medium text-[#241232]">Enable auto escalation</div>
+                <div className="mt-2 text-sm text-[#6f6578]">Automatically escalate high-severity risks after the configured threshold window.</div>
               </div>
             </label>
 
@@ -213,7 +216,7 @@ export function RiskModelPage() {
               <input className="input" type="number" min={1} max={90} value={draft.autoEscalationDays} onChange={(e) => setDraft((c) => ({ ...c, autoEscalationDays: Number(e.target.value || 14) }))} />
             </label>
 
-            <button className="button-primary" disabled={saving} onClick={() => void handleSave()} type="button">
+            <button className="button-primary" disabled={saving} onClick={() => setReviewSaveOpen(true)} type="button">
               <Save className="mr-2 h-4 w-4" />
               {saving ? 'Saving...' : 'Save risk model'}
             </button>
@@ -223,19 +226,19 @@ export function RiskModelPage() {
         <div className="space-y-4">
           <section className="panel-subtle">
             <div className="flex items-center gap-3">
-              <ShieldCheck className="h-5 w-5 text-cyan-300" />
-              <h2 className="text-lg font-semibold text-white">Governance signals</h2>
+              <ShieldCheck className="h-5 w-5 text-[#7a3ccf]" />
+              <h2 className="text-lg font-semibold text-[#241232]">Governance signals</h2>
             </div>
             <div className="mt-5 space-y-3">
               {snapshot?.records.governanceSignals.map((item) => (
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4" key={item.title}>
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={item.title}>
                   <div className="flex items-center justify-between gap-3">
-                    <div className="font-medium text-white">{item.title}</div>
-                    <span className={item.status === 'Active' || item.status === 'Deterministic' || item.status === 'Configured' ? 'badge-positive' : 'badge-neutral'}>
+                    <div className="font-medium text-[#241232]">{item.title}</div>
+                    <span className={item.status === 'Active' || item.status === 'Deterministic' || item.status === 'Configured' ? 'status-pill-positive' : 'status-pill-neutral'}>
                       {item.status}
                     </span>
                   </div>
-                  <div className="mt-2 text-sm text-slate-400">{item.detail}</div>
+                  <div className="mt-2 text-sm text-[#6f6578]">{item.detail}</div>
                 </div>
               ))}
             </div>
@@ -243,17 +246,17 @@ export function RiskModelPage() {
 
           <section className="panel-subtle">
             <div className="flex items-center gap-3">
-              <LayoutGrid className="h-5 w-5 text-cyan-300" />
-              <h2 className="text-lg font-semibold text-white">Threshold bands</h2>
+              <LayoutGrid className="h-5 w-5 text-[#7a3ccf]" />
+              <h2 className="text-lg font-semibold text-[#241232]">Threshold bands</h2>
             </div>
             <div className="mt-5 space-y-3">
               {snapshot?.records.thresholdBands.map((item) => (
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4" key={item.label}>
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={item.label}>
                   <div className="flex items-center justify-between gap-3">
-                    <div className="font-medium text-white">{item.label}</div>
-                    <span className="badge-neutral">{item.value}</span>
+                    <div className="font-medium text-[#241232]">{item.label}</div>
+                    <span className="status-pill-neutral">{item.value}</span>
                   </div>
-                  <div className="mt-2 text-sm text-slate-400">{item.hint}</div>
+                  <div className="mt-2 text-sm text-[#6f6578]">{item.hint}</div>
                 </div>
               ))}
             </div>
@@ -261,12 +264,12 @@ export function RiskModelPage() {
 
           <section className="panel-subtle">
             <div className="flex items-center gap-3">
-              <ShieldAlert className="h-5 w-5 text-cyan-300" />
-              <h2 className="text-lg font-semibold text-white">Runtime contracts</h2>
+              <ShieldAlert className="h-5 w-5 text-[#7a3ccf]" />
+              <h2 className="text-lg font-semibold text-[#241232]">Runtime contracts</h2>
             </div>
             <div className="mt-5 space-y-3">
               {snapshot?.records.runtimeContracts.map((item) => (
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4 text-sm text-slate-300" key={item}>
+                <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#4f435c]" key={item}>
                   {item}
                 </div>
               ))}
@@ -274,6 +277,55 @@ export function RiskModelPage() {
           </section>
         </div>
       </section>
+
+      <RegModal
+        description="Confirm the scoring model, appetite bands, and escalation posture before risk calculations inherit these defaults."
+        footer={
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button className="button-secondary" disabled={saving} onClick={() => setReviewSaveOpen(false)} type="button">
+              Cancel
+            </button>
+            <button className="button-primary" disabled={saving} onClick={() => void handleSave()} type="button">
+              {saving ? 'Saving...' : 'Save risk model'}
+            </button>
+          </div>
+        }
+        onOpenChange={setReviewSaveOpen}
+        open={reviewSaveOpen}
+        title="Save risk model"
+      >
+        <div className="space-y-4 text-sm text-[#4f435c]">
+          <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+            <div className="font-semibold text-[#241232]">{draft.modelType}</div>
+            <div className="mt-2 text-[#6f6578]">Formula: {draft.formulaPreset}</div>
+            <div className="mt-1 text-[#6f6578]">
+              Scale: {draft.likelihoodScale} likelihood by {draft.impactScale} impact
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-3xl border border-[#ded8e4] bg-white p-4">
+              <div className="label">Acceptable max</div>
+              <div className="mt-2 font-semibold text-[#241232]">{draft.acceptableMax}</div>
+            </div>
+            <div className="rounded-3xl border border-[#ded8e4] bg-white p-4">
+              <div className="label">Monitor max</div>
+              <div className="mt-2 font-semibold text-[#241232]">{draft.monitorMax}</div>
+            </div>
+            <div className="rounded-3xl border border-[#ded8e4] bg-white p-4">
+              <div className="label">Mitigate max</div>
+              <div className="mt-2 font-semibold text-[#241232]">{draft.mitigateMax}</div>
+            </div>
+          </div>
+          <div className="rounded-3xl border border-[#ded8e4] bg-white p-4">
+            <div className="label">Escalation</div>
+            <div className="mt-2 text-[#4f435c]">
+              {draft.autoEscalationEnabled
+                ? `${draft.autoEscalationThreshold} risks escalate after ${draft.autoEscalationDays} days.`
+                : 'Auto escalation is disabled.'}
+            </div>
+          </div>
+        </div>
+      </RegModal>
     </div>
   );
 }

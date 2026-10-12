@@ -15,11 +15,13 @@ import {
 } from 'lucide-react';
 import { ApiClient } from '../../shared/api/client';
 import { useEdgeIdentity } from '../../shared/session/identity';
-import { CoachMarksPanel, type CoachMarkItem } from '../../components/CoachMarksPanel';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import {
+  RegPageHeader,
+  RegStatusPill,
+  RegTableShell,
+} from '../../components/regovise/PagePrimitives';
 import { Progress } from '../../components/ui/progress';
 import { Skeleton } from '../../components/ui/skeleton';
-import { cn } from '../../lib/utils';
 import { canAccessShellRoute, type ShellAccessProfile } from '../../shell/shellAccess';
 import type { OpsParityOverview } from '../ops/useOpsParityOverview';
 import type {
@@ -180,193 +182,14 @@ const EMPTY_ASSURANCE_OVERVIEW: AssuranceOverview = {
   workflowRuns: [],
 };
 
-function buildHomeCoachMarks(stage: HomeStage, access: ShellAccessProfile): { title: string; description: string; items: CoachMarkItem[] } {
-  const allItems: Record<HomeStage, { title: string; description: string; items: CoachMarkItem[] }> = {
-    setup: {
-      title: 'Set up the workspace in the order the product expects.',
-      description:
-        'Regovise works best when domains, team access, governance sources, and the first assessment are established in sequence instead of as isolated admin chores.',
-      items: [
-        {
-          id: 'setup-domains',
-          eyebrow: 'Boundaries',
-          title: 'Define domains first',
-          body: 'Domains and access boundaries decide what every later page, review, and package is allowed to see.',
-          route: '/workspace/domains',
-          ctaLabel: 'Open domains',
-        },
-        {
-          id: 'setup-team',
-          eyebrow: 'People',
-          title: 'Assign the operating team',
-          body: 'Invite administrators, contributors, and portal users before loading too much content into the workspace.',
-          route: '/workspace/team',
-          ctaLabel: 'Open team',
-        },
-        {
-          id: 'setup-frameworks',
-          eyebrow: 'Sources',
-          title: 'Load frameworks and controls',
-          body: 'Frameworks give assessments, evidence mapping, and reports a common source of truth.',
-          route: '/frameworks',
-          ctaLabel: 'Open frameworks',
-          tone: 'focus',
-        },
-        {
-          id: 'setup-assessments',
-          eyebrow: 'Launch',
-          title: 'Start the first assessment',
-          body: 'Once the foundations exist, assessments become the engine that creates evidence demand, review work, and package outputs.',
-          route: '/assessments',
-          ctaLabel: 'Open assessments',
-        },
-      ],
-    },
-    program: {
-      title: 'Think in one operating loop, not separate modules.',
-      description:
-        'Program work in Regovise starts with frameworks and domains, runs through assessments and supporting records, and then feeds evidence and assurance work.',
-      items: [
-        {
-          id: 'program-workspace',
-          eyebrow: 'Program',
-          title: 'This page is the operating layer',
-          body: 'Use Program as the place to orient the governance program before you dive into a specific workbench.',
-          route: '/program',
-          ctaLabel: 'Stay here',
-        },
-        {
-          id: 'program-assessments',
-          eyebrow: 'Assessments',
-          title: 'Assessments create the real work',
-          body: 'Risk and compliance assessments are where the program turns frameworks and business context into concrete action.',
-          route: '/assessments',
-          ctaLabel: 'Open assessments',
-          tone: 'focus',
-        },
-        {
-          id: 'program-evidence',
-          eyebrow: 'Evidence',
-          title: 'Evidence is downstream of program work',
-          body: 'Evidence and monitoring should support active assessments instead of being collected as an isolated archive.',
-          route: '/evidence-management',
-          ctaLabel: 'Open evidence',
-        },
-        {
-          id: 'program-assurance',
-          eyebrow: 'Outputs',
-          title: 'Assurance packages are the final product',
-          body: 'When the program is healthy, packages and reviews become the clean, shareable output of the system.',
-          route: '/assurance',
-          ctaLabel: 'Open assurance',
-        },
-      ],
-    },
-    assurance: {
-      title: 'Assurance is a chain, not a report folder.',
-      description:
-        'The assurance side of Regovise is meant to move from evidence intake to deterministic checks, human review, packages, and bounded automation.',
-      items: [
-        {
-          id: 'assurance-evidence',
-          eyebrow: 'Evidence',
-          title: 'Start with evidence intake',
-          body: 'Evidence jobs and source artifacts are the grounded inputs that the rest of assurance depends on.',
-          route: '/assurance/evidence',
-          ctaLabel: 'Open evidence explorer',
-        },
-        {
-          id: 'assurance-reviews',
-          eyebrow: 'Review',
-          title: 'Human review is part of the contract',
-          body: 'Recommendations, approval gates, and review history are first-class, not afterthoughts.',
-          route: '/assurance/reviews',
-          ctaLabel: 'Open review queue',
-          tone: 'focus',
-        },
-        {
-          id: 'assurance-packages',
-          eyebrow: 'Packages',
-          title: 'Packages assemble the shareable output',
-          body: '20x packages are where validation, reconciliation, lineage, and final report artifacts come together.',
-          route: '/assurance/packages',
-          ctaLabel: 'Open packages',
-        },
-        {
-          id: 'assurance-agents',
-          eyebrow: 'Automation',
-          title: 'Agent runs stay bounded and reviewable',
-          body: 'The automation layer is designed to explain itself and wait for approval instead of hiding decisions.',
-          route: '/assurance/agent-runs',
-          ctaLabel: 'Open agent runs',
-        },
-      ],
-    },
-    portal: {
-      title: 'Portal users stay on the external collaboration path.',
-      description:
-        'The portal flow exists so outside contributors can respond to assigned work without navigating the broader program and assurance shell.',
-      items: [
-        {
-          id: 'portal-assignments',
-          eyebrow: 'Assignments',
-          title: 'Start with assigned work',
-          body: 'The portal is for responding to specific requests, not for browsing the full compliance workspace.',
-          route: '/portal',
-          ctaLabel: 'Open portal',
-          tone: 'focus',
-        },
-        {
-          id: 'portal-requests',
-          eyebrow: 'Responses',
-          title: 'Complete evidence requests in place',
-          body: 'Keep external collaboration inside the portal flow instead of sending users into the admin shell.',
-          route: '/portal',
-          ctaLabel: 'Review assignments',
-        },
-        {
-          id: 'portal-access',
-          eyebrow: 'Identity',
-          title: 'Use My Access if something looks wrong',
-          body: 'If the wrong assignments or domains appear, check the current role and perimeter before escalating.',
-          route: '/workspace/me',
-          ctaLabel: 'Open My Access',
-        },
-      ],
-    },
-    workspace: {
-      title: 'This account is intentionally scoped.',
-      description:
-        'Regovise is keeping the workspace intentionally narrow until the role expands. That keeps limited users focused on the few places they actually need.',
-      items: [
-        {
-          id: 'workspace-access',
-          eyebrow: 'Access',
-          title: 'Check your current scope first',
-          body: 'My Access explains the active roles, groups, and domains shaping what this account can see.',
-          route: '/workspace/me',
-          ctaLabel: 'Open My Access',
-          tone: 'focus',
-        },
-      ],
-    },
-  };
-
-  const coachMarks = allItems[stage];
-  return {
-    ...coachMarks,
-    items: coachMarks.items.filter((item) => !item.route || canAccessShellRoute(item.route, access)),
-  };
-}
-
-function toneClasses(tone: WorklistItem['tone']) {
+function statusTone(tone: WorklistItem['tone']): 'success' | 'info' | 'warning' {
   if (tone === 'complete') {
-    return 'bg-emerald-400/10 text-emerald-300';
+    return 'success';
   }
   if (tone === 'active') {
-    return 'bg-cyan-400/10 text-cyan-300';
+    return 'info';
   }
-  return 'bg-amber-400/10 text-amber-300';
+  return 'warning';
 }
 
 function hasAnyProgramArea(access: ShellAccessProfile): boolean {
@@ -733,20 +556,18 @@ export function HomePage({ access }: HomePageProps) {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="panel">
+        <div className="rounded-lg border border-[#ded8e4] bg-white p-6">
           <Skeleton className="h-5 w-28 rounded-full" />
-          <Skeleton className="mt-4 h-10 w-[28rem] rounded-2xl" />
-          <Skeleton className="mt-4 h-20 w-full rounded-3xl" />
+          <Skeleton className="mt-4 h-9 w-full max-w-[28rem] rounded-md" />
+          <Skeleton className="mt-4 h-16 w-full rounded-md" />
         </div>
-        <div className="grid gap-4 lg:grid-cols-3">
-          {[0, 1, 2].map((item) => (
-            <Card key={item} className="border-white/10">
-              <CardContent className="p-6">
-                <Skeleton className="h-5 w-24 rounded-full" />
-                <Skeleton className="mt-4 h-8 w-20 rounded-2xl" />
-                <Skeleton className="mt-4 h-16 w-full rounded-3xl" />
-              </CardContent>
-            </Card>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {[0, 1, 2, 3].map((item) => (
+            <div className="rounded-lg border border-[#ded8e4] bg-white p-5" key={item}>
+              <Skeleton className="h-4 w-24 rounded-full" />
+              <Skeleton className="mt-4 h-8 w-20 rounded-md" />
+              <Skeleton className="mt-3 h-5 w-full rounded-md" />
+            </div>
           ))}
         </div>
       </div>
@@ -771,396 +592,314 @@ export function HomePage({ access }: HomePageProps) {
   ].filter(
     (item): item is { route: string; label: string; icon: typeof Search } => Boolean(item),
   );
-  const heroTitle =
-    derived.stage === 'portal'
-      ? 'Keep external collaboration moving from the right Regovise surface.'
-      : derived.stage === 'workspace'
-        ? 'Work from the Regovise areas assigned to this account.'
-        : 'Run the complete compliance program from Regovise.';
-  const hasCoreSnapshot = Boolean(data.core);
-  const primaryMetric = access.canUsePortal && !hasAnyProgramArea(access)
-    ? { label: 'Portal access', value: access.isAuditee ? 'Active' : 'Available', detail: 'This session is centered on external assignments and collaboration.' }
-    : { label: 'Assessments', value: String(derived.assessmentCount), detail: 'Risk and compliance work already running in this tenant.' };
-  const secondaryMetric = access.canUseAssurance
-    ? {
-        label: 'Assurance queue',
-        value: String(derived.assuranceSignals),
-        detail: 'Packages, pending reviews, and approval-gated assurance actions.',
-      }
-    : access.canUsePortal
-      ? {
-          label: 'Assigned surfaces',
-          value: access.canUsePortal ? 'Portal' : 'Workspace',
-          detail: 'The current account is focused on external collaboration and scoped workspace access.',
-        }
-      : {
-          label: 'Current access',
-          value: 'Scoped',
-          detail: 'This account only sees the routes and records allowed by the current role assignments.',
-        };
-
-  const stageCardTone =
+  const workQueueAvailable = canAccessShellRoute('/tasks', access);
+  const primaryAction = workQueueAvailable
+    ? { label: 'Open Work Queue', route: '/tasks' }
+    : derived.copy.primaryAction;
+  const secondaryAction =
+    primaryAction.route === derived.copy.primaryAction.route
+      ? derived.copy.secondaryAction
+      : derived.copy.primaryAction;
+  const stageTone =
     derived.stage === 'assurance'
-      ? 'bg-cyan-400/10 text-cyan-300'
-      : derived.stage === 'program'
-        ? 'bg-violet-400/10 text-violet-300'
-        : 'bg-amber-400/10 text-amber-300';
-  const coachMarks = buildHomeCoachMarks(derived.stage, access);
+      ? 'info'
+      : derived.stage === 'program' || derived.stage === 'portal'
+        ? 'purple'
+        : 'warning';
+  const readinessTone =
+    data.readiness?.status === 'pass'
+      ? 'success'
+      : data.readiness?.status === 'attention'
+        ? 'warning'
+        : 'danger';
+  const isPortalOnly = access.canUsePortal && !hasAnyProgramArea(access) && !access.canUseAssurance;
+  const summaryMetrics = isPortalOnly
+    ? [
+        {
+          label: 'Portal access',
+          value: access.isAuditee ? 'Active' : 'Available',
+          detail: 'External assignments and collaboration',
+          icon: Users,
+        },
+        {
+          label: 'Priority work',
+          value: String(derived.worklist.length),
+          detail: 'Items available to this role',
+          icon: Activity,
+        },
+        {
+          label: 'Workspace scope',
+          value: 'Scoped',
+          detail: 'Permission-aware route access',
+          icon: ShieldCheck,
+        },
+        {
+          label: 'Available areas',
+          value: String(derived.journeyCards.length),
+          detail: 'Product areas assigned to this account',
+          icon: ClipboardCheck,
+        },
+      ]
+    : [
+        {
+          label: 'Assessments',
+          value: String(derived.assessmentCount),
+          detail: 'Risk and compliance assessments',
+          icon: ClipboardCheck,
+        },
+        {
+          label: 'Priority work',
+          value: String(derived.worklist.length),
+          detail: 'Items needing the next action',
+          icon: Activity,
+        },
+        {
+          label: 'Evidence jobs',
+          value: String(core.counts.evidenceJobs),
+          detail: 'Collection jobs in the workspace',
+          icon: FileOutput,
+        },
+        {
+          label: 'Assurance queue',
+          value: String(derived.assuranceSignals),
+          detail: 'Packages, reviews, and writebacks',
+          icon: ShieldCheck,
+        },
+      ];
+  const progressValue =
+    access.isWorkspaceAdmin && data.ops
+      ? derived.quickStartProgress
+      : Math.min(100, derived.assuranceSignals > 0 ? 100 : derived.assessmentCount > 0 ? 65 : 25);
+  const progressLabel =
+    access.isWorkspaceAdmin && data.ops
+      ? `${derived.quickStartCompleted}/${data.ops.quickStart.length || 0} setup steps complete`
+      : `${derived.assessmentCount} active assessment${derived.assessmentCount === 1 ? '' : 's'}`;
 
   return (
     <div className="space-y-6">
-      <section className="panel grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <div>
-          <div className="eyebrow">{derived.copy.eyebrow}</div>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight text-white">
-            {heroTitle}
-          </h1>
-          <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300">{derived.copy.description}</p>
-          <div className="mt-5 flex flex-wrap gap-3">
-            <Link className="button-primary" to={derived.copy.primaryAction.route}>
-              {derived.copy.primaryAction.label}
+      <RegPageHeader
+        actions={
+          <>
+            <Link className="button-primary justify-center" to={primaryAction.route}>
+              {primaryAction.label}
             </Link>
-            <Link className="button-secondary" to={derived.copy.secondaryAction.route}>
-              {derived.copy.secondaryAction.label}
+            <Link className="button-secondary justify-center" to={secondaryAction.route}>
+              {secondaryAction.label}
             </Link>
-            <button className="button-secondary" onClick={() => void loadHome()} type="button">
+            <button className="button-secondary justify-center" onClick={() => void loadHome()} type="button">
               <RefreshCw className="mr-2 h-4 w-4" />
               Refresh
             </button>
-          </div>
-        </div>
-
-        <Card className="border-white/10">
-          <CardHeader className="pb-3">
-            <div className="eyebrow">Recommended posture</div>
-            <CardTitle className="flex items-center gap-3 text-xl text-white">
-              <span
-                className={cn(
-                  'inline-flex items-center rounded-full px-3 py-1 text-xs font-medium uppercase tracking-[0.18em]',
-                  stageCardTone,
-                )}
-              >
-                {STAGE_LABELS[derived.stage]}
-              </span>
-              {derived.copy.title}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-5 pt-0">
-            <div>
-              <div className="flex items-center justify-between text-xs uppercase tracking-[0.18em] text-slate-500">
-                <span>{access.isWorkspaceAdmin && data.ops ? 'Setup progress' : 'Workspace maturity'}</span>
-                <span>
-                  {access.isWorkspaceAdmin && data.ops
-                    ? `${derived.quickStartCompleted}/${data.ops.quickStart.length || 0}`
-                    : `${derived.assessmentCount} active assessment${derived.assessmentCount === 1 ? '' : 's'}`}
-                </span>
-              </div>
-              <Progress
-                className="mt-3 h-2"
-                value={access.isWorkspaceAdmin && data.ops ? derived.quickStartProgress : Math.min(100, derived.assuranceSignals > 0 ? 100 : 60)}
-              />
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="text-xs uppercase tracking-[0.18em] text-slate-500">{primaryMetric.label}</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{primaryMetric.value}</div>
-                <div className="mt-2 text-xs leading-5 text-slate-400">
-                  {primaryMetric.detail}
-                </div>
-              </div>
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                <div className="text-xs uppercase tracking-[0.18em] text-slate-500">{secondaryMetric.label}</div>
-                <div className="mt-2 text-2xl font-semibold text-white">{secondaryMetric.value}</div>
-                <div className="mt-2 text-xs leading-5 text-slate-400">
-                  {secondaryMetric.detail}
-                </div>
-              </div>
-            </div>
-            <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-xs uppercase tracking-[0.18em] text-slate-500">
-                    {access.canUseAssurance ? 'Assurance package readiness' : 'Current access surface'}
-                  </div>
-                  <div className="mt-2 text-sm font-medium text-white">
-                    {access.canUseAssurance
-                      ? data.readiness?.source.packageFileName ??
-                        (assurance.summary.packageCount > 0
-                          ? `${assurance.summary.packageCount} package${assurance.summary.packageCount === 1 ? '' : 's'} assembled`
-                          : 'No assurance package has been built yet')
-                      : access.canUsePortal
-                        ? 'This session is focused on portal-driven collaboration and assigned external work.'
-                        : 'This session is limited to the workspace capabilities currently assigned to your account.'}
-                  </div>
-                </div>
-                {access.canUseAssurance && data.readiness?.status ? (
-                  <span
-                    className={cn(
-                      'inline-flex items-center rounded-full px-3 py-1 text-xs font-medium uppercase tracking-[0.18em]',
-                      data.readiness.status === 'pass'
-                        ? 'bg-emerald-400/10 text-emerald-300'
-                        : data.readiness.status === 'attention'
-                          ? 'bg-amber-400/10 text-amber-300'
-                          : 'bg-rose-400/10 text-rose-300',
-                    )}
-                  >
-                    {data.readiness.status}
-                  </span>
-                ) : null}
-              </div>
-              <div className="mt-3 text-sm text-slate-400">
-                {access.canUseAssurance
-                  ? data.readiness?.source.packageRoute
-                    ? 'The current evidence, review, and package chain is ready to inspect from one place.'
-                    : 'Build an evidence-backed package to unlock review-ready assurance sharing from the Home surface.'
-                  : access.canUsePortal
-                    ? 'Open the auditee portal to respond to assigned work without exposing the broader workspace.'
-                    : 'Use My Access to confirm the current role or request broader access when you need additional workspace areas.'}
-              </div>
-              {access.canUseAssurance && data.readiness?.source.packageRoute ? (
-                <Link
-                  className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-cyan-300 transition hover:text-cyan-200"
-                  to={data.readiness.source.packageRoute}
-                >
-                  Open current package
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              ) : null}
-            </div>
-          </CardContent>
-        </Card>
-      </section>
-
-      <CoachMarksPanel
-        storageKey={`home-${derived.stage}`}
-        title={coachMarks.title}
-        description={coachMarks.description}
-        items={coachMarks.items}
+          </>
+        }
+        className="rounded-lg border border-[#ded8e4]"
+        description={derived.copy.description}
+        eyebrow="Home"
+        meta={
+          <>
+            <RegStatusPill tone={stageTone}>{STAGE_LABELS[derived.stage]}</RegStatusPill>
+            <span>{progressLabel}</span>
+          </>
+        }
+        title="Program health"
       />
 
-      <section className="grid gap-4 xl:grid-cols-3">
-        {derived.journeyCards.map((card) => (
-          <Link
-            key={card.id}
-            className="panel-subtle block transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
-            to={card.route}
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="text-lg font-semibold text-white">{card.title}</div>
-                <div className="mt-2 text-sm leading-6 text-slate-300">{card.description}</div>
+      <section aria-label="Program health summary" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {summaryMetrics.map((metric) => {
+          const Icon = metric.icon;
+          return (
+            <div className="rounded-lg border border-[#ded8e4] bg-white p-5" key={metric.label}>
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm font-semibold text-[#4f435c]">{metric.label}</span>
+                <Icon className="h-4 w-4 text-[#6f20c9]" />
               </div>
-              <span
-                className={cn(
-                  'inline-flex shrink-0 items-center rounded-full px-3 py-1 text-xs font-medium uppercase tracking-[0.18em]',
-                  toneClasses(card.tone),
-                )}
-              >
-                {card.statusLabel}
-              </span>
+              <div className="mt-3 text-2xl font-semibold text-[#241232]">{metric.value}</div>
+              <p className="mt-1 text-xs leading-5 text-[#6f6578]">{metric.detail}</p>
             </div>
-            <div className="mt-6 flex items-end justify-between gap-3">
-              <div>
-                <div className="text-3xl font-semibold text-white">{card.metric}</div>
-                <div className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">{card.metricLabel}</div>
-              </div>
-              <div className="inline-flex items-center gap-2 text-sm font-medium text-cyan-300">
-                Open
-                <ArrowRight className="h-4 w-4" />
-              </div>
-            </div>
-          </Link>
-        ))}
+          );
+        })}
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
-        <Card className="border-white/10">
-          <CardHeader>
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.65fr)]">
+        <RegTableShell>
+          <div className="border-b border-[#ded8e4] px-5 py-4">
             <div className="eyebrow">
               {derived.stage === 'setup'
                 ? 'Immediate setup work'
-                : derived.stage === 'program'
-                  ? 'Program focus'
-                  : derived.stage === 'portal'
-                    ? 'Portal focus'
-                    : derived.stage === 'workspace'
-                      ? 'Current access'
-                      : 'Assurance attention queue'}
+                : derived.stage === 'assurance'
+                  ? 'Assurance attention queue'
+                  : 'Priority work'}
             </div>
-            <CardTitle className="text-2xl text-white">
-              {derived.stage === 'setup'
-                ? 'Finish the few steps that unlock the rest of the platform.'
-                : derived.stage === 'program'
-                  ? 'Keep the program moving without losing the operating picture.'
-                  : derived.stage === 'portal'
-                    ? 'Move external assignments forward from the surfaces your role is meant to use.'
-                    : derived.stage === 'workspace'
-                      ? 'Start with your current access and expand only when the work calls for it.'
-                      : 'Review the items most likely to block a package or approval flow.'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+            <h2 className="mt-1 text-lg font-semibold text-[#241232]">What needs attention next</h2>
+          </div>
+          <div className="divide-y divide-[#ded8e4]">
             {derived.worklist.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-white/10 bg-slate-950/20 p-5 text-sm text-slate-400">
-                No immediate items are queued here right now. Use the next recommended workspace to move into the right operating area for this role.
+              <div className="px-5 py-8 text-sm text-[#6f6578]">
+                No immediate items are queued. Open the recommended workspace to continue the program.
               </div>
             ) : (
               derived.worklist.map((item) => (
                 <Link
+                  className="flex flex-col gap-3 px-5 py-4 transition hover:bg-[#f7f2ff] sm:flex-row sm:items-start sm:justify-between"
                   key={item.id}
-                  className="block rounded-3xl border border-white/10 bg-slate-950/30 p-4 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
                   to={item.route}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="font-medium text-white">{item.title}</div>
-                      <div className="mt-1 text-sm leading-6 text-slate-400">{item.detail}</div>
-                    </div>
-                    <span
-                      className={cn(
-                        'inline-flex shrink-0 items-center rounded-full px-3 py-1 text-xs font-medium uppercase tracking-[0.18em]',
-                        toneClasses(item.tone),
-                      )}
-                    >
-                      {item.statusLabel}
-                    </span>
-                  </div>
+                  <span className="min-w-0">
+                    <span className="block font-medium text-[#241232]">{item.title}</span>
+                    <span className="mt-1 block text-sm leading-6 text-[#6f6578]">{item.detail}</span>
+                  </span>
+                  <RegStatusPill className="shrink-0 self-start" tone={statusTone(item.tone)}>
+                    {item.statusLabel}
+                  </RegStatusPill>
                 </Link>
               ))
             )}
-          </CardContent>
-        </Card>
+          </div>
+          {workQueueAvailable ? (
+            <div className="border-t border-[#ded8e4] bg-[#fbf9fc] px-5 py-3">
+              <Link className="inline-flex items-center gap-2 text-sm font-semibold text-[#6f20c9]" to="/tasks">
+                Open full Work Queue
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          ) : null}
+        </RegTableShell>
 
         <div className="space-y-4">
-          <Card className="border-white/10">
-            <CardHeader className="pb-3">
-              <div className="eyebrow">Workspace snapshot</div>
-              <CardTitle className="text-xl text-white">
-                {hasCoreSnapshot ? 'What is already active' : 'What this role is focused on'}
-              </CardTitle>
-            </CardHeader>
-            {hasCoreSnapshot ? (
-              <CardContent className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                  <div className="flex items-center gap-2 text-sm font-medium text-white">
-                    <Users className="h-4 w-4 text-cyan-300" />
-                    Domains and access
-                  </div>
-                  <div className="mt-3 text-2xl font-semibold text-white">{core.counts.domains}</div>
-                  <div className="mt-1 text-xs text-slate-400">
-                    {core.counts.users} team members and {core.counts.roleAssignments} assignments.
-                  </div>
-                </div>
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                  <div className="flex items-center gap-2 text-sm font-medium text-white">
-                    <ShieldCheck className="h-4 w-4 text-cyan-300" />
-                    Governance sources
-                  </div>
-                  <div className="mt-3 text-2xl font-semibold text-white">{core.counts.frameworks}</div>
-                  <div className="mt-1 text-xs text-slate-400">Frameworks ready to support policy and assessment work.</div>
-                </div>
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                  <div className="flex items-center gap-2 text-sm font-medium text-white">
-                    <Activity className="h-4 w-4 text-cyan-300" />
-                    Monitoring activity
-                  </div>
-                  <div className="mt-3 text-2xl font-semibold text-white">{core.counts.conMonExecutions}</div>
-                  <div className="mt-1 text-xs text-slate-400">Continuous-monitoring runs already captured in the workspace.</div>
-                </div>
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
-                  <div className="flex items-center gap-2 text-sm font-medium text-white">
-                    <FileOutput className="h-4 w-4 text-cyan-300" />
-                    Evidence collection
-                  </div>
-                  <div className="mt-3 text-2xl font-semibold text-white">{core.counts.evidenceJobs}</div>
-                  <div className="mt-1 text-xs text-slate-400">Evidence jobs that can now feed review and package workflows.</div>
-                </div>
-              </CardContent>
-            ) : (
-              <CardContent className="space-y-3">
-                <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4 text-sm leading-6 text-slate-300">
-                  {access.canUsePortal
-                    ? 'This account is centered on portal collaboration and scoped external work rather than the broader program workspace.'
-                    : 'This account currently has a narrower workspace role, so Regovise is only presenting the areas needed for the assigned work.'}
-                </div>
-              </CardContent>
-            )}
-          </Card>
+          <section className="rounded-lg border border-[#ded8e4] bg-white p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="eyebrow">Current posture</div>
+                <h2 className="mt-1 text-lg font-semibold text-[#241232]">{derived.copy.title}</h2>
+              </div>
+              {access.canUseAssurance && data.readiness?.status ? (
+                <RegStatusPill tone={readinessTone}>{data.readiness.status}</RegStatusPill>
+              ) : null}
+            </div>
+            <div className="mt-5 flex items-center justify-between gap-3 text-xs font-medium text-[#62576a]">
+              <span>{access.isWorkspaceAdmin && data.ops ? 'Setup progress' : 'Program maturity'}</span>
+              <span>{progressLabel}</span>
+            </div>
+            <Progress className="mt-3 h-2" value={progressValue} />
+            <div className="mt-5 border-t border-[#ded8e4] pt-4">
+              <div className="text-xs font-semibold uppercase text-[#62576a]">Current package</div>
+              <div className="mt-2 text-sm font-medium text-[#241232]">
+                {data.readiness?.source.packageFileName ??
+                  (assurance.summary.packageCount > 0
+                    ? `${assurance.summary.packageCount} package${assurance.summary.packageCount === 1 ? '' : 's'} assembled`
+                    : access.canUseAssurance
+                      ? 'No assurance package assembled yet'
+                      : 'Not available for this role')}
+              </div>
+              {data.readiness?.source.packageRoute ? (
+                <Link
+                  className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-[#6f20c9]"
+                  to={data.readiness.source.packageRoute}
+                >
+                  Review package
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              ) : null}
+            </div>
+          </section>
 
-          <Card className="border-white/10">
-            <CardHeader className="pb-3">
-              <div className="eyebrow">Useful next places</div>
-              <CardTitle className="text-xl text-white">Jump straight to the right workspace</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <section className="rounded-lg border border-[#ded8e4] bg-white p-5">
+            <div className="eyebrow">Quick links</div>
+            <h2 className="mt-1 text-lg font-semibold text-[#241232]">Jump to a workspace</h2>
+            <div className="mt-3 divide-y divide-[#ded8e4]">
               {nextPlaces.length === 0 ? (
-                <div className="rounded-3xl border border-dashed border-white/10 bg-slate-950/20 p-5 text-sm text-slate-400">
-                  Open My Access to review the current role and request broader workspace capabilities if you need them.
-                </div>
+                <Link className="flex min-h-11 items-center justify-between text-sm text-[#4f435c]" to="/workspace/me">
+                  Review My Access
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               ) : (
                 nextPlaces.map((item) => {
                   const Icon = item.icon;
                   return (
                     <Link
+                      className="flex min-h-11 items-center justify-between gap-3 py-2 text-sm text-[#4f435c] hover:text-[#241232]"
                       key={item.route}
-                      className="flex items-center justify-between rounded-3xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-slate-200 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
                       to={item.route}
                     >
-                      <span className="flex items-center gap-3">
-                        <Icon className="h-4 w-4 text-cyan-300" />
-                        {item.label}
+                      <span className="flex min-w-0 items-center gap-3">
+                        <Icon className="h-4 w-4 shrink-0 text-[#6f20c9]" />
+                        <span>{item.label}</span>
                       </span>
-                      <ArrowRight className="h-4 w-4 text-slate-500" />
+                      <ArrowRight className="h-4 w-4 shrink-0 text-[#62576a]" />
                     </Link>
                   );
                 })
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section>
+        <div className="mb-3">
+          <div className="eyebrow">Program areas</div>
+          <h2 className="mt-1 text-lg font-semibold text-[#241232]">Work across the program without losing context</h2>
+        </div>
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        {derived.journeyCards.map((card) => (
+          <Link
+            key={card.id}
+            className="flex min-h-[11rem] flex-col justify-between rounded-lg border border-[#ded8e4] bg-white p-5 transition hover:border-[#b891f2] hover:bg-[#f7f2ff]"
+            to={card.route}
+          >
+            <div>
+              <div className="flex items-start justify-between gap-3">
+                <div className="text-base font-semibold text-[#241232]">{card.title}</div>
+                <RegStatusPill className="shrink-0" tone={statusTone(card.tone)}>
+                  {card.statusLabel}
+                </RegStatusPill>
+              </div>
+              <div className="mt-2 text-sm leading-6 text-[#4f435c]">{card.description}</div>
+            </div>
+            <div className="mt-5 flex items-end justify-between gap-3 border-t border-[#ded8e4] pt-4">
+              <div>
+                <div className="text-xl font-semibold text-[#241232]">{card.metric}</div>
+                <div className="mt-1 text-xs text-[#62576a]">{card.metricLabel}</div>
+              </div>
+              <ArrowRight className="h-4 w-4 text-[#6f20c9]" />
+            </div>
+          </Link>
+        ))}
         </div>
       </section>
 
       {access.isWorkspaceAdmin && data.readiness?.checks.some((check) => check.status !== 'pass') ? (
-        <section className="panel-subtle">
-          <div className="flex items-start gap-3">
-            <div className="mt-1 flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-400/10 text-amber-300">
-              <AlertTriangle className="h-5 w-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <h2 className="text-lg font-semibold text-white">Assurance package readiness needs attention</h2>
-              <p className="mt-1 text-sm leading-6 text-slate-400">
-                The current package chain has open readiness checks. Review the flagged evidence, package, or agent work before treating it as fully share-ready.
+        <RegTableShell>
+          <div className="flex items-start gap-3 border-b border-[#ded8e4] px-5 py-4">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[#8a4d00]" />
+            <div>
+              <h2 className="text-lg font-semibold text-[#241232]">Assurance package readiness needs attention</h2>
+              <p className="mt-1 text-sm leading-6 text-[#6f6578]">
+                Review open deterministic checks before treating the package as share-ready.
               </p>
-              <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                {data.readiness.checks
-                  .filter((check) => check.status !== 'pass')
-                  .slice(0, 6)
-                  .map((check) => (
-                    <Link
-                      key={check.id}
-                      className="rounded-3xl border border-white/10 bg-slate-950/30 p-4 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
-                      to={check.route ?? '/assurance'}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="font-medium text-white">{check.title}</div>
-                        <span
-                          className={cn(
-                            'inline-flex shrink-0 items-center rounded-full px-3 py-1 text-xs font-medium uppercase tracking-[0.18em]',
-                            check.status === 'attention'
-                              ? 'bg-amber-400/10 text-amber-300'
-                              : 'bg-rose-400/10 text-rose-300',
-                          )}
-                        >
-                          {check.status}
-                        </span>
-                      </div>
-                      <div className="mt-3 text-sm leading-6 text-slate-400">{check.detail}</div>
-                    </Link>
-                  ))}
-              </div>
             </div>
           </div>
-        </section>
+          <div className="divide-y divide-[#ded8e4]">
+            {data.readiness.checks
+              .filter((check) => check.status !== 'pass')
+              .slice(0, 6)
+              .map((check) => (
+                <Link
+                  className="flex flex-col gap-3 px-5 py-4 hover:bg-[#f7f2ff] sm:flex-row sm:items-start sm:justify-between"
+                  key={check.id}
+                  to={check.route ?? '/assurance'}
+                >
+                  <span className="min-w-0">
+                    <span className="block font-medium text-[#241232]">{check.title}</span>
+                    <span className="mt-1 block text-sm leading-6 text-[#6f6578]">{check.detail}</span>
+                  </span>
+                  <RegStatusPill tone={check.status === 'attention' ? 'warning' : 'danger'}>
+                    {check.status}
+                  </RegStatusPill>
+                </Link>
+              ))}
+          </div>
+        </RegTableShell>
       ) : null}
     </div>
   );

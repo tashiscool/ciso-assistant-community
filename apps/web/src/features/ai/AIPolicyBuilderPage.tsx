@@ -30,12 +30,12 @@ function formatDate(value: string) {
 
 function badgeClass(status: string) {
   if (status === 'Finished' || status === 'Complete') {
-    return 'badge-success';
+    return 'status-pill-success';
   }
   if (status === 'Attention') {
-    return 'badge-danger';
+    return 'status-pill-danger';
   }
-  return 'badge-neutral';
+  return 'status-pill-neutral';
 }
 
 function slugify(value: string) {
@@ -661,7 +661,7 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
 
   if (loading || !workspace) {
     return (
-      <div className="panel p-6 text-sm text-slate-300">
+      <div className="panel p-6 text-sm text-[#4f435c]">
         Loading {isSecurityProfilesSurface ? 'Security Profiles' : 'AI Policy Builder'}...
       </div>
     );
@@ -682,20 +682,20 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
       <section className="panel grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <div>
           <div className="eyebrow">{isSecurityProfilesSurface ? 'Security Profiles' : 'AI Policy Builder'}</div>
-          <h1 className="mt-2 text-3xl font-semibold text-white">
+          <h1 className="mt-2 text-3xl font-semibold text-[#241232]">
             {isSecurityProfilesSurface
               ? 'Build reusable security baselines from loaded catalogues and imported profile JSON'
               : 'Standardize policy requirements from profiles and control catalogues'}
           </h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
             {isSecurityProfilesSurface
               ? 'Use loaded control catalogues as baseline sources, import compatible profile JSON when the parent catalogues already exist, and activate the resulting control set through tenant-backed builder sessions.'
               : 'Launch the builder from a policy context, queue mapped controls from security profiles or manual catalogue picks, then batch-create standardized requirements that stay editable after generation.'}
           </p>
-          <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-400">
-            <span className="badge-neutral">{isSecurityProfilesSurface ? 'Baseline workspace' : 'Policy wizard'}</span>
-            <span className="badge-neutral">D1-backed queue</span>
-            <span className="badge-neutral">{isSecurityProfilesSurface ? 'JSON import/export' : 'Control deduplication'}</span>
+          <div className="mt-4 flex flex-wrap gap-2 text-xs text-[#6f6578]">
+            <span className="status-pill-neutral">{isSecurityProfilesSurface ? 'Baseline workspace' : 'Policy wizard'}</span>
+            <span className="status-pill-neutral">D1-backed queue</span>
+            <span className="status-pill-neutral">{isSecurityProfilesSurface ? 'JSON import/export' : 'Control deduplication'}</span>
           </div>
           {isSecurityProfilesSurface ? (
             <div className="mt-4 flex flex-wrap gap-3">
@@ -709,28 +709,28 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
           ) : null}
         </div>
         <div className="panel-subtle space-y-3">
-          <div className="text-xs uppercase tracking-[0.22em] text-slate-500">
+          <div className="text-xs uppercase tracking-[0.22em] text-[#62576a]">
             {isSecurityProfilesSurface ? 'Baseline Context' : 'Policy Context'}
           </div>
-          <div className="text-lg font-semibold text-white">{workspace.policyContext.name}</div>
-          <div className="text-sm text-slate-300">Owner: {workspace.policyContext.owner}</div>
-          <div className="text-sm text-slate-300">Location: {workspace.policyContext.location}</div>
-          <div className="grid gap-2 text-sm text-slate-300">
-            <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2">
+          <div className="text-lg font-semibold text-[#241232]">{workspace.policyContext.name}</div>
+          <div className="text-sm text-[#4f435c]">Owner: {workspace.policyContext.owner}</div>
+          <div className="text-sm text-[#4f435c]">Location: {workspace.policyContext.location}</div>
+          <div className="grid gap-2 text-sm text-[#4f435c]">
+            <div className="flex items-center justify-between rounded-2xl border border-[#ded8e4] bg-white px-3 py-2">
               <span>Profiles configured</span>
-              <span className={workspace.policyContext.readiness.profilesConfigured ? 'badge-success' : 'badge-danger'}>
+              <span className={workspace.policyContext.readiness.profilesConfigured ? 'status-pill-success' : 'status-pill-danger'}>
                 {workspace.policyContext.readiness.profilesConfigured ? 'Ready' : 'Missing'}
               </span>
             </div>
-            <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2">
+            <div className="flex items-center justify-between rounded-2xl border border-[#ded8e4] bg-white px-3 py-2">
               <span>Control catalogues loaded</span>
-              <span className={workspace.policyContext.readiness.controlCataloguesLoaded ? 'badge-success' : 'badge-danger'}>
+              <span className={workspace.policyContext.readiness.controlCataloguesLoaded ? 'status-pill-success' : 'status-pill-danger'}>
                 {workspace.policyContext.readiness.controlCataloguesLoaded ? 'Ready' : 'Missing'}
               </span>
             </div>
-            <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2">
+            <div className="flex items-center justify-between rounded-2xl border border-[#ded8e4] bg-white px-3 py-2">
               <span>Existing requirements</span>
-              <span className="badge-neutral">{workspace.policyContext.readiness.existingRequirementCount}</span>
+              <span className="status-pill-neutral">{workspace.policyContext.readiness.existingRequirementCount}</span>
             </div>
           </div>
         </div>
@@ -744,19 +744,19 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
         <section className="panel-subtle grid gap-4 md:grid-cols-3">
           <div>
             <div className="label">Manual creation</div>
-            <div className="mt-2 text-sm leading-6 text-slate-300">
+            <div className="mt-2 text-sm leading-6 text-[#4f435c]">
               Build baseline sessions directly from tenant catalogues, then combine controls across multiple frameworks in the queue when one catalogue is not enough.
             </div>
           </div>
           <div>
             <div className="label">Automated import</div>
-            <div className="mt-2 text-sm leading-6 text-slate-300">
+            <div className="mt-2 text-sm leading-6 text-[#4f435c]">
               Import compatible profile JSON, preview the baseline, and queue any controls that match catalogues already loaded in this tenant.
             </div>
           </div>
           <div>
             <div className="label">Security-plan activation</div>
-            <div className="mt-2 text-sm leading-6 text-slate-300">
+            <div className="mt-2 text-sm leading-6 text-[#4f435c]">
               Activation sessions feed downstream requirement and security-plan preparation work without creating a second hidden baseline store.
             </div>
           </div>
@@ -766,9 +766,9 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {metrics.map((metric) => (
           <article key={metric.label} className="panel-subtle">
-            <div className="text-xs uppercase tracking-[0.22em] text-slate-500">{metric.label}</div>
-            <div className="mt-3 text-3xl font-semibold text-white">{metric.value}</div>
-            <div className="mt-2 text-sm text-slate-400">{metric.detail}</div>
+            <div className="text-xs uppercase tracking-[0.22em] text-[#62576a]">{metric.label}</div>
+            <div className="mt-3 text-3xl font-semibold text-[#241232]">{metric.value}</div>
+            <div className="mt-2 text-sm text-[#6f6578]">{metric.detail}</div>
           </article>
         ))}
       </section>
@@ -778,7 +778,7 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="eyebrow">Sessions</div>
-              <div className="mt-2 text-lg font-semibold text-white">
+              <div className="mt-2 text-lg font-semibold text-[#241232]">
                 {isSecurityProfilesSurface ? 'Profile Activation Sessions' : 'Policy Builder Sessions'}
               </div>
             </div>
@@ -791,26 +791,26 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
             {workspace.sessions.map((session) => (
               <button
                 key={session.id}
-                className={`panel-subtle w-full text-left transition ${selectedSessionId === session.id ? 'border-cyan-300/40 bg-cyan-400/[0.06]' : ''}`}
+                className={`panel-subtle w-full text-left transition ${selectedSessionId === session.id ? 'border-[#c7a9ed] bg-[#f2e8ff]' : ''}`}
                 onClick={() => setSelectedSessionId(session.id)}
                 type="button"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="text-sm font-semibold text-white">{session.title}</div>
-                    <div className="mt-1 text-xs text-slate-400">{session.policyLocation}</div>
+                    <div className="text-sm font-semibold text-[#241232]">{session.title}</div>
+                    <div className="mt-1 text-xs text-[#6f6578]">{session.policyLocation}</div>
                   </div>
                   <span className={badgeClass(session.status)}>{session.status}</span>
                 </div>
-                <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-400">
+                <div className="mt-3 flex flex-wrap gap-2 text-xs text-[#6f6578]">
                   <span>{session.queuedControls} queued</span>
                   <span>Owner: {session.owner}</span>
                 </div>
-                <div className="mt-2 text-xs text-slate-500">Saved {formatDate(session.lastSavedAt)}</div>
+                <div className="mt-2 text-xs text-[#62576a]">Saved {formatDate(session.lastSavedAt)}</div>
               </button>
             ))}
             {workspace.sessions.length === 0 && (
-              <div className="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-center text-sm text-slate-400">
+              <div className="rounded-2xl border border-dashed border-[#ded8e4] px-4 py-8 text-center text-sm text-[#6f6578]">
                 {isSecurityProfilesSurface
                   ? 'No profile activation sessions yet. Create one to turn a baseline into queue-ready controls.'
                   : 'No builder sessions yet. Create one to start generating policy requirements.'}
@@ -821,7 +821,7 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
 
         <section className="panel space-y-6">
           {detailLoading && (
-            <div className="text-sm text-slate-400">
+            <div className="text-sm text-[#6f6578]">
               Loading {isSecurityProfilesSurface ? 'profile activation' : 'builder'} session...
             </div>
           )}
@@ -830,8 +830,8 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <div className="eyebrow">{isSecurityProfilesSurface ? 'Activation Flow' : 'Wizard'}</div>
-                  <div className="mt-2 text-2xl font-semibold text-white">{detail.session.title}</div>
-                  <div className="mt-2 text-sm text-slate-300">
+                  <div className="mt-2 text-2xl font-semibold text-[#241232]">{detail.session.title}</div>
+                  <div className="mt-2 text-sm text-[#4f435c]">
                     Owner: {detail.session.owner} · Policy location: {detail.session.policyLocation}
                   </div>
                 </div>
@@ -847,7 +847,7 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
               </div>
 
               <label className="block space-y-2">
-                <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Session title</span>
+                <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Session title</span>
                 <input
                   className="input"
                   value={titleDraft}
@@ -867,7 +867,7 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                   <div className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
                     <div className="space-y-3">
                       <label className="block space-y-2">
-                        <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Security Profile</span>
+                        <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Security Profile</span>
                         <select className="input" value={selectedProfileId} onChange={(event) => setSelectedProfileId(event.target.value)}>
                           {availableProfiles.map((profile) => (
                             <option key={profile.id} value={profile.id}>
@@ -877,11 +877,11 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                         </select>
                       </label>
                       {isSecurityProfilesSurface ? (
-                        <div className="space-y-3 rounded-2xl border border-white/10 bg-slate-950/50 p-4">
+                        <div className="space-y-3 rounded-2xl border border-[#ded8e4] bg-white p-4">
                           <div className="flex items-center justify-between gap-3">
                             <div>
-                              <div className="text-sm font-medium text-white">Import or export profile JSON</div>
-                              <div className="mt-1 text-xs leading-5 text-slate-400">
+                              <div className="text-sm font-medium text-[#241232]">Import or export profile JSON</div>
+                              <div className="mt-1 text-xs leading-5 text-[#6f6578]">
                                 Imported profiles stay in this workspace session and queue successfully only when matching catalogues already exist in the tenant.
                               </div>
                             </div>
@@ -893,7 +893,7 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                             ) : null}
                           </div>
                           <label className="block space-y-2">
-                            <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Import profile file</span>
+                            <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Import profile file</span>
                             <input
                               className="input"
                               type="file"
@@ -919,15 +919,15 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                         </div>
                       ) : null}
                       {isSecurityProfilesSurface ? (
-                        <div className="space-y-3 rounded-2xl border border-white/10 bg-slate-950/50 p-4">
+                        <div className="space-y-3 rounded-2xl border border-[#ded8e4] bg-white p-4">
                           <div>
-                            <div className="text-sm font-medium text-white">Manual profile creation</div>
-                            <div className="mt-1 text-xs leading-5 text-slate-400">
+                            <div className="text-sm font-medium text-[#241232]">Manual profile creation</div>
+                            <div className="mt-1 text-xs leading-5 text-[#6f6578]">
                               Build a reusable baseline by selecting controls from one catalogue family at a time, then save the draft as a local security profile.
                             </div>
                           </div>
                           <label className="block space-y-2">
-                            <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Draft profile title</span>
+                            <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Draft profile title</span>
                             <input
                               className="input"
                               value={manualProfileLabel}
@@ -936,7 +936,7 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                             />
                           </label>
                           <label className="block space-y-2">
-                            <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Draft description</span>
+                            <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Draft description</span>
                             <textarea
                               className="input min-h-24"
                               value={manualProfileDescription}
@@ -945,7 +945,7 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                             />
                           </label>
                           <label className="block space-y-2">
-                            <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Catalogue family</span>
+                            <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Catalogue family</span>
                             <select className="input" value={selectedFamilyName} onChange={(event) => setSelectedFamilyName(event.target.value)}>
                               {selectedCatalogueFamilies.map((entry) => (
                                 <option key={entry.family} value={entry.family}>
@@ -972,18 +972,18 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                               Add selected control
                             </button>
                           </div>
-                          <div className="grid gap-3 text-sm text-slate-300 sm:grid-cols-3">
+                          <div className="grid gap-3 text-sm text-[#4f435c] sm:grid-cols-3">
                             <div className="panel-subtle">
                               <div className="label">Draft controls</div>
-                              <div className="mt-2 text-white">{manualDraftControls.length}</div>
+                              <div className="mt-2 text-[#241232]">{manualDraftControls.length}</div>
                             </div>
                             <div className="panel-subtle">
                               <div className="label">Catalogues used</div>
-                              <div className="mt-2 text-white">{manualDraftCatalogues.length}</div>
+                              <div className="mt-2 text-[#241232]">{manualDraftCatalogues.length}</div>
                             </div>
                             <div className="panel-subtle">
                               <div className="label">Families covered</div>
-                              <div className="mt-2 text-white">{manualDraftFamilies.length}</div>
+                              <div className="mt-2 text-[#241232]">{manualDraftFamilies.length}</div>
                             </div>
                           </div>
                           <div className="flex flex-wrap gap-2">
@@ -1004,17 +1004,17 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                               Clear draft
                             </button>
                           </div>
-                          <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-3">
-                            <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Draft preview</div>
+                          <div className="rounded-2xl border border-[#ded8e4] bg-white p-3">
+                            <div className="text-xs uppercase tracking-[0.18em] text-[#62576a]">Draft preview</div>
                             <div className="mt-3 space-y-2 text-sm">
                               {manualDraftControls.slice(0, 8).map((entry) => (
                                 <div
                                   key={`${entry.catalogueName}::${entry.control.controlId}`}
-                                  className="flex items-center justify-between gap-3 rounded-2xl border border-white/5 px-3 py-2"
+                                  className="flex items-center justify-between gap-3 rounded-2xl border border-[#eeeaf2] px-3 py-2"
                                 >
                                   <div>
-                                    <div className="font-medium text-white">{entry.control.controlId}</div>
-                                    <div className="text-xs text-slate-400">
+                                    <div className="font-medium text-[#241232]">{entry.control.controlId}</div>
+                                    <div className="text-xs text-[#6f6578]">
                                       {entry.catalogueName} · {entry.control.family}
                                     </div>
                                   </div>
@@ -1028,12 +1028,12 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                                 </div>
                               ))}
                               {manualDraftControls.length > 8 ? (
-                                <div className="text-xs text-slate-500">
+                                <div className="text-xs text-[#62576a]">
                                   Showing the first 8 controls in the draft preview.
                                 </div>
                               ) : null}
                               {manualDraftControls.length === 0 ? (
-                                <div className="text-sm text-slate-400">
+                                <div className="text-sm text-[#6f6578]">
                                   Add a family or a specific control to start building a manual security profile.
                                 </div>
                               ) : null}
@@ -1049,7 +1049,7 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                         <Sparkles className="h-4 w-4" />
                         {isSecurityProfilesSurface ? 'Queue baseline controls' : 'Queue profile controls'}
                       </button>
-                      <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">
+                      <div className="rounded-2xl border border-[#ded8e4] bg-white p-4 text-sm text-[#4f435c]">
                         {isSecurityProfilesSurface
                           ? 'Selecting a profile queues its mapped controls, skips duplicates already present in the policy context, and keeps the baseline queue available across the remaining activation steps.'
                           : 'Selecting a profile queues all mapped controls, skips duplicates already in the policy context, and preserves the queue across wizard steps.'}
@@ -1057,15 +1057,15 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                     </div>
                     <div className="panel-subtle">
                       <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div className="flex items-center gap-2 text-white">
-                          <ShieldCheck className="h-4 w-4 text-cyan-300" />
+                        <div className="flex items-center gap-2 text-[#241232]">
+                          <ShieldCheck className="h-4 w-4 text-[#7a3ccf]" />
                           <span className="font-semibold">{currentProfile?.label ?? 'No profile selected'}</span>
                         </div>
-                        <span className="badge-neutral">{currentProfile?.controls.length ?? 0} controls</span>
+                        <span className="status-pill-neutral">{currentProfile?.controls.length ?? 0} controls</span>
                       </div>
-                      <div className="mt-2 text-sm text-slate-300">{currentProfile?.description}</div>
+                      <div className="mt-2 text-sm text-[#4f435c]">{currentProfile?.description}</div>
                       {currentLocalProfile ? (
-                        <div className="mt-3 rounded-2xl border border-cyan-400/20 bg-cyan-400/5 px-3 py-2 text-xs leading-5 text-cyan-100">
+                        <div className="mt-3 rounded-2xl border border-[#d7c3f1] bg-[#f6f1fa] px-3 py-2 text-xs leading-5 text-[#5f1aa8]">
                           {currentLocalProfile.sourceKind === 'imported'
                             ? `Imported from ${currentLocalProfile.fileName} on ${formatDate(currentLocalProfile.createdAt)}.`
                             : `Manually drafted in this workspace on ${formatDate(currentLocalProfile.createdAt)}.`}
@@ -1073,37 +1073,37 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                       ) : null}
                       <div className="mt-4 flex flex-wrap gap-2">
                         {(currentProfile?.catalogues ?? []).map((catalogue) => (
-                          <span key={catalogue} className="badge-neutral">
+                          <span key={catalogue} className="status-pill-neutral">
                             {catalogue}
                           </span>
                         ))}
                       </div>
-                      <div className="mt-4 grid gap-3 text-sm text-slate-300 sm:grid-cols-3">
+                      <div className="mt-4 grid gap-3 text-sm text-[#4f435c] sm:grid-cols-3">
                         <div className="panel-subtle">
                           <div className="label">Catalogues</div>
-                          <div className="mt-2 text-white">{currentProfile?.catalogues.length ?? 0}</div>
+                          <div className="mt-2 text-[#241232]">{currentProfile?.catalogues.length ?? 0}</div>
                         </div>
                         <div className="panel-subtle">
                           <div className="label">Families</div>
-                          <div className="mt-2 text-white">
+                          <div className="mt-2 text-[#241232]">
                             {currentProfile ? new Set(currentProfile.controls.map((control) => control.family || 'Uncategorized')).size : 0}
                           </div>
                         </div>
                         <div className="panel-subtle">
                           <div className="label">Source</div>
-                          <div className="mt-2 text-white">
+                          <div className="mt-2 text-[#241232]">
                             {currentLocalProfile ? (currentLocalProfile.sourceKind === 'imported' ? 'Imported JSON' : 'Manual Draft') : 'Tenant Derived'}
                           </div>
                         </div>
                       </div>
                       {(currentProfile?.controls.length ?? 0) > previewControls.length ? (
-                        <div className="mt-4 text-xs text-slate-500">
+                        <div className="mt-4 text-xs text-[#62576a]">
                           Showing the first {previewControls.length} controls in this profile preview.
                         </div>
                       ) : null}
-                      <div className="mt-4 overflow-hidden rounded-2xl border border-white/10">
+                      <div className="mt-4 overflow-hidden rounded-2xl border border-[#ded8e4]">
                         <table className="min-w-full text-left text-sm">
-                          <thead className="bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
+                          <thead className="bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
                             <tr>
                               <th className="px-4 py-3">Control</th>
                               <th className="px-4 py-3">Title</th>
@@ -1112,15 +1112,15 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                           </thead>
                           <tbody>
                             {previewControls.map((control) => (
-                              <tr key={control.controlId} className="border-t border-white/5">
-                                <td className="px-4 py-3 font-medium text-white">{control.controlId}</td>
-                                <td className="px-4 py-3 text-slate-300">{control.title}</td>
-                                <td className="px-4 py-3 text-slate-400">{control.family}</td>
+                              <tr key={control.controlId} className="border-t border-[#eeeaf2]">
+                                <td className="px-4 py-3 font-medium text-[#241232]">{control.controlId}</td>
+                                <td className="px-4 py-3 text-[#4f435c]">{control.title}</td>
+                                <td className="px-4 py-3 text-[#6f6578]">{control.family}</td>
                               </tr>
                             ))}
                             {(currentProfile?.controls.length ?? 0) === 0 && (
                               <tr>
-                                <td className="px-4 py-6 text-slate-400" colSpan={3}>
+                                <td className="px-4 py-6 text-[#6f6578]" colSpan={3}>
                                   No controls available for this profile.
                                 </td>
                               </tr>
@@ -1136,7 +1136,7 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                   <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
                     <div className="space-y-3">
                       <label className="block space-y-2">
-                        <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Catalogue</span>
+                        <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Catalogue</span>
                         <select className="input" value={selectedCatalogueName} onChange={(event) => setSelectedCatalogueName(event.target.value)}>
                           {workspace.catalogues.map((catalogue) => (
                             <option key={catalogue.name} value={catalogue.name}>
@@ -1146,7 +1146,7 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                         </select>
                       </label>
                       <label className="block space-y-2">
-                        <span className="text-xs uppercase tracking-[0.22em] text-slate-500">Security Control</span>
+                        <span className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Security Control</span>
                         <select className="input" value={selectedControlId} onChange={(event) => setSelectedControlId(event.target.value)}>
                           {(selectedCatalogue?.controls ?? []).map((control) => (
                             <option key={control.controlId} value={control.controlId}>
@@ -1163,26 +1163,26 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                         <Wand2 className="h-4 w-4" />
                         Add control to queue
                       </button>
-                      <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">
+                      <div className="rounded-2xl border border-[#ded8e4] bg-white p-4 text-sm text-[#4f435c]">
                         Duplicate controls are rejected clearly and the queue continues to accumulate across multiple catalogues.
                       </div>
                     </div>
                     <div className="panel-subtle">
                       <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2 text-white">
-                          <ClipboardList className="h-4 w-4 text-cyan-300" />
+                        <div className="flex items-center gap-2 text-[#241232]">
+                          <ClipboardList className="h-4 w-4 text-[#7a3ccf]" />
                           <span className="font-semibold">Current queue</span>
                         </div>
-                        <span className="badge-neutral">{detail.queue.length} queued</span>
+                        <span className="status-pill-neutral">{detail.queue.length} queued</span>
                       </div>
                       {detail.queue.length > queuePreview.length ? (
-                        <div className="mt-4 text-xs text-slate-500">
+                        <div className="mt-4 text-xs text-[#62576a]">
                           Showing the first {queuePreview.length} queued controls in this session preview.
                         </div>
                       ) : null}
-                      <div className="mt-4 overflow-hidden rounded-2xl border border-white/10">
+                      <div className="mt-4 overflow-hidden rounded-2xl border border-[#ded8e4]">
                         <table className="min-w-full text-left text-sm">
-                          <thead className="bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
+                          <thead className="bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
                             <tr>
                               <th className="px-4 py-3">Source</th>
                               <th className="px-4 py-3">Control</th>
@@ -1191,15 +1191,15 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                           </thead>
                           <tbody>
                             {queuePreview.map((item) => (
-                              <tr key={item.id} className="border-t border-white/5">
-                                <td className="px-4 py-3 text-slate-300">{item.sourceName}</td>
-                                <td className="px-4 py-3 font-medium text-white">{item.controlId}</td>
-                                <td className="px-4 py-3 text-slate-400">{item.title}</td>
+                              <tr key={item.id} className="border-t border-[#eeeaf2]">
+                                <td className="px-4 py-3 text-[#4f435c]">{item.sourceName}</td>
+                                <td className="px-4 py-3 font-medium text-[#241232]">{item.controlId}</td>
+                                <td className="px-4 py-3 text-[#6f6578]">{item.title}</td>
                               </tr>
                             ))}
                             {detail.queue.length === 0 && (
                               <tr>
-                                <td className="px-4 py-6 text-slate-400" colSpan={3}>
+                                <td className="px-4 py-6 text-[#6f6578]" colSpan={3}>
                                   No controls have been added to the queue yet.
                                 </td>
                               </tr>
@@ -1216,21 +1216,21 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                     <div className="space-y-3">
                       <div className="panel-subtle">
                         <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-2 text-white">
-                            <CheckCircle2 className="h-4 w-4 text-cyan-300" />
+                          <div className="flex items-center gap-2 text-[#241232]">
+                            <CheckCircle2 className="h-4 w-4 text-[#7a3ccf]" />
                             <span className="font-semibold">Queue summary</span>
                           </div>
-                          <span className="badge-neutral">{detail.queue.length} queued</span>
+                          <span className="status-pill-neutral">{detail.queue.length} queued</span>
                         </div>
                         <div className="mt-4 space-y-2">
                           {detail.queueSummary.map((item) => (
-                            <div key={item.sourceName} className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/50 px-3 py-2 text-sm">
-                              <span className="text-slate-300">{item.sourceName}</span>
-                              <span className="badge-neutral">{item.count}</span>
+                            <div key={item.sourceName} className="flex items-center justify-between rounded-2xl border border-[#ded8e4] bg-white px-3 py-2 text-sm">
+                              <span className="text-[#4f435c]">{item.sourceName}</span>
+                              <span className="status-pill-neutral">{item.count}</span>
                             </div>
                           ))}
                           {detail.queueSummary.length === 0 && (
-                            <div className="text-sm text-slate-400">No queued controls to summarize yet.</div>
+                            <div className="text-sm text-[#6f6578]">No queued controls to summarize yet.</div>
                           )}
                         </div>
                         <div className="mt-4 flex flex-wrap gap-2">
@@ -1244,16 +1244,16 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                       </div>
 
                       <div className="panel-subtle">
-                        <div className="text-xs uppercase tracking-[0.22em] text-slate-500">Pipeline</div>
+                        <div className="text-xs uppercase tracking-[0.22em] text-[#62576a]">Pipeline</div>
                         <div className="mt-4 space-y-3">
                           {detail.pipeline.map((step) => (
-                            <div key={step.id} className="rounded-2xl border border-white/10 bg-slate-950/50 p-4">
+                            <div key={step.id} className="rounded-2xl border border-[#ded8e4] bg-white p-4">
                               <div className="flex items-center justify-between gap-3">
-                                <div className="font-medium text-white">{step.title}</div>
+                                <div className="font-medium text-[#241232]">{step.title}</div>
                                 <span className={badgeClass(step.status)}>{step.status}</span>
                               </div>
-                              <div className="mt-2 text-sm text-slate-300">{step.helper}</div>
-                              <div className="mt-3 text-xs text-slate-500">{step.metric}</div>
+                              <div className="mt-2 text-sm text-[#4f435c]">{step.helper}</div>
+                              <div className="mt-3 text-xs text-[#62576a]">{step.metric}</div>
                             </div>
                           ))}
                         </div>
@@ -1262,18 +1262,18 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
 
                     <div className="space-y-4">
                       <div className="panel-subtle overflow-hidden">
-                        <div className="flex items-center gap-2 text-white">
-                          <ClipboardList className="h-4 w-4 text-cyan-300" />
+                        <div className="flex items-center gap-2 text-[#241232]">
+                          <ClipboardList className="h-4 w-4 text-[#7a3ccf]" />
                           <span className="font-semibold">Preview controls</span>
                         </div>
                         {detail.queue.length > queuePreview.length ? (
-                          <div className="mt-4 text-xs text-slate-500">
+                          <div className="mt-4 text-xs text-[#62576a]">
                             Showing the first {queuePreview.length} controls in the final review preview.
                           </div>
                         ) : null}
-                        <div className="mt-4 overflow-hidden rounded-2xl border border-white/10">
+                        <div className="mt-4 overflow-hidden rounded-2xl border border-[#ded8e4]">
                           <table className="min-w-full text-left text-sm">
-                            <thead className="bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
+                            <thead className="bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
                               <tr>
                                 <th className="px-4 py-3">Control ID</th>
                                 <th className="px-4 py-3">Title</th>
@@ -1282,15 +1282,15 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                             </thead>
                             <tbody>
                               {queuePreview.map((item) => (
-                                <tr key={item.id} className="border-t border-white/5">
-                                  <td className="px-4 py-3 font-medium text-white">{item.controlId}</td>
-                                  <td className="px-4 py-3 text-slate-300">{item.title}</td>
-                                  <td className="px-4 py-3 text-slate-400">{item.family}</td>
+                                <tr key={item.id} className="border-t border-[#eeeaf2]">
+                                  <td className="px-4 py-3 font-medium text-[#241232]">{item.controlId}</td>
+                                  <td className="px-4 py-3 text-[#4f435c]">{item.title}</td>
+                                  <td className="px-4 py-3 text-[#6f6578]">{item.family}</td>
                                 </tr>
                               ))}
                               {detail.queue.length === 0 && (
                                 <tr>
-                                  <td className="px-4 py-6 text-slate-400" colSpan={3}>
+                                  <td className="px-4 py-6 text-[#6f6578]" colSpan={3}>
                                     No controls queued yet. Add profiles or manual controls before finishing.
                                   </td>
                                 </tr>
@@ -1301,36 +1301,36 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
                       </div>
 
                       <div className="panel-subtle">
-                        <div className="flex items-center gap-2 text-white">
-                          <Sparkles className="h-4 w-4 text-cyan-300" />
+                        <div className="flex items-center gap-2 text-[#241232]">
+                          <Sparkles className="h-4 w-4 text-[#7a3ccf]" />
                           <span className="font-semibold">Created requirements</span>
                         </div>
                         {detail.createdRequirements.length > createdRequirementsPreview.length ? (
-                          <div className="mt-4 text-xs text-slate-500">
+                          <div className="mt-4 text-xs text-[#62576a]">
                             Showing the first {createdRequirementsPreview.length} created requirements in this session preview.
                           </div>
                         ) : null}
                         <div className="mt-4 space-y-3">
                           {createdRequirementsPreview.map((item) => (
-                            <article key={item.id} className="rounded-2xl border border-white/10 bg-slate-950/50 p-4">
+                            <article key={item.id} className="rounded-2xl border border-[#ded8e4] bg-white p-4">
                               <div className="flex items-center justify-between gap-3">
                                 <div>
-                                  <div className="font-medium text-white">{item.title}</div>
-                                  <div className="mt-1 text-xs text-slate-500">
+                                  <div className="font-medium text-[#241232]">{item.title}</div>
+                                  <div className="mt-1 text-xs text-[#62576a]">
                                     {item.sourceControlId} · {item.sourceName}
                                   </div>
                                 </div>
-                                <span className="badge-success">{item.status}</span>
+                                <span className="status-pill-success">{item.status}</span>
                               </div>
-                              <div className="mt-2 text-sm text-slate-300">{item.description}</div>
-                              <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-400">
+                              <div className="mt-2 text-sm text-[#4f435c]">{item.description}</div>
+                              <div className="mt-3 flex flex-wrap gap-2 text-xs text-[#6f6578]">
                                 <span>Assignee: {item.assignee ?? 'Current user'}</span>
                                 <span>Created {formatDate(item.createdAt)}</span>
                               </div>
                             </article>
                           ))}
                           {detail.createdRequirements.length === 0 && (
-                            <div className="rounded-2xl border border-dashed border-white/10 px-4 py-8 text-sm text-slate-400">
+                            <div className="rounded-2xl border border-dashed border-[#ded8e4] px-4 py-8 text-sm text-[#6f6578]">
                               Created requirements will appear here after you finish the wizard and can then be attested, edited, or deleted.
                             </div>
                           )}
@@ -1342,7 +1342,7 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
               </Tabs>
             </>
           ) : (
-            <div className="rounded-2xl border border-dashed border-white/10 px-6 py-12 text-center text-sm text-slate-400">
+            <div className="rounded-2xl border border-dashed border-[#ded8e4] px-6 py-12 text-center text-sm text-[#6f6578]">
               {isSecurityProfilesSurface
                 ? 'Select a profile activation session or create one to start building a reusable baseline queue.'
                 : 'Select a builder session or create one to start queuing policy requirements.'}
@@ -1353,10 +1353,10 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
 
       <section className="panel-subtle grid gap-4 md:grid-cols-3">
         <div className="flex items-start gap-3">
-          <ShieldCheck className="mt-0.5 h-5 w-5 text-cyan-300" />
+          <ShieldCheck className="mt-0.5 h-5 w-5 text-[#7a3ccf]" />
           <div>
-            <div className="font-medium text-white">Profile prerequisites</div>
-            <div className="mt-2 text-sm text-slate-400">
+            <div className="font-medium text-[#241232]">Profile prerequisites</div>
+            <div className="mt-2 text-sm text-[#6f6578]">
               {isSecurityProfilesSurface
                 ? 'Loaded catalogues are the source of truth for manual baseline creation, and imported profile JSON only activates cleanly when those parent catalogues already exist in the tenant.'
                 : 'Security profiles and control catalogues must be loaded before the builder can queue mapped requirements.'}
@@ -1364,10 +1364,10 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
           </div>
         </div>
         <div className="flex items-start gap-3">
-          <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-300" />
+          <AlertTriangle className="mt-0.5 h-5 w-5 text-[#8a4d00]" />
           <div>
-            <div className="font-medium text-white">Duplicate protection</div>
-            <div className="mt-2 text-sm text-slate-400">
+            <div className="font-medium text-[#241232]">Duplicate protection</div>
+            <div className="mt-2 text-sm text-[#6f6578]">
               {isSecurityProfilesSurface
                 ? 'Controls already present in the same activation context are skipped or rejected clearly so baseline-driven sessions stay reproducible and audit-friendly.'
                 : 'Controls already present in the same policy context are skipped or rejected clearly to keep requirement sets clean.'}
@@ -1375,10 +1375,10 @@ export function AIPolicyBuilderPage({ surface = 'ai-builder' }: AIPolicyBuilderP
           </div>
         </div>
         <div className="flex items-start gap-3">
-          <CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-300" />
+          <CheckCircle2 className="mt-0.5 h-5 w-5 text-[#126b36]" />
           <div>
-            <div className="font-medium text-white">{isSecurityProfilesSurface ? 'After activation' : 'After completion'}</div>
-            <div className="mt-2 text-sm text-slate-400">
+            <div className="font-medium text-[#241232]">{isSecurityProfilesSurface ? 'After activation' : 'After completion'}</div>
+            <div className="mt-2 text-sm text-[#6f6578]">
               {isSecurityProfilesSurface
                 ? 'Activated baseline sessions continue into requirement generation and security-plan preparation without hiding the resulting control set behind an internal-only page.'
                 : 'Finished requirements remain editable after generation and are intended to flow into score-card and attestation workflows.'}

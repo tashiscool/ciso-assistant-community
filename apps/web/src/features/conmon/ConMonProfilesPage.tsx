@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { RegStatusPill } from '../../components/regovise/PagePrimitives';
 import { ApiClient } from '../../shared/api/client';
 import { useEdgeIdentity } from '../../shared/session/identity';
 
@@ -78,7 +79,7 @@ export function ConMonProfilesPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading ConMon profiles...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading ConMon profiles...</div>;
   }
 
   return (
@@ -86,8 +87,8 @@ export function ConMonProfilesPage() {
       <section className="panel grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
         <div>
           <div className="eyebrow">ConMon</div>
-          <h1 className="mt-2 text-3xl font-semibold text-white">Continuous Monitoring Profiles</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Continuous Monitoring Profiles</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f435c]">
             Use profiles to define monitoring baselines and launch runs for the parts of the
             program that need recurring review.
           </p>
@@ -128,7 +129,7 @@ export function ConMonProfilesPage() {
 
       <section className="panel overflow-hidden p-0">
         <table className="min-w-full text-left text-sm">
-          <thead className="border-b border-white/10 bg-slate-950/70 text-xs uppercase tracking-[0.18em] text-slate-500">
+          <thead className="border-b border-[#ded8e4] bg-white text-xs uppercase tracking-[0.18em] text-[#62576a]">
             <tr>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Type</th>
@@ -139,16 +140,16 @@ export function ConMonProfilesPage() {
           </thead>
           <tbody>
             {profiles.map((profile) => (
-              <tr key={profile.id} className="border-t border-white/5 align-top">
-                <td className="px-4 py-4 text-white">
+              <tr key={profile.id} className="border-t border-[#eeeaf2] align-top">
+                <td className="px-4 py-4 text-[#241232]">
                   <div className="font-medium">{profile.name}</div>
-                  <div className="mt-1 text-xs text-slate-500">{profile.updatedAt}</div>
+                  <div className="mt-1 text-xs text-[#62576a]">{profile.updatedAt}</div>
                 </td>
-                <td className="px-4 py-4 text-slate-300">{profile.profileType}</td>
+                <td className="px-4 py-4 text-[#4f435c]">{profile.profileType}</td>
                 <td className="px-4 py-4">
-                  <span className="badge-success">{profile.status}</span>
+                  <RegStatusPill tone="success">{profile.status}</RegStatusPill>
                 </td>
-                <td className="max-w-xl px-4 py-4 text-slate-300">{profile.description}</td>
+                <td className="max-w-xl px-4 py-4 text-[#4f435c]">{profile.description}</td>
                 <td className="px-4 py-4 text-right">
                   <button
                     className="button-secondary"
@@ -163,7 +164,7 @@ export function ConMonProfilesPage() {
             ))}
             {profiles.length === 0 && (
               <tr>
-                <td className="px-4 py-8 text-center text-slate-400" colSpan={5}>
+                <td className="px-4 py-8 text-center text-[#6f6578]" colSpan={5}>
                   No ConMon profiles found for tenant <span className="font-mono">{identity.tenantId}</span>.
                 </td>
               </tr>

@@ -2067,6 +2067,39 @@ export async function handleIamRoutes(
         .bind(displayName, firstName, lastName, locale, id, tenantId)
         .run();
 
+      if (Array.isArray(body.groupIds)) {
+        const groupIds = uniqueSorted(body.groupIds);
+        for (const groupId of groupIds) {
+          const group = await ensureGroupExists(ctx.env, tenantId, groupId);
+          if (!group) {
+            return json(
+              { error: 'group_not_found', message: `User group ${groupId} was not found.` },
+              { status: 404 },
+            );
+          }
+        }
+
+        await ctx.env.D1_MAIN.prepare(
+          `
+          DELETE FROM user_group_memberships
+          WHERE user_id = ?
+          `,
+        )
+          .bind(id)
+          .run();
+
+        for (const groupId of groupIds) {
+          await ctx.env.D1_MAIN.prepare(
+            `
+            INSERT OR IGNORE INTO user_group_memberships (user_id, group_id)
+            VALUES (?, ?)
+            `,
+          )
+            .bind(id, groupId)
+            .run();
+        }
+      }
+
       const updated = await loadSingleUserResponse(ctx.env, tenantId, id);
       return updated ? json({ data: updated }) : json({ error: 'not_found' }, { status: 404 });
     }
@@ -2183,6 +2216,7 @@ export async function handleIamRoutes(
     if (ctx.request.method === 'PUT' && id) {
       const body = await readJson<CreateUserGroupInput>(ctx.request);
       const name = body.name?.trim();
+      const folderId = body.folderId?.trim() || null;
 
       if (!name) {
         return json(
@@ -2191,17 +2225,74 @@ export async function handleIamRoutes(
         );
       }
 
+      const existingGroup = await ensureGroupExists(ctx.env, tenantId, id);
+      if (!existingGroup) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+      if (existingGroup.is_builtin) {
+        return json(
+          { error: 'builtin_user_group', message: 'Built-in user groups cannot be edited.' },
+          { status: 400 },
+        );
+      }
+      if (folderId) {
+        const folder = await ensureFolderExists(ctx.env, tenantId, folderId);
+        if (!folder) {
+          return json(
+            { error: 'folder_not_found', message: 'Selected folder scope was not found.' },
+            { status: 404 },
+          );
+        }
+      }
+      const memberUserIds = Array.isArray(body.memberUserIds)
+        ? uniqueSorted(body.memberUserIds)
+        : null;
+      if (memberUserIds) {
+        for (const userId of memberUserIds) {
+          const user = await ensureUserExists(ctx.env, tenantId, userId);
+          if (!user) {
+            return json(
+              { error: 'user_not_found', message: `User ${userId} was not found.` },
+              { status: 404 },
+            );
+          }
+        }
+      }
+
       await ctx.env.D1_MAIN.prepare(
         `
         UPDATE user_groups
         SET name = ?,
             description = ?,
+            folder_id = COALESCE(?, folder_id),
             updated_at = (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
         WHERE id = ? AND tenant_id = ?
         `,
       )
-        .bind(name, body.description?.trim() || null, id, tenantId)
+        .bind(name, body.description?.trim() || null, folderId, id, tenantId)
         .run();
+
+      if (memberUserIds) {
+        await ctx.env.D1_MAIN.prepare(
+          `
+          DELETE FROM user_group_memberships
+          WHERE group_id = ?
+          `,
+        )
+          .bind(id)
+          .run();
+
+        for (const userId of memberUserIds) {
+          await ctx.env.D1_MAIN.prepare(
+            `
+            INSERT OR IGNORE INTO user_group_memberships (user_id, group_id)
+            VALUES (?, ?)
+            `,
+          )
+            .bind(userId, id)
+            .run();
+        }
+      }
 
       const updated = await loadSingleGroupResponse(ctx.env, tenantId, id);
       return updated ? json({ data: updated }) : json({ error: 'not_found' }, { status: 404 });
@@ -2303,6 +2394,17 @@ export async function handleIamRoutes(
         );
       }
 
+      const existingRole = await ensureRoleExists(ctx.env, tenantId, id);
+      if (!existingRole) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+      if (existingRole.builtin) {
+        return json(
+          { error: 'builtin_role', message: 'Built-in roles cannot be edited.' },
+          { status: 400 },
+        );
+      }
+
       await ctx.env.D1_MAIN.prepare(
         `
         UPDATE roles
@@ -2313,6 +2415,29 @@ export async function handleIamRoutes(
       )
         .bind(name, body.description?.trim() || null, id, tenantId)
         .run();
+
+      if (Array.isArray(body.permissions)) {
+        const permissions = uniqueSorted(body.permissions);
+        await ctx.env.D1_MAIN.prepare(
+          `
+          DELETE FROM role_permissions
+          WHERE role_id = ?
+          `,
+        )
+          .bind(id)
+          .run();
+
+        for (const permission of permissions) {
+          await ctx.env.D1_MAIN.prepare(
+            `
+            INSERT OR IGNORE INTO role_permissions (role_id, permission)
+            VALUES (?, ?)
+            `,
+          )
+            .bind(id, permission)
+            .run();
+        }
+      }
 
       const updated = await loadSingleRoleResponse(ctx.env, tenantId, id);
       return updated ? json({ data: updated }) : json({ error: 'not_found' }, { status: 404 });
@@ -2444,6 +2569,112 @@ export async function handleIamRoutes(
         },
         { status: 201 },
       );
+    }
+
+    if (ctx.request.method === 'PUT' && id) {
+      const body = await readJson<CreateRoleAssignmentInput>(ctx.request);
+      const roleId = body.roleId?.trim();
+      const scopeFolderId = body.scopeFolderId?.trim();
+      const userId = body.userId?.trim() || null;
+      const groupId = body.groupId?.trim() || null;
+
+      if (!roleId || !scopeFolderId) {
+        return json(
+          {
+            error: 'invalid_role_assignment',
+            message: 'Role and folder scope are required.',
+          },
+          { status: 400 },
+        );
+      }
+
+      if ((userId && groupId) || (!userId && !groupId)) {
+        return json(
+          {
+            error: 'invalid_role_assignment',
+            message: 'Select exactly one principal: a user or a user group.',
+          },
+          { status: 400 },
+        );
+      }
+
+      const currentAssignment = await loadSingleRoleAssignmentResponse(ctx.env, tenantId, id);
+      if (!currentAssignment) {
+        return json({ error: 'not_found' }, { status: 404 });
+      }
+      if (currentAssignment.isBuiltin) {
+        return json(
+          {
+            error: 'builtin_role_assignment',
+            message: 'Built-in role assignments cannot be edited.',
+          },
+          { status: 400 },
+        );
+      }
+
+      const [role, folder] = await Promise.all([
+        ensureRoleExists(ctx.env, tenantId, roleId),
+        ensureFolderExists(ctx.env, tenantId, scopeFolderId),
+      ]);
+
+      if (!role) {
+        return json(
+          { error: 'role_not_found', message: 'Selected role was not found.' },
+          { status: 404 },
+        );
+      }
+
+      if (!folder) {
+        return json(
+          { error: 'folder_not_found', message: 'Selected folder scope was not found.' },
+          { status: 404 },
+        );
+      }
+
+      if (userId) {
+        const user = await ensureUserExists(ctx.env, tenantId, userId);
+        if (!user) {
+          return json(
+            { error: 'user_not_found', message: 'Selected user was not found.' },
+            { status: 404 },
+          );
+        }
+      }
+
+      if (groupId) {
+        const group = await ensureGroupExists(ctx.env, tenantId, groupId);
+        if (!group) {
+          return json(
+            { error: 'group_not_found', message: 'Selected user group was not found.' },
+            { status: 404 },
+          );
+        }
+      }
+
+      await ctx.env.D1_MAIN.prepare(
+        `
+        UPDATE role_assignments
+        SET role_id = ?,
+            user_id = ?,
+            group_id = ?,
+            scope_folder_id = ?,
+            is_recursive = ?
+        WHERE id = ? AND tenant_id = ? AND is_builtin = 0
+        `,
+      )
+        .bind(
+          roleId,
+          userId,
+          groupId,
+          scopeFolderId,
+          body.isRecursive === false ? 0 : 1,
+          id,
+          tenantId,
+        )
+        .run();
+
+      const updated = await loadSingleRoleAssignmentResponse(ctx.env, tenantId, id);
+      return updated ? json({ data: updated }) : json({ error: 'not_found' }, { status: 404 });
     }
 
     if (ctx.request.method === 'DELETE' && id) {

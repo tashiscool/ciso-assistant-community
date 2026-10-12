@@ -2,6 +2,7 @@ import { AwsClient } from 'aws4fetch';
 import { XMLParser } from 'fast-xml-parser';
 import type { EnvBindings } from '../../types/env';
 import type { FindingV1 } from './types';
+import { providerRequest } from '../../utils/providerRequest';
 
 export const NATIVE_COLLECTOR_PROVIDERS = ['github', 'wiz', 'aws', 'okta'] as const;
 
@@ -367,18 +368,23 @@ export function hasLiveCollectorConfiguration(
 async function githubRequest(connector: NativeCollectorConnector, pathname: string) {
   const token = getString(connector.config, ['token', 'accessToken', 'pat']);
   const baseUrl = connector.baseUrl || 'https://api.github.com';
-  const response = await fetch(`${baseUrl.replace(/\/$/, '')}${pathname}`, {
-    headers: {
-      Accept: 'application/vnd.github+json',
-      Authorization: `Bearer ${token}`,
-      'User-Agent': 'regovise-grc-native-collector',
-      'X-GitHub-Api-Version': '2022-11-28',
+  return providerRequest(
+    (signal) => fetch(`${baseUrl.replace(/\/$/, '')}${pathname}`, {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `Bearer ${token}`,
+        'User-Agent': 'regovise-grc-native-collector',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+      signal,
+    }),
+    (response) => {
+      if (!response.ok) {
+        throw new Error(`GitHub API request failed (${response.status}) for ${pathname}.`);
+      }
+      return response.json();
     },
-  });
-  if (!response.ok) {
-    throw new Error(`GitHub API request failed (${response.status}) for ${pathname}.`);
-  }
-  return response.json();
+  );
 }
 
 async function collectGithubFindings(connector: NativeCollectorConnector): Promise<NativeCollectorResult> {
@@ -477,20 +483,25 @@ async function fetchWizAccessToken(connector: NativeCollectorConnector) {
     return null;
   }
   const baseUrl = (connector.baseUrl || 'https://api.us1.app.wiz.io').replace(/\/$/, '');
-  const response = await fetch(`${baseUrl}/oauth/token`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({
-      client_id: clientId,
-      client_secret: clientSecret,
-      audience: 'wiz-api',
-      grant_type: 'client_credentials',
+  const body = asRecord(await providerRequest(
+    (signal) => fetch(`${baseUrl}/oauth/token`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        client_id: clientId,
+        client_secret: clientSecret,
+        audience: 'wiz-api',
+        grant_type: 'client_credentials',
+      }),
+      signal,
     }),
-  });
-  if (!response.ok) {
-    throw new Error(`Wiz token request failed (${response.status}).`);
-  }
-  const body = asRecord(await response.json());
+    (response) => {
+      if (!response.ok) {
+        throw new Error(`Wiz token request failed (${response.status}).`);
+      }
+      return response.json();
+    },
+  ));
   return typeof body.access_token === 'string' && body.access_token ? body.access_token : null;
 }
 
@@ -500,14 +511,15 @@ async function collectWizFindings(connector: NativeCollectorConnector): Promise<
     throw new Error('Wiz collector requires apiToken/accessToken or clientId/clientSecret.');
   }
   const baseUrl = (connector.baseUrl || 'https://api.us1.app.wiz.io').replace(/\/$/, '');
-  const response = await fetch(`${baseUrl}/graphql`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      query: `
+  const body = asRecord(await providerRequest(
+    (signal) => fetch(`${baseUrl}/graphql`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: `
         query RegoviseIssues($first: Int!) {
           issuesV2(first: $first) {
             nodes {
@@ -523,13 +535,17 @@ async function collectWizFindings(connector: NativeCollectorConnector): Promise<
           }
         }
       `,
-      variables: { first: 5 },
+        variables: { first: 5 },
+      }),
+      signal,
     }),
-  });
-  if (!response.ok) {
-    throw new Error(`Wiz GraphQL request failed (${response.status}).`);
-  }
-  const body = asRecord(await response.json());
+    (response) => {
+      if (!response.ok) {
+        throw new Error(`Wiz GraphQL request failed (${response.status}).`);
+      }
+      return response.json();
+    },
+  ));
   const issues = asArray<Record<string, unknown>>(asRecord(asRecord(asRecord(body.data).issuesV2)).nodes);
   const now = nowIso();
   const findings =
@@ -582,16 +598,21 @@ async function collectOktaFindings(connector: NativeCollectorConnector): Promise
     throw new Error('Okta collector requires apiToken/token and baseUrl/orgUrl.');
   }
   const request = async (pathname: string) => {
-    const response = await fetch(`${baseUrl}${pathname}`, {
-      headers: {
-        Accept: 'application/json',
-        Authorization: `SSWS ${token}`,
+    return providerRequest(
+      (signal) => fetch(`${baseUrl}${pathname}`, {
+        headers: {
+          Accept: 'application/json',
+          Authorization: `SSWS ${token}`,
+        },
+        signal,
+      }),
+      (response) => {
+        if (!response.ok) {
+          throw new Error(`Okta API request failed (${response.status}) for ${pathname}.`);
+        }
+        return response.json();
       },
-    });
-    if (!response.ok) {
-      throw new Error(`Okta API request failed (${response.status}) for ${pathname}.`);
-    }
-    return response.json();
+    );
   };
 
   const [roles, orgFactors] = await Promise.all([
@@ -669,14 +690,20 @@ async function collectAwsFindings(connector: NativeCollectorConnector): Promise<
   });
 
   const getXml = async (url: string, service: string, init: RequestInit = {}) => {
-    const response = await client.fetch(url, {
-      ...init,
-      aws: { service, region },
-    });
-    if (!response.ok) {
-      throw new Error(`AWS request failed (${response.status}) for ${url}.`);
-    }
-    return xmlParser.parse(await response.text());
+    return providerRequest(
+      (signal) => client.fetch(url, {
+        ...init,
+        signal,
+        aws: { service, region },
+      }),
+      async (response) => {
+        if (!response.ok) {
+          throw new Error(`AWS request failed (${response.status}) for ${url}.`);
+        }
+        return xmlParser.parse(await response.text());
+      },
+      { signal: init.signal },
+    );
   };
 
   let encryptionEnabled = false;
@@ -705,18 +732,23 @@ async function collectAwsFindings(connector: NativeCollectorConnector): Promise<
     region,
     service: 'cloudtrail',
   });
-  const cloudTrailResponse = await cloudTrailClient.fetch(`https://cloudtrail.${region}.amazonaws.com/`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/x-www-form-urlencoded; charset=utf-8',
+  const cloudTrailBody = await providerRequest(
+    (signal) => cloudTrailClient.fetch(`https://cloudtrail.${region}.amazonaws.com/`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded; charset=utf-8',
+      },
+      body: 'Action=DescribeTrails&Version=2013-11-01',
+      aws: { service: 'cloudtrail', region },
+      signal,
+    }),
+    async (response) => {
+      if (!response.ok) {
+        throw new Error(`AWS CloudTrail request failed (${response.status}).`);
+      }
+      return xmlParser.parse(await response.text());
     },
-    body: 'Action=DescribeTrails&Version=2013-11-01',
-    aws: { service: 'cloudtrail', region },
-  });
-  if (!cloudTrailResponse.ok) {
-    throw new Error(`AWS CloudTrail request failed (${cloudTrailResponse.status}).`);
-  }
-  const cloudTrailBody = xmlParser.parse(await cloudTrailResponse.text());
+  );
   const cloudTrailResponseRecord = asRecord(cloudTrailBody);
   const describeTrailsResponse = asRecord(cloudTrailResponseRecord.DescribeTrailsResponse);
   const describeTrailsResult = asRecord(describeTrailsResponse.DescribeTrailsResult);
@@ -733,18 +765,23 @@ async function collectAwsFindings(connector: NativeCollectorConnector): Promise<
     region: 'us-east-1',
     service: 'iam',
   });
-  const iamResponse = await iamClient.fetch('https://iam.amazonaws.com/', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/x-www-form-urlencoded; charset=utf-8',
+  const iamBody = await providerRequest(
+    (signal) => iamClient.fetch('https://iam.amazonaws.com/', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded; charset=utf-8',
+      },
+      body: 'Action=GetAccountSummary&Version=2010-05-08',
+      aws: { service: 'iam', region: 'us-east-1' },
+      signal,
+    }),
+    async (response) => {
+      if (!response.ok) {
+        throw new Error(`AWS IAM request failed (${response.status}).`);
+      }
+      return xmlParser.parse(await response.text());
     },
-    body: 'Action=GetAccountSummary&Version=2010-05-08',
-    aws: { service: 'iam', region: 'us-east-1' },
-  });
-  if (!iamResponse.ok) {
-    throw new Error(`AWS IAM request failed (${iamResponse.status}).`);
-  }
-  const iamBody = xmlParser.parse(await iamResponse.text());
+  );
   const summaryEntries = asArray<Record<string, unknown>>(
     asRecord(
       asRecord(asRecord(asRecord(iamBody).GetAccountSummaryResponse)?.GetAccountSummaryResult)?.SummaryMap,

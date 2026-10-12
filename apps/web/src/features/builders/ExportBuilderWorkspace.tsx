@@ -22,6 +22,7 @@ import {
   X,
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { RegModal, RegRightDrawer } from '../../components/regovise/PagePrimitives';
 import {
   addExportBuilderSubTemplate,
   analyzeExportBuilderTemplate,
@@ -50,6 +51,13 @@ import type {
 } from './exportTypes';
 
 type PrimaryTab = 'setup' | 'mappings' | 'subtemplates' | 'gallery' | 'preview';
+type ExportBuilderReviewAction = 'duplicate' | 'test-preview' | 'auto-map' | 'export-mappings';
+type PendingTemplateUpload = {
+  file: File;
+  mode: 'primary-template' | 'subtemplate-add' | 'subtemplate-reanalyze';
+  subTemplateId?: string | null;
+  subTemplateTitle?: string;
+};
 
 const renderTypes: RenderType[] = [
   'Text',
@@ -159,6 +167,52 @@ function moduleContextCopy(module: ExportModule) {
     case 'Security Plans':
     default:
       return 'Security-plan mode is active. Use plan metadata, system-owner details, and implementation narrative fields for narrative document generation.';
+  }
+}
+
+function reviewActionCopy(action: ExportBuilderReviewAction | null, draft: ExportBuilderDetail | null) {
+  const title = draft?.title ?? 'this export configuration';
+  switch (action) {
+    case 'duplicate':
+      return {
+        title: 'Duplicate export configuration',
+        description: `Review "${title}" before creating a separate copy for customization.`,
+        body: 'The existing configuration stays unchanged. The copy starts from the current saved export definition, including mappings, filters, template metadata, and preview context.',
+        confirmLabel: 'Duplicate export',
+        busyKey: 'duplicate',
+      };
+    case 'test-preview':
+      return {
+        title: 'Run export preview',
+        description: `Review "${title}" before generating a new preview run.`,
+        body: 'This creates a preview test run in the canonical Export Builder runtime. It does not publish the export or change the saved definition.',
+        confirmLabel: 'Run preview',
+        busyKey: 'test',
+      };
+    case 'auto-map':
+      return {
+        title: 'Refresh auto map',
+        description: `Review "${title}" before refreshing field suggestions.`,
+        body: 'Auto-map uses the current draft mappings and Cloudflare-backed matching heuristics to refresh suggested field assignments. Review the mapping workspace before saving changes globally.',
+        confirmLabel: 'Refresh mappings',
+        busyKey: 'auto-map',
+      };
+    case 'export-mappings':
+      return {
+        title: 'Export field mappings',
+        description: `Review "${title}" before downloading mapping JSON.`,
+        body: 'This downloads the current draft mappings, filters, and filter expression as a local JSON file. No tenant data or saved configuration is changed.',
+        confirmLabel: 'Download mappings',
+        busyKey: null,
+      };
+    default:
+      return {
+        title: 'Review export action',
+        description: undefined,
+        body: 'Review this Export Builder action before continuing.',
+        confirmLabel: 'Continue',
+        busyKey: null,
+      };
   }
 }
 
@@ -274,6 +328,13 @@ export function ExportBuilderWorkspace() {
   const [testScenarioName, setTestScenarioName] = useState('FedRAMP readiness review');
   const [selectedMappingId, setSelectedMappingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<PrimaryTab>('setup');
+  const [createDrawerOpen, setCreateDrawerOpen] = useState(false);
+  const [importMappingsDrawerOpen, setImportMappingsDrawerOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [pendingSubTemplateRemove, setPendingSubTemplateRemove] = useState<SubTemplate | null>(null);
+  const [pendingStarterTemplateCopy, setPendingStarterTemplateCopy] = useState<StarterTemplate | null>(null);
+  const [pendingReviewAction, setPendingReviewAction] = useState<ExportBuilderReviewAction | null>(null);
+  const [pendingTemplateUpload, setPendingTemplateUpload] = useState<PendingTemplateUpload | null>(null);
   const [loading, setLoading] = useState(true);
   const [detailLoading, setDetailLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -395,6 +456,11 @@ export function ExportBuilderWorkspace() {
     [draft, selectedMappingId],
   );
 
+  const pendingReviewCopy = useMemo(
+    () => reviewActionCopy(pendingReviewAction, draft),
+    [pendingReviewAction, draft],
+  );
+
   async function refreshLibraryAndDetail(nextSelectedId?: string) {
     const previousId = nextSelectedId ?? selectedId;
     await loadExports();
@@ -417,6 +483,7 @@ export function ExportBuilderWorkspace() {
       await loadExports();
       setSelectedId(created.id);
       setActiveTab('setup');
+      setCreateDrawerOpen(false);
       setNotice('New export configuration created in the canonical Export Builder service.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to create export configuration.');
@@ -468,11 +535,6 @@ export function ExportBuilderWorkspace() {
     if (!draft) {
       return;
     }
-    const confirmation = window.prompt(`Type "${draft.title}" to confirm delete.`);
-    if (confirmation !== draft.title) {
-      setNotice('Delete cancelled.');
-      return;
-    }
     try {
       setBusyAction('delete');
       setError(null);
@@ -480,6 +542,7 @@ export function ExportBuilderWorkspace() {
       await deleteExportBuilderConfig(draft.id);
       setSelectedId(null);
       await loadExports();
+      setDeleteModalOpen(false);
       setNotice('Export configuration deleted.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete export configuration.');
@@ -583,6 +646,7 @@ export function ExportBuilderWorkspace() {
       });
       setDetail(updated);
       setDraft(clone(updated));
+      setImportMappingsDrawerOpen(false);
       setNotice('Field mappings imported and validated.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to import field mappings.');
@@ -690,8 +754,96 @@ export function ExportBuilderWorkspace() {
     );
   }
 
+  function handleRemoveSubTemplate(template: SubTemplate) {
+    setDraft((current) =>
+      current
+        ? {
+            ...current,
+            subTemplates: current.subTemplates.filter((item) => item.id !== template.id),
+          }
+        : current,
+    );
+    setPendingSubTemplateRemove(null);
+    setNotice(`Sub-template "${template.title}" removed from the draft. Save changes to persist the export update.`);
+  }
+
+  async function handleCopyStarterTemplate(template: StarterTemplate) {
+    try {
+      setBusyAction(`starter:${template.id}`);
+      setError(null);
+      setNotice(null);
+      const created = await createExportBuilderConfig({
+        starterTemplateId: template.id,
+        title: `${template.title} Copy`,
+      });
+      await loadExports();
+      setSelectedId(created.id);
+      setActiveTab('setup');
+      setPendingStarterTemplateCopy(null);
+      setNotice(`${template.title} copied into a new export configuration.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to copy starter template.');
+    } finally {
+      setBusyAction(null);
+    }
+  }
+
+  function resetFileInputs() {
+    if (templateUploadRef.current) {
+      templateUploadRef.current.value = '';
+    }
+    if (mappingImportRef.current) {
+      mappingImportRef.current.value = '';
+    }
+    if (subTemplateUploadRef.current) {
+      subTemplateUploadRef.current.value = '';
+    }
+  }
+
+  function dismissTemplateUploadReview() {
+    setPendingTemplateUpload(null);
+    setPendingSubTemplateId(null);
+    resetFileInputs();
+  }
+
+  async function confirmTemplateUploadReview() {
+    const pending = pendingTemplateUpload;
+    if (!pending) {
+      return;
+    }
+    setPendingTemplateUpload(null);
+    if (pending.mode === 'primary-template') {
+      await handleAnalyzeTemplate(pending.file);
+    } else if (pending.subTemplateId) {
+      await handleAnalyzeTemplate(pending.file, pending.subTemplateId);
+    } else {
+      await handleAddSubTemplate(pending.file);
+    }
+  }
+
+  async function confirmReviewAction() {
+    const action = pendingReviewAction;
+    setPendingReviewAction(null);
+    switch (action) {
+      case 'duplicate':
+        await handleDuplicate();
+        break;
+      case 'test-preview':
+        await handleTest();
+        break;
+      case 'auto-map':
+        await handleAutoMap();
+        break;
+      case 'export-mappings':
+        handleExportMappings();
+        break;
+      default:
+        break;
+    }
+  }
+
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading Export Builder...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading Export Builder...</div>;
   }
 
   return (
@@ -704,7 +856,10 @@ export function ExportBuilderWorkspace() {
         onChange={(event) => {
           const file = event.target.files?.[0];
           if (file) {
-            void handleAnalyzeTemplate(file);
+            setPendingTemplateUpload({
+              file,
+              mode: 'primary-template',
+            });
           }
         }}
       />
@@ -729,9 +884,19 @@ export function ExportBuilderWorkspace() {
           const file = event.target.files?.[0];
           if (file) {
             if (pendingSubTemplateId) {
-              void handleAnalyzeTemplate(file, pendingSubTemplateId);
+              const selectedTemplate = draft?.subTemplates.find((template) => template.id === pendingSubTemplateId);
+              setPendingTemplateUpload({
+                file,
+                mode: 'subtemplate-reanalyze',
+                subTemplateId: pendingSubTemplateId,
+                subTemplateTitle: selectedTemplate?.title ?? newSubTemplateTitle,
+              });
             } else {
-              void handleAddSubTemplate(file);
+              setPendingTemplateUpload({
+                file,
+                mode: 'subtemplate-add',
+                subTemplateTitle: newSubTemplateTitle || file.name,
+              });
             }
           }
         }}
@@ -741,8 +906,8 @@ export function ExportBuilderWorkspace() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">Builders</div>
-            <h1 className="mt-2 text-3xl font-semibold text-white">Export Builder</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Export Builder</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
               Build customized DOCX and XLSX exports by mapping Regovise fields to placeholder tags,
               applying advanced filters, and generating compliance-ready document packages directly
               from the canonical Cloudflare runtime.
@@ -753,11 +918,15 @@ export function ExportBuilderWorkspace() {
               <FileCheck2 className="mr-2 h-4 w-4" />
               Export Builder
             </Link>
-            <button className="button-secondary" onClick={() => void handleDuplicate()} type="button">
+            <button className="button-secondary" onClick={() => setCreateDrawerOpen(true)} type="button">
+              <Plus className="mr-2 h-4 w-4" />
+              Create Export
+            </button>
+            <button className="button-secondary" disabled={!draft} onClick={() => setPendingReviewAction('duplicate')} type="button">
               <Copy className="mr-2 h-4 w-4" />
               {busyAction === 'duplicate' ? 'Duplicating...' : 'Duplicate'}
             </button>
-            <button className="button-secondary" onClick={() => void handleTest()} type="button">
+            <button className="button-secondary" disabled={!draft} onClick={() => setPendingReviewAction('test-preview')} type="button">
               <Play className="mr-2 h-4 w-4" />
               {busyAction === 'test' ? 'Testing...' : 'Test Export'}
             </button>
@@ -777,7 +946,7 @@ export function ExportBuilderWorkspace() {
           <div className="metric-card" key={metric.label}>
             <div className="metric-label">{metric.label}</div>
             <div className="metric-value">{metric.value}</div>
-            <div className="mt-2 text-xs text-slate-500">{metric.detail}</div>
+            <div className="mt-2 text-xs text-[#62576a]">{metric.detail}</div>
           </div>
         ))}
       </section>
@@ -787,12 +956,12 @@ export function ExportBuilderWorkspace() {
           <div className="flex items-center justify-between">
             <div>
               <div className="eyebrow">Export Library</div>
-              <h2 className="mt-2 text-xl font-semibold text-white">Configurations</h2>
+              <h2 className="mt-2 text-xl font-semibold text-[#241232]">Configurations</h2>
             </div>
-            <Sparkles className="h-5 w-5 text-cyan-300" />
+            <Sparkles className="h-5 w-5 text-[#7a3ccf]" />
           </div>
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-500" />
+            <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-[#62576a]" />
             <input
               className="input pl-10"
               placeholder="Search exports"
@@ -800,63 +969,37 @@ export function ExportBuilderWorkspace() {
               onChange={(event) => setSearch(event.target.value)}
             />
           </div>
-          <form
-            className="space-y-3"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void handleCreateExport();
-            }}
-          >
-            <input
-              className="input"
-              placeholder="New export title"
-              value={newExportTitle}
-              onChange={(event) => setNewExportTitle(event.target.value)}
-            />
-            <select
-              className="input"
-              value={newStarterTemplateId}
-              onChange={(event) => setNewStarterTemplateId(event.target.value)}
-            >
-              <option value="">Start blank</option>
-              {starterTemplates.map((template) => (
-                <option key={template.id} value={template.id}>
-                  {template.title}
-                </option>
-              ))}
-            </select>
-            <button className="button-secondary w-full" disabled={saving} type="submit">
-              <Plus className="mr-2 h-4 w-4" />
-              Create New Export
-            </button>
-          </form>
+          <button className="button-secondary w-full justify-center" onClick={() => setCreateDrawerOpen(true)} type="button">
+            <Plus className="mr-2 h-4 w-4" />
+            Create New Export
+          </button>
           <div className="space-y-3">
             {filteredExports.map((item) => (
               <button
                 key={item.id}
                 className={`panel-subtle w-full text-left transition ${
-                  selectedId === item.id ? 'border-cyan-300/30 bg-cyan-400/[0.04]' : 'hover:border-cyan-300/20'
+                  selectedId === item.id ? 'border-[#d7c3f1] bg-[#f6f1fa]' : 'hover:border-[#d7c3f1]'
                 }`}
                 onClick={() => setSelectedId(item.id)}
                 type="button"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="font-medium text-white">{item.title}</div>
-                    <div className="mt-1 text-sm text-slate-400">
+                    <div className="font-medium text-[#241232]">{item.title}</div>
+                    <div className="mt-1 text-sm text-[#6f6578]">
                       {item.module} · {item.exportType}
                     </div>
                   </div>
-                  <span className={item.status === 'Active' ? 'badge-success' : 'badge-neutral'}>
+                  <span className={item.status === 'Active' ? 'status-pill-success' : 'status-pill-neutral'}>
                     {item.status}
                   </span>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="badge-neutral">{item.exportGroup}</span>
-                  <span className="badge-neutral">{item.tags} tags</span>
-                  <span className="badge-neutral">{item.mappings} mappings</span>
+                  <span className="status-pill-neutral">{item.exportGroup}</span>
+                  <span className="status-pill-neutral">{item.tags} tags</span>
+                  <span className="status-pill-neutral">{item.mappings} mappings</span>
                 </div>
-                <div className="mt-3 text-xs text-slate-500">Updated {formatDate(item.lastUpdated)}</div>
+                <div className="mt-3 text-xs text-[#62576a]">Updated {formatDate(item.lastUpdated)}</div>
               </button>
             ))}
           </div>
@@ -864,21 +1007,21 @@ export function ExportBuilderWorkspace() {
 
         <section className="panel">
           {detailLoading || !draft ? (
-            <div className="text-sm text-slate-300">Loading export definition...</div>
+            <div className="text-sm text-[#4f435c]">Loading export definition...</div>
           ) : (
             <div className="space-y-6">
               <div className="panel-subtle">
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div>
                     <div className="eyebrow">Export Summary</div>
-                    <h3 className="mt-2 text-xl font-semibold text-white">{draft.title}</h3>
+                    <h3 className="mt-2 text-xl font-semibold text-[#241232]">{draft.title}</h3>
                     <div className="mt-2 flex flex-wrap gap-2">
-                      <span className={draft.status === 'Active' ? 'badge-success' : 'badge-neutral'}>
+                      <span className={draft.status === 'Active' ? 'status-pill-success' : 'status-pill-neutral'}>
                         {draft.status}
                       </span>
-                      <span className="badge-neutral">{draft.module}</span>
-                      <span className="badge-neutral">{draft.exportType}</span>
-                      <span className="badge-neutral">{draft.exportGroup}</span>
+                      <span className="status-pill-neutral">{draft.module}</span>
+                      <span className="status-pill-neutral">{draft.exportType}</span>
+                      <span className="status-pill-neutral">{draft.exportGroup}</span>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -886,18 +1029,18 @@ export function ExportBuilderWorkspace() {
                       <Upload className="mr-2 h-4 w-4" />
                       Upload Template
                     </button>
-                    <button className="button-secondary" onClick={() => void handleAutoMap()} type="button">
+                    <button className="button-secondary" onClick={() => setPendingReviewAction('auto-map')} type="button">
                       <WandSparkles className="mr-2 h-4 w-4" />
                       {busyAction === 'auto-map' ? 'Auto Mapping...' : 'Auto Map Fields'}
                     </button>
-                    <button className="button-secondary" onClick={() => void handleDelete()} type="button">
+                    <button className="button-secondary" onClick={() => setDeleteModalOpen(true)} type="button">
                       <Trash2 className="mr-2 h-4 w-4" />
                       {busyAction === 'delete' ? 'Deleting...' : 'Delete'}
                     </button>
                   </div>
                 </div>
                 {draft.templateAnalysis.issues.length > 0 && (
-                  <div className="mt-4 rounded-2xl border border-amber-300/20 bg-amber-400/10 p-4 text-sm text-amber-100">
+                  <div className="mt-4 rounded-2xl border border-[#f6d48e] bg-[#fff2d9] p-4 text-sm text-[#8a4d00]">
                     <div className="flex items-start gap-3">
                       <AlertTriangle className="mt-0.5 h-4 w-4" />
                       <div className="space-y-1">
@@ -911,7 +1054,7 @@ export function ExportBuilderWorkspace() {
               </div>
 
               <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as PrimaryTab)}>
-                <TabsList className="mb-6 w-fit rounded-2xl border border-white/10 bg-slate-950/70">
+                <TabsList className="mb-6 w-fit rounded-2xl border border-[#ded8e4] bg-white">
                   <TabsTrigger value="setup">Setup</TabsTrigger>
                   <TabsTrigger value="mappings">Export Mappings</TabsTrigger>
                   <TabsTrigger value="subtemplates">Sub Templates</TabsTrigger>
@@ -965,7 +1108,7 @@ export function ExportBuilderWorkspace() {
                         value={draft.exportGroup}
                         onChange={(event) => setDraft({ ...draft, exportGroup: event.target.value })}
                       />
-                      <div className="mt-2 text-xs text-slate-500">
+                      <div className="mt-2 text-xs text-[#62576a]">
                         Type a new value here to create a custom group, equivalent to "Add New Group" in classic RegScale.
                       </div>
                     </div>
@@ -1005,40 +1148,40 @@ export function ExportBuilderWorkspace() {
                       <div className="eyebrow">Template Analysis</div>
                       <div className="mt-4 grid gap-4 sm:grid-cols-2">
                         <div>
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Tags Found</div>
-                          <div className="mt-2 text-2xl font-semibold text-white">{draft.templateAnalysis.tagsFound}</div>
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Tags Found</div>
+                          <div className="mt-2 text-2xl font-semibold text-[#241232]">{draft.templateAnalysis.tagsFound}</div>
                         </div>
                         <div>
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Mapped</div>
-                          <div className="mt-2 text-2xl font-semibold text-white">{draft.templateAnalysis.mappedTags}</div>
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Mapped</div>
+                          <div className="mt-2 text-2xl font-semibold text-[#241232]">{draft.templateAnalysis.mappedTags}</div>
                         </div>
                         <div>
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Repeated Tags</div>
-                          <div className="mt-2 text-2xl font-semibold text-white">{draft.templateAnalysis.repeatedTags}</div>
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Repeated Tags</div>
+                          <div className="mt-2 text-2xl font-semibold text-[#241232]">{draft.templateAnalysis.repeatedTags}</div>
                         </div>
                         <div>
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Tables Detected</div>
-                          <div className="mt-2 text-2xl font-semibold text-white">{draft.templateAnalysis.tablesDetected}</div>
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Tables Detected</div>
+                          <div className="mt-2 text-2xl font-semibold text-[#241232]">{draft.templateAnalysis.tablesDetected}</div>
                         </div>
                       </div>
                     </div>
 
                     <div className="panel-subtle">
                       <div className="eyebrow">Module Context</div>
-                      <div className="mt-4 space-y-3 text-sm text-slate-300">
+                      <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
                         <div>
                           Export Builder now supports security plan, security control, risk, asset,
                           master assessment, and evidence-oriented output models from the same mapping surface.
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          <span className="badge-neutral">Narrative packages</span>
-                          <span className="badge-neutral">Control matrices</span>
-                          <span className="badge-neutral">Risk registers</span>
-                          <span className="badge-neutral">Asset inventories</span>
-                          <span className="badge-neutral">Component Control Implementations</span>
-                          <span className="badge-neutral">DataObjects</span>
+                          <span className="status-pill-neutral">Narrative packages</span>
+                          <span className="status-pill-neutral">Control matrices</span>
+                          <span className="status-pill-neutral">Risk registers</span>
+                          <span className="status-pill-neutral">Asset inventories</span>
+                          <span className="status-pill-neutral">Component Control Implementations</span>
+                          <span className="status-pill-neutral">DataObjects</span>
                         </div>
-                        <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-slate-400">
+                        <div className="rounded-2xl border border-[#ded8e4] bg-white p-3 text-[#6f6578]">
                           {moduleContextCopy(draft.module)}
                         </div>
                       </div>
@@ -1053,8 +1196,8 @@ export function ExportBuilderWorkspace() {
                         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                           <div>
                             <div className="eyebrow">Template Upload</div>
-                            <h3 className="mt-2 text-lg font-semibold text-white">Analyze placeholders</h3>
-                            <p className="mt-2 text-sm leading-6 text-slate-300">
+                            <h3 className="mt-2 text-lg font-semibold text-[#241232]">Analyze placeholders</h3>
+                            <p className="mt-2 text-sm leading-6 text-[#4f435c]">
                               Upload or browse for a DOCX or XLSX template to extract <code>{'{{field_name}}'}</code>{' '}
                               placeholders, detect table regions, and prepare mapping suggestions. The tag delimiter is
                               always double curly braces; other file types are rejected.
@@ -1065,11 +1208,11 @@ export function ExportBuilderWorkspace() {
                               <Upload className="mr-2 h-4 w-4" />
                               {busyAction === 'analyze-template' ? 'Analyzing...' : 'Upload Template'}
                             </button>
-                            <button className="button-secondary" onClick={() => mappingImportRef.current?.click()} type="button">
+                            <button className="button-secondary" onClick={() => setImportMappingsDrawerOpen(true)} type="button">
                               <Upload className="mr-2 h-4 w-4" />
                               Import Field Mappings
                             </button>
-                            <button className="button-secondary" onClick={handleExportMappings} type="button">
+                            <button className="button-secondary" onClick={() => setPendingReviewAction('export-mappings')} type="button">
                               <Download className="mr-2 h-4 w-4" />
                               Export Field Mappings
                             </button>
@@ -1079,20 +1222,20 @@ export function ExportBuilderWorkspace() {
 
                       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                         <div className="panel-subtle">
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Tags Found</div>
-                          <div className="mt-2 text-2xl font-semibold text-white">{draft.templateAnalysis.tagsFound}</div>
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Tags Found</div>
+                          <div className="mt-2 text-2xl font-semibold text-[#241232]">{draft.templateAnalysis.tagsFound}</div>
                         </div>
                         <div className="panel-subtle">
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Mapped</div>
-                          <div className="mt-2 text-2xl font-semibold text-white">{draft.templateAnalysis.mappedTags}</div>
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Mapped</div>
+                          <div className="mt-2 text-2xl font-semibold text-[#241232]">{draft.templateAnalysis.mappedTags}</div>
                         </div>
                         <div className="panel-subtle">
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Unmapped</div>
-                          <div className="mt-2 text-2xl font-semibold text-white">{draft.templateAnalysis.unmappedTags}</div>
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Unmapped</div>
+                          <div className="mt-2 text-2xl font-semibold text-[#241232]">{draft.templateAnalysis.unmappedTags}</div>
                         </div>
                         <div className="panel-subtle">
-                          <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Detection Mode</div>
-                          <div className="mt-2 text-sm font-medium text-white">
+                          <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Detection Mode</div>
+                          <div className="mt-2 text-sm font-medium text-[#241232]">
                             {draft.templateAnalysis.extractionMode === 'content-scan' ? 'Content scan' : 'Heuristic seed'}
                           </div>
                         </div>
@@ -1102,11 +1245,11 @@ export function ExportBuilderWorkspace() {
                         <div className="mb-4 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                           <div>
                             <div className="eyebrow">Mapping Workspace</div>
-                            <div className="mt-2 text-sm text-slate-300">
+                            <div className="mt-2 text-sm text-[#4f435c]">
                               Review each placeholder, accept semantic suggestions, or override render settings.
                             </div>
                           </div>
-                          <button className="button-secondary" onClick={() => void handleAutoMap()} type="button">
+                          <button className="button-secondary" onClick={() => setPendingReviewAction('auto-map')} type="button">
                             <WandSparkles className="mr-2 h-4 w-4" />
                             Refresh Auto Map
                           </button>
@@ -1117,8 +1260,8 @@ export function ExportBuilderWorkspace() {
                               key={mapping.id}
                               className={`rounded-2xl border p-4 transition ${
                                 selectedMappingId === mapping.id
-                                  ? 'border-cyan-300/30 bg-cyan-400/[0.04]'
-                                  : 'border-white/10 bg-slate-950/60'
+                                  ? 'border-[#d7c3f1] bg-[#f6f1fa]'
+                                  : 'border-[#ded8e4] bg-white'
                               }`}
                             >
                               <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
@@ -1127,15 +1270,15 @@ export function ExportBuilderWorkspace() {
                                   onClick={() => setSelectedMappingId(mapping.id)}
                                   type="button"
                                 >
-                                  <div className="font-medium text-white">{mapping.tag}</div>
-                                  <div className="mt-1 text-xs text-slate-500">
+                                  <div className="font-medium text-[#241232]">{mapping.tag}</div>
+                                  <div className="mt-1 text-xs text-[#62576a]">
                                     {mapping.tableRegion} · Confidence {mapping.confidence}
                                   </div>
                                 </button>
                                 <div className="flex flex-wrap gap-2">
-                                  {mapping.repeated && <span className="badge-neutral">Repeated</span>}
-                                  {mapping.accepted && <span className="badge-success">Accepted</span>}
-                                  {!mapping.fieldPath && <span className="badge-danger">Needs mapping</span>}
+                                  {mapping.repeated && <span className="status-pill-neutral">Repeated</span>}
+                                  {mapping.accepted && <span className="status-pill-success">Accepted</span>}
+                                  {!mapping.fieldPath && <span className="status-pill-danger">Needs mapping</span>}
                                 </div>
                               </div>
                               <div className="mt-4 grid gap-3 xl:grid-cols-[minmax(0,1.4fr)_220px_140px]">
@@ -1173,7 +1316,7 @@ export function ExportBuilderWorkspace() {
                                     </option>
                                   ))}
                                 </select>
-                                <label className="flex items-center gap-2 rounded-2xl border border-white/10 bg-slate-950/50 px-3 text-sm text-slate-300">
+                                <label className="flex items-center gap-2 rounded-2xl border border-[#ded8e4] bg-white px-3 text-sm text-[#4f435c]">
                                   <input
                                     type="checkbox"
                                     checked={mapping.accepted}
@@ -1193,18 +1336,18 @@ export function ExportBuilderWorkspace() {
                         <div className="eyebrow">Selected Placeholder</div>
                         {selectedMapping ? (
                           <div className="mt-4 space-y-3">
-                            <div className="font-medium text-white">{selectedMapping.tag}</div>
-                            <div className="text-sm text-slate-400">
+                            <div className="font-medium text-[#241232]">{selectedMapping.tag}</div>
+                            <div className="text-sm text-[#6f6578]">
                               {selectedMapping.fieldPath ?? 'Choose a field from the browser to map this placeholder.'}
                             </div>
-                            <div className="grid gap-2 text-sm text-slate-300">
+                            <div className="grid gap-2 text-sm text-[#4f435c]">
                               <div>Render Type: {selectedMapping.renderType}</div>
                               <div>Region: {selectedMapping.tableRegion}</div>
                               <div>Confidence: {selectedMapping.confidence}</div>
                             </div>
                           </div>
                         ) : (
-                          <div className="mt-4 text-sm text-slate-400">
+                          <div className="mt-4 text-sm text-[#6f6578]">
                             Select a placeholder row to review mapping detail.
                           </div>
                         )}
@@ -1224,7 +1367,7 @@ export function ExportBuilderWorkspace() {
                         </div>
                         <div className="space-y-3">
                           {draft.filterRows.map((row) => (
-                            <div key={row.id} className="rounded-2xl border border-white/10 bg-slate-950/60 p-3">
+                            <div key={row.id} className="rounded-2xl border border-[#ded8e4] bg-white p-3">
                               <div className="grid gap-3">
                                 <select
                                   className="input"
@@ -1311,8 +1454,8 @@ export function ExportBuilderWorkspace() {
                     <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                       <div>
                         <div className="eyebrow">DOCX Sub Templates</div>
-                        <h3 className="mt-2 text-lg font-semibold text-white">Appendices and companion sections</h3>
-                        <p className="mt-2 text-sm leading-6 text-slate-300">
+                        <h3 className="mt-2 text-lg font-semibold text-[#241232]">Appendices and companion sections</h3>
+                        <p className="mt-2 text-sm leading-6 text-[#4f435c]">
                           Sub templates keep their own file, tag analysis, and field mappings for multi-part compliance packages.
                         </p>
                       </div>
@@ -1341,7 +1484,7 @@ export function ExportBuilderWorkspace() {
 
                   <div className="space-y-4">
                     {draft.exportType !== 'DOCX' && (
-                      <div className="panel-subtle text-sm text-amber-100">
+                      <div className="panel-subtle text-sm text-[#8a4d00]">
                         Sub Templates are only supported for DOCX export configurations. Switch the export type to DOCX
                         before adding appendices or companion narrative sections.
                       </div>
@@ -1350,13 +1493,13 @@ export function ExportBuilderWorkspace() {
                       <div key={template.id} className="panel-subtle">
                         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                           <div>
-                            <div className="font-medium text-white">{template.title}</div>
-                            <div className="mt-1 text-sm text-slate-400">
+                            <div className="font-medium text-[#241232]">{template.title}</div>
+                            <div className="mt-1 text-sm text-[#6f6578]">
                               {template.fileName} · {template.analysis.tagsFound} tags · {template.analysis.mappedTags} mapped
                             </div>
                           </div>
                           <div className="flex flex-wrap gap-2">
-                            <span className="badge-neutral">{template.status}</span>
+                            <span className="status-pill-neutral">{template.status}</span>
                             <button
                               className="button-secondary"
                               onClick={() => {
@@ -1371,12 +1514,7 @@ export function ExportBuilderWorkspace() {
                             </button>
                             <button
                               className="button-secondary"
-                              onClick={() =>
-                                setDraft({
-                                  ...draft,
-                                  subTemplates: draft.subTemplates.filter((item) => item.id !== template.id),
-                                })
-                              }
+                              onClick={() => setPendingSubTemplateRemove(template)}
                               type="button"
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
@@ -1386,16 +1524,16 @@ export function ExportBuilderWorkspace() {
                         </div>
                         <div className="mt-4 space-y-3">
                           {template.analysis.issues.map((issue) => (
-                            <div key={issue} className="rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-sm text-slate-300">
+                            <div key={issue} className="rounded-2xl border border-[#ded8e4] bg-white p-3 text-sm text-[#4f435c]">
                               {issue}
                             </div>
                           ))}
                           {template.mappings.map((mapping) => (
-                            <div key={mapping.id} className="rounded-2xl border border-white/10 bg-slate-950/60 p-3">
+                            <div key={mapping.id} className="rounded-2xl border border-[#ded8e4] bg-white p-3">
                               <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                                 <div>
-                                  <div className="font-medium text-white">{mapping.tag}</div>
-                                  <div className="mt-1 text-xs text-slate-500">{mapping.tableRegion}</div>
+                                  <div className="font-medium text-[#241232]">{mapping.tag}</div>
+                                  <div className="mt-1 text-xs text-[#62576a]">{mapping.tableRegion}</div>
                                 </div>
                                 <select
                                   className="input xl:w-[340px]"
@@ -1423,7 +1561,7 @@ export function ExportBuilderWorkspace() {
                       </div>
                     ))}
                     {draft.subTemplates.length === 0 && (
-                      <div className="panel-subtle text-sm text-slate-400">
+                      <div className="panel-subtle text-sm text-[#6f6578]">
                         Add a DOCX appendix or companion narrative to manage its mappings separately from the primary export.
                       </div>
                     )}
@@ -1436,38 +1574,22 @@ export function ExportBuilderWorkspace() {
                       <div key={template.id} className="panel-subtle">
                         <div className="flex items-start justify-between gap-3">
                           <div>
-                            <div className="font-medium text-white">{template.title}</div>
-                            <div className="mt-1 text-sm text-slate-400">
+                            <div className="font-medium text-[#241232]">{template.title}</div>
+                            <div className="mt-1 text-sm text-[#6f6578]">
                               {template.module} · {template.exportType}
                             </div>
                           </div>
-                          <span className="badge-neutral">{template.kind}</span>
+                          <span className="status-pill-neutral">{template.kind}</span>
                         </div>
-                        <p className="mt-4 text-sm leading-6 text-slate-300">{template.description}</p>
+                        <p className="mt-4 text-sm leading-6 text-[#4f435c]">{template.description}</p>
                         <div className="mt-4 flex flex-wrap gap-2">
-                          <span className="badge-neutral">{template.exportGroup}</span>
-                          <span className="badge-neutral">{template.defaultTags.length} starter tags</span>
+                          <span className="status-pill-neutral">{template.exportGroup}</span>
+                          <span className="status-pill-neutral">{template.defaultTags.length} starter tags</span>
                         </div>
                         <div className="mt-4 flex flex-wrap gap-2">
                           <button
                             className="button-secondary"
-                            onClick={async () => {
-                              try {
-                                setBusyAction(`starter:${template.id}`);
-                                const created = await createExportBuilderConfig({
-                                  starterTemplateId: template.id,
-                                  title: `${template.title} Copy`,
-                                });
-                                await loadExports();
-                                setSelectedId(created.id);
-                                setActiveTab('setup');
-                                setNotice(`${template.title} copied into a new export configuration.`);
-                              } catch (err) {
-                                setError(err instanceof Error ? err.message : 'Unable to copy starter template.');
-                              } finally {
-                                setBusyAction(null);
-                              }
-                            }}
+                            onClick={() => setPendingStarterTemplateCopy(template)}
                             type="button"
                           >
                             <Copy className="mr-2 h-4 w-4" />
@@ -1486,12 +1608,12 @@ export function ExportBuilderWorkspace() {
                         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                           <div>
                             <div className="eyebrow">Preview Generation</div>
-                            <h3 className="mt-2 text-lg font-semibold text-white">Run a test export</h3>
-                            <p className="mt-2 text-sm leading-6 text-slate-300">
+                            <h3 className="mt-2 text-lg font-semibold text-[#241232]">Run a test export</h3>
+                            <p className="mt-2 text-sm leading-6 text-[#4f435c]">
                               Generate a preview summary for mapped and unmapped tags before publishing the export for operators.
                             </p>
                           </div>
-                          <button className="button-primary" onClick={() => void handleTest()} type="button">
+                          <button className="button-primary" onClick={() => setPendingReviewAction('test-preview')} type="button">
                             <Play className="mr-2 h-4 w-4" />
                             {busyAction === 'test' ? 'Generating...' : 'Run Test Export'}
                           </button>
@@ -1511,51 +1633,51 @@ export function ExportBuilderWorkspace() {
                           <div key={run.id} className="panel-subtle">
                             <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                               <div>
-                                <div className="font-medium text-white">{run.scenarioName}</div>
-                                <div className="mt-1 text-sm text-slate-400">
+                                <div className="font-medium text-[#241232]">{run.scenarioName}</div>
+                                <div className="mt-1 text-sm text-[#6f6578]">
                                   {run.result.generatedArtifactName} · {formatDate(run.createdAt)}
                                 </div>
                               </div>
                               <div className="flex flex-wrap gap-2">
-                                <span className="badge-success">{run.status}</span>
-                                <span className="badge-neutral">{run.result.mappedTags} mapped</span>
-                                <span className="badge-neutral">{run.result.unmappedTags} unmapped</span>
-                                <span className={run.result.filterExpressionValid ? 'badge-success' : 'badge-danger'}>
+                                <span className="status-pill-success">{run.status}</span>
+                                <span className="status-pill-neutral">{run.result.mappedTags} mapped</span>
+                                <span className="status-pill-neutral">{run.result.unmappedTags} unmapped</span>
+                                <span className={run.result.filterExpressionValid ? 'status-pill-success' : 'status-pill-danger'}>
                                   filters {run.result.filterExpressionValid ? 'valid' : 'invalid'}
                                 </span>
-                                <span className="badge-neutral">{run.result.subTemplates} sub templates</span>
+                                <span className="status-pill-neutral">{run.result.subTemplates} sub templates</span>
                               </div>
                             </div>
                             <div className="mt-4 grid gap-3 md:grid-cols-2">
-                              <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-sm text-slate-300">
-                                <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Generation Mode</div>
+                              <div className="rounded-2xl border border-[#ded8e4] bg-white p-3 text-sm text-[#4f435c]">
+                                <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Generation Mode</div>
                                 <div className="mt-2">{run.result.generationMode}</div>
                               </div>
-                              <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-sm text-slate-300">
-                                <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Data Sources</div>
+                              <div className="rounded-2xl border border-[#ded8e4] bg-white p-3 text-sm text-[#4f435c]">
+                                <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Data Sources</div>
                                 <div className="mt-2">
                                   {run.result.dataSources.length > 0 ? run.result.dataSources.join(', ') : 'No mapped sources yet'}
                                 </div>
                               </div>
-                              <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-sm text-slate-300">
-                                <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Render Types</div>
+                              <div className="rounded-2xl border border-[#ded8e4] bg-white p-3 text-sm text-[#4f435c]">
+                                <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Render Types</div>
                                 <div className="mt-2">
                                   {run.result.renderTypes.length > 0 ? run.result.renderTypes.join(', ') : 'No render types'}
                                 </div>
                               </div>
-                              <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-sm text-slate-300">
-                                <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Master Assessment Mode</div>
+                              <div className="rounded-2xl border border-[#ded8e4] bg-white p-3 text-sm text-[#4f435c]">
+                                <div className="text-xs uppercase tracking-[0.2em] text-[#62576a]">Master Assessment Mode</div>
                                 <div className="mt-2">{run.result.masterAssessmentMode ? 'Enabled' : 'Not used'}</div>
                               </div>
                             </div>
                             {run.result.filterDiagnostics.length > 0 && (
-                              <div className="mt-4 rounded-2xl border border-amber-300/20 bg-amber-400/10 p-3 text-sm text-amber-100">
+                              <div className="mt-4 rounded-2xl border border-[#f6d48e] bg-[#fff2d9] p-3 text-sm text-[#8a4d00]">
                                 {run.result.filterDiagnostics.join(' ')}
                               </div>
                             )}
                             <div className="mt-4 space-y-2">
                               {run.result.previewLines.map((line) => (
-                                <div key={line} className="rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-sm text-slate-300">
+                                <div key={line} className="rounded-2xl border border-[#ded8e4] bg-white p-3 text-sm text-[#4f435c]">
                                   {line}
                                 </div>
                               ))}
@@ -1563,7 +1685,7 @@ export function ExportBuilderWorkspace() {
                           </div>
                         ))}
                         {draft.testRuns.length === 0 && (
-                          <div className="panel-subtle text-sm text-slate-400">
+                          <div className="panel-subtle text-sm text-[#6f6578]">
                             No preview runs yet. Use the test action to generate a mapping summary and artifact name.
                           </div>
                         )}
@@ -1573,28 +1695,28 @@ export function ExportBuilderWorkspace() {
                     <aside className="space-y-4">
                       <div className="panel-subtle">
                         <div className="eyebrow">Checklist</div>
-                        <div className="mt-4 space-y-3 text-sm text-slate-300">
+                        <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
                           <div className="flex items-start gap-3">
-                            <CheckCircle2 className="mt-0.5 h-4 w-4 text-cyan-300" />
+                            <CheckCircle2 className="mt-0.5 h-4 w-4 text-[#7a3ccf]" />
                             <div>Template uploaded and analyzed</div>
                           </div>
                           <div className="flex items-start gap-3">
-                            <Braces className="mt-0.5 h-4 w-4 text-cyan-300" />
+                            <Braces className="mt-0.5 h-4 w-4 text-[#7a3ccf]" />
                             <div>Placeholder tags mapped to canonical Regovise fields</div>
                           </div>
                           <div className="flex items-start gap-3">
-                            <Filter className="mt-0.5 h-4 w-4 text-cyan-300" />
+                            <Filter className="mt-0.5 h-4 w-4 text-[#7a3ccf]" />
                             <div>Filter expression reviewed for table and worksheet context</div>
                           </div>
                           <div className="flex items-start gap-3">
-                            <FolderTree className="mt-0.5 h-4 w-4 text-cyan-300" />
+                            <FolderTree className="mt-0.5 h-4 w-4 text-[#7a3ccf]" />
                             <div>DOCX sub templates added for appendices when needed</div>
                           </div>
                         </div>
                       </div>
                       <div className="panel-subtle">
                         <div className="eyebrow">Template Tips</div>
-                        <div className="mt-4 space-y-3 text-sm text-slate-300">
+                        <div className="mt-4 space-y-3 text-sm text-[#4f435c]">
                           <div>
                             Use <code>{'{{field_name}}'}</code> placeholders for direct mappings.
                           </div>
@@ -1614,19 +1736,19 @@ export function ExportBuilderWorkspace() {
       </section>
 
       {hasUnsavedChanges && (
-        <section className="panel sticky bottom-4 border-cyan-300/20 bg-slate-950/85 backdrop-blur-xl">
+        <section className="panel sticky bottom-4 border-[#d7c3f1] bg-white backdrop-blur-xl">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="mt-0.5 h-5 w-5 text-amber-300" />
+              <AlertTriangle className="mt-0.5 h-5 w-5 text-[#8a4d00]" />
               <div>
-                <div className="font-medium text-white">Unsaved changes</div>
-                <div className="mt-1 text-sm text-slate-300">
+                <div className="font-medium text-[#241232]">Unsaved changes</div>
+                <div className="mt-1 text-sm text-[#4f435c]">
                   Saving updates the export definition, field mappings, filters, and sub-template configuration globally for the tenant.
                 </div>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button className="button-secondary" onClick={() => void handleTest()} type="button">
+              <button className="button-secondary" onClick={() => setPendingReviewAction('test-preview')} type="button">
                 <Play className="mr-2 h-4 w-4" />
                 Preview
               </button>
@@ -1638,6 +1760,345 @@ export function ExportBuilderWorkspace() {
           </div>
         </section>
       )}
+      <RegRightDrawer
+        open={createDrawerOpen}
+        onOpenChange={setCreateDrawerOpen}
+        title="Create export configuration"
+        description="Start from a blank DOCX/XLSX definition or copy one of the curated starter templates."
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setCreateDrawerOpen(false)} type="button">
+              Cancel
+            </button>
+            <button className="button-primary" disabled={saving} onClick={() => void handleCreateExport()} type="button">
+              <Plus className="mr-2 h-4 w-4" />
+              {saving ? 'Creating...' : 'Create export'}
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-5">
+          <div>
+            <label className="label">Export title</label>
+            <input
+              className="input mt-2"
+              placeholder="Security plan export"
+              value={newExportTitle}
+              onChange={(event) => setNewExportTitle(event.target.value)}
+            />
+          </div>
+          <div>
+            <label className="label">Starter template</label>
+            <select
+              className="input mt-2"
+              value={newStarterTemplateId}
+              onChange={(event) => setNewStarterTemplateId(event.target.value)}
+            >
+              <option value="">Start blank</option>
+              {starterTemplates.map((template) => (
+                <option key={template.id} value={template.id}>
+                  {template.title}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="panel-subtle text-sm leading-6 text-[#4f435c]">
+            New configurations preserve the existing Export Builder runtime contract. You can upload templates,
+            map placeholders, import mappings, and run test exports after creation.
+          </div>
+        </div>
+      </RegRightDrawer>
+
+      <RegRightDrawer
+        open={importMappingsDrawerOpen}
+        onOpenChange={setImportMappingsDrawerOpen}
+        title="Import field mappings"
+        description="Review the expected mapping payload before selecting a JSON file to import into this export definition."
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setImportMappingsDrawerOpen(false)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-primary"
+              disabled={!draft || busyAction === 'import-mappings'}
+              onClick={() => mappingImportRef.current?.click()}
+              type="button"
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              {busyAction === 'import-mappings' ? 'Importing...' : 'Select JSON file'}
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-5">
+          <div className="panel-subtle">
+            <div className="eyebrow">Expected payload</div>
+            <pre className="mt-3 max-h-72 overflow-auto rounded-2xl border border-[#ded8e4] bg-white p-4 text-xs leading-5 text-[#241232]">
+{`{
+  "mappings": [{ "tag": "{{owner}}", "fieldPath": "controls.owner" }],
+  "filterRows": [],
+  "filterExpression": "1 AND 2"
+}`}
+            </pre>
+          </div>
+          <div className="text-sm leading-6 text-[#4f435c]">
+            Imported mappings are validated by the existing Export Builder service before they replace the current
+            mapping and filter draft. Save changes after reviewing the imported assignments.
+          </div>
+        </div>
+      </RegRightDrawer>
+
+      <RegModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        title="Delete export configuration"
+        description={draft ? `This permanently removes "${draft.title}" from the tenant export library.` : undefined}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setDeleteModalOpen(false)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary border-[#f1b7bd] text-[#a51f2b] hover:border-[#df7d89] hover:bg-[#fff3f4]"
+              disabled={busyAction === 'delete'}
+              onClick={() => void handleDelete()}
+              type="button"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              {busyAction === 'delete' ? 'Deleting...' : 'Delete export'}
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-3 text-sm leading-6 text-[#4f435c]">
+          <p>
+            This action removes the export definition, its mapping draft, filters, sub-template configuration, and
+            recent preview history from this tenant's Export Builder library.
+          </p>
+          <p>Duplicate the export first if operators may need the current mapping setup later.</p>
+        </div>
+      </RegModal>
+      <RegModal
+        open={Boolean(pendingSubTemplateRemove)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingSubTemplateRemove(null);
+          }
+        }}
+        title="Remove sub-template"
+        description={
+          pendingSubTemplateRemove
+            ? `Review the DOCX appendix before removing "${pendingSubTemplateRemove.title}" from this export draft.`
+            : undefined
+        }
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setPendingSubTemplateRemove(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary border-[#f1b7bd] text-[#a51f2c] hover:border-[#df7d89] hover:bg-[#fff3f4]"
+              disabled={!pendingSubTemplateRemove}
+              onClick={() => pendingSubTemplateRemove && handleRemoveSubTemplate(pendingSubTemplateRemove)}
+              type="button"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Remove sub-template
+            </button>
+          </div>
+        }
+      >
+        {pendingSubTemplateRemove ? (
+          <div className="space-y-3 text-sm leading-6 text-[#4f435c]">
+            <p>
+              Removing this sub-template also removes its analyzed tags, field mappings, template file metadata,
+              and companion-section preview context from the draft.
+            </p>
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+              <div className="font-semibold text-[#241232]">{pendingSubTemplateRemove.title}</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="status-pill-neutral">{pendingSubTemplateRemove.status}</span>
+                <span className="status-pill-neutral">{pendingSubTemplateRemove.fileName}</span>
+                <span className="status-pill-neutral">{pendingSubTemplateRemove.analysis.tagsFound} tags</span>
+                <span className="status-pill-neutral">{pendingSubTemplateRemove.mappings.length} mappings</span>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
+      <RegModal
+        open={Boolean(pendingStarterTemplateCopy)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingStarterTemplateCopy(null);
+          }
+        }}
+        title="Copy starter template"
+        description={
+          pendingStarterTemplateCopy
+            ? `Review "${pendingStarterTemplateCopy.title}" before creating a new export configuration.`
+            : undefined
+        }
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setPendingStarterTemplateCopy(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-primary"
+              disabled={
+                !pendingStarterTemplateCopy || busyAction === `starter:${pendingStarterTemplateCopy.id}`
+              }
+              onClick={() => pendingStarterTemplateCopy && void handleCopyStarterTemplate(pendingStarterTemplateCopy)}
+              type="button"
+            >
+              <Copy className="mr-2 h-4 w-4" />
+              {pendingStarterTemplateCopy && busyAction === `starter:${pendingStarterTemplateCopy.id}`
+                ? 'Copying...'
+                : 'Copy template'}
+            </button>
+          </div>
+        }
+      >
+        {pendingStarterTemplateCopy ? (
+          <div className="space-y-3 text-sm leading-6 text-[#4f435c]">
+            <p>
+              This creates a separate export draft from the curated starter. The original template and existing export
+              definitions remain unchanged.
+            </p>
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+              <div className="font-semibold text-[#241232]">{pendingStarterTemplateCopy.title}</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="status-pill-neutral">{pendingStarterTemplateCopy.module}</span>
+                <span className="status-pill-neutral">{pendingStarterTemplateCopy.exportType}</span>
+                <span className="status-pill-neutral">{pendingStarterTemplateCopy.exportGroup}</span>
+                <span className="status-pill-neutral">{pendingStarterTemplateCopy.defaultTags.length} starter tags</span>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
+      <RegModal
+        open={Boolean(pendingReviewAction)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingReviewAction(null);
+          }
+        }}
+        title={pendingReviewCopy.title}
+        description={pendingReviewCopy.description}
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setPendingReviewAction(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-primary"
+              disabled={Boolean(pendingReviewCopy.busyKey && busyAction === pendingReviewCopy.busyKey)}
+              onClick={() => void confirmReviewAction()}
+              type="button"
+            >
+              {pendingReviewAction === 'duplicate' && <Copy className="mr-2 h-4 w-4" />}
+              {pendingReviewAction === 'test-preview' && <Play className="mr-2 h-4 w-4" />}
+              {pendingReviewAction === 'auto-map' && <WandSparkles className="mr-2 h-4 w-4" />}
+              {pendingReviewAction === 'export-mappings' && <Download className="mr-2 h-4 w-4" />}
+              {pendingReviewCopy.busyKey && busyAction === pendingReviewCopy.busyKey
+                ? 'Working...'
+                : pendingReviewCopy.confirmLabel}
+            </button>
+          </div>
+        }
+      >
+        <div className="space-y-4 text-sm leading-6 text-[#4f435c]">
+          <p>{pendingReviewCopy.body}</p>
+          {draft ? (
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+              <div className="font-semibold text-[#241232]">{draft.title}</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="status-pill-neutral">{draft.module}</span>
+                <span className="status-pill-neutral">{draft.exportType}</span>
+                <span className="status-pill-neutral">{draft.mappings.length} mappings</span>
+                <span className="status-pill-neutral">{draft.filterRows.length} filters</span>
+                <span className="status-pill-neutral">{draft.subTemplates.length} sub templates</span>
+              </div>
+              {pendingReviewAction === 'test-preview' && (
+                <div className="mt-3 rounded-2xl border border-[#ded8e4] bg-white p-3 text-[#62576a]">
+                  Preview scenario: <span className="font-medium text-[#241232]">{testScenarioName || 'Untitled preview'}</span>
+                </div>
+              )}
+            </div>
+          ) : null}
+        </div>
+      </RegModal>
+      <RegModal
+        open={Boolean(pendingTemplateUpload)}
+        onOpenChange={(open) => {
+          if (!open) {
+            dismissTemplateUploadReview();
+          }
+        }}
+        title={
+          pendingTemplateUpload?.mode === 'subtemplate-add'
+            ? 'Add sub-template file'
+            : pendingTemplateUpload?.mode === 'subtemplate-reanalyze'
+              ? 'Re-analyze sub-template file'
+              : 'Analyze export template'
+        }
+        description={
+          pendingTemplateUpload
+            ? `Review "${pendingTemplateUpload.file.name}" before sending it to the existing Export Builder analyzer.`
+            : undefined
+        }
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={dismissTemplateUploadReview} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-primary"
+              disabled={
+                !pendingTemplateUpload ||
+                busyAction === 'analyze-template' ||
+                busyAction === 'add-subtemplate' ||
+                (pendingTemplateUpload.subTemplateId
+                  ? busyAction === `subtemplate:${pendingTemplateUpload.subTemplateId}`
+                  : false)
+              }
+              onClick={() => void confirmTemplateUploadReview()}
+              type="button"
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              {pendingTemplateUpload?.mode === 'subtemplate-add'
+                ? 'Add sub-template'
+                : pendingTemplateUpload?.mode === 'subtemplate-reanalyze'
+                  ? 'Re-analyze file'
+                  : 'Analyze template'}
+            </button>
+          </div>
+        }
+      >
+        {pendingTemplateUpload ? (
+          <div className="space-y-4 text-sm leading-6 text-[#4f435c]">
+            <p>
+              The file is only processed after confirmation. The existing analyzer extracts placeholder tags and mapping
+              suggestions without changing the saved export definition until you review and save the draft.
+            </p>
+            <div className="rounded-2xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
+              <div className="font-semibold text-[#241232]">{pendingTemplateUpload.file.name}</div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="status-pill-neutral">
+                  {(pendingTemplateUpload.file.size / 1024).toFixed(1)} KB
+                </span>
+                <span className="status-pill-neutral">{pendingTemplateUpload.file.type || 'Template file'}</span>
+                {pendingTemplateUpload.subTemplateTitle && (
+                  <span className="status-pill-neutral">{pendingTemplateUpload.subTemplateTitle}</span>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
     </div>
   );
 }

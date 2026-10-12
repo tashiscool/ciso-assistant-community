@@ -1,0 +1,20 @@
+{
+  "name": "regovise-verification",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "npm@11.6.2",
+  "engines": { "node": ">=22.12 <25", "npm": ">=10 <12" },
+  "scripts": {
+    "verify": "node ops/quality/verify.mjs",
+    "verify:full": "node ops/quality/verify.mjs --integration",
+    "verify:structure": "node ops/quality/source_policy.mjs",
+    "verify:reuse": "node ops/quality/check_reuse.mjs",
+    "verify:contracts": "npm --prefix cloudflare run alignment:check && npm --prefix cloudflare run validate:grc-contracts",
+    "verify:local": "node ops/local/run_worker.mjs",
+    "verify:release-plan": "node cloudflare/scripts/release_plan.mjs",
+    "test:practices": "node --test ops/test/*.test.mjs",
+    "audit:traceability": "node ops/audit/feature_traceability.mjs",
+    "audit:dependencies": "node ops/quality/dependency_audit.mjs"
+  }
+}

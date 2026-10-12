@@ -1,9 +1,23 @@
 import { useEffect, useMemo, useState } from 'react';
+import { RegFilterBar, RegPageHeader, RegStatusPill } from '../../components/regovise/PagePrimitives';
 import { getFindingDetail, getFindings, getFrameworkLibrary } from './api';
 import type { FindingDetail, FindingSummary, FrameworkLibrarySummary } from './types';
 
 function summarizeFindingLocation(item: FindingSummary) {
   return [item.accountId, item.region].filter(Boolean).join(' • ') || 'Scope not provided';
+}
+
+function statusTone(status: string) {
+  if (status === 'fail') {
+    return 'danger';
+  }
+  if (status === 'pass') {
+    return 'success';
+  }
+  if (status === 'inconclusive' || status === 'partial') {
+    return 'warning';
+  }
+  return 'neutral';
 }
 
 export function FindingsExplorerPage() {
@@ -88,33 +102,36 @@ export function FindingsExplorerPage() {
 
   return (
     <div className="space-y-6">
-      <section className="panel">
-        <div className="eyebrow">Normalized Findings</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Findings Explorer</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
-          Review normalized connector and import findings, inspect mapped control evaluations, and follow evidence
-          references that feed cross-framework assessments and report bundles.
-        </p>
-      </section>
+      <RegPageHeader
+        eyebrow="Compliance / Normalized Findings"
+        title="Findings Explorer"
+        description="Review normalized connector and import findings, inspect mapped control evaluations, and follow evidence references that feed cross-framework assessments and report bundles."
+        meta={
+          <>
+            <RegStatusPill tone="neutral">{findings.length} loaded</RegStatusPill>
+            <RegStatusPill tone="purple">{frameworks.length} framework targets</RegStatusPill>
+            <RegStatusPill tone="info">{sourceOptions.length} sources</RegStatusPill>
+          </>
+        }
+        actions={
+          <button className="button-primary" onClick={() => void loadList(selectedId)} type="button">
+            Refresh findings
+          </button>
+        }
+        className="rounded-lg border border-[#ded8e4] shadow-[0_8px_24px_rgba(48,24,72,0.04)]"
+      />
 
       {error ? <div className="notice-error">{error}</div> : null}
 
       <section className="panel">
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-          <div>
-            <div className="eyebrow">Filters</div>
-            <h2 className="mt-2 text-2xl font-semibold text-white">Assessment-ready intake</h2>
-          </div>
-          <button className="button-primary" onClick={() => void loadList(selectedId)} type="button">
-            Refresh findings
-          </button>
-        </div>
+        <div className="eyebrow">Assessment-ready intake</div>
+        <h2 className="mt-2 text-2xl font-semibold text-[#241232]">Filters</h2>
 
-        <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <label className="flex flex-col gap-2 text-sm text-slate-300">
+        <RegFilterBar className="mt-5 rounded-lg border border-[#ded8e4] px-4 py-4">
+          <label className="flex flex-col gap-2 text-sm text-[#4f435c]">
             Framework
             <select
-              className="rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/40"
+              className="rounded-2xl border border-[#ded8e4] bg-white px-4 py-3 text-sm text-[#241232] outline-none focus:border-[#8b35e6]"
               onChange={(event) => setFilters((current) => ({ ...current, framework: event.target.value }))}
               value={filters.framework}
             >
@@ -126,10 +143,10 @@ export function FindingsExplorerPage() {
               ))}
             </select>
           </label>
-          <label className="flex flex-col gap-2 text-sm text-slate-300">
+          <label className="flex flex-col gap-2 text-sm text-[#4f435c]">
             Source
             <select
-              className="rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/40"
+              className="rounded-2xl border border-[#ded8e4] bg-white px-4 py-3 text-sm text-[#241232] outline-none focus:border-[#8b35e6]"
               onChange={(event) => setFilters((current) => ({ ...current, source: event.target.value }))}
               value={filters.source}
             >
@@ -141,10 +158,10 @@ export function FindingsExplorerPage() {
               ))}
             </select>
           </label>
-          <label className="flex flex-col gap-2 text-sm text-slate-300">
+          <label className="flex flex-col gap-2 text-sm text-[#4f435c]">
             Severity
             <select
-              className="rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/40"
+              className="rounded-2xl border border-[#ded8e4] bg-white px-4 py-3 text-sm text-[#241232] outline-none focus:border-[#8b35e6]"
               onChange={(event) => setFilters((current) => ({ ...current, severity: event.target.value }))}
               value={filters.severity}
             >
@@ -156,10 +173,10 @@ export function FindingsExplorerPage() {
               ))}
             </select>
           </label>
-          <label className="flex flex-col gap-2 text-sm text-slate-300">
+          <label className="flex flex-col gap-2 text-sm text-[#4f435c]">
             Status
             <select
-              className="rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/40"
+              className="rounded-2xl border border-[#ded8e4] bg-white px-4 py-3 text-sm text-[#241232] outline-none focus:border-[#8b35e6]"
               onChange={(event) => setFilters((current) => ({ ...current, status: event.target.value }))}
               value={filters.status}
             >
@@ -171,7 +188,7 @@ export function FindingsExplorerPage() {
               ))}
             </select>
           </label>
-        </div>
+        </RegFilterBar>
 
         <div className="mt-4">
           <button className="button-secondary" onClick={() => void loadList(selectedId)} type="button">
@@ -184,17 +201,17 @@ export function FindingsExplorerPage() {
         <div className="panel space-y-3">
           <div className="flex items-center justify-between gap-3">
             <div className="eyebrow">Findings</div>
-            <span className="badge-neutral">{findings.length} loaded</span>
+            <RegStatusPill tone="neutral">{findings.length} loaded</RegStatusPill>
           </div>
 
           {loading ? (
-            <div className="rounded-3xl border border-dashed border-white/10 bg-slate-950/20 p-6 text-sm text-slate-400">
+            <div className="rounded-3xl border border-dashed border-[#ded8e4] bg-[#fbf9fc] p-6 text-sm text-[#6f6578]">
               Loading normalized findings...
             </div>
           ) : null}
 
           {!loading && findings.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-white/10 bg-slate-950/20 p-6 text-sm text-slate-400">
+            <div className="rounded-3xl border border-dashed border-[#ded8e4] bg-[#fbf9fc] p-6 text-sm text-[#6f6578]">
               No findings match the current filters yet.
             </div>
           ) : null}
@@ -206,8 +223,8 @@ export function FindingsExplorerPage() {
                   <button
                     className={`w-full rounded-3xl border px-4 py-4 text-left transition ${
                       active
-                        ? 'border-cyan-300/30 bg-cyan-400/[0.06] text-white'
-                        : 'border-white/10 bg-slate-950/20 text-slate-300 hover:border-cyan-300/20 hover:bg-cyan-400/[0.03]'
+                        ? 'border-[#d7c3f1] bg-[#f2e8ff] text-[#241232]'
+                        : 'border-[#ded8e4] bg-[#fbf9fc] text-[#4f435c] hover:border-[#d7c3f1] hover:bg-[#f6f1fa]'
                     }`}
                     key={item.id}
                     onClick={() => setSelectedId(item.id)}
@@ -218,13 +235,13 @@ export function FindingsExplorerPage() {
                         <div className="eyebrow">{item.source}</div>
                         <div className="mt-2 text-base font-semibold">{item.resourceId}</div>
                       </div>
-                      <span className={item.statusSummary === 'fail' ? 'badge-warning' : 'badge-neutral'}>
+                      <RegStatusPill tone={statusTone(item.statusSummary)}>
                         {item.statusSummary}
-                      </span>
+                      </RegStatusPill>
                     </div>
-                    <div className="mt-3 text-sm text-slate-400">{item.resourceType}</div>
-                    <div className="mt-2 text-xs text-slate-500">{summarizeFindingLocation(item)}</div>
-                    <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-400">
+                    <div className="mt-3 text-sm text-[#6f6578]">{item.resourceType}</div>
+                    <div className="mt-2 text-xs text-[#62576a]">{summarizeFindingLocation(item)}</div>
+                    <div className="mt-4 flex flex-wrap gap-2 text-xs text-[#6f6578]">
                       <span>{item.severitySummary}</span>
                       <span>{item.evaluationCount} evals</span>
                       <span>{item.scfMatchCount} SCF matches</span>
@@ -239,15 +256,15 @@ export function FindingsExplorerPage() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="eyebrow">Finding detail</div>
-              <h2 className="mt-2 text-2xl font-semibold text-white">
+              <h2 className="mt-2 text-2xl font-semibold text-[#241232]">
                 {detail?.resourceId ?? 'Select a finding'}
               </h2>
             </div>
-            {detail ? <span className="badge-neutral">{detail.source}</span> : null}
+            {detail ? <RegStatusPill tone="neutral">{detail.source}</RegStatusPill> : null}
           </div>
 
           {detailLoading ? (
-            <div className="mt-6 rounded-3xl border border-dashed border-white/10 bg-slate-950/20 p-6 text-sm text-slate-400">
+            <div className="mt-6 rounded-3xl border border-dashed border-[#ded8e4] bg-[#fbf9fc] p-6 text-sm text-[#6f6578]">
               Loading finding detail...
             </div>
           ) : null}
@@ -257,40 +274,40 @@ export function FindingsExplorerPage() {
               <div className="grid gap-3 md:grid-cols-4">
                 <div className="panel-subtle">
                   <div className="label">Status</div>
-                  <div className="mt-2 text-lg font-semibold text-white">{detail.statusSummary}</div>
+                  <div className="mt-2 text-lg font-semibold text-[#241232]">{detail.statusSummary}</div>
                 </div>
                 <div className="panel-subtle">
                   <div className="label">Severity</div>
-                  <div className="mt-2 text-lg font-semibold text-white">{detail.severitySummary}</div>
+                  <div className="mt-2 text-lg font-semibold text-[#241232]">{detail.severitySummary}</div>
                 </div>
                 <div className="panel-subtle">
                   <div className="label">Evaluations</div>
-                  <div className="mt-2 text-lg font-semibold text-white">{detail.evaluationCount}</div>
+                  <div className="mt-2 text-lg font-semibold text-[#241232]">{detail.evaluationCount}</div>
                 </div>
                 <div className="panel-subtle">
                   <div className="label">Evidence refs</div>
-                  <div className="mt-2 text-lg font-semibold text-white">{detail.evidenceRefCount}</div>
+                  <div className="mt-2 text-lg font-semibold text-[#241232]">{detail.evidenceRefCount}</div>
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-5">
+              <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-5">
                 <div className="eyebrow">Resource scope</div>
                 <div className="mt-3 grid gap-3 md:grid-cols-2">
                   <div>
                     <div className="label">Type</div>
-                    <div className="mt-1 text-sm text-white">{detail.resourceType}</div>
+                    <div className="mt-1 text-sm text-[#241232]">{detail.resourceType}</div>
                   </div>
                   <div>
                     <div className="label">Collected</div>
-                    <div className="mt-1 text-sm text-white">{new Date(detail.collectedAt).toLocaleString()}</div>
+                    <div className="mt-1 text-sm text-[#241232]">{new Date(detail.collectedAt).toLocaleString()}</div>
                   </div>
                   <div>
                     <div className="label">Account</div>
-                    <div className="mt-1 text-sm text-white">{detail.accountId ?? 'n/a'}</div>
+                    <div className="mt-1 text-sm text-[#241232]">{detail.accountId ?? 'n/a'}</div>
                   </div>
                   <div>
                     <div className="label">Region</div>
-                    <div className="mt-1 text-sm text-white">{detail.region ?? 'n/a'}</div>
+                    <div className="mt-1 text-sm text-[#241232]">{detail.region ?? 'n/a'}</div>
                   </div>
                 </div>
               </div>
@@ -298,32 +315,32 @@ export function FindingsExplorerPage() {
               <div className="space-y-3">
                 <div className="eyebrow">Control evaluations</div>
                 {detail.evaluations.map((evaluation) => (
-                  <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-5" key={evaluation.id}>
+                  <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-5" key={evaluation.id}>
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
-                        <div className="text-sm font-semibold text-white">
+                        <div className="text-sm font-semibold text-[#241232]">
                           {evaluation.controlFramework} • {evaluation.controlId}
                         </div>
-                        <div className="mt-2 text-sm text-slate-300">{evaluation.title ?? evaluation.message ?? 'No narrative attached.'}</div>
+                        <div className="mt-2 text-sm text-[#4f435c]">{evaluation.title ?? evaluation.message ?? 'No narrative attached.'}</div>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        <span className={evaluation.status === 'fail' ? 'badge-warning' : 'badge-neutral'}>
+                        <RegStatusPill tone={statusTone(evaluation.status)}>
                           {evaluation.status}
-                        </span>
-                        {evaluation.severity ? <span className="badge-neutral">{evaluation.severity}</span> : null}
+                        </RegStatusPill>
+                        {evaluation.severity ? <RegStatusPill tone="neutral">{evaluation.severity}</RegStatusPill> : null}
                       </div>
                     </div>
                     {evaluation.remediationSummary ? (
-                      <div className="mt-4 text-sm leading-6 text-slate-300">
-                        <span className="font-semibold text-white">Remediation:</span> {evaluation.remediationSummary}
+                      <div className="mt-4 text-sm leading-6 text-[#4f435c]">
+                        <span className="font-semibold text-[#241232]">Remediation:</span> {evaluation.remediationSummary}
                       </div>
                     ) : null}
                     {evaluation.scfControlIds.length > 0 ? (
                       <div className="mt-4 flex flex-wrap gap-2">
                         {evaluation.scfControlIds.map((controlId) => (
-                          <span className="badge-neutral" key={controlId}>
+                          <RegStatusPill tone="neutral" key={controlId}>
                             {controlId}
-                          </span>
+                          </RegStatusPill>
                         ))}
                       </div>
                     ) : null}
@@ -334,7 +351,7 @@ export function FindingsExplorerPage() {
           ) : null}
 
           {!detailLoading && !detail ? (
-            <div className="mt-6 rounded-3xl border border-dashed border-white/10 bg-slate-950/20 p-6 text-sm text-slate-400">
+            <div className="mt-6 rounded-3xl border border-dashed border-[#ded8e4] bg-[#fbf9fc] p-6 text-sm text-[#6f6578]">
               Select a finding from the left to inspect mapped evaluations and evidence references.
             </div>
           ) : null}

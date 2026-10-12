@@ -5593,16 +5593,18 @@ async function seedDemoComplianceRequirements(env: EnvBindings) {
 async function bootstrapDemoTenant(env: EnvBindings) {
   const now = new Date().toISOString();
 
-  // Seed IAM first so folders and principals exist before domain records reference them.
+  // Create the parent tenant before IAM folders and principals reference it.
+  await env.D1_MAIN.prepare(
+    `
+    INSERT OR IGNORE INTO tenants (id, slug, name)
+    VALUES (?, ?, ?)
+    `,
+  )
+    .bind(DEMO_IDS.tenantId, 'demo', 'CISO Assistant Demo Tenant')
+    .run();
   await seedDemoIamWorkspace(env);
 
   const statements = [
-    env.D1_MAIN.prepare(
-      `
-      INSERT OR IGNORE INTO tenants (id, slug, name)
-      VALUES (?, ?, ?)
-      `,
-    ).bind(DEMO_IDS.tenantId, 'demo', 'CISO Assistant Demo Tenant'),
     env.D1_MAIN.prepare(
       `
       INSERT OR IGNORE INTO users (id, tenant_id, email, display_name, locale, is_active)
@@ -6020,7 +6022,7 @@ function getBootstrapSecret(env: EnvBindings): string | null {
     return raw;
   }
 
-  if (env.APP_ENV !== 'production') {
+  if (env.APP_ENV === 'development') {
     return 'local-bootstrap-secret';
   }
 
@@ -6075,6 +6077,9 @@ async function derivePasswordHash(
   saltHex: string,
   iterations = 100000,
 ): Promise<string> {
+  if (!Number.isSafeInteger(iterations) || iterations < 1 || iterations > 100000 || !/^(?:[a-f0-9]{2}){16,64}$/i.test(saltHex)) {
+    throw Object.assign(new Error('The saved credential is not supported. Ask an administrator to reset it.'), { status: 401, code: 'invalid_credential_parameters' });
+  }
   const encoder = new TextEncoder();
   const key = await crypto.subtle.importKey(
     'raw',
@@ -6352,7 +6357,7 @@ async function buildTenantLoginOptions(
   const tenantSlug = slugifyTenant(rawTenantSlug);
   const tenant = await loadTenantBySlug(env, tenantSlug);
   const emailRuntime = getEmailRuntimeSummary(env);
-  const previewOnly = !emailRuntime.sendingEnabled && env.APP_ENV !== 'production';
+  const previewOnly = !emailRuntime.sendingEnabled && env.APP_ENV === 'development';
 
   if (!tenant) {
     return {
@@ -6495,7 +6500,8 @@ async function loadPendingSsoTransaction(
     return null;
   }
 
-  if (Date.parse(row.expires_at) <= Date.now()) {
+  const expiresAt = Date.parse(row.expires_at);
+  if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
     await markSsoTransactionConsumed(env, transactionId);
     return null;
   }
@@ -7144,7 +7150,7 @@ async function buildLoginConfig(env: EnvBindings): Promise<LoginConfigPayload> {
       .first<{ tenant_slug: string | null; email: string | null }>(),
   ]);
 
-  const previewOnly = !emailRuntime.sendingEnabled && env.APP_ENV !== 'production';
+  const previewOnly = !emailRuntime.sendingEnabled && env.APP_ENV === 'development';
   const emailCodeEnabled = bootstrap.initialized && (emailRuntime.sendingEnabled || previewOnly);
   const passwordConfiguredUserCount = Number(passwordConfiguredRow?.count ?? 0);
   const passwordSignInEnabled = bootstrap.initialized && Number(localLoginUserCount?.count ?? 0) > 0;
@@ -7588,56 +7594,49 @@ async function upsertLocalPasswordCredential(
     password: string;
     updatedByUserId: string | null;
     resetRequired?: boolean;
+    // Present only for self-service changes. Admin resets deliberately omit this guard.
+    expectedCredential?: { passwordHash: string | null; sessionId: string };
   },
-): Promise<void> {
+): Promise<string> {
   const now = new Date().toISOString();
   const saltHex = generateSaltHex();
   const iterations = 100000;
   const passwordHash = await derivePasswordHash(input.password, saltHex, iterations);
-
-  await env.D1_MAIN.prepare(
-    `
-    INSERT INTO local_password_credentials (
-      user_id,
-      tenant_id,
-      password_hash,
-      password_salt,
-      hash_method,
-      hash_iterations,
-      created_at,
-      updated_at,
-      updated_by_user_id,
-      reset_required,
-      failed_attempts,
-      last_failed_at,
-      locked_until
-    ) VALUES (?, ?, ?, ?, 'pbkdf2_sha256', ?, ?, ?, ?, ?, 0, NULL, NULL)
-    ON CONFLICT(user_id) DO UPDATE SET
-      tenant_id = excluded.tenant_id,
-      password_hash = excluded.password_hash,
-      password_salt = excluded.password_salt,
-      hash_method = excluded.hash_method,
-      hash_iterations = excluded.hash_iterations,
-      updated_at = excluded.updated_at,
-      updated_by_user_id = excluded.updated_by_user_id,
-      reset_required = excluded.reset_required,
-      failed_attempts = 0,
-      last_failed_at = NULL,
-      locked_until = NULL
-    `,
-  )
-    .bind(
-      input.userId,
-      input.tenantId,
-      passwordHash,
-      saltHex,
-      iterations,
-      now,
-      now,
-      input.updatedByUserId,
-      input.resetRequired ? 1 : 0,
-    )
-    .run();
+  const expected = input.expectedCredential;
+  const guard = expected
+    ? `WHERE EXISTS (SELECT 1 FROM sessions AS session INNER JOIN users AS principal
+         ON principal.id = session.user_id AND principal.tenant_id = session.tenant_id
+         WHERE session.id = ? AND session.user_id = ? AND session.tenant_id = ?
+           AND julianday(session.expires_at) > julianday('now') AND principal.is_active = 1)
+       AND ${expected.passwordHash === null
+         ? 'NOT EXISTS (SELECT 1 FROM local_password_credentials WHERE user_id = ? AND tenant_id = ?)'
+         : 'EXISTS (SELECT 1 FROM local_password_credentials WHERE user_id = ? AND tenant_id = ? AND password_hash = ?)'} `
+    : '';
+  const results = await env.D1_MAIN.batch([
+    env.D1_MAIN.prepare(`
+      INSERT INTO local_password_credentials (
+        user_id, tenant_id, password_hash, password_salt, hash_method, hash_iterations,
+        created_at, updated_at, updated_by_user_id, reset_required, failed_attempts, last_failed_at, locked_until
+      ) SELECT ?, ?, ?, ?, 'pbkdf2_sha256', ?, ?, ?, ?, ?, 0, NULL, NULL
+        ${guard}
+      ON CONFLICT(user_id) DO UPDATE SET
+        tenant_id = excluded.tenant_id, password_hash = excluded.password_hash,
+        password_salt = excluded.password_salt, hash_method = excluded.hash_method,
+        hash_iterations = excluded.hash_iterations, updated_at = excluded.updated_at,
+        updated_by_user_id = excluded.updated_by_user_id, reset_required = excluded.reset_required,
+        failed_attempts = 0, last_failed_at = NULL, locked_until = NULL
+    `).bind(
+      input.userId, input.tenantId, passwordHash, saltHex, iterations, now, now,
+      input.updatedByUserId, input.resetRequired ? 1 : 0,
+      ...(expected ? [expected.sessionId, input.userId, input.tenantId,
+        input.userId, input.tenantId, ...(expected.passwordHash === null ? [] : [expected.passwordHash])] : []),
+    ),
+    env.D1_MAIN.prepare(`DELETE FROM sessions WHERE tenant_id = ? AND user_id = ?
+      AND EXISTS (SELECT 1 FROM local_password_credentials WHERE user_id = ? AND tenant_id = ? AND password_hash = ? AND password_salt = ?)`)
+      .bind(input.tenantId, input.userId, input.userId, input.tenantId, passwordHash, saltHex),
+  ]);
+  if (!results[0].meta.changes) throw Object.assign(new Error('Your account changed. Sign in again before changing the password.'), { status: 409, code: 'credential_conflict' });
+  return passwordHash;
 }
 
 async function recordFailedPasswordAttempt(
@@ -7819,7 +7818,7 @@ export async function handleCoreRoutes(
           status: 201,
           headers: {
             'Set-Cookie': buildSessionCookieHeader(
-              session.id,
+              session.token,
               session.expires_at,
               isSecureRequest(ctx),
             ),
@@ -7883,7 +7882,7 @@ export async function handleCoreRoutes(
           status: 201,
           headers: {
             'Set-Cookie': buildSessionCookieHeader(
-              session.id,
+              session.token,
               session.expires_at,
               isSecureRequest(ctx),
             ),
@@ -8179,7 +8178,8 @@ export async function handleCoreRoutes(
       }
 
       const now = new Date().toISOString();
-      if (loginCode.expires_at <= now) {
+      const codeExpiresAt = Date.parse(loginCode.expires_at);
+      if (!Number.isFinite(codeExpiresAt) || codeExpiresAt <= Date.now()) {
         await ctx.env.D1_MAIN.prepare(
           `
           UPDATE local_login_codes
@@ -8232,16 +8232,27 @@ export async function handleCoreRoutes(
         );
       }
 
-      await ctx.env.D1_MAIN.prepare(
+      const consumed = await ctx.env.D1_MAIN.prepare(
         `
         UPDATE local_login_codes
         SET consumed_at = ?,
             last_attempt_at = ?
         WHERE id = ?
+          AND tenant_id = ? AND user_id = ? AND email_normalized = ?
+          AND purpose = 'sign_in' AND code_hash = ?
+          AND consumed_at IS NULL AND attempts < 5
+          AND julianday(expires_at) > julianday('now')
+          AND EXISTS (SELECT 1 FROM users AS principal
+            WHERE principal.id = local_login_codes.user_id
+              AND principal.tenant_id = local_login_codes.tenant_id
+              AND principal.is_active = 1 AND principal.keep_local_login = 1)
         `,
       )
-        .bind(now, now, loginCode.id)
+        .bind(now, now, loginCode.id, principal.tenantId, principal.userId, email, codeHash)
         .run();
+      if (consumed.meta.changes !== 1) {
+        return json({ error: 'invalid_login_code', message: 'That sign-in code was not accepted.' }, { status: 401 });
+      }
 
       const session = await createSession(ctx.env, ctx.request, {
         tenantId: principal.tenantId,
@@ -8264,7 +8275,7 @@ export async function handleCoreRoutes(
           status: 201,
           headers: {
             'Set-Cookie': buildSessionCookieHeader(
-              session.id,
+              session.token,
               session.expires_at,
               isSecureRequest(ctx),
             ),
@@ -8430,6 +8441,17 @@ export async function handleCoreRoutes(
         );
       }
 
+      if (normalizeAuthProtocol(transaction.auth_protocol) !== 'oidc') {
+        return json({ error: 'stale_sso_callback', message: 'This single sign-on callback is no longer valid. Start sign-in again from the login page.' }, { status: 409 });
+      }
+      const claimed = await ctx.env.D1_MAIN.prepare(`
+        UPDATE sso_auth_transactions SET consumed_at = ?
+        WHERE id = ? AND tenant_id = ? AND auth_protocol = ?
+          AND consumed_at IS NULL AND julianday(expires_at) > julianday('now')
+      `).bind(new Date().toISOString(), transaction.id, transaction.tenant_id, transaction.auth_protocol).run();
+      if (claimed.meta.changes !== 1) {
+        return json({ error: 'stale_sso_callback', message: 'This single sign-on callback is no longer valid. Start sign-in again from the login page.' }, { status: 409 });
+      }
       const claims = await completeOidcCodeExchange(
         ctx.env,
         config,
@@ -8449,7 +8471,6 @@ export async function handleCoreRoutes(
       );
 
       const authResult = await finalizeSsoAuthentication(ctx.env, ctx.request, config, claims);
-      await markSsoTransactionConsumed(ctx.env, transaction.id);
 
       return json(
         {
@@ -8470,7 +8491,7 @@ export async function handleCoreRoutes(
           status: 201,
           headers: {
             'Set-Cookie': buildSessionCookieHeader(
-              authResult.session.id,
+              authResult.session.token,
               authResult.session.expires_at,
               isSecureRequest(ctx),
             ),
@@ -8631,6 +8652,7 @@ export async function handleCoreRoutes(
         );
       }
 
+      if (credential.hash_method !== 'pbkdf2_sha256') throw Object.assign(new Error('Credential parameters are not supported.'), { status: 401, code: 'invalid_credential_parameters' });
       const derivedHash = await derivePasswordHash(
         password,
         credential.password_salt,
@@ -8652,6 +8674,7 @@ export async function handleCoreRoutes(
       const session = await createSession(ctx.env, ctx.request, {
         tenantId: principal.tenantId,
         userId: principal.userId,
+        expectedPasswordHash: credential.password_hash,
       });
 
       return json(
@@ -8671,7 +8694,7 @@ export async function handleCoreRoutes(
           status: 201,
           headers: {
             'Set-Cookie': buildSessionCookieHeader(
-              session.id,
+              session.token,
               session.expires_at,
               isSecureRequest(ctx),
             ),
@@ -8784,6 +8807,7 @@ export async function handleCoreRoutes(
           );
         }
 
+        if (currentCredential.hash_method !== 'pbkdf2_sha256') throw Object.assign(new Error('Credential parameters are not supported.'), { status: 401, code: 'invalid_credential_parameters' });
         const currentHash = await derivePasswordHash(
           currentPassword,
           currentCredential.password_salt,
@@ -8800,17 +8824,23 @@ export async function handleCoreRoutes(
         }
       }
 
-      await upsertLocalPasswordCredential(ctx.env, {
+      const currentToken = getSessionIdFromRequest(ctx.request);
+      const currentSession = currentToken ? await getSessionById(ctx.env, currentToken) : null;
+      if (!currentSession || currentSession.user_id !== ctx.userId || currentSession.tenant_id !== ctx.tenantId) {
+        return json({ error: 'missing_identity', message: 'Sign in before changing your password.' }, { status: 401 });
+      }
+      const passwordHash = await upsertLocalPasswordCredential(ctx.env, {
         tenantId: ctx.tenantId,
         userId: ctx.userId,
         password: newPassword,
         updatedByUserId: ctx.userId,
+        expectedCredential: { passwordHash: currentCredential?.password_hash ?? null, sessionId: currentSession.id },
       });
-
-      return json({
-        data: {
-          passwordSet: true,
-        },
+      const renewed = await createSession(ctx.env, ctx.request, {
+        tenantId: ctx.tenantId, userId: ctx.userId, expectedPasswordHash: passwordHash,
+      });
+      return json({ data: { passwordSet: true } }, {
+        headers: { 'Set-Cookie': buildSessionCookieHeader(renewed.token, renewed.expires_at, isSecureRequest(ctx)) },
       });
     }
 
@@ -8867,7 +8897,7 @@ export async function handleCoreRoutes(
           status: 201,
           headers: {
             'Set-Cookie': buildSessionCookieHeader(
-              session.id,
+              session.token,
               session.expires_at,
               isSecureRequest(ctx),
             ),
@@ -12140,11 +12170,7 @@ export async function handleCoreRoutes(
       return access;
     }
 
-    if (id) {
-      if (ctx.request.method !== 'GET') {
-        return methodNotAllowed(['GET']);
-      }
-
+    if (id && ctx.request.method === 'GET') {
       const entity = await ctx.env.D1_MAIN.prepare(
         `
         SELECT
@@ -14813,7 +14839,7 @@ export async function handleCoreRoutes(
       return methodNotAllowed(['POST']);
     }
 
-    if (ctx.env.APP_ENV === 'production') {
+    if (ctx.env.APP_ENV !== 'development') {
       return json(
         { error: 'demo_disabled', message: 'Demo bootstrap is disabled in production.' },
         { status: 403 },
@@ -14835,7 +14861,9 @@ export async function handleCoreRoutes(
       return methodNotAllowed(['GET']);
     }
 
-    if (ctx.tenantId && ctx.tenantId !== id) {
+    const access = await requireRootAdminAccess(ctx);
+    if (access instanceof Response) return access;
+    if (access.tenantId !== id) {
       return json(
         { error: 'tenant_mismatch', message: 'Requested tenant does not match auth context.' },
         { status: 403 },

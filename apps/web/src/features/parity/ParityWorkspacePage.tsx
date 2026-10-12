@@ -178,15 +178,15 @@ export function ParityWorkspacePage({ section, title, description }: Props) {
   }, [overview, query]);
 
   if (loading || !overview) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading parity workspace...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading parity workspace...</div>;
   }
 
   return (
     <div className="space-y-6">
       <section className="panel">
         <div className="eyebrow">Legacy Coverage</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">{title}</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">{description}</p>
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">{title}</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">{description}</p>
       </section>
 
       {error && <div className="notice-error">{error}</div>}
@@ -197,7 +197,7 @@ export function ParityWorkspacePage({ section, title, description }: Props) {
             <div key={item.id} className="metric-card">
               <div className="metric-label">{item.label}</div>
               <div className="metric-value">{item.value}</div>
-              <div className="mt-2 text-xs text-slate-500">{item.detail}</div>
+              <div className="mt-2 text-xs text-[#62576a]">{item.detail}</div>
             </div>
           ))}
         </section>
@@ -211,10 +211,10 @@ export function ParityWorkspacePage({ section, title, description }: Props) {
               <Link key={item.id} className="panel-subtle block" to={item.route}>
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <div className="font-medium text-white">{item.title}</div>
-                    <div className="mt-1 text-sm text-slate-400">{item.detail}</div>
+                    <div className="font-medium text-[#241232]">{item.title}</div>
+                    <div className="mt-1 text-sm text-[#6f6578]">{item.detail}</div>
                   </div>
-                  <div className="text-sm text-slate-300">{formatDate(item.date)}</div>
+                  <div className="text-sm text-[#4f435c]">{formatDate(item.date)}</div>
                 </div>
               </Link>
             ))}
@@ -234,10 +234,10 @@ export function ParityWorkspacePage({ section, title, description }: Props) {
           </div>
           <div className="panel-subtle md:col-span-2">
             <div className="label">Latest activity</div>
-            <div className="mt-3 text-sm text-slate-300">
+            <div className="mt-3 text-sm text-[#4f435c]">
               Export: {overview.backupRestore.latestExport ?? 'n/a'}
             </div>
-            <div className="mt-1 text-sm text-slate-300">
+            <div className="mt-1 text-sm text-[#4f435c]">
               Import: {overview.backupRestore.latestImport ?? 'n/a'}
             </div>
           </div>
@@ -248,19 +248,19 @@ export function ParityWorkspacePage({ section, title, description }: Props) {
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <div className="metric-card">
             <div className="metric-label">Tenant</div>
-            <div className="mt-3 text-sm font-semibold text-white">{overview.settings.tenantId}</div>
+            <div className="mt-3 text-sm font-semibold text-[#241232]">{overview.settings.tenantId}</div>
           </div>
           <div className="metric-card">
             <div className="metric-label">User</div>
-            <div className="mt-3 text-sm font-semibold text-white">{overview.settings.userId ?? 'anonymous'}</div>
+            <div className="mt-3 text-sm font-semibold text-[#241232]">{overview.settings.userId ?? 'anonymous'}</div>
           </div>
           <div className="metric-card">
             <div className="metric-label">Auth</div>
-            <div className="mt-3 text-sm font-semibold text-white">{overview.settings.authStrategy}</div>
+            <div className="mt-3 text-sm font-semibold text-[#241232]">{overview.settings.authStrategy}</div>
           </div>
           <div className="metric-card">
             <div className="metric-label">Runtime</div>
-            <div className="mt-3 text-sm font-semibold text-white">{overview.settings.appEnv}</div>
+            <div className="mt-3 text-sm font-semibold text-[#241232]">{overview.settings.appEnv}</div>
           </div>
         </section>
       )}
@@ -273,10 +273,10 @@ export function ParityWorkspacePage({ section, title, description }: Props) {
               <Link key={item.id} className="panel-subtle block" to={item.route}>
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <div className="font-medium text-white">{item.title}</div>
-                    <div className="mt-1 text-sm text-slate-400">{item.detail}</div>
+                    <div className="font-medium text-[#241232]">{item.title}</div>
+                    <div className="mt-1 text-sm text-[#6f6578]">{item.detail}</div>
                   </div>
-                  <span className="badge-neutral">{item.completed ? 'done' : 'next'}</span>
+                  <span className="status-pill-neutral">{item.completed ? 'done' : 'next'}</span>
                 </div>
               </Link>
             ))}
@@ -299,12 +299,12 @@ export function ParityWorkspacePage({ section, title, description }: Props) {
                 <Link key={`${item.section}-${item.id}`} className="panel-subtle block" to={item.route}>
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <div className="font-medium text-white">{item.title}</div>
-                      <div className="mt-1 text-sm text-slate-400">
+                      <div className="font-medium text-[#241232]">{item.title}</div>
+                      <div className="mt-1 text-sm text-[#6f6578]">
                         {item.section} · {item.subtitle}
                       </div>
                     </div>
-                    <span className="badge-neutral">open</span>
+                    <span className="status-pill-neutral">open</span>
                   </div>
                 </Link>
               ))}
@@ -318,17 +318,17 @@ export function ParityWorkspacePage({ section, title, description }: Props) {
           {cards.map((item) => (
             <Link
               key={`${item.route}-${item.id}`}
-              className="panel-subtle block transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
+              className="panel-subtle block transition hover:border-[#d7c3f1] hover:bg-[#f6f1fa]"
               to={item.route}
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <div className="font-medium text-white">{item.title}</div>
-                  <div className="mt-1 text-sm text-slate-400">{item.subtitle}</div>
+                  <div className="font-medium text-[#241232]">{item.title}</div>
+                  <div className="mt-1 text-sm text-[#6f6578]">{item.subtitle}</div>
                 </div>
-                <span className="badge-neutral">{item.status}</span>
+                <span className="status-pill-neutral">{item.status}</span>
               </div>
-              <div className="mt-3 text-sm leading-6 text-slate-300">{item.detail}</div>
+              <div className="mt-3 text-sm leading-6 text-[#4f435c]">{item.detail}</div>
             </Link>
           ))}
         </section>

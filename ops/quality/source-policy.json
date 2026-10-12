@@ -1,0 +1,20 @@
+{
+  "canonicalRuntime": [
+    "apps/web/src",
+    "cloudflare/src"
+  ],
+  "referenceTracks": [
+    "backend",
+    "frontend",
+    "openregscale",
+    "enterprise",
+    "cli"
+  ],
+  "javascriptExceptions": [
+    {
+      "path": "cloudflare/src/service-delivery/runtime.mjs",
+      "reason": "Imported shared service-delivery runtime; its paired declaration and provenance manifest are preserved. Updates need hash/provenance review.",
+      "sha256": "35881c34fa614db4d8d58a55ebfb77915255b65a85f9f8450cf51d0bae760007"
+    }
+  ]
+}

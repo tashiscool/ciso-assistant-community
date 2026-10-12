@@ -156,8 +156,8 @@ function PageShell({
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">{eyebrow}</div>
-            <h1 className="mt-2 text-3xl font-semibold text-white">{title}</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">{description}</p>
+            <h1 className="mt-2 text-3xl font-semibold text-[#241232]">{title}</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">{description}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {primaryActions.map((action) => (
@@ -178,7 +178,7 @@ function PageShell({
 }
 
 function LoadingState() {
-  return <div className="panel p-6 text-sm text-slate-300">Loading parity workspace...</div>;
+  return <div className="panel p-6 text-sm text-[#4f435c]">Loading parity workspace...</div>;
 }
 
 function ErrorState({ message }: { message: string }) {
@@ -192,7 +192,7 @@ function SummaryStats({ items }: { items: Array<{ label: string; value: string |
         <div className="metric-card" key={item.label}>
           <div className="metric-label">{item.label}</div>
           <div className="metric-value">{item.value}</div>
-          <div className="mt-2 text-xs text-slate-500">{item.detail}</div>
+          <div className="mt-2 text-xs text-[#62576a]">{item.detail}</div>
         </div>
       ))}
     </section>
@@ -205,18 +205,18 @@ function CardGrid({ items }: { items: ParityCard[] }) {
       {items.map((item) => (
         <Link
           key={`${item.route}-${item.id}`}
-          className="panel-subtle block transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
+          className="panel-subtle block transition hover:border-[#d7c3f1] hover:bg-[#f6f1fa]"
           to={item.route}
         >
           <div className="flex items-start justify-between gap-3">
             <div>
-              <div className="font-medium text-white">{item.title}</div>
-              <div className="mt-1 text-sm text-slate-400">{item.subtitle}</div>
+              <div className="font-medium text-[#241232]">{item.title}</div>
+              <div className="mt-1 text-sm text-[#6f6578]">{item.subtitle}</div>
             </div>
-            <span className="badge-neutral">{item.status}</span>
+            <span className="status-pill-neutral">{item.status}</span>
           </div>
-          <div className="mt-3 text-sm leading-6 text-slate-300">{item.detail}</div>
-          <div className="mt-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-cyan-300/80">
+          <div className="mt-3 text-sm leading-6 text-[#4f435c]">{item.detail}</div>
+          <div className="mt-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-[#7a3ccf]">
             Open workspace
             <ArrowRight className="h-3.5 w-3.5" />
           </div>
@@ -239,10 +239,10 @@ function TimelineList({
           <Link className="panel-subtle block" key={item.id} to={item.route}>
             <div className="flex items-center justify-between gap-3">
               <div>
-                <div className="font-medium text-white">{item.title}</div>
-                <div className="mt-1 text-sm text-slate-400">{item.detail}</div>
+                <div className="font-medium text-[#241232]">{item.title}</div>
+                <div className="mt-1 text-sm text-[#6f6578]">{item.detail}</div>
               </div>
-              <div className="text-sm text-slate-300">{formatDate(item.date)}</div>
+              <div className="text-sm text-[#4f435c]">{formatDate(item.date)}</div>
             </div>
           </Link>
         ))}
@@ -293,7 +293,7 @@ function SearchWorkspace({ overview }: { overview: ParityOverview }) {
         <div className="eyebrow">Tenant Search Index</div>
         <div className="mt-4 space-y-4">
           <div className="relative">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#62576a]" />
             <input
               className="input pl-11"
               onChange={(event) => setQuery(event.target.value)}
@@ -306,19 +306,19 @@ function SearchWorkspace({ overview }: { overview: ParityOverview }) {
               <Link className="panel-subtle block" key={`${item.section}-${item.id}`} to={item.route}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="font-medium text-white">{item.title}</div>
-                    <div className="mt-1 text-sm text-slate-400">
+                    <div className="font-medium text-[#241232]">{item.title}</div>
+                    <div className="mt-1 text-sm text-[#6f6578]">
                       {item.section} · {item.subtitle}
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {item.keywords.map((keyword) => (
-                        <span className="badge-neutral" key={`${item.id}-${keyword}`}>
+                        <span className="status-pill-neutral" key={`${item.id}-${keyword}`}>
                           {keyword}
                         </span>
                       ))}
                     </div>
                   </div>
-                  <span className="badge-success">open</span>
+                  <span className="status-pill-success">open</span>
                 </div>
               </Link>
             ))}
@@ -345,10 +345,10 @@ function QuickStartWorkspace({ overview }: { overview: ParityOverview }) {
       />
       <section className="panel">
         <div className="eyebrow">Quick Start Progress</div>
-        <div className="mt-4 rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+        <div className="mt-4 rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-5">
           <div className="flex items-center justify-between gap-3">
-            <div className="text-sm font-medium text-white">Tenant readiness</div>
-            <div className="text-sm text-cyan-200">{progress}% complete</div>
+            <div className="text-sm font-medium text-[#241232]">Tenant readiness</div>
+            <div className="text-sm text-[#6d28d9]">{progress}% complete</div>
           </div>
           <Progress className="mt-4" value={progress} />
         </div>
@@ -357,10 +357,10 @@ function QuickStartWorkspace({ overview }: { overview: ParityOverview }) {
             <Link className="panel-subtle block" key={item.id} to={item.route}>
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <div className="font-medium text-white">{item.title}</div>
-                  <div className="mt-1 text-sm text-slate-400">{item.detail}</div>
+                  <div className="font-medium text-[#241232]">{item.title}</div>
+                  <div className="mt-1 text-sm text-[#6f6578]">{item.detail}</div>
                 </div>
-                <span className={item.completed ? 'badge-success' : 'badge-neutral'}>
+                <span className={item.completed ? 'status-pill-success' : 'status-pill-neutral'}>
                   {item.completed ? 'done' : 'next'}
                 </span>
               </div>
@@ -391,12 +391,12 @@ function SettingsWorkspace({ overview }: { overview: ParityOverview }) {
               <Link className="panel-subtle block" key={item.id} to={item.route}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="font-medium text-white">{item.title}</div>
-                    <div className="mt-1 text-sm text-slate-400">{item.subtitle}</div>
+                    <div className="font-medium text-[#241232]">{item.title}</div>
+                    <div className="mt-1 text-sm text-[#6f6578]">{item.subtitle}</div>
                   </div>
-                  <span className="badge-neutral">{item.status}</span>
+                  <span className="status-pill-neutral">{item.status}</span>
                 </div>
-                <div className="mt-3 text-sm text-slate-300">{item.detail}</div>
+                <div className="mt-3 text-sm text-[#4f435c]">{item.detail}</div>
               </Link>
             ))}
           </div>
@@ -408,12 +408,12 @@ function SettingsWorkspace({ overview }: { overview: ParityOverview }) {
               <Link className="panel-subtle block" key={item.id} to={item.route}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="font-medium text-white">{item.title}</div>
-                    <div className="mt-1 text-sm text-slate-400">{item.subtitle}</div>
+                    <div className="font-medium text-[#241232]">{item.title}</div>
+                    <div className="mt-1 text-sm text-[#6f6578]">{item.subtitle}</div>
                   </div>
-                  <span className="badge-success">{item.status}</span>
+                  <span className="status-pill-success">{item.status}</span>
                 </div>
-                <div className="mt-3 text-sm text-slate-300">{item.detail}</div>
+                <div className="mt-3 text-sm text-[#4f435c]">{item.detail}</div>
               </Link>
             ))}
           </div>
@@ -439,14 +439,14 @@ function BackupWorkspace({ overview }: { overview: ParityOverview }) {
           <div className="eyebrow">Recovery Sources</div>
           <div className="mt-4 grid gap-3">
             <Link className="panel-subtle block" to="/reports">
-              <div className="font-medium text-white">Report export archive</div>
-              <div className="mt-2 text-sm text-slate-400">
+              <div className="font-medium text-[#241232]">Report export archive</div>
+              <div className="mt-2 text-sm text-[#6f6578]">
                 Review generated report artifacts and export packages available for controlled recovery.
               </div>
             </Link>
             <Link className="panel-subtle block" to="/imports">
-              <div className="font-medium text-white">Import replay pipeline</div>
-              <div className="mt-2 text-sm text-slate-400">
+              <div className="font-medium text-[#241232]">Import replay pipeline</div>
+              <div className="mt-2 text-sm text-[#6f6578]">
                 Re-run workbook-style imports and inspect created-object tracking for recovery verification.
               </div>
             </Link>
@@ -459,12 +459,12 @@ function BackupWorkspace({ overview }: { overview: ParityOverview }) {
               <Link className="panel-subtle block" key={item.id} to={item.route}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="font-medium text-white">{item.title}</div>
-                    <div className="mt-1 text-sm text-slate-400">{item.subtitle}</div>
+                    <div className="font-medium text-[#241232]">{item.title}</div>
+                    <div className="mt-1 text-sm text-[#6f6578]">{item.subtitle}</div>
                   </div>
-                  <span className="badge-neutral">{item.status}</span>
+                  <span className="status-pill-neutral">{item.status}</span>
                 </div>
-                <div className="mt-3 text-sm text-slate-300">{item.detail}</div>
+                <div className="mt-3 text-sm text-[#4f435c]">{item.detail}</div>
               </Link>
             ))}
           </div>
@@ -482,7 +482,7 @@ function AnalyticsWorkspace({ overview }: { overview: ParityOverview }) {
           <div className="metric-card" key={item.id}>
             <div className="metric-label">{item.label}</div>
             <div className="metric-value">{item.value}</div>
-            <div className="mt-2 text-xs text-slate-500">{item.detail}</div>
+            <div className="mt-2 text-xs text-[#62576a]">{item.detail}</div>
           </div>
         ))}
       </section>
@@ -493,10 +493,10 @@ function AnalyticsWorkspace({ overview }: { overview: ParityOverview }) {
             <Link className="panel-subtle block" key={item.id} to={item.route}>
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <div className="font-medium text-white">{item.title}</div>
-                  <div className="mt-1 text-sm text-slate-400">{item.detail}</div>
+                  <div className="font-medium text-[#241232]">{item.title}</div>
+                  <div className="mt-1 text-sm text-[#6f6578]">{item.detail}</div>
                 </div>
-                <span className="badge-neutral">{item.subtitle}</span>
+                <span className="status-pill-neutral">{item.subtitle}</span>
               </div>
             </Link>
           ))}

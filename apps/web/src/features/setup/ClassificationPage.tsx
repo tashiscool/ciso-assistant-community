@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Download, Edit3, Plus, ShieldCheck, Trash2 } from 'lucide-react';
+import { RegModal } from '../../components/regovise/PagePrimitives';
 import {
   createSetupClassification,
   deleteSetupClassification,
@@ -38,8 +39,10 @@ export function ClassificationPage() {
   const [snapshot, setSnapshot] = useState<SetupClassificationSnapshot | null>(null);
   const [draft, setDraft] = useState(defaultDraft);
   const [editing, setEditing] = useState<SetupClassificationRecord | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<SetupClassificationRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -80,6 +83,7 @@ export function ClassificationPage() {
 
   async function handleDelete(record: SetupClassificationRecord) {
     try {
+      setDeleting(true);
       setError(null);
       setNotice(null);
       const next = await deleteSetupClassification(record.id);
@@ -88,9 +92,12 @@ export function ClassificationPage() {
         setEditing(null);
         setDraft(defaultDraft);
       }
+      setPendingDelete(null);
       setNotice('Classification removed.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete classification.');
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -103,7 +110,7 @@ export function ClassificationPage() {
   );
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading classifications...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading classifications...</div>;
   }
 
   if (error && !snapshot) {
@@ -115,8 +122,8 @@ export function ClassificationPage() {
       <section className="panel grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
         <div>
           <div className="eyebrow">Setup</div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Classification</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">Classification</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
             Maintain tenant impact profiles that drive downstream system categorization, export posture, and review
             expectations across the canonical stack.
           </p>
@@ -206,14 +213,14 @@ export function ClassificationPage() {
 
           <section className="panel-subtle">
             <div className="flex items-center gap-3">
-              <ShieldCheck className="h-5 w-5 text-cyan-300" />
-              <h2 className="text-lg font-semibold text-white">Coverage by level</h2>
+              <ShieldCheck className="h-5 w-5 text-[#7a3ccf]" />
+              <h2 className="text-lg font-semibold text-[#241232]">Coverage by level</h2>
             </div>
             <div className="mt-5 grid gap-3">
               {snapshot?.coverage.map((item) => (
-                <div className="flex items-center justify-between rounded-3xl border border-white/10 bg-slate-950/30 p-4" key={item.level}>
-                  <div className="text-sm text-slate-300">{item.level}</div>
-                  <span className="badge-neutral">{item.count}</span>
+                <div className="flex items-center justify-between rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4" key={item.level}>
+                  <div className="text-sm text-[#4f435c]">{item.level}</div>
+                  <span className="status-pill-neutral">{item.count}</span>
                 </div>
               ))}
             </div>
@@ -221,26 +228,26 @@ export function ClassificationPage() {
         </div>
 
         <section className="panel overflow-hidden p-0">
-          <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+          <div className="flex items-center justify-between border-b border-[#ded8e4] px-6 py-4">
             <div>
               <div className="eyebrow">Classification Catalog</div>
-              <p className="mt-1 text-sm text-slate-400">Persisted tenant impact profiles used by system and export workflows.</p>
+              <p className="mt-1 text-sm text-[#6f6578]">Persisted tenant impact profiles used by system and export workflows.</p>
             </div>
-            <ShieldCheck className="h-5 w-5 text-cyan-300" />
+            <ShieldCheck className="h-5 w-5 text-[#7a3ccf]" />
           </div>
-          <div className="divide-y divide-white/6">
+          <div className="divide-y divide-[#ded8e4]">
             {snapshot?.records.map((record) => (
               <div className="px-6 py-4" key={record.id}>
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                   <div>
-                    <div className="font-medium text-white">{record.title}</div>
+                    <div className="font-medium text-[#241232]">{record.title}</div>
                     <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                      <span className="badge-neutral">C {record.confidentiality}</span>
-                      <span className="badge-neutral">I {record.integrity}</span>
-                      <span className="badge-neutral">A {record.availability}</span>
-                      <span className="badge-neutral">Usage {record.usageCount}</span>
+                      <span className="status-pill-neutral">C {record.confidentiality}</span>
+                      <span className="status-pill-neutral">I {record.integrity}</span>
+                      <span className="status-pill-neutral">A {record.availability}</span>
+                      <span className="status-pill-neutral">Usage {record.usageCount}</span>
                     </div>
-                    <div className="mt-2 text-xs text-slate-500">
+                    <div className="mt-2 text-xs text-[#62576a]">
                       Updated {new Date(record.updatedAt).toLocaleString()}
                     </div>
                   </div>
@@ -261,7 +268,7 @@ export function ClassificationPage() {
                       <Edit3 className="mr-2 h-4 w-4" />
                       Edit
                     </button>
-                    <button className="button-secondary" onClick={() => void handleDelete(record)} type="button">
+                    <button className="button-secondary" onClick={() => setPendingDelete(record)} type="button">
                       <Trash2 className="mr-2 h-4 w-4" />
                       Delete
                     </button>
@@ -271,12 +278,55 @@ export function ClassificationPage() {
             ))}
           </div>
           {highestProfiles.length > 0 && (
-            <div className="border-t border-white/10 px-6 py-4 text-sm text-slate-400">
+            <div className="border-t border-[#ded8e4] px-6 py-4 text-sm text-[#6f6578]">
               Highest-impact profiles: {highestProfiles.map((item) => item.title).join(', ')}
             </div>
           )}
         </section>
       </section>
+      <RegModal
+        open={Boolean(pendingDelete)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingDelete(null);
+          }
+        }}
+        title="Delete classification"
+        description={
+          pendingDelete ? `Review the downstream impact before removing "${pendingDelete.title}".` : undefined
+        }
+        footer={
+          <div className="flex flex-wrap justify-end gap-2">
+            <button className="button-secondary" onClick={() => setPendingDelete(null)} type="button">
+              Cancel
+            </button>
+            <button
+              className="button-secondary border-[#f2b7bf] text-[#9d1f2c] hover:bg-[#ffe2e5]"
+              disabled={!pendingDelete || deleting}
+              onClick={() => pendingDelete && void handleDelete(pendingDelete)}
+              type="button"
+            >
+              {deleting ? 'Deleting...' : 'Delete classification'}
+            </button>
+          </div>
+        }
+      >
+        <div className="notice-warning">
+          Classification profiles inform system categorization, export posture, and setup review expectations. Removing a
+          profile may change how related setup records are interpreted.
+        </div>
+        {pendingDelete ? (
+          <div className="mt-4 rounded-lg border border-[#ded8e4] bg-[#fbf9fc] p-4 text-sm text-[#4f435c]">
+            <div className="font-semibold text-[#241232]">{pendingDelete.title}</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <span className="status-pill-neutral">C {pendingDelete.confidentiality}</span>
+              <span className="status-pill-neutral">I {pendingDelete.integrity}</span>
+              <span className="status-pill-neutral">A {pendingDelete.availability}</span>
+              <span className="status-pill-neutral">Usage {pendingDelete.usageCount}</span>
+            </div>
+          </div>
+        ) : null}
+      </RegModal>
     </div>
   );
 }

@@ -7,8 +7,8 @@ export function RiskAssessmentConversionPage() {
     <div className="space-y-6">
       <section className="panel">
         <div className="eyebrow">Quantitative Migration</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Convert to Quantitative Study</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Convert to Quantitative Study</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[#4f435c]">
           The legacy conversion route now maps to the quantitative workbench. Use the existing risk
           assessment context to open or create a quantitative study and continue the modeling flow in
           the Cloudflare/React app.

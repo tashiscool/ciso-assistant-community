@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Sparkles } from 'lucide-react';
+import { RegStatusPill } from '../../components/regovise/PagePrimitives';
 import type { AssuranceExplainAudience, AssuranceExplanation } from './types';
 
 type AudienceOption = {
@@ -99,7 +100,7 @@ export function AssuranceExplainPanel({
       <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <div>
           <div className="label">{heading}</div>
-          <p className="mt-2 text-sm leading-6 text-slate-400">{helperText}</p>
+          <p className="mt-2 text-sm leading-6 text-[#6f6578]">{helperText}</p>
         </div>
         <button
           className="button-secondary"
@@ -169,28 +170,28 @@ export function AssuranceExplainPanel({
           </button>
         </div>
 
-        <div className="rounded-3xl border border-white/8 bg-black/15 p-4">
+        <div className="rounded-3xl border border-[#ded8e4] bg-white p-4">
           {error && <div className="notice-error">{error}</div>}
 
           {!error && !explanation && !loading && (
-            <div className="text-sm text-slate-400">Select an assurance item to load the explainer.</div>
+            <div className="text-sm text-[#6f6578]">Select an assurance item to load the explainer.</div>
           )}
 
-          {loading && !explanation && <div className="text-sm text-slate-400">Generating the current explanation...</div>}
+          {loading && !explanation && <div className="text-sm text-[#6f6578]">Generating the current explanation...</div>}
 
           {explanation && (
             <div className="space-y-4">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="badge-neutral">{explanation.audience}</span>
-                <span className={explanation.provider === 'cloudflare-workers-ai' ? 'badge-success' : 'badge-neutral'}>
+                <RegStatusPill tone="neutral">{explanation.audience}</RegStatusPill>
+                <RegStatusPill tone={explanation.provider === 'cloudflare-workers-ai' ? 'success' : 'neutral'}>
                   {explanation.provider === 'cloudflare-workers-ai' ? 'AI-backed' : 'Deterministic'}
-                </span>
-                <span className="text-xs text-slate-500">{formatDate(explanation.generatedAt)}</span>
+                </RegStatusPill>
+                <span className="text-xs text-[#62576a]">{formatDate(explanation.generatedAt)}</span>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-white">{explanation.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-300">{explanation.explanation}</p>
+                <h3 className="text-lg font-semibold text-[#241232]">{explanation.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-[#4f435c]">{explanation.explanation}</p>
               </div>
 
               {explanation.highlights.length > 0 && (
@@ -198,7 +199,7 @@ export function AssuranceExplainPanel({
                   <div className="label">Highlights</div>
                   <div className="mt-2 space-y-2">
                     {explanation.highlights.map((item) => (
-                      <div key={item} className="rounded-2xl border border-white/8 bg-slate-950/40 px-3 py-2 text-sm text-slate-300">
+                      <div key={item} className="rounded-2xl border border-[#ded8e4] bg-[#f7f4f9] px-3 py-2 text-sm text-[#4f435c]">
                         {item}
                       </div>
                     ))}
@@ -211,7 +212,7 @@ export function AssuranceExplainPanel({
                   <div className="label">Suggested actions</div>
                   <div className="mt-2 space-y-2">
                     {explanation.suggestedActions.map((item) => (
-                      <div key={item} className="rounded-2xl border border-cyan-400/15 bg-cyan-400/[0.04] px-3 py-2 text-sm text-slate-200">
+                      <div key={item} className="rounded-2xl border border-[#d7c3f1] bg-[#f7f2ff] px-3 py-2 text-sm text-[#4f236e]">
                         {item}
                       </div>
                     ))}
@@ -224,7 +225,7 @@ export function AssuranceExplainPanel({
                   <div className="label">Evidence refs</div>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {explanation.evidenceRefs.map((item) => (
-                      <span key={item} className="rounded-full border border-white/10 bg-slate-950/60 px-3 py-1 font-mono text-xs text-cyan-200">
+                      <span key={item} className="rounded-full border border-[#ded8e4] bg-[#f7f4f9] px-3 py-1 font-mono text-xs text-[#6f20c9]">
                         {item}
                       </span>
                     ))}

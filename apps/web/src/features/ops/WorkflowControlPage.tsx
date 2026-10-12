@@ -68,7 +68,7 @@ export function WorkflowControlPage() {
   }
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading workflow control room...</div>;
+    return <div className="panel p-6 text-sm text-[#51465e]">Loading workflow control room...</div>;
   }
 
   if (error && !snapshot) {
@@ -81,8 +81,8 @@ export function WorkflowControlPage() {
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <div className="eyebrow">Operations</div>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">Workflow</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#241232]">Workflow</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#51465e]">
               Coordinate workflow templates, in-flight runs, and Durable Object leases from a canonical Worker-backed
               control room.
             </p>
@@ -118,8 +118,8 @@ export function WorkflowControlPage() {
 
       <section className="grid gap-4 xl:grid-cols-[0.92fr_1.08fr]">
         <div className="panel-subtle space-y-4">
-          <div className="flex items-center gap-2 text-white">
-            <ShieldCheck className="h-4 w-4 text-cyan-300" />
+          <div className="flex items-center gap-2 text-[#241232]">
+            <ShieldCheck className="h-4 w-4 text-[#7a2ed6]" />
             <h2 className="text-lg font-semibold">Lease coordination</h2>
           </div>
           <label className="space-y-1">
@@ -131,38 +131,38 @@ export function WorkflowControlPage() {
             Acquire lease
           </button>
 
-          <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+          <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
             <div className="eyebrow">Workflow lanes</div>
             <div className="mt-4 grid gap-3">
               {snapshot?.lanes.map((lane) => (
-                <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4" key={lane.id}>
+                <div className="rounded-2xl border border-[#ded8e4] bg-white p-4" key={lane.id}>
                   <div className="flex items-center justify-between">
-                    <div className="font-medium text-white">{lane.label}</div>
-                    <span className="badge-neutral">{lane.count}</span>
+                    <div className="font-medium text-[#241232]">{lane.label}</div>
+                    <span className="status-pill-neutral">{lane.count}</span>
                   </div>
-                  <div className="mt-2 text-sm text-slate-400">{lane.detail}</div>
+                  <div className="mt-2 text-sm text-[#6f6578]">{lane.detail}</div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-slate-950/30 p-4">
+          <div className="rounded-3xl border border-[#ded8e4] bg-[#fbf9fc] p-4">
             <div className="eyebrow">Templates</div>
             <div className="mt-4 space-y-3">
               {snapshot?.templates.map((template) => (
                 <Link
-                  className="block rounded-2xl border border-white/8 bg-white/[0.02] p-4 transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
+                  className="block rounded-2xl border border-[#ded8e4] bg-white p-4 transition hover:border-[#8b35e6]/30 hover:bg-[#f8f3ff]"
                   key={template.id}
                   to={template.route}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="font-medium text-white">{template.title}</div>
-                      <div className="mt-1 text-sm text-slate-400">{template.detail}</div>
+                      <div className="font-medium text-[#241232]">{template.title}</div>
+                      <div className="mt-1 text-sm text-[#6f6578]">{template.detail}</div>
                     </div>
-                    <span className="badge-neutral">{template.activeCount}</span>
+                    <span className="status-pill-neutral">{template.activeCount}</span>
                   </div>
-                  <div className="mt-3 text-xs uppercase tracking-[0.16em] text-slate-500">{template.module}</div>
+                  <div className="mt-3 text-xs uppercase tracking-[0.16em] text-[#62576a]">{template.module}</div>
                 </Link>
               ))}
             </div>
@@ -171,24 +171,24 @@ export function WorkflowControlPage() {
 
         <div className="space-y-4">
           <section className="panel overflow-hidden p-0">
-            <div className="border-b border-white/10 px-6 py-4">
+            <div className="border-b border-[#ded8e4] px-6 py-4">
               <div className="eyebrow">Active leases</div>
-              <p className="mt-1 text-sm text-slate-400">Current tenant workflow coordinator locks.</p>
+              <p className="mt-1 text-sm text-[#6f6578]">Current tenant workflow coordinator locks.</p>
             </div>
-            <div className="divide-y divide-white/6">
+            <div className="divide-y divide-[#ded8e4]">
               {snapshot?.activeLeases.length ? (
                 snapshot.activeLeases.map((lease) => (
                   <div className="flex flex-col gap-3 px-6 py-4 md:flex-row md:items-start md:justify-between" key={lease.leaseKey}>
                     <div>
                       <div className="flex items-center gap-2">
-                        <GitBranch className="h-4 w-4 text-cyan-300" />
-                        <div className="font-medium text-white">{lease.leaseKey}</div>
+                        <GitBranch className="h-4 w-4 text-[#7a2ed6]" />
+                        <div className="font-medium text-[#241232]">{lease.leaseKey}</div>
                       </div>
-                      <div className="mt-2 text-sm text-slate-400">
+                      <div className="mt-2 text-sm text-[#6f6578]">
                         Acquired {new Date(lease.acquiredAt).toLocaleString()} · Expires {new Date(lease.expiresAt).toLocaleString()}
                       </div>
                       {lease.metadata && (
-                        <div className="mt-2 text-xs text-slate-500">{JSON.stringify(lease.metadata)}</div>
+                        <div className="mt-2 text-xs text-[#62576a]">{JSON.stringify(lease.metadata)}</div>
                       )}
                     </div>
                     <button className="button-secondary" disabled={busy} onClick={() => void handleReleaseLease(lease.leaseKey)} type="button">
@@ -198,28 +198,28 @@ export function WorkflowControlPage() {
                   </div>
                 ))
               ) : (
-                <div className="px-6 py-6 text-sm text-slate-400">No active workflow leases in this tenant.</div>
+                <div className="px-6 py-6 text-sm text-[#6f6578]">No active workflow leases in this tenant.</div>
               )}
             </div>
           </section>
 
           <section className="panel overflow-hidden p-0">
-            <div className="border-b border-white/10 px-6 py-4">
+            <div className="border-b border-[#ded8e4] px-6 py-4">
               <div className="eyebrow">Recent workflow runs</div>
-              <p className="mt-1 text-sm text-slate-400">Latest cross-module workflow activity derived from canonical Worker tables.</p>
+              <p className="mt-1 text-sm text-[#6f6578]">Latest cross-module workflow activity derived from canonical Worker tables.</p>
             </div>
-            <div className="divide-y divide-white/6">
+            <div className="divide-y divide-[#ded8e4]">
               {snapshot?.recentRuns.map((run) => (
                 <div className="px-6 py-4" key={`${run.module}:${run.id}`}>
                   <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <div className="font-medium text-white">{run.title}</div>
-                        <span className="badge-neutral">{run.module}</span>
-                        <span className={run.status === 'Done' ? 'badge-positive' : 'badge-neutral'}>{run.status}</span>
+                        <div className="font-medium text-[#241232]">{run.title}</div>
+                        <span className="status-pill-neutral">{run.module}</span>
+                        <span className={run.status === 'Done' ? 'status-pill-positive' : 'status-pill-neutral'}>{run.status}</span>
                       </div>
-                      <div className="mt-2 text-sm text-slate-300">{run.detail}</div>
-                      <div className="mt-2 text-xs text-slate-500">{new Date(run.updatedAt).toLocaleString()}</div>
+                      <div className="mt-2 text-sm text-[#51465e]">{run.detail}</div>
+                      <div className="mt-2 text-xs text-[#62576a]">{new Date(run.updatedAt).toLocaleString()}</div>
                     </div>
                     <Link className="button-secondary" to={run.route}>
                       Open

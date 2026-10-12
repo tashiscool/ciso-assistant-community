@@ -34,15 +34,15 @@ export function LibrariesPage() {
   }, [identity.tenantId, identity.userId]);
 
   if (loading) {
-    return <div className="panel p-6 text-sm text-slate-300">Loading library catalog...</div>;
+    return <div className="panel p-6 text-sm text-[#4f435c]">Loading library catalog...</div>;
   }
 
   return (
     <div className="space-y-6">
       <section className="panel">
         <div className="eyebrow">Catalog</div>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Libraries</h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+        <h1 className="mt-2 text-3xl font-semibold text-[#241232]">Libraries</h1>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-[#4f435c]">
           Browse the packaged frameworks, threats, and scoring assets that seed governance and
           assessment workflows inside the migrated workspace.
         </p>
@@ -54,46 +54,46 @@ export function LibrariesPage() {
         {libraries.map((library) => (
           <Link
             key={library.id}
-            className="panel transition hover:border-cyan-300/30 hover:bg-cyan-400/[0.03]"
+            className="panel transition hover:border-[#d7c3f1] hover:bg-[#f6f1fa]"
             to={`/libraries/${library.id}`}
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="eyebrow">Library Pack</div>
-                <h2 className="mt-2 text-2xl font-semibold text-white">{library.name}</h2>
+                <h2 className="mt-2 text-2xl font-semibold text-[#241232]">{library.name}</h2>
               </div>
-              <span className={library.hasUpdate ? 'badge-success' : 'badge-neutral'}>
+              <span className={library.hasUpdate ? 'status-pill-success' : 'status-pill-neutral'}>
                 {library.hasUpdate ? 'Update Available' : 'Current'}
               </span>
             </div>
-            <p className="mt-4 text-sm leading-6 text-slate-300">
+            <p className="mt-4 text-sm leading-6 text-[#4f435c]">
               {library.description || 'No library description available.'}
             </p>
             <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <div className="panel-subtle">
                 <div className="label">Reference controls</div>
-                <div className="mt-2 text-lg font-semibold text-white">
+                <div className="mt-2 text-lg font-semibold text-[#241232]">
                   {library.objectsMeta.referenceControls}
                 </div>
               </div>
               <div className="panel-subtle">
                 <div className="label">Threats</div>
-                <div className="mt-2 text-lg font-semibold text-white">{library.objectsMeta.threats}</div>
+                <div className="mt-2 text-lg font-semibold text-[#241232]">{library.objectsMeta.threats}</div>
               </div>
               <div className="panel-subtle">
                 <div className="label">Risk matrices</div>
-                <div className="mt-2 text-lg font-semibold text-white">
+                <div className="mt-2 text-lg font-semibold text-[#241232]">
                   {library.objectsMeta.riskMatrices}
                 </div>
               </div>
               <div className="panel-subtle">
                 <div className="label">Framework</div>
-                <div className="mt-2 text-sm font-semibold text-white">
+                <div className="mt-2 text-sm font-semibold text-[#241232]">
                   {library.frameworkName ?? 'None'}
                 </div>
               </div>
             </div>
-            <div className="mt-5 flex flex-wrap gap-4 text-sm text-slate-400">
+            <div className="mt-5 flex flex-wrap gap-4 text-sm text-[#6f6578]">
               <span>Provider: {library.provider}</span>
               <span>Packager: {library.packager}</span>
               <span>Version: {library.version ?? 'n/a'}</span>
@@ -102,7 +102,7 @@ export function LibrariesPage() {
           </Link>
         ))}
         {libraries.length === 0 && (
-          <div className="panel text-sm text-slate-400">
+          <div className="panel text-sm text-[#6f6578]">
             No library packs are available for tenant <span className="font-mono">{identity.tenantId}</span>.
           </div>
         )}

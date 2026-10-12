@@ -1,0 +1,29 @@
+# Production hardening and release boundary
+
+The canonical Regovise runtime is `apps/web` plus the Cloudflare Worker. The legacy Django/Svelte applications remain reference implementations. The approved October 2026 hardening changes preserve the canonical domain model and deployment bindings.
+
+## Security behavior
+
+Production and unknown environments reject client-selected identity headers. Root administration requires root-scoped permissions. Full tenant workflow snapshots require matching authenticated administrative access. Private trust-center grants bind the selected artifact's tenant and offering. Credentialed CORS reflects only configured trusted origins; unsafe API methods reject untrusted browser origins before authentication or writes. JSON input has a streaming 1 MiB limit, strict UTF-8/object parsing and typed 400/413 responses. API responses are not cacheable, and unexpected production errors omit implementation details.
+
+New sessions use opaque cryptographically generated tokens; D1 stores only SHA-256 identifiers. Returned session identifiers are metadata and cannot authenticate. Existing raw-token sessions migrate when a valid active principal presents the original cookie. Active user, tenant and expiry checks apply to every session lookup. Password replacement and session revocation share a D1 transaction. Self-service changes compare the verified credential and active session at write time, then issue a new cookie against the new password hash. Administrator resets deliberately revoke the affected user's sessions. Local sign-in codes and OIDC states are claimed once with scoped, database-clock expiry guards before issuing sessions or exchanging provider codes; a failed OIDC exchange requires a new sign-in attempt. These changes use existing tables and require no session schema migration.
+
+Queue replay verifies exact R2 bytes before decoding, then validates message shape, queue, type and tenant before any business/audit mutation or dispatch. The existing coordinator lease prevents competing replay workers; malformed receipts produce safe errors without payload logging.
+
+Public questionnaires enforce their login requirement on the server and require a same-tenant D1 session when enabled. Changed malformed tables and selection lists are rejected before persistence. Native table editing preserves row objects and unknown fields; incompatible legacy answers remain read-only. Submission validates required cells and locks edits. Concurrent stale saves and transitions return 409 instead of overwriting newer state. Canonical answers and derived properties now share a guarded D1 transaction; transition history is prepared from the committed snapshot in the same transaction as the state change. The regression suite covers real migration-derived SQLite and the actual handlers; identity/permission test fixtures remain synthetic.
+
+## Verification and promotion
+
+`npm run verify:full` checks source/reuse rules, types, production web build, toolchain migration, UI contracts, frontend/Worker alignment, GRC schemas, queue recovery/integrity, HTTP/session/questionnaire regressions, release artifact integrity and fresh isolated core/GRC/scrutiny/FedRAMP journeys. The isolated harness owns its D1/R2/queues and uses synthetic SCF fixtures; it cannot call real providers. Registry dependency audits block high/critical findings and fail when advisory retrieval is unavailable. Both canonical lockfiles currently report zero advisories.
+
+Browser acceptance includes 1440×1000 and 390×844 native questionnaire controls, persisted table/list values, submitted locks, bounded horizontal table scrolling and shared-table keyboard/filter behavior. The development-only Vanta prototype is unavailable in the production router. Visual/source checks do not establish all-role accessibility certification or a screen-reader audit.
+
+The release package binds the commit, Worker runtime, web assets, public configuration and SQL inventory to a separately retained digest. A second Wrangler no-bundle dry-run proves the runtime bytes survive promotion unchanged. Only validated committed source is packaged. Release validation has no production credentials. Promotion never rebuilds, synchronizes secrets or fabricates domain records. The production probe checks every public asset byte, environment health and a real D1 cookie session, and revokes only its own explicit bootstrap session. See [operator commands](../../ops/release/README.md).
+
+Production preflight confirmed the 41 applied migration names (including two historical SSO files absent from the current source inventory), seven operational queues and an existing authenticated Wrangler account. The missing `ciso-assistant-dlq` was created under the approved release scope. The pending `0040_queue_dead_letter_recovery.sql` and `0041_donation_supported_services.sql` contain additive tables/indexes only. A D1 Time Travel bookmark was retained before migration. Service delivery remains disabled in the public production configuration.
+
+## Claims this evidence does not establish
+
+Deployment success is not an ATO decision, FedRAMP authorization, independent penetration test or proof that every external connector is configured and live. Configuration-only MFA/service-account/SAML surfaces, native document export fidelity, advanced quantitative models and generic shared-module workflows retain the capability limits described in the repository maps. Production provider transactions and client domain records are deliberately absent from the narrow release probe. Those operations require feature-specific acceptance evidence before being presented as complete automation.
+
+Generated verification/probe receipts remain under ignored `artifacts/verification`; exact release identifiers are retained there and reported by the release operator. This document describes tested boundaries, not a claim of universal or 100% product correctness.

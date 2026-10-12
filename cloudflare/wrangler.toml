@@ -9,6 +9,8 @@ html_handling = "auto-trailing-slash"
 not_found_handling = "single-page-application"
 
 [vars]
+SERVICE_DELIVERY_ENABLED = "false"
+SERVICE_DONATION_RETURN_URL = "https://regovise.com/"
 APP_ENV = "development"
 
 [[d1_databases]]
@@ -24,12 +26,20 @@ preview_bucket_name = "ciso-assistant-evidence-preview"
 
 [durable_objects]
 bindings = [
+  { name = "SERVICE_COORDINATOR", class_name = "DonationServiceCoordinator" },
   { name = "TENANT_WORKFLOW_COORDINATOR", class_name = "TenantWorkflowCoordinator" }
 ]
 
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["TenantWorkflowCoordinator"]
+
+[[migrations]]
+tag = "v2-donation-services"
+new_sqlite_classes = ["DonationServiceCoordinator"]
+
+[triggers]
+crons = ["*/15 * * * *"]
 
 [queues]
 producers = [
@@ -42,13 +52,14 @@ producers = [
   { binding = "QUEUE_GRC_AI_ENRICH", queue = "ciso-assistant-grc-ai-enrich" }
 ]
 consumers = [
-  { queue = "ciso-assistant-evidence-jobs", max_batch_size = 5, max_retries = 3 },
-  { queue = "ciso-assistant-conmon-jobs", max_batch_size = 5, max_retries = 3 },
-  { queue = "ciso-assistant-grc-content-import", max_batch_size = 2, max_retries = 3 },
-  { queue = "ciso-assistant-grc-scf-refresh", max_batch_size = 2, max_retries = 3 },
-  { queue = "ciso-assistant-grc-finding-ingest", max_batch_size = 5, max_retries = 3 },
-  { queue = "ciso-assistant-grc-gap-report", max_batch_size = 2, max_retries = 3 },
-  { queue = "ciso-assistant-grc-ai-enrich", max_batch_size = 2, max_retries = 3 }
+  { queue = "ciso-assistant-evidence-jobs", max_batch_size = 5, max_retries = 3, dead_letter_queue = "ciso-assistant-dlq" },
+  { queue = "ciso-assistant-conmon-jobs", max_batch_size = 5, max_retries = 3, dead_letter_queue = "ciso-assistant-dlq" },
+  { queue = "ciso-assistant-grc-content-import", max_batch_size = 2, max_retries = 3, dead_letter_queue = "ciso-assistant-dlq" },
+  { queue = "ciso-assistant-grc-scf-refresh", max_batch_size = 2, max_retries = 3, dead_letter_queue = "ciso-assistant-dlq" },
+  { queue = "ciso-assistant-grc-finding-ingest", max_batch_size = 5, max_retries = 3, dead_letter_queue = "ciso-assistant-dlq" },
+  { queue = "ciso-assistant-grc-gap-report", max_batch_size = 2, max_retries = 3, dead_letter_queue = "ciso-assistant-dlq" },
+  { queue = "ciso-assistant-grc-ai-enrich", max_batch_size = 2, max_retries = 3, dead_letter_queue = "ciso-assistant-dlq" },
+  { queue = "ciso-assistant-dlq", max_batch_size = 10, max_retries = 5 }
 ]
 
 [env.production]
@@ -56,6 +67,8 @@ name = "ciso-assistant-edge-production"
 workers_dev = false
 
 [env.production.vars]
+SERVICE_DELIVERY_ENABLED = "false"
+SERVICE_DONATION_RETURN_URL = "https://regovise.com/"
 APP_ENV = "production"
 APP_ORIGIN = "https://regovise.com"
 EMAIL_PROVIDER = "mailchannels"
@@ -85,6 +98,7 @@ preview_bucket_name = "ciso-assistant-evidence-preview"
 
 [env.production.durable_objects]
 bindings = [
+  { name = "SERVICE_COORDINATOR", class_name = "DonationServiceCoordinator" },
   { name = "TENANT_WORKFLOW_COORDINATOR", class_name = "TenantWorkflowCoordinator" }
 ]
 
@@ -99,13 +113,14 @@ producers = [
   { binding = "QUEUE_GRC_AI_ENRICH", queue = "ciso-assistant-grc-ai-enrich" }
 ]
 consumers = [
-  { queue = "ciso-assistant-evidence-jobs", max_batch_size = 5, max_retries = 3 },
-  { queue = "ciso-assistant-conmon-jobs", max_batch_size = 5, max_retries = 3 },
-  { queue = "ciso-assistant-grc-content-import", max_batch_size = 2, max_retries = 3 },
-  { queue = "ciso-assistant-grc-scf-refresh", max_batch_size = 2, max_retries = 3 },
-  { queue = "ciso-assistant-grc-finding-ingest", max_batch_size = 5, max_retries = 3 },
-  { queue = "ciso-assistant-grc-gap-report", max_batch_size = 2, max_retries = 3 },
-  { queue = "ciso-assistant-grc-ai-enrich", max_batch_size = 2, max_retries = 3 }
+  { queue = "ciso-assistant-evidence-jobs", max_batch_size = 5, max_retries = 3, dead_letter_queue = "ciso-assistant-dlq" },
+  { queue = "ciso-assistant-conmon-jobs", max_batch_size = 5, max_retries = 3, dead_letter_queue = "ciso-assistant-dlq" },
+  { queue = "ciso-assistant-grc-content-import", max_batch_size = 2, max_retries = 3, dead_letter_queue = "ciso-assistant-dlq" },
+  { queue = "ciso-assistant-grc-scf-refresh", max_batch_size = 2, max_retries = 3, dead_letter_queue = "ciso-assistant-dlq" },
+  { queue = "ciso-assistant-grc-finding-ingest", max_batch_size = 5, max_retries = 3, dead_letter_queue = "ciso-assistant-dlq" },
+  { queue = "ciso-assistant-grc-gap-report", max_batch_size = 2, max_retries = 3, dead_letter_queue = "ciso-assistant-dlq" },
+  { queue = "ciso-assistant-grc-ai-enrich", max_batch_size = 2, max_retries = 3, dead_letter_queue = "ciso-assistant-dlq" },
+  { queue = "ciso-assistant-dlq", max_batch_size = 10, max_retries = 5 }
 ]
 
 [[env.production.routes]]

@@ -2261,7 +2261,7 @@ export async function generateVdrReport(
       id, offering_id, tenant_id, report_month, title, report_markdown, report_json, artifact_version_id,
       status, published_at, publication_state, generation_source, created_by_user_id, created_at, updated_at
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(tenant_id, report_month) DO UPDATE SET
       title = excluded.title,
       report_markdown = excluded.report_markdown,
@@ -5351,6 +5351,12 @@ export async function loadArtifactPayload(
   }
 
   if (input.grantId?.trim() && input.portalToken?.trim()) {
+    const matchingGrant = await env.D1_MAIN.prepare(
+      'SELECT id FROM trust_center_access_grants WHERE id = ? AND offering_id = ? AND tenant_id = ? LIMIT 1',
+    ).bind(input.grantId.trim(), artifact.offering_id, artifact.tenant_id).first<{ id: string }>();
+    if (!matchingGrant) {
+      fedrampError(403, 'artifact_grant_scope_mismatch', 'The portal grant does not authorize this artifact.');
+    }
     await loadPortalTrustCenterView(env, {
       grantId: input.grantId.trim(),
       token: input.portalToken.trim(),
